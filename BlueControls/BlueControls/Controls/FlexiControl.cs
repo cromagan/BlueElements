@@ -30,7 +30,6 @@ using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
@@ -476,8 +475,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-
-                if(_IdleTimer != null) {
+                if (_IdleTimer != null) {
                     _IdleTimer.Tick -= _IdleTimer_Tick;
                     _IdleTimer.Dispose();
                 }
@@ -544,6 +542,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected ComboBox? GetComboBox() {
         foreach (var thisc in Controls) {
             if (thisc is ComboBox cbx) { return cbx; }
+        }
+        return null;
+    }
+
+    protected ListBox? GetListBox() {
+        foreach (var thisc in Controls) {
+            if (thisc is ListBox lb) { return lb; }
         }
         return null;
     }
@@ -720,84 +725,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected void StyleListBox(ListBox control, ColumnItem? column) {
-        control.Enabled = Enabled;
-        control.Item.Clear();
-        control.Item.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column == null || column.IsDisposed) {
-            return;
-        }
-
-        ItemCollectionList.ItemCollectionList item = new(true);
-        if (column.DropdownBearbeitungErlaubt) {
-            ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
-            if (!column.DropdownWerteAndererZellenAnzeigen) {
-                bool again;
-                do {
-                    again = false;
-                    foreach (var thisItem in item) {
-                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
-                            again = true;
-                            item.Remove(thisItem);
-                            break;
-                        }
-                    }
-                } while (again);
-            }
-        }
-
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
-                break;
-        }
-
-        control.FilterAllowed = false;
-        control.MoveAllowed = false;
-        switch (_editType) {
-            //case EditTypeFormula.Gallery:
-            //    control.Appearance = BlueListBoxAppearance.Gallery;
-            //    control.RemoveAllowed = true;
-            //    break;
-
-            case EditTypeFormula.Listbox:
-                control.RemoveAllowed = true;
-                control.Appearance = ListBoxAppearance.Listbox;
-                break;
-        }
-    }
-
-    protected void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
-        control.Enabled = Enabled;
-        control.Item.RemoveAll();
-        control.Item.CheckBehavior = CheckBehavior.NoSelection;
-        if (column == null || column.IsDisposed) { return; }
-        ItemCollectionList.ItemCollectionList item = new(true);
-        ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
-        control.SuggestionsAdd(item);
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
-                break;
-        }
-    }
-
     protected void StyleTextBox(TextBox control) {
         control.Enabled = Enabled;
         control.GetStyleFrom(this);
@@ -942,7 +869,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ListBox control = new() {
             Enabled = Enabled
         };
-        StyleListBox(control, null);
+        control.Item.Clear();
+        control.Item.CheckBehavior = CheckBehavior.MultiSelection;
         StandardBehandlung(control);
         UpdateValueToControl();
         return control;
@@ -954,7 +882,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         SwapListBox control = new() {
             Enabled = Enabled
         };
-        StyleSwapListBox(control, null);
+        control.Item.RemoveAll();
+        control.Item.CheckBehavior = CheckBehavior.NoSelection;
         StandardBehandlung(control);
         UpdateValueToControl();
         return control;

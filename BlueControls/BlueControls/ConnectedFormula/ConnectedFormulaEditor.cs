@@ -145,9 +145,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
         //    isf2.Datenbank_wählen();
         //}
 
-        if (x is IItemAcceptFilter iaf2 && iaf2.Parents.Count == 0) {
-            iaf2.Datenquellen_bearbeiten();
-        }
+        //if (x is IItemAcceptFilter iaf2 && iaf2.Parents.Count == 0) {
+        //    iaf2.Datenquellen_bearbeiten();
+        //}
     }
 
     private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {

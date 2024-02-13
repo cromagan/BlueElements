@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace BlueBasics;
@@ -37,7 +36,7 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
             throw new ArgumentException("Ungültige Eingabeparameter.");
         }
 
-        var BlackIndex = -1;
+        var blackIndex = -1;
 
         // Schleife über alle Zeilen im Bild
         for (var y = 0; y < bitmapData.Height; y++) {
@@ -45,22 +44,19 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
 
             // Schleife über alle Pixel in der aktuellen Zeile
             for (var x = 0; x < bitmapData.Width; x++) {
-                var index = (y * bitmapData.Width + x) * 4; // Index des aktuellen Pixels im bits-Array
+                var index = ((y * bitmapData.Width) + x) * 4; // Index des aktuellen Pixels im bits-Array
 
                 // Überprüfen, ob der aktuelle Pixel dunkel ist
                 if (IsDarkPixel(bits[index], bits[index + 1], bits[index + 2])) {
-
-                    if (darkPixelCountInRow == 0) { BlackIndex = index; }
+                    if (darkPixelCountInRow == 0) { blackIndex = index; }
                     darkPixelCountInRow++; // Inkrementieren des Zählers für dunkle Pixel in der Zeile
-
                 } else {
-
                     // Überprüfen, ob die Anzahl der dunklen Pixel in der Zeile den Faktor erreicht hat
                     if (darkPixelCountInRow > 1) {
                         // Ersetzen des linksten dunklen Pixels durch Weiß
-                        bits[BlackIndex] = 255;         // Blau-Komponente
-                        bits[BlackIndex + 1] = 255;     // Grün-Komponente
-                        bits[BlackIndex + 2] = 255;     // Rot-Komponente
+                        bits[blackIndex] = 255;         // Blau-Komponente
+                        bits[blackIndex + 1] = 255;     // Grün-Komponente
+                        bits[blackIndex + 2] = 255;     // Rot-Komponente
                     }
                     darkPixelCountInRow = 0; // Zurücksetzen des Zählers, wenn ein heller Pixel gefunden wird
                 }
@@ -73,22 +69,19 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
 
             // Schleife über alle Pixel in der aktuellen Spalte
             for (var y = 0; y < bitmapData.Height; y++) {
-                var index = (y * bitmapData.Width + x) * 4; // Index des aktuellen Pixels im bits-Array
+                var index = ((y * bitmapData.Width) + x) * 4; // Index des aktuellen Pixels im bits-Array
 
                 // Überprüfen, ob der aktuelle Pixel dunkel ist
                 if (IsDarkPixel(bits[index], bits[index + 1], bits[index + 2])) {
-
-                    if (darkPixelCountInColumn == 0) { BlackIndex = index;}
+                    if (darkPixelCountInColumn == 0) { blackIndex = index; }
                     darkPixelCountInColumn++; // Inkrementieren des Zählers für dunkle Pixel in der Spalte
-
-
                 } else {
                     // Überprüfen, ob die Anzahl der dunklen Pixel in der Spalte den Faktor erreicht hat
                     if (darkPixelCountInColumn > 1) {
                         // Ersetzen des obersten dunklen Pixels durch Weiß
-                        bits[BlackIndex] = 255;         // Blau-Komponente
-                        bits[BlackIndex + 1] = 255;     // Grün-Komponente
-                        bits[BlackIndex + 2] = 255;     // Rot-Komponente
+                        bits[blackIndex] = 255;         // Blau-Komponente
+                        bits[blackIndex + 1] = 255;     // Grün-Komponente
+                        bits[blackIndex + 2] = 255;     // Rot-Komponente
                     }
                     darkPixelCountInColumn = 0; // Zurücksetzen des Zählers, wenn ein heller Pixel gefunden wird
                 }

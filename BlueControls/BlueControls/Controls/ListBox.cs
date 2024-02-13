@@ -154,7 +154,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         set {
             if (_moveAllowed == value) { return; }
             _moveAllowed = value;
-            ////if (_MoveAllowed) { _FilterAllowed = false; }
             CheckButtons();
         }
     }
@@ -251,7 +250,21 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         #region  tmpDesign
 
         var tmpDesign = Design.ListBox;
-        if (_appearance is not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) { tmpDesign = (Design)_appearance; }
+        if (_appearance is not ListBoxAppearance.Gallery
+                       and not ListBoxAppearance.FileSystem
+                       and not ListBoxAppearance.Listbox_Boxes) { tmpDesign = (Design)_appearance; }
+
+        #endregion
+
+        #region  checkboxDesign
+
+        var checkboxDesign = Design.Undefiniert;
+        if (_appearance == ListBoxAppearance.Listbox_Boxes && Item.CheckBehavior != CheckBehavior.NoSelection) {
+            checkboxDesign = Design.CheckBox_TextStyle;
+            if (Item.CheckBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection) {
+                checkboxDesign = Design.OptionButton_TextStyle;
+            }
+        }
 
         #endregion
 
@@ -291,13 +304,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         _mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
         _ = Parallel.ForEach(Item.ItemOrder, thisItem => {
-            if (thisItem.Pos.IntersectsWith(visArea)) {
-                var vStateItem = tmpState;
-                if (_mouseOverItem == thisItem && Enabled) { vStateItem |= States.Standard_MouseOver; }
-                if (!thisItem.Enabled) { vStateItem = States.Standard_Disabled; }
-                if (thisItem.Checked) { vStateItem |= States.Checked; }
+            // Kopie von thisItem erstellen
+            var currentItem = thisItem;
+            if (currentItem.Pos.IntersectsWith(visArea)) {
+                var itemState = tmpState;
+                if (_mouseOverItem == currentItem && Enabled) { itemState |= States.Standard_MouseOver; }
+                if (!currentItem.Enabled) { itemState = States.Standard_Disabled; }
+                if (currentItem.Checked) { itemState |= States.Checked; }
                 lock (locker) {
-                    thisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, false); // Items müssen beim Erstellen ersetzt werden!!!!
+                    currentItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, itemState, true, FilterTxt.Text, false, checkboxDesign); // Items müssen beim Erstellen ersetzt werden!!!!
                 }
             }
         });

@@ -19,13 +19,11 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 
 #nullable enable
 
@@ -96,88 +94,6 @@ public static class ItemAcceptFilterExtensions {
         if (l.Count == 0) { l.Add(-1); }
 
         return l;
-    }
-
-    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public static void Datenquellen_bearbeiten(this IItemAcceptFilter item) {
-        if (item.Parent is null) { return; }
-
-        Database? outd = null;
-        if (item is IItemSendFilter iiss) {
-            outd = iiss.DatabaseOutput;
-        }
-
-        if (item.DatabaseInputMustMatchOutputDatabase && outd == null) {
-            return;
-        }
-
-        //if (sameDatabase && item.GetFilterFrom.Count > 0) {
-        //    if (item.Parent[item.GetFilterFrom[0]] is IItemSendFilter ir) {
-        //        matchDB = ir.DatabaseOutput;
-        //    }
-        //}
-
-        var x = new ItemCollectionList.ItemCollectionList(false);
-
-        // Die Items, die man noch wählen könnte
-        foreach (var thisR in item.Parent) {
-            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
-                if (!item.Parents.Contains(rfp.KeyName) && item != rfp) {
-                    if (outd == null || outd == rfp.DatabaseOutput) {
-                        _ = x.Add("Hinzu: " + rfp.ReadableText(), "+|" + rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
-                    }
-                }
-            }
-        }
-
-        // Die Items, die entfernt werden können
-        if (item.Parents.Count > 0) {
-            x.AddSeparator();
-
-            foreach (var thisIt in item.Parents) {
-                var name = thisIt;
-                var im = QuickImage.Get(ImageCode.Warnung, 16);
-
-                if (item.Parent[name] is IReadableText ir) {
-                    name = ir.ReadableText();
-                    im = ir.SymbolForReadableText();
-                }
-
-                _ = x.Add("Entf.: " + name, "-|" + thisIt, im, true, "3");
-            }
-        }
-
-        x.AddSeparator();
-        _ = x.Add(ContextMenuCommands.Abbruch);
-
-        var it = InputBoxListBoxStyle.Show("Aktion wählen:", x, AddType.None, true);
-
-        if (it == null || it.Count != 1) {
-            return;
-        }
-
-        var ak = it[0].SplitBy("|");
-        if (ak.Length != 2) { return; }
-
-        if (ak[0] == "+") {
-            var t = item.Parent[ak[1]];
-
-            if (t is IItemSendFilter rfp2) {
-                var l = new List<string>();
-                l.AddRange(item.Parents);
-                l.Add(rfp2.KeyName);
-                l = l.SortedDistinctList();
-                item.Parents = l.AsReadOnly();
-            }
-        }
-
-        if (ak[0] == "-") {
-            var l = new List<string>();
-            l.AddRange(item.Parents);
-            l.Remove(ak[1]);
-            l = l.SortedDistinctList();
-            item.Parents = l.AsReadOnly();
-        }
     }
 
     #endregion
@@ -331,6 +247,8 @@ public sealed class ItemAcceptFilter {
             new FlexiControl("Eingang:", widthOfControl)
         };
 
+        if (item.Parent is null) { return l; }
+
         Database? outp = null;
 
         if (item is IItemSendFilter iiss) {
@@ -340,7 +258,20 @@ public sealed class ItemAcceptFilter {
         if (item.DatabaseInputMustMatchOutputDatabase && outp == null) {
             l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl));
         } else {
-            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
+            //l.Add(new FlexiControlForProperty<>(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
+
+            var x = new ItemCollectionList.ItemCollectionList(false);
+
+            // Die Items, die man noch wählen könnte
+            foreach (var thisR in item.Parent) {
+                if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
+                    if (outp == null || outp == rfp.DatabaseOutput) {
+                        _ = x.Add(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
+                    }
+                }
+            }
+
+            l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 5, x));
         }
 
         return l;

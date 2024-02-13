@@ -198,11 +198,19 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
     /// </summary>
     public void Disable() => Enabled = false;
 
-    public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
-        //if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }
+    public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign) {
         if (itemdesign == Design.Undefiniert) { return; }
         var positionModified = Pos with { X = Pos.X - xModifier, Y = Pos.Y - yModifier };
-        DrawExplicit(gr, positionModified, itemdesign, vState, drawBorderAndBack, translate);
+
+        if (checkboxDesign != Design.Undefiniert) {
+            var design = Skin.DesignOf(checkboxDesign, state);
+            gr.DrawImage(QuickImage.Get(design.Image), positionModified.X, positionModified.Y);
+            positionModified.Offset(18, 0);
+            positionModified.Inflate(-18, 0);
+            if (state.HasFlag(States.Checked)) { state ^= States.Checked; }
+        }
+
+        DrawExplicit(gr, positionModified, itemdesign, state, drawBorderAndBack, translate);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
                 var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen

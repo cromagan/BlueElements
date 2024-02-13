@@ -24,6 +24,8 @@ public enum ListBoxAppearance {
     //   Undefiniert = enDesign.Undefiniert
     Listbox = Design.ListBox,
 
+    Listbox_Boxes = 11002,
+
     DropdownSelectbox = Design.Form_SelectBox_Dropdown,
     Autofilter = Design.Form_AutoFilter,
     KontextMenu = Design.Form_KontextMenu,

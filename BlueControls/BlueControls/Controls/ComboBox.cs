@@ -211,7 +211,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             var r = i.Pos;
             var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Item.ItemDesign).Height) / 2.0);
             i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Item.ItemDesign).Height));
-            i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate);
+            i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
             i.SetCoordinates(r);
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);

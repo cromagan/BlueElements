@@ -860,7 +860,7 @@ public static class Skin {
 
     #region Methods
 
-    public static ImageCodeEffect AdditionalState(States vState) => vState.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;
+    public static ImageCodeEffect AdditionalState(States state) => state.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;
 
     public static List<string>? AllStyles() {
         if (StyleDb == null) { InitStyles(); }
@@ -1124,11 +1124,12 @@ public static class Skin {
     /// <param name="gr"></param>
     /// <param name="txt"></param>
     /// <param name="qi"></param>
+    /// <param name="design"></param>
     /// <param name="align"></param>
     /// <param name="fitInRect"></param>
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
-
+    /// <param name="translate"></param>
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, SkinDesign design, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
@@ -1147,7 +1148,7 @@ public static class Skin {
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
     /// <param name="bFont"></param>
-
+    /// <param name="translate"></param>
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
         var pSize = SizeF.Empty;
         var tSize = SizeF.Empty;

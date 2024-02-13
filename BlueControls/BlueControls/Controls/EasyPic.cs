@@ -243,19 +243,19 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    protected override void DrawControl(Graphics gr, States vState) {
+    protected override void DrawControl(Graphics gr, States state) {
         HandleChangesNow();
 
-        if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
-        if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
+        if (state.HasFlag(States.Standard_MouseOver)) { state ^= States.Standard_MouseOver; }
+        if (state.HasFlag(States.Standard_MousePressed)) { state ^= States.Standard_MousePressed; }
 
-        Skin.Draw_Back(gr, Design.EasyPic, vState, DisplayRectangle, this, true);
+        Skin.Draw_Back(gr, Design.EasyPic, state, DisplayRectangle, this, true);
 
         if (_bitmap != null) {
             gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
         }
 
-        Skin.Draw_Border(gr, Design.EasyPic, vState, DisplayRectangle);
+        Skin.Draw_Border(gr, Design.EasyPic, state, DisplayRectangle);
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {

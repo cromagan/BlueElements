@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq.Expressions;
 using System.Windows.Forms;
@@ -69,7 +70,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     public FlexiControlForProperty() : this(null, 1, null) { }
 
-    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list) : base() {
+    /// <summary>
+    /// Je nach Datentyp eine andere Anzeige
+    /// </summary>
+    public FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -95,6 +99,18 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     Size = new Size(s1.Width + 30, 22);
                     break;
                 }
+
+            case Accessor<List<string>>:
+            case Accessor<ReadOnlyCollection<string>>: {
+                    CaptionPosition = CaptionPosition.Über_dem_Feld;
+                    EditType = EditTypeFormula.Listbox;
+                    Size = new Size(200, 16 + (24 * rowCount));
+                    var lb = CreateSubControls() as ListBox;
+                    StyleListBox(lb, list);
+
+                    break;
+                }
+
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
             {
                     if (list != null) {
@@ -188,6 +204,67 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnValueChanged();
     }
 
+    protected void StyleListBox(ListBox? control, ItemCollectionList.ItemCollectionList? list) {
+        if (control == null) { return; }
+
+        control.Enabled = Enabled;
+
+        //EditType = EditTypeFormula.Listbox;
+        //var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
+        //lb.Item.AddClonesFrom(list);
+
+        //control.Item.Clear();
+        //control.Item.CheckBehavior = CheckBehavior.MultiSelection;
+        //if (column == null || column.IsDisposed) { return; }
+
+        //ItemCollectionList.ItemCollectionList item = new(true);
+        //if (column.DropdownBearbeitungErlaubt) {
+        //    ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        //    if (!column.DropdownWerteAndererZellenAnzeigen) {
+        //        bool again;
+        //        do {
+        //            again = false;
+        //            foreach (var thisItem in item) {
+        //                if (!column.DropDownItems.Contains(thisItem.KeyName)) {
+        //                    again = true;
+        //                    item.Remove(thisItem);
+        //                    break;
+        //                }
+        //            }
+        //        } while (again);
+        //    }
+        //}
+
+        //switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+        //    case EditTypeTable.Textfeld:
+        //        control.AddAllowed = AddType.Text;
+        //        break;
+
+        //    case EditTypeTable.Listbox:
+        //        control.AddAllowed = AddType.OnlySuggests;
+        //        break;
+
+        //    default:
+        //        control.AddAllowed = AddType.None;
+        //        break;
+        //}
+
+        //control.FilterAllowed = false;
+        //control.MoveAllowed = false;
+        //switch (EditType) {
+        //    //case EditTypeFormula.Gallery:
+        //    //    control.Appearance = BlueListBoxAppearance.Gallery;
+        //    //    control.RemoveAllowed = true;
+        //    //    break;
+
+        //    case EditTypeFormula.Listbox:
+        //        control.RemoveAllowed = true;
+        //        control.Appearance = ListBoxAppearance.Listbox;
+        //        break;
+        //}
+    }
+
     private bool CheckEnabledState() {
         if (DesignMode) {
             DisabledReason = string.Empty;
@@ -230,6 +307,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
         switch (_accessor) {
             case Accessor<string> al:
                 if (al.Get() != Value) { al.Set(Value); }
+                break;
+
+            case Accessor<ReadOnlyCollection<string>> roc:
+                var listnewro = Value.SplitAndCutByCrToList().AsReadOnly();
+                if (listnewro.IsDifferentTo(roc.Get())) { roc.Set(listnewro); }
                 break;
 
             case Accessor<List<string>> ls:
@@ -313,6 +395,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
             case string s:
                 ValueSet(s, true, false);
+                break;
+
+            case ReadOnlyCollection<string> roc:
+                ValueSet(roc.JoinWithCr(), true, false);
                 break;
 
             case List<string> ls:

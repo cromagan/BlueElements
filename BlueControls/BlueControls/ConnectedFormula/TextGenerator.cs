@@ -160,7 +160,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States vState) {
+    protected override void DrawControl(Graphics gr, States state) {
         HandleChangesNow();
         //if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         //if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
@@ -172,7 +172,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
         ////}
 
         //Skin.Draw_Border(gr, Design.EasyPic, vState, DisplayRectangle);
-        base.DrawControl(gr, vState);
+        base.DrawControl(gr, state);
     }
 
     private void GenerateColumns() {

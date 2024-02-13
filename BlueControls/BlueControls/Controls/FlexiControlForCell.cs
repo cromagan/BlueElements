@@ -47,7 +47,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private string _columnName = string.Empty;
 
     private FilterCollection? _filterInput;
-    private Database? _lastDB;
+    private Database? _lastDb;
 
     #endregion
 
@@ -190,7 +190,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (this.Database() is Database db && db != _lastDB && !db.IsDisposed) {
+        if (this.Database() is Database db && db != _lastDb && !db.IsDisposed) {
             db.Cell.CellValueChanged -= Database_CellValueChanged;
             db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
             db.Row.RowChecked -= Database_RowChecked;
@@ -206,8 +206,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         RowsInputChangedHandled = true;
         this.DoRows();
 
-        if (this.Database() is Database db2 && _lastDB != db2 && !db2.IsDisposed) {
-            _lastDB = db2;
+        if (this.Database() is Database db2 && _lastDb != db2 && !db2.IsDisposed) {
+            _lastDb = db2;
             db2.Cell.CellValueChanged += Database_CellValueChanged;
             db2.Column.ColumnInternalChanged += Column_ItemInternalChanged;
             db2.Row.RowChecked += Database_RowChecked;
@@ -390,6 +390,82 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     protected override void RemoveAll() {
         FillCellNow();
         base.RemoveAll();
+    }
+
+    protected void StyleListBox(ListBox control, ColumnItem? column) {
+        control.Enabled = Enabled;
+        control.Item.Clear();
+        control.Item.CheckBehavior = CheckBehavior.MultiSelection;
+        if (column == null || column.IsDisposed) { return; }
+
+        ItemCollectionList.ItemCollectionList item = new(true);
+        if (column.DropdownBearbeitungErlaubt) {
+            ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+            if (!column.DropdownWerteAndererZellenAnzeigen) {
+                bool again;
+                do {
+                    again = false;
+                    foreach (var thisItem in item) {
+                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
+                            again = true;
+                            item.Remove(thisItem);
+                            break;
+                        }
+                    }
+                } while (again);
+            }
+        }
+
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
+        }
+
+        control.FilterAllowed = false;
+        control.MoveAllowed = false;
+        switch (EditType) {
+            //case EditTypeFormula.Gallery:
+            //    control.Appearance = BlueListBoxAppearance.Gallery;
+            //    control.RemoveAllowed = true;
+            //    break;
+
+            case EditTypeFormula.Listbox:
+                control.RemoveAllowed = true;
+                control.Appearance = ListBoxAppearance.Listbox;
+                break;
+        }
+    }
+
+    protected void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
+        control.Enabled = Enabled;
+        control.Item.RemoveAll();
+        control.Item.CheckBehavior = CheckBehavior.NoSelection;
+        if (column == null || column.IsDisposed) { return; }
+        ItemCollectionList.ItemCollectionList item = new(true);
+        ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        control.SuggestionsAdd(item);
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
+        }
     }
 
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {

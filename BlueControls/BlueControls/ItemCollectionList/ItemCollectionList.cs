@@ -814,7 +814,13 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         }
     }
 
-    internal void SetValuesTo(List<string> values) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="values"></param>
+    /// <param name="checkmode"></param>
+
+    internal void SetValuesTo(List<string> values, bool checkmode) {
         var ist = this.ToListOfString();
         var zuviel = ist.Except(values).ToList();
         var zuwenig = values.Except(ist).ToList();
