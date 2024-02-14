@@ -125,10 +125,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
 
         PermissionGroups_NewRow.Suggestions.Clear();
-        PermissionGroups_NewRow.Suggestions.AddRange(db.Permission_AllUsed(false));
+        PermissionGroups_NewRow.Item.AddRange(db.Permission_AllUsed(false));
 
         DatenbankAdmin.Suggestions.Clear();
-        DatenbankAdmin.Suggestions.AddRange(db.Permission_AllUsed(false));
+        DatenbankAdmin.Item.AddRange(db.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(db.Column, false);

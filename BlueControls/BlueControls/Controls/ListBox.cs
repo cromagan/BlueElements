@@ -49,7 +49,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private bool _autosort = true;
     private CheckBehavior _checkBehavior;
     private List<string> _checked = [];
-    private string _filterText;
+    private string _filterText = string.Empty;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
     private AbstractListItem? _mouseOverItem;
@@ -671,10 +671,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = Item[thisit];
-            if (it == null) { it = Item.Add(thisit); }
+            var it = Item[thisit] ?? Item.Add(thisit);
 
-            if (it != null && it.IsClickable()) {
+            if (it.IsClickable()) {
                 newList.Add(thisit);
             }
         }

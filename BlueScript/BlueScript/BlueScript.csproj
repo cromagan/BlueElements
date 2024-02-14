@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="EventArgs\ButtonArgs.cs" />
     <Compile Include="Interfaces\IUsableForButton.cs" />
+    <Compile Include="Methods\Method_Execute.cs" />
     <Compile Include="Methods\Method_MaxDate.cs" />
     <Compile Include="Methods\Method_Ping.cs" />
     <Compile Include="Methods\Method_SaveText.cs" />

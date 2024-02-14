@@ -706,10 +706,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // lbxCellEditor
             // 
             this.lbxCellEditor.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.lbxCellEditor.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             this.lbxCellEditor.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.lbxCellEditor.FilterText = null;
             this.lbxCellEditor.Location = new System.Drawing.Point(576, 48);
             this.lbxCellEditor.Name = "lbxCellEditor";
-            this.lbxCellEditor.RemoveAllowed = true;
             this.lbxCellEditor.Size = new System.Drawing.Size(328, 272);
             this.lbxCellEditor.TabIndex = 26;
             // 
@@ -1492,6 +1493,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tblFilterliste.Arrangement = "";
+            this.tblFilterliste.FilterInputChangedHandled = false;
             this.tblFilterliste.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Gewähle_Zeile;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";

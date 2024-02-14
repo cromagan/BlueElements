@@ -320,7 +320,8 @@ internal sealed partial class ColumnEditor {
             _ = cbxEinheit.Item.Add("St.", ImageCode.Eins);
         }
         lbxCellEditor.Suggestions.Clear();
-        lbxCellEditor.Suggestions.AddRange(_column.Database?.Permission_AllUsed(true));
+
+        lbxCellEditor.Item.AddRange(_column.Database?.Permission_AllUsed(true));
         if (_table?.CurrentArrangement != null) {
             butAktuellZurueck.Enabled = _table.CurrentArrangement[_column]?.PreviewsVisible() != null;
             butAktuellVor.Enabled = _table.CurrentArrangement[_column]?.NextVisible() != null;
@@ -381,7 +382,7 @@ internal sealed partial class ColumnEditor {
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
         txbRegex.Text = _column.Regex;
         txbTags.Text = _column.Tags.JoinWithCr();
-        lbxCellEditor.Item.Clear();
+        lbxCellEditor.UncheckAll();
         lbxCellEditor.Check(_column.PermissionGroupsChangeCell);
         txbAllowedChars.Text = _column.AllowedChars;
         txbMaxTextLenght.Text = _column.MaxTextLenght.ToString();

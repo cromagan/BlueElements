@@ -107,12 +107,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
             this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.PermissionGroups_NewRow.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.PermissionGroups_NewRow.FilterText = null;
             this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             this.PermissionGroups_NewRow.RemoveAllowed = true;
             this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 352);
             this.PermissionGroups_NewRow.TabIndex = 4;
+            this.PermissionGroups_NewRow.Translate = false;
             // 
             // capNeueZeilenInfo
             // 
@@ -138,12 +141,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.DatenbankAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
             this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.DatenbankAdmin.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.DatenbankAdmin.FilterText = null;
             this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
             this.DatenbankAdmin.Name = "DatenbankAdmin";
-            this.DatenbankAdmin.RemoveAllowed = true;
             this.DatenbankAdmin.Size = new System.Drawing.Size(176, 434);
             this.DatenbankAdmin.TabIndex = 4;
+            this.DatenbankAdmin.Translate = false;
             // 
             // capNeueZeilen
             // 
@@ -188,6 +193,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
             this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.lbxSortierSpalten.FilterText = null;
             this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
             this.lbxSortierSpalten.MoveAllowed = true;
             this.lbxSortierSpalten.Name = "lbxSortierSpalten";
@@ -486,7 +492,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tblUndo
             // 
+            this.tblUndo.Arrangement = "";
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tblUndo.FilterInputChangedHandled = false;
             this.tblUndo.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Gewähle_Zeile;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
