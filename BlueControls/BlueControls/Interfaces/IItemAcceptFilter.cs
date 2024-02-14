@@ -271,7 +271,28 @@ public sealed class ItemAcceptFilter {
                 }
             }
 
-            l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 5, x));
+            switch (item.AllowedInputFilter) {
+                case AllowedInputFilter.One:
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.AlwaysSingleSelection));
+                    break;
+
+                case AllowedInputFilter.More:
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection));
+                    break;
+
+                case AllowedInputFilter.More | AllowedInputFilter.None:
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection));
+                    break;
+
+                case AllowedInputFilter.One | AllowedInputFilter.None:
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.SingleSelection));
+                    break;
+
+                default:
+
+                    //case AllowedInputFilter.None:
+                    break;
+            }
         }
 
         return l;

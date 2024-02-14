@@ -53,27 +53,27 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, 1, list) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, 1, list, CheckBehavior.MultiSelection) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, CheckBehavior.MultiSelection) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, CheckBehavior.MultiSelection) { }
 
-    public FlexiControlForProperty() : this(null, 1, null) { }
+    public FlexiControlForProperty() : this(null, 1, null, CheckBehavior.MultiSelection) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -106,7 +106,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
                     var lb = CreateSubControls() as ListBox;
-                    StyleListBox(lb, list);
+                    StyleListBox(lb, list, checkBehavior);
 
                     break;
                 }
@@ -204,7 +204,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnValueChanged();
     }
 
-    protected void StyleListBox(ListBox? control, ItemCollectionList.ItemCollectionList? list) {
+    protected void StyleListBox(ListBox? control, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior) {
         if (control == null) { return; }
 
         control.Enabled = Enabled;
@@ -212,7 +212,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         //EditType = EditTypeFormula.Listbox;
         //var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
-        control.CheckBehavior = CheckBehavior.MultiSelection;
+        control.CheckBehavior = checkBehavior;
         control.Appearance = ListBoxAppearance.Listbox_Boxes;
         control.Item.AddClonesFrom(list);
         control.AddAllowed = AddType.None;

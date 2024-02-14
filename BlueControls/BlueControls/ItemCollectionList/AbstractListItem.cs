@@ -177,9 +177,9 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
         if (checkboxDesign != Design.Undefiniert) {
             var design = Skin.DesignOf(checkboxDesign, state);
-            gr.DrawImage(QuickImage.Get(design.Image), positionModified.X, positionModified.Y);
-            positionModified.Offset(18, 0);
-            positionModified.Inflate(-18, 0);
+            gr.DrawImage(QuickImage.Get(design.Image, 12), positionModified.X + 4, positionModified.Y + 3);
+            positionModified.X += 20;
+            positionModified.Width -= 20;
             if (state.HasFlag(States.Checked)) { state ^= States.Checked; }
         }
 

@@ -415,6 +415,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 } while (again);
             }
         }
+        control.Item.AddClonesFrom(item);
 
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:

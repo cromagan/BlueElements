@@ -572,8 +572,8 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     public void Swap(int index1, int index2) {
         if (index1 == index2) { return; }
-        var l = ItemOrder.ToList();
-        (l[index1], l[index2]) = (l[index2], l[index1]);
+        //var l = ItemOrder.ToList();
+        (this[index1], this[index2]) = (this[index2], this[index1]);
         _maxNeededItemSize = Size.Empty;
         _itemOrder = null;
         OnChanged();

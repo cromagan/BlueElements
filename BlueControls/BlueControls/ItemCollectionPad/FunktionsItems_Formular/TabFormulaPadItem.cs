@@ -399,16 +399,16 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         if (CFormula?.PadData != null) {
             foreach (var thisf in CFormula.PadData.AllPages()) {
                 if (!CFormula.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-                    _ = childs.Suggestions.Add(thisf, ImageCode.Formel);
+                    _ = childs.Suggestions.Add(thisf, ImageCode.Register);
                 }
             }
         }
 
         foreach (var thisf in _childs) {
             if (File.Exists(thisf)) {
-                childs.AddAndCheck(new TextListItem(thisf, thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
+                childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
             } else {
-                childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Formel, 16), false, true, string.Empty));
+                childs.AddAndCheck(new TextListItem(thisf, thisf, QuickImage.Get(ImageCode.Register, 16), false, true, string.Empty));
             }
         }
 

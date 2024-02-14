@@ -87,9 +87,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         base.OnFormClosing(e);
 
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        Database = null;
 
         WriteInfosBack();
+        Database = null;
     }
 
     protected override void OnLoad(System.EventArgs e) {

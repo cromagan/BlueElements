@@ -29,107 +29,111 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.SliderY = new  Slider();
-            this.Down = new  Button();
-            this.Up = new  Button();
-            this.Plus = new  Button();
-            this.Minus = new  Button();
-            this.FilterTxt = new  TextBox();
-            this.FilterCap = new  Caption();
+            this.SliderY = new BlueControls.Controls.Slider();
+            this.btnDown = new BlueControls.Controls.Button();
+            this.btnUp = new BlueControls.Controls.Button();
+            this.btnPlus = new BlueControls.Controls.Button();
+            this.btnMinus = new BlueControls.Controls.Button();
+            this.txbFilter = new BlueControls.Controls.TextBox();
+            this.capFilter = new BlueControls.Controls.Caption();
             this.SuspendLayout();
             // 
             // SliderY
             // 
-            this.SliderY.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom)
-                                                   | AnchorStyles.Right)));
-            this.SliderY.Location = new Point(159, 0);
+            this.SliderY.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SliderY.CausesValidation = false;
+            this.SliderY.Location = new System.Drawing.Point(159, 0);
             this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = Orientation.Senkrecht;
-            this.SliderY.Size = new Size(18, 144);
+            this.SliderY.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
+            this.SliderY.Size = new System.Drawing.Size(18, 144);
             this.SliderY.Visible = false;
-            this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChange);
+            this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChange);
             // 
-            // Down
+            // btnDown
             // 
-            this.Down.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.Down.ImageCode = "Pfeil_Unten|16";
-            this.Down.Location = new Point(24, 144);
-            this.Down.Name = "Down";
-            this.Down.Size = new Size(24, 24);
-            this.Down.TabIndex = 51;
-            this.Down.Click += new EventHandler(this.Down_Click);
+            this.btnDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDown.ImageCode = "Pfeil_Unten|16";
+            this.btnDown.Location = new System.Drawing.Point(24, 144);
+            this.btnDown.Name = "btnDown";
+            this.btnDown.Size = new System.Drawing.Size(24, 24);
+            this.btnDown.TabIndex = 51;
+            this.btnDown.Visible = false;
+            this.btnDown.Click += new System.EventHandler(this.btnDown_Click);
             // 
-            // Up
+            // btnUp
             // 
-            this.Up.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.Up.ImageCode = "Pfeil_Oben|16";
-            this.Up.Location = new Point(0, 144);
-            this.Up.Name = "Up";
-            this.Up.Size = new Size(24, 24);
-            this.Up.TabIndex = 50;
-            this.Up.Click += new EventHandler(this.Up_Click);
+            this.btnUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUp.ImageCode = "Pfeil_Oben|16";
+            this.btnUp.Location = new System.Drawing.Point(0, 144);
+            this.btnUp.Name = "btnUp";
+            this.btnUp.Size = new System.Drawing.Size(24, 24);
+            this.btnUp.TabIndex = 50;
+            this.btnUp.Visible = false;
+            this.btnUp.Click += new System.EventHandler(this.btnUp_Click);
             // 
-            // Plus
+            // btnPlus
             // 
-            this.Plus.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
-            this.Plus.ImageCode = "PlusZeichen|16";
-            this.Plus.Location = new Point(152, 144);
-            this.Plus.Name = "Plus";
-            this.Plus.Size = new Size(24, 24);
-            this.Plus.TabIndex = 48;
-            this.Plus.Click += new EventHandler(this.Plus_Click);
+            this.btnPlus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPlus.ImageCode = "PlusZeichen|16";
+            this.btnPlus.Location = new System.Drawing.Point(152, 144);
+            this.btnPlus.Name = "btnPlus";
+            this.btnPlus.Size = new System.Drawing.Size(24, 24);
+            this.btnPlus.TabIndex = 48;
+            this.btnPlus.Click += new System.EventHandler(this.btnPlus_Click);
             // 
-            // Minus
+            // btnMinus
             // 
-            this.Minus.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
-            this.Minus.ImageCode = "MinusZeichen|16";
-            this.Minus.Location = new Point(128, 144);
-            this.Minus.Name = "Minus";
-            this.Minus.Size = new Size(24, 24);
-            this.Minus.TabIndex = 47;
-            this.Minus.Click += new EventHandler(this.Minus_Click);
+            this.btnMinus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinus.ImageCode = "MinusZeichen|16";
+            this.btnMinus.Location = new System.Drawing.Point(128, 144);
+            this.btnMinus.Name = "btnMinus";
+            this.btnMinus.Size = new System.Drawing.Size(24, 24);
+            this.btnMinus.TabIndex = 47;
+            this.btnMinus.Visible = false;
+            this.btnMinus.Click += new System.EventHandler(this.btnMinus_Click);
             // 
-            // FilterTxt
+            // txbFilter
             // 
-            this.FilterTxt.Anchor = ((AnchorStyles)(((AnchorStyles.Bottom | AnchorStyles.Left)
-                                                     | AnchorStyles.Right)));
-            this.FilterTxt.Cursor = Cursors.IBeam;
-            this.FilterTxt.Location = new Point(40, 144);
-            this.FilterTxt.Name = "FilterTxt";
-            this.FilterTxt.Size = new Size(80, 24);
-            this.FilterTxt.TabIndex = 52;
-            this.FilterTxt.Visible = false;
-            this.FilterTxt.TextChanged += new EventHandler(this.FilterTxt_TextChanged);
+            this.txbFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbFilter.Location = new System.Drawing.Point(40, 144);
+            this.txbFilter.Name = "txbFilter";
+            this.txbFilter.Size = new System.Drawing.Size(80, 24);
+            this.txbFilter.TabIndex = 52;
+            this.txbFilter.Visible = false;
+            this.txbFilter.TextChanged += new System.EventHandler(this.txtFilter_TextChanged);
             // 
-            // FilterCap
+            // capFilter
             // 
-            this.FilterCap.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.FilterCap.CausesValidation = false;
-            this.FilterCap.Location = new Point(0, 144);
-            this.FilterCap.Name = "FilterCap";
-            this.FilterCap.Size = new Size(40, 24);
-            this.FilterCap.Text = "Filter:";
-            this.FilterCap.Visible = false;
+            this.capFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capFilter.CausesValidation = false;
+            this.capFilter.Location = new System.Drawing.Point(0, 144);
+            this.capFilter.Name = "capFilter";
+            this.capFilter.Size = new System.Drawing.Size(40, 24);
+            this.capFilter.Text = "Filter:";
+            this.capFilter.Visible = false;
             // 
             // ListBox
             // 
-            this.Controls.Add(this.FilterCap);
-            this.Controls.Add(this.FilterTxt);
-            this.Controls.Add(this.Plus);
-            this.Controls.Add(this.Minus);
-            this.Controls.Add(this.Down);
-            this.Controls.Add(this.Up);
+            this.Controls.Add(this.capFilter);
+            this.Controls.Add(this.txbFilter);
+            this.Controls.Add(this.btnPlus);
+            this.Controls.Add(this.btnMinus);
+            this.Controls.Add(this.btnDown);
+            this.Controls.Add(this.btnUp);
             this.Controls.Add(this.SliderY);
-            this.Name = "ListBox";
-            this.Size = new Size(177, 168);
+            this.Size = new System.Drawing.Size(177, 168);
             this.ResumeLayout(false);
+
         }
-        private Button Down;
-        private Button Up;
-        private Button Plus;
-        private Button Minus;
+        private Button btnDown;
+        private Button btnUp;
+        private Button btnPlus;
+        private Button btnMinus;
         private Slider SliderY;
-        internal TextBox FilterTxt;
-        internal Caption FilterCap;
+        internal TextBox txbFilter;
+        internal Caption capFilter;
     }
 }

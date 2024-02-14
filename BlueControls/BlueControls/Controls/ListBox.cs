@@ -167,7 +167,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         set {
             if (_removeAllowed == value) { return; }
             _removeAllowed = value;
-            CheckButtons();
+            Invalidate();
         }
     }
 
@@ -255,7 +255,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         _ = base.Focus();
     }
 
-    public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
+    public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || SliderY.Focused() || capFilter.Focused || txbFilter.Focused;
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
@@ -322,43 +322,21 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-
-        #region  tmpDesign
-
-        var tmpDesign = Design.ListBox;
-        if (_appearance is not ListBoxAppearance.Gallery
-                       and not ListBoxAppearance.FileSystem
-                       and not ListBoxAppearance.Listbox_Boxes) { tmpDesign = (Design)_appearance; }
-
-        #endregion
-
-        #region  checkboxDesign
+        var tmpDesign = _appearance is ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.Listbox_Boxes
+            ? Design.ListBox
+            : (Design)_appearance;
 
         var checkboxDesign = Design.Undefiniert;
         if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected) {
-            checkboxDesign = Design.CheckBox_TextStyle;
-            if (_checkBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection) {
-                checkboxDesign = Design.OptionButton_TextStyle;
-            }
+            checkboxDesign = _checkBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection
+                ? Design.OptionButton_TextStyle
+                : Design.CheckBox_TextStyle;
         }
 
-        #endregion
-
-        #region tmpState
-
         var tmpState = state;
-        if (tmpState.HasFlag(States.Standard_MouseOver)) { tmpState ^= States.Standard_MouseOver; }
-        if (tmpState.HasFlag(States.Standard_MousePressed)) { tmpState ^= States.Standard_MousePressed; }
-        if (tmpState.HasFlag(States.Standard_HasFocus)) { tmpState ^= States.Standard_HasFocus; }
+        tmpState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
 
-        #endregion
-
-        #region tmpbuttonleisteHeight
-
-        var tmpbuttonleisteHeight = 0;
-        if (ButtonsVisible()) { tmpbuttonleisteHeight = Plus.Height; }
-
-        #endregion
+        var tmpButtonLeisteHeight = ButtonsVisible() ? btnPlus.Height : 0;
 
         if (Item.Count == 0) {
             SliderY.Visible = false;
@@ -366,37 +344,42 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = Item.ItemData();
-        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - tmpbuttonleisteHeight), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
+        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height - tmpButtonLeisteHeight), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
 
-        var tmpsliderWidth = 0;
-        if (SliderY.Visible) { tmpsliderWidth = SliderY.Width; }
+        var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
 
-        var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top,
-           DisplayRectangle.Width - tmpsliderWidth, DisplayRectangle.Height - tmpbuttonleisteHeight);
-        var visArea = borderCoords with { Y = (int)(borderCoords.Y + SliderY.Value) };
+        var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - tmpSliderWidth, DisplayRectangle.Height - tmpButtonLeisteHeight);
+        var visArea = borderCoords with { Y = borderCoords.Y + (int)SliderY.Value };
+
         if (borderCoords.Height > 0) {
             Skin.Draw_Back(gr, tmpDesign, tmpState, borderCoords, this, true);
         }
-        _mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
+
+        //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
-        _ = Parallel.ForEach(Item.ItemOrder, thisItem => {
-            // Kopie von thisItem erstellen
+
+        Parallel.ForEach(Item.ItemOrder, thisItem => {
             var currentItem = thisItem;
             if (currentItem.Pos.IntersectsWith(visArea)) {
                 var itemState = tmpState;
                 if (_mouseOverItem == currentItem && Enabled) { itemState |= States.Standard_MouseOver; }
+
                 if (!currentItem.Enabled) { itemState = States.Standard_Disabled; }
                 if (IsChecked(currentItem)) { itemState |= States.Checked; }
+
                 lock (locker) {
-                    currentItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, itemState, true, FilterTxt.Text, false, checkboxDesign); // Items müssen beim Erstellen ersetzt werden!!!!
+                    currentItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, itemState, true, txbFilter.Text, false, checkboxDesign);
                 }
             }
         });
-        if (borderCoords.Height > 0) {
-            // Kann sein, wenn PaintModY größer als die Höhe ist
-            if (tmpDesign == Design.ListBox) { Skin.Draw_Border(gr, tmpDesign, tmpState, borderCoords); }
+
+        if (borderCoords.Height > 0 && tmpDesign == Design.ListBox) {
+            Skin.Draw_Border(gr, tmpDesign, tmpState, borderCoords);
         }
-        if (tmpbuttonleisteHeight > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, tmpbuttonleisteHeight), this); }
+
+        if (tmpButtonLeisteHeight > 0) {
+            Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, tmpButtonLeisteHeight), this);
+        }
     }
 
     protected override void OnDoubleClick(System.EventArgs e) {
@@ -414,20 +397,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        if (_mouseOverItem != null) {
-            _mouseOverItem = null;
-            Invalidate();
-        }
+
+        DoMouseMovement();
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
-        var nd = MouseOverNode(MousePos().X, MousePos().Y);
-        if (nd != _mouseOverItem) {
-            _mouseOverItem = nd;
-            Invalidate();
-            DoQuickInfo();
-        }
+        DoMouseMovement();
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
@@ -444,7 +420,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                                       ListBoxAppearance.Gallery or
                                       ListBoxAppearance.FileSystem) {
                         if (nd.IsClickable()) {
-                            ChangeCheck(nd);
+                            if (CheckBehavior != CheckBehavior.AllSelected) {
+                                ChangeCheck(nd);
+                            }
                         }
                     }
                     OnItemClicked(new AbstractListItemEventArgs(nd));
@@ -465,13 +443,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnParentEnabledChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
-        Down.Invalidate();
-        Up.Invalidate();
-        Minus.Invalidate();
-        Plus.Invalidate();
+        btnDown.Invalidate();
+        btnUp.Invalidate();
+        btnMinus.Invalidate();
+        btnPlus.Invalidate();
         SliderY.Invalidate();
-        FilterCap.Invalidate();
-        FilterTxt.Invalidate();
+        capFilter.Invalidate();
+        txbFilter.Invalidate();
+        DoMouseMovement();
         CheckButtons();
         base.OnEnabledChanged(e);
     }
@@ -481,80 +460,27 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         base.OnVisibleChanged(e);
     }
 
-    private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
-
-    private void ChangeCheck(AbstractListItem ne) {
-        if (IsChecked(ne)) {
-            UnCheck(ne);
-        } else {
-            Check(ne);
-        }
-    }
-
-    private void CheckButtons() {
-        if (!Visible) { return; }
-        if (Parent == null) { return; }
-        var nr = Checked;
-        Down.Visible = _moveAllowed;
-        Up.Visible = _moveAllowed;
-        Plus.Visible = _addAlloweds != AddType.None;
-        Minus.Visible = _removeAllowed;
-        FilterTxt.Visible = _filterAllowed;
-        FilterCap.Visible = _filterAllowed;
-        FilterCap.Left = _moveAllowed && _filterAllowed ? Down.Right : 0;
-        FilterTxt.Left = FilterCap.Right;
-        FilterTxt.Width = Minus.Left - FilterTxt.Left;
-        if (_removeAllowed) {
-            Minus.Enabled = nr.Count != 0;
-        }
-        if (_moveAllowed) {
-            if (nr.Count != 1) {
-                Up.Enabled = false;
-                Down.Enabled = false;
-            } else {
-                Up.Enabled = Item[0].KeyName != nr[0];
-                Down.Enabled = Item[Item.Count - 1].KeyName != nr[0];
-            }
-        }
-    }
-
-    private void Down_Click(object sender, System.EventArgs e) {
+    private void btnDown_Click(object sender, System.EventArgs e) {
         var ln = -1;
         for (var z = Item.ItemOrder.Count - 1; z >= 0; z--) {
-            if (Checked.Contains(Item[z].KeyName)) {
+            if (Item[z] == _mouseOverItem) {
                 if (ln < 0) { return; }// Befehl verwerfen...
                 Item.Swap(ln, z);
-                CheckButtons();
+                Refresh(); // Um die Item-Positionen neu zu berechnen
+                ValidateCheckStates(Item.ItemOrder.ToListOfString(), string.Empty);
+                DoMouseMovement();
                 return;
             }
             ln = z;
         }
     }
 
-    private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
-
-    private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
-
-    private bool IsChecked(string name) => _checked.Contains(name);
-
-    private void Item_Changed(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
+    private void btnMinus_Click(object sender, System.EventArgs e) {
+        if (_mouseOverItem == null) { return; }
+        UnCheck(_mouseOverItem);
     }
 
-    private void Minus_Click(object sender, System.EventArgs e) => UnCheck(Checked.ToList());
-
-    private AbstractListItem? MouseOverNode(int x, int y) => ButtonsVisible() && y >= Height - Plus.Height ? null : Item[x, (int)(y + SliderY.Value)];
-
-    private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
-    private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
-
-    private void Plus_Click(object sender, System.EventArgs e) {
+    private void btnPlus_Click(object sender, System.EventArgs e) {
         OnAddClicked();
         switch (_addAlloweds) {
             case AddType.UserDef:
@@ -578,23 +504,143 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         CheckButtons();
     }
 
-    private void SliderY_ValueChange(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-    }
-
-    private void Up_Click(object sender, System.EventArgs e) {
+    private void btnUp_Click(object sender, System.EventArgs e) {
         AbstractListItem? ln = null;
         foreach (var thisItem in Item.ItemOrder) {
-            if (IsChecked(thisItem)) {
+            if (thisItem == _mouseOverItem) {
                 if (ln == null) { return; }// Befehl verwerfen...
                 Item.Swap(Item.IndexOf(ln), Item.IndexOf(thisItem));
-                CheckButtons();
+                Refresh(); // Um die Item-Positionen neu zu berechnen
+                ValidateCheckStates(Item.ItemOrder.ToListOfString(), string.Empty);
+                DoMouseMovement();
                 return;
             }
             ln = thisItem;
         }
     }
+
+    private bool ButtonsVisible() => btnPlus.Visible || txbFilter.Visible;
+
+    private void ChangeCheck(AbstractListItem ne) {
+        if (IsChecked(ne)) {
+            UnCheck(ne);
+        } else {
+            Check(ne);
+        }
+    }
+
+    private void CheckButtons() {
+        if (!Visible) { return; }
+        if (Parent == null) { return; }
+        var nr = Checked;
+        btnPlus.Visible = _addAlloweds != AddType.None;
+        txbFilter.Visible = _filterAllowed;
+        capFilter.Visible = _filterAllowed;
+        capFilter.Left = _moveAllowed && _filterAllowed ? btnDown.Right : 0;
+        txbFilter.Left = capFilter.Right;
+        txbFilter.Width = btnMinus.Left - txbFilter.Left;
+    }
+
+    private void DoMouseMovement() {
+        if (IsDisposed) { return; }
+
+        var nd = MouseOverNode(MousePos().X, MousePos().Y);
+        if (!Enabled) { nd = null; }
+
+        if (nd == _mouseOverItem) { return; }
+        _mouseOverItem = nd;
+
+        if (_mouseOverItem != null && _checkBehavior == CheckBehavior.AllSelected) {
+            var pos = _mouseOverItem.Pos.Right;
+
+            #region down-Button
+
+            //btnUp.Enabled = Item[0].KeyName != nr[0];
+            //btnDown.Enabled = Item[Item.Count - 1].KeyName != nr[0];
+
+            if (_moveAllowed && !Item.AutoSort && Item.Count > 1) {
+                btnDown.Width = 16;
+                btnDown.Height = 16;
+                pos -= btnDown.Width;
+                btnDown.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnDown.Left = pos;
+                btnDown.Visible = true;
+                btnDown.Enabled = Item[Item.Count -1] != _mouseOverItem; 
+            } else {
+                btnDown.Visible = false;
+            }
+
+            #endregion
+
+            #region Up-Button
+
+            if (_moveAllowed && !Item.AutoSort && Item.Count > 1) {
+                btnUp.Width = 16;
+                btnUp.Height = 16;
+                pos -= btnUp.Width;
+                btnUp.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnUp.Left = pos;
+                btnUp.Visible = true;
+                btnUp.Enabled = Item[0] != _mouseOverItem;
+            } else {
+                btnUp.Visible = false;
+            }
+
+            #endregion
+
+            #region Löschen-Button
+
+            if (_removeAllowed) {
+                btnMinus.Width = 16;
+                btnMinus.Height = 16;
+                pos -= btnMinus.Width;
+                btnMinus.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnMinus.Left = pos;
+                btnMinus.Visible = true;
+                btnMinus.Enabled = true;
+            } else {
+                btnMinus.Visible = false;
+            }
+
+            #endregion
+        } else {
+            btnMinus.Visible = false;
+            btnUp.Visible = false;
+            btnDown.Visible = false;
+        }
+
+        Invalidate();
+        DoQuickInfo();
+        Invalidate();
+    }
+
+    private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
+
+    private bool IsChecked(string name) => _checked.Contains(name);
+
+    private void Item_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
+    }
+
+    private AbstractListItem? MouseOverNode(int x, int y) => ButtonsVisible() && y >= Height - btnPlus.Height ? null : Item[x, (int)(y + SliderY.Value)];
+
+    private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
+
+    private void SliderY_ValueChange(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        _mouseOverItem = null; // Damit die Buttons neu berechnet werden.
+        DoMouseMovement();
+        Invalidate();
+    }
+
+    private void txtFilter_TextChanged(object sender, System.EventArgs e) => Invalidate();
 
     private void ValidateCheckStates(List<string> newCheckedItems, string lastaddeditem) {
         newCheckedItems = newCheckedItems.SortedDistinctList();
@@ -642,6 +688,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         foreach (var thisit in newCheckedItems) {
             var it = Item[thisit];
+            if (it == null) { it = Item.Add(thisit); }
+
             if (it != null && it.IsClickable()) {
                 newList.Add(thisit);
             }
