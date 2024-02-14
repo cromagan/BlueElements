@@ -34,8 +34,6 @@ namespace BlueControls.Controls
             this.btnUp = new BlueControls.Controls.Button();
             this.btnPlus = new BlueControls.Controls.Button();
             this.btnMinus = new BlueControls.Controls.Button();
-            this.txbFilter = new BlueControls.Controls.TextBox();
-            this.capFilter = new BlueControls.Controls.Caption();
             this.SuspendLayout();
             // 
             // SliderY
@@ -53,7 +51,7 @@ namespace BlueControls.Controls
             // btnDown
             // 
             this.btnDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDown.ImageCode = "Pfeil_Unten|16";
+            this.btnDown.ImageCode = "Pfeil_Unten_Scrollbar|8";
             this.btnDown.Location = new System.Drawing.Point(24, 144);
             this.btnDown.Name = "btnDown";
             this.btnDown.Size = new System.Drawing.Size(24, 24);
@@ -64,7 +62,7 @@ namespace BlueControls.Controls
             // btnUp
             // 
             this.btnUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnUp.ImageCode = "Pfeil_Oben|16";
+            this.btnUp.ImageCode = "Pfeil_Oben_Scrollbar|8";
             this.btnUp.Location = new System.Drawing.Point(0, 144);
             this.btnUp.Name = "btnUp";
             this.btnUp.Size = new System.Drawing.Size(24, 24);
@@ -75,17 +73,20 @@ namespace BlueControls.Controls
             // btnPlus
             // 
             this.btnPlus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPlus.ImageCode = "PlusZeichen|16";
+            this.btnPlus.ImageCode = "PlusZeichen|14";
             this.btnPlus.Location = new System.Drawing.Point(152, 144);
             this.btnPlus.Name = "btnPlus";
-            this.btnPlus.Size = new System.Drawing.Size(24, 24);
+            this.btnPlus.Size = new System.Drawing.Size(64, 24);
+            this.btnPlus.Text = "hinzu";
             this.btnPlus.TabIndex = 48;
+            this.btnPlus.Visible = false;
+            this.btnPlus.QuickInfo = "Neuen Eintrag hinzufügen";
             this.btnPlus.Click += new System.EventHandler(this.btnPlus_Click);
             // 
             // btnMinus
             // 
             this.btnMinus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinus.ImageCode = "MinusZeichen|16";
+            this.btnMinus.ImageCode = "MinusZeichen|14";
             this.btnMinus.Location = new System.Drawing.Point(128, 144);
             this.btnMinus.Name = "btnMinus";
             this.btnMinus.Size = new System.Drawing.Size(24, 24);
@@ -93,32 +94,8 @@ namespace BlueControls.Controls
             this.btnMinus.Visible = false;
             this.btnMinus.Click += new System.EventHandler(this.btnMinus_Click);
             // 
-            // txbFilter
-            // 
-            this.txbFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFilter.Location = new System.Drawing.Point(40, 144);
-            this.txbFilter.Name = "txbFilter";
-            this.txbFilter.Size = new System.Drawing.Size(80, 24);
-            this.txbFilter.TabIndex = 52;
-            this.txbFilter.Visible = false;
-            this.txbFilter.TextChanged += new System.EventHandler(this.txtFilter_TextChanged);
-            // 
-            // capFilter
-            // 
-            this.capFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capFilter.CausesValidation = false;
-            this.capFilter.Location = new System.Drawing.Point(0, 144);
-            this.capFilter.Name = "capFilter";
-            this.capFilter.Size = new System.Drawing.Size(40, 24);
-            this.capFilter.Text = "Filter:";
-            this.capFilter.Visible = false;
-            // 
             // ListBox
             // 
-            this.Controls.Add(this.capFilter);
-            this.Controls.Add(this.txbFilter);
             this.Controls.Add(this.btnPlus);
             this.Controls.Add(this.btnMinus);
             this.Controls.Add(this.btnDown);
@@ -133,7 +110,5 @@ namespace BlueControls.Controls
         private Button btnPlus;
         private Button btnMinus;
         private Slider SliderY;
-        internal TextBox txbFilter;
-        internal Caption capFilter;
     }
 }

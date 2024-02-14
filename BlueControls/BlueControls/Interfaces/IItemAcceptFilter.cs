@@ -244,7 +244,7 @@ public sealed class ItemAcceptFilter {
 
     internal List<GenericControl> GetStyleOptions(IItemAcceptFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
-            new FlexiControl("Eingang:", widthOfControl)
+            new FlexiControl("Eingang:", widthOfControl, true)
         };
 
         if (item.Parent is null) { return l; }
@@ -256,7 +256,7 @@ public sealed class ItemAcceptFilter {
         }
 
         if (item.DatabaseInputMustMatchOutputDatabase && outp == null) {
-            l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl));
+            l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl, false));
         } else {
             //l.Add(new FlexiControlForProperty<>(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
 

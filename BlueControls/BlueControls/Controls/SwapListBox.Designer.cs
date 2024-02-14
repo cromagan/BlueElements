@@ -74,7 +74,6 @@ namespace BlueControls.Controls {
             this.Suggest.AutoSort = true;
             this.Suggest.CheckBehavior = CheckBehavior.AllSelected;
             this.Suggest.Dock = DockStyle.Fill;
-            this.Suggest.FilterAllowed = true;
             this.Suggest.Location = new Point(0, 0);
             this.Suggest.Name = "Suggest";
             this.Suggest.Size = new Size(345, 252);

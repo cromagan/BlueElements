@@ -155,7 +155,7 @@ public sealed class ItemSendSomething {
 
     public List<GenericControl> GetStyleOptions(IItemSendFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
-            new FlexiControl("Ausgang:", widthOfControl)
+            new FlexiControl("Ausgang:", widthOfControl, true)
         };
 
         if (item.DatabaseOutput is not Database db || db.IsDisposed) {

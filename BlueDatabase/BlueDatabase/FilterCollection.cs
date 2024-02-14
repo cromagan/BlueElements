@@ -166,7 +166,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Add(FilterItem fi) {
         if (IsDisposed) { return; }
 
-        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {
+            fi.FilterType = FilterType.AlwaysFalse;
+            //Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!");
+        }
         if (!fi.IsOk()) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
 
         OnChanging();
@@ -194,7 +197,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
+    //public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
 
     public void ChangeTo(FilterItem? fi) {
         if (fi != null && fi.Database == _database && _internal.Count == 1 && Exists(fi)) { return; }
@@ -484,7 +487,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
         }
 
-        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {
+            fi.FilterType = FilterType.AlwaysFalse;
+        }
 
         if (fi.Parent != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelte Filterverwendung!"); }
         fi.Parent = this;

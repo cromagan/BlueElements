@@ -34,7 +34,6 @@ namespace BlueControls {
             // 
             this.lstCommands.AddAllowed = BlueControls.Enums.AddType.None;
             this.lstCommands.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lstCommands.FilterAllowed = true;
             this.lstCommands.Location = new System.Drawing.Point(0, 0);
             this.lstCommands.Name = "lstCommands";
             this.lstCommands.Size = new System.Drawing.Size(272, 450);

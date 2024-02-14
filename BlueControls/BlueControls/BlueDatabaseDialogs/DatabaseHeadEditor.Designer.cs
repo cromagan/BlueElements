@@ -108,7 +108,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.PermissionGroups_NewRow.FilterAllowed = true;
             this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             this.PermissionGroups_NewRow.RemoveAllowed = true;
@@ -140,7 +139,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.DatenbankAdmin.FilterAllowed = true;
             this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
             this.DatenbankAdmin.Name = "DatenbankAdmin";
             this.DatenbankAdmin.RemoveAllowed = true;

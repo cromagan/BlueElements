@@ -707,7 +707,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.lbxCellEditor.AddAllowed = BlueControls.Enums.AddType.Text;
             this.lbxCellEditor.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.lbxCellEditor.FilterAllowed = true;
             this.lbxCellEditor.Location = new System.Drawing.Point(576, 48);
             this.lbxCellEditor.Name = "lbxCellEditor";
             this.lbxCellEditor.RemoveAllowed = true;

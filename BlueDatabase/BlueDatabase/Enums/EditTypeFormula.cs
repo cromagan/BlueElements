@@ -50,6 +50,8 @@ public enum EditTypeFormula {
     //tmpOptionButtonsPic = 21,
     nur_als_Text_anzeigen = 22,
 
+    als_Überschrift_anzeigen = 23,
+
     ////ListBoxForRelation = 24,
     //Listbox_3_Zeilen = 25,
     Listbox = 26,

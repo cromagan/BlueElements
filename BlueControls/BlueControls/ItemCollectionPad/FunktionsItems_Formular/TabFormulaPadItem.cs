@@ -244,7 +244,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         List<GenericControl> l =
         [
             .. _itemAccepts.GetStyleOptions(this, widthOfControl),
-            new FlexiControl("Formulare:", -1),
+            new FlexiControl("Formulare:", -1, false),
             Childs(),
             new FlexiControl(),
             .. base.GetStyleOptions(widthOfControl),

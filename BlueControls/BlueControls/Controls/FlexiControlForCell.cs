@@ -431,7 +431,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 break;
         }
 
-        control.FilterAllowed = false;
         control.MoveAllowed = false;
         switch (EditType) {
             //case EditTypeFormula.Gallery:

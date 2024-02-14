@@ -481,7 +481,6 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstExported.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
-            this.lstExported.FilterAllowed = true;
             this.lstExported.Location = new System.Drawing.Point(8, 40);
             this.lstExported.Name = "lstExported";
             this.lstExported.Size = new System.Drawing.Size(847, 593);

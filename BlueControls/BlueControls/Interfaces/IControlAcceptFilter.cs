@@ -139,7 +139,11 @@ public static class ControlAcceptFilterExtension {
 
         item.FilterInput = item.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
-        if (item.FilterInput != null && item.FilterInput.Database == null) { Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler"); }
+        if (item.FilterInput != null && item.FilterInput.Database == null) {
+            item.FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
+                item.FilterInput.Add(new FilterItem(mustbeDatabase,string.Empty ));
+            //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler"); 
+        }
     }
 
     /// <summary>
@@ -202,7 +206,12 @@ public static class ControlAcceptFilterExtension {
                 }
 
                 fc ??= new FilterCollection(fi.Database, "filterofsender");
-                fc.AddIfNotExists(fi);
+
+                foreach (var thifi in fi) {
+                    if (thifi.Clone() is FilterItem fic) {
+                        fc.AddIfNotExists(fic);
+                    }
+                }
             }
         }
 

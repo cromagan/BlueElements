@@ -113,9 +113,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     /// <param name="captionText"></param>
     /// <param name="width"></param>
-    public FlexiControl(string captionText, int width) : base(false, false) {
+    public FlexiControl(string captionText, int width, bool isCaption) : base(false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _editType = EditTypeFormula.nur_als_Text_anzeigen;
+
+        if (isCaption) {
+            _editType = EditTypeFormula.als_Überschrift_anzeigen;
+        } else {
+            _editType = EditTypeFormula.nur_als_Text_anzeigen;
+        }
+
         _caption = captionText;
         _captionPosition = CaptionPosition.Links_neben_dem_Feld;
 
