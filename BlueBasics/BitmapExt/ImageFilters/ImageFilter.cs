@@ -32,7 +32,7 @@ public abstract class ImageFilter : IHasKeyName {
 
     #region Methods
 
-    public abstract void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias);
+    public abstract void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias);
 
     #endregion
 }

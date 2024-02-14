@@ -102,7 +102,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
                 hotItem,
                 control
             ];
-            var contextMenu = Show(thisContextMenu, CheckBehavior.AllSelected, null, infos, (Control)control, translate);
+            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, infos, (Control)control, translate);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         } else {
             if (par != null) {

@@ -25,8 +25,6 @@ public class ReadableListItem : TextListItem {
 
     #region Constructors
 
-    public ReadableListItem(IReadableTextWithKey item) : this(item, false, true, string.Empty) { }
-
     public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, userDefCompareKey) {
         Item = item;
 

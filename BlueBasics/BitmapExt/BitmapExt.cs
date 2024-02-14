@@ -92,7 +92,9 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public int Height { get; private set; }
+
     public bool IsDisposed { get; private set; }
+
     public int Width { get; private set; }
 
     #endregion
@@ -238,6 +240,15 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return bitmap;
     }
 
+    public static Color GetPixel(BitmapData bitmapData, byte[] bits, int x, int y) {
+        int index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+        byte b = bits[index];
+        byte g = bits[index + 1];
+        byte r = bits[index + 2];
+        byte a = bits[index + 3];
+        return Color.FromArgb(a, r, g, b);
+    }
+
     public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
         try {
             if (sourceBmp == null || !sourceBmp.IsValid()) { return null; }
@@ -349,6 +360,14 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return target;
     }
 
+    public static void SetPixel(BitmapData bitmapData, byte[] bits, int x, int y, Color color) {
+        int index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+        bits[index] = color.B;
+        bits[index + 1] = color.G;
+        bits[index + 2] = color.R;
+        bits[index + 3] = color.A;
+    }
+
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
         // Open a Stream and decode a TIFF image
         FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -399,7 +418,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         var f = ImageFilters.Get(name);
         if (f == null) { return false; }
 
-        f.ProcessFilter(_bitmapData, ref _bits, factor, 0);
+        f.ProcessFilter(_bitmapData, _bits, factor, 0);
 
         return true;
     }

@@ -39,5 +39,10 @@ public enum CheckBehavior {
     /// <summary>
     /// Es muss genau ein Eintrag gewählt sein. Sozusagen -kein- Cancel erlaubt.
     /// </summary>
-    AlwaysSingleSelection = 3
+    AlwaysSingleSelection = 3,
+
+    /// <summary>
+    /// Es können keine Einträge gewählt werden. Es können nur Werte angeklickt werden.
+    /// </summary>
+    NoSelection = 4
 }

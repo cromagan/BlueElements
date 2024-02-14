@@ -601,10 +601,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         switch (_checkBehavior) {
             case CheckBehavior.AllSelected:
-
                 SetValuesTo(newCheckedItems);
-
                 newCheckedItems = Item.ToListOfString();
+                break;
+
+            case CheckBehavior.NoSelection:
+                newCheckedItems.Clear();
                 break;
 
             case CheckBehavior.MultiSelection:
@@ -626,10 +628,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
 
                 if (newCheckedItems.Count == 0) {
-                    var it = Item.FirstOrDefault(thisp => thisp != null && !thisp.IsClickable());
+                    var it = Item.FirstOrDefault(thisp => thisp != null && thisp.IsClickable());
                     if (it != null) { newCheckedItems.Add(it.KeyName); }
                 }
-
                 break;
 
             default:

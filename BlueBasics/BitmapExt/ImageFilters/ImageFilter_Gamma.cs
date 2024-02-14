@@ -30,7 +30,7 @@ internal class ImageFilter_Gamma : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Stellen Sie sicher, dass der Gamma-Wert gültig ist
         factor = Math.Max(factor, 0.001f);
 

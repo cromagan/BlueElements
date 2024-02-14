@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace BlueBasics;
@@ -30,76 +31,49 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Überprüfen der Eingabeparameter
-        if (bits == null || bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || factor <= 0) {
-            throw new ArgumentException("Ungültige Eingabeparameter.");
-        }
+        if (bits == null || bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || factor <= 0) { return; }
 
-        var blackIndex = -1;
+        var staerke = (int)factor;
 
-        // Schleife über alle Zeilen im Bild
-        for (var y = 0; y < bitmapData.Height; y++) {
-            var darkPixelCountInRow = 0; // Zähler für dunkle Pixel in einer Zeile
-
-            // Schleife über alle Pixel in der aktuellen Zeile
-            for (var x = 0; x < bitmapData.Width; x++) {
-                var index = ((y * bitmapData.Width) + x) * 4; // Index des aktuellen Pixels im bits-Array
-
-                // Überprüfen, ob der aktuelle Pixel dunkel ist
-                if (IsDarkPixel(bits[index], bits[index + 1], bits[index + 2])) {
-                    if (darkPixelCountInRow == 0) { blackIndex = index; }
-                    darkPixelCountInRow++; // Inkrementieren des Zählers für dunkle Pixel in der Zeile
-                } else {
-                    // Überprüfen, ob die Anzahl der dunklen Pixel in der Zeile den Faktor erreicht hat
-                    if (darkPixelCountInRow > 1) {
-                        // Ersetzen des linksten dunklen Pixels durch Weiß
-                        bits[blackIndex] = 255;         // Blau-Komponente
-                        bits[blackIndex + 1] = 255;     // Grün-Komponente
-                        bits[blackIndex + 2] = 255;     // Rot-Komponente
+        for (var x = 0; x < bitmapData.Width - 1; x++) {
+            for (var y = 0; y < bitmapData.Height - 1; y++) {
+                if (!IsWhite(x, y)) {
+                    for (var wi = staerke; wi > 0; wi--) {
+                        var ma1 = (int)Math.Floor((float)wi / 2);
+                        var ma2 = wi - ma1;
+                        // X
+                        if (IsWhite(x - ma1 - 1, y) && IsWhite(x + ma2 + 1, y)) {
+                            var allblack = true;
+                            for (var ch = -ma1; ch <= ma2; ch++) {
+                                if (IsWhite(x + ch, y)) { allblack = false; break; }
+                            }
+                            if (allblack) {
+                                for (var ch = -ma1; ch <= ma2; ch++) {
+                                    if (ch != 0) { BitmapExt.SetPixel(bitmapData, bits, x + ch, y, Color.White); }
+                                }
+                            }
+                        }
+                        // Y
+                        if (IsWhite(x, y - ma1 - 1) && IsWhite(x, y + ma2 + 1)) {
+                            var allblack = true;
+                            for (var ch = -ma1; ch <= ma2; ch++) {
+                                if (IsWhite(x, y + ch)) { allblack = false; break; }
+                            }
+                            if (allblack) {
+                                for (var ch = -ma1; ch <= ma2; ch++) {
+                                    if (ch != 0) { BitmapExt.SetPixel(bitmapData, bits, x, y + ch, Color.White); }
+                                }
+                            }
+                        }
                     }
-                    darkPixelCountInRow = 0; // Zurücksetzen des Zählers, wenn ein heller Pixel gefunden wird
                 }
             }
         }
 
-        // Schleife über alle Spalten im Bild
-        for (var x = 0; x < bitmapData.Width; x++) {
-            var darkPixelCountInColumn = 0; // Zähler für dunkle Pixel in einer Spalte
-
-            // Schleife über alle Pixel in der aktuellen Spalte
-            for (var y = 0; y < bitmapData.Height; y++) {
-                var index = ((y * bitmapData.Width) + x) * 4; // Index des aktuellen Pixels im bits-Array
-
-                // Überprüfen, ob der aktuelle Pixel dunkel ist
-                if (IsDarkPixel(bits[index], bits[index + 1], bits[index + 2])) {
-                    if (darkPixelCountInColumn == 0) { blackIndex = index; }
-                    darkPixelCountInColumn++; // Inkrementieren des Zählers für dunkle Pixel in der Spalte
-                } else {
-                    // Überprüfen, ob die Anzahl der dunklen Pixel in der Spalte den Faktor erreicht hat
-                    if (darkPixelCountInColumn > 1) {
-                        // Ersetzen des obersten dunklen Pixels durch Weiß
-                        bits[blackIndex] = 255;         // Blau-Komponente
-                        bits[blackIndex + 1] = 255;     // Grün-Komponente
-                        bits[blackIndex + 2] = 255;     // Rot-Komponente
-                    }
-                    darkPixelCountInColumn = 0; // Zurücksetzen des Zählers, wenn ein heller Pixel gefunden wird
-                }
-            }
-        }
-    }
-
-    // Hilfsmethode zur Überprüfung, ob ein Pixel dunkel ist
-    private bool IsDarkPixel(byte b, byte g, byte r) {
-        // Hier können Sie die Kriterien anpassen, um festzustellen, ob ein Pixel dunkel ist
-        // Zum Beispiel könnten Sie die Helligkeit des Pixels überprüfen
-        // Eine einfache Möglichkeit ist die Überprüfung, ob alle Kanäle unter einem bestimmten Schwellenwert liegen
-        var threshold = 50; // Schwellenwert für die Dunkelheit
-
-        return (r < threshold && g < threshold && b < threshold);
+        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= bitmapData.Width || y >= bitmapData.Height || BitmapExt.GetPixel(bitmapData, bits, x, y).IsNearWhite(0.9);
     }
 
     #endregion
-
-    // Hilfsmethode zur Überprüfung, ob ein Pixel nahe Weiß ist
 }

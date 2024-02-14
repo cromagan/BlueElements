@@ -383,11 +383,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstEventScripts.CheckBehavior = BlueControls.Enums.CheckBehavior.AlwaysSingleSelection;
             this.lstEventScripts.FilterAllowed = true;
-            this.lstEventScripts.Location = new System.Drawing.Point(8, 24);
+            this.lstEventScripts.Location = new System.Drawing.Point(8, 16);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
-            this.lstEventScripts.Size = new System.Drawing.Size(222, 586);
+            this.lstEventScripts.Size = new System.Drawing.Size(222, 594);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
             this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);

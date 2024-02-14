@@ -30,7 +30,7 @@ internal class ImageFilter_Brightness : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
         factor = Math.Max(factor, 0.001f); // Stellen Sie sicher, dass die Helligkeit nicht 0 ist
 
         // Schleife über alle Pixel im Bild

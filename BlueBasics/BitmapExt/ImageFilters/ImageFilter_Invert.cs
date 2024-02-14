@@ -29,7 +29,7 @@ internal class ImageFilter_Invert : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Schleife über alle Pixel im Bild
         unsafe {
             for (var i = 0; i < bits.Length; i += 4) {

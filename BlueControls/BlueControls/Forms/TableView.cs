@@ -1122,9 +1122,8 @@ public partial class TableView : FormWithStatusBar {
         var ok = true;
         foreach (var thisColumnItem in db.Column) {
             if (!thisColumnItem.IsOk()) {
-                var d = new TextListItem("Spalte ' " + thisColumnItem.KeyName + " ' reparieren", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
+                var d = lstAufgaben.Item.Add("Spalte ' " + thisColumnItem.KeyName + " ' reparieren", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
                 d.Enabled = db.IsAdministrator();
-                lstAufgaben.AddAndCheck(d);
                 ok = false;
             }
             if (!ok) {
@@ -1134,24 +1133,22 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (!string.IsNullOrEmpty(db.EventScriptErrorMessage) || !string.IsNullOrEmpty(db.CheckScriptError())) {
-            var d = new TextListItem("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
+            var d = lstAufgaben.Item.Add("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
-            lstAufgaben.AddAndCheck(d);
             lstAufgaben.Enabled = true;
             return;
         }
 
         if (!db.IsRowScriptPossible(false)) {
-            var d = new TextListItem("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
+            var d = lstAufgaben.Item.Add("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
             d.Enabled = db.IsAdministrator();
-            lstAufgaben.AddAndCheck(d);
             lstAufgaben.Enabled = true;
             return;
         }
 
         foreach (var thiss in db.EventScript) {
             if (thiss != null && thiss.ManualExecutable) {
-                var d = new ReadableListItem(thiss);
+                var d = lstAufgaben.Item.Add(thiss);
                 d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
 
                 if (d.Enabled && thiss.NeedRow && !db.IsRowScriptPossible(true)) {
@@ -1159,21 +1156,17 @@ public partial class TableView : FormWithStatusBar {
                 }
 
                 //d.QuickInfo = thiss.QuickInfo;
-                lstAufgaben.AddAndCheck(d);
             }
         }
 
         if (db.HasPrepareFormulaCheckScript()) {
-            var d = new TextListItem("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt);
-            lstAufgaben.AddAndCheck(d);
+            _ = lstAufgaben.Item.Add("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt);
         }
 
         if (db.IsAdministrator()) {
-            var d = new TextListItem("Skripte bearbeiten", "#editscript", ImageCode.Skript);
+            var d = lstAufgaben.Item.Add("Skripte bearbeiten", "#editscript", ImageCode.Skript);
             d.Enabled = db.IsAdministrator();
-            lstAufgaben.AddAndCheck(d);
             lstAufgaben.Enabled = true;
-
             return;
         }
 
