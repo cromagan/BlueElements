@@ -452,6 +452,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             case EditTypeFormula.None:
                 break;
 
+            case EditTypeFormula.als_Überschrift_anzeigen:
+                _captionPosition = CaptionPosition.ohne;
+                Control_Create_GroupBox();
+                break;
+
             case EditTypeFormula.nur_als_Text_anzeigen:
                 _captionPosition = CaptionPosition.Links_neben_dem_Feld;
                 Control_Create_Caption();
@@ -573,6 +578,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 textBox.LostFocus += TextEditControl_LostFocus;
                 break;
 
+            case GroupBox:
             case Caption _:
             case Line:
                 break;
@@ -628,6 +634,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 textBox.LostFocus -= TextEditControl_LostFocus;
                 break;
 
+            case GroupBox:
             case Caption _:
             case Line:
                 break;
@@ -849,6 +856,20 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private ComboBox Control_Create_ComboBox() {
         ComboBox control = new();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
+        StandardBehandlung(control);
+        UpdateValueToControl();
+        return control;
+    }
+
+    /// <summary>
+    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
+    /// </summary>
+    private GroupBox Control_Create_GroupBox() {
+        GroupBox control = new() {
+            Enabled = Enabled,
+            GroupBoxStyle = GroupBoxStyle.NormalBold,
+            Text = _caption
+        };
         StandardBehandlung(control);
         UpdateValueToControl();
         return control;
@@ -1142,6 +1163,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                     UpdateValueTo_Caption();
                     break;
 
+                case GroupBox:
                 case Line:
                     //if (!string.IsNullOrEmpty(Value)) {
                     //    Develop.DebugPrint(FehlerArt.Fehler, "Line kann keine Value erhalten: '" + Value + "'");

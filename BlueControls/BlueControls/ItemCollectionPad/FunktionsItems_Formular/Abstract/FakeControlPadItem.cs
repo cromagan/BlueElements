@@ -111,7 +111,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         List<GenericControl> l = [];
 
         if (Bei_Export_sichtbar) {
-            new FlexiControl("Sichtbarkeit:", widthOfControl, true);
+            l.Add(new FlexiControl("Sichtbarkeit:", widthOfControl, true));
             l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 

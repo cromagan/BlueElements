@@ -108,6 +108,13 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                         Rectangle topTxt = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
                         Skin.Draw_FormatedText(e.Graphics, base.Text, Design.GroupBoxBold, state, null, Alignment.Top_Left, topTxt, this, false, true);
                     }
+                } else {
+                    var d = Skin.DesignOf(Design.GroupBoxBold, state);
+                    e.Graphics.Clear(d.BorderColor1);
+                    if (!string.IsNullOrEmpty(Text)) {
+                        Rectangle topTxt = new(Skin.Padding, 0, Width, Height);
+                        Skin.Draw_FormatedText(e.Graphics, base.Text, Design.GroupBoxBold, state, null, Alignment.VerticalCenter_Left, topTxt, this, false, true);
+                    }
                 }
                 break;
             //if (Height > 33) {

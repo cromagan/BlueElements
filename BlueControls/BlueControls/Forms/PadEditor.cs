@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
@@ -171,12 +172,15 @@ public partial class PadEditor : PadEditorReadOnly {
 
         //Rückwärts inserten
 
-        flexis.Insert(0, new FlexiControl()); // Trennlinie
+        //flexis.Insert(0, new FlexiControl()); // Trennlinie
         if (bpi is IErrorCheckable iec && !iec.IsOk()) {
-            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
-        }
-        flexis.Insert(0, new FlexiControl(bpi.Description, stdWidth, false)); // Beschreibung
+            flexis.Insert(0, new FlexiControl("Achtung!", stdWidth, true));
 
+  flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
+        }
+
+        flexis.Insert(0, new FlexiControl(bpi.Description, stdWidth, false)); // Beschreibung
+        flexis.Insert(0, new FlexiControl("Beschreibung:", stdWidth, true));
         #region  SideMenu erstellen
 
         var top = Skin.Padding;
