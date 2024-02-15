@@ -25,6 +25,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using static BlueDatabase.Database;
 
 namespace BlueControls.Interfaces;
@@ -58,23 +59,6 @@ public interface IItemSendFilter : IChangedFeedback, IReadableTextWithChangingAn
 public static class ItemSendSomethingExtension {
 
     #region Methods
-
-    public static void Datenbank_wählen(this IItemSendFilter item) {
-        var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen: ", string.Empty);
-        if (db == null) { return; }
-        if (db == item.DatabaseOutput) { return; }
-
-        item.DatabaseOutput = db;
-
-        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase) {
-            ias.Parents = new List<string>().AsReadOnly();
-        }
-    }
-
-    public static void Datenbankkopf(this IItemSendFilter item) {
-        if (item.DatabaseOutput is not Database db || db.IsDisposed) { return; }
-        TableView.OpenDatabaseHeadEditor(db);
-    }
 
     public static void DoChilds(this IItemSendFilter item) {
         //if (_childIds == null) { return; }
@@ -158,14 +142,15 @@ public sealed class ItemSendSomething {
             new FlexiControl("Ausgang:", widthOfControl, true)
         };
 
-        if (item.DatabaseOutput is not Database db || db.IsDisposed) {
-            l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
-            return l;
+        var ld = Database.AllAvailableTables(string.Empty);
+
+        var ld2 = new ItemCollectionList.ItemCollectionList(true);
+
+        foreach (var thisd in ld) {
+            _ = ld2.Add(thisd);
         }
 
-        l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank ändern (gewählt: " + db.Caption + ")", ImageCode.Datenbank));
-
-        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank-Kopf von '" + db.Caption + "'", ImageCode.Stift));
+        l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, ld2));
 
         return l;
     }

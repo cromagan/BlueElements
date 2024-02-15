@@ -58,6 +58,12 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     #region Constructors
 
+    public ItemCollectionList(List<IReadableTextWithKey> items) : this(true) {
+        foreach (var thisd in items) {
+            _ = Add(thisd);
+        }
+    }
+
     public ItemCollectionList(bool autosort) : this(ListBoxAppearance.Listbox, autosort) { }
 
     public ItemCollectionList(ListBoxAppearance design, bool autosort) : base() {
@@ -71,6 +77,8 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         _autoSort = autosort;
         GetDesigns();
     }
+
+    public ItemCollectionList(bool autosort, List<AbstractListItem> abstractListItems) : this(autosort) => AddRange(abstractListItems);
 
     #endregion
 

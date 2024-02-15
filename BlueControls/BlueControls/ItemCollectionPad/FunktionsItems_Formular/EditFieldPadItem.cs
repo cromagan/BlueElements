@@ -218,9 +218,10 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         u.AddRange(typeof(CaptionPosition));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
         l.Add(new FlexiControlForProperty<bool>(() => AutoX));
-        var b = new ItemCollectionList.ItemCollectionList(false);
-        b.AddRange(GetAllowedEditTypes(Column));
+
+        var b = new ItemCollectionList.ItemCollectionList(false, GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+
         //l.Add(new FlexiControl());
         //l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
         //l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
