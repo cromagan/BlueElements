@@ -362,7 +362,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 if (_mouseOverItem == currentItem && Enabled) { itemState |= States.Standard_MouseOver; }
 
                 if (!currentItem.Enabled) { itemState = States.Standard_Disabled; }
-                if (IsChecked(currentItem)) { itemState |= States.Checked; }
+
+                if (CheckBehavior != CheckBehavior.AllSelected && IsChecked(currentItem)) { itemState |= States.Checked; }
 
                 lock (locker) {
                     currentItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, itemState, true, _filterText, false, checkboxDesign);

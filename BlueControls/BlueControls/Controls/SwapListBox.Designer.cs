@@ -84,6 +84,8 @@ namespace BlueControls.Controls {
             // 
             // txbFilter
             // 
+            this.txbFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbFilter.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbFilter.Location = new System.Drawing.Point(0, 0);
             this.txbFilter.Name = "txbFilter";
@@ -95,8 +97,10 @@ namespace BlueControls.Controls {
             // Suggest
             // 
             this.Suggest.AddAllowed = BlueControls.Enums.AddType.None;
+            this.Suggest.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Suggest.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
-            this.Suggest.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.Suggest.Location = new System.Drawing.Point(0, 24);
             this.Suggest.Name = "Suggest";
             this.Suggest.Size = new System.Drawing.Size(345, 228);

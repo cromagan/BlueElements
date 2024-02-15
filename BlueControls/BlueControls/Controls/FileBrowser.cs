@@ -26,6 +26,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -48,11 +49,11 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 {
     #region Fields
 
+    private string _directory = string.Empty;
     private FilterCollection? _filterInput;
     private string _lastcheck = string.Empty;
 
     private string _originalText = string.Empty;
-
     private string _sort = "Name";
 
     private string _todel = string.Empty;
@@ -83,10 +84,31 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     public bool DeleteDir { get; set; }
 
+    public string Directory {
+        get => IsDisposed ? string.Empty : _directory;
+        set {
+            if (IsDisposed) { return; }
+            value = value.TrimEnd("\\") + "\\";
+
+            if (value == _directory) { return; }
+
+            RemoveWatcher();
+            if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
+            lsbFiles.Item.Clear();
+
+            _directory = value;
+            _lastcheck = string.Empty;
+
+            txbPfad.Text = _directory;
+
+            CheckButtons(false); // Macht der Worker wieder heile
+        }
+    }
+
     public new bool Enabled {
         get => base.Enabled; set {
             base.Enabled = value;
-            CheckButtons(DirectoryExists(txbPfad.Text));
+            CheckButtons(DirectoryExists(_directory));
         }
     }
 
@@ -109,8 +131,9 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     public string OriginalText {
         get => _originalText;
         set {
+            if (_originalText == value) { return; }
             _originalText = value;
-            CheckButtons(DirectoryExists(txbPfad.Text));
+            CheckButtons(DirectoryExists(_directory));
         }
     }
 
@@ -118,18 +141,6 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
-
-    public string Pfad {
-        get => IsDisposed ? string.Empty : txbPfad.Text;
-        set {
-            if (IsDisposed) { return; }
-            if (value != txbPfad.Text) {
-                txbPfad.Text = value;
-                txbPfad_Enter(null, null);
-                CheckButtons(false); // Macht der Worker wieder heile
-            }
-        }
-    }
 
     public List<RowItem>? RowsInput { get; set; }
 
@@ -158,7 +169,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
-    public string GestStandardCommand(string extension) {
+    public string GetStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
         var type = mainkey?.GetValue(""); // GetValue("") read the standard value of a key
@@ -200,14 +211,18 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
             ct = list.ReplaceInText(OriginalText);
         }
 
-        Pfad = ct;
+        Directory = ct;
 
         CreateWatcher();
     }
 
     public void ParentFilterOutput_Changed() { }
 
-    public void Reload() => ÖffnePfad(txbPfad.Text);
+    public void Reload() {
+        var p = _directory;
+        Directory = string.Empty;
+        Directory = p;
+    }
 
     public void RowsInput_Changed() { }
 
@@ -268,23 +283,23 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
         var i = ScreenShot.GrabArea(ParentForm());
 
-        var dateiPng = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), "PNG");
+        var dateiPng = TempFile(_directory.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), "PNG");
         i.Save(dateiPng, ImageFormat.Png);
         i.Dispose();
         CollectGarbage();
-        txbPfad_Enter(null, null);
+        Reload();
     }
 
-    private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(txbPfad.Text);
+    private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(_directory);
 
-    private void btnZurück_Click(object? sender, System.EventArgs e) => ÖffnePfad(txbPfad.Text.PathParent(1));
+    private void btnZurück_Click(object? sender, System.EventArgs e) => Directory = Directory.PathParent(1);
 
     private void CheckButtons(bool pfadexists) {
         txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
-        lsbFiles.Enabled = Enabled;
-        btnAddScreenShot.Enabled = pfadexists;
-        btnExplorerÖffnen.Enabled = pfadexists;
-        btnZurück.Enabled = pfadexists;
+        lsbFiles.Enabled = Enabled && pfadexists;
+        btnAddScreenShot.Enabled = Enabled && pfadexists;
+        btnExplorerÖffnen.Enabled = Enabled && pfadexists;
+        btnZurück.Enabled = Enabled && pfadexists;
     }
 
     private void chkFolder_Tick(object sender, System.EventArgs e) {
@@ -295,14 +310,14 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         if (ThumbGenerator.IsBusy) { return; }
 
-        if (_lastcheck == txbPfad.Text) { return; }
+        if (_lastcheck == _directory) { return; }
 
         ThumbGenerator.RunWorkerAsync();
     }
 
     private void CreateWatcher() {
-        if (!string.IsNullOrEmpty(txbPfad.Text) && DirectoryExists(txbPfad.Text)) {
-            _watcher = new FileSystemWatcher(txbPfad.Text);
+        if (!string.IsNullOrEmpty(_directory) && DirectoryExists(_directory)) {
+            _watcher = new FileSystemWatcher(_directory);
             _watcher.Changed += Watcher_Changed;
             _watcher.Created += Watcher_Created;
             _watcher.Deleted += Watcher_Deleted;
@@ -313,21 +328,13 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     private DragDropEffects CurrentState(DragEventArgs e) {
-        if (!DirectoryExists(txbPfad.Text)) {
-            return DragDropEffects.None;
-        }
+        if (!DirectoryExists(_directory)) { return DragDropEffects.None; }
 
-        if (!CanWriteInDirectory(txbPfad.Text)) {
-            return DragDropEffects.None;
-        }
+        if (!CanWriteInDirectory(_directory)) { return DragDropEffects.None; }
 
-        if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) {
-            return DragDropEffects.Move;
-        }
+        if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) { return DragDropEffects.Move; }
 
-        if (e.AllowedEffect.HasFlag(DragDropEffects.Copy)) {
-            return DragDropEffects.Copy;
-        }
+        if (e.AllowedEffect.HasFlag(DragDropEffects.Copy)) { return DragDropEffects.Copy; }
 
         return DragDropEffects.None;
     }
@@ -426,7 +433,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         }
 
         foreach (var thisfile in files) {
-            var f = TempFile(txbPfad.Text, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
+            var f = TempFile(_directory, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
 
             if (tmp == DragDropEffects.Copy) {
                 _ = CopyFile(thisfile, f, true);
@@ -482,7 +489,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
             var tmp = e.Item.KeyName;
 
-            var x = GestStandardCommand("." + tmp.FileSuffix());
+            var x = GetStandardCommand("." + tmp.FileSuffix());
 
             if (string.IsNullOrEmpty(x)) { return; }
 
@@ -499,25 +506,8 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
             return;
         }
 
-        ÖffnePfad(e.Item.KeyName);
+        Directory = e.Item.KeyName;
     }
-
-    private void ÖffnePfad(string newPath) {
-        if (IsDisposed) { return; }
-
-        RemoveWatcher();
-        if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
-
-        newPath = newPath.TrimEnd("\\") + "\\";
-        var dropChanged = !string.Equals(newPath, txbPfad.Text, StringComparison.OrdinalIgnoreCase);
-        txbPfad.Text = newPath;
-        lsbFiles.Item.Clear();
-
-        if (dropChanged) { OnFolderChanged(); }
-        _lastcheck = string.Empty;
-    }
-
-    private void OnFolderChanged() => FolderChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void RemoveWatcher() {
         try {
@@ -535,7 +525,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
-        var newPath = txbPfad.Text.Trim("\\") + "\\";
+        var newPath = _directory.Trim("\\") + "\\";
 
         if (_lastcheck == newPath) { return; }
         if (!newPath.IsFormat(FormatHolder.Filepath)) { return; }
@@ -555,9 +545,9 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         if (DeleteDir && Enabled) {
             if (DirectoryExists(_todel)) {
-                var emd = Directory.GetDirectories(_todel, "*", SearchOption.TopDirectoryOnly);
+                var emd = System.IO.Directory.GetDirectories(_todel, "*", SearchOption.TopDirectoryOnly);
                 if (emd.Length == 0) {
-                    var emf = Directory.GetFiles(_todel, "*", SearchOption.TopDirectoryOnly);
+                    var emf = System.IO.Directory.GetFiles(_todel, "*", SearchOption.TopDirectoryOnly);
                     if (emf.Length == 0) {
                         _ = DeleteDir(_todel, false);
                     }
@@ -573,7 +563,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         if (!DirectoryExists(newPath)) {
             if (CreateDir && Enabled) {
-                _ = Directory.CreateDirectory(newPath);
+                _ = System.IO.Directory.CreateDirectory(newPath);
             } else {
                 return;
             }
@@ -582,7 +572,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         #endregion
 
-        var allF = Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
+        var allF = System.IO.Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
 
         if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
 
@@ -632,7 +622,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         #region Verzeichniss objekte Flott erstellen
 
-        var allD = Directory.GetDirectories(newPath, "*", SearchOption.TopDirectoryOnly);
+        var allD = System.IO.Directory.GetDirectories(newPath, "*", SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
             var fi = new FileInfo(thisString);
             if (AddThis(fi)) {
@@ -705,7 +695,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     private void txbPfad_Enter(object? sender, System.EventArgs? e) {
         if (IsDisposed) { return; }
-        ÖffnePfad(txbPfad.Text);
+        Directory = txbPfad.Text;
     }
 
     private void Watcher_Changed(object sender, FileSystemEventArgs e) {
@@ -714,21 +704,21 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
         //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }
-        txbPfad_Enter(null, System.EventArgs.Empty);
+        Reload();
     }
 
-    private void Watcher_Created(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+    private void Watcher_Created(object sender, FileSystemEventArgs e) => Reload();
 
-    private void Watcher_Deleted(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+    private void Watcher_Deleted(object sender, FileSystemEventArgs e) => Reload();
 
     /// <summary>
     /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Watcher_Error(object sender, ErrorEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+    private void Watcher_Error(object sender, ErrorEventArgs e) => Reload();
 
-    private void Watcher_Renamed(object sender, RenamedEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+    private void Watcher_Renamed(object sender, RenamedEventArgs e) => Reload();
 
     #endregion
 }

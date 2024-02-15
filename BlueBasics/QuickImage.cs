@@ -344,7 +344,7 @@ public sealed class QuickImage : IReadableText, IStringable {
             string.IsNullOrEmpty(Färbung) &&
             Sättigung == 100 &&
             Helligkeit == 100 &&
-            Transparenz == 100 &&
+            Transparenz == 0 &&
             string.IsNullOrEmpty(Zweitsymbol)) {
             return (bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false), false);
         }
