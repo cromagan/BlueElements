@@ -153,12 +153,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     #region Methods
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-
         WriteInfosBack();
-        Item = null;
+        base.OnFormClosing(e);
         Database = null;
+
+        Item = null;
     }
 
     protected override void OnLoad(System.EventArgs e) {
@@ -381,7 +380,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
+        if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
 
         if (_item != null) {
             _item.ScriptText = eventScriptEditor.ScriptText;

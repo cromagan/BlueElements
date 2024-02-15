@@ -19,12 +19,19 @@ public partial class Befehlsreferenz : Form {
 
     #region Methods
 
+    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
+
     private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
         if (e.Item is ReadableListItem r && r.Item is Method thisc) {
             co += thisc.HintText();
         }
         txbComms.Text = co;
+    }
+
+    private void txbFilter_TextChanged(object sender, System.EventArgs e) {
+        lstCommands.FilterText = txbFilter.Text;
+        btnFilterDel.Enabled = Enabled && !string.IsNullOrEmpty(txbFilter.Text);
     }
 
     private void WriteCommandsToList() {

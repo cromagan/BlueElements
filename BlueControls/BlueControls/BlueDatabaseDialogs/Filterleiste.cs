@@ -209,6 +209,8 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
 
             #endregion
 
+            var count = 0;
+
             foreach (var thisColumn in columSort) {
                 var showMe = false;
                 if (thisColumn.Database is Database db && !db.IsDisposed) {
@@ -249,7 +251,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                             Controls.Add(flx);
                         }
 
-                        if (leftpos + constwi > Width) {
+                        if (leftpos + constwi > Width && count >0) {
                             leftpos = beginnx;
                             toppos = toppos + consthe + Skin.PaddingSmal;
                         }
@@ -261,6 +263,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                         flx.Anchor = anchor;
                         toppos += down;
                         leftpos += right;
+                        count++;
                     }
                 }
             }

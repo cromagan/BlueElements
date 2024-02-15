@@ -158,6 +158,7 @@
     <Compile Include="ConnectedFormula\TextGenerator.Designer.cs">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Designer Support\InputFormatConverter .cs" />
     <Compile Include="Enums\AllowedInputFilter.cs" />
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="Enums\FlexiFilterDefaultFilter.cs" />

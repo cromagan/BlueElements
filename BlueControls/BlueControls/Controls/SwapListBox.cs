@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -115,7 +116,11 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         base.OnEnabledChanged(e);
         Main.Enabled = Enabled;
         Suggest.Enabled = Enabled;
+        btnFilterDel.Enabled = Enabled;
+        txbFilter.Enabled = Enabled;
     }
+
+    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
     private void Main_ItemCheckedChanged(object sender, System.EventArgs e) {
         foreach (var thisn in Main.Item) {
@@ -142,6 +147,12 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 
     private void Suggest_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
+
+    private void txbFilter_TextChanged(object sender, System.EventArgs e) {
+        Main.FilterText = txbFilter.Text;
+        Suggest.FilterText = txbFilter.Text;
+        btnFilterDel.Enabled = Enabled && !string.IsNullOrEmpty(txbFilter.Text);
+    }
 
     #endregion
 }
