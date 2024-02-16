@@ -26,7 +26,6 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -69,12 +68,6 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         //((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
     }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? FolderChanged;
 
     #endregion
 

@@ -54,7 +54,6 @@ public class VariableString : Variable {
     public override int CheckOrder => 2;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
-    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>
@@ -92,6 +91,8 @@ public class VariableString : Variable {
         v.Parse(ToString());
         return v;
     }
+
+    public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

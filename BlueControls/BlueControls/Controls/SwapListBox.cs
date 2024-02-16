@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -122,27 +121,27 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
-    private void Main_ItemCheckedChanged(object sender, System.EventArgs e) {
-        foreach (var thisn in Main.Item) {
-            Suggest.UnCheck(thisn.KeyName);
-        }
+    //private void Main_ItemCheckedChanged(object sender, System.EventArgs e) {
+    //    foreach (var thisn in Main.Item) {
+    //        Suggest.UnCheck(thisn.KeyName);
+    //    }
 
-        //if (e.OldItems != null) {
-        //    foreach (var thisit in e.OldItems) {
-        //        if (thisit is AbstractListItem bli) {
-        //            if (Suggest.Item[bli.KeyName] == null) {
-        //                Suggest.Item.Add(bli.Clone() as AbstractListItem);
-        //            }
-        //        }
-        //    }
-        //}
+    //    //if (e.OldItems != null) {
+    //    //    foreach (var thisit in e.OldItems) {
+    //    //        if (thisit is AbstractListItem bli) {
+    //    //            if (Suggest.Item[bli.KeyName] == null) {
+    //    //                Suggest.Item.Add(bli.Clone() as AbstractListItem);
+    //    //            }
+    //    //        }
+    //    //    }
+    //    //}
 
-        //if (e.Action == NotifyCollectionChangedAction.Reset) {
-        //    Develop.DebugPrint_NichtImplementiert();
-        //}
+    //    //if (e.Action == NotifyCollectionChangedAction.Reset) {
+    //    //    Develop.DebugPrint_NichtImplementiert();
+    //    //}
 
-        OnItemCheckedChanged();
-    }
+    //    OnItemCheckedChanged();
+    //}
 
     private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 

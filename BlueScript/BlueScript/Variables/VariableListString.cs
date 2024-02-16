@@ -64,8 +64,7 @@ public class VariableListString : Variable {
     public static string ShortName_Variable => "*lst";
     public override int CheckOrder => 3;
     public override bool GetFromStringPossible => true;
-    public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
-    public override bool MustDispose => false;
+    public override bool IsNullOrEmpty => _list.Count == 0;
     public override string MyClassId => ClassId;
 
     /// <summary>
@@ -109,6 +108,8 @@ public class VariableListString : Variable {
         v.Parse(ToString());
         return v;
     }
+
+    public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableListString v) {

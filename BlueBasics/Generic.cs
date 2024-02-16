@@ -212,9 +212,7 @@ public static class Generic {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
         var s = type + "\r\n" + UserName + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         var key = x + (s.GetHashCode() * 100000000) + tmp;
-        if (key < 0) { return (key * -1).ToString(); }
-
-        return key.ToString();
+        return key < 0 ? (key * -1).ToString() : key.ToString();
     }
 
     public static void LaunchBrowser(string url) {

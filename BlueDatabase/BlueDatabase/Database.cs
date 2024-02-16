@@ -438,7 +438,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region Kritische Variablen Disposen
 
             foreach (var thisVar in _variables) {
-                if (thisVar is IDisposable id && thisVar.MustDispose) { id.Dispose(); }
+                thisVar.DisposeContent();
             }
 
             #endregion
@@ -1835,7 +1835,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //_ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
-    public virtual string? NextRowKey() {
+    public virtual string NextRowKey() {
+        if (IsDisposed) { return string.Empty; }
         var tmp = 0;
         string key;
 
@@ -3126,7 +3127,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
+        if (bLoaded != null && bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
             // Gezipte Daten-Kennung gefunden
             bLoaded = bLoaded.UnzipIt();
         }
@@ -3142,98 +3143,112 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private void Parse(byte[] data, NeedPassword? needPassword) {
         var pointer = 0;
-
-        ColumnItem? column = null;
-        RowItem? row = null;
         var columnUsed = new List<ColumnItem>();
-
         Undo.Clear();
 
-        do {
-            if (pointer >= data.Length) { break; }
+        {
+            ColumnItem? column = null;
+            RowItem? row = null;
+            do {
+                if (pointer >= data.Length) {
+                    break;
+                }
 
-            var (i, command, value, columname, rowKey) = Parse(data, pointer);
-            pointer = i;
+                var (i, command, value, columname, rowKey) = Parse(data, pointer);
+                pointer = i;
 
-            if (!command.IsObsolete()) {
+                if (!command.IsObsolete()) {
 
-                #region Zeile suchen oder erstellen
+                    #region Zeile suchen oder erstellen
 
-                if (!string.IsNullOrEmpty(rowKey)) {
-                    row = Row.SearchByKey(rowKey);
-                    if (row == null || row.IsDisposed) {
-                        _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.InitialLoad);
+                    if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.SearchByKey(rowKey);
+                        if (row == null || row.IsDisposed) {
+                            _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.InitialLoad);
+                            row = Row.SearchByKey(rowKey);
+                        }
+
+                        if (row == null || row.IsDisposed) {
+                            Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
+                            Freeze("Zeile hinzufügen Fehler");
+                            return;
+                        }
+
+                        row.IsInCache = DateTime.UtcNow;
                     }
-                    if (row == null || row.IsDisposed) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
-                        Freeze("Zeile hinzufügen Fehler");
-                        return;
-                    }
-                    row.IsInCache = DateTime.UtcNow;
-                }
 
-                #endregion
+                    #endregion
 
-                #region Spalte suchen oder erstellen
+                    #region Spalte suchen oder erstellen
 
-                //if (colKey > -1 && string.IsNullOrEmpty(columname)) {
-                //    column = db.Column.SearchByKey(colKey);
-                //    if (Column  ==null || Column .IsDisposed) {
-                //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                //        _ = db.Column.SetValueInternal(DatabaseDataType.Command_AddColumnByKey, true, string.Empty);
-                //        column = db.Column.SearchByKey(colKey);
-                //    }
-                //    if (Column  ==null || Column .IsDisposed) {
-                //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
-                //        db.SetReadOnly();
-                //        return;
-                //    }
-                //    column.IsInCache = DateTime.UtcNow;
-                //    columnUsed.Add(column);
-                //}
+                    //if (colKey > -1 && string.IsNullOrEmpty(columname)) {
+                    //    column = db.Column.SearchByKey(colKey);
+                    //    if (Column  ==null || Column .IsDisposed) {
+                    //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
+                    //        _ = db.Column.SetValueInternal(DatabaseDataType.Command_AddColumnByKey, true, string.Empty);
+                    //        column = db.Column.SearchByKey(colKey);
+                    //    }
+                    //    if (Column  ==null || Column .IsDisposed) {
+                    //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                    //        db.SetReadOnly();
+                    //        return;
+                    //    }
+                    //    column.IsInCache = DateTime.UtcNow;
+                    //    columnUsed.Add(column);
+                    //}
 
-                if (!string.IsNullOrEmpty(columname)) {
-                    column = Column.Exists(columname);
-                    if (column == null || column.IsDisposed) {
-                        if (command != DatabaseDataType.ColumnName) { Develop.DebugPrint(command + " an erster Stelle!"); }
-                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
+                    if (!string.IsNullOrEmpty(columname)) {
                         column = Column.Exists(columname);
+                        if (column == null || column.IsDisposed) {
+                            if (command != DatabaseDataType.ColumnName) {
+                                Develop.DebugPrint(command + " an erster Stelle!");
+                            }
+
+                            _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
+                            column = Column.Exists(columname);
+                        }
+
+                        if (column == null || column.IsDisposed) {
+                            Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                            Freeze("Spalte hinzufügen Fehler");
+                            return;
+                        }
+
+                        column.IsInCache = DateTime.UtcNow;
+                        columnUsed.Add(column);
                     }
-                    if (column == null || column.IsDisposed) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
-                        Freeze("Spalte hinzufügen Fehler");
-                        return;
+
+                    #endregion
+
+                    #region Bei verschlüsselten Datenbanken das Passwort abfragen
+
+                    if (command == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
+                        var pwd = string.Empty;
+
+                        if (needPassword != null) {
+                            pwd = needPassword();
+                        }
+
+                        if (pwd != value) {
+                            Freeze("Passwort falsch");
+                            break;
+                        }
                     }
-                    column.IsInCache = DateTime.UtcNow;
-                    columnUsed.Add(column);
-                }
 
-                #endregion
+                    #endregion
 
-                #region Bei verschlüsselten Datenbanken das Passwort abfragen
-
-                if (command == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
-                    var pwd = string.Empty;
-
-                    if (needPassword != null) { pwd = needPassword(); }
-                    if (pwd != value) {
-                        Freeze("Passwort falsch");
+                    if (command == DatabaseDataType.EOF) {
                         break;
                     }
+
+                    var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.InitialLoad);
+                    if (!string.IsNullOrEmpty(fehler.Error)) {
+                        Freeze("Datenbank-Ladefehler");
+                        Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
+                    }
                 }
-
-                #endregion
-
-                if (command == DatabaseDataType.EOF) { break; }
-
-                var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.InitialLoad);
-                if (!string.IsNullOrEmpty(fehler.Error)) {
-                    Freeze("Datenbank-Ladefehler");
-                    Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
-                }
-            }
-        } while (true);
+            } while (true);
+        }
 
         #region unbenutzte (gelöschte) Spalten entfernen
 
@@ -3244,7 +3259,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, column.KeyName, Reason.InitialLoad);
+                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, Reason.InitialLoad);
                 //_ = SetValueInternal(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
             }
         }

@@ -107,6 +107,11 @@ public class Method_Filter : Method_Database {
         #endregion
 
         var fii = new FilterItem(filterColumn, filtertype, attvar.ValueStringGet(3));
+
+        if (!fii.IsOk()) {
+            return new DoItFeedback(infos.Data, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
+        }
+
         return new DoItFeedback(new VariableFilterItem(fii));
     }
 

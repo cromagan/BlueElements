@@ -16,14 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 //using CefSharp.WinForms;
-using System;
+
 using BlueScript.Structures;
 using CefSharp.OffScreen;
 using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 
-public class VariableWebpage : Variable, IDisposable {
+public class VariableWebpage : Variable {
 
     #region Fields
 
@@ -52,7 +52,6 @@ public class VariableWebpage : Variable, IDisposable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _browser == null;
-    public override bool MustDispose => true;
     public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
@@ -74,7 +73,7 @@ public class VariableWebpage : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() => _browser?.Dispose();
+    public override void DisposeContent() => _browser?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableWebpage v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

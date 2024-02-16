@@ -155,9 +155,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
         base.OnFormClosing(e);
+
+        Item = null; // erst das Item!
         Database = null;
 
-        Item = null;
+      
     }
 
     protected override void OnLoad(System.EventArgs e) {

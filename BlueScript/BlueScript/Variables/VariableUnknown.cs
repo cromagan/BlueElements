@@ -54,7 +54,6 @@ public class VariableUnknown : Variable {
     public override int CheckOrder => 100;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
-    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>
@@ -89,6 +88,8 @@ public class VariableUnknown : Variable {
         v.Parse(ToString());
         return v;
     }
+
+    public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

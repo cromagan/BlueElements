@@ -17,14 +17,13 @@
 
 #nullable enable
 
-using System;
 using System.Drawing;
 using BlueScript.Structures;
 using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 
-public class VariableBitmap : Variable, IDisposable {
+public class VariableBitmap : Variable {
 
     #region Fields
 
@@ -53,7 +52,6 @@ public class VariableBitmap : Variable, IDisposable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp == null;
-    public override bool MustDispose => true;
     public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
@@ -75,7 +73,7 @@ public class VariableBitmap : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() => _bmp?.Dispose();
+    public override void DisposeContent() => _bmp?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

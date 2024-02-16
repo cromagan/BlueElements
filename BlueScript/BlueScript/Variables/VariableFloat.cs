@@ -57,7 +57,6 @@ public class VariableFloat : Variable {
     public override int CheckOrder => 1;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
-    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>
@@ -91,6 +90,8 @@ public class VariableFloat : Variable {
         v.Parse(ToString());
         return v;
     }
+
+    public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

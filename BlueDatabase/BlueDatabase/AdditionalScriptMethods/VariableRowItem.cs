@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -25,17 +24,21 @@ using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript;
 
-public class VariableRowItem : Variable, IDisposable {
+public class VariableRowItem : Variable {
 
     #region Fields
 
+    private string _lastText = string.Empty;
     private RowItem? _row;
 
     #endregion
 
     #region Constructors
 
-    public VariableRowItem(string name, RowItem? value, bool ronly, string comment) : base(name, ronly, comment) => _row = value;
+    public VariableRowItem(string name, RowItem? value, bool ronly, string comment) : base(name, ronly, comment) {
+        _row = value;
+        GetText();
+    } 
 
     public VariableRowItem(RowItem? value) : this(DummyName(), value, true, string.Empty) { }
 
@@ -46,18 +49,34 @@ public class VariableRowItem : Variable, IDisposable {
     #region Properties
 
     public static string ClassId => "row";
+
     public static string ShortName_Variable => "*row";
+
     public override int CheckOrder => 99;
+
     public override bool GetFromStringPossible => false;
+
     public override bool IsNullOrEmpty => _row == null;
-    public override bool MustDispose => true;
+
     public override string MyClassId => ClassId;
+
+    public override string ReadableText => _lastText;
 
     public RowItem? RowItem {
         get => _row;
         private set {
             if (ReadOnly) { return; }
             _row = value;
+
+            GetText();
+        }
+    }
+
+    private void GetText() {
+        if (_row == null) {
+            _lastText = "Row: [NULL]";
+        } else {
+            _lastText = "Row: " + _row.CellFirstString();
         }
     }
 
@@ -73,7 +92,9 @@ public class VariableRowItem : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() => _row = null;
+    public override void DisposeContent() {
+        _row = null;
+    }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

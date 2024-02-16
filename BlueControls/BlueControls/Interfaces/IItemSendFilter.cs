@@ -20,12 +20,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Forms;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using static BlueDatabase.Database;
 
 namespace BlueControls.Interfaces;
@@ -65,13 +62,11 @@ public static class ItemSendSomethingExtension {
 
         if (item.Parent == null) { return; }
 
-        if (item.ChildIds != null) {
-            foreach (var thisChild in item.ChildIds) {
-                var item2 = item.Parent[thisChild];
+        foreach (var thisChild in item.ChildIds) {
+            var item2 = item.Parent[thisChild];
 
-                if (item2 is IItemAcceptFilter ias) {
-                    ias.CalculateInputColorIds();
-                }
+            if (item2 is IItemAcceptFilter ias) {
+                ias.CalculateInputColorIds();
             }
         }
     }

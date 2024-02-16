@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -97,9 +96,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
             foreach (var thisVar in tmpv) {
                 if (varCol.Get(thisVar.KeyName) == null) {
-                    if (thisVar is IDisposable id && thisVar.MustDispose) {
-                        id.Dispose();
-                    }
+                    thisVar.DisposeContent();
                 }
             }
 

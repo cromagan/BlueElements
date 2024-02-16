@@ -71,8 +71,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public abstract bool IsNullOrEmpty { get; }
 
-    public abstract bool MustDispose { get; }
     public abstract string MyClassId { get; }
+
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
     public bool ReadOnly {
@@ -211,6 +211,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
         return 0;
     }
+
+    public abstract void DisposeContent();
 
     public abstract DoItFeedback GetValueFrom(Variable variable, LogData ld);
 

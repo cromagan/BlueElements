@@ -17,19 +17,20 @@
 
 #nullable enable
 
-using System;
+using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript;
 
-public class VariableFilterItem : Variable, IDisposable {
+public class VariableFilterItem : Variable {
 
     #region Fields
 
-    private FilterItem _filter;
+    private FilterItem? _filter;
+
+    private string _lastText = string.Empty;
 
     #endregion
 
@@ -39,28 +40,38 @@ public class VariableFilterItem : Variable, IDisposable {
 
     public VariableFilterItem(string name) : this(name, null!, true, string.Empty) { }
 
-    public VariableFilterItem(string name, FilterItem value, bool ronly, string comment) : base(name, ronly, comment) => _filter = value;
+    public VariableFilterItem(string name, FilterItem value, bool ronly, string comment) : base(name, ronly, comment) {
+        _filter = value;
+        GetText();
+    }
 
     #endregion
 
     #region Properties
 
     public static string ClassId => "fil";
+
     public static string ShortName_Variable => "*fil";
+
     public override int CheckOrder => 99;
 
-    public FilterItem FilterItem {
+    public FilterItem? FilterItem {
         get => _filter;
         private set {
             if (ReadOnly) { return; }
             _filter = value;
+            GetText();
         }
     }
 
     public override bool GetFromStringPossible => false;
-    public override bool IsNullOrEmpty => _filter == null;
-    public override bool MustDispose => true;
+
+    public override bool IsNullOrEmpty => _filter == null || !_filter.IsOk();
+
     public override string MyClassId => ClassId;
+
+    public override string ReadableText => _lastText;
+
     public override bool ToStringPossible => false;
 
     #endregion
@@ -73,7 +84,10 @@ public class VariableFilterItem : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() => _filter.Dispose();
+    public override void DisposeContent() {
+        _filter?.Dispose();
+        _filter = null;
+    }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
@@ -87,6 +101,14 @@ public class VariableFilterItem : Variable, IDisposable {
     protected override void SetValue(object? x) { }
 
     protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => null;
+
+    private void GetText() {
+        if (_filter == null || !_filter.IsOk()) {
+            _lastText = "Filter: [ERROR]";
+        } else {
+            _lastText = "Filter: " + _filter.ReadableText();
+        }
+    }
 
     #endregion
 }
