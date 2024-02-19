@@ -81,13 +81,9 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
     }
 
-    internal void SuggestionsClear() {
-        Suggest.UncheckAll();
-    }
+    internal void SuggestionsClear() => Suggest.UncheckAll();
 
-    internal void UnCheck() {
-        UnCheck(Main.Checked);
-    }
+    internal void UnCheck() => UnCheck(Main.Checked);
 
     internal void UnCheck(IEnumerable<string> list) {
         foreach (var thisIt in list) {
@@ -101,14 +97,19 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         var sourceItem = source.Item[@internal];
         var targetItem = target.Item[@internal];
 
+        var did = false;
         if (sourceItem != null && targetItem == null) {
             target.AddAndCheck(sourceItem.Clone() as AbstractListItem);
+            did = true;
         } else if (sourceItem == null && targetItem == null) {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
             target.AddAndCheck(targetItem);
+            did = true;
         }
 
         if (sourceItem != null && doRemove) { source.UnCheck(sourceItem); }
+
+        if (did) { OnItemCheckedChanged(); }
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {

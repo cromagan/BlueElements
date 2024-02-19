@@ -92,9 +92,7 @@ public class VariableRowItem : Variable {
         return v;
     }
 
-    public override void DisposeContent() {
-        _row = null;
-    }
+    public override void DisposeContent() => _row = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

@@ -69,9 +69,7 @@ public class InputFormatConverter : TypeConverter {
     }
 
     // Überprüfen, ob dieser Konverter eine Liste von Standardwerten unterstützt.
-    public override bool GetStandardValuesSupported(ITypeDescriptorContext context) {
-        return true;
-    }
+    public override bool GetStandardValuesSupported(ITypeDescriptorContext context) => true;
 
     #endregion
 }

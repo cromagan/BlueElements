@@ -68,6 +68,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Item = new ItemCollectionList.ItemCollectionList(true);
         Item.Changed += Item_Changed;
+        Item.CollectionChanged += Item_CollectionChanged;
         _appearance = ListBoxAppearance.Listbox;
     }
 
@@ -317,6 +318,17 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             } else {
                 _ = Item.Add(thisString);
             }
+        }
+    }
+
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) {
+            }
+            Item.Changed -= Item_Changed;
+            Item.CollectionChanged -= Item_CollectionChanged;
+        } finally {
+            base.Dispose(disposing);
         }
     }
 
@@ -609,6 +621,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (IsDisposed) { return; }
         Invalidate();
     }
+
+    private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => Invalidate();
 
     private AbstractListItem? MouseOverNode(int x, int y) => Item[x, (int)(y + SliderY.Value)];
 
