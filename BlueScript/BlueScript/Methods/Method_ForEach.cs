@@ -69,7 +69,7 @@ internal class Method_ForEach : Method {
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv, null);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

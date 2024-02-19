@@ -34,7 +34,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal];
+    public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
 
     public List<List<string>> ArgsForButton => [StringVal];
 
@@ -48,7 +48,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => 0;
 
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
 
@@ -60,7 +60,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "CallByFilename(Filename, KeepVariables);";
+    public override string Syntax => "CallByFilename(Filename, KeepVariables, Attribute0, ...);";
 
     #endregion
 
@@ -79,18 +79,18 @@ public class Method_CallByFilename : Method, IUseableForButton {
     /// <param name="addMe"></param>
     /// <param name="varCol"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe) {
+    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, List<string> attributes) {
         ScriptEndedFeedback scx;
 
         if (keepVariables) {
             if (addMe != null) { varCol.Add(addMe); }
-            scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname);
+            scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname, attributes);
         } else {
             var tmpv = new VariableCollection();
             tmpv.AddRange(varCol);
             if (addMe != null) { tmpv.Add(addMe); }
 
-            scx = Script.Parse(tmpv, scp, reducedscripttext, lineadd, subname);
+            scx = Script.Parse(tmpv, scp, reducedscripttext, lineadd, subname, attributes);
 
             #region Kritische Variablen Disposen
 
@@ -144,7 +144,16 @@ public class Method_CallByFilename : Method, IUseableForButton {
             return new DoItFeedback(infos.Data, "Fehler in Datei " + vs + ": " + error);
         }
 
-        var scx = CallSub(varCol, scp, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null);
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
+        var scx = CallSub(varCol, scp, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a);
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }

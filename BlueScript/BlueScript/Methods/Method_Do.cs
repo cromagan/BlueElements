@@ -34,8 +34,8 @@ internal class Method_Do : Method {
     public override List<List<string>> Args => [];
     public override string Command => "do";
     public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => true;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -59,7 +59,7 @@ internal class Method_Do : Method {
             du++;
             if (du > 100000) { return new DoItFeedback(infos.Data, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, null);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

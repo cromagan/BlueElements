@@ -31,7 +31,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, RowVar];
+    public override List<List<string>> Args => [StringVal, RowVar, StringVal];
 
     public List<List<string>> ArgsForButton => [StringVal];
 
@@ -47,7 +47,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => 0;
 
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
 
@@ -59,7 +59,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "CallRow(Scriptname, Row);";
+    public override string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 
     #endregion
 
@@ -77,9 +77,18 @@ public class Method_CallRow : Method_Database, IUseableForButton {
             return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
         }
 
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
         var vs = attvar.ValueStringGet(0);
 
-        var s2 = row.ExecuteScript(null, vs, false, false, scp.ChangeValues, 0);
+        var s2 = row.ExecuteScript(null, vs, false, false, scp.ChangeValues, 0, a);
         if (!s2.AllOk) {
             infos.Data.Protocol.AddRange(s2.Protocol);
             return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");

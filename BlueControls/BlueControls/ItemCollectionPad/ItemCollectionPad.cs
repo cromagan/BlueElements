@@ -581,7 +581,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
         if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
-        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
+        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null);
         if (!script.AllOk) { return script; }
 
          ((ICanHaveVariables)this).ParseVariables(script.Variables);

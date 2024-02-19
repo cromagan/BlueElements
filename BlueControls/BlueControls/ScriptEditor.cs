@@ -140,7 +140,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
         if (ex.Feedback == null) {
             var scp = new ScriptProperties(MethodType.Standard, false, [], null);
             var s = new Script(null, string.Empty, scp);
-            ex.Feedback = s.Parse(0, "Main");
+            ex.Feedback = s.Parse(0, "Main", null);
         }
 
         grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);

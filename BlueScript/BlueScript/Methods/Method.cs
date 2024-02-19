@@ -205,7 +205,8 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         var attributes = SplitAttributeToString(attributText);
         if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen."); }
-        if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (attributes.Count < types.Count && lastArgMinCount !=0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (attributes.Count < types.Count -1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
         if (lastArgMinCount <= 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
         if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
 

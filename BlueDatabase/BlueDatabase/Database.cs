@@ -1305,7 +1305,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
             };
-            var scf = sc.Parse(0, s.KeyName);
+            var scf = sc.Parse(0, s.KeyName, attributes);
 
             #endregion
 

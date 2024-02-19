@@ -163,11 +163,19 @@ public class Script {
         return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
     }
 
-    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname, List<string>? attributes) {
         var pos = 0;
         var endScript = false;
 
         var ld = new LogData(subname, lineadd + 1);
+
+
+        varCol.RemoveWithComment("Attribut");
+        if (attributes != null) {
+            for (var z = 0; z < attributes.Count; z++) {
+                varCol.Add(new VariableString("Attribut" + z.ToString(), attributes[z], true, "Attribut"));
+            }
+        }
 
         do {
             if (pos >= redScriptText.Length || endScript) {
@@ -238,14 +246,14 @@ public class Script {
         return (s.ToString(), string.Empty);
     }
 
-    public ScriptEndedFeedback Parse(int lineadd, string subname) {
+    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes) {
         (ReducedScriptText, var error) = ReduceText(ScriptText);
 
         if (!string.IsNullOrEmpty(error)) {
             return new ScriptEndedFeedback(error, false, true, subname);
         }
 
-        return Parse(Variables, Properties, ReducedScriptText, lineadd, subname);
+        return Parse(Variables, Properties, ReducedScriptText, lineadd, subname, attributes);
     }
 
     #endregion

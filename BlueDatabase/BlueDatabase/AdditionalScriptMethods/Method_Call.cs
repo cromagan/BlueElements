@@ -34,7 +34,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal];
+    public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
 
     public List<List<string>> ArgsForButton => [StringVal];
 
@@ -48,7 +48,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => 0;
 
     public override MethodType MethodType => MethodType.Database;
 
@@ -60,7 +60,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "Call(SubName, KeepVariables);";
+    public override string Syntax => "Call(SubName, KeepVariables, Attribut0, ...);";
 
     #endregion
 
@@ -91,7 +91,16 @@ internal class Method_Call : Method_Database, IUseableForButton {
             return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
         }
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null);
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
+        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a);
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }

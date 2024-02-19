@@ -313,7 +313,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         //if (IsInCache == null) { Develop.DebugPrint(FehlerArt.Fehler, "Refresh-Fehler"); }
 
-        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0);
+        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
@@ -416,13 +416,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="tryforsceonds"></param>
     /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds, List<string>? attributes) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
-            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues);
+            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues, attributes);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -633,7 +633,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues) {
+    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, List<string>? attributes) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not Database db || db.IsDisposed) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
@@ -641,7 +641,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        var script = db.ExecuteScript(eventname, scriptname, changevalues, this, null);
+        var script = db.ExecuteScript(eventname, scriptname, changevalues, this, attributes);
 
         if (!script.AllOk) {
             db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));

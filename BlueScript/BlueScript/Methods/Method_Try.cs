@@ -39,8 +39,8 @@ internal class Method_Try : Method {
                                           "Das Skript wird in jedem Fall nach dem Codeblock-Ende weiter ausgeführt.\r\n" +
                                           "Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
 
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => true;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -54,7 +54,7 @@ internal class Method_Try : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Try-Befehl", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Try-Befehl", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, null);
         return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }
 

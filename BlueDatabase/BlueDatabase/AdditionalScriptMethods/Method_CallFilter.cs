@@ -31,7 +31,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FilterVar];
+    public override List<List<string>> Args => [StringVal, FilterVar, StringVal];
 
     public List<List<string>> ArgsForButton => [StringVal];
 
@@ -84,7 +84,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
         foreach (var thisR in r) {
             if (thisR != null && !thisR.IsDisposed) {
                 //s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ChangeValues, 0);
+                var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ChangeValues, 0, null);
                 if (!s2.AllOk) {
                     infos.Data.Protocol.AddRange(s2.Protocol);
                     return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");

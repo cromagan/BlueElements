@@ -45,7 +45,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
+    public override int LastArgMinCount => 0;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";

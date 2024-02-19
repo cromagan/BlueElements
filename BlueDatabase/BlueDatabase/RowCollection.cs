@@ -188,7 +188,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1);
+        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1, null);
 
         return row;
     }
@@ -323,7 +323,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0, null);
 
             if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
@@ -367,7 +367,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 var r = SearchByKey(key);
                 if (r != null && !r.IsDisposed) {
-                    var ok = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2);
+                    var ok = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null);
 
                     if (!ok.AllOk) { break; }
 
@@ -465,7 +465,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (runScriptOfNewRow) {
-            _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f);
+            _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null);
         }
 
         return item;
@@ -709,7 +709,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rk = (string)e.Argument;
         var r = SearchByKey(rk);
         if (r == null || r.IsDisposed) { return; }
-        var _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10);
+        var _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null);
     }
 
     private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
