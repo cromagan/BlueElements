@@ -30,6 +30,7 @@ using BlueControls.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+using BlueDatabase;
 
 #nullable enable
 
@@ -350,6 +351,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
                 break;
 
+            case Accessor<Database?> adb:
+                var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+                if (adb.Get() != db) { adb.Set(db); }
+                break;
+
             //case Accessor <enum> ae:
             //    FloatTryParse(Value, out var f);
             //    if (af.Get() != f) { af.Set(f); }
@@ -434,6 +440,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
             case Color co:
                 ValueSet(co.ToHtmlCode(), true, false);
+                break;
+
+            case Database db:
+                ValueSet(db.ConnectionData.UniqueId, true, false);
                 break;
 
             default:

@@ -144,7 +144,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         List<GenericControl> l =
         [
             .. _itemSends.GetStyleOptions(this, widthOfControl),
-            new FlexiControl(),
+            //new FlexiControl(),
             .. base.GetStyleOptions(widthOfControl),
         ];
 

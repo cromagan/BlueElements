@@ -173,9 +173,10 @@ public partial class PadEditor : PadEditorReadOnly {
 
         //flexis.Insert(0, new FlexiControl()); // Trennlinie
         if (bpi is IErrorCheckable iec && !iec.IsOk()) {
+            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
             flexis.Insert(0, new FlexiControl("Achtung!", stdWidth, true));
 
-            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
+
         }
 
         flexis.Insert(0, new FlexiControl(bpi.Description, stdWidth, false)); // Beschreibung
