@@ -46,9 +46,8 @@ public class Method_If : Method {
     public override List<List<string>> Args => [BoolVal];
     public override string Command => "if";
     public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
-     public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => true;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -89,7 +88,7 @@ public class Method_If : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, "Fehler innerhalb der runden Klammern des If-Befehls"); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null);
+            var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, null);
             if (!scx.AllOk) { return scx; }
             return new DoItFeedback(scx.BreakFired, scx.EndScript); // If muss die Breaks und Endsripts erhalten!
         }
