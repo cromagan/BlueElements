@@ -1262,7 +1262,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         var r2 = new List<RowItem>();
         r2.AddRange(r);
 
-        if (pinned != null) { r.AddIfNotExists(pinned); }
+        if (pinned != null) { r2.AddIfNotExists(pinned); }
 
         return Contents(r2);
     }
