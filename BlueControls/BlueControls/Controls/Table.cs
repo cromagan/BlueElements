@@ -523,8 +523,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 return;
             }
             if (vereinfachteSuche) {
-                var ist3 = ist2.StarkeVereinfachung(" ,");
-                var searchTxt3 = searchTxt.StarkeVereinfachung(" ,");
+                var ist3 = ist2.StarkeVereinfachung(" ,", true);
+                var searchTxt3 = searchTxt.StarkeVereinfachung(" ,", true);
                 if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
                     foundColumn = column;
                     foundRow = row;

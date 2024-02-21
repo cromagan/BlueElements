@@ -100,8 +100,8 @@ public sealed partial class Search : Form {
                 // Allgemeine Prüfung
                 if (ist1.Contains(searchT.ToLower())) { break; }
                 if (btnAehnliches.Checked) {
-                    var ist3 = ist1.StarkeVereinfachung(" ,");
-                    var searchTxt3 = searchT.StarkeVereinfachung(" ,");
+                    var ist3 = ist1.StarkeVereinfachung(" ,", true);
+                    var searchTxt3 = searchT.StarkeVereinfachung(" ,", true);
                     if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
                         break;
                     }

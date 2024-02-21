@@ -83,9 +83,49 @@ public static class Constants {
     public static readonly List<string> KlammerRundZu = [")"];
     public static readonly List<string> Komma = [","];
     public static readonly Pen PenRed1 = new(Color.Red, 1);
+
+    public static readonly Dictionary<string, string> Replacements = new() {
+                    {"ä", "ae"}, {"ö", "oe"}, {"ü", "ue"},
+                    {"á", "a"},  {"ó", "o"},  {"ú", "u"}, {"í", "i"}, {"é", "e"},
+                    {"à", "a"},  {"ò", "o"},  {"ù", "u"}, {"ì", "i"}, {"è", "e"},
+                    {"â", "a"},  {"ô", "o"},  {"û", "u"}, {"î", "i"}, {"ê", "e"},
+                    {"ž", "z"},
+                    {"ß", "ss"}
+                    //// Spanische Akzente und Sonderzeichen
+                    //{"ñ", "n"},
+                    // // Französische Akzente und Ligaturen
+                    //{"ç", "c"},
+                    //{"œ", "oe"},
+                    //{"æ", "ae"},
+
+                    //// Portugiesische Akzente und Sonderzeichen
+                    //{"ã", "a"}, {"õ", "o"},
+                    //{"ç", "c"},
+
+                    //// Türkische Sonderzeichen
+                    //{"ş", "s"}, {"ğ", "g"},
+
+                    //// Skandinavische Zeichen
+                    //{"å", "a"},
+                    //{"ø", "o"},
+                    //{"ä", "ae"},
+                    //{"ö", "oe"},
+                    //{"ü", "ue"},
+
+                    //// Polnische Akzente
+                    //{"ł", "l"},
+                    //{"ń", "n"}, {"ś", "s"},
+                    //{"ź", "z"}, {"ć", "c"},
+                    //{"ę", "e"},
+
+                    //// Weitere europäische Sonderzeichen
+                    //{"đ", "d"},
+                    //{"ħ", "h"},
+                    //{"ł", "l"},
+                    };
+
     public static readonly int RowCaptionSizeY = 50;
     public static readonly Encoding Win1252 = Encoding.GetEncoding(1252);
-
     public static float DefaultTolerance = 0.0001f;
     public static double FineTolerance = 0.0000001d;
     public static float IntTolerance = 0.5f;

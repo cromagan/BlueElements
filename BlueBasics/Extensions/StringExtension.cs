@@ -521,6 +521,24 @@ public static partial class Extensions {
         return tXt;
     }
 
+    public static string RemoveDuplicateChars(this string input) {
+        if (string.IsNullOrEmpty(input)) {
+            return string.Empty;
+        }
+
+        StringBuilder result = new StringBuilder();
+        char? previousChar = null;
+
+        foreach (char currentChar in input) {
+            if (previousChar != currentChar) {
+                result.Append(currentChar);
+                previousChar = currentChar;
+            }
+        }
+
+        return result.ToString();
+    }
+
     /// <summary>
     /// Entfernt alle < > aus dem gegebenen Text.
     /// </summary>
@@ -731,29 +749,23 @@ public static partial class Extensions {
     //    if (OpenBraketCount != 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Parse Fehler: " + tXT); }
     //    return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
     //}
-    public static string StarkeVereinfachung(this string tXt, string additinalAllowed) {
+    /// <summary>
+    /// Reduziert den Text auf Kleinbuchstaben und Zahlen. Umlaute zu ae.
+    /// additinalAllowed gibgt an welche Zeichen noch erlaubt sein sollen. Z.B. Leerzeichen und ,
+    /// Aber auch diese nur einmal und nicht doppelt hinereinandwer
+    /// </summary>
+    /// <param name="tXt"></param>
+    /// <param name="additinalAllowed"></param>
+    /// <returns></returns>
+    public static string StarkeVereinfachung(this string tXt, string additinalAllowed, bool removedupes) {
         tXt = tXt.ToLower().ReduceToChars(Char_Numerals + Char_Buchstaben + additinalAllowed);
-        tXt = tXt.Replace("ä", "ae");
-        tXt = tXt.Replace("ö", "oe");
-        tXt = tXt.Replace("ü", "ue");
-        tXt = tXt.Replace("á", "a");
-        tXt = tXt.Replace("ó", "o");
-        tXt = tXt.Replace("ú", "u");
-        tXt = tXt.Replace("í", "i");
-        tXt = tXt.Replace("é", "e");
-        tXt = tXt.Replace("à", "a");
-        tXt = tXt.Replace("ò", "o");
-        tXt = tXt.Replace("ù", "u");
-        tXt = tXt.Replace("ì", "i");
-        tXt = tXt.Replace("è", "e");
-        tXt = tXt.Replace("â", "a");
-        tXt = tXt.Replace("ô", "o");
-        tXt = tXt.Replace("û", "u");
-        tXt = tXt.Replace("î", "i");
-        tXt = tXt.Replace("ê", "e");
-        tXt = tXt.Replace("ž", "z");
-        tXt = tXt.Replace("ß", "ss");
-        return tXt;
+        foreach (var replacement in Constants.Replacements) {
+            tXt = tXt.Replace(replacement.Key, replacement.Value);
+        }
+
+        if (!removedupes) { return tXt; }
+
+        return tXt.RemoveDuplicateChars();
     }
 
     /// <summary>

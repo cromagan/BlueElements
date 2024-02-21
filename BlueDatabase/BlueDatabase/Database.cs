@@ -777,7 +777,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public static string MakeValidTableName(string tablename) {
         var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
         tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
-        tmp = tmp.StarkeVereinfachung("_").ToUpper();
+        tmp = tmp.StarkeVereinfachung("_", false).ToUpper();
 
         while (tmp.Contains("__")) {
             tmp = tmp.Replace("__", "_");
