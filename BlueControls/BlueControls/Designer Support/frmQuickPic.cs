@@ -121,11 +121,12 @@ internal sealed class QuickPic : Panel {
 
     public void StartAll(string code) {
         LB.Items.Clear();
-        const ImageCode tempVar = (ImageCode)9999;
-        for (ImageCode z = 0; z <= tempVar; z++) {
-            var w = Enum.GetName(z.GetType(), z);
-            if (!string.IsNullOrEmpty(w)) { _ = LB.Items.Add(w); }
+        var im = QuickImage.Images();
+
+        foreach (var thisIm in im) {
+            _ = LB.Items.Add(thisIm);
         }
+
         QuickImage l = new(code);
         PicName.Text = l.Name;
         Färb.Text = l.Färbung;

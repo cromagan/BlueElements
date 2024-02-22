@@ -478,7 +478,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     #region Methods
 
     public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
-        if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 1) {
+        if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 20) {
             return AllavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
@@ -1664,7 +1664,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (!string.IsNullOrEmpty(f) && !dictVorhanden.ContainsKey(f)) {
                     dictVorhanden.Add(f, thisR);
                 } else {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption +  "' sind nicht eindeutig.");
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
                 }
             }

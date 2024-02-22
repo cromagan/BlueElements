@@ -38,7 +38,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
 
-    public List<string> ArgsForButtonDescription => ["Skriptname", "Attribut 0"];
+    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Zusätzliches Attribut"];
 
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
 

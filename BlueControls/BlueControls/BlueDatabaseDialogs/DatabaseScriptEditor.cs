@@ -31,6 +31,7 @@ using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -158,8 +159,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         Item = null; // erst das Item!
         Database = null;
-
-      
     }
 
     protected override void OnLoad(System.EventArgs e) {
@@ -201,6 +200,53 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
+
+    private void btnVerlauf_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        //if (lstEventScripts.Checked.Count != 1) {
+        //    btnVerlauf.Enabled = false;
+        //    Item = null;
+        //    return;
+        //}
+
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
+            Item = null;
+            btnVerlauf.Enabled = false;
+            return;
+        }
+        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
+        ////Item = selectedlstEventScripts;
+        ////btnVerlauf.Enabled = true;
+        ///
+        var l = new List<string>();
+
+        foreach (var thisUndo in db.Undo) {
+            if (thisUndo.Command == BlueDatabase.Enums.DatabaseDataType.EventScript) {
+                l.Add("############################################################################");
+                l.Add("############################################################################");
+                l.Add("############################################################################");
+                l.Add("############################################################################");
+                l.Add("############################################################################");
+                l.Add(thisUndo.DateTimeUtc.ToString(Constants.Format_Date7) + " " + thisUndo.User);
+
+                List<string> ai = [.. thisUndo.ChangedTo.SplitAndCutByCr()];
+                var found = false;
+                foreach (var t in ai) {
+                    var s = new DatabaseScriptDescription(db, t);
+                    if (s.KeyName == selectedlstEventScripts.KeyName && selectedlstEventScripts.ScriptText != s.ScriptText) {
+                        l.Add(s.ScriptText);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    l.Add("    -> Keine Änderung am gewählten Skript");
+                }
+            }
+        }
+
+        l.WriteAllText(TempFile("", "Scrip.txt"), Win1252, true);
+    }
 
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
@@ -335,15 +381,19 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (lstEventScripts.Checked.Count != 1) {
+            btnVerlauf.Enabled = false;
             Item = null;
             return;
         }
+
         if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
             Item = null;
+            btnVerlauf.Enabled = false;
             return;
         }
         var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
         Item = selectedlstEventScripts;
+        btnVerlauf.Enabled = true;
     }
 
     private void ScriptEditor_Changed(object sender, System.EventArgs e) {

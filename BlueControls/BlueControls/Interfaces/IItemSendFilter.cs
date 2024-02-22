@@ -27,7 +27,7 @@ using static BlueDatabase.Database;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendFilter : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName, IItemToControl {
+public interface IItemSendFilter : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName, IItemToControl, IErrorCheckable {
 
     #region Properties
 

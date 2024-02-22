@@ -35,7 +35,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
     public List<List<string>> ArgsForButton => [StringVal];
 
-    public List<string> ArgsForButtonDescription => ["Skriptname"];
+    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript"];
 
     public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
 

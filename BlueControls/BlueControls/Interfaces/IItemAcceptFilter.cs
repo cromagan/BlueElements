@@ -24,9 +24,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-
-#nullable enable
-
 using BlueDatabase;
 
 namespace BlueControls.Interfaces;
@@ -34,7 +31,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptFilter : IHasKeyName, IChangedFeedback, IHasVersion, IItemToControl {
+public interface IItemAcceptFilter : IHasKeyName, IChangedFeedback, IHasVersion, IItemToControl, IErrorCheckable {
 
     #region Properties
 
@@ -265,27 +262,30 @@ public sealed class ItemAcceptFilter {
             // Die Items, die man noch wählen könnte
             foreach (var thisR in item.Parent) {
                 if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
-                    if (outp == null || outp == rfp.DatabaseOutput) {
+                    //if (outp == null || outp == rfp.DatabaseOutput) {
+                    if (rfp != item && rfp.IsOk()) {
                         _ = x.Add(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
                     }
+
+                    //}
                 }
             }
 
             switch (item.AllowedInputFilter) {
                 case AllowedInputFilter.One:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.AlwaysSingleSelection));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.AlwaysSingleSelection, string.Empty));
                     break;
 
                 case AllowedInputFilter.More:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection, string.Empty));
                     break;
 
                 case AllowedInputFilter.More | AllowedInputFilter.None:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection, string.Empty));
                     break;
 
                 case AllowedInputFilter.One | AllowedInputFilter.None:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.SingleSelection));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.SingleSelection, string.Empty));
                     break;
 
                 default:

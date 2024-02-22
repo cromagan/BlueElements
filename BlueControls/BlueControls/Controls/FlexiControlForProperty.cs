@@ -54,27 +54,33 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, 1, list, CheckBehavior.MultiSelection) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, 1, list, CheckBehavior.MultiSelection, string.Empty) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, CheckBehavior.MultiSelection) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, CheckBehavior.MultiSelection, string.Empty) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, CheckBehavior.MultiSelection) { }
-
-    public FlexiControlForProperty() : this(null, 1, null, CheckBehavior.MultiSelection) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, CheckBehavior.MultiSelection, string.Empty) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior) : base() {
+    /// <param name="expr"></param>
+    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, 1, null, CheckBehavior.MultiSelection, captionText) { }
+
+    public FlexiControlForProperty() : this(null, 1, null, CheckBehavior.MultiSelection, string.Empty) { }
+
+    /// <summary>
+    /// Je nach Datentyp eine andere Anzeige
+    /// </summary>
+    public FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior, string captionText) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -85,8 +91,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         #region Caption setzen
 
-        var x = _accessor.Name.SplitAndCutBy("__");
-        Caption = x[0].Replace("_", " ") + ":";
+        if (string.IsNullOrEmpty(captionText)) {
+            var x = _accessor.Name.SplitAndCutBy("__");
+            Caption = x[0].Replace("_", " ") + ":";
+        } else {
+            Caption = captionText.TrimEnd(":") + ":";
+        }
 
         #endregion Caption setzen
 

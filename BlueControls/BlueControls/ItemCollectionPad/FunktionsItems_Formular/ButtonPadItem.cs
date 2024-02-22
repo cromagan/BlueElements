@@ -84,18 +84,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
 
-    [Description("Die Beschriftung des Knopfes.")]
-    public string Anzeige {
-        get => _anzeige;
-        set {
-            if (IsDisposed) { return; }
-            if (_anzeige == value) { return; }
-            _anzeige = value;
-            OnChanged();
-        }
-    }
-
-    [Description("Das 1. Argument des Scriptes.")]
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
     public string Arg1 {
         get => _arg1;
         set {
@@ -106,7 +95,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
-    [Description("Das 2. Argument des Scriptes.")]
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
     public string Arg2 {
         get => _arg2;
         set {
@@ -117,7 +106,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
-    [Description("Das 3. Argument des Scriptes.")]
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
     public string Arg3 {
         get => _arg3;
         set {
@@ -128,7 +117,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
-    [Description("Das 4. Argument des Scriptes.")]
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
     public string Arg4 {
         get => _arg4;
         set {
@@ -140,6 +129,17 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public bool AutoSizeableHeight => false;
+
+    [Description("Die Beschriftung des Knopfes.")]
+    public string Beschriftung {
+        get => _anzeige;
+        set {
+            if (IsDisposed) { return; }
+            if (_anzeige == value) { return; }
+            _anzeige = value;
+            OnChanged();
+        }
+    }
 
     [Description("Ein Bild für den Knopf. Beispiel: PlusZeichen|16")]
     public string Bild {
@@ -288,12 +288,20 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        //l.Add(new FlexiControl());
 
-        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
+        l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => Bild));
+        l.Add(new FlexiControlForProperty<string>(() => Beschriftung));
+
+        var im = QuickImage.Images();
+
+        var c = new ItemCollectionList.ItemCollectionList(true);
+        foreach (var thisIm in im) {
+            c.Add(thisIm, thisIm + "|16", QuickImage.Get(thisIm, 16));
+        }
+
+        l.Add(new FlexiControlForProperty<string>(() => Bild, c));
 
         //var sn = new ItemCollectionList.ItemCollectionList(true) {
         //    "#Neue Zeile in der Datenbank anlegen"
@@ -324,16 +332,20 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             }
         }
 
+        l.Add(new FlexiControl("Aktion bei Drücken:", widthOfControl, true));
+
         l.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
         var m = Script.Commands.Get(_action);
 
         if (m is IUseableForButton ufb) {
-            if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1)); }
-            if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2)); }
-            if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3)); }
-            if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4)); }
+            if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0])); }
+            if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2, ufb.ArgsForButtonDescription[1])); }
+            if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3, ufb.ArgsForButtonDescription[2])); }
+            if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
         }
+
+        l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
     }

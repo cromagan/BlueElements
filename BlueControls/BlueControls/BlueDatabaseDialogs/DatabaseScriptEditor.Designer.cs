@@ -51,6 +51,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_valuechanged = new BlueControls.Controls.Button();
             this.chkAuslöser_prepaireformula = new BlueControls.Controls.Button();
             this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
+            this.btnVerlauf = new BlueControls.Controls.Button();
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
@@ -368,6 +369,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.grpVerfügbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpVerfügbareSkripte.CausesValidation = false;
+            this.grpVerfügbareSkripte.Controls.Add(this.btnVerlauf);
             this.grpVerfügbareSkripte.Controls.Add(this.lstEventScripts);
             this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVerfügbareSkripte.Location = new System.Drawing.Point(3, 3);
@@ -376,6 +378,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVerfügbareSkripte.TabIndex = 2;
             this.grpVerfügbareSkripte.TabStop = false;
             this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
+            // 
+            // btnVerlauf
+            // 
+            this.btnVerlauf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnVerlauf.Enabled = false;
+            this.btnVerlauf.ImageCode = "Undo|32";
+            this.btnVerlauf.Location = new System.Drawing.Point(112, 368);
+            this.btnVerlauf.Name = "btnVerlauf";
+            this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
+            this.btnVerlauf.Size = new System.Drawing.Size(120, 56);
+            this.btnVerlauf.TabIndex = 1;
+            this.btnVerlauf.Text = "Verlauf";
+            this.btnVerlauf.Click += new System.EventHandler(this.btnVerlauf_Click);
             // 
             // lstEventScripts
             // 
@@ -387,7 +402,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Location = new System.Drawing.Point(8, 16);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
-            this.lstEventScripts.Size = new System.Drawing.Size(222, 594);
+            this.lstEventScripts.Size = new System.Drawing.Size(222, 346);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
             this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
@@ -464,5 +479,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnSpaltenuebersicht;
         private Button chkChangeValuesInTest;
         private Button btnVersionErhöhen;
+        private Button btnVerlauf;
     }
 }

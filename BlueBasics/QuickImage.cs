@@ -30,6 +30,7 @@ using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Constants;
+using System.Collections.Generic;
 
 namespace BlueBasics;
 
@@ -118,17 +119,29 @@ public sealed class QuickImage : IReadableText, IStringable {
     #region Properties
 
     public string ChangeGreenTo { get; } = string.Empty;
+
     public string Code { get; } = string.Empty;
+
     public int DrehWinkel { get; }
+
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
+
     public string Färbung { get; } = string.Empty;
+
     public int Height { get; private set; }
+
     public int Helligkeit { get; }
+
     public bool IsError { get; }
+
     public string Name { get; } = string.Empty;
+
     public int Sättigung { get; }
+
     public int Transparenz { get; }
+
     public int Width { get; private set; }
+
     public string Zweitsymbol { get; } = string.Empty;
 
     #endregion
@@ -284,6 +297,20 @@ public sealed class QuickImage : IReadableText, IStringable {
     public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung.ToHtmlCode(), changeGreenTo.ToHtmlCode(), 100, 100, 0, 0, string.Empty));
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
+
+    public static List<string> Images() {
+        var type = typeof(ImageCode);
+        var l = new List<string>();
+
+        foreach (int z1 in Enum.GetValues(type)) {
+            var n = Enum.GetName(type, z1);
+            if (n != null) {
+                l.Add(n);
+            }
+        }
+
+        return l;
+    }
 
     public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;
 
