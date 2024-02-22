@@ -37,6 +37,9 @@ internal class Method_Execte : Method, IUseableForButton {
     public override List<List<string>> Args => [StringVal, StringVal];
 
     public List<List<string>> ArgsForButton => Args;
+
+    public List<string> ArgsForButtonDescription => ["Befehl", "Attribute"];
+
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "execute";
 

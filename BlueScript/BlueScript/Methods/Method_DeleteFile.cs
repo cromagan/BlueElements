@@ -38,7 +38,7 @@ internal class Method_DeleteFile : Method, IUseableForButton {
     public override List<List<string>> Args => [StringVal];
 
     public List<List<string>> ArgsForButton => Args;
-
+    public List<string> ArgsForButtonDescription => ["Datei"];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "deletefile";

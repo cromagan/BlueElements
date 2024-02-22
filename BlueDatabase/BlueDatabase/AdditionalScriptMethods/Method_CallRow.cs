@@ -33,7 +33,9 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
 
-    public List<List<string>> ArgsForButton => [StringVal];
+    public List<List<string>> ArgsForButton => [StringVal, StringVal];
+
+    public List<string> ArgsForButtonDescription => ["Skriptname", "Attribut 0"];
 
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
@@ -97,7 +99,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + rowarg;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + rowarg + "," + arg2;
 
     #endregion
 }

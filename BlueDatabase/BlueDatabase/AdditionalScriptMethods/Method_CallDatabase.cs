@@ -35,6 +35,9 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
+
+    public List<string> ArgsForButtonDescription => ["Datenbank", "Skriptname", "Attribut 0"];
+
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "calldatabase";
 

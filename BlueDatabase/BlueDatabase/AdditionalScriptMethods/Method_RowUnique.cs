@@ -38,6 +38,8 @@ public class Method_RowUnique : Method, IUseableForButton {
 
     public List<List<string>> ArgsForButton => [];
 
+    public List<string> ArgsForButtonDescription => [];
+
     public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
 
     public override string Command => "rowunique";

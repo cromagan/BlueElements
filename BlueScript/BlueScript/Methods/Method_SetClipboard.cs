@@ -38,6 +38,7 @@ internal class Method_SetClipboard : Method, IUseableForButton {
 
     public List<List<string>> ArgsForButton => [StringVal];
 
+    public List<string> ArgsForButtonDescription => ["Text"];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "setclipboard";
@@ -51,7 +52,6 @@ internal class Method_SetClipboard : Method, IUseableForButton {
     public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
-
     public string NiceTextForUser => "Text in die Zwischenablage kopieren";
 
     public override string Returns => string.Empty;

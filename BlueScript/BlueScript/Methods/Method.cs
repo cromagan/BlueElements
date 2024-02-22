@@ -26,6 +26,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 using static BlueBasics.Constants;
+using BlueScript.Interfaces;
 
 namespace BlueScript.Methods;
 
@@ -205,8 +206,8 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         var attributes = SplitAttributeToString(attributText);
         if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen."); }
-        if (attributes.Count < types.Count && lastArgMinCount !=0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (attributes.Count < types.Count -1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
         if (lastArgMinCount <= 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
         if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
 
@@ -368,19 +369,52 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         co += "~~~~~~~~~~\r\n";
         for (var z = 0; z < Args.Count; z++) {
             co = co + "  - Argument " + (z + 1) + ": " + Args[z].JoinWith(", ");
+
             if (z == Args.Count - 1 && LastArgMinCount > 0) {
-                co += " -> Dieses Argument kann beliebig oft wiederholt werden";
+                switch (LastArgMinCount) {
+                    case -1: break; // genau einmal
+                    case 0:
+                        co += " (darf fehlen oder mehrfach wiederholt werden)";
+                        break;
+
+                    case 1:
+                        co += " (darf mehrfach wiederholt werden)";
+                        break;
+
+                    default:
+
+                        co += " (muss mindetens " + LastArgMinCount.ToString() + "x wiederholt werden)";
+                        break;
+                }
             }
             co += "\r\n";
         }
         co += "\r\n";
         co += "Rückgabe:\r\n";
         co += "~~~~~~~~~\r\n";
-        co = co + "  - Rückgabetyp: " + Returns + "\r\n";
+        if (string.IsNullOrEmpty(Returns)) {
+            co = co + "  - Rückgabetyp: -\r\n";
+        } else {
+
+            if (MustUseReturnValue) {
+                co = co + "  - Rückgabetyp: " + Returns + "(muss verwendet werden)\r\n";
+            } else {
+                co = co + "  - Rückgabetyp: " + Returns + " (darf verworfen werden)\r\n";
+            }
+        }
+
         co += "\r\n";
         co += "Beschreibung:\r\n";
         co += "~~~~~~~~~~~~\r\n";
         co = co + Description + "\r\n";
+
+        if (this is IUseableForButton) {
+            co += "\r\n";
+            co += "Hinweis:\r\n";
+            co += "~~~~~~~~~~~~\r\n";
+            co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
+        }
+
         return co;
     }
 

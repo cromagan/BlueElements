@@ -36,6 +36,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
 
     public List<List<string>> ArgsForButton => Args;
 
+    public List<string> ArgsForButtonDescription => ["Text"];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "softmessage";
@@ -55,7 +56,6 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";
-
     public override string Syntax => "SoftMessage(Text);";
 
     #endregion

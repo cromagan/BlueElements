@@ -796,7 +796,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
         var (data, fileinfo) = LoadBytesFromDisk(EditableErrorReasonType.LoadForCheckingOnly);
         if (data == null || !savedDataUncompressed.SequenceEqual(data)) {
-            // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
+            // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichtert und ungeladen.
             _checkedAndReloadNeed = true;
             _lastSaveCode = "Fehler";
             //Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);

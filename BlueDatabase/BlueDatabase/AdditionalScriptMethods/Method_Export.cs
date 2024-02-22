@@ -39,6 +39,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
     public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
 
+    public List<string> ArgsForButtonDescription => ["Dateiname", "Format", "Ansichtname"];
     public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
 
     public override string Command => "export";

@@ -30,7 +30,7 @@ public interface IUseableForButton {
     #region Properties
 
     public List<List<string>> ArgsForButton { get; }
-
+    public List<string> ArgsForButtonDescription { get; }
     public ButtonArgs ClickableWhen { get; }
 
     public string Command { get; }

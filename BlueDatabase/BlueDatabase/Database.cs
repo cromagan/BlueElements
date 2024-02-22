@@ -1664,7 +1664,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (!string.IsNullOrEmpty(f) && !dictVorhanden.ContainsKey(f)) {
                     dictVorhanden.Add(f, thisR);
                 } else {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen sind nicht eindeutig.");
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption +  "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
                 }
             }

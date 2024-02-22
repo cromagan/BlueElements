@@ -37,7 +37,7 @@ internal class Method_MoveDirectory : Method, IUseableForButton {
     public override List<List<string>> Args => [StringVal, StringVal];
 
     public List<List<string>> ArgsForButton => Args;
-
+    public List<string> ArgsForButtonDescription => ["Von", "Nach"];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "movedirectory";

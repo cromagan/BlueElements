@@ -36,7 +36,9 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
 
-    public List<List<string>> ArgsForButton => [StringVal];
+    public List<List<string>> ArgsForButton => [StringVal, StringVal];
+
+    public List<string> ArgsForButtonDescription => ["Skriptname", "Attribut 0"];
 
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
 
@@ -105,7 +107,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + arg2;
 
     #endregion
 }
