@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
@@ -28,24 +29,24 @@ using BlueScript.Variables;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_AddRow : Method_Database {
+public class Method_AddRows : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, BoolVal];
-    public override string Command => "addrow";
+    public override List<List<string>> Args => [StringVal, ListStringVar, BoolVal];
+    public override string Command => "addrows";
 
-    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\n" +
-                                          "Es wird immer eine neue Zeile erstellt!\r\n" +
-                                          "KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
+    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
+                                          "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind.!\r\n" +
+                                          "Leere KeyValues werden übersprungen.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableRowItem.ShortName_Variable;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";
+    public override string Syntax => "AddRows(database, keyvalues, startScriptOfNewRow);";
 
     #endregion
 
@@ -61,14 +62,12 @@ public class Method_AddRow : Method_Database {
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
-        if (string.IsNullOrEmpty(attvar.ValueStringGet(1))) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
-        //var r = db.Row[attvar.ValueString(1)];
+        var keys = attvar.ValueListStringGet(1);
+        keys = keys.SortedDistinctList();
+        var exe = attvar.ValueBoolGet(2);
 
-        //if (r != null && !(attvar.ValueBool(2)) { return Method_Row?.RowToObject(r); }
-
-        if (attvar.ValueBoolGet(2)) {
+        if (exe) {
             StackTrace stackTrace = new();
-
             if (stackTrace.FrameCount > 400) {
                 return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf");
             }
@@ -76,9 +75,11 @@ public class Method_AddRow : Method_Database {
 
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
-        var r = db.Row.GenerateAndAdd(db.NextRowKey(), attvar.ValueStringGet(1), attvar.ValueBoolGet(2), true, "Script Command: Add Row");
+        foreach (var thisKey in keys) {
+            _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, exe, true, "Script Command: Add Rows");
+        }
 
-        return Method_Row.RowToObjectFeedback(r);
+        return DoItFeedback.Null();
     }
 
     #endregion

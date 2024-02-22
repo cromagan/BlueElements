@@ -368,7 +368,12 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         co += "Argumente:\r\n";
         co += "~~~~~~~~~~\r\n";
         for (var z = 0; z < Args.Count; z++) {
-            co = co + "  - Argument " + (z + 1) + ": " + Args[z].JoinWith(", ");
+            var a = Args[z].JoinWith(", ");
+            if (a.Contains("*")) {
+                a = a.Replace("*", "") + " (muss eine vorhandene Variable sein)";
+            }
+
+            co = co + "  - Argument " + (z + 1) + ": " + a;
 
             if (z == Args.Count - 1 && LastArgMinCount > 0) {
                 switch (LastArgMinCount) {
@@ -378,7 +383,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
                         break;
 
                     case 1:
-                        co += " (darf mehrfach wiederholt werden)";
+                        co += " (muss vorhanden sein und darf mehrfach wiederholt werden)";
                         break;
 
                     default:
@@ -395,7 +400,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         if (string.IsNullOrEmpty(Returns)) {
             co = co + "  - Rückgabetyp: -\r\n";
         } else {
-
             if (MustUseReturnValue) {
                 co = co + "  - Rückgabetyp: " + Returns + "(muss verwendet werden)\r\n";
             } else {
