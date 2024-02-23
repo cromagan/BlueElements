@@ -100,35 +100,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    /// <summary>
-    /// Verwendete Ressourcen bereinigen.
-    /// </summary>
-    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            components?.Dispose();
-
-            if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
-                _befehlsReferenz.Close();
-                _befehlsReferenz?.Dispose();
-                _befehlsReferenz = null;
-            }
-        }
-        base.Dispose(disposing);
-    }
-
-    private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
-        if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
-            _befehlsReferenz.Close();
-            _befehlsReferenz?.Dispose();
-            _befehlsReferenz = null;
-        }
-
-        _befehlsReferenz = new Befehlsreferenz();
-        _befehlsReferenz.Show();
-    }
-
-    private void btnTest_Click(object sender, System.EventArgs e) {
+    public void TesteScript() {
         Message("Starte Skript");
 
         grpVariablen.Clear();
@@ -149,11 +121,24 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
         Message(ex.Feedback.AllOk ? "Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden." : ex.Feedback.ProtocolText);
     }
 
-    private void btnZusatzDateien_Click(object sender, System.EventArgs e) => OpenAdditionalFileFolder();
+    /// <summary>
+    /// Verwendete Ressourcen bereinigen.
+    /// </summary>
+    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            components?.Dispose();
+
+            if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
+                _befehlsReferenz.Close();
+                _befehlsReferenz?.Dispose();
+                _befehlsReferenz = null;
+            }
+        }
+        base.Dispose(disposing);
+    }
 
     private void OnExecuteScript(ScriptEventArgs scriptEventArgs) => ExecuteScript?.Invoke(this, scriptEventArgs);
-
-    private void OpenAdditionalFileFolder() { }
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {

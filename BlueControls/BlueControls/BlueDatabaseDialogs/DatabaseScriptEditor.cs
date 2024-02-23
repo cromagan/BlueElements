@@ -53,7 +53,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     public DatabaseScriptEditor(Database database) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        grpEigenschaften.Enabled = false;
+        tbcScriptEigenschaften.Enabled = false;
         eventScriptEditor.Enabled = false;
         Database = database;
 
@@ -113,7 +113,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             _item = null; // Um keine werte zurück zu Schreiben werden des anzeigen
 
             if (value != null) {
-                grpEigenschaften.Enabled = true;
+                tbcScriptEigenschaften.Enabled = true;
                 eventScriptEditor.Enabled = true;
                 txbName.Text = value.KeyName;
 
@@ -131,7 +131,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
                 _item = value;
             } else {
-                grpEigenschaften.Enabled = false;
+                tbcScriptEigenschaften.Enabled = false;
                 eventScriptEditor.Enabled = false;
                 txbTestZeile.Enabled = false;
 
@@ -181,22 +181,22 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         }
     }
 
-    protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(Database?.Variables);
-
     private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         Close();
     }
 
+    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => TableView.OpenDatabaseHeadEditor(Database);
+
     private void btnSave_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        btnSave.Enabled = false;
+        btnSaveLoad.Enabled = false;
 
         WriteInfosBack();
         _ = db.Save();
 
-        btnSave.Enabled = true;
+        btnSaveLoad.Enabled = true;
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
@@ -364,7 +364,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         _allowTemporay = true;
         e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r, null);
         _allowTemporay = false;
-        variableEditor.WriteVariablesToTable(Database?.Variables);
     }
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
@@ -444,20 +443,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         t2.AddRange(lstEventScripts.Item.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
         Database.EventScriptErrorMessage = string.Empty;
-
-        #endregion
-
-        #region Variablen
-
-        // Identisch in DatabaseHeadEditor und DatabaseScriptEditor
-        var l = variableEditor.GetVariables();
-        var l2 = new List<VariableString>();
-        foreach (var thisv in l) {
-            if (thisv is VariableString vs) {
-                l2.Add(vs);
-            }
-        }
-        Database.Variables = new VariableCollection(l2);
 
         #endregion
     }
