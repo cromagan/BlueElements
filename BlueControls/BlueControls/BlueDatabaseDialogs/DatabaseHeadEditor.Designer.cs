@@ -65,6 +65,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
+            this.btnDummyAdmin = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -90,6 +91,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.grpBenutzergruppen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpBenutzergruppen.CausesValidation = false;
+            this.grpBenutzergruppen.Controls.Add(this.btnDummyAdmin);
             this.grpBenutzergruppen.Controls.Add(this.PermissionGroups_NewRow);
             this.grpBenutzergruppen.Controls.Add(this.capNeueZeilenInfo);
             this.grpBenutzergruppen.Controls.Add(this.Caption22);
@@ -110,21 +112,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.PermissionGroups_NewRow.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.PermissionGroups_NewRow.FilterText = null;
-            this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
+            this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 64);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             this.PermissionGroups_NewRow.RemoveAllowed = true;
-            this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 352);
+            this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 376);
             this.PermissionGroups_NewRow.TabIndex = 4;
             this.PermissionGroups_NewRow.Translate = false;
             // 
             // capNeueZeilenInfo
             // 
             this.capNeueZeilenInfo.CausesValidation = false;
-            this.capNeueZeilenInfo.Location = new System.Drawing.Point(192, 408);
+            this.capNeueZeilenInfo.Location = new System.Drawing.Point(192, 440);
             this.capNeueZeilenInfo.Name = "capNeueZeilenInfo";
-            this.capNeueZeilenInfo.Size = new System.Drawing.Size(176, 72);
-            this.capNeueZeilenInfo.Text = "<i>Administratoren dürfen immer neue Zeilen anlegen, wenn die erste Spalte eine B" +
-    "earbeitung zulässt";
+            this.capNeueZeilenInfo.Size = new System.Drawing.Size(176, 40);
+            this.capNeueZeilenInfo.Text = "<i>Die erste Spalte muss eine Bearbeitung zulassen";
             this.capNeueZeilenInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption22
@@ -527,6 +528,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
+            // btnDummyAdmin
+            // 
+            this.btnDummyAdmin.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.btnDummyAdmin.Checked = true;
+            this.btnDummyAdmin.Enabled = false;
+            this.btnDummyAdmin.Location = new System.Drawing.Point(192, 48);
+            this.btnDummyAdmin.Name = "btnDummyAdmin";
+            this.btnDummyAdmin.Size = new System.Drawing.Size(176, 16);
+            this.btnDummyAdmin.TabIndex = 17;
+            this.btnDummyAdmin.Text = "#Administrator";
+            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1244, 756);
@@ -591,5 +603,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private GroupBox grpUndoActions;
         private TabPage tabVariablen;
         private VariableEditor variableEditor;
+        private Button btnDummyAdmin;
     }
 }

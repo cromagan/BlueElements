@@ -2482,7 +2482,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         List<string> toc = [];
 
         if (contentHolderCellRow != null) {
-            t.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
+            toc.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
         }
 
         var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.SingleSelection, toc, new CellExtEventArgs(cellInThisDatabaseColumn, cellInThisDatabaseRow), this, Translate);

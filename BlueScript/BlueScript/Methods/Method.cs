@@ -44,7 +44,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     #region Properties
 
     public abstract List<List<string>> Args { get; }
-
     public abstract string Command { get; }
     public abstract string Description { get; }
 
@@ -62,7 +61,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     }
 
     public abstract bool GetCodeBlockAfter { get; }
-
     public string KeyName => Command;
 
     /// <summary>
@@ -72,10 +70,14 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     ///   1 = das letzte Argument darf öfters vorhanden sein
     /// > 2 = das letzte Argumengt muss mindestes so oft vorhanden sein.
     /// </summary>
-    public abstract int LastArgMinCount { get; } //TODO: 0 implementieren
+    public abstract int LastArgMinCount { get; }
 
     public abstract MethodType MethodType { get; }
+
+    //TODO: 0 implementieren
     public abstract bool MustUseReturnValue { get; }
+
+    public string QuickInfo => HintText();
     public abstract string Returns { get; }
     public abstract string StartSequence { get; }
 

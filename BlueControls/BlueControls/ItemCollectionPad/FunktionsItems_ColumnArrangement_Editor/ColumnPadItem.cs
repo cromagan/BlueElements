@@ -104,7 +104,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
         l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
         l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Column.Quickinfo, 5));
+        l.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
         l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
         //if (AdditionalStyleOptions != null) {

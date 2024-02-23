@@ -37,7 +37,6 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 {
     #region Fields
 
-    private Befehlsreferenz? _befehlsReferenz;
     private string _lastVariableContent = string.Empty;
     private string? _lastWord = string.Empty;
     private bool _menuDone;
@@ -128,12 +127,6 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
     protected override void Dispose(bool disposing) {
         if (disposing) {
             components?.Dispose();
-
-            if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
-                _befehlsReferenz.Close();
-                _befehlsReferenz?.Dispose();
-                _befehlsReferenz = null;
-            }
         }
         base.Dispose(disposing);
     }

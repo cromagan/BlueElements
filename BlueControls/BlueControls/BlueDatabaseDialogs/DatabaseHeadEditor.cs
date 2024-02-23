@@ -99,6 +99,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         PermissionGroups_NewRow.Item.Clear();
         PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Suggestions.Clear();
+        PermissionGroups_NewRow.Item.AddRange(db.Permission_AllUsed(false));
 
         DatenbankAdmin.Item.Clear();
         DatenbankAdmin.Check(db.DatenbankAdmin);
@@ -123,9 +125,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbAdditionalFiles.Text = db.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = db.StandardFormulaFile;
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
-
-        PermissionGroups_NewRow.Suggestions.Clear();
-        PermissionGroups_NewRow.Item.AddRange(db.Permission_AllUsed(false));
 
         DatenbankAdmin.Suggestions.Clear();
         DatenbankAdmin.Item.AddRange(db.Permission_AllUsed(false));

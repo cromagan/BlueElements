@@ -116,8 +116,6 @@ public class ConnectionInfo : IReadableTextWithKey {
 
     #endregion
 
-    //public event EventHandler? Changed;
-
     #region Properties
 
     /// <summary>
@@ -126,6 +124,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// </summary>
     public string AdditionalData { get; } = string.Empty;
 
+    //public event EventHandler? Changed;
     /// <summary>
     /// Eine Kennung, die von von Database abgeleiten Klassen erkannt werden kann.
     /// Enthält nur einen Wert wie z.B. DatabaseSQL.
@@ -140,6 +139,8 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann
     /// </summary>
     public Database? Provider { get; set; }
+
+    public string QuickInfo => _tablename;
 
     /// <summary>
     /// Die Tabelle, um die es geht.

@@ -255,7 +255,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new ConnectedFormulaButton() {
             Text = _anzeige,
-            ImageCode = _image,
+            ImageCode = _image + "|16",
             Drückbar_wenn = _enabledwhenrows,
             Arg1 = _arg1,
             Arg2 = _arg2,
@@ -298,7 +298,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         var c = new ItemCollectionList.ItemCollectionList(true);
         foreach (var thisIm in im) {
-            c.Add(thisIm, thisIm + "|16", QuickImage.Get(thisIm, 16));
+            c.Add(thisIm, thisIm, QuickImage.Get(thisIm, 16));
         }
 
         l.Add(new FlexiControlForProperty<string>(() => Bild, c));

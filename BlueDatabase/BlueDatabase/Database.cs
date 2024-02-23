@@ -2775,7 +2775,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, name);
         SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, name);
+        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
         //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);

@@ -36,11 +36,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Fields
 
     public bool ShowHead = true;
-
     private readonly List<ColumnViewItem> _internal = [];
-
     private readonly List<string> _permissionGroups_Show = [];
-
     private Database? _database;
     private int? _headSize;
 
@@ -80,7 +77,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public bool IsDisposed { get; private set; }
-
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
@@ -94,6 +90,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             }
         }
     }
+
+    public string QuickInfo => string.Empty;
 
     #endregion
 
@@ -163,7 +161,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
     public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
-        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {

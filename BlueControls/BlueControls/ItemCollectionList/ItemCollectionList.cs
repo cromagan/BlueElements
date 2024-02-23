@@ -208,11 +208,13 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         if (checkedItemsAtRow?.Database is Database db && !db.IsDisposed) {
             l.AddRange(checkedItemsAtRow.CellGetList(column));
             l = l.SortedDistinctList();
+            
         }
 
         if (maxItems > 0 && l.Count > maxItems) { return; }
 
         e.AddRange(l, column, style, column.BehaviorOfImageAndText);
+
     }
 
     public TextListItem Add(string internalAndReadableText) => Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);

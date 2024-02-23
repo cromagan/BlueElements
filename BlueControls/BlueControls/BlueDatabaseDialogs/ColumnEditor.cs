@@ -390,7 +390,7 @@ internal sealed partial class ColumnEditor {
         btnOtherValuesToo.Checked = _column.DropdownWerteAndererZellenAnzeigen;
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        txbQuickinfo.Text = _column.Quickinfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        txbQuickinfo.Text = _column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxEinheit.Text = _column.Suffix;
         txbBildCodeConstHeight.Text = _column.ConstantHeightOfImageCode;
         cbxBildTextVerhalten.Text = ((int)_column.BehaviorOfImageAndText).ToString();
@@ -445,7 +445,7 @@ internal sealed partial class ColumnEditor {
 
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
         _column.Format = (DataFormat)IntParse(cbxFormat.Text);
-        _column.Quickinfo = txbQuickinfo.Text.Replace("\r", "<BR>");
+        _column.QuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
         _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
         _column.Suffix = cbxEinheit.Text;
         _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
@@ -559,7 +559,7 @@ internal sealed partial class ColumnEditor {
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             if (b == null || b.IsDisposed) { return; }
-            b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
+            b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
             b.DropdownAllesAbwählenErlaubt = true;

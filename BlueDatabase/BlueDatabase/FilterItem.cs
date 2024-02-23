@@ -201,6 +201,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterCollection? Parent { get; set; } = null;
 
+    public string QuickInfo => ReadableText();
+
     public ReadOnlyCollection<string> SearchValue {
         get => _searchValue;
         private set {

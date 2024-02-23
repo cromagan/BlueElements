@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 
 namespace BlueControls.ItemCollectionList;
@@ -38,6 +39,7 @@ public class ReadableListItem : TextListItem {
     #region Properties
 
     public IReadableTextWithKey Item { get; }
+    public override string QuickInfo => Item.QuickInfo;
 
     #endregion
 

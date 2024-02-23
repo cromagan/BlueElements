@@ -210,9 +210,13 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         var symb = ImageCode.Formel;
         var c = Color.Transparent;
 
+        var h = 100;
+
         if (ManualExecutable) {
-            c = Color.Yellow;
+            //c = Color.Yellow;
             symb = ImageCode.Person;
+        } else {
+            h = 170;
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) { symb = ImageCode.Layout; }
@@ -222,7 +226,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
-        return QuickImage.Get(symb, 16, c, Color.Transparent);
+        return QuickImage.Get(symb, 16, c, Color.Transparent, h);
     }
 
     public override string ToString() {

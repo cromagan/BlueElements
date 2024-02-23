@@ -43,8 +43,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     #region Fields
 
     private bool _allowTemporay;
+    private Befehlsreferenz? _befehlsReferenz;
     private Database? _database;
     private DatabaseScriptDescription? _item;
+
+    private bool testmode = true;
 
     #endregion
 
@@ -107,6 +110,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         }
         set {
             if (_item == value) { return; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
             WriteInfosBack();
 
@@ -116,6 +120,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 tbcScriptEigenschaften.Enabled = true;
                 eventScriptEditor.Enabled = true;
                 txbName.Text = value.KeyName;
+                txbQuickInfo.Text = value.QuickInfo;
+
+                cbxPic.Text = value.Image;
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
@@ -129,6 +136,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.ScriptText;
 
+                PermissionGroups_NewRow.Item.Clear();
+                PermissionGroups_NewRow.Check(value.UserGroups);
+                PermissionGroups_NewRow.Suggestions.Clear();
+                PermissionGroups_NewRow.Item.AddRange(db.Permission_AllUsed(false));
+
                 _item = value;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
@@ -136,6 +148,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 txbTestZeile.Enabled = false;
 
                 txbName.Text = string.Empty;
+                cbxPic.Text = string.Empty;
+                txbQuickInfo.Text = string.Empty;
                 eventScriptEditor.ScriptText = string.Empty;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
@@ -155,6 +169,13 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
+
+        if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
+            _befehlsReferenz.Close();
+            _befehlsReferenz?.Dispose();
+            _befehlsReferenz = null;
+        }
+
         base.OnFormClosing(e);
 
         Item = null; // erst das Item!
@@ -165,6 +186,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         base.OnLoad(e);
 
         var didMessage = false;
+
+        var im = QuickImage.Images();
+        foreach (var thisIm in im) {
+            cbxPic.Item.Add(thisIm, thisIm, QuickImage.Get(thisIm, 16));
+        }
 
         lstEventScripts.Item.Clear();
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
@@ -186,6 +212,22 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         Close();
     }
 
+    private void btnAusführen_Click(object sender, System.EventArgs e) {
+        testmode = false;
+        eventScriptEditor.TesteScript();
+    }
+
+    private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
+        if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
+            _befehlsReferenz.Close();
+            _befehlsReferenz?.Dispose();
+            _befehlsReferenz = null;
+        }
+
+        _befehlsReferenz = new Befehlsreferenz();
+        _befehlsReferenz.Show();
+    }
+
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => TableView.OpenDatabaseHeadEditor(Database);
 
     private void btnSave_Click(object sender, System.EventArgs e) {
@@ -200,6 +242,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
+
+    private void btnTest_Click(object sender, System.EventArgs e) {
+        testmode = true;
+        eventScriptEditor.TesteScript();
+    }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
@@ -258,6 +305,16 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (tmp == int.MaxValue) { tmp = 0; }
 
         Database.EventScriptVersion = tmp.ToString();
+    }
+
+    private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        ExecuteFile(db.AdditionalFilesPfadWhole());
+    }
+
+    private void cbxPic_TextChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.Image = cbxPic.Text.TrimEnd("|16");
     }
 
     private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
@@ -357,12 +414,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
         }
 
-        if (chkChangeValuesInTest.Checked) {
+        if (!testmode) {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
         _allowTemporay = true;
-        e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r, null);
+        e.Feedback = Database?.ExecuteScript(_item, !testmode, r, null);
         _allowTemporay = false;
     }
 
@@ -393,6 +450,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
         Item = selectedlstEventScripts;
         btnVerlauf.Enabled = true;
+    }
+
+    private void PermissionGroups_NewRow_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        var tmp = PermissionGroups_NewRow.Checked.ToList();
+        _ = tmp.Remove(Constants.Administrator);
+        Item.UserGroups = new(tmp);
     }
 
     private void ScriptEditor_Changed(object sender, System.EventArgs e) {
@@ -428,6 +491,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.KeyName = txbName.Text;
+    }
+
+    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.QuickInfo = txbQuickInfo.Text;
     }
 
     private void WriteInfosBack() {

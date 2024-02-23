@@ -859,7 +859,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public string Quickinfo {
+    public string QuickInfo {
         get => _quickInfo;
         set {
             if (IsDisposed) { return; }
@@ -1160,7 +1160,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         LineLeft = source.LineLeft;
         LineRight = source.LineRight;
         MultiLine = source.MultiLine;
-        Quickinfo = source.Quickinfo;
+        QuickInfo = source.QuickInfo;
         ForeColor = source.ForeColor;
         BackColor = source.BackColor;
         EditAllowedDespiteLock = source.EditAllowedDespiteLock;

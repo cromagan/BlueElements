@@ -241,7 +241,13 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
     public virtual QuickImage? SymbolForReadableText() {
         if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
-        if (!string.IsNullOrEmpty(_image)) { return QuickImage.Get(_image); }
+        if (!string.IsNullOrEmpty(_image)) {
+            if (ManualExecutable) {
+                return QuickImage.Get(_image + "|16");
+            } else {
+                return QuickImage.Get(_image + "|16|||||170");
+            }
+        }
         //if (_manualexecutable) {            return QuickImage.Get(ImageCode.Person, 16, Color.Yellow, Color.Transparent);        }
         return null;
     }
