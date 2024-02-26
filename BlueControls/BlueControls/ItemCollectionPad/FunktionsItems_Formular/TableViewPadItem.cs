@@ -132,6 +132,13 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
+    public override void AddedToCollection() {
+        base.AddedToCollection();
+        _itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
@@ -228,13 +235,6 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         return result.Parseable(base.ToString());
-    }
-
-    internal override void AddedToCollection() {
-        base.AddedToCollection();
-        _itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

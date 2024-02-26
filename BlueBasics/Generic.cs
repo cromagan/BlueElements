@@ -199,9 +199,11 @@ public static class Generic {
         foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
             try {
                 foreach (var thist in thisas.GetTypes()) {
-                    if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
-                        l.Add((T)Activator.CreateInstance(thist, constructorArgs));
-                    }
+                    try {
+                        if (thist.IsClass && !thist.IsAbstract && typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
+                            l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                        }
+                    } catch { }
                 }
             } catch { }
         }
@@ -328,6 +330,20 @@ public static class Generic {
     private static IEnumerable<byte> GetHash(this string inputString) {
         using HashAlgorithm algorithm = SHA256.Create();
         return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+    }
+
+    private static bool HasMatchingConstructor(Type type, object[] constructorArgs) {
+        // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
+        if (constructorArgs.Length == 0) {
+            return type.GetConstructor(Type.EmptyTypes) != null;
+        }
+
+        // Überprüfen Sie, ob ein Konstruktor existiert, der den Typen der bereitgestellten Argumente entspricht
+        var constructorInfo = type.GetConstructor(
+            constructorArgs.Select(arg => arg.GetType()).ToArray()
+        );
+
+        return constructorInfo != null;
     }
 
     #endregion

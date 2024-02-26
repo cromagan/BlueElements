@@ -17,8 +17,6 @@
 
 #nullable enable
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -89,6 +87,12 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     #endregion
 
     #region Methods
+
+    public override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+    }
 
     [Description("Diese Inhalte dieser Spalte werden als Auswahlmenü der ersten Stufe angezeigt")]
     public void Auswahl_Spalte_1_wählen() => ChooseColumn(1, ref _auswahl1);
@@ -202,12 +206,6 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         result.ParseableAdd("Column Menu 2", _auswahl2);
         result.ParseableAdd("Column Menu 3", _auswahl3);
         return result.Parseable(base.ToString());
-    }
-
-    internal override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

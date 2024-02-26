@@ -108,6 +108,13 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     #region Methods
 
+    public override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
@@ -312,13 +319,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         result.ParseableAdd("Parent", CFormula);
         result.ParseableAdd("Childs", _childs);
         return result.Parseable(base.ToString());
-    }
-
-    internal override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
 
     protected override void Dispose(bool disposing) {

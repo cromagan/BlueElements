@@ -172,6 +172,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     #region Methods
 
+    public virtual void AddedToCollection() { }
+
     public object? Clone() {
         var x = ToString();
 
@@ -467,8 +469,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         x.Inflate(-ZoomPadding, -ZoomPadding);
         return x;
     }
-
-    internal virtual void AddedToCollection() { }
 
     internal void AddLineStyleOption(List<GenericControl> l) {
         if (_parent == null) { return; }

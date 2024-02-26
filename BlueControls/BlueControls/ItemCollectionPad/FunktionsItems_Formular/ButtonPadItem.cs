@@ -250,6 +250,13 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         return true;
     }
 
+    public override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
@@ -432,13 +439,6 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
         result.ParseableAdd("Action", _action);
         return result.Parseable(base.ToString());
-    }
-
-    internal override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

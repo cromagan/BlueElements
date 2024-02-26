@@ -52,6 +52,7 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnWeitere = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -209,6 +210,7 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnWeitere);
             this.grpFelder.Controls.Add(this.btnTextGenerator);
             this.grpFelder.Controls.Add(this.btnButton);
             this.grpFelder.Controls.Add(this.btnBild);
@@ -507,6 +509,17 @@ namespace BlueControls.Forms {
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
             // 
+            // btnWeitere
+            // 
+            this.btnWeitere.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitere.ImageCode = "Frage|16";
+            this.btnWeitere.Location = new System.Drawing.Point(144, 46);
+            this.btnWeitere.Name = "btnWeitere";
+            this.btnWeitere.Size = new System.Drawing.Size(104, 22);
+            this.btnWeitere.TabIndex = 8;
+            this.btnWeitere.Text = "weitere...";
+            this.btnWeitere.Click += new System.EventHandler(this.btnWeitere_Click);
+            // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -569,5 +582,6 @@ namespace BlueControls.Forms {
         private GroupBox groupBox2;
         private Button btnSkripteBearbeiten;
         private Button btnTextGenerator;
+        private Button btnWeitere;
     }
 }

@@ -121,6 +121,13 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
 
     #region Methods
 
+    public override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
@@ -213,13 +220,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
         result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
         result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
         return result.Parseable(base.ToString());
-    }
-
-    internal override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

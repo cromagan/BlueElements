@@ -169,6 +169,13 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return l;
     }
 
+    public override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
@@ -294,13 +301,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         result.ParseableAdd("Caption", _überschriftanordung);
         result.ParseableAdd("AutoDistance", _autoX);
         return result.Parseable(base.ToString());
-    }
-
-    internal override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

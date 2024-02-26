@@ -31,6 +31,8 @@ using BlueDatabase;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using static BlueBasics.Extensions;
+using BlueControls.ItemCollectionList;
 
 #nullable enable
 
@@ -294,6 +296,34 @@ public partial class ConnectedFormulaEditor : PadEditor {
         CFormula = null;
         EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", c, r, true);
         CFormula = c;
+    }
+
+    private void btnWeitere_Click(object sender, System.EventArgs e) {
+        var l = BlueBasics.Generic.GetInstaceOfType<IItemToControl>(string.Empty);
+
+        if (l == null || l.Count == 0) { return; }
+
+        var i = new ItemCollectionList.ItemCollectionList(true);
+
+        foreach (var thisl in l) {
+            i.Add(thisl);
+        }
+
+        var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
+
+        if (x == null || x.Count != 1) { return; }
+
+        var toadd = i.Get(x[0]);
+
+        if (toadd is not ReadableListItem rli) { return; }
+
+        if (rli.Item is not AbstractPadItem api) { return; }
+
+        //if (toadd is not AbstractPadItem api) {  return; }
+
+        //var x = new FileExplorerPadItem(string.Empty);
+
+        AddCentered(api);
     }
 
     private void CheckButtons() { }

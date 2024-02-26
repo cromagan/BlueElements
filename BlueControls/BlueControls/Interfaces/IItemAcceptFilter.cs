@@ -206,40 +206,7 @@ public sealed class ItemAcceptFilter {
         item.UpdateSideOptionMenu();
     }
 
-    public List<int> InputColorIdGet(IItemAcceptFilter item) {
-        if (_inputColorId.Count == 0) {
-            CalculateInputColorIds(item);
-        }
-        return _inputColorId;
-    }
-
-    public List<string> ParsableTags() {
-        List<string> result = [];
-        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
-        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
-
-        return result;
-    }
-
-    public void ParseFinished(IItemAcceptFilter item) { }
-
-    public bool ParseThis(string tag, string value) {
-        switch (tag) {
-            case "getvaluefrom":
-            case "getvaluefromkey":
-            case "getfilterfromkeys":
-                var tmp = value.FromNonCritical().SplitBy("|");
-                _getFilterFromKeys.Clear();
-                foreach (var thiss in tmp) {
-                    _getFilterFromKeys.Add(thiss.FromNonCritical());
-                }
-                _getFilterFrom = null;
-                return true;
-        }
-        return false;
-    }
-
-    internal List<GenericControl> GetStyleOptions(IItemAcceptFilter item, int widthOfControl) {
+    public List<GenericControl> GetStyleOptions(IItemAcceptFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
             new FlexiControl("Eingang:", widthOfControl, true)
         };
@@ -296,6 +263,39 @@ public sealed class ItemAcceptFilter {
         }
 
         return l;
+    }
+
+    public List<int> InputColorIdGet(IItemAcceptFilter item) {
+        if (_inputColorId.Count == 0) {
+            CalculateInputColorIds(item);
+        }
+        return _inputColorId;
+    }
+
+    public List<string> ParsableTags() {
+        List<string> result = [];
+        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
+        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
+
+        return result;
+    }
+
+    public void ParseFinished(IItemAcceptFilter item) { }
+
+    public bool ParseThis(string tag, string value) {
+        switch (tag) {
+            case "getvaluefrom":
+            case "getvaluefromkey":
+            case "getfilterfromkeys":
+                var tmp = value.FromNonCritical().SplitBy("|");
+                _getFilterFromKeys.Clear();
+                foreach (var thiss in tmp) {
+                    _getFilterFromKeys.Add(thiss.FromNonCritical());
+                }
+                _getFilterFrom = null;
+                return true;
+        }
+        return false;
     }
 
     #endregion

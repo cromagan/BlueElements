@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Windows.Forms;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
@@ -26,7 +27,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das PadItem zu einem ConnectedFormula-Control übersetzt werden kann.
 /// </summary>
-public interface IItemToControl : IHasKeyName, IHasVersion {
+public interface IItemToControl : IHasKeyName, IHasVersion, ICloneable, IReadableText, IReadableTextWithKey {
 
     #region Methods
 
