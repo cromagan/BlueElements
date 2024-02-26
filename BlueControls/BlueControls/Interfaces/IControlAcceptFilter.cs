@@ -47,8 +47,18 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
 
     #region Methods
 
+    /// <summary>
+    /// Weiterleitung nach: this.FilterInput_DispodingEvent()
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e);
 
+    /// <summary>
+    /// Weiterleitung nach:  this.FilterInput_RowsChanged();
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public void FilterInput_RowsChanged(object sender, System.EventArgs e);
 
     public void HandleChangesNow();
@@ -56,9 +66,7 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
     public void Invalidate();
 
     /// <summary>
-    /// Wird ausgelöst, wenn eine relevante Änderung der eingehenen Filter(Daten) erfolgt ist.
-    /// Hier können die neuen temporären Filter(Daten) (FilterInput) berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
-    /// Events können gekoppelt werden
+    /// Entweder ignorieerem oder HandleChangesNow aufrufen
     /// </summary>
     public void ParentFilterOutput_Changed();
 
@@ -141,8 +149,8 @@ public static class ControlAcceptFilterExtension {
 
         if (item.FilterInput != null && item.FilterInput.Database == null) {
             item.FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
-                item.FilterInput.Add(new FilterItem(mustbeDatabase,string.Empty ));
-            //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler"); 
+            item.FilterInput.Add(new FilterItem(mustbeDatabase, string.Empty));
+            //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
         }
     }
 

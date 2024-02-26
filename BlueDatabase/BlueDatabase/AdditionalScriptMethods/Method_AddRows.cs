@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
