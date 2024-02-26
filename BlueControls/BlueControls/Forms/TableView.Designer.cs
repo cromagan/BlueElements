@@ -504,7 +504,7 @@ namespace BlueControls.Forms {
             // btnSaveLoad
             // 
             this.btnSaveLoad.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSaveLoad.ImageCode = "Refresh|16";
+            this.btnSaveLoad.ImageCode = "Diskette|16";
             this.btnSaveLoad.Location = new System.Drawing.Point(80, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
             this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";

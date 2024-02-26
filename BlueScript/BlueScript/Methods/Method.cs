@@ -381,16 +381,16 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
                 switch (LastArgMinCount) {
                     case -1: break; // genau einmal
                     case 0:
-                        co += " (darf fehlen oder mehrfach wiederholt werden)";
+                        co += " (darf fehlen; darf mehrfach wiederholt werden)";
                         break;
 
                     case 1:
-                        co += " (muss vorhanden sein und darf mehrfach wiederholt werden)";
+                        co += " (muss angegeben werden; darf mehrfach wiederholt werden)";
                         break;
 
                     default:
 
-                        co += " (muss mindetens " + LastArgMinCount.ToString() + "x wiederholt werden)";
+                        co += " (muss mindestens " + LastArgMinCount.ToString() + "x wiederholt werden)";
                         break;
                 }
             }
