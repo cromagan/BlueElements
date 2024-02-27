@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -46,21 +47,21 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptFilter, IAutosizable {
+public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
-    private readonly List<string> _childs = [];
     private readonly ItemAcceptFilter _itemAccepts;
+    private string _child = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) {
+    public RegionFormulaPadItem() : this(Generic.UniqueInternal(), null) {
     }
 
-    public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
+    public RegionFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
         _itemAccepts = new();
 
         CFormula = cf;
@@ -69,13 +70,13 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         }
     }
 
-    public TabFormulaPadItem(string intern) : this(intern, null) { }
+    public RegionFormulaPadItem(string intern) : this(intern, null) { }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "FI-ChildFormula";
+    public static string ClassId => "FI-RegionFormula";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
@@ -84,9 +85,19 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     /// </summary>
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
 
+    public string Child {
+        get => _child;
+        set {
+            if (IsDisposed) { return; }
+            if (_child == value) { return; }
+            _child = value;
+            OnChanged();
+        }
+    }
+
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
-    public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
+    public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
@@ -132,102 +143,99 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
         // ist das eigentlich nicht nötig
 
-        foreach (var thisc in _childs) {
-            ConnectedFormula.ConnectedFormula? cf;
-            string pg;
-            string pgvis;
+        //foreach (var thisc in _childs) {
+        //    ConnectedFormula.ConnectedFormula? cf;
+        //    string pg;
+        //    string pgvis;
 
-            #region Connected Formuala (cf)  ermitteln und evtl. von festplatte laden
+        //    #region Connected Formuala (cf)  ermitteln und evtl. von festplatte laden
 
-            if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
-                pg = "Head";
-                pgvis = string.Empty;
-            } else {
-                cf = CFormula;
-                pg = thisc;
-                pgvis = thisc;
-            }
+        //    if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+        //        cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
+        //        pg = "Head";
+        //        pgvis = string.Empty;
+        //    } else {
+        //        cf = CFormula;
+        //        pg = thisc;
+        //        pgvis = thisc;
+        //    }
 
-            #endregion
+        //    #endregion
 
-            #region Prüfen, ob der Tab schon vorhanden ist (existsTab)
+        //    #region Prüfen, ob der Tab schon vorhanden ist (existsTab)
 
-            TabPage? existTab = null;
+        //    TabPage? existTab = null;
 
-            foreach (var thisTab in tabctrl.TabPages) {
-                if (thisTab is TabPage tb) {
-                    if (tb.Name == thisc.FileNameWithoutSuffix()) {
-                        existTab = tb;
-                        break;
-                    }
-                }
-            }
+        //    foreach (var thisTab in tabctrl.TabPages) {
+        //        if (thisTab is TabPage tb) {
+        //            if (tb.Name == thisc.FileNameWithoutSuffix()) {
+        //                existTab = tb;
+        //                break;
+        //            }
+        //        }
+        //    }
 
-            #endregion
+        //    #endregion
 
-            if (cf != null) {
-                if (cf.HasVisibleItemsForMe(pgvis)) {
-                    ConnectedFormulaView? cc;
+        //    if (cf != null) {
+        //        if (cf.HasVisibleItemsForMe(pgvis)) {
+        //            ConnectedFormulaView? cc;
 
-                    if (existTab == null) {
+        //            if (existTab == null) {
+        //                #region Neuen Tab und ConnectedFormulaView (cc) erstellen
 
-                        #region Neuen Tab und ConnectedFormulaView (cc) erstellen
+        //                var t = new TabPage {
+        //                    Name = thisc.FileNameWithoutSuffix(),
+        //                    Text = thisc.FileNameWithoutSuffix()
+        //                };
+        //                tabctrl.TabPages.Add(t);
 
-                        var t = new TabPage {
-                            Name = thisc.FileNameWithoutSuffix(),
-                            Text = thisc.FileNameWithoutSuffix()
-                        };
-                        tabctrl.TabPages.Add(t);
+        //                cc = new ConnectedFormulaView(pg);
+        //                t.Controls.Add(cc);
+        //                cc.InitFormula(cf, cc.Database());
+        //                cc.Dock = DockStyle.Fill;
+        //                cc.DoInputSettings(parentView, this);
+        //                cc.DoOutputSettings(cc.Database(), cc.Name);
+        //                //cc.HandleChangesNow();
 
-                        cc = new ConnectedFormulaView(pg);
-                        t.Controls.Add(cc);
-                        cc.InitFormula(cf, cc.Database());
-                        cc.Dock = DockStyle.Fill;
-                        cc.DoInputSettings(parentView, this);
-                        cc.DoOutputSettings(cc.Database(), cc.Name);
-                        //cc.HandleChangesNow();
+        //                //cc.GenerateView();
 
-                        //cc.GenerateView();
+        //                #endregion
+        //            } else {
+        //                #region ConnectedFormulaView (cc) im Tab Suchen
 
-                        #endregion
-                    } else {
+        //                foreach (var thisControl in existTab.Controls) {
+        //                    if (thisControl is ConnectedFormulaView cctmp) {
+        //                        cc = cctmp;
+        //                        break;
+        //                    }
+        //                }
 
-                        #region ConnectedFormulaView (cc) im Tab Suchen
+        //                #endregion
+        //            }
 
-                        foreach (var thisControl in existTab.Controls) {
-                            if (thisControl is ConnectedFormulaView cctmp) {
-                                cc = cctmp;
-                                break;
-                            }
-                        }
+        //            //if (cc != null) {
+        //            //    cc.UserGroup = myGroup;
+        //            //    cc.UserName = myName;
+        //            //}
+        //        } else {
+        //            if (existTab != null) {
+        //                #region Tab löschen
 
-                        #endregion
-                    }
+        //                foreach (var thisC in existTab.Controls) {
+        //                    if (thisC is IDisposable c) {
+        //                        c.Dispose();
+        //                    }
+        //                }
 
-                    //if (cc != null) {
-                    //    cc.UserGroup = myGroup;
-                    //    cc.UserName = myName;
-                    //}
-                } else {
-                    if (existTab != null) {
+        //                tabctrl.TabPages.Remove(existTab);
+        //                existTab.Dispose();
 
-                        #region Tab löschen
-
-                        foreach (var thisC in existTab.Controls) {
-                            if (thisC is IDisposable c) {
-                                c.Dispose();
-                            }
-                        }
-
-                        tabctrl.TabPages.Remove(existTab);
-                        existTab.Dispose();
-
-                        #endregion
-                    }
-                }
-            }
-        }
+        //                #endregion
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     public override string ErrorReason() {
@@ -240,22 +248,25 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         //b = _itemSends.ErrorReason(this);
         //if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (_childs.Count == 0) {
-            return "Keine Formulare gewählt.";
+        if (string.IsNullOrEmpty(_child)) {
+            return "Keine Formular gewählt.";
         }
 
         return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+        var cl = new ItemCollectionList.ItemCollectionList(true);
+
+        CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
+
         List<GenericControl> l =
-        [
-            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
-            new FlexiControl("Eigenschaften:", widthOfControl, true),
-            new FlexiControl("Formulare:", -1, false),
-            Childs(),
-            .. base.GetStyleOptions(widthOfControl),
+            [ .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+              new FlexiControl("Eigenschaften:", widthOfControl, true),
+              new FlexiControlForProperty<string>(() => Child, cl),
+              .. base.GetStyleOptions(widthOfControl),
         ];
+
         return l;
     }
 
@@ -277,18 +288,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                 }
                 return true;
 
-            case "path":
-                return true;
-
-            case "childs":
-                var tmp = value.FromNonCritical().SplitBy("|");
-                _childs.Clear();
-                foreach (var thiss in tmp) {
-                    _childs.AddIfNotExists(thiss.FromNonCritical());
-                }
-                return true;
-
-            case "notallowedchilds":
+            case "child":
+                _child = value.FromNonCritical();
                 return true;
         }
         return false;
@@ -317,7 +318,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
         result.ParseableAdd("Parent", CFormula);
-        result.ParseableAdd("Childs", _childs);
+        result.ParseableAdd("Child", _child);
         return result.Parseable(base.ToString());
     }
 
@@ -331,30 +332,30 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         DrawColorScheme(gr, positionModified, zoom, null, false, false, false);
-        var headh = 25 * zoom;
-        var headb = 70 * zoom;
+        //var headh = 25 * zoom;
+        //var headb = 70 * zoom;
 
-        var body = positionModified with { Y = positionModified.Y + headh, Height = positionModified.Height - headh };
-        var c = -1;
-        foreach (var thisC in _childs) {
-            c++;
-            var it = new RectangleF(positionModified.X + (c * headb), positionModified.Y, headb, headh);
+        //var body = positionModified with { Y = positionModified.Y + headh, Height = positionModified.Height - headh };
+        //var c = -1;
+        //foreach (var thisC in _childs) {
+        //    c++;
+        //    var it = new RectangleF(positionModified.X + (c * headb), positionModified.Y, headb, headh);
 
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
+        //    gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
-            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
-            gr.DrawRectangle(new Pen(Color.Black, zoom), it);
-        }
+        //    Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
+        //    gr.DrawRectangle(new Pen(Color.Black, zoom), it);
+        //}
 
-        gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
-        gr.DrawRectangle(new Pen(Color.Black, zoom), body);
+        //gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
+        //gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
-        //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        //Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
+        ////Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+        ////Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
-        if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
-        }
+        //if (!forPrinting) {
+        //    DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+        //}
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
@@ -367,33 +368,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     //    }
     //    return null;
     //}
-
-    private ListBox Childs() {
-        var childs = new ListBox {
-            AddAllowed = AddType.OnlySuggests,
-            RemoveAllowed = true,
-            MoveAllowed = true,
-            AutoSort = false,
-            CheckBehavior = CheckBehavior.AllSelected
-        };
-
-        CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);
-
-        foreach (var thisf in _childs) {
-            if (File.Exists(thisf)) {
-                childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
-            } else {
-                childs.AddAndCheck(new TextListItem(thisf, thisf, QuickImage.Get(ImageCode.Register, 16), false, true, string.Empty));
-            }
-        }
-
-        childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
-        childs.ContextMenuInit += Childs_ContextMenuInit;
-        childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
-        childs.Disposed += Childs_Disposed;
-
-        return childs;
-    }
 
     private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuCommands.Bearbeiten);
 
@@ -410,33 +384,15 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         }
     }
 
-    private void Childs_Disposed(object sender, System.EventArgs e) {
-        if (sender is ListBox childs) {
-            childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
-            childs.ContextMenuInit -= Childs_ContextMenuInit;
-            childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
-            childs.Disposed -= Childs_Disposed;
-        }
-    }
-
-    private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        _childs.Clear();
-        _childs.AddRange(((ListBox)sender).Checked);
-        OnChanged();
-        this.RaiseVersion();
-        UpdateSideOptionMenu();
-    }
-
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (CFormula == null) { return; }
 
-        foreach (var thisl in CFormula.NotAllowedChilds) {
-            _ = _childs.Remove(thisl);
+        if (CFormula.NotAllowedChilds.Contains(_child)) {
+            Child = string.Empty;
         }
 
-        OnChanged();
+        //OnChanged();
     }
 
     #endregion

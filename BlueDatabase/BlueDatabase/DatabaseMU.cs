@@ -321,9 +321,15 @@ public class DatabaseMu : Database {
 
         var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
 
-        lock (_writer) {
-            _writer.WriteLine(l.ToString());
+
+        try {
+            lock (_writer) {
+                _writer.WriteLine(l.ToString());
+            }
+        } catch {
+            Freeze("Netzwerkfehler!");
         }
+
 
         return string.Empty;
     }

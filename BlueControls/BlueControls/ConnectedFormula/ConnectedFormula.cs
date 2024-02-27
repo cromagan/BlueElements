@@ -37,6 +37,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using BlueControls.EventArgs;
+using System.IO;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -520,6 +521,39 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
     //    if (!isLoading) { Variables_Changed(); }
     //}
+
+    /// <summary>
+    /// Leert die eingehende List und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds
+    /// </summary>
+    /// <param name="list"></param>
+    /// <param name="notAllowedChilds"></param>
+    internal void AddChilds(ItemCollectionList.ItemCollectionList list, ReadOnlyCollection<string> notAllowedChilds) {
+        list.Clear();
+
+        if (File.Exists(Filename)) {
+            foreach (var thisf in Directory.GetFiles(Filename.FilePath(), "*.cfo")) {
+                if (!notAllowedChilds.Contains(thisf)) {
+                    _ = list.Add(thisf, ImageCode.Diskette);
+                }
+            }
+        }
+
+        foreach (var thisf in ConnectedFormula.AllFiles) {
+            if (!notAllowedChilds.Contains(thisf.Filename)) {
+                if (list[thisf.Filename] == null) {
+                    _ = list.Add(thisf.Filename, ImageCode.Diskette);
+                }
+            }
+        }
+
+        if (PadData != null) {
+            foreach (var thisf in PadData.AllPages()) {
+                if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
+                    _ = list.Add(thisf, ImageCode.Register);
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
