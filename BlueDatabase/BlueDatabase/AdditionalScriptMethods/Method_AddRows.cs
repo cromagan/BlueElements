@@ -36,7 +36,7 @@ public class Method_AddRows : Method_Database {
     public override string Command => "addrows";
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
-                                          "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind.!\r\n" +
+                                          "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
                                           "Leere KeyValues werden übersprungen.";
 
     public override bool GetCodeBlockAfter => false;
@@ -75,7 +75,9 @@ public class Method_AddRows : Method_Database {
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
         foreach (var thisKey in keys) {
-            _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, exe, true, "Script Command: Add Rows");
+            if (db.Row[thisKey] is null) {
+                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, exe, true, "Script Command: Add Rows");
+            }
         }
 
         return DoItFeedback.Null();

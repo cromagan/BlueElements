@@ -22,6 +22,7 @@ using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
 
@@ -30,11 +31,15 @@ internal class Method_Min : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal];
+    public override List<List<string>> Args => [[VariableFloat.ShortName_Variable, VariableString.ShortName_Variable, VariableListString.ShortName_Variable]];
     public override string Command => "min";
-    public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
+
+    public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.\r\n" +
+                                            "Ein Text wird wenn möglich als Zahl interpretiert.\r\n" +
+                                            "Ist das nicht möglich, wird der Text ignoriert.";
+
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 2;
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
@@ -48,8 +53,35 @@ internal class Method_Min : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var val = attvar.Attributes.Select(thisval => ((VariableFloat)thisval).ValueNum).Prepend(float.MaxValue).Min();
-        return new DoItFeedback(val);
+
+        var l = new List<double>();
+        foreach (var thisvar in attvar.Attributes) {
+            switch (thisvar) {
+                case VariableFloat vf:
+                    l.Add(vf.ValueNum);
+                    break;
+
+                case VariableString vs:
+                    if (DoubleTryParse(vs.ValueString, out var r)) {
+                        l.Add(r);
+                    }
+                    break;
+
+                case VariableListString vl:
+                    foreach (var thiss in vl.ValueList) {
+                        if (DoubleTryParse(thiss, out var r2)) {
+                            l.Add(r2);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if (l.Count > 0) {
+            return new DoItFeedback(l.Min());
+        }
+
+        return new DoItFeedback(infos.Data, "Keine gültigen Werte angekommen");
     }
 
     #endregion

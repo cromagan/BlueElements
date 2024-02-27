@@ -399,6 +399,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         OnItemDoubleClick(new AbstractListItemEventArgs(nd));
     }
 
+    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
 
@@ -629,8 +631,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 

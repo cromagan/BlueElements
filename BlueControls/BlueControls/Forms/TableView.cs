@@ -252,7 +252,7 @@ public partial class TableView : FormWithStatusBar {
                     split = MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
                 }
 
-                column.Statisik(tbl.RowsVisibleUnique(), !split);
+                column.Statistik(tbl.RowsVisibleUnique(), !split);
                 break;
 
             case "VorherigenInhaltWiederherstellen":

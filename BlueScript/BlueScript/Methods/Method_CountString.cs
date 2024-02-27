@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -32,16 +33,20 @@ internal class Method_CountString : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], StringVal];
     public override string Command => "countstring";
-    public override string Description => "Zählt wie oft der Suchstring im Text vorkommt.";
-     public override int LastArgMinCount => -1;
+
+    public override string Description => "Ist das erste Argument ein Text, wird gezählt, wie oft der Suchstring im Text vorkommt.\r\n" +
+        "Ist es eine Liste, wird gezählt, wie oft ein Listeneintrag dem Text entspricht.\r\n" +
+        "Achtung: Groß/Kleinschreibung wird beachtet!";
+
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "CountString(Text, Suchstring)";
+    public override string Syntax => "CountString(Text/Liste, Suchstring)";
 
     #endregion
 
@@ -49,9 +54,18 @@ internal class Method_CountString : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(attvar.ReadableText(0).CountString(attvar.ReadableText(1)));
+
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+
+        switch (attvar.Attributes[0]) {
+            case VariableString vs:
+                return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
+
+            case VariableListString vl:
+                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)));
+        }
+
+        return new DoItFeedback(infos.Data, "Interner Fehler.");
     }
 
     #endregion

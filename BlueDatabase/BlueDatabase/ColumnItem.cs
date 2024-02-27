@@ -1821,7 +1821,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public void Statisik(List<RowItem> rows, bool ignoreMultiLine) {
+    public void Statistik(List<RowItem> rows, bool ignoreMultiLine) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (rows.Count < 1) { return; }
@@ -1855,7 +1855,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
 
         var l = new List<string> {
-            "Statisik der vorkommenden Werte der Spalte: " + ReadableText(),
+            "Statistik der vorkommenden Werte der Spalte: " + ReadableText(),
             " - nur aktuell angezeigte Zeilen",
             ignoreMultiLine ? " - Zelleninhalte werden als ganzes behandelt" : " - Zelleninhalte werden gesplittet",
             " "

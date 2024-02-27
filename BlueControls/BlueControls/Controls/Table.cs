@@ -768,7 +768,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (FilterOutputType == Filterausgabe.Gewähle_Zeile) {
                 this.DoOutputSettings(db, Name);
-                FilterOutput.Add(new FilterItem(setedrow));
+               // FilterOutput.Add(new FilterItem(setedrow));
+                FilterOutput.ChangeTo(new FilterItem(setedrow));
             }
         }
     }

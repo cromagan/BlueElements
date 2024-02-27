@@ -66,9 +66,9 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     /// <summary>
     /// Gibt an, ob und wie oft das letzte Argument wiederholt werden kann bzw. muss.
     ///  -1 = das letzte Argument muss genau 1x vorhanden sein.
-    ///   0 = das letzte Argument darf fehlen oder öfters vorhanden sein (nicht implementiert)
+    ///   0 = das letzte Argument darf fehlen oder öfters vorhanden sein
     ///   1 = das letzte Argument darf öfters vorhanden sein
-    /// > 2 = das letzte Argumengt muss mindestes so oft vorhanden sein.
+    /// > 2 = das letzte Argument muss mindestes so oft vorhanden sein.
     /// </summary>
     public abstract int LastArgMinCount { get; }
 

@@ -107,6 +107,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Indexers
 
+
+    /// <summary>
+    /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
+    /// </summary>
+    /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
     public RowItem? this[string primärSchlüssel] {
         get {
             if (Database?.Column.First() is ColumnItem c) {
@@ -119,9 +124,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
+    /// Durchsucht  Datenbank mit dem angegeben Filter..
     /// </summary>
-    /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
+    /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
+
+
     public RowItem? this[params FilterItem[] filter] {
         get {
             //if (filter == null || filter.Length == 0) {
