@@ -22,8 +22,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -37,9 +35,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using ListBox = BlueControls.Controls.ListBox;
-using TabControl = BlueControls.Controls.TabControl;
+using static BlueBasics.Converter;
 
 #nullable enable
 
@@ -146,18 +142,26 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         ConnectedFormula.ConnectedFormula? cf;
+
+        string txt;
         string pg;
         if (_child.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
             cf = ConnectedFormula.ConnectedFormula.GetByFilename(_child);
             pg = "Head";
+            txt = _child.FileNameWithoutSuffix();
         } else {
             cf = CFormula;
             pg = _child;
+            txt = pg;
         }
 
         var con = new ConnectedFormulaView(pg) {
             GroupBoxStyle = _rahmenStil
         };
+
+        if (_rahmenStil != GroupBoxStyle.Nothing) {
+            con.Text = txt;
+        }
 
         con.DoInputSettings(parent, this);
         con.InitFormula(cf, this.DatabaseInput);
@@ -223,6 +227,10 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
             case "child":
                 _child = value.FromNonCritical();
                 return true;
+
+            case "borderstyle":
+                _rahmenStil = (GroupBoxStyle)IntParse(value);
+                return true;
         }
         return false;
     }
@@ -251,7 +259,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
 
         result.ParseableAdd("Parent", CFormula);
         result.ParseableAdd("Child", _child);
-        result.ParseableAdd("Style", _rahmenStil);
+        result.ParseableAdd("BorderStyle", _rahmenStil);
         return result.Parseable(base.ToString());
     }
 

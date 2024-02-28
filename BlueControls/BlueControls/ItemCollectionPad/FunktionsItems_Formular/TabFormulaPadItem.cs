@@ -181,6 +181,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         tabctrl.TabPages.Add(t);
 
                         cc = new ConnectedFormulaView(pg);
+                        cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.Database());
                         cc.Dock = DockStyle.Fill;

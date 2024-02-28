@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
@@ -43,7 +42,6 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
     private FilterCollection? _filterInput;
     private bool _generated;
-    private bool disposedValue;
 
     #endregion
 
@@ -156,8 +154,22 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
         #endregion
 
+        var x1 = 0;
+        var x2 = 0;
+        var y1= 0;
+        var y2= 0;  
+
+        if(GroupBoxStyle != GroupBoxStyle.Nothing) {
+            x1 = Skin.Padding;
+            x2 = Skin.Padding;
+            y1 = Skin.Padding * 3;
+            y2 = Skin.Padding;
+        }
+
+
+
         if (ConnectedFormula?.PadData != null) {
-            var l = ResizeControls(ConnectedFormula.PadData, Width, Height, Page);
+            var l = ResizeControls(ConnectedFormula.PadData, Width -x1-x2, Height-y1-y2, Page);
             var autoc = new List<FlexiControlForCell>();
 
             foreach (var thisit in ConnectedFormula.PadData) {
@@ -176,8 +188,8 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
                         if (thisit is IAutosizable) {
                             foreach (var (item, newpos) in l) {
                                 if (item == thisit) {
-                                    o.Left = (int)newpos.Left;
-                                    o.Top = (int)newpos.Top;
+                                    o.Left = (int)newpos.Left+x1;
+                                    o.Top = (int)newpos.Top+y1;
                                     o.Width = (int)newpos.Width;
                                     o.Height = (int)newpos.Height;
                                 }
