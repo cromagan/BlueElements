@@ -198,15 +198,15 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void btnEinstellung_Click(object sender, System.EventArgs e) {
         switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "Cricut Maker", "Abbrechen")) {
             case 0:
-                flxBreite.ValueSet("210", true, false);
-                flxHöhe.ValueSet("297", true, false);
-                flxAbstand.ValueSet("0", true, false);
+                flxBreite.ValueSet("210", true);
+                flxHöhe.ValueSet("297", true);
+                flxAbstand.ValueSet("0", true);
                 break;
 
             case 1:
-                flxBreite.ValueSet("171,1", true, false);
-                flxHöhe.ValueSet("234,9", true, false);
-                flxAbstand.ValueSet("2", true, false);
+                flxBreite.ValueSet("171,1", true);
+                flxHöhe.ValueSet("234,9", true);
+                flxAbstand.ValueSet("2", true);
                 break;
         }
     }

@@ -489,7 +489,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
-        Item.KeyName = txbName.Text;
+            Item.KeyName = txbName.Text;
     }
 
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {

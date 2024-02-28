@@ -55,7 +55,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         GenQuickInfo(btnButton, new ButtonPadItem(string.Empty));
 
-        GenQuickInfo(btnTextGenerator, new TextGeneratorPadItem(string.Empty));
+        GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem(string.Empty));
 
         GenQuickInfo(btnFileExplorer, new FileExplorerPadItem(string.Empty));
 
@@ -233,6 +233,15 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
 
+    private void btnRegionAdd_Click(object sender, System.EventArgs e) {
+        if (CFormula == null) { return; }
+
+        var x = new RegionFormulaPadItem(string.Empty, CFormula) {
+            Bei_Export_sichtbar = true
+        };
+        AddCentered(x);
+    }
+
     private void btnRegisterKarte_Click(object sender, System.EventArgs e) {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
@@ -265,11 +274,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnTable_Click(object sender, System.EventArgs e) {
         var x = new TableViewPadItem(string.Empty);
-        AddCentered(x);
-    }
-
-    private void btnTextGenerator_Click(object sender, System.EventArgs e) {
-        var x = new TextGeneratorPadItem(string.Empty);
         AddCentered(x);
     }
 

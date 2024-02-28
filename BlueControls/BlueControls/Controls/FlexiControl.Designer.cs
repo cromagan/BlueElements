@@ -16,14 +16,7 @@ namespace BlueControls.Controls {
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.components = new Container();
-            this._IdleTimer = new Timer(this.components);
             this.SuspendLayout();
-            // 
-            // _IdleTimer
-            // 
-            this._IdleTimer.Enabled = true;
-            this._IdleTimer.Interval = 1000;
-            this._IdleTimer.Tick += new EventHandler(this._IdleTimer_Tick);
             // 
             // FlexiControl
             // 
@@ -31,6 +24,5 @@ namespace BlueControls.Controls {
             this.Size = new Size(100, 100);
             this.ResumeLayout(false);
         }
-        protected Timer _IdleTimer;
     }
 }

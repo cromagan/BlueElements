@@ -46,6 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbZeilenFilter
             // 
             this.txbZeilenFilter.Cursor = Cursors.IBeam;
+            this.txbZeilenFilter.RaiseChangeDelay = 1;
             this.txbZeilenFilter.Location = new Point(8, 8);
             this.txbZeilenFilter.Margin = new Padding(4);
             this.txbZeilenFilter.Name = "txbZeilenFilter";

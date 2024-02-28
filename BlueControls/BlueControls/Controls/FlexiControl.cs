@@ -51,17 +51,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     ///// </summary>
     protected bool IsFilling;
 
-    /// <summary>
-    /// Speichert, wann die letzte Text-Änderung vorgenommen wurden.
-    /// Wenn NULL, dann wurde bereits ein Event ausgelöst.
-    /// </summary>
-    protected DateTime? LastTextChange;
-
     private AdditionalCheck _additionalCheck = AdditionalCheck.None;
 
     private string _allowedChars = string.Empty;
-
-    private bool _alwaysInstantChange;
 
     private string _caption = string.Empty;
 
@@ -165,19 +157,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_allowedChars == value) { return; }
             _allowedChars = value;
             UpdateControls();
-        }
-    }
-
-    /// <summary>
-    /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
-    /// </summary>
-    [DefaultValue(false)]
-    public bool AlwaysInstantChange {
-        get => _alwaysInstantChange;
-        set {
-            if (_alwaysInstantChange == value) { return; }
-            _alwaysInstantChange = value;
-            RaiseEventIfChanged();
         }
     }
 
@@ -392,22 +371,21 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     /// <param name="newvalue"></param>
     /// <param name="updateControls"></param>
-    /// <param name="doInstantChangedValue">Löst bei einer Werteänderung ValueChanged aus. Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
-    public void ValueSet(string? newvalue, bool updateControls, bool doInstantChangedValue) {
+    ///
+    public void ValueSet(string? newvalue, bool updateControls) {
         if (IsDisposed) { return; }
         newvalue ??= string.Empty;
 
         if (Value == newvalue) { return; }
 
-        LastTextChange = DateTime.UtcNow;
         Value = newvalue;
         if (updateControls) { UpdateValueToControl(); }
-        if (doInstantChangedValue || InvokeRequired || !Focused || _alwaysInstantChange) { RaiseEventIfChanged(); }
+        OnValueChanged();
     }
 
     protected virtual void CommandButton_Click(object sender, System.EventArgs e) {
         if (_editType != EditTypeFormula.Button) { return; }
-        ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
+        ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
         OnButtonClicked();
     }
 
@@ -485,10 +463,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                if (_IdleTimer != null) {
-                    _IdleTimer.Tick -= _IdleTimer_Tick;
-                    _IdleTimer.Dispose();
-                }
+                //if (ParentForm() is Form parentForm) {
+                //    parentForm.FormClosing -= ParentForm_FormClosing;
+                //}
 
                 _infoText = string.Empty;
                 //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
@@ -570,12 +547,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         switch (e.Control) {
             case ComboBox comboBox:
                 comboBox.TextChanged += ValueChanged_ComboBox;
-                comboBox.LostFocus += TextEditControl_LostFocus;
+                comboBox.RaiseChangeDelay = 1;
                 break;
 
             case TextBox textBox:
                 textBox.TextChanged += ValueChanged_TextBox;
-                textBox.LostFocus += TextEditControl_LostFocus;
+                textBox.RaiseChangeDelay = 1;
                 break;
 
             case GroupBox:
@@ -626,12 +603,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         switch (e.Control) {
             case ComboBox comboBox:
                 comboBox.TextChanged -= ValueChanged_ComboBox;
-                comboBox.LostFocus -= TextEditControl_LostFocus;
                 break;
 
             case TextBox textBox:
                 textBox.TextChanged -= ValueChanged_TextBox;
-                textBox.LostFocus -= TextEditControl_LostFocus;
                 break;
 
             case GroupBox:
@@ -680,14 +655,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     //protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
 
-    protected override void OnParentChanged(System.EventArgs e) {
-        base.OnParentChanged(e);
+    //protected override void OnParentChanged(System.EventArgs e) {
+    //    base.OnParentChanged(e);
 
-        var parentForm = ParentForm();
-        if (parentForm == null) { return; }
-
-        parentForm.FormClosing += ParentForm_FormClosing;
-    }
+    //    if (ParentForm() is Form parentForm) {
+    //        parentForm.FormClosing += ParentForm_FormClosing;
+    //    }
+    //}
 
     protected override void OnQuickInfoChanged() {
         base.OnQuickInfoChanged();
@@ -732,7 +706,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         if (removevalueIfNotExists) {
             if (control.Item[Value] == null) {
-                ValueSet(string.Empty, true, true);
+                ValueSet(string.Empty, true);
             }
         }
     }
@@ -743,13 +717,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Verhalten = _multiLine || Height > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-    }
-
-    private void _IdleTimer_Tick(object sender, System.EventArgs e) {
-        if (LastTextChange == null) { return; }
-        if (DateTime.UtcNow.Subtract((DateTime)LastTextChange).TotalSeconds < 20) { return; }
-        _ = Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
-        RaiseEventIfChanged();
     }
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
@@ -979,16 +946,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void ListBox_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        ValueSet(((ListBox)sender).Checked.JoinWithCr(), false, true);
-    }
-
-    private void ParentForm_FormClosing(object sender, FormClosingEventArgs e) => RaiseEventIfChanged();
-
-    private void RaiseEventIfChanged() {
-        if (LastTextChange == null) { return; }
-        if (IsDisposed) { return; }
-        LastTextChange = null;
-        OnValueChanged();
+        ValueSet(((ListBox)sender).Checked.JoinWithCr(), false);
     }
 
     // Versuchen, die Werte noch zurückzugeben
@@ -1037,7 +995,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void SwapListBox_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false, true);
+        ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
     }
 
     //private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
@@ -1053,8 +1011,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     //    if (IsFilling) { return; }
     //    ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
     //}
-
-    private void TextEditControl_LostFocus(object sender, System.EventArgs e) => RaiseEventIfChanged();
 
     private void UpdateControls() {
         if (_captionObject is Caption c) { c.Translate = _translateCaption; }
@@ -1180,17 +1136,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void ValueChanged_ComboBox(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        ValueSet(((ComboBox)sender).Text, false, ((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList);
+        ValueSet(((ComboBox)sender).Text, false);
     }
 
     private void ValueChanged_TextBox(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        ValueSet(((TextBox)sender).Text, false, false);
+        ValueSet(((TextBox)sender).Text, false);
     }
 
     // TODO: Erstellen!//if (_EditType != enEditTypeFormula.Button) { return; }//CheckIfChanged("+");//OnButtonClicked();
 
-    private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
+    private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
 
     #endregion
 }

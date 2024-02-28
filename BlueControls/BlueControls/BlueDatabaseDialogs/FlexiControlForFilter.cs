@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -36,7 +37,7 @@ using BlueDatabase.Enums;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter {
+public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter, IDisposableExtended {
 
     #region Fields
 
@@ -61,7 +62,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(204, 24);
-        AlwaysInstantChange = true;
+        //AlwaysInstantChange = true;
         FilterSingleColumn = column;
         this.Invalidate_FilterInput();
         ShowInfoWhenDisabled = true;
@@ -199,7 +200,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
         if (filterSingle == null) {
             this.Invalidate_FilterOutput();
-            ValueSet(string.Empty, true, true);
+            ValueSet(string.Empty, true);
             return;
         }
 
@@ -412,7 +413,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
             nvalue = filterSingle.SearchValue.JoinWithCr();
         }
 
-        ValueSet(nvalue, true, true);
+        ValueSet(nvalue, true);
 
         GenerateQickInfoText(filterSingle);
 
@@ -423,7 +424,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
             Caption = "?";
             EditType = EditTypeFormula.nur_als_Text_anzeigen;
             QuickInfo = string.Empty;
-            ValueSet(string.Empty, true, true);
+            ValueSet(string.Empty, true);
             return;
         }
 
@@ -485,7 +486,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         CaptionPosition = DefaultCaptionPosition;
         Caption = FilterSingleColumn.ReadableText() + ":";
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-        ValueSet(nvalue, true, true);
+        ValueSet(nvalue, true);
         //return;
         //}
 

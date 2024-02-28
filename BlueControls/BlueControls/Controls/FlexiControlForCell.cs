@@ -40,7 +40,7 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlUsesRow {
+public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlUsesRow, IDisposableExtended {
 
     #region Fields
 
@@ -727,7 +727,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         var (column, row) = GetTmpVariables();
 
         if (column == null || row == null) {
-            ValueSet(string.Empty, true, true);
+            ValueSet(string.Empty, true);
             InfoText = string.Empty;
             return;
         }
@@ -735,11 +735,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         switch (column.Format) {
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                 _ = GetRealColumn(column, row);
-                ValueSet(row.CellGetString(column), true, true);
+                ValueSet(row.CellGetString(column), true);
                 break;
 
             default:
-                ValueSet(row.CellGetString(column), true, true);
+                ValueSet(row.CellGetString(column), true);
                 break;
         }
     }

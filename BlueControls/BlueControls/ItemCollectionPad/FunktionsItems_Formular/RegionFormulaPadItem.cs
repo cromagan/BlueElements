@@ -37,6 +37,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 
@@ -45,7 +46,7 @@ using TabControl = BlueControls.Controls.TabControl;
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
-/// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
+/// Erzeut ein Unter-Element von ConnectedFormulaView
 /// </summary>
 public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptFilter, IAutosizable {
 
@@ -53,6 +54,8 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
 
     private readonly ItemAcceptFilter _itemAccepts;
     private string _child = string.Empty;
+
+    private GroupBoxStyle _rahmenStil = GroupBoxStyle.Normal;
 
     #endregion
 
@@ -96,10 +99,13 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+
     public bool DatabaseInputMustMatchOutputDatabase => false;
+
     public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+
     public override bool MustBeInDrawingArea => true;
 
     public bool MustBeOneRow => true;
@@ -111,6 +117,16 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    }
+
+    [DefaultValue(GroupBoxStyle.Normal)]
+    public GroupBoxStyle RahmenStil {
+        get => _rahmenStil;
+        set {
+            if (_rahmenStil == value) { return; }
+            _rahmenStil = value;
+            OnChanged();
+        }
     }
 
     protected override int SaveOrder => 1000;
@@ -129,113 +145,24 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new TabControl();
-        con.Name = this.DefaultItemToControlName();
-        // Die Input-Settings werden direkt auf das erzeugte
-        //con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(parent, this);
+        ConnectedFormula.ConnectedFormula? cf;
+        string pg;
+        if (_child.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+            cf = ConnectedFormula.ConnectedFormula.GetByFilename(_child);
+            pg = "Head";
+        } else {
+            cf = CFormula;
+            pg = _child;
+        }
+
+        var con = new ConnectedFormulaView(pg) {
+            GroupBoxStyle = _rahmenStil
+        };
+
+        con.DoInputSettings(parent, this);
+        con.InitFormula(cf, this.DatabaseInput);
+
         return con;
-    }
-
-    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView) {
-        // Eigentlich überpowert die Routine.
-        // Sie checkt und aktualisiert die Tabs.
-        // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
-        // ist das eigentlich nicht nötig
-
-        //foreach (var thisc in _childs) {
-        //    ConnectedFormula.ConnectedFormula? cf;
-        //    string pg;
-        //    string pgvis;
-
-        //    #region Connected Formuala (cf)  ermitteln und evtl. von festplatte laden
-
-        //    if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-        //        cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
-        //        pg = "Head";
-        //        pgvis = string.Empty;
-        //    } else {
-        //        cf = CFormula;
-        //        pg = thisc;
-        //        pgvis = thisc;
-        //    }
-
-        //    #endregion
-
-        //    #region Prüfen, ob der Tab schon vorhanden ist (existsTab)
-
-        //    TabPage? existTab = null;
-
-        //    foreach (var thisTab in tabctrl.TabPages) {
-        //        if (thisTab is TabPage tb) {
-        //            if (tb.Name == thisc.FileNameWithoutSuffix()) {
-        //                existTab = tb;
-        //                break;
-        //            }
-        //        }
-        //    }
-
-        //    #endregion
-
-        //    if (cf != null) {
-        //        if (cf.HasVisibleItemsForMe(pgvis)) {
-        //            ConnectedFormulaView? cc;
-
-        //            if (existTab == null) {
-        //                #region Neuen Tab und ConnectedFormulaView (cc) erstellen
-
-        //                var t = new TabPage {
-        //                    Name = thisc.FileNameWithoutSuffix(),
-        //                    Text = thisc.FileNameWithoutSuffix()
-        //                };
-        //                tabctrl.TabPages.Add(t);
-
-        //                cc = new ConnectedFormulaView(pg);
-        //                t.Controls.Add(cc);
-        //                cc.InitFormula(cf, cc.Database());
-        //                cc.Dock = DockStyle.Fill;
-        //                cc.DoInputSettings(parentView, this);
-        //                cc.DoOutputSettings(cc.Database(), cc.Name);
-        //                //cc.HandleChangesNow();
-
-        //                //cc.GenerateView();
-
-        //                #endregion
-        //            } else {
-        //                #region ConnectedFormulaView (cc) im Tab Suchen
-
-        //                foreach (var thisControl in existTab.Controls) {
-        //                    if (thisControl is ConnectedFormulaView cctmp) {
-        //                        cc = cctmp;
-        //                        break;
-        //                    }
-        //                }
-
-        //                #endregion
-        //            }
-
-        //            //if (cc != null) {
-        //            //    cc.UserGroup = myGroup;
-        //            //    cc.UserName = myName;
-        //            //}
-        //        } else {
-        //            if (existTab != null) {
-        //                #region Tab löschen
-
-        //                foreach (var thisC in existTab.Controls) {
-        //                    if (thisC is IDisposable c) {
-        //                        c.Dispose();
-        //                    }
-        //                }
-
-        //                tabctrl.TabPages.Remove(existTab);
-        //                existTab.Dispose();
-
-        //                #endregion
-        //            }
-        //        }
-        //    }
-        //}
     }
 
     public override string ErrorReason() {
@@ -260,10 +187,15 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
 
         CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
 
+        var u = new ItemCollectionList.ItemCollectionList(false);
+        u.AddRange(typeof(GroupBoxStyle));
+
         List<GenericControl> l =
             [ .. _itemAccepts.GetStyleOptions(this, widthOfControl),
               new FlexiControl("Eigenschaften:", widthOfControl, true),
               new FlexiControlForProperty<string>(() => Child, cl),
+
+                            new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u),
               .. base.GetStyleOptions(widthOfControl),
         ];
 
@@ -296,7 +228,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     }
 
     public override string ReadableText() {
-        const string txt = "Formulare: ";
+        const string txt = "Unterformular: ";
 
         if (this.IsOk() && DatabaseInput != null) {
             return txt + DatabaseInput.Caption;
@@ -319,6 +251,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
 
         result.ParseableAdd("Parent", CFormula);
         result.ParseableAdd("Child", _child);
+        result.ParseableAdd("Style", _rahmenStil);
         return result.Parseable(base.ToString());
     }
 

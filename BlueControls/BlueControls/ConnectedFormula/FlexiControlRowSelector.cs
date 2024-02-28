@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -32,7 +33,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlUsesRow {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlUsesRow, IDisposableExtended {
 
     #region Fields
 
@@ -167,7 +168,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (cb?.Item != null && cb.Item.Count == 1) {
-            ValueSet(cb.Item[0].KeyName, true, true);
+            ValueSet(cb.Item[0].KeyName, true);
         }
 
         if (cb?.Item == null || cb.Item.Count < 2) {
@@ -183,7 +184,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         // am Ende auf null setzen, um Blinki zu vermeiden
 
         if (cb?.Item?[Value] == null) {
-            ValueSet(string.Empty, true, true);
+            ValueSet(string.Empty, true);
         }
 
         #endregion

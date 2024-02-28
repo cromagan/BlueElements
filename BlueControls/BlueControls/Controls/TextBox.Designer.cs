@@ -7,32 +7,7 @@ namespace BlueControls.Controls
 {
     public partial class TextBox 
     {
-        //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing)
-        {
-            try
-            {
-                if (disposing)
-                {
-                    //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
-                    components?.Dispose();
-                }
-            }
-            finally
-            {
-                base.Dispose(disposing);
-                //   Dictionary.Release()
-                _cursorCharPos = 0;
-                _markStart = 0;
-                _markEnd = 0;
-                _mouseValue = 0;
-                _cursorVisible = false;
-                _suffix = null;
-                _eTxt.Changed -= _eTxt_Changed;
-                _eTxt?.Dispose();
-            }
-        }
+
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.

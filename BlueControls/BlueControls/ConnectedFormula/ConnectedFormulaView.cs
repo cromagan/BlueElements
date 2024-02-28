@@ -37,12 +37,13 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IControlUsesRow, IControlSendFilter {
+public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBackgroundNone, IControlUsesRow, IControlSendFilter, IDisposable {
 
     #region Fields
 
     private FilterCollection? _filterInput;
     private bool _generated;
+    private bool disposedValue;
 
     #endregion
 
@@ -57,6 +58,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         ((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -113,6 +120,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     public RowItem? ShowingRow => this.RowSingleOrNull();
 
     #endregion
+
+    //public void Dispose() {
+    //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //    Dispose(disposing: true);
+    //    GC.SuppressFinalize(this);
+    //}
 
     #region Methods
 
@@ -285,6 +298,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
+    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
     public void ParentFilterOutput_Changed() { }
 
     public void RowsInput_Changed() { }
@@ -325,19 +340,20 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        GenerateView();
-
-        HandleChangesNow();
-    }
-
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
 
         if (e.Control is RowEntryControl rec) {
             rec.ConnectChildParents(this);
         }
+    }
+
+    protected override void OnPaint(PaintEventArgs e) {
+        //Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+        base.OnPaint(e);
+        GenerateView();
+
+        HandleChangesNow();
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
@@ -396,4 +412,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     }
 
     #endregion
+
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~ConnectedFormulaView()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
 }

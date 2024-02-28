@@ -28,6 +28,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void InitializeComponent() {
             this.eventScriptEditor = new BlueControls.ScriptEditor();
             this.tbcScriptEigenschaften = new BlueControls.Controls.TabControl();
+            this.tabSkriptEditor = new System.Windows.Forms.TabPage();
             this.tabKopfdaten = new System.Windows.Forms.TabPage();
             this.txbQuickInfo = new BlueControls.Controls.TextBox();
             this.cbxPic = new BlueControls.Controls.ComboBox();
@@ -50,7 +51,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnVerlauf = new BlueControls.Controls.Button();
             this.capName = new BlueControls.Controls.Caption();
             this.txbName = new BlueControls.Controls.TextBox();
-            this.tabSkriptEditor = new System.Windows.Forms.TabPage();
             this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.cpZeile = new BlueControls.Controls.Caption();
@@ -70,11 +70,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnTest = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
+            this.tabSkriptEditor.SuspendLayout();
             this.tabKopfdaten.SuspendLayout();
             this.grpRechte.SuspendLayout();
             this.grpEigenschaften.SuspendLayout();
             this.grpAuslöser.SuspendLayout();
-            this.tabSkriptEditor.SuspendLayout();
             this.grpVerfügbareSkripte.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -119,6 +119,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 0;
             // 
+            // tabSkriptEditor
+            // 
+            this.tabSkriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSkriptEditor.Controls.Add(this.eventScriptEditor);
+            this.tabSkriptEditor.Location = new System.Drawing.Point(4, 25);
+            this.tabSkriptEditor.Name = "tabSkriptEditor";
+            this.tabSkriptEditor.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSkriptEditor.Size = new System.Drawing.Size(1052, 514);
+            this.tabSkriptEditor.TabIndex = 1;
+            this.tabSkriptEditor.Text = "Skript-Editor";
+            // 
             // tabKopfdaten
             // 
             this.tabKopfdaten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -141,6 +152,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbQuickInfo
             // 
+            this.txbQuickInfo.RaiseChangeDelay = 5;
             this.txbQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbQuickInfo.Location = new System.Drawing.Point(8, 296);
             this.txbQuickInfo.MultiLine = true;
@@ -151,6 +163,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // cbxPic
             // 
+            this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxPic.Location = new System.Drawing.Point(680, 32);
@@ -374,6 +387,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbName
             // 
+            this.txbName.RaiseChangeDelay = 5;
             this.txbName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbName.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -382,17 +396,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbName.Size = new System.Drawing.Size(662, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
-            // 
-            // tabSkriptEditor
-            // 
-            this.tabSkriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSkriptEditor.Controls.Add(this.eventScriptEditor);
-            this.tabSkriptEditor.Location = new System.Drawing.Point(4, 25);
-            this.tabSkriptEditor.Name = "tabSkriptEditor";
-            this.tabSkriptEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSkriptEditor.Size = new System.Drawing.Size(1052, 514);
-            this.tabSkriptEditor.TabIndex = 1;
-            this.tabSkriptEditor.Text = "Skript-Editor";
             // 
             // grpVerfügbareSkripte
             // 
@@ -432,6 +435,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbTestZeile
             // 
+            this.txbTestZeile.RaiseChangeDelay = 5;
             this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbTestZeile.Enabled = false;
             this.txbTestZeile.Location = new System.Drawing.Point(128, 24);
@@ -622,11 +626,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.pnlStatusBar.ResumeLayout(false);
             this.tbcScriptEigenschaften.ResumeLayout(false);
+            this.tabSkriptEditor.ResumeLayout(false);
             this.tabKopfdaten.ResumeLayout(false);
             this.grpRechte.ResumeLayout(false);
             this.grpEigenschaften.ResumeLayout(false);
             this.grpAuslöser.ResumeLayout(false);
-            this.tabSkriptEditor.ResumeLayout(false);
             this.grpVerfügbareSkripte.ResumeLayout(false);
             this.ribMain.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);

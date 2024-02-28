@@ -382,8 +382,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
 
-        if (existingColumnFilter.Count == 0) {
-            Add(fi);
+        if (existingColumnFilter.Count == 0 && fi.Clone() is FilterItem fin) {
+            Add(fin);
             return;
         }
 

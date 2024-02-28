@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
-            this.btnTextGenerator = new BlueControls.Controls.Button();
+            this.btnRegionAdd = new BlueControls.Controls.Button();
             this.btnButton = new BlueControls.Controls.Button();
             this.btnBild = new BlueControls.Controls.Button();
             this.btnFileExplorer = new BlueControls.Controls.Button();
@@ -211,7 +211,7 @@ namespace BlueControls.Forms {
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpFelder.Controls.Add(this.btnWeitere);
-            this.grpFelder.Controls.Add(this.btnTextGenerator);
+            this.grpFelder.Controls.Add(this.btnRegionAdd);
             this.grpFelder.Controls.Add(this.btnButton);
             this.grpFelder.Controls.Add(this.btnBild);
             this.grpFelder.Controls.Add(this.btnFileExplorer);
@@ -225,16 +225,16 @@ namespace BlueControls.Forms {
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
             // 
-            // btnTextGenerator
+            // btnRegionAdd
             // 
-            this.btnTextGenerator.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnTextGenerator.ImageCode = "Brief|16";
-            this.btnTextGenerator.Location = new System.Drawing.Point(8, 46);
-            this.btnTextGenerator.Name = "btnTextGenerator";
-            this.btnTextGenerator.Size = new System.Drawing.Size(136, 22);
-            this.btnTextGenerator.TabIndex = 7;
-            this.btnTextGenerator.Text = "Text-Generator";
-            this.btnTextGenerator.Click += new System.EventHandler(this.btnTextGenerator_Click);
+            this.btnRegionAdd.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnRegionAdd.ImageCode = "Fragezeichen|16";
+            this.btnRegionAdd.Location = new System.Drawing.Point(8, 46);
+            this.btnRegionAdd.Name = "btnRegionAdd";
+            this.btnRegionAdd.Size = new System.Drawing.Size(136, 22);
+            this.btnRegionAdd.TabIndex = 7;
+            this.btnRegionAdd.Text = "Region";
+            this.btnRegionAdd.Click += new System.EventHandler(this.btnRegionAdd_Click);
             // 
             // btnButton
             // 
@@ -581,7 +581,7 @@ namespace BlueControls.Forms {
         private Button btnArbeitsbereich;
         private GroupBox groupBox2;
         private Button btnSkripteBearbeiten;
-        private Button btnTextGenerator;
+        private Button btnRegionAdd;
         private Button btnWeitere;
     }
 }

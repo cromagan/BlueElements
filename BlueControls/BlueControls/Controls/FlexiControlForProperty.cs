@@ -39,11 +39,13 @@ namespace BlueControls.Controls;
 // https://stackoverflow.com/questions/724143/how-do-i-create-a-delegate-for-a-net-property
 // http://peisker.net/dotnet/propertydelegates.htm
 // http://geekswithblogs.net/akraus1/archive/2006/02/10/69047.aspx
-public class FlexiControlForProperty<T> : FlexiControl {
+public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
 
     #region Fields
 
     private readonly Accessor<T>? _accessor;
+
+    private Timer _checker;
 
     #endregion
 
@@ -84,7 +86,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         _accessor = new(expr);
 
         GenFehlerText();
-        _IdleTimer.Tick += Checker_Tick;
+
         CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
@@ -187,6 +189,19 @@ public class FlexiControlForProperty<T> : FlexiControl {
         GenFehlerText();
 
         _ = CheckEnabledState();
+
+        _checker = new Timer();
+        _checker.Enabled = true;
+        _checker.Interval = 1000;
+        _checker.Tick += Checker_Tick;
+    }
+
+    #endregion
+
+    #region Destructors
+
+    ~FlexiControlForProperty() {
+        Dispose(false);
     }
 
     #endregion
@@ -194,7 +209,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
     #region Methods
 
     protected override void Dispose(bool disposing) {
-        _IdleTimer.Tick -= Checker_Tick;
+        if (disposing) {
+            _checker.Dispose();
+        }
+
+        _checker.Enabled = false;
+        _checker.Tick -= Checker_Tick;
         //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
         base.Dispose(disposing);
     }
@@ -229,7 +249,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         control.AddAllowed = AddType.None;
         control.RemoveAllowed = false;
 
-        ValueSet(string.Empty, true, true);
+        ValueSet(string.Empty, true);
         //control.Check(Value.SplitByCr());
 
         //control.Item.Clear();
@@ -307,9 +327,9 @@ public class FlexiControlForProperty<T> : FlexiControl {
     }
 
     private void Checker_Tick(object sender, System.EventArgs e) {
+        if (Parent == null || !Parent.Visible || !Visible || IsDisposed || Parent.IsDisposed) { return; }
         //if (_IsFilling) { return; }
         if (!Allinitialized) { return; }
-        if (LastTextChange != null) { return; } // Noch am bearbeiten
         SetValueFromProperty();
     }
 
@@ -405,7 +425,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private void SetValueFromProperty() {
         if (_accessor == null || !_accessor.CanRead) {
-            ValueSet(string.Empty, true, false);
+            ValueSet(string.Empty, true);
             InfoText = string.Empty;
             return;
         }
@@ -413,47 +433,47 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         switch (x) {
             case null:
-                ValueSet(string.Empty, true, false);
+                ValueSet(string.Empty, true);
                 break;
 
             case string s:
-                ValueSet(s, true, false);
+                ValueSet(s, true);
                 break;
 
             case ReadOnlyCollection<string> roc:
-                ValueSet(roc.JoinWithCr(), true, false);
+                ValueSet(roc.JoinWithCr(), true);
                 break;
 
             case List<string> ls:
-                ValueSet(ls.JoinWithCr(), true, false);
+                ValueSet(ls.JoinWithCr(), true);
                 break;
 
             case bool bo:
-                ValueSet(bo.ToPlusMinus(), true, false);
+                ValueSet(bo.ToPlusMinus(), true);
                 break;
 
             case int iv:
-                ValueSet(iv.ToString(), true, false);
+                ValueSet(iv.ToString(), true);
                 break;
 
             case Enum:
-                ValueSet(((int)x).ToString(), true, false);
+                ValueSet(((int)x).ToString(), true);
                 break;
 
             case double db:
-                ValueSet(db.ToString(Format_Float2), true, false);
+                ValueSet(db.ToString(Format_Float2), true);
                 break;
 
             case float fl:
-                ValueSet(fl.ToString(Format_Float2), true, false);
+                ValueSet(fl.ToString(Format_Float2), true);
                 break;
 
             case Color co:
-                ValueSet(co.ToHtmlCode(), true, false);
+                ValueSet(co.ToHtmlCode(), true);
                 break;
 
             case Database db:
-                ValueSet(db.ConnectionData.UniqueId, true, false);
+                ValueSet(db.ConnectionData.UniqueId, true);
                 break;
 
             default:
