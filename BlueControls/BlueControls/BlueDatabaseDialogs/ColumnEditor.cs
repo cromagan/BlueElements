@@ -321,7 +321,7 @@ internal sealed partial class ColumnEditor {
         }
         lbxCellEditor.Suggestions.Clear();
 
-        lbxCellEditor.Item.AddRange(_column.Database?.Permission_AllUsed(true));
+        lbxCellEditor.Item.AddRange(Database.Permission_AllUsed(true));
         if (_table?.CurrentArrangement != null) {
             butAktuellZurueck.Enabled = _table.CurrentArrangement[_column]?.PreviewsVisible() != null;
             butAktuellVor.Enabled = _table.CurrentArrangement[_column]?.NextVisible() != null;

@@ -208,13 +208,11 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         if (checkedItemsAtRow?.Database is Database db && !db.IsDisposed) {
             l.AddRange(checkedItemsAtRow.CellGetList(column));
             l = l.SortedDistinctList();
-            
         }
 
         if (maxItems > 0 && l.Count > maxItems) { return; }
 
         e.AddRange(l, column, style, column.BehaviorOfImageAndText);
-
     }
 
     public TextListItem Add(string internalAndReadableText) => Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
@@ -550,9 +548,9 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     public Size CalculateColumnAndSize() {
         var (biggestItemX, _, heightAdded, orienation) = ItemData();
-        if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation); }
+        if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
-        return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation);
+        return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation, 0);
     }
 
     public object Clone() {
@@ -589,7 +587,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         OnChanged();
     }
 
-    internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed) {
+    internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, int addy) {
         try {
             if (Math.Abs(_lastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 _lastCheckedMaxSize = controlDrawingArea;
@@ -681,6 +679,8 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
                 }
             }
 
+            maxy += addy;
+
             #region  sliderY
 
             if (sliderY != null) {
@@ -716,7 +716,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
             return _maxNeededItemSize;
         } catch {
             Develop.CheckStackForOverflow();
-            return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed);
+            return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
         }
     }
 

@@ -141,21 +141,16 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        ConnectedFormula.ConnectedFormula? cf;
+        ConnectedFormula.ConnectedFormula? cf = null;
 
-        string txt;
-        string pg;
+        string txt = "?";
+
         if (_child.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
             cf = ConnectedFormula.ConnectedFormula.GetByFilename(_child);
-            pg = "Head";
             txt = _child.FileNameWithoutSuffix();
-        } else {
-            cf = CFormula;
-            pg = _child;
-            txt = pg;
         }
 
-        var con = new ConnectedFormulaView(pg) {
+        var con = new ConnectedFormulaView("Head", parent.Mode) {
             GroupBoxStyle = _rahmenStil
         };
 

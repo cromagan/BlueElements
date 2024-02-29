@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Interfaces;
@@ -32,7 +33,7 @@ public interface IAutosizable {
 
     #region Methods
 
-    public bool IsVisibleForMe();
+    public bool IsVisibleForMe(string mode);
 
     public void SetCoordinates(RectangleF r, bool overrideFixedSize);
 

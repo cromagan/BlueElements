@@ -347,13 +347,18 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         var tmpState = state;
         tmpState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
 
+        var addy = 0;
+
+        if (_addAlloweds != AddType.None) { addy = 32; }
+
         if (Item.Count == 0) {
             SliderY.Visible = false;
             SliderY.Value = 0;
+            addy = 0;
         }
 
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = Item.ItemData();
-        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed);
+        _ = Item.ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
 
@@ -475,7 +480,18 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void btnMinus_Click(object sender, System.EventArgs e) {
         if (_mouseOverItem == null) { return; }
+
+        if(_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count <2) { return; }
+
+
         UnCheck(_mouseOverItem);
+
+        if (_checkBehavior != CheckBehavior.AllSelected) {
+            Item.Remove(_mouseOverItem);
+            //Check(string.Empty);
+        }
+
+
     }
 
     private void btnPlus_Click(object sender, System.EventArgs e) {
@@ -551,7 +567,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (nd == _mouseOverItem) { return; }
         _mouseOverItem = nd;
 
-        if (_mouseOverItem != null && _checkBehavior == CheckBehavior.AllSelected) {
+        if (_mouseOverItem != null) {
             var pos = _mouseOverItem.Pos.Right;
 
             #region down-Button
@@ -591,7 +607,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             #region Löschen-Button
 
-            if (_removeAllowed) {
+            var removeok = _removeAllowed;
+
+            if(_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count == 1) { removeok = false; }
+
+            if (removeok) {
                 btnMinus.Width = 16;
                 btnMinus.Height = 16;
                 pos -= btnMinus.Width;

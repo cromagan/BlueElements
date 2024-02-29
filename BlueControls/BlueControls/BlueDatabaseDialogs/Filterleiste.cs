@@ -218,7 +218,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                     var viewItemCurrent = cu?[thisColumn];
                     var filterItem = _table?.Filter[thisColumn];
 
-                    #region Sichtbarkeit des Filterelemts bestimmen
+                    #region Sichtbarkeit des Filterelements bestimmen
 
                     if (thisColumn.AutoFilterSymbolPossible()) {
                         if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
@@ -251,7 +251,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                             Controls.Add(flx);
                         }
 
-                        if (leftpos + constwi > Width && count >0) {
+                        if (leftpos + constwi > Width && count > 0) {
                             leftpos = beginnx;
                             toppos = toppos + consthe + Skin.PaddingSmal;
                         }

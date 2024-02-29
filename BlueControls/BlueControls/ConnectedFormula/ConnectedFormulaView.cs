@@ -43,15 +43,18 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
     private FilterCollection? _filterInput;
     private bool _generated;
 
+    private string _modus = string.Empty;
+
     #endregion
 
     #region Constructors
 
-    public ConnectedFormulaView() : this("Head") { }
+    public ConnectedFormulaView() : this("Head", null) { }
 
-    public ConnectedFormulaView(string page) {
+    public ConnectedFormulaView(string page, string mode) {
         InitializeComponent();
         Page = page;
+        Mode = mode;
         InitFormula(null, null);
         ((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
@@ -69,10 +72,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
     public List<IControlAcceptFilter> Childs { get; } = [];
 
-    public ConnectedFormula.ConnectedFormula? ConnectedFormula {
-        get; private set;
-        //set => SetData(value, Database, RowKey, Page);
-    }
+    public ConnectedFormula.ConnectedFormula? ConnectedFormula { get; private set; }
 
     public new ControlCollection Controls {
         get {
@@ -98,6 +98,15 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
     public bool FilterInputChangedHandled { get; set; }
 
     public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
+
+    public string Mode {
+        get => _modus;
+        set {
+            if (_modus == value) { return; }
+            _modus = value;
+            InvalidateView();
+        }
+    }
 
     public string Page { get; }
 
@@ -156,20 +165,18 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
         var x1 = 0;
         var x2 = 0;
-        var y1= 0;
-        var y2= 0;  
+        var y1 = 0;
+        var y2 = 0;
 
-        if(GroupBoxStyle != GroupBoxStyle.Nothing) {
+        if (GroupBoxStyle != GroupBoxStyle.Nothing) {
             x1 = Skin.Padding;
             x2 = Skin.Padding;
             y1 = Skin.Padding * 3;
             y2 = Skin.Padding;
         }
 
-
-
         if (ConnectedFormula?.PadData != null) {
-            var l = ResizeControls(ConnectedFormula.PadData, Width -x1-x2, Height-y1-y2, Page);
+            var l = ResizeControls(ConnectedFormula.PadData, Width - x1 - x2, Height - y1 - y2, Page, Mode);
             var autoc = new List<FlexiControlForCell>();
 
             foreach (var thisit in ConnectedFormula.PadData) {
@@ -180,7 +187,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
                         _ = unused.Remove(o);
 
                         if (thisit is FakeControlPadItem cspi) {
-                            o.Visible = cspi.IsVisibleForMe();
+                            o.Visible = cspi.IsVisibleForMe(Mode);
                         } else {
                             o.Visible = true;
                         }
@@ -188,8 +195,8 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
                         if (thisit is IAutosizable) {
                             foreach (var (item, newpos) in l) {
                                 if (item == thisit) {
-                                    o.Left = (int)newpos.Left+x1;
-                                    o.Top = (int)newpos.Top+y1;
+                                    o.Left = (int)newpos.Left + x1;
+                                    o.Top = (int)newpos.Top + y1;
                                     o.Width = (int)newpos.Width;
                                     o.Height = (int)newpos.Height;
                                 }
@@ -197,7 +204,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
                         }
 
                         if (thisit is TabFormulaPadItem c3) {
-                            c3.CreateTabs((TabControl)o, this);
+                            c3.CreateTabs((TabControl)o, this, Mode);
                         }
 
                         if (o.Visible && o is FlexiControlForCell fo &&

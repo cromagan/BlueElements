@@ -177,7 +177,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
 
         ItemCollectionList.ItemCollectionList aa = new(true);
-        aa.AddRange(db.Permission_AllUsed(false));
+        aa.AddRange(Database.Permission_AllUsed(false));
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text);
         if (b == null) { return; }
 

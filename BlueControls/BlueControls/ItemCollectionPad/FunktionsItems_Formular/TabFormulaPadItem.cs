@@ -126,7 +126,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return con;
     }
 
-    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView) {
+    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, string modes) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -167,7 +167,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             #endregion
 
             if (cf != null) {
-                if (cf.HasVisibleItemsForMe(pgvis)) {
+                if (cf.HasVisibleItemsForMe(pgvis, modes)) {
                     ConnectedFormulaView? cc;
 
                     if (existTab == null) {
@@ -180,7 +180,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         };
                         tabctrl.TabPages.Add(t);
 
-                        cc = new ConnectedFormulaView(pg);
+                        cc = new ConnectedFormulaView(pg, modes);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.Database());

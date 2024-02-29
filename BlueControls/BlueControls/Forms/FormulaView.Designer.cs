@@ -273,6 +273,7 @@ namespace BlueControls.Forms {
             // CFormula
             // 
             this.CFormula.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CFormula.GroupBoxStyle = Enums.GroupBoxStyle.Nothing;
             this.CFormula.Location = new System.Drawing.Point(0, 110);
             this.CFormula.Name = "CFormula";
             this.CFormula.Size = new System.Drawing.Size(1202, 316);

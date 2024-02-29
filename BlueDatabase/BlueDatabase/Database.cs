@@ -786,6 +786,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return tmp;
     }
 
+    public static IEnumerable<string> Permission_AllUsed(bool cellLevel) {
+        var l = new List<string>();
+
+        foreach (var thisDB in AllFiles) {
+            if (!thisDB.IsDisposed) {
+                l.AddRange(thisDB.Permission_AllUsedInThisDB(cellLevel));
+            }
+        }
+
+        return l.SortedDistinctList();
+    }
+
     public static bool SaveToFile(Database db, int minLen, string filn) {
         var bytes = ToListOfByte(db, minLen, db.FileStateUTCDate);
 
@@ -1897,7 +1909,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public IEnumerable<string> Permission_AllUsed(bool cellLevel) {
+    public IEnumerable<string> Permission_AllUsedInThisDB(bool cellLevel) {
         List<string> e = [];
         foreach (var thisColumnItem in Column) {
             if (thisColumnItem != null) {

@@ -163,7 +163,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         if (op == 2) { return; }
 
-        CFormula.Resize(FloatParse(wi) * AutosizableExtension.GridSize, FloatParse(he) * AutosizableExtension.GridSize, op == 0);
+        CFormula.Resize(FloatParse(wi) * AutosizableExtension.GridSize, FloatParse(he) * AutosizableExtension.GridSize, op == 0, string.Empty);
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {

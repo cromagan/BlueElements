@@ -33,6 +33,8 @@ using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 using static BlueBasics.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 #nullable enable
 
@@ -50,8 +52,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     public static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
-    public readonly List<string> VisibleFor = [];
-
     #endregion
 
     #region Constructors
@@ -63,6 +63,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     #region Properties
 
     public abstract bool MustBeInDrawingArea { get; }
+    public ReadOnlyCollection<string> VisibleFor { get; set; } = new([]);
     protected override int SaveOrder => 3;
 
     #endregion
@@ -115,7 +116,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
-            l.Add(new FlexiControlForDelegate(Sichtbarkeit, "Sichtbarkeit", ImageCode.Schild));
+            var vf = new ItemCollectionList.ItemCollectionList(false);
+            vf.AddRange(BlueControls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed());
+            l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
         }
 
         //l.Add(new FlexiControl());
@@ -123,19 +126,33 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return l;
     }
 
-    public bool IsVisibleForMe() {
+    public bool IsVisibleForMe(string mode) {
         //if(!Bei_Export_sichtbar ) { return false; }
+        if (VisibleFor.Count == 0) { return true; }
+        if (string.IsNullOrEmpty(mode)) { return true; }
 
-        if (string.IsNullOrEmpty(UserGroup) || string.IsNullOrEmpty(UserName)) { return true; }
-
-        if (VisibleFor.Count == 0 || VisibleFor.Contains(Constants.Everybody, false)) { return true; }
-
-        if (UserGroup.Equals(Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
-
-        if (VisibleFor.Contains(UserGroup, false)) { return true; }
+        if (VisibleFor.Contains(Constants.Everybody, false)) { return true; }
+        if (VisibleFor.Contains(mode, false)) { return true; }
+        if (string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase) &&
+    VisibleFor.Contains(Constants.Administrator, false)) { return true; }
 
         if (VisibleFor.Contains("#USER: " + UserName, false)) { return true; }
         if (VisibleFor.Contains("#USER:" + UserName, false)) { return true; }
+
+
+
+        //if (!string.IsNullOrEmpty(modus) && Modes.Count > 0) {
+
+        //}
+
+        //if (string.IsNullOrEmpty(UserGroup) || string.IsNullOrEmpty(UserName)) { return true; }
+
+        //if (UserGroup.Equals(Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
+
+        //if (VisibleFor.Contains(UserGroup, false)) { return true; }
+
+        //   return modes.Any(mode => VisibleFor.Any(visible => string.Equals(mode, visible, StringComparison.OrdinalIgnoreCase)));
+
         return false;
     }
 
@@ -150,13 +167,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         switch (tag) {
             case "visiblefor":
                 value = value.Replace("\r", "|");
-
-                var tmp = value.FromNonCritical().SplitBy("|");
-                VisibleFor.Clear();
-                foreach (var thiss in tmp) {
-                    VisibleFor.Add(thiss.FromNonCritical());
-                }
-                if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
+                var tmp = value.FromNonCritical().SplitBy("|").ToList();
+                if (tmp.Count == 0) { tmp.Add(Constants.Everybody); }
+                tmp = tmp.SortedDistinctList();
+                VisibleFor = tmp.AsReadOnly();
                 return true;
         }
         return false;
@@ -171,27 +185,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         x.Width = (Parent.SheetSizeInPix.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         x.X = (x.Width * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
         SetCoordinates(x, true);
-    }
-
-    public void Sichtbarkeit() {
-        if (IsDisposed) { return; }
-        ItemCollectionList.ItemCollectionList aa = new(true);
-        aa.AddRange(Permission_AllUsed());
-
-        if (aa[Constants.Administrator] == null) { _ = aa.Add(Constants.Administrator); }
-        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, CheckBehavior.MultiSelection, VisibleFor, AddType.Text);
-        if (b == null) { return; }
-        VisibleFor.Clear();
-
-        VisibleFor.AddRange(b.ToArray());
-
-        if (VisibleFor.Count > 1 && VisibleFor.Contains(Constants.Everybody, false)) {
-            VisibleFor.Clear();
-            VisibleFor.Add(Constants.Everybody);
-        }
-
-        if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Administrator); }
-        OnChanged();
     }
 
     public void Standardhöhe_setzen() {
@@ -213,7 +206,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
-        if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
+        //if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
 
         result.ParseableAdd("VisibleFor", VisibleFor);
 
@@ -354,21 +347,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             //gr.FillRectangle(Brushes.LightGray, uc);
             //gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
         }
-    }
-
-    private IEnumerable<string> Permission_AllUsed() {
-        var l = new List<string>();
-        if (Parent != null) {
-            foreach (var thisIt in Parent) {
-                if (thisIt is FakeControlPadItem csi) {
-                    l.AddRange(csi.VisibleFor);
-                }
-            }
-        }
-        l.Add(Constants.Everybody);
-        l.Add("#User: " + UserName);
-
-        return l.SortedDistinctList();
     }
 
     #endregion

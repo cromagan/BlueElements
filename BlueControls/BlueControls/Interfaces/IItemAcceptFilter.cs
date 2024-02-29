@@ -240,19 +240,19 @@ public sealed class ItemAcceptFilter {
 
             switch (item.AllowedInputFilter) {
                 case AllowedInputFilter.One:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.AlwaysSingleSelection, string.Empty));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, string.Empty, 3, x, CheckBehavior.AlwaysSingleSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.More:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection, string.Empty));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.More | AllowedInputFilter.None:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.MultiSelection, string.Empty));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.One | AllowedInputFilter.None:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, 3, x, CheckBehavior.SingleSelection, string.Empty));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None));
                     break;
 
                 default:

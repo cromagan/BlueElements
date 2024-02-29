@@ -403,14 +403,14 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         RectangleF PositioOf(int no) => new(newX[no], newY[no], newW[no], newH[no]);
     }
 
-    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad.ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page) {
+    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad.ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page, string mode) {
 
         #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
 
         List<IAutosizable> its = [];
 
         foreach (var thisc in padData) {
-            if (thisc is IAutosizable aas && aas.IsVisibleForMe() && thisc.IsVisibleOnPage(page)) {
+            if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode) && thisc.IsVisibleOnPage(page)) {
                 its.Add(aas);
             }
         }
@@ -428,6 +428,18 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         }
 
         return erg;
+    }
+
+    public static IEnumerable<string> VisibleFor_AllUsed() {
+        var l = new List<string>();
+
+        foreach (var thisCf in AllFiles) {
+            if (!thisCf.IsDisposed && thisCf.PadData is ItemCollectionPad.ItemCollectionPad icp) {
+                l.AddRange(icp.VisibleFor_AllUsed());
+            }
+        }
+
+        return l.SortedDistinctList();
     }
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => _saved = true;
@@ -541,18 +553,18 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         foreach (var thisf in ConnectedFormula.AllFiles) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
                 if (list[thisf.Filename] == null) {
-                    _ = list.Add(thisf.Filename, ImageCode.Diskette);
+                    _ = list.Add(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette);
                 }
             }
         }
 
-        if (PadData != null) {
-            foreach (var thisf in PadData.AllPages()) {
-                if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-                    _ = list.Add(thisf, ImageCode.Register);
-                }
-            }
-        }
+        //if (PadData != null) {
+        //    foreach (var thisf in PadData.AllPages()) {
+        //        if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
+        //            _ = list.Add(thisf, ImageCode.Register);
+        //        }
+        //    }
+        //}
     }
 
     /// <summary>
@@ -561,7 +573,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     /// </summary>
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
-    internal bool HasVisibleItemsForMe(string page) {
+    internal bool HasVisibleItemsForMe(string page, string mode) {
         if (_padData == null) { return false; }
 
         foreach (var thisItem in _padData) {
@@ -569,7 +581,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
                 if (thisItem is FakeControlPadItem cspi) {
-                    if (cspi.IsVisibleForMe()) { return true; }
+                    if (cspi.MustBeInDrawingArea && cspi.IsVisibleForMe(mode)) { return true; }
                 }
             }
         }
@@ -591,7 +603,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
-    internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls) {
+    internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls, string mode) {
         if (PadData == null) { return; }
 
         if (changeControls) {
@@ -599,7 +611,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
             //var newhHeightPixel = MmToPixel(newheightinmm, ItemCollectionPad.Dpi);
 
             foreach (var thisPage in PadData.AllPages()) {
-                var x = ResizeControls(PadData, newWidthPixel, newhHeightPixel, thisPage);
+                var x = ResizeControls(PadData, newWidthPixel, newhHeightPixel, thisPage, mode);
 
                 #region Die neue Position in die Items schreiben
 

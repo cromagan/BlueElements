@@ -56,33 +56,33 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, 1, list, CheckBehavior.MultiSelection, string.Empty) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, CheckBehavior.MultiSelection, string.Empty) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, CheckBehavior.MultiSelection, string.Empty) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, 1, null, CheckBehavior.MultiSelection, captionText) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
 
-    public FlexiControlForProperty() : this(null, 1, null, CheckBehavior.MultiSelection, string.Empty) { }
+    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior, string captionText) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior, AddType addallowed) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -119,7 +119,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
                     var lb = CreateSubControls() as ListBox;
-                    StyleListBox(lb, list, checkBehavior);
+                    StyleListBox(lb, list, checkBehavior, addallowed);
 
                     break;
                 }
@@ -235,7 +235,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         base.OnValueChanged();
     }
 
-    protected void StyleListBox(ListBox? control, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior) {
+    protected void StyleListBox(ListBox? control, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior, AddType addallowed) {
         if (control == null) { return; }
 
         control.Enabled = Enabled;
@@ -246,7 +246,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         control.CheckBehavior = checkBehavior;
         control.Appearance = ListBoxAppearance.Listbox_Boxes;
         control.Item.AddClonesFrom(list);
-        control.AddAllowed = AddType.None;
+        control.AddAllowed = addallowed;
         control.RemoveAllowed = false;
 
         ValueSet(string.Empty, true);

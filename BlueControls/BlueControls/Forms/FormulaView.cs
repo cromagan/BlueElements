@@ -34,7 +34,11 @@ public partial class FormulaView : FormWithStatusBar {
 
     public FormulaView() => InitializeComponent();
 
-    public FormulaView(string filename) : this() => FormulaSet(filename);
+    public FormulaView(string filename, string mode) : this() {
+        CFormula.Mode = mode;
+
+        FormulaSet(filename);
+    }
 
     #endregion
 

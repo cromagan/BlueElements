@@ -46,6 +46,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
 using static BlueBasics.Constants;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -233,6 +234,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
+
     public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     /// <summary>
@@ -536,6 +538,21 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
+    public IEnumerable<string> Permission_AllUsed() {
+        var l = new List<string>();
+
+        foreach (var thisIt in this) {
+            if (thisIt is FakeControlPadItem csi) {
+                l.AddRange(csi.VisibleFor);
+            }
+        }
+
+        l.Add(Constants.Everybody);
+        l.Add("#User: " + UserName);
+
+        return l.SortedDistinctList();
+    }
+
     public void Remove(string internalname) => Remove(this[internalname]);
 
     public new void Remove(AbstractPadItem? item) {
@@ -703,6 +720,24 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
 
         return result.Parseable(tmp);
+    }
+
+    public IEnumerable<string> VisibleFor_AllUsed() {
+        var l = new List<string>();
+
+        foreach (var thisIt in this) {
+            if (thisIt is FakeControlPadItem csi) {
+                l.AddRange(csi.VisibleFor);
+            }
+        }
+
+        l.Add(Constants.Administrator);
+        l.Add(Constants.Everybody);
+        l.Add("#User: " + UserName);
+
+        l.AddRange(Database.Permission_AllUsed(false));
+
+        return l.SortedDistinctList();
     }
 
     internal Rectangle DruckbereichRect() =>
