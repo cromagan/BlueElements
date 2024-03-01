@@ -550,42 +550,27 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (columnVar == null || columnVar.ReadOnly) { return; }
         if (!column.Format.CanBeChangedByRules()) { return; }
 
-        //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-        //    var columnLinkVar = vars.GetSystem(Column.KeyName + "_Link");
-        //    if (columnLinkVar != null) {
-        //        column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
-        //    }
-        //}
+        switch (columnVar) {
+            case VariableFloat vf:
+                CellSet(column, vf.ValueNum);
+                break;
 
-        if (columnVar is VariableFloat vf) {
-            CellSet(column, vf.ValueNum);
-            return;
-        }
+            case VariableListString vl:
+                CellSet(column, vl.ValueList);
+                break;
 
-        if (columnVar is VariableListString vl) {
-            CellSet(column, vl.ValueList);
-            return;
-        }
+            case VariableBool vb:
+                CellSet(column, vb.ValueBool);
+                break;
 
-        if (columnVar is VariableBool vb) {
-            CellSet(column, vb.ValueBool);
-            return;
-        }
-        if (columnVar is VariableString vs) {
-            CellSet(column, vs.ValueString);
-            return;
-        }
-        //if (columnVar is VariableDateTime vd) {
-        //    var x = vd.ValueDate.ToString(Constants.Format_Date9, CultureInfo.InvariantCulture);
-        //    x = x.TrimEnd(".000");
-        //    x = x.TrimEnd(".0");
-        //    x = x.TrimEnd("00:00:00");
-        //    x = x.TrimEnd(" ");
-        //    CellSet(column, x);
-        //    return;
-        //}
+            case VariableString vs:
+                CellSet(column, vs.ValueString);
+                break;
 
-        Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
+            default:
+                Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
+                break;
+        }
     }
 
     internal bool AmIChanger() {

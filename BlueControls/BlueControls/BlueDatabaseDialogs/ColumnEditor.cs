@@ -366,7 +366,6 @@ internal sealed partial class ColumnEditor {
         txbFixedColumnWidth.Text = _column.FixedColumnWidth > 0 ? _column.FixedColumnWidth.ToString() : string.Empty;
         btnAutoEditToUpper.Checked = _column.AfterEditDoUCase;
         btnAutoEditKleineFehler.Checked = _column.AfterEditAutoCorrect;
-        txbInitValue.Text = _column.CellInitValue;
         txbJoker.Text = _column.AutoFilterJoker;
         txbUeberschift1.Text = _column.CaptionGroup1;
         txbUeberschift2.Text = _column.CaptionGroup2;
@@ -471,7 +470,6 @@ internal sealed partial class ColumnEditor {
 
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         _column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
-        _column.CellInitValue = txbInitValue.Text;
         _column.ShowMultiLineInOneLine = btnEinzeiligDarstellen.Checked;
         _column.ShowUndo = btnLogUndo.Checked;
         _column.FormatierungErlaubt = btnFormatierungErlaubt.Checked;

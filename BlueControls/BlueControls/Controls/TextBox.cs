@@ -165,7 +165,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     [DefaultValue("")]
     public string Prefix { get; set; } = string.Empty;
 
-    [DefaultValue(true)]
+    [DefaultValue(0)]
     public int RaiseChangeDelay {
         get => _raiseChangeDelay / 2; // Umrechnung aus Sekunden
         set {

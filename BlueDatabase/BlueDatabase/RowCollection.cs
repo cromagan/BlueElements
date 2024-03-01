@@ -107,7 +107,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Indexers
 
-
     /// <summary>
     /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
     /// </summary>
@@ -127,7 +126,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Durchsucht  Datenbank mit dem angegeben Filter..
     /// </summary>
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
-
 
     public RowItem? this[params FilterItem[] filter] {
         get {
@@ -453,12 +451,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src, u); }
             if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture)); }
 
-            // Dann die Inital-Werte reinschreiben
-            foreach (var thisColum in db.Column) {
-                if (thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue)) {
-                    item.CellSet(thisColum, thisColum.CellInitValue);
-                }
-            }
+            //// Dann die Inital-Werte reinschreiben
+            //foreach (var thisColum in db.Column) {
+            //    if (thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue)) {
+            //        item.CellSet(thisColum, thisColum.CellInitValue);
+            //    }
+            //}
         }
 
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
@@ -467,7 +465,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Null!");
         }
 
-        if (item.CellFirstString() != db.Column.First().AutoCorrect(valueOfCellInFirstColumn, true)) {
+        if (item.CellFirstString() != db.Column?.First()?.AutoCorrect(valueOfCellInFirstColumn, true)) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 

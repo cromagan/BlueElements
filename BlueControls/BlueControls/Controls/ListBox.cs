@@ -332,17 +332,24 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-        var tmpDesign = _appearance is ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.Listbox_Boxes
-            ? Design.ListBox
-            : (Design)_appearance;
 
+    private Design CheckboxDesign() {
         var checkboxDesign = Design.Undefiniert;
         if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected) {
             checkboxDesign = _checkBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection
                 ? Design.OptionButton_TextStyle
                 : Design.CheckBox_TextStyle;
         }
+        return checkboxDesign;
+    }
+
+
+    protected override void DrawControl(Graphics gr, States state) {
+        var tmpDesign = _appearance is ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.Listbox_Boxes
+            ? Design.ListBox
+            : (Design)_appearance;
+
+        var checkboxDesign = CheckboxDesign();
 
         var tmpState = state;
         tmpState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
@@ -481,8 +488,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void btnMinus_Click(object sender, System.EventArgs e) {
         if (_mouseOverItem == null) { return; }
 
-        if(_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count <2) { return; }
-
+        if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
+        if (CheckboxDesign() != Design.Undefiniert) { return; }
 
         UnCheck(_mouseOverItem);
 
@@ -609,7 +616,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             var removeok = _removeAllowed;
 
-            if(_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count == 1) { removeok = false; }
+            if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { removeok = false; }
+            if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
 
             if (removeok) {
                 btnMinus.Width = 16;

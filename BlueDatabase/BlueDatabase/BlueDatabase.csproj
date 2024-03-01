@@ -83,6 +83,7 @@
     <Compile Include="AdditionalScriptMethods\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_WriteBackDBVariables.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />

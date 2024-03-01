@@ -2758,7 +2758,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);
         SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, name);
+        //SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, name);
         SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
