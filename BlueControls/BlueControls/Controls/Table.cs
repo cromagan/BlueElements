@@ -2672,42 +2672,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Draw_CellAsButton(Graphics gr, ColumnItem cellInThisDatabaseColumn, RowItem cellInThisDatabaseRow, Rectangle cellrectangle) {
-        ButtonCellEventArgs e = new(cellInThisDatabaseColumn, cellInThisDatabaseRow);
-        OnNeedButtonArgs(e);
-
-        var s = States.Standard;
-        if (!Enabled) { s = States.Standard_Disabled; }
-        if (e.Cecked) { s |= States.Checked; }
-
-        var x = new ExtText(Design.Button_CheckBox, s);
-        Button.DrawButton(this, gr, Design.Button_CheckBox, s, e.Image, Alignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
-    }
-
-    /// <summary>
-    /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.
-    /// </summary>
-    /// <param name="gr"></param>
-    /// <param name="cellInThisDatabaseColumn"></param>
-    /// <param name="cellInThisDatabaseRow"></param>
-    /// <param name="cellrectangle"></param>
-    /// <param name="contentHolderCellColumn"></param>
-    /// <param name="contentHolderCellRow"></param>
-    /// <param name="font"></param>
-    /// <param name="state"></param>
-    private void Draw_CellTransparentDirect(Graphics gr, ColumnItem cellInThisDatabaseColumn, RowItem cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem contentHolderCellColumn, RowItem contentHolderCellRow, BlueFont font, States state) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-
-        if (cellInThisDatabaseColumn.Format == DataFormat.Button) {
-            Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
-            return;
-        }
-
-        var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
-
-        Draw_CellTransparentDirect(gr, toDraw, ShortenStyle.Replaced, cellrectangle, font, contentHolderCellColumn, _pix16, contentHolderCellColumn.BehaviorOfImageAndText, state, db.GlobalScale);
-    }
-
     private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWoSlider, ColumnViewCollection ca) {
         if (cellInThisDatabaseColumn.Column is not ColumnItem tmpc) { return; }
 
@@ -2720,13 +2684,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (viewItem.Column is not ColumnItem cellInThisDatabaseColumn) { return; }
 
-        bool isAdmin = db.IsAdministrator();
-        bool isCurrentThreadBackground = Thread.CurrentThread.IsBackground;
-        int columnX1 = viewItem.OrderTmpSpalteX1 ?? 0;
-        int drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2;
+        var isAdmin = db.IsAdministrator();
+        var isCurrentThreadBackground = Thread.CurrentThread.IsBackground;
+        var columnX1 = viewItem.OrderTmpSpalteX1 ?? 0;
+        var drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2;
+        var errorImg = QuickImage.Get("Warnung|10||||||120||60");
 
         if (Database.Column.First() is ColumnItem columnFirst && cellInThisDatabaseColumn == columnFirst && UserEdit_NewRowAllowed()) {
-            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle(viewItem.OrderTmpSpalteX1 ?? 0 + 1, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth, 16 - 2), this, false, _newRowFont, Translate);
+            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle(columnX1 + 1, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth, 16 - 2), this, false, _newRowFont, Translate);
         }
 
         for (var currentRowNo = firstVisibleRow; currentRowNo <= lastVisibleRow; currentRowNo++) {
@@ -2757,18 +2722,47 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 #region Draw_CellTransparent
 
-                if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                    var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
+                switch (cellInThisDatabaseColumn.Format) {
+                    case DataFormat.Button:
+                        ButtonCellEventArgs e = new(cellInThisDatabaseColumn, cellInThisDatabaseRow);
+                        OnNeedButtonArgs(e);
 
-                    if (lcolumn != null && lrow != null) {
-                        Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, _cellFont, state);
-                    } else {
-                        if (cellInThisDatabaseRow.Database?.IsAdministrator() ?? false) {
-                            gr.DrawImage(QuickImage.Get("Warnung|10||||||120||60"), cellrectangle.Left + 3, cellrectangle.Top + 1);
+                        var s = States.Standard;
+                        if (!Enabled) { s = States.Standard_Disabled; }
+                        if (e.Cecked) { s |= States.Checked; }
+
+                        var x = new ExtText(Design.Button_CheckBox, s);
+
+                        if (cellrectangle.Width > 40) {
+                            cellrectangle.X += Skin.PaddingSmal;
+                            cellrectangle.Width -= Skin.PaddingSmal * 2;
                         }
-                    }
-                } else {
-                    Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn, cellInThisDatabaseRow, _cellFont, state);
+
+                        if (cellrectangle.Height > 40) {
+                            cellrectangle.Y += Skin.Padding;
+                            cellrectangle.Height -= Skin.Padding * 2;
+                        }
+
+                        Button.DrawButton(this, gr, Design.Button_CheckBox, s, e.Image, Alignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
+                        break;
+
+                    case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                        var (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
+
+                        if (contentHolderCellColumn != null && contentHolderCellRow != null) {
+                            var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
+                            Draw_CellTransparentDirect(gr, toDraw, ShortenStyle.Replaced, cellrectangle, _cellFont, contentHolderCellColumn, _pix16, contentHolderCellColumn.BehaviorOfImageAndText, state, db.GlobalScale);
+                        } else {
+                            if (isAdmin) {
+                                gr.DrawImage(errorImg, cellrectangle.Left + 3, cellrectangle.Top + 1);
+                            }
+                        }
+                        break;
+
+                    default:
+                        var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
+                        Draw_CellTransparentDirect(gr, toDrawd, ShortenStyle.Replaced, cellrectangle, _cellFont, cellInThisDatabaseColumn, _pix16, cellInThisDatabaseColumn.BehaviorOfImageAndText, state, db.GlobalScale);
+                        break;
                 }
 
                 #endregion
