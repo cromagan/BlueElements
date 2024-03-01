@@ -74,7 +74,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<RowEventArgs>? RowGotData;
 
-    public event EventHandler? RowRemoved;
+    public event EventHandler<RowEventArgs>? RowRemoved;
 
     public event EventHandler<RowChangedEventArgs>? RowRemoving;
 
@@ -185,17 +185,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var s = db2.NextRowKey();
         if (s == null || string.IsNullOrEmpty(s)) { return null; }
 
-        var row = db2.Row.GenerateAndAdd(s, first.JoinWithCr(), false, true, comment);
+        return db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, true, comment);
 
-        foreach (var thisfi in fc) {
-            if (thisfi.Column is ColumnItem c) {
-                row.CellSet(c, thisfi.SearchValue.ToList());
-            }
-        }
+        //foreach (var thisfi in fc) {
+        //    if (thisfi.Column is ColumnItem c) {
+        //        row.CellSet(c, thisfi.SearchValue.ToList());
+        //    }
+        //}
 
-        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1, null);
+        //_ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1, null);
 
-        return row;
+        //return row;
     }
 
     public static string UniqueKeyValue() {
@@ -393,14 +393,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //                }
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
-    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
+    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, FilterCollection? fc, string comment) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (!Database.Row.IsNewRowPossible()) { return null; }
 
         var s = Database.NextRowKey();
         if (s == null || string.IsNullOrEmpty(s)) { return null; }
 
-        return GenerateAndAdd(s, valueOfCellInFirstColumn, true, true, comment);
+        return GenerateAndAdd(s, valueOfCellInFirstColumn, fc, true, true, comment);
     }
 
     //                foreach (var thisRow in rowsToExpand) {
@@ -414,7 +414,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
+    public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, FilterCollection? fc, bool runScriptOfNewRow, bool fullprocessing, string comment) {
         var db = Database;
         if (db == null || db.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
@@ -451,12 +451,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src, u); }
             if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture)); }
 
-            //// Dann die Inital-Werte reinschreiben
-            //foreach (var thisColum in db.Column) {
-            //    if (thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue)) {
-            //        item.CellSet(thisColum, thisColum.CellInitValue);
-            //    }
-            //}
+            // Dann die Inital-Werte reinschreiben
+            if (fc != null) {
+                foreach (var thisColum in db.Column) {
+                    var val = fc.InitValue(thisColum, string.IsNullOrWhiteSpace(valueOfCellInFirstColumn));
+                    if (!string.IsNullOrWhiteSpace(val)) {
+                        item.CellSet(thisColum, val);
+                    }
+                }
+            }
         }
 
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
@@ -604,7 +607,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // Zeilen erzeugen und Format übertragen
         foreach (var thisRow in sourceDatabase.Row) {
-            var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, false, false, "Clone - Zeile fehlt");
+            var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, false, "Clone - Zeile fehlt");
             l.CloneFrom(thisRow, true);
         }
 
@@ -640,7 +643,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
-            OnRowRemoved();
+            OnRowRemoved(new RowChangedEventArgs(row, reason));
             return string.Empty;
         }
 
@@ -701,7 +704,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnRowGotData(object sender, RowEventArgs e) => RowGotData?.Invoke(this, e);
 
-    private void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
+    private void OnRowRemoved(RowChangedEventArgs e) => RowRemoved?.Invoke(this, e);
 
     private void OnRowRemoving(RowChangedEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;

@@ -293,6 +293,46 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public IEnumerator<FilterItem> GetEnumerator() => _internal.GetEnumerator();
 
+    /// <summary>
+    /// Gibt den Wert zur¸ck, der in eine neue Zeile reingeschrieben wird
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns></returns>
+    public string InitValue(ColumnItem column, bool firstToo) {
+        if (this.Count == 0) { return string.Empty; }
+        if (column == null || column.IsDisposed) { return string.Empty; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
+
+        if (column.Format is not DataFormat.Text
+                        and not DataFormat.RelationText
+                        and not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
+
+        if (!firstToo && db.Column.First() == column) { return string.Empty; }
+
+        if (column == db.Column.SysCorrect ||
+            column == db.Column.SysRowChangeDate ||
+            column == db.Column.SysRowChanger ||
+            column == db.Column.SysRowCreator ||
+            column == db.Column.SysRowCreateDate ||
+            column == db.Column.SysLocked ||
+            column == db.Column.SysRowState) { return string.Empty; }
+
+
+
+        var fi = this[column];
+
+        if (fi == null) { return string.Empty; }
+        if (fi.FilterType is not FilterType.Istgleich
+                        and not FilterType.Istgleich_GroﬂKleinEgal
+                        and not FilterType.Istgleich_ODER_GroﬂKleinEgal
+                        and not FilterType.Istgleich_UND_GroﬂKleinEgal
+                        and not FilterType.Instr
+                        and not FilterType.Instr_GroﬂKleinEgal
+                        and not FilterType.Instr_UND_GroﬂKleinEgal) { return string.Empty; }
+
+        return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
+    }
+
     public bool IsDifferentTo(FilterCollection? fc) {
         if (IsDisposed) { return false; }
         if (fc == this) { return false; }
@@ -584,7 +624,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void RegisterDatabaseEvents() {
         if (_database != null) {
             _database.DisposingEvent += _database_Disposing;
-            _database.Row.RowRemoving += Row_RowRemoving;
+            _database.Row.RowRemoved += Row_RowRemoved;
+            //_database.Row.RowRemoved += Row_RowRemoving;
             _database.Row.RowAdded += Row_Added;
             _database.Cell.CellValueChanged += _Database_CellValueChanged;
         }
@@ -596,7 +637,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (e.Row.MatchesTo(_internal)) { Invalidate_FilteredRows(); }
     }
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) {
+    private void Row_RowRemoved(object sender, RowEventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { Invalidate_FilteredRows(); }
@@ -605,7 +646,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void UnRegisterDatabaseEvents() {
         if (_database != null) {
             _database.DisposingEvent -= _database_Disposing;
-            _database.Row.RowRemoving -= Row_RowRemoving;
+            _database.Row.RowRemoved -= Row_RowRemoved;
             _database.Row.RowAdded -= Row_Added;
             _database.Cell.CellValueChanged -= _Database_CellValueChanged;
         }

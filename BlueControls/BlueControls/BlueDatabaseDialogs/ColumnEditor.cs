@@ -604,7 +604,7 @@ internal sealed partial class ColumnEditor {
         var spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
 
         foreach (var col in linkdb.Column) {
-            var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
+            var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, null, "Neue Spalte");
 
             if (r != null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ");

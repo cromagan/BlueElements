@@ -87,7 +87,7 @@ public partial class VariableEditor : UserControl {
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
-            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
+            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, null, "Neue Variable");
 
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId);

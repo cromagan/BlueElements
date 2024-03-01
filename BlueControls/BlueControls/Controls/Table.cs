@@ -181,8 +181,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler? PinnedChanged;
 
-    public event EventHandler<RowChangedEventArgs>? RowAdded;
-
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
     public event EventHandler<RowEventArgs>? SelectedRowChanged;
@@ -787,8 +785,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.ViewChanged -= _Database_ViewChanged;
             db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
-            db1.Row.RowAdded -= Row_RowAdded;
             db1.Row.RowRemoving -= Row_RowRemoving;
+            //db1.Row.RowRemoved -= Row_RowRemoved; // macht Filter_Changed
             db1.Row.RowGotData -= _Database_Row_RowGotData;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
@@ -815,8 +813,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.ViewChanged += _Database_ViewChanged;
             db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
-            db2.Row.RowAdded += Row_RowAdded;
             db2.Row.RowRemoving += Row_RowRemoving;
+            //db2.Row.RowRemoved += Row_RowRemoved; // macht Filter_Changed
             db2.Row.RowGotData += _Database_Row_RowGotData;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
@@ -2045,13 +2043,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue) || !(table.Database?.Row.IsNewRowPossible() ?? false)) { return; }
 
-            var fe = table.EditableErrorReason(cellInThisDatabaseColumn.Database?.Column.First(), null, EditableErrorReasonType.EditCurrently, true, false, true);
+            if (cellInThisDatabaseColumn.Database is not Database db || db.IsDisposed) { return; }
+
+            var fe = table.EditableErrorReason(db.Column.First(), null, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(fe)) {
                 NotEditableInfo(fe);
                 return;
             }
 
-            var newr = cellInThisDatabaseColumn.Database?.Row.GenerateAndAdd(newValue, "Neue Zeile über Tabellen-Ansicht");
+            var newr = db.Row.GenerateAndAdd(newValue, table.Filter, "Neue Zeile über Tabellen-Ansicht");
 
             var l = table.RowsFiltered;
             if (newr != null && !l.Contains(newr)) {
@@ -2690,8 +2690,26 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2;
         var errorImg = QuickImage.Get("Warnung|10||||||120||60");
 
-        if (Database.Column.First() is ColumnItem columnFirst && cellInThisDatabaseColumn == columnFirst && UserEdit_NewRowAllowed()) {
-            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle(columnX1 + 1, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth, 16 - 2), this, false, _newRowFont, Translate);
+        if (SliderY.Value < _pix16 && UserEdit_NewRowAllowed()) {
+            string txt;
+            var plus = 0;
+            QuickImage? qi;
+            if (Database.Column.First() is ColumnItem columnFirst && cellInThisDatabaseColumn == columnFirst) {
+                txt = "[Neue Zeile]";
+                plus = _pix16;
+                qi = QuickImage.Get(ImageCode.PlusZeichen, _pix16 - 2);
+            } else {
+                txt = Filter.InitValue(cellInThisDatabaseColumn, false);
+                qi = QuickImage.Get(ImageCode.PlusZeichen, 12);
+            }
+
+            if (!string.IsNullOrEmpty(txt)) {
+                var pos = new Rectangle(columnX1 + plus, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth - plus, _pix16);
+                Draw_CellTransparentDirect(gr, txt, ShortenStyle.Replaced, pos, _newRowFont, cellInThisDatabaseColumn, _pix16, cellInThisDatabaseColumn.BehaviorOfImageAndText, state, db.GlobalScale);
+                if (qi != null) {
+                    gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
+                }
+            }
         }
 
         for (var currentRowNo = firstVisibleRow; currentRowNo <= lastVisibleRow; currentRowNo++) {
@@ -2769,8 +2787,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 if (_unterschiede != null && _unterschiede != cellInThisDatabaseRow) {
                     if (cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn) != _unterschiede.CellGetString(cellInThisDatabaseColumn)) {
-                        Rectangle tmpr = new(columnX1 + 1, DrawY(ca, cellInThisDatabaseRowData) + 1,
-                            drawWidth, cellInThisDatabaseRowData.DrawHeight - 2);
+                        Rectangle tmpr = new(columnX1 + 1, DrawY(ca, cellInThisDatabaseRowData) + 1, drawWidth, cellInThisDatabaseRowData.DrawHeight - 2);
                         gr.DrawRectangle(PenRed1, tmpr);
                     }
                 }
@@ -3143,10 +3160,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnRowAdded(RowChangedEventArgs e) {
-        if (IsDisposed) { return; }
-        RowAdded?.Invoke(this, e);
-    }
+    //private void OnRowAdded(RowChangedEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    RowAdded?.Invoke(this, e);
+    //}
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
@@ -3246,10 +3263,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return tmp;
     }
 
-    private void Row_RowAdded(object sender, RowChangedEventArgs e) {
-        if (IsDisposed) { return; }
-        OnRowAdded(e);
-    }
+    //private void Row_RowAdded(object sender, RowChangedEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    OnRowAdded(e);
+    //}
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (IsDisposed) { return; }

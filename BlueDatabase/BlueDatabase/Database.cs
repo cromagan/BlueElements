@@ -1713,7 +1713,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 dictVorhanden.Remove(thisD.Key); // Speedup
             } else {
                 neuZ++;
-                row = Row.GenerateAndAdd(thisD.Value[0], "Import, fehlende Zeile");
+                row = Row.GenerateAndAdd(thisD.Value[0], null, "Import, fehlende Zeile");
             }
 
             if (row == null) {

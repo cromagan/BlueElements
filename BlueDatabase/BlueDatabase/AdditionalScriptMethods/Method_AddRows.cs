@@ -76,7 +76,7 @@ public class Method_AddRows : Method_Database {
 
         foreach (var thisKey in keys) {
             if (db.Row[thisKey] is null) {
-                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, exe, true, "Script Command: Add Rows");
+                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, null, exe, true, "Script Command: Add Rows");
             }
         }
 
