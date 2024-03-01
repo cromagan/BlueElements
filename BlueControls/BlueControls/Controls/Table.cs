@@ -2685,32 +2685,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     /// <summary>
-    /// Zeichnet die gesamte Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
-    /// </summary>
-    /// <param name="gr"></param>
-    /// <param name="cellInThisDatabaseColumn"></param>
-    /// <param name="cellInThisDatabaseRow"></param>
-    /// <param name="cellrectangle"></param>
-    /// <param name="_cellFont"></param>
-    /// <param name="state"></param>
-    private void Draw_CellTransparent(Graphics gr, ColumnItem cellInThisDatabaseColumn, RowItem cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont _cellFont, States state) {
-        if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
-
-            if (lcolumn != null && lrow != null) {
-                Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, _cellFont, state);
-            } else {
-                if (cellInThisDatabaseRow.Database?.IsAdministrator() ?? false) {
-                    gr.DrawImage(QuickImage.Get("Warnung|10||||||120||60"), cellrectangle.Left + 3, cellrectangle.Top + 1);
-                }
-            }
-            return;
-        }
-
-        Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn, cellInThisDatabaseRow, _cellFont, state);
-    }
-
-    /// <summary>
     /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.
     /// </summary>
     /// <param name="gr"></param>
@@ -2776,7 +2750,23 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     Draw_Cursor(gr, displayRectangleWoSlider, false);
                 }
 
-                Draw_CellTransparent(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, _cellFont, state);
+                #region Draw_CellTransparent
+
+                if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                    var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
+
+                    if (lcolumn != null && lrow != null) {
+                        Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, _cellFont, state);
+                    } else {
+                        if (cellInThisDatabaseRow.Database?.IsAdministrator() ?? false) {
+                            gr.DrawImage(QuickImage.Get("Warnung|10||||||120||60"), cellrectangle.Left + 3, cellrectangle.Top + 1);
+                        }
+                    }
+                } else {
+                    Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn, cellInThisDatabaseRow, _cellFont, state);
+                }
+
+                #endregion
 
                 if (_unterschiede != null && _unterschiede != cellInThisDatabaseRow) {
                     if (cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn) != _unterschiede.CellGetString(cellInThisDatabaseColumn)) {
