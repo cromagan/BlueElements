@@ -2720,8 +2720,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (viewItem.Column is not ColumnItem cellInThisDatabaseColumn) { return; }
 
+        bool isAdmin = db.IsAdministrator();
+        bool isCurrentThreadBackground = Thread.CurrentThread.IsBackground;
+        int columnX1 = viewItem.OrderTmpSpalteX1 ?? 0;
+        int drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2;
+
         if (Database.Column.First() is ColumnItem columnFirst && cellInThisDatabaseColumn == columnFirst && UserEdit_NewRowAllowed()) {
-            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle(viewItem.OrderTmpSpalteX1 ?? 0 + 1, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2, 16 - 2), this, false, _newRowFont, Translate);
+            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle(viewItem.OrderTmpSpalteX1 ?? 0 + 1, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth, 16 - 2), this, false, _newRowFont, Translate);
         }
 
         for (var currentRowNo = firstVisibleRow; currentRowNo <= lastVisibleRow; currentRowNo++) {
@@ -2729,13 +2734,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var cellInThisDatabaseRow = cellInThisDatabaseRowData.Row;
             gr.SmoothingMode = SmoothingMode.None;
 
-            Rectangle cellrectangle = new(viewItem.OrderTmpSpalteX1 ?? 0, DrawY(ca, cellInThisDatabaseRowData),
+            Rectangle cellrectangle = new(columnX1, DrawY(ca, cellInThisDatabaseRowData),
                 viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont), Math.Max(cellInThisDatabaseRowData.DrawHeight, _pix16));
 
             if (cellInThisDatabaseRowData.Expanded) {
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
 
-                if (db.IsAdministrator()) {
+                if (isAdmin) {
                     if (cellInThisDatabaseRow.NeedsUpdate()) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
                         db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);
@@ -2744,7 +2749,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
 
-                if (!Thread.CurrentThread.IsBackground && CursorPosColumn == cellInThisDatabaseColumn && CursorPosRow == cellInThisDatabaseRowData) {
+                if (!isCurrentThreadBackground && CursorPosColumn == cellInThisDatabaseColumn && CursorPosRow == cellInThisDatabaseRowData) {
                     _tmpCursorRect = cellrectangle;
                     _tmpCursorRect.Height -= 1;
                     Draw_Cursor(gr, displayRectangleWoSlider, false);
@@ -2770,8 +2775,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 if (_unterschiede != null && _unterschiede != cellInThisDatabaseRow) {
                     if (cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn) != _unterschiede.CellGetString(cellInThisDatabaseColumn)) {
-                        Rectangle tmpr = new(viewItem.OrderTmpSpalteX1 ?? 0 + 1, DrawY(ca, cellInThisDatabaseRowData) + 1,
-                            viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2, cellInThisDatabaseRowData.DrawHeight - 2);
+                        Rectangle tmpr = new(columnX1 + 1, DrawY(ca, cellInThisDatabaseRowData) + 1,
+                            drawWidth, cellInThisDatabaseRowData.DrawHeight - 2);
                         gr.DrawRectangle(PenRed1, tmpr);
                     }
                 }
