@@ -309,6 +309,20 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     private void CreateWatcher() {
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(CreateWatcher));
+                return;
+            } catch {
+                // Kann dank Multitasking disposed sein
+                Develop.CheckStackForOverflow();
+                CreateWatcher();
+                return;
+            }
+        }
+
         if (!string.IsNullOrEmpty(_directory) && DirectoryExists(_directory)) {
             _watcher = new FileSystemWatcher(_directory);
             _watcher.Changed += Watcher_Changed;
@@ -503,6 +517,20 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     private void RemoveWatcher() {
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(RemoveWatcher));
+                return;
+            } catch {
+                // Kann dank Multitasking disposed sein
+                Develop.CheckStackForOverflow();
+                RemoveWatcher();
+                return;
+            }
+        }
+
         try {
             if (_watcher != null) {
                 _watcher.EnableRaisingEvents = false;
@@ -511,7 +539,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
                 _watcher.Deleted -= Watcher_Deleted;
                 _watcher.Renamed -= Watcher_Renamed;
                 _watcher.Error -= Watcher_Error;
-                _watcher?.Dispose();
+                //_watcher?.Dispose();
                 _watcher = null;
             }
         } catch { }

@@ -64,8 +64,8 @@ public abstract class Method_WebPage : Method {
         #region  Warten, bis der Ladevorgang gestartet ist
 
         var d = DateTime.UtcNow;
-        while (!browser.IsLoading) {
-            Develop.DoEvents();
+        while (browser.IsLoading) {
+            //Develop.DoEvents();
             if (DateTime.UtcNow.Subtract(d).TotalSeconds > 10) {
                 return true;
             }

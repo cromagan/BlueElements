@@ -232,10 +232,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 } else {
                     _eTxt.PlainText = value;
                 }
-
-                Invalidate();
-                RaiseEventIfTextChanged(true);  // Wichtig, z.B: für ComboBox
             }
+
+            Invalidate();
+            RaiseEventIfTextChanged(true);  // Wichtig, z.B: für ComboBox
         }
     }
 
