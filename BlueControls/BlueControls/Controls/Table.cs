@@ -447,8 +447,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return false;
     }
 
+    public static void ImportBdb(Database database) {
+        using ImportBdb x = new(database);
+        _ = x.ShowDialog();
+    }
+
     public static void ImportCsv(Database database, string csvtxt) {
-        using Import x = new(database, csvtxt);
+        using ImportCsv x = new(database, csvtxt);
         _ = x.ShowDialog();
     }
 
@@ -1096,6 +1101,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    public void ImportBdb() {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        ImportBdb(db);
+    }
+
     public void ImportClipboard() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         if (!Clipboard.ContainsText()) {
@@ -1109,7 +1119,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void ImportCsv(string csvtxt) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        ImportCsv(Database, csvtxt);
+        ImportCsv(db, csvtxt);
     }
 
     public void Invalidate_AllColumnArrangements() {

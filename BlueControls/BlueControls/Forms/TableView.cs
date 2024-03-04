@@ -133,8 +133,6 @@ public partial class TableView : FormWithStatusBar {
             _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
             _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
             //_ = e.UserMenu.AddSeparator();
-
-
         }
 
         if (row != null) {
@@ -154,7 +152,6 @@ public partial class TableView : FormWithStatusBar {
                 }
             }
         }
-
     }
 
     public static void ContextMenuItemClicked(Table? tbl, ColumnItem? column, RowItem? row, ContextMenuItemClickedEventArgs e) {
@@ -768,6 +765,14 @@ public partial class TableView : FormWithStatusBar {
         Database.ForceSaveAll();
 
         _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID, string.Empty));
+    }
+
+    private void btnMDBImport_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) {
+            return;
+        }
+
+        Table.ImportBdb();
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {

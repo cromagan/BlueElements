@@ -59,12 +59,12 @@ public abstract class Method_WebPage : Method {
     }
 
     public static bool WaitLoaded(ChromiumWebBrowser browser) {
-        Generic.Pause(0.1, false); // Um au jeden Fall das IsLoading zu erfassen
+        Generic.Pause(0.1, false); // Um auf jeden Fall das IsLoading zu erfassen
 
         #region  Warten, bis der Ladevorgang gestartet ist
 
         var d = DateTime.UtcNow;
-        while (browser.IsLoading) {
+        while (!browser.IsLoading) {
             //Develop.DoEvents();
             if (DateTime.UtcNow.Subtract(d).TotalSeconds > 10) {
                 return true;
@@ -77,7 +77,7 @@ public abstract class Method_WebPage : Method {
 
         d = DateTime.UtcNow;
         while (browser.IsLoading || !AllImagesLoaded(browser)) {
-            Generic.Pause(1, true);
+            Generic.Pause(1, false);
             if (DateTime.UtcNow.Subtract(d).TotalSeconds > 60) {
                 return false;
             }

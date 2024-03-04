@@ -221,11 +221,17 @@ public class DatabaseMu : Database {
 
         try {
 
-            #region Namen aller Tabellen um UCase ermitteln (tbn)
+            #region Namen aller Tabellen um UCase ermitteln (tbn), alle ungültigen FRG-Dateien ermitteln (frgu)
 
             var tbn = new List<string>();
+            var frgu = new List<string>();
             foreach (var thisdb in db) {
-                tbn.AddIfNotExists(thisdb.TableName.ToUpper());
+                if (thisdb is DatabaseMu dbmu) {
+                    tbn.AddIfNotExists(dbmu.TableName.ToUpper());
+                    if (!string.IsNullOrEmpty(dbmu._myFragmentsFilename)) {
+                        frgu.Add(dbmu._myFragmentsFilename);
+                    }
+                }
             }
 
             #endregion
@@ -236,7 +242,7 @@ public class DatabaseMu : Database {
 
             if (!frgma.Contains(_myFragmentsFilename) && !string.IsNullOrEmpty(_myFragmentsFilename)) { return (null, null); }
 
-            frgma.Remove(_myFragmentsFilename);
+            frgma.RemoveRange(frgu);
 
             #endregion
 
@@ -321,7 +327,6 @@ public class DatabaseMu : Database {
 
         var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
 
-
         try {
             lock (_writer) {
                 _writer.WriteLine(l.ToString());
@@ -329,7 +334,6 @@ public class DatabaseMu : Database {
         } catch {
             Freeze("Netzwerkfehler!");
         }
-
 
         return string.Empty;
     }

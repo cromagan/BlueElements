@@ -123,6 +123,12 @@
     <Compile Include="BlueDatabaseDialogs\ColumnArrangementPadEditor.Designer.cs">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="BlueDatabaseDialogs\ImportBdb.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BlueDatabaseDialogs\ImportBdb.designer.cs">
+      <DependentUpon>ImportBdb.cs</DependentUpon>
+    </Compile>
     <Compile Include="BlueDatabaseDialogs\Search.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -460,11 +466,11 @@
     <Compile Include="BlueDatabaseDialogs\DatabaseHeadEditor.Designer.cs">
       <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Import.cs">
+    <Compile Include="BlueDatabaseDialogs\ImportCsv.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Import.designer.cs">
-      <DependentUpon>Import.cs</DependentUpon>
+    <Compile Include="BlueDatabaseDialogs\ImportCsv.designer.cs">
+      <DependentUpon>ImportCsv.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueDatabaseDialogs\LayoutPadEditor.cs">
       <SubType>Form</SubType>
@@ -641,6 +647,10 @@
     <EmbeddedResource Include="BlueDatabaseDialogs\ColumnArrangementPadEditor.resx">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="BlueDatabaseDialogs\ImportBdb.resx">
+      <DependentUpon>ImportBdb.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Search.resx">
       <DependentUpon>Search.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -661,8 +671,8 @@
       <DependentUpon>ColumnEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Import.resx">
-      <DependentUpon>Import.cs</DependentUpon>
+    <EmbeddedResource Include="BlueDatabaseDialogs\ImportCsv.resx">
+      <DependentUpon>ImportCsv.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\LayoutPadEditor.resx">

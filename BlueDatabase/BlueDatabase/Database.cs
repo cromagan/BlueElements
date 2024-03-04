@@ -595,6 +595,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
+    public static Database? GetByFilename(string filname, bool readOnly, NeedPassword? needPassword, bool checktablename, string mustbefreezed) {
+        var l = new ConnectionInfo(filname, null, mustbefreezed);
+        return GetById(l, readOnly, needPassword, checktablename);
+    }
+
     public static Database? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword, bool checktablename) {
         if (ci is null) { return null; }
 
@@ -1556,7 +1561,55 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return e.Count == 1;
     }
 
-    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
+    public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
+        foreach (var thisFile in files) {
+            var db = Database.GetByFilename(thisFile, true, null, false, "Import");
+            if (db == null) {
+                return thisFile + " konnte nicht geladen werden.";
+            }
+
+            foreach (var thisr in db.Row) {
+                var r = Row.GenerateAndAdd("Dummy", null, "BDB Import");
+
+                if (r == null) { return "Zeile konnte nicht generiert werden."; }
+
+                foreach (var thisc in db.Column) {
+                    if (thisc != colForFilename) {
+                        var c = Column.Exists(thisc.KeyName);
+                        if (c == null) {
+                            c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, string.Empty, null, string.Empty);
+                            if (c == null) { return "Spalte konnte nicht generiert werden."; }
+                            c.CloneFrom(thisc, false);
+                        }
+
+                        var w = thisr.CellGetString(thisc);
+                        r.CellSet(c, w);
+                        if (r.CellGetString(c) != w) { return "Setzungsfehler!"; }
+                    }
+                }
+
+                if (colForFilename != null) {
+                    r.CellSet(colForFilename, thisFile);
+
+                    if (r.CellGetString(colForFilename) != thisFile) { return "Setzungsfehler!"; }
+                }
+            }
+
+            //if (deleteImportet) {
+                Save();
+
+                if (HasPendingChanges) { return "Speicher-Fehler!"; }
+                db.Dispose();
+                //db = null;
+                var d = DeleteFile(thisFile, false);
+                if (!d) { return "Lösch-Fehler!"; }
+            //}
+        }
+
+        return string.Empty;
+    }
+
+    public string ImportCsv(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
         if (!Row.IsNewRowPossible()) {
             OnDropMessage(FehlerArt.Warnung, "Abbruch, Datenbank unterstützt keine neuen Zeilen.");
             return "Abbruch, Datenbank unterstützt keine neuen Zeilen.";

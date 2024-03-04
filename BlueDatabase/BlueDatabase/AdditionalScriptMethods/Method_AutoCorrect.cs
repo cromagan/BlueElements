@@ -20,36 +20,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
-using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
-using System;
-
-using System.Collections.Generic;
-
-using System.Drawing;
-
-using System.Linq;
-
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-using BlueBasics;
-
 using BlueBasics.Enums;
-
-using BlueBasics.Interfaces;
-
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-
-using BlueScript.Structures;
-using BlueScript.Variables;
 
 using static BlueBasics.Converter;
 

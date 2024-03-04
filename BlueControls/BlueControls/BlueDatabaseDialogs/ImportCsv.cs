@@ -26,7 +26,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class Import : FormWithStatusBar, IHasDatabase {
+public sealed partial class ImportCsv : FormWithStatusBar, IHasDatabase {
 
     #region Fields
 
@@ -38,13 +38,13 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
 
     #region Constructors
 
-    public Import(Database? database, string importtext) : base() {
+    public ImportCsv(Database? database, string importtext) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
         var ein = _originalImportText.SplitAndCutByCrToList();
-        Eintr.Text = ein.Count + " zum Importieren bereit.";
+        capEinträge.Text = ein.Count + " zum Importieren bereit.";
         Database = database;
     }
 
@@ -87,16 +87,16 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
 
     private void Fertig_Click(object sender, System.EventArgs e) {
         var TR = string.Empty;
-        if (TabStopp.Checked) {
+        if (optTabStopp.Checked) {
             TR = "\t";
-        } else if (Semikolon.Checked) {
+        } else if (optSemikolon.Checked) {
             TR = ";";
-        } else if (Komma.Checked) {
+        } else if (optKomma.Checked) {
             TR = ",";
-        } else if (Leerzeichen.Checked) {
+        } else if (optLeerzeichen.Checked) {
             TR = " ";
-        } else if (Andere.Checked) {
-            TR = aTXT.Text;
+        } else if (optAndere.Checked) {
+            TR = txtAndere.Text;
         }
         if (string.IsNullOrEmpty(TR)) {
             MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
@@ -105,7 +105,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         var m = "Datenbank-Fehler";
 
         if (Database != null && !Database.IsDisposed) {
-            m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
+            m = Database.ImportCsv(_originalImportText, optSpalteZuordnen.Checked, optZeilenZuorden.Checked, TR, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

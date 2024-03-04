@@ -77,6 +77,7 @@ namespace BlueControls.Forms {
             this.btnHTMLExport = new BlueControls.Controls.Button();
             this.btnCSVClipboard = new BlueControls.Controls.Button();
             this.grpImport = new BlueControls.Controls.GroupBox();
+            this.btnMDBImport = new BlueControls.Controls.Button();
             this.btnClipboardImport = new BlueControls.Controls.Button();
             this.pnlDatabaseSelect = new System.Windows.Forms.Panel();
             this.tbcDatabaseSelector = new BlueControls.Controls.TabControl();
@@ -120,7 +121,6 @@ namespace BlueControls.Forms {
             // 
             this.capStatusBar.Location = new System.Drawing.Point(304, 0);
             this.capStatusBar.Size = new System.Drawing.Size(1025, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -629,7 +629,7 @@ namespace BlueControls.Forms {
             this.grpExport.Controls.Add(this.btnCSVClipboard);
             this.grpExport.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpExport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpExport.Location = new System.Drawing.Point(88, 0);
+            this.grpExport.Location = new System.Drawing.Point(144, 0);
             this.grpExport.Name = "grpExport";
             this.grpExport.Size = new System.Drawing.Size(224, 81);
             this.grpExport.TabIndex = 3;
@@ -677,22 +677,36 @@ namespace BlueControls.Forms {
             // 
             this.grpImport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpImport.CausesValidation = false;
+            this.grpImport.Controls.Add(this.btnMDBImport);
             this.grpImport.Controls.Add(this.btnClipboardImport);
             this.grpImport.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpImport.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpImport.Location = new System.Drawing.Point(0, 0);
             this.grpImport.Name = "grpImport";
-            this.grpImport.Size = new System.Drawing.Size(88, 81);
+            this.grpImport.Size = new System.Drawing.Size(144, 81);
             this.grpImport.TabIndex = 4;
             this.grpImport.TabStop = false;
             this.grpImport.Text = "Import";
             // 
+            // btnMDBImport
+            // 
+            this.btnMDBImport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnMDBImport.ImageCode = "Tabelle||||||||||Datenbank";
+            this.btnMDBImport.Location = new System.Drawing.Point(72, 2);
+            this.btnMDBImport.Name = "btnMDBImport";
+            this.btnMDBImport.QuickInfo = "Importiert in die aktuell angezeigte Datenbank\r\nDaten einer andere Datenbank.";
+            this.btnMDBImport.Size = new System.Drawing.Size(64, 66);
+            this.btnMDBImport.TabIndex = 40;
+            this.btnMDBImport.Text = "Datei-Import";
+            this.btnMDBImport.Click += new System.EventHandler(this.btnMDBImport_Click);
+            // 
             // btnClipboardImport
             // 
             this.btnClipboardImport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnClipboardImport.ImageCode = "Tabelle||||||||||Pfeil_Links";
+            this.btnClipboardImport.ImageCode = "Tabelle||||||||||Clipboard";
             this.btnClipboardImport.Location = new System.Drawing.Point(8, 2);
             this.btnClipboardImport.Name = "btnClipboardImport";
+            this.btnClipboardImport.QuickInfo = "Importiert in die aktuell angezeigte Datenbank\r\nDaten aus dem Clipboard.\r\n";
             this.btnClipboardImport.Size = new System.Drawing.Size(64, 66);
             this.btnClipboardImport.TabIndex = 39;
             this.btnClipboardImport.Text = "Clipboard-Import";
@@ -746,7 +760,9 @@ namespace BlueControls.Forms {
             // 
             // Table
             // 
+            this.Table.Arrangement = "";
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Table.FilterInputChangedHandled = false;
             this.Table.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Im_Element_Gewählte_Filter;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
@@ -809,10 +825,16 @@ namespace BlueControls.Forms {
             // CFO
             // 
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CFO.FilterInputChangedHandled = false;
             this.CFO.Location = new System.Drawing.Point(0, 0);
+            this.CFO.Mode = null;
             this.CFO.Name = "CFO";
+            this.CFO.RowsInput = null;
+            this.CFO.RowsInputChangedHandled = false;
+            this.CFO.RowsInputManualSeted = false;
             this.CFO.Size = new System.Drawing.Size(338, 566);
             this.CFO.TabIndex = 0;
+            this.CFO.TabStop = false;
             // 
             // capZeilen2
             // 
@@ -825,7 +847,7 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.* Alle Dateien|*";
+            this.LoadTab.Filter = "Datenbanken (*.BDB;*.MBDB)|*.BDB;*.MBDB|Alle Dateien (*.*)|*.*";
             this.LoadTab.Title = "Bitte Datenbank laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
@@ -935,5 +957,6 @@ namespace BlueControls.Forms {
         private Button btnSkripteBearbeiten;
         protected GroupBox grpAufgaben;
         private ListBox lstAufgaben;
+        private Button btnMDBImport;
     }
 }
