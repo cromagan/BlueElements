@@ -118,6 +118,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     protected override void OnHandleCreated(System.EventArgs e) {
         base.OnHandleCreated(e);
+        CheckBack();
         if (!_loaded) { LoadSettingsFromDisk(); }
         GenerateMenu();
     }
