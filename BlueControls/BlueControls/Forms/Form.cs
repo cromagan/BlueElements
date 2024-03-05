@@ -86,6 +86,7 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     public bool IsClosed { get; private set; }
+    public bool isClosing { get; private set; }
 
     protected override CreateParams CreateParams {
         get {
@@ -128,15 +129,16 @@ public partial class Form : System.Windows.Forms.Form {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
 
+        isClosing = true;
+
         if (this is not FloatingForm and not MessageBox) {
             Database.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
         }
 
         base.OnFormClosing(e);
-        if (!e.Cancel) {
-            IsClosed = true;
-        }
+        if (!e.Cancel) { IsClosed = true; }
+        isClosing = IsClosed;
     }
 
     protected override void OnInvalidated(InvalidateEventArgs e) {

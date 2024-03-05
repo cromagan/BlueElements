@@ -54,6 +54,8 @@ public class GenericControl : Control {
 
     private PartentType _myParentType = PartentType.Unbekannt;
 
+    private Form? _pform = null;
+
     // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
     private string _quickInfo = string.Empty;
 
@@ -236,7 +238,17 @@ public class GenericControl : Control {
         return _bitmapOfControl;
     }
 
-    public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(Cursor.Position));
+    public void CheckBack() => _pform = ParentForm();
+
+    public bool ContainsMouse() => DoDrawings() && ClientRectangle.Contains(PointToClient(Cursor.Position));
+
+    public bool DoDrawings() {
+        if (IsDisposed || Disposing) { return false; }
+        if (_pform == null || _pform.IsDisposed || !_pform.Visible) { return false; }
+        if (_pform is BlueControls.Forms.Form bf && bf.isClosing) { return false; }
+        if (!Visible) { return false; }
+        return true;
+    }
 
     public void DoQuickInfo() {
         if (string.IsNullOrEmpty(_quickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
@@ -250,11 +262,16 @@ public class GenericControl : Control {
         }
     }
 
+    public new void Invalidate() {
+        if (!DoDrawings()) { return; }
+        base.Invalidate();
+    }
+
     public Point MousePos() {
         if (InvokeRequired) {
             return (Point)Invoke(new Func<Point>(MousePos));
         }
-        if (IsDisposed) { return default; }
+        if (!DoDrawings()) { return default; }
         return PointToClient(Cursor.Position);
     }
 
@@ -270,7 +287,7 @@ public class GenericControl : Control {
     /// </summary>
     /// <remarks></remarks>
     public override void Refresh() {
-        if (IsDisposed) { return; }
+        if (!DoDrawings()) { return; }
         DoDraw(CreateGraphics());
     }
 
@@ -310,7 +327,7 @@ public class GenericControl : Control {
             _ = Invoke(new Action(() => OnEnabledChanged(e)));
             return;
         }
-        if (IsDisposed) { return; }
+        if (!DoDrawings()) { return; }
         base.OnEnabledChanged(e);
         Invalidate();
     }
@@ -352,7 +369,9 @@ public class GenericControl : Control {
 
     protected override void OnMouseDown(MouseEventArgs e) {
         lock (this) {
-            if (IsDisposed) { return; }
+            if (_pform == null) { CheckBack(); }
+
+            if (!DoDrawings()) { return; }
             if (_mousePressing) { return; }
             _mousePressing = true;
             Forms.QuickInfo.Close();
@@ -364,27 +383,35 @@ public class GenericControl : Control {
     }
 
     protected override void OnMouseEnter(System.EventArgs e) {
-        if (IsDisposed) { return; }
+        if (_pform == null) { CheckBack(); }
+        if (!DoDrawings()) { return; }
+
         base.OnMouseEnter(e);
         if (!string.IsNullOrEmpty(_quickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
-        if (IsDisposed) { return; }
+        if (_pform == null) { CheckBack(); }
+
+        if (!DoDrawings()) { return; }
         base.OnMouseLeave(e);
         DoQuickInfo();
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
         lock (this) {
-            if (IsDisposed) { return; }
+            if (_pform == null) { CheckBack(); }
+
+            if (!DoDrawings()) { return; }
             base.OnMouseMove(e);
             DoQuickInfo();
         }
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
-        if (IsDisposed) { return; }
+        if (_pform == null) { CheckBack(); }
+
+        if (!DoDrawings()) { return; }
         if (!_mousePressing) { return; }
         Develop.SetUserDidSomething();
         _mousePressing = false;
@@ -392,7 +419,9 @@ public class GenericControl : Control {
     }
 
     protected override void OnMouseWheel(MouseEventArgs e) {
-        if (IsDisposed) { return; }
+        if (_pform == null) { CheckBack(); }
+
+        if (!DoDrawings()) { return; }
         Develop.SetUserDidSomething();
         _mousePressing = false;
         base.OnMouseWheel(e);
@@ -405,6 +434,21 @@ public class GenericControl : Control {
     protected override void OnPaintBackground(PaintEventArgs pevent) {
         // do not allow the background to be painted
         // Um flimmern zu vermeiden!
+    }
+
+    protected override void OnParentChanged(System.EventArgs e) {
+        base.OnParentChanged(e);
+        CheckBack();
+    }
+
+    protected override void OnParentEnabledChanged(System.EventArgs e) {
+        CheckBack();
+        base.OnParentEnabledChanged(e);
+    }
+
+    protected override void OnParentVisibleChanged(System.EventArgs e) {
+        CheckBack();
+        base.OnParentVisibleChanged(e);
     }
 
     protected virtual void OnQuickInfoChanged() {
@@ -460,8 +504,10 @@ public class GenericControl : Control {
     }
 
     private void DoDraw(Graphics gr) {
-        if (IsDisposed) {
-            gr.Clear(Color.Red);
+        if (_pform == null) { CheckBack(); }
+
+        if (!DoDrawings()) {
+            gr.Clear(Color.LightGray);
             return;
         }
 

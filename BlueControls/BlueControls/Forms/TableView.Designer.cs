@@ -59,6 +59,7 @@ namespace BlueControls.Forms {
             this.btnSuchFenster = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
+            this.btnAufräumen = new BlueControls.Controls.Button();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
@@ -91,6 +92,7 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
+            this.grpAufräumen = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -451,16 +453,29 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminZeilen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminZeilen.CausesValidation = false;
+            this.grpAdminZeilen.Controls.Add(this.btnAufräumen);
             this.grpAdminZeilen.Controls.Add(this.btnSuchenUndErsetzen);
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminZeilen.Location = new System.Drawing.Point(520, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
-            this.grpAdminZeilen.Size = new System.Drawing.Size(168, 81);
+            this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
             this.grpAdminZeilen.TabStop = false;
             this.grpAdminZeilen.Text = "Zeilen";
+            // 
+            // btnAufräumen
+            // 
+            this.btnAufräumen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAufräumen.ImageCode = "Zeile||||||||||Pinsel";
+            this.btnAufräumen.Location = new System.Drawing.Point(160, 2);
+            this.btnAufräumen.Name = "btnAufräumen";
+            this.btnAufräumen.QuickInfo = "Es wird ein extra Dialog geöffnet.\r\nZeilen löschen / zusammenfügen";
+            this.btnAufräumen.Size = new System.Drawing.Size(64, 66);
+            this.btnAufräumen.TabIndex = 45;
+            this.btnAufräumen.Text = "Zeilen aufräumen";
+            this.btnAufräumen.Click += new System.EventHandler(this.btnAufräumen_Click);
             // 
             // btnSuchenUndErsetzen
             // 
@@ -825,12 +840,12 @@ namespace BlueControls.Forms {
             // CFO
             // 
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CFO.FilterInputChangedHandled = false;
+            this.CFO.FilterInputChangedHandled = true;
             this.CFO.Location = new System.Drawing.Point(0, 0);
             this.CFO.Mode = null;
             this.CFO.Name = "CFO";
             this.CFO.RowsInput = null;
-            this.CFO.RowsInputChangedHandled = false;
+            this.CFO.RowsInputChangedHandled = true;
             this.CFO.RowsInputManualSeted = false;
             this.CFO.Size = new System.Drawing.Size(338, 566);
             this.CFO.TabIndex = 0;
@@ -855,6 +870,17 @@ namespace BlueControls.Forms {
             // 
             this.SaveTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
+            // 
+            // grpAufräumen
+            // 
+            this.grpAufräumen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.grpAufräumen.ImageCode = "Zeile||||||||||Pinsel";
+            this.grpAufräumen.Location = new System.Drawing.Point(160, 2);
+            this.grpAufräumen.Name = "grpAufräumen";
+            this.grpAufräumen.QuickInfo = "Angezeigte Zeilen löschen";
+            this.grpAufräumen.Size = new System.Drawing.Size(72, 66);
+            this.grpAufräumen.TabIndex = 45;
+            this.grpAufräumen.Text = "Zeilen löschen";
             // 
             // TableView
             // 
@@ -958,5 +984,7 @@ namespace BlueControls.Forms {
         protected GroupBox grpAufgaben;
         private ListBox lstAufgaben;
         private Button btnMDBImport;
+        private Button btnAufräumen;
+        private Button grpAufräumen;
     }
 }

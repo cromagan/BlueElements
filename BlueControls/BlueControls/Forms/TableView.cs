@@ -562,12 +562,12 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
+        base.OnFormClosing(e);
+
         SaveSettingsToDisk();
         DatabaseSet(null, string.Empty);
         MultiUserFile.SaveAll(true);
         Database.ForceSaveAll();
-
-        base.OnFormClosing(e);
     }
 
     protected override void OnLoad(System.EventArgs e) {
@@ -722,6 +722,14 @@ public partial class TableView : FormWithStatusBar {
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
 
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
+
+    private void btnAufräumen_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) {
+            return;
+        }
+
+        Table.RowCleanUp();
+    }
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) {

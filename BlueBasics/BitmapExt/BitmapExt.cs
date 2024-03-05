@@ -509,6 +509,9 @@ public class BitmapExt : IDisposable, IDisposableExtended {
             return Color.Transparent;
         }
 
+        if (x < 0 || y < 0) { return Color.Transparent; }
+        if (x >= Width || y >= Height) { return Color.Transparent; }
+
         var index = (y * _bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
         var blue = _bits[index];
         var green = _bits[index + 1];

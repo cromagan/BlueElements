@@ -193,7 +193,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
             // Großes Bild per automatik generieren und Zeichnen
             //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
             //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
-            var tmpPic = QuickImage.Get(QuickImage.GenerateCode(qi.Name, control.Width - 6, 28, qi.Effekt, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
+            var tmpPic = QuickImage.Get(QuickImage.GenerateCode(qi.Name, 48, 28, qi.Effekt, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
             Skin.Draw_FormatedText(gr, string.Empty, tmpPic, design, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
 
             var tt = LanguageTool.DoTranslate(text, translate);
