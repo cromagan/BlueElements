@@ -364,11 +364,11 @@
     <Compile Include="Forms\PictureView.designer.cs">
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmBefehlsreferenz.cs">
+    <Compile Include="Befehlsreferenz.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmBefehlsreferenz.Designer.cs">
-      <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
+    <Compile Include="Befehlsreferenz.Designer.cs">
+      <DependentUpon>Befehlsreferenz.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IItemToControl.cs" />
     <Compile Include="Interfaces\IBackgroundNone.cs" />
@@ -838,8 +838,8 @@
     <EmbeddedResource Include="Controls\ZoomPad.resx">
       <DependentUpon>ZoomPad.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmBefehlsreferenz.resx">
-      <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
+    <EmbeddedResource Include="Befehlsreferenz.resx">
+      <DependentUpon>Befehlsreferenz.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ScriptEditor.resx">
       <DependentUpon>ScriptEditor.cs</DependentUpon>

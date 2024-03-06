@@ -457,11 +457,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _ = x.ShowDialog();
     }
 
-    public static void RowCleanUp(Database database) {
-        using RowCleanUp x = new(database);
-        _ = x.ShowDialog();
-    }
-
     public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         if (tableView.Database is not Database db || db.IsDisposed) {
             MessageBox.Show("Datenbank-Fehler.", ImageCode.Information, "OK");
@@ -1382,7 +1377,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     internal void RowCleanUp() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        RowCleanUp(db);
+        var l = new RowCleanUp(this);
+        l.Show();
     }
 
     //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -2210,7 +2206,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             case "doeinzigartig":
                 Filter.Remove(e.Column);
-                e.Column.GetUniques(RowsVisibleUnique(), out var einzigartig, out _);
+                RowCollection.GetUniques(e.Column, RowsVisibleUnique(), out var einzigartig, out _);
                 if (einzigartig.Count > 0) {
                     Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, einzigartig));
                     Notification.Show("Die aktuell einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
@@ -2221,7 +2217,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             case "donichteinzigartig":
                 Filter.Remove(e.Column);
-                e.Column.GetUniques(RowsVisibleUnique(), out _, out var xNichtEinzigartig);
+                RowCollection.GetUniques(e.Column, RowsVisibleUnique(), out _, out var xNichtEinzigartig);
                 if (xNichtEinzigartig.Count > 0) {
                     Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, xNichtEinzigartig));
                     Notification.Show("Die aktuell <b>nicht</b> einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);

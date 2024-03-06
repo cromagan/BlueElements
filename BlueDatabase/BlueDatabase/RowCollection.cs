@@ -198,6 +198,34 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         //return row;
     }
 
+    /// <summary>
+    /// Sucht dopplete Einträge in der angegebenen Spalte. Dabei werden Multiline-Einträge auggesplittet.
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="rows"></param>
+    /// <param name="unique"></param>
+    /// <param name="notUnique"></param>
+    public static void GetUniques(ColumnItem column, List<RowItem> rows, out List<string> unique, out List<string> notUnique) {
+        unique = [];
+        notUnique = [];
+        HashSet<string> uniqueSet = [];
+
+        foreach (var thisRow in rows) {
+            if (thisRow != null && !thisRow.IsDisposed) {
+                var values = column.MultiLine ? thisRow.CellGetList(column) : [thisRow.CellGetString(column)];
+                foreach (var value in values) {
+                    if (uniqueSet.Contains(value)) {
+                        _ = notUnique.AddIfNotExists(value);
+                    } else {
+                        uniqueSet.Add(value);
+                        unique.Add(value);
+                    }
+                }
+            }
+        }
+        unique = unique.Except(notUnique).ToList();
+    }
+
     public static string UniqueKeyValue() {
         var x = 9999;
         do {

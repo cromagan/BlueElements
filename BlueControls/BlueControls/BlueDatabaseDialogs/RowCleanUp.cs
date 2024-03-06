@@ -22,7 +22,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Extensions;
@@ -34,25 +37,31 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
     #region Fields
 
     private Database? _database;
-
-    private List<string>? _files;
+    private Table? _table;
 
     #endregion
 
     #region Constructors
 
-    public RowCleanUp(Database? database) : base() {
+    public RowCleanUp(Table table) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
+        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        Table = table;
+
+        Database = table.Database;
+        //_table.SelectedCellChanged += SelectedCellChanged;
+        //SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
+
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         //_originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
         //var ein = _originalImportText.SplitAndCutByCrToList();
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
-        Database = database;
+        //Database = database;
 
-        if (database != null) {
+        if (_database is Database db && !db.IsDisposed) {
             //var lst = new ItemCollectionList.ItemCollectionList(true);
-            cbxColDateiname.Item.AddRange(database.Column, false);
+            lstColumns.Item.AddRange(db.Column, false);
             //cbxColDateiname.Item = lst;
         }
 
@@ -80,6 +89,23 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         }
     }
 
+    public Table? Table {
+        get => _table;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _table) { return; }
+
+            if (_table != null) {
+                _table.VisibleRowsChanged -= _table_VisibleRowsChanged;
+            }
+            _table = value;
+
+            if (_table != null) {
+                _table.VisibleRowsChanged += _table_VisibleRowsChanged;
+            }
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -94,80 +120,136 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         Close();
     }
 
-    private void btnDatenbankwählen_Click(object sender, System.EventArgs e) => _ = LoadTab.ShowDialog();
+    private void _table_VisibleRowsChanged(object sender, System.EventArgs e) {
+        CheckButtons();
+    }
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
-    private void cbxColDateiname_TextChanged(object sender, System.EventArgs e) {
-        CheckButtons();
-    }
-
     private void CheckButtons() {
-        if (_database == null) {
+        if (_database == null || _table == null) {
             txtInfo.Text = "Keine Datenbank gewählt.";
-            btnImport.Enabled = false;
+            btnExecute.Enabled = false;
             return;
         }
 
-        if (_files == null || _files.Count == 0) {
-            txtInfo.Text = "Keine Datei(en) zum Importieren gewählt.";
-            btnImport.Enabled = false;
+        var r = _table.RowsVisibleUnique()?.Count ?? 0;
+
+        if (r == 0) {
+            txtInfo.Text = "Keine Zeilen angezeigt.";
+            btnExecute.Enabled = false;
             return;
         }
 
-        if (_database.Column.Exists(cbxColDateiname.Text) == null) {
-            txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
-            btnImport.Enabled = false;
+        if (lstColumns.Checked.Count == 0) {
+            txtInfo.Text = "Keine Spalten gewählt.";
+            btnExecute.Enabled = false;
             return;
         }
 
-        btnImport.Enabled = true;
-
-        if (_files.Count == 1) {
-            txtInfo.Text = _files[0];
-            return;
-        }
-
-        txtInfo.Text = _files.Count.ToString() + " Dateien.";
-    }
-
-    private void Fertig_Click(object sender, System.EventArgs e) {
-        //var TR = string.Empty;
-        //if (TabStopp.Checked) {
-        //    TR = "\t";
-        //} else if (Semikolon.Checked) {
-        //    TR = ";";
-        //} else if (Komma.Checked) {
-        //    TR = ",";
-        //} else if (Leerzeichen.Checked) {
-        //    TR = " ";
-        //} else if (Andere.Checked) {
-        //    TR = aTXT.Text;
-        //}
-        //if (string.IsNullOrEmpty(TR)) {
-        //    MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
+        //if (_database.Column.Exists(cbxColDateiname.Text) == null) {
+        //    txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
+        //    btnImport.Enabled = false;
         //    return;
         //}
 
-        //if (_files == null || _files.Count == 0) { return; }
-        //if (_database == null) { return; }
+        btnExecute.Enabled = true;
 
-        //var m = "Datenbank-Fehler";
-
-        //if (Database != null && !Database.IsDisposed) {
-        //    m = Database.ImportBdb(_files, _database.Column.Exists(cbxColDateiname.Text), btnDateienlöschen.Checked);
+        //if (_files.Count == 1) {
+        //    txtInfo.Text = _files[0];
+        //    return;
         //}
 
-        //if (!string.IsNullOrEmpty(m)) {
-        //    MessageBox.Show(m, ImageCode.Information, "OK");
-        //}
-        Close();
+        txtInfo.Text = r.ToString() + " angepinnte und gefilterte Zeilen werden berücksichtigt.";
     }
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) {
-        _files = LoadTab.FileNames.ToList();
-        CheckButtons();
+    private void Fertig_Click(object sender, System.EventArgs e) {
+        var r = _table?.RowsVisibleUnique();
+
+        if (r == null || r.Count == 0) {
+            MessageBox.Show("Keine Zeilen gewählt.", ImageCode.Information, "OK");
+            return;
+        }
+
+        if (_database is not Database db || db.IsDisposed) { return; }
+        List<ColumnItem> columns = new List<ColumnItem>();
+        foreach (var column in lstColumns.Checked) {
+            if (db.Column.Exists(column) is ColumnItem c) {
+                columns.Add(c);
+            }
+        }
+
+        foreach (var thisR in r) {
+            if (!thisR.IsDisposed && db.Row.Contains(thisR)) {
+
+                #region Filtercol erstellen
+
+                var f = new FilterCollection(db, "Dupe Suche");
+
+                foreach (var thisc in columns) {
+                    f.Add(new FilterItem(thisc, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
+                }
+
+                #endregion
+
+                #region Zeilen ermitteln (rows)
+
+                var rows = f.Rows.Intersect(r).ToList();
+
+                #endregion
+
+                if (rows.Count > 1) {
+                    if (optFülle.Checked) {
+
+                        #region Leere Werte befüllen
+
+                        foreach (var thisC in db.Column) {
+
+                            #region neuen Wert zum Reinschreiben ermitteln (Wert)
+
+                            var wert = string.Empty;
+                            foreach (var thisR2 in rows) {
+                                if (string.IsNullOrEmpty(wert)) { wert = thisR2.CellGetString(thisC); }
+                            }
+
+                            #endregion
+
+                            #region Wert in leere Zellen reinscheiben
+
+                            foreach (var thisR2 in rows) {
+                                if (string.IsNullOrEmpty(thisR2.CellGetString(thisC))) { thisR2.CellSet(thisC, wert); }
+                            }
+
+                            #endregion
+                        }
+
+                        #endregion
+                    } else if (optLöschen.Checked) {
+
+                        #region Jüngste löschen
+
+                        RowItem ToDel = rows[0];
+
+                        foreach (var thisR2 in rows) {
+                            if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(ToDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {
+                                ToDel = thisR2;
+                            }
+                        }
+
+                        db.Row.Remove(ToDel, "RowCleanUp");
+
+                        #endregion
+                    } else {
+                        MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
+                        return;
+                    }
+                }
+
+            }
+        }
     }
+
+    private void lstColumns_ItemClicked(object sender, AbstractListItemEventArgs e) => CheckButtons();
 
     #endregion
 }

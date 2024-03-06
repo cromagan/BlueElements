@@ -1436,24 +1436,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return UcaseNamesSortedByLenght;
     }
 
-    public void GetUniques(List<RowItem> rows, out List<string> einzigartig, out List<string> nichtEinzigartig) {
-        einzigartig = [];
-        nichtEinzigartig = [];
-        foreach (var thisRow in rows) {
-            if (thisRow != null && !thisRow.IsDisposed) {
-                var tmp = MultiLine ? thisRow.CellGetList(this) : [thisRow.CellGetString(this)];
-                foreach (var thisString in tmp) {
-                    if (einzigartig.Contains(thisString)) {
-                        _ = nichtEinzigartig.AddIfNotExists(thisString);
-                    } else {
-                        _ = einzigartig.AddIfNotExists(thisString);
-                    }
-                }
-            }
-        }
-        einzigartig.RemoveString(nichtEinzigartig, false);
-    }
-
     public void Invalidate_ColumAndContent() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         Invalidate_Head();
@@ -2469,8 +2451,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
                 Database.Cell.DoSystemColumns(db, this, thisRow, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
                 thisRow.Database?.Row.AddRowWithChangedValue(thisRow);
-      
-
             }
         }
     }

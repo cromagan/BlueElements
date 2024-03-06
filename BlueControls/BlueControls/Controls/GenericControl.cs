@@ -26,8 +26,6 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Enums;
-using BlueControls.Forms;
-using Form = System.Windows.Forms.Form;
 
 #nullable enable
 
@@ -128,7 +126,7 @@ public class GenericControl : Control {
 
         do {
             switch (o) {
-                case Forms.Form frm:
+                case System.Windows.Forms.Form frm:
                     return frm;
 
                 case null:
@@ -183,10 +181,10 @@ public class GenericControl : Control {
                 return PartentType.Slider;
             //Is = "FRMMSGBOX"
 
-            case FloatingForm:
+            case BlueControls.Forms.FloatingForm:
                 return PartentType.MsgBox;
 
-            case DialogWithOkAndCancel:
+            case BlueControls.Forms.DialogWithOkAndCancel:
                 return PartentType.MsgBox;
 
             case TextBox:
