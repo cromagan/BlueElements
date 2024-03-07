@@ -31,9 +31,9 @@ internal class Method_Add : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public override List<List<string>> Args => [ListStringVar, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain]];
     public override string Command => "add";
-    public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
+    public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.\r\nZahlen werden in Text (max. 5 Nachkommastellen) umgewandelt";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
@@ -59,6 +59,9 @@ internal class Method_Add : Method {
             }
             if (attvar.Attributes[z] is VariableListString vl) {
                 tmpList.AddRange(vl.ValueList);
+            }
+            if (attvar.Attributes[z] is VariableFloat vf) {
+                tmpList.Add(vf.ValueForReplace);
             }
         }
 

@@ -19,6 +19,7 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -225,8 +226,8 @@ public partial class PadEditor : PadEditorReadOnly {
 
         if (Pad.Item != null) {
             ckbRaster.Checked = Pad.Item.SnapMode == SnapMode.SnapToGrid;
-            txbRasterAnzeige.Text = Pad.Item.GridShow.ToString(Constants.Format_Float2);
-            txbRasterFangen.Text = Pad.Item.GridSnap.ToString(Constants.Format_Float2);
+            txbRasterAnzeige.Text = Pad.Item.GridShow.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
+            txbRasterFangen.Text = Pad.Item.GridSnap.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
         }
     }
 

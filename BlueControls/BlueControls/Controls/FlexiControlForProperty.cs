@@ -31,6 +31,7 @@ using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 using BlueDatabase;
+using System.Globalization;
 
 #nullable enable
 
@@ -461,11 +462,11 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                 break;
 
             case double db:
-                ValueSet(db.ToString(Format_Float2), true);
+                ValueSet(db.ToString(Format_Float2, CultureInfo.InvariantCulture), true);
                 break;
 
             case float fl:
-                ValueSet(fl.ToString(Format_Float2), true);
+                ValueSet(fl.ToString(Format_Float2, CultureInfo.InvariantCulture), true);
                 break;
 
             case Color co:

@@ -110,7 +110,7 @@ public class DimensionPadItem : AbstractPadItem {
 
     public static string ClassId => "DIMENSION";
     public override string Description => string.Empty;
-    public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
+    public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
     public int Nachkommastellen { get; set; }
 
@@ -150,7 +150,7 @@ public class DimensionPadItem : AbstractPadItem {
 
     public string Angezeigter_Text_Oben() {
         if (!string.IsNullOrEmpty(Text_Oben)) { return Text_Oben; }
-        var s = Länge_In_Mm.ToString(Constants.Format_Float10);
+        var s = Länge_In_Mm.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture);
         s = s.Replace(".", ",");
         if (s.Contains(",")) {
             s = s.TrimEnd("0");

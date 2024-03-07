@@ -32,7 +32,7 @@ public class Method_AddRows : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, ListStringVar, BoolVal];
+    public override List<List<string>> Args => [StringVal, ListStringVar];
     public override string Command => "addrows";
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
@@ -45,7 +45,7 @@ public class Method_AddRows : Method_Database {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRows(database, keyvalues, startScriptOfNewRow);";
+    public override string Syntax => "AddRows(database, keyvalues);";
 
     #endregion
 
@@ -63,20 +63,17 @@ public class Method_AddRows : Method_Database {
 
         var keys = attvar.ValueListStringGet(1);
         keys = keys.SortedDistinctList();
-        var exe = attvar.ValueBoolGet(2);
 
-        if (exe) {
-            StackTrace stackTrace = new();
-            if (stackTrace.FrameCount > 400) {
-                return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf");
-            }
+        StackTrace stackTrace = new();
+        if (stackTrace.FrameCount > 400) {
+            return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf");
         }
 
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
         foreach (var thisKey in keys) {
             if (db.Row[thisKey] is null) {
-                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, null, exe, true, "Script Command: Add Rows");
+                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, null, true, "Script Command: Add Rows");
             }
         }
 

@@ -28,6 +28,7 @@ using static BlueBasics.Extensions;
 using BlueBasics.Enums;
 
 using static BlueBasics.Converter;
+using System.Globalization;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -72,7 +73,7 @@ internal class Method_AutoCorrect : Method_Database {
             var s = string.Empty;
             switch (columnVar) {
                 case VariableFloat vf:
-                    s = vf.ValueNum.ToString(Constants.Format_Float1);
+                    s = vf.ValueNum.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
                     break;
 
                 case VariableListString vl:

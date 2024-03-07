@@ -1068,7 +1068,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
         if (_afterEditAutoCorrect) { value = KleineFehlerCorrect(value); }
         if (_roundAfterEdit > -1 && DoubleTryParse(value, out var erg)) {
-            erg = Math.Round(erg, _roundAfterEdit);
+            erg = Math.Round(erg, _roundAfterEdit, MidpointRounding.AwayFromZero);
             value = erg.ToString(CultureInfo.InvariantCulture);
         }
         if (_afterEditQuickSortRemoveDouble) {

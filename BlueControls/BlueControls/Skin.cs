@@ -835,7 +835,7 @@ public static class Skin {
     public const string DummyStandardFont = "<Name=Arial, Size=10>";
     public const int Padding = 9;
     public const int PaddingSmal = 3;
-    public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2);
+    public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
     public static Database? StyleDb;
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;

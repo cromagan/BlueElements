@@ -92,7 +92,7 @@ public static partial class Extensions {
             case SortierTyp.ZahlenwertFloat:
                 if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                 if (DoubleTryParse(isValue, out var dw)) {
-                    var t = dw.ToString(Format_Float10_3);
+                    var t = dw.ToString(Format_Float10_3, CultureInfo.InvariantCulture);
                     if (!t.Contains(",")) { t += ",000"; }
 
                     if (dw >= 0) { t = "A" + t; }

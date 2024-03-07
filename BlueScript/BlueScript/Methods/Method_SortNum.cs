@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Globalization;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -65,7 +66,7 @@ internal class Method_SortNum : Method {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        vli.ValueList = nums.ConvertAll(i => i.ToString(Constants.Format_Float1));
+        vli.ValueList = nums.ConvertAll(i => i.ToString(Constants.Format_Float5, CultureInfo.InvariantCulture));
         return DoItFeedback.Null();
     }
 

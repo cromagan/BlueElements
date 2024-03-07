@@ -19,6 +19,7 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using BlueBasics;
 using BlueBasics.Enums;
 using static BlueBasics.Converter;
@@ -98,9 +99,9 @@ public partial class FontSelectDialog {
             if (FName.Item[value.FontName] == null) { _ = FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
             FName.UncheckAll();
             FName.Check(value.FontName);
-            if (FSize.Item[value.Size.ToString(Constants.Format_Float1)] == null) { _ = FSize.Item.Add(value.Size.ToString(Constants.Format_Float1)); }
+            if (FSize.Item[value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture)] == null) { _ = FSize.Item.Add(value.Size.ToString(Constants.Format_Float1)); }
             FSize.UncheckAll();
-            FSize.Check(value.Size.ToString(Constants.Format_Float1));
+            FSize.Check(value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
             fFett.Checked = value.Bold;
             fKursiv.Checked = value.Italic;
             fUnterstrichen.Checked = value.Underline;

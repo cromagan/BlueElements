@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -370,7 +371,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                         if (zd2 < zd1) {
                             Generic.Swap(ref zd1, ref zd2);
                         }
-                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToString(Constants.Format_Float9) + "|" + zd2.ToString(Constants.Format_Float9)));
+                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToString(Constants.Format_Float9, CultureInfo.InvariantCulture) + "|" + zd2.ToString(Constants.Format_Float9, CultureInfo.InvariantCulture)));
                         return;
                     }
                 }

@@ -32,12 +32,12 @@ public class Method_AddRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, BoolVal];
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "addrow";
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\n" +
                                           "Es wird immer eine neue Zeile erstellt!\r\n" +
-                                          "KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
+                                          "KeyValue muss einen Wert enthalten - zur Not kann UniqueRowId() benutzt werden.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -45,7 +45,7 @@ public class Method_AddRow : Method_Database {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";
+    public override string Syntax => "AddRow(database, keyvalue);";
 
     #endregion
 
@@ -76,7 +76,7 @@ public class Method_AddRow : Method_Database {
 
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
-        var r = db.Row.GenerateAndAdd(db.NextRowKey(), attvar.ValueStringGet(1), null, attvar.ValueBoolGet(2), true, "Script Command: Add Row");
+        var r = db.Row.GenerateAndAdd(db.NextRowKey(), attvar.ValueStringGet(1), null, true, "Script Command: Add Row");
 
         return Method_Row.RowToObjectFeedback(r);
     }

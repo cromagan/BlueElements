@@ -192,8 +192,8 @@ public partial class ZoomPad : GenericControl {
     /// <remarks>
     /// </remarks>
     protected Point KoordinatesUnscaled(MouseEventArgs e) =>
-        new((int)Math.Round(((e.X + _shiftX) / Zoom) - 0.5d, 0),
-            (int)Math.Round(((e.Y + _shiftY) / Zoom) - 0.5d, 0));
+        new((int)Math.Round(((e.X + _shiftX) / Zoom) - 0.5d, 0, MidpointRounding.AwayFromZero),
+            (int)Math.Round(((e.Y + _shiftY) / Zoom) - 0.5d, 0, MidpointRounding.AwayFromZero));
 
     protected virtual RectangleF MaxBounds() {
         Develop.DebugPrint_RoutineMussUeberschriebenWerden();

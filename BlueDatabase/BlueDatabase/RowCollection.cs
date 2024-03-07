@@ -185,7 +185,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var s = db2.NextRowKey();
         if (s == null || string.IsNullOrEmpty(s)) { return null; }
 
-        return db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, true, comment);
+        return db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment);
 
         //foreach (var thisfi in fc) {
         //    if (thisfi.Column is ColumnItem c) {
@@ -428,7 +428,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var s = Database.NextRowKey();
         if (s == null || string.IsNullOrEmpty(s)) { return null; }
 
-        return GenerateAndAdd(s, valueOfCellInFirstColumn, fc, true, true, comment);
+        return GenerateAndAdd(s, valueOfCellInFirstColumn, fc, true, comment);
     }
 
     //                foreach (var thisRow in rowsToExpand) {
@@ -442,7 +442,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, FilterCollection? fc, bool runScriptOfNewRow, bool fullprocessing, string comment) {
+    public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, FilterCollection? fc, bool fullprocessing, string comment) {
         var db = Database;
         if (db == null || db.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
@@ -500,9 +500,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 
-        if (runScriptOfNewRow) {
-            _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null);
-        }
+        _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null);
 
         return item;
     }
@@ -635,7 +633,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // Zeilen erzeugen und Format übertragen
         foreach (var thisRow in sourceDatabase.Row) {
-            var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, false, "Clone - Zeile fehlt");
+            var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
             l.CloneFrom(thisRow, true);
         }
 

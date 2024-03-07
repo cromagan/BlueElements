@@ -68,10 +68,10 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         //Höhe.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
         //   Format.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Width.ToString & ";" & _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
         // Zufuhr.Text = _PrintDocument1.
-        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString(Constants.Format_Float1);
-        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString(Constants.Format_Float1);
-        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString(Constants.Format_Float1);
-        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString(Constants.Format_Float1);
+        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
+        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
+        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
+        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
         DrawSampleAndCheckButton();
         // PrepareForShowing(Controls)
         _doing = false;
@@ -114,7 +114,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         827 => 210.0F,
         1169 => 297.0F,
         1654 => 420.0F,
-        _ => Math.Round(inch * 0.254, 1)
+        _ => Math.Round(inch * 0.254, 1, MidpointRounding.AwayFromZero)
     };
 
     private void Abmasse_TextChanged(object sender, System.EventArgs e) {
@@ -204,8 +204,8 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
                     break;
             }
         }
-        Breite.Text = Math.Round(b, 1).ToString(CultureInfo.InvariantCulture);
-        Höhe.Text = Math.Round(h, 1).ToString(CultureInfo.InvariantCulture);
+        Breite.Text = Math.Round(b, 1, MidpointRounding.AwayFromZero).ToString(CultureInfo.InvariantCulture);
+        Höhe.Text = Math.Round(h, 1, MidpointRounding.AwayFromZero).ToString(CultureInfo.InvariantCulture);
     }
 
     private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {

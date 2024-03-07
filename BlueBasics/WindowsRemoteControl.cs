@@ -140,8 +140,8 @@ public static class WindowsRemoteControl {
         var input_Move = new Input {
             type = InputType.INPUT_MOUSE
         };
-        input_Move.mi.dx = (int)Math.Round(x * (65535 / screenWidth), 0);
-        input_Move.mi.dy = (int)Math.Round(y * (65535 / screenHeight), 0);
+        input_Move.mi.dx = (int)Math.Round(x * (65535 / screenWidth), 0, MidpointRounding.AwayFromZero);
+        input_Move.mi.dy = (int)Math.Round(y * (65535 / screenHeight), 0, MidpointRounding.AwayFromZero);
         input_Move.mi.mouseData = 0;
         input_Move.mi.dwFlags = Mouseeventf.MOVE | Mouseeventf.ABSOLUTE;
         input_Move.mi.time = 0;

@@ -968,12 +968,12 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         _prRu ??= new PointM(this, "Druckbereich RU", 0, 0);
         _prLu ??= new PointM(this, "Druckbereich LU", 0, 0);
 
-        var ssw = (float)Math.Round(MmToPixel(_sheetSizeInMm.Width, Dpi), 1);
-        var ssh = (float)Math.Round(MmToPixel(_sheetSizeInMm.Height, Dpi), 1);
-        var rr = (float)Math.Round(MmToPixel(_randinMm.Right, Dpi), 1);
-        var rl = (float)Math.Round(MmToPixel(_randinMm.Left, Dpi), 1);
-        var ro = (float)Math.Round(MmToPixel(_randinMm.Top, Dpi), 1);
-        var ru = (float)Math.Round(MmToPixel(_randinMm.Bottom, Dpi), 1);
+        var ssw = (float)Math.Round(MmToPixel(_sheetSizeInMm.Width, Dpi), 1, MidpointRounding.AwayFromZero);
+        var ssh = (float)Math.Round(MmToPixel(_sheetSizeInMm.Height, Dpi), 1, MidpointRounding.AwayFromZero);
+        var rr = (float)Math.Round(MmToPixel(_randinMm.Right, Dpi), 1, MidpointRounding.AwayFromZero);
+        var rl = (float)Math.Round(MmToPixel(_randinMm.Left, Dpi), 1, MidpointRounding.AwayFromZero);
+        var ro = (float)Math.Round(MmToPixel(_randinMm.Top, Dpi), 1, MidpointRounding.AwayFromZero);
+        var ru = (float)Math.Round(MmToPixel(_randinMm.Bottom, Dpi), 1, MidpointRounding.AwayFromZero);
         _prLo.SetTo(rl, ro);
         _prRo.SetTo(ssw - rr, ro);
         _prRu.SetTo(ssw - rr, ssh - ru);

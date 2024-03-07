@@ -19,6 +19,7 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using BlueBasics;
 using BlueControls.EventArgs;
 
@@ -128,7 +129,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         //sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
-        capGamma.Text = sldGamma.Value.ToString(Constants.Format_Float1);
+        capGamma.Text = sldGamma.Value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
         OnDoInvalidate();
     }
 
@@ -136,7 +137,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         //sldHelligkeit.Value = 0f;
-        capHelligkeit.Text = sldHelligkeit.Value.ToString(Constants.Format_Float1);
+        capHelligkeit.Text = sldHelligkeit.Value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
         OnDoInvalidate();
     }
 
@@ -144,7 +145,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldGamma.Value = 1f;
         //sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
-        capKontrast.Text = sldKontrast.Value.ToString(Constants.Format_Float1);
+        capKontrast.Text = sldKontrast.Value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
         OnDoInvalidate();
     }
 

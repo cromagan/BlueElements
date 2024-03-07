@@ -91,8 +91,8 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         var minY = Math.Min(Math.Min(p[0].Y, p[1].Y), Math.Min(p[2].Y, p[3].Y));
         var maxX = Math.Max(Math.Max(p[0].X, p[1].X), Math.Max(p[2].X, p[3].X));
         var maxY = Math.Max(Math.Max(p[0].Y, p[1].Y), Math.Max(p[2].Y, p[3].Y));
-        var b = (int)Math.Round(maxX - minX);
-        var h = (int)Math.Round(maxY - minY);
+        var b = (int)Math.Round(maxX - minX, MidpointRounding.AwayFromZero);
+        var h = (int)Math.Round(maxY - minY, MidpointRounding.AwayFromZero);
         Bitmap nBmp = new(b, h);
         // Create the real rotation transformation.
         Matrix rotateAtCenter = new();

@@ -140,7 +140,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         pad.Item.SheetStyleScale = tmp.SheetStyleScale;
         tmp.Dispose();
         var druckB = pad.Item.DruckbereichRect();
-        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), 1);
+        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), MidpointRounding.AwayFromZero);
         var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));
         for (var x = 0; x < tempVar; x++) {
             var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));

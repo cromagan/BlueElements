@@ -639,7 +639,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public void Set(ColumnItem? column, RowItem? row, int value) => Set(column, row, value.ToString());
 
-    public void Set(ColumnItem? column, RowItem? row, double value) => Set(column, row, value.ToString(Constants.Format_Float1));
+    public void Set(ColumnItem? column, RowItem? row, double value) => Set(column, row, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
 
     public void SetSizeOfCellContent(ColumnItem column, RowItem row, Size contentSize) {
         var key = TextSizeKey(column, row.CellGetString(column));
