@@ -36,10 +36,10 @@ public enum CheckBehavior {
     /// </summary>
     MultiSelection = 2,
 
-    /// <summary>
-    /// Es muss genau ein Eintrag gewählt sein. Sozusagen -kein- Cancel erlaubt.
-    /// </summary>
-    AlwaysSingleSelection = 3,
+    ///// <summary>
+    ///// Es muss genau ein Eintrag gewählt sein. Sozusagen -kein- Cancel erlaubt.
+    ///// </summary>
+    //AlwaysSingleSelection = 3,
 
     /// <summary>
     /// Es können keine Einträge gewählt werden. Es können nur Werte angeklickt werden.

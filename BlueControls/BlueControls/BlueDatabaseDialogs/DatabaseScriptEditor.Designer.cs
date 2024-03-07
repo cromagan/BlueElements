@@ -1,14 +1,9 @@
-using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueScript.EventArgs;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
-using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 using TextBox = BlueControls.Controls.TextBox;
 
@@ -35,11 +30,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capQuickInfo = new BlueControls.Controls.Caption();
             this.capImage = new BlueControls.Controls.Caption();
             this.grpRechte = new BlueControls.Controls.GroupBox();
-            this.btnDummyAdmin = new BlueControls.Controls.Button();
-            this.PermissionGroups_NewRow = new BlueControls.Controls.ListBox();
+            this.lstPermissionExecute = new BlueControls.Controls.ListBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
             this.chkAendertWerte = new BlueControls.Controls.Button();
-            this.chkExternVerfügbar = new BlueControls.Controls.Button();
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
             this.chkAuslöser_databaseloaded = new BlueControls.Controls.Button();
@@ -152,22 +145,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbQuickInfo
             // 
-            this.txbQuickInfo.RaiseChangeDelay = 5;
             this.txbQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbQuickInfo.Location = new System.Drawing.Point(8, 296);
             this.txbQuickInfo.MultiLine = true;
             this.txbQuickInfo.Name = "txbQuickInfo";
+            this.txbQuickInfo.RaiseChangeDelay = 5;
             this.txbQuickInfo.Size = new System.Drawing.Size(664, 152);
             this.txbQuickInfo.TabIndex = 28;
             this.txbQuickInfo.TextChanged += new System.EventHandler(this.txbQuickInfo_TextChanged);
             // 
             // cbxPic
             // 
-            this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxPic.Location = new System.Drawing.Point(680, 32);
             this.cbxPic.Name = "cbxPic";
+            this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Size = new System.Drawing.Size(288, 24);
             this.cbxPic.TabIndex = 27;
             this.cbxPic.TextChanged += new System.EventHandler(this.cbxPic_TextChanged);
@@ -192,8 +185,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpRechte
             // 
             this.grpRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpRechte.Controls.Add(this.btnDummyAdmin);
-            this.grpRechte.Controls.Add(this.PermissionGroups_NewRow);
+            this.grpRechte.Controls.Add(this.lstPermissionExecute);
             this.grpRechte.Location = new System.Drawing.Point(440, 64);
             this.grpRechte.Name = "grpRechte";
             this.grpRechte.Size = new System.Drawing.Size(224, 208);
@@ -201,38 +193,26 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpRechte.TabStop = false;
             this.grpRechte.Text = "Rechte";
             // 
-            // btnDummyAdmin
+            // lstPermissionExecute
             // 
-            this.btnDummyAdmin.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnDummyAdmin.Checked = true;
-            this.btnDummyAdmin.Enabled = false;
-            this.btnDummyAdmin.Location = new System.Drawing.Point(8, 16);
-            this.btnDummyAdmin.Name = "btnDummyAdmin";
-            this.btnDummyAdmin.Size = new System.Drawing.Size(208, 16);
-            this.btnDummyAdmin.TabIndex = 19;
-            this.btnDummyAdmin.Text = "#Administrator";
-            // 
-            // PermissionGroups_NewRow
-            // 
-            this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lstPermissionExecute.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.lstPermissionExecute.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.PermissionGroups_NewRow.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.PermissionGroups_NewRow.FilterText = null;
-            this.PermissionGroups_NewRow.Location = new System.Drawing.Point(8, 32);
-            this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
-            this.PermissionGroups_NewRow.RemoveAllowed = true;
-            this.PermissionGroups_NewRow.Size = new System.Drawing.Size(208, 168);
-            this.PermissionGroups_NewRow.TabIndex = 18;
-            this.PermissionGroups_NewRow.Translate = false;
-            this.PermissionGroups_NewRow.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.PermissionGroups_NewRow_ItemClicked);
+            this.lstPermissionExecute.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
+            this.lstPermissionExecute.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.lstPermissionExecute.FilterText = null;
+            this.lstPermissionExecute.Location = new System.Drawing.Point(8, 16);
+            this.lstPermissionExecute.Name = "lstPermissionExecute";
+            this.lstPermissionExecute.RemoveAllowed = true;
+            this.lstPermissionExecute.Size = new System.Drawing.Size(208, 184);
+            this.lstPermissionExecute.TabIndex = 18;
+            this.lstPermissionExecute.Translate = false;
+            this.lstPermissionExecute.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstPermissionExecute_ItemClicked);
             // 
             // grpEigenschaften
             // 
             this.grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpEigenschaften.Controls.Add(this.chkAendertWerte);
-            this.grpEigenschaften.Controls.Add(this.chkExternVerfügbar);
             this.grpEigenschaften.Controls.Add(this.chkZeile);
             this.grpEigenschaften.Location = new System.Drawing.Point(8, 64);
             this.grpEigenschaften.Name = "grpEigenschaften";
@@ -252,18 +232,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAendertWerte.TabIndex = 16;
             this.chkAendertWerte.Text = "Ändert Werte";
             this.chkAendertWerte.CheckedChanged += new System.EventHandler(this.chkAendertWerte_CheckedChanged);
-            // 
-            // chkExternVerfügbar
-            // 
-            this.chkExternVerfügbar.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkExternVerfügbar.Location = new System.Drawing.Point(8, 72);
-            this.chkExternVerfügbar.Name = "chkExternVerfügbar";
-            this.chkExternVerfügbar.QuickInfo = "Wenn das Skript über eine Menüleiste oder dem Kontextmenü\r\nwählbar sein soll, mus" +
-    "s dieses Häkchen gesetzt sein.";
-            this.chkExternVerfügbar.Size = new System.Drawing.Size(120, 22);
-            this.chkExternVerfügbar.TabIndex = 15;
-            this.chkExternVerfügbar.Text = "Extern verfügbar";
-            this.chkExternVerfügbar.CheckedChanged += new System.EventHandler(this.chkExternVerfügbar_CheckedChanged);
             // 
             // chkZeile
             // 
@@ -387,12 +355,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbName
             // 
-            this.txbName.RaiseChangeDelay = 5;
             this.txbName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbName.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbName.Location = new System.Drawing.Point(8, 32);
             this.txbName.Name = "txbName";
+            this.txbName.RaiseChangeDelay = 5;
             this.txbName.Size = new System.Drawing.Size(662, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
@@ -416,7 +384,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstEventScripts.CheckBehavior = BlueControls.Enums.CheckBehavior.AlwaysSingleSelection;
+            this.lstEventScripts.CheckBehavior = BlueControls.Enums.CheckBehavior.SingleSelection;
             this.lstEventScripts.Location = new System.Drawing.Point(8, 16);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
@@ -435,11 +403,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbTestZeile
             // 
-            this.txbTestZeile.RaiseChangeDelay = 5;
             this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbTestZeile.Enabled = false;
             this.txbTestZeile.Location = new System.Drawing.Point(128, 24);
             this.txbTestZeile.Name = "txbTestZeile";
+            this.txbTestZeile.RaiseChangeDelay = 5;
             this.txbTestZeile.Size = new System.Drawing.Size(379, 22);
             this.txbTestZeile.TabIndex = 7;
             // 
@@ -641,13 +609,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
         private GroupBox grpVerfügbareSkripte;
-        private ListBox lstEventScripts;
+        private BlueControls.Controls.ListBox lstEventScripts;
         private ScriptEditor eventScriptEditor;
         private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;
         private Button chkAuslöser_newrow;
         private Button chkAendertWerte;
-        private Button chkExternVerfügbar;
         private Button chkZeile;
         private TextBox txbName;
         private Caption capName;
@@ -676,8 +643,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private GroupBox grpAuslöser;
         private GroupBox grpRechte;
         private GroupBox grpEigenschaften;
-        private Button btnDummyAdmin;
-        private ListBox PermissionGroups_NewRow;
+        private BlueControls.Controls.ListBox lstPermissionExecute;
         private Controls.ComboBox cbxPic;
         private Caption capQuickInfo;
         private Caption capImage;

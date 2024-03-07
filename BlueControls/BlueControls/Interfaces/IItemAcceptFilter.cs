@@ -240,7 +240,7 @@ public sealed class ItemAcceptFilter {
 
             switch (item.AllowedInputFilter) {
                 case AllowedInputFilter.One:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, string.Empty, 3, x, CheckBehavior.AlwaysSingleSelection, AddType.None));
+                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => item.Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.More:

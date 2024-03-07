@@ -143,7 +143,7 @@ public partial class TableView : FormWithStatusBar {
             var didmenu = false;
 
             foreach (var thiss in db.EventScript) {
-                if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
+                if (thiss != null && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
                     if (!didmenu) {
                         _ = e.UserMenu.Add("Skripte", true);
                         didmenu = true;
@@ -1188,7 +1188,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         foreach (var thiss in db.EventScript) {
-            if (thiss != null && thiss.ManualExecutable) {
+            if (thiss != null && thiss.UserGroups.Count > 0) {
                 var d = lstAufgaben.Item.Add(thiss);
                 d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
 

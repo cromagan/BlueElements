@@ -37,8 +37,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
     private string _keyName;
 
-    private bool _manualexecutable;
-
     private string _quickinfo;
 
     private string _scriptText;
@@ -52,10 +50,10 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     protected ScriptDescription(string name, string script) {
         _keyName = name;
         _scriptText = script;
-        _manualexecutable = false;
+
         _admininfo = string.Empty;
         _quickinfo = string.Empty;
-        _usergroups = [];
+        _usergroups = [Constants.Administrator];
         _image = string.Empty;
     }
 
@@ -126,16 +124,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         }
     }
 
-    public bool ManualExecutable {
-        get => _manualexecutable;
-        set {
-            if (IsDisposed) { return; }
-            if (_manualexecutable == value) { return; }
-            _manualexecutable = value;
-            OnChanged();
-        }
-    }
-
     public string QuickInfo {
         get => _quickinfo;
         set {
@@ -202,8 +190,11 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
                 return true;
 
             case "manualexecutable":
+                if (value.FromPlusMinus()) {
+                    _usergroups.Add(Constants.Administrator);
+                    _usergroups = _usergroups.SortedDistinctList();
+                }
 
-                _manualexecutable = value.FromPlusMinus();
                 return true;
 
             case "quickinfo":
@@ -219,7 +210,8 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
                 return true;
 
             case "usergroups":
-                _usergroups = value.FromNonCritical().SplitAndCutByCrToList();
+                _usergroups.AddRange(value.FromNonCritical().SplitAndCutByCrToList());
+                _usergroups = _usergroups.SortedDistinctList();
                 return true;
 
             case "changevalues":
@@ -242,7 +234,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     public virtual QuickImage? SymbolForReadableText() {
         if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
         if (!string.IsNullOrEmpty(_image)) {
-            if (ManualExecutable) {
+            if (_usergroups.Count > 0) {
                 return QuickImage.Get(_image + "|16");
             } else {
                 return QuickImage.Get(_image + "|16|||||170");
@@ -259,7 +251,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
             result.ParseableAdd("Name", _keyName);
             result.ParseableAdd("Script", _scriptText);
-            result.ParseableAdd("ManualExecutable", _manualexecutable);
+            //result.ParseableAdd("ManualExecutable", _manualexecutable);
             result.ParseableAdd("ChangeValues", _changeValues);
             result.ParseableAdd("QuickInfo", _quickinfo);
             result.ParseableAdd("AdminInfo", _admininfo);

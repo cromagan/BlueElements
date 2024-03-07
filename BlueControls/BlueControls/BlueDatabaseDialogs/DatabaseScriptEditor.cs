@@ -131,14 +131,15 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
-                chkExternVerfügbar.Checked = value.ManualExecutable;
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.ScriptText;
 
-                PermissionGroups_NewRow.Item.Clear();
-                PermissionGroups_NewRow.Check(value.UserGroups);
-                PermissionGroups_NewRow.Suggestions.Clear();
-                PermissionGroups_NewRow.Item.AddRange(Database.Permission_AllUsed(false));
+                lstPermissionExecute.Item.Clear();
+                var l = Database.Permission_AllUsed(false).ToList();
+                l.AddIfNotExists(Constants.Administrator);
+                lstPermissionExecute.Item.AddRange(l);
+                lstPermissionExecute.Check(value.UserGroups);
+                lstPermissionExecute.Suggestions.Clear();
 
                 _item = value;
             } else {
@@ -153,7 +154,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_prepaireformula.Checked = false;
-                chkExternVerfügbar.Checked = false;
                 chkAendertWerte.Checked = false;
                 chkAuslöser_valuechangedThread.Checked = false;
                 chkAuslöser_databaseloaded.Checked = false;
@@ -335,12 +335,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         Item.EventTypes = tmp;
     }
 
-    private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-
-        Item.ManualExecutable = chkExternVerfügbar.Checked;
-    }
-
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
 
@@ -451,9 +445,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         btnVerlauf.Enabled = true;
     }
 
-    private void PermissionGroups_NewRow_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        var tmp = PermissionGroups_NewRow.Checked.ToList();
-        _ = tmp.Remove(Constants.Administrator);
+    private void lstPermissionExecute_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        var tmp = lstPermissionExecute.Checked.ToList();
+        //_ = tmp.Remove(Constants.Administrator);
         Item.UserGroups = new(tmp);
     }
 

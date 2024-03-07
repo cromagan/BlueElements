@@ -332,18 +332,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-
-    private Design CheckboxDesign() {
-        var checkboxDesign = Design.Undefiniert;
-        if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected) {
-            checkboxDesign = _checkBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection
-                ? Design.OptionButton_TextStyle
-                : Design.CheckBox_TextStyle;
-        }
-        return checkboxDesign;
-    }
-
-
     protected override void DrawControl(Graphics gr, States state) {
         var tmpDesign = _appearance is ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.Listbox_Boxes
             ? Design.ListBox
@@ -488,7 +476,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void btnMinus_Click(object sender, System.EventArgs e) {
         if (_mouseOverItem == null) { return; }
 
-        if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
+        //if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
         if (CheckboxDesign() != Design.Undefiniert) { return; }
 
         UnCheck(_mouseOverItem);
@@ -497,8 +485,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             Item.Remove(_mouseOverItem);
             //Check(string.Empty);
         }
-
-
     }
 
     private void btnPlus_Click(object sender, System.EventArgs e) {
@@ -546,6 +532,16 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         } else {
             Check(ne);
         }
+    }
+
+    private Design CheckboxDesign() {
+        var checkboxDesign = Design.Undefiniert;
+        if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected) {
+            checkboxDesign = _checkBehavior == CheckBehavior.SingleSelection
+                ? Design.OptionButton_TextStyle
+                : Design.CheckBox_TextStyle;
+        }
+        return checkboxDesign;
     }
 
     private void DoMouseMovement() {
@@ -616,7 +612,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             var removeok = _removeAllowed;
 
-            if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { removeok = false; }
             if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
 
             if (removeok) {
@@ -652,7 +647,21 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => Invalidate();
+    private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        var last = string.Empty;
+        if (e.NewItems != null && e.NewItems.Count > 0) {
+            last = string.Empty;
+        }
+
+        var l = new List<string>();
+        foreach (var thisc in _checked) {
+            if (Item[thisc] != null) { l.Add(thisc); }
+        }
+
+        ValidateCheckStates(l, last);
+
+        Invalidate();
+    }
 
     private AbstractListItem? MouseOverNode(int x, int y) => Item[x, (int)(y + SliderY.Value)];
 
@@ -693,18 +702,18 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
                 break;
 
-            case CheckBehavior.AlwaysSingleSelection:
-                if (newCheckedItems.Count > 1) {
-                    if (string.IsNullOrEmpty(lastaddeditem)) { lastaddeditem = newCheckedItems[0]; }
-                    newCheckedItems.Clear();
-                    newCheckedItems.Add(lastaddeditem);
-                }
+            //case CheckBehavior.AlwaysSingleSelection:
+            //    if (newCheckedItems.Count > 1) {
+            //        if (string.IsNullOrEmpty(lastaddeditem)) { lastaddeditem = newCheckedItems[0]; }
+            //        newCheckedItems.Clear();
+            //        newCheckedItems.Add(lastaddeditem);
+            //    }
 
-                if (newCheckedItems.Count == 0) {
-                    var it = Item.FirstOrDefault(thisp => thisp != null && thisp.IsClickable());
-                    if (it != null) { newCheckedItems.Add(it.KeyName); }
-                }
-                break;
+            //if (newCheckedItems.Count == 0) {
+            //    var it = Item.FirstOrDefault(thisp => thisp != null && thisp.IsClickable());
+            //    if (it != null) { newCheckedItems.Add(it.KeyName); }
+            //}
+            //break;
 
             default:
                 Develop.DebugPrint(_checkBehavior);

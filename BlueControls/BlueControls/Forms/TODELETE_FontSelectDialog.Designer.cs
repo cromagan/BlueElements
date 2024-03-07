@@ -61,7 +61,7 @@ namespace BlueControls.Forms
             // FName
             // 
             this.FName.AddAllowed = AddType.None;
-            this.FName.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
+            this.FName.CheckBehavior = CheckBehavior.SingleSelection;
             this.FName.Location = new Point(8, 32);
             this.FName.Name = "FName";
             this.FName.Size = new Size(216, 296);
@@ -88,7 +88,7 @@ namespace BlueControls.Forms
             // FSize
             // 
             this.FSize.AddAllowed = AddType.Text;
-            this.FSize.CheckBehavior = CheckBehavior.AlwaysSingleSelection;
+            this.FSize.CheckBehavior = CheckBehavior.SingleSelection;
             this.FSize.Location = new Point(232, 32);
             this.FSize.Name = "FSize";
             this.FSize.Size = new Size(88, 296);

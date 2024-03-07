@@ -35,7 +35,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), CheckBehavior.SingleSelection, null, AddType.None) { }
 
-    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) : base(checkBehavior != CheckBehavior.AlwaysSingleSelection, true) {
+    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) : base(true, true) {
         InitializeComponent();
         if (itemsOriginal.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes) {
             Develop.DebugPrint("Design nicht Listbox");
@@ -64,7 +64,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         ItemCollectionList.ItemCollectionList x = new(ListBoxAppearance.Listbox, true);
         x.AddRange(items);
         //x.Sort();
-        var erg = Show(txt, x, CheckBehavior.AlwaysSingleSelection, null, AddType.None);
+        var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }
 

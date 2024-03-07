@@ -151,7 +151,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             if (ChangeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
-            if (ManualExecutable) { return "Routinen, die das Formular vorbereiten, können nicht von außerhalb benutzt werden."; }
+            if (UserGroups.Count > 0) { return "Routinen, die das Formular vorbereiten, können nicht von außerhalb benutzt werden."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) {
@@ -212,7 +212,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
         var h = 100;
 
-        if (ManualExecutable) {
+        if (UserGroups.Count > 0) {
             //c = Color.Yellow;
             symb = ImageCode.Person;
         } else {
