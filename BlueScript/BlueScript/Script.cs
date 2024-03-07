@@ -169,9 +169,10 @@ public class Script {
 
         var ld = new LogData(subname, lineadd + 1);
 
-
-        varCol.RemoveWithComment("Attribut");
         if (attributes != null) {
+            // Attribute nur löschen, wenn neue vorhanden sind.
+            // Ansonsten werden bei Try / If / For diese gelöscht
+            varCol.RemoveWithComment("Attribut");
             for (var z = 0; z < attributes.Count; z++) {
                 varCol.Add(new VariableString("Attribut" + z.ToString(), attributes[z], true, "Attribut"));
             }

@@ -53,7 +53,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
         _admininfo = string.Empty;
         _quickinfo = string.Empty;
-        _usergroups = [Constants.Administrator];
+        _usergroups = [];
         _image = string.Empty;
     }
 

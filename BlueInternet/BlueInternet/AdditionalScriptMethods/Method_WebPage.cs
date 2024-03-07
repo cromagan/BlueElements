@@ -66,8 +66,8 @@ public abstract class Method_WebPage : Method {
         var d = DateTime.UtcNow;
         while (!browser.IsLoading) {
             //Develop.DoEvents();
-            if (DateTime.UtcNow.Subtract(d).TotalSeconds > 10) {
-                return true;
+            if (DateTime.UtcNow.Subtract(d).TotalSeconds > 2) {
+               break;
             }
         }
 

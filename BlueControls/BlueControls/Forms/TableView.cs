@@ -143,7 +143,7 @@ public partial class TableView : FormWithStatusBar {
             var didmenu = false;
 
             foreach (var thiss in db.EventScript) {
-                if (thiss != null && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
+                if (thiss != null && thiss.UserGroups.Count > 0 &&   db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
                     if (!didmenu) {
                         _ = e.UserMenu.Add("Skripte", true);
                         didmenu = true;

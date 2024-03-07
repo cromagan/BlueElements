@@ -44,8 +44,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
     public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
                                                 "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-                                            "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
-                                            "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
+                                            "Kein Zugriff auf auf Datenbank-Variablen!";
 
     public override bool GetCodeBlockAfter => false;
 

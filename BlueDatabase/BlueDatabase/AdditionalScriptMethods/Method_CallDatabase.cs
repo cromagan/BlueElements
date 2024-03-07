@@ -44,8 +44,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
     public override string Description => "Führt das Skript in der angegebenen Datenabank aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszühenden Skript zur Verfügung.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-        "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
-        "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
+        "Kein Zugriff auf auf Datenbank-Variablen!";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;

@@ -44,8 +44,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
     public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
             "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-        "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
-        "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
+        "Kein Zugriff auf auf Datenbank-Variablen!";
 
     public override bool GetCodeBlockAfter => false;
 
