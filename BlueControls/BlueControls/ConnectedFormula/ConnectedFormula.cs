@@ -46,7 +46,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     #region Fields
 
     public const float StandardHöhe = 1.75f;
-    public const string Version = "0.30";
+    public const string Version = "0.50"; // 0.50 seit 08.03.2024
 
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
     private readonly List<string> _databaseFiles = [];

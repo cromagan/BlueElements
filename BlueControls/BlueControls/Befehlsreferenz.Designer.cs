@@ -40,7 +40,7 @@ namespace BlueControls {
             this.lstCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstCommands.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
+            this.lstCommands.CheckBehavior = BlueControls.Enums.CheckBehavior.SingleSelection;
             this.lstCommands.Location = new System.Drawing.Point(8, 56);
             this.lstCommands.Name = "lstCommands";
             this.lstCommands.Size = new System.Drawing.Size(288, 384);

@@ -22,15 +22,13 @@ using BlueScript;
 using BlueScript.Enums;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_RowUnique : Method, IUseableForButton {
+public class Method_RowUnique : Method_Database, IUseableForButton {
 
     #region Properties
 
@@ -55,7 +53,7 @@ public class Method_RowUnique : Method, IUseableForButton {
 
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
 
-    public override bool MustUseReturnValue => true;
+    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
     public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen";
 
@@ -73,6 +71,9 @@ public class Method_RowUnique : Method, IUseableForButton {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
+        var mydb = MyDatabase(scp);
+        if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null || allFi.Count == 0) {
             return new DoItFeedback(infos.Data, "Fehler im Filter");
@@ -86,7 +87,7 @@ public class Method_RowUnique : Method, IUseableForButton {
 
         if (r.Count == 0) {
             if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
-            var nr = RowCollection.GenerateAndAdd(allFi, "Skript Befehl 'RowUnique'");
+            var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
             if (nr == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden"); }
             return Method_Row.RowToObjectFeedback(nr);
         }

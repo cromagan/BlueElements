@@ -55,6 +55,9 @@ public class Method_AddRows : Method_Database {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
+        var mydb = MyDatabase(scp);
+        if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
@@ -73,7 +76,7 @@ public class Method_AddRows : Method_Database {
 
         foreach (var thisKey in keys) {
             if (db.Row[thisKey] is null) {
-                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, null, true, "Script Command: Add Rows");
+                _ = db.Row.GenerateAndAdd(db.NextRowKey(), thisKey, null, true, "Script-Befehl: 'AddRows' von " + mydb.Caption);
             }
         }
 

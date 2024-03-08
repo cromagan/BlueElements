@@ -650,7 +650,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
         var last = string.Empty;
         if (e.NewItems != null && e.NewItems.Count > 0) {
-            last = string.Empty;
+            if (e.NewItems[0] is AbstractListItem ali) {
+                last = ali.KeyName;
+            }
         }
 
         var l = new List<string>();

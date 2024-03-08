@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -25,7 +24,6 @@ using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
