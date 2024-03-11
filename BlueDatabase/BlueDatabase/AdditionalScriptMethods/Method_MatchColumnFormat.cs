@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptMethods;
@@ -35,7 +35,7 @@ internal class Method_MatchColumnFormat : Method_Database {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "matchcolumnformat";
     public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
     public override bool MustUseReturnValue => true;

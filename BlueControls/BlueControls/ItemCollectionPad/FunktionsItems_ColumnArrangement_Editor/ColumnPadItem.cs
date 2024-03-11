@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,6 +25,9 @@ using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 
@@ -56,12 +56,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     public static string ClassId => "FI-Column";
     public ColumnItem? Column { get; }
 
-    public string Datenbank {
-        get {
-            if (IsDisposed || Column?.Database is not Database db || db.IsDisposed) { return "?"; }
-            return db.TableName;
-        }
-    }
+    public string Datenbank => IsDisposed || Column?.Database is not Database db || db.IsDisposed ? "?" : db.TableName;
 
     public override string Description => string.Empty;
 

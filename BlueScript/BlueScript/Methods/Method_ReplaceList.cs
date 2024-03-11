@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace BlueScript.Methods;
 
@@ -37,7 +37,7 @@ internal class Method_ReplaceList : Method {
     public override List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
     public override string Command => "replacelist";
     public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;

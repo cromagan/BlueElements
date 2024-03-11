@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Drawing;
 using BlueControls.Enums;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 

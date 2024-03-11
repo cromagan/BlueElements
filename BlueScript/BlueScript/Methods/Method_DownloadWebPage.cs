@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -41,7 +41,7 @@ internal class Method_DownloadWebPage : Method {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadwebpage";
     public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;

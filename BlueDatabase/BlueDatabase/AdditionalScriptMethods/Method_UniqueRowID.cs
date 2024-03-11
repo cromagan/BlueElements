@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -32,8 +32,8 @@ public class Method_UniqueRowId : Method_Database {
     public override List<List<string>> Args => [];
     public override string Command => "uniquerowid";
     public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;

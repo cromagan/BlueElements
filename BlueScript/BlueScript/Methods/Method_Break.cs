@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -34,7 +34,7 @@ internal class Method_Break : Method {
     public override List<List<string>> Args => [];
     public override string Command => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.Break;
     public override bool MustUseReturnValue => false;

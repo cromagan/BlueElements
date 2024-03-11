@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -35,7 +35,7 @@ internal class Method_SplitWords : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "splitwords";
     public override string Description => "Gibt eine Liste aller Wörter zurück.\r\nDie Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.\r\nJedes Wort ist nur einmal in der Liste.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;

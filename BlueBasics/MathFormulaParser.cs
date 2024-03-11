@@ -19,8 +19,8 @@
 
 using System;
 using System.Collections.Generic;
-using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+using static BlueBasics.Converter;
 
 namespace BlueBasics;
 

@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using static BlueBasics.IO;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using static BlueBasics.Extensions;
+using static BlueBasics.IO;
 
 namespace BlueControls.ItemCollectionList;
 

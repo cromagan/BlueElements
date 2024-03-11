@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Globalization;
-using BlueBasics;
-using BlueControls.EventArgs;
 
 namespace BluePaint;
 

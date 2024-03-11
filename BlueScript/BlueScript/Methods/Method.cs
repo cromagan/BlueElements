@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Extensions;
+using System;
+using System.Collections.Generic;
 using static BlueBasics.Constants;
-using BlueScript.Interfaces;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
@@ -379,7 +379,8 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
             if (z == Args.Count - 1 && LastArgMinCount > 0) {
                 switch (LastArgMinCount) {
-                    case -1: break; // genau einmal
+                    case -1:
+                        break; // genau einmal
                     case 0:
                         co += " (darf fehlen; darf mehrfach wiederholt werden)";
                         break;
@@ -400,7 +401,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         co += "Rückgabe:\r\n";
         co += "~~~~~~~~~\r\n";
         if (string.IsNullOrEmpty(Returns)) {
-            co = co + "  - Rückgabetyp: -\r\n";
+            co += "  - Rückgabetyp: -\r\n";
         } else {
             if (MustUseReturnValue) {
                 co = co + "  - Rückgabetyp: " + Returns + "(muss verwendet werden)\r\n";

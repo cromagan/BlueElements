@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BlueBasics;
+using BlueBasics.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel; // Für TypeConverter
 using System.Globalization; // Für CultureInfo
-using System.Collections.Generic;
-using BlueBasics.Interfaces;
-using BlueBasics;
 using System.Linq; // Für IList<T>
 
 public class InputFormatConverter : TypeConverter {
@@ -63,10 +63,9 @@ public class InputFormatConverter : TypeConverter {
     }
 
     // Überprüfen, ob die Liste der Standardwerte exklusiv ist.
-    public override bool GetStandardValuesExclusive(ITypeDescriptorContext context) {
+    public override bool GetStandardValuesExclusive(ITypeDescriptorContext context) =>
         // False bedeutet, dass auch andere Werte neben den Standardwerten möglich sind.
-        return false;
-    }
+        false;
 
     // Überprüfen, ob dieser Konverter eine Liste von Standardwerten unterstützt.
     public override bool GetStandardValuesSupported(ITypeDescriptorContext context) => true;

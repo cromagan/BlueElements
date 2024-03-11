@@ -20,11 +20,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
+using System.Globalization;
+using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Interfaces.ParseableExtension;
-using static BlueBasics.Constants;
-using System.Globalization;
 
 namespace BlueScript.Variables;
 

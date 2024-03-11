@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptMethods;
@@ -34,7 +34,7 @@ internal class Method_IsDropDownItem : Method_Database {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "isdropdownitem";
     public override string Description => "Prüft, ob der Inhalt oder die Inhalte der Variable im Dropdownmenu der Spalte vorkommt.\r\nEs werden nur fest eingegebene Dropdown-Werte berücksichtigt - keine 'Werte anderer Zellen'.\r\nEs wird streng auf die Groß/Kleinschreibung geachtet.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;

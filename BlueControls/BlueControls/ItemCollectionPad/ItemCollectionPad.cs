@@ -17,6 +17,19 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
+using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueDatabase;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,23 +43,10 @@ using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
-using BlueScript.Structures;
-using BlueScript.Variables;
+using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
-using static BlueBasics.Constants;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -601,7 +601,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null);
         if (!script.AllOk) { return script; }
 
-         ((ICanHaveVariables)this).ParseVariables(script.Variables);
+        this.ParseVariables(script.Variables);
 
         return script;
     }

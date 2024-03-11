@@ -30,7 +30,7 @@ internal class ImageFilter_Contrast : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         factor = (100.0f + factor) / 100.0f;
         factor *= factor;
 

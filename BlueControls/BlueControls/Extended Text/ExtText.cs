@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueDatabase;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Text;
+using System.Threading.Tasks;
 using static BlueBasics.Converter;
 
 // VTextTyp-Hirachie
@@ -331,8 +331,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     public int Height() {
         while (_width == null) { ReBreak(); }
 
-        if (_height == null) { return -1; }
-        return (int)_height;
+        return _height ?? -1;
     }
 
     public bool InsertChar(AsciiKey ascii, int position) {

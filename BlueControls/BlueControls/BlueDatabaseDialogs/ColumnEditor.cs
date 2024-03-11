@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,6 +24,11 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 

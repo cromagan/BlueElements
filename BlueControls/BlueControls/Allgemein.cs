@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Specialized;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
@@ -26,6 +24,8 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System.Collections.Specialized;
+using System.Windows.Forms;
 
 namespace BlueControls;
 
@@ -71,11 +71,7 @@ public static class Allgemein {
         par.OnContextMenuInit(ec);
         if (ec.Cancel) { return null; }
 
-        if (thisContextMenu.Count > 0 || userMenu.Count > 0) {
-            return par;
-        }
-
-        return null;
+        return thisContextMenu.Count > 0 || userMenu.Count > 0 ? par : null;
     }
 
     public static void StartGlobalService() {

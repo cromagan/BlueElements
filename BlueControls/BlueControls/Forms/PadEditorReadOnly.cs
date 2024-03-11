@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueBasics;
 
 namespace BlueControls.Forms;
 

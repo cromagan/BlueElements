@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -170,7 +170,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         }
 
         if (_database is not Database db || db.IsDisposed) { return; }
-        List<ColumnItem> columns = new List<ColumnItem>();
+        var columns = new List<ColumnItem>();
         foreach (var column in lstColumns.Checked) {
             if (db.Column[column] is ColumnItem c) {
                 columns.Add(c);
@@ -226,7 +226,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
 
                         #region Jüngste löschen
 
-                        RowItem ToDel = rows[0];
+                        var ToDel = rows[0];
 
                         foreach (var thisR2 in rows) {
                             if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(ToDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {

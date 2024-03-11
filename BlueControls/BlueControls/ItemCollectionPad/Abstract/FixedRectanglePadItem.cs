@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Drawing;
 using BlueControls.EventArgs;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 

@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Extensions;
-
-using BlueBasics.Enums;
-
-using static BlueBasics.Converter;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 

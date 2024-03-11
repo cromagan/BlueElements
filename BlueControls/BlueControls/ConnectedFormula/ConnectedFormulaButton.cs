@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -30,6 +26,10 @@ using BlueScript;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -57,7 +57,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     public ConnectedFormulaButton() : base() {
         //((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        this.RegisterEvents();
     }
 
     #endregion
@@ -132,9 +132,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
+            this.RegisterEvents();
         }
     }
 

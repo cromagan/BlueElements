@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -34,7 +34,7 @@ internal class Method_ToUpper : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "toupper";
     public override string Description => "Gibt den Text in Großbuchstaben zurück";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;

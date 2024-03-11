@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Enums;
+using System.Collections.Generic;
 
 namespace BlueControls.Forms;
 

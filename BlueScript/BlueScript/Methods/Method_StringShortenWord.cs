@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
@@ -36,7 +36,7 @@ internal class Method_StringShortenWord : Method {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "stringshortenword";
     public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;

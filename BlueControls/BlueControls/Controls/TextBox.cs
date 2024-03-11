@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -32,6 +27,11 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Controls;

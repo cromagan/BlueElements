@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,9 +27,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -292,10 +292,7 @@ public class DatabaseMu : Database {
         return (null, null);
     }
 
-    protected override bool IsThereNeedToMakeMeMaster() {
-        if (_mustMakeMaster) { return true; }
-        return base.IsThereNeedToMakeMeMaster();
-    }
+    protected override bool IsThereNeedToMakeMeMaster() => _mustMakeMaster ? true : base.IsThereNeedToMakeMeMaster();
 
     protected override List<Database> LoadedDatabasesWithSameServer() {
         var oo = new List<Database>();

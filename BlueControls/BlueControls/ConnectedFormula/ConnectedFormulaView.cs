@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -29,6 +25,10 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
 #nullable enable
@@ -49,7 +49,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
     #region Constructors
 
-    public ConnectedFormulaView() : this("Head", null) { }
+    public ConnectedFormulaView() : this("Head", string.Empty) { }
 
     public ConnectedFormulaView(string page, string mode) {
         InitializeComponent();
@@ -89,7 +89,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
             ((IControlAcceptFilter)this).RegisterEvents();
         }

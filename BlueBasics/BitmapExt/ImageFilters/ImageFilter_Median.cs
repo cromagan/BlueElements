@@ -31,7 +31,7 @@ internal class ImageFilter_Median : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Größe des Median-Kernels basierend auf dem Faktor
         var kernelSize = (int)factor;
 

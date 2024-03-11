@@ -17,18 +17,18 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 

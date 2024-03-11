@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Enums;
+using System.Collections.Generic;
 
 namespace BlueBasics.Interfaces;
 
@@ -173,8 +173,7 @@ public static class InputFormatExtensions {
             if (t.MaxTextLenght != source.MaxTextLenght) { return false; }
         }
 
-        if (t.MaxTextLenght < 1) { return false; }
-        return true;
+        return t.MaxTextLenght >= 1;
     }
 
     #endregion

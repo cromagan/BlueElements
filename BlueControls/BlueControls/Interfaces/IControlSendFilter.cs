@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Interfaces;
 using BlueDatabase;
+using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
 

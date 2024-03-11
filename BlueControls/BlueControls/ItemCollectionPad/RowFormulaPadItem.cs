@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,6 +25,9 @@ using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad;
 

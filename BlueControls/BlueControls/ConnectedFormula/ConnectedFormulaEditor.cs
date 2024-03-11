@@ -17,23 +17,23 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueDatabase;
-using static BlueBasics.IO;
-using static BlueBasics.Converter;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using static BlueBasics.Extensions;
-using BlueControls.ItemCollectionList;
+using BlueDatabase;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
+using static BlueBasics.IO;
 
 #nullable enable
 
@@ -367,10 +367,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void GenQuickInfo(Controls.Button b, FakeControlPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
-        txt = txt + "<br><br><b><u>Beschreibung:</b></u>";
+        txt += "<br><br><b><u>Beschreibung:</b></u>";
         txt = txt + "<br>" + from.Description;
 
-        txt = txt + "<br><br><b><u>Eigenschaften:</b></u>";
+        txt += "<br><br><b><u>Eigenschaften:</b></u>";
 
         if (from is IItemAcceptFilter ias) {
             if (ias.MustBeOneRow) {
@@ -378,16 +378,16 @@ public partial class ConnectedFormulaEditor : PadEditor {
                     "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Datenbank ergeben,<br>" +
                     "   da die Werte der Zeile in dem Element benutzt werden können.";
             } else {
-                txt = txt + "<br> - Das Element kann Filter <u>empfangen</u> und verarbeitet diese.";
+                txt += "<br> - Das Element kann Filter <u>empfangen</u> und verarbeitet diese.";
             }
         }
 
         if (from is IItemSendFilter) {
-            txt = txt + "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
+            txt += "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
         }
 
         if (!from.MustBeInDrawingArea) {
-            txt = txt + "<br> - Das Element dient nur zur Berechnung von Werten<br> und ist im Formular <u>nicht sichtbar</u>.";
+            txt += "<br> - Das Element dient nur zur Berechnung von Werten<br> und ist im Formular <u>nicht sichtbar</u>.";
         }
 
         b.QuickInfo = txt;

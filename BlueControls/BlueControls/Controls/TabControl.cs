@@ -17,9 +17,9 @@
 
 #nullable enable
 
+using BlueControls.Enums;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
 
 namespace BlueControls.Controls;
 

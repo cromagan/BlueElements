@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing.Imaging;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing.Imaging;
 
 namespace BlueScript.Methods;
 
@@ -36,7 +36,7 @@ internal class Method_BitmapToBase64 : Method {
     public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], StringVal];
     public override string Command => "bitmaptobase64";
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;

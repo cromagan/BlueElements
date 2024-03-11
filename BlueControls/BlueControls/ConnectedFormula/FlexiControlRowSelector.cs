@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -27,6 +24,9 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.Extensions;
 
 #nullable enable
@@ -73,7 +73,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
             ((IControlAcceptFilter)this).RegisterEvents();
         }

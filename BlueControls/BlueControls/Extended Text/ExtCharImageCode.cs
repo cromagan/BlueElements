@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System;
-using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
+using System;
+using System.Drawing;
 using static BlueBasics.Constants;
 
 namespace BlueControls.Extended_Text;
@@ -56,10 +56,7 @@ internal class ExtCharImageCode : ExtChar {
         } catch { }
     }
 
-    public override string HtmlText() {
-        if (_qi == null) { return string.Empty; }
-        return "<IMAGECODE=" + _qi.Code + ">";
-    }
+    public override string HtmlText() => _qi == null ? string.Empty : "<IMAGECODE=" + _qi.Code + ">";
 
     public override bool IsLineBreak() => false;
 

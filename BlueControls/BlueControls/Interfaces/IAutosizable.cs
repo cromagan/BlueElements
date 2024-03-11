@@ -55,11 +55,7 @@ public static class AutosizableExtension {
 
     #region Methods
 
-    public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) {
-        if (!item.AutoSizeableHeight) { return false; }
-
-        return heightinPixel > MinHeigthCapAndBox;
-    }
+    public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) => !item.AutoSizeableHeight ? false : heightinPixel > MinHeigthCapAndBox;
 
     public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.UsedArea.Height * scale);
 

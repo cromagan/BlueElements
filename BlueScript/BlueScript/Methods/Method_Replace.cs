@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -34,7 +34,7 @@ internal class Method_Replace : Method {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "replace";
     public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;

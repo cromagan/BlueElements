@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -34,6 +29,11 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;

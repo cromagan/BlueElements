@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -32,6 +25,13 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -62,7 +62,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
         //((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        this.RegisterEvents();
     }
 
     #endregion
@@ -102,9 +102,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
+            this.RegisterEvents();
         }
     }
 

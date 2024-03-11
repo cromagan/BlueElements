@@ -29,7 +29,7 @@ internal class ImageFilter_AllePixelZuSchwarz : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Berechnung der Schwellenwerte für die Farben
         var threshold = (int)(255 * factor);
 

@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -32,6 +27,11 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -102,10 +102,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public ColumnItem? Column {
         get {
             var c = DatabaseInput?.Column[_columnName];
-            if (c == null || c.IsDisposed) {
-                return null;
-            }
-            return c;
+            return c == null || c.IsDisposed ? null : c;
         }
     }
 

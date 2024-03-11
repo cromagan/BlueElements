@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,6 +24,13 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 
 namespace BlueDatabase;
 
@@ -214,10 +214,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisRow != null && !thisRow.IsDisposed) {
                 var values = column.MultiLine ? thisRow.CellGetList(column) : [thisRow.CellGetString(column)];
                 foreach (var value in values) {
-                    if (uniqueSet.Contains(value)) {
+                    if (!uniqueSet.Add(value)) {
                         _ = notUnique.AddIfNotExists(value);
                     } else {
-                        uniqueSet.Add(value);
                         unique.Add(value);
                     }
                 }
@@ -426,7 +425,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!Database.Row.IsNewRowPossible()) { return null; }
 
         var s = Database.NextRowKey();
-        if (s == null || string.IsNullOrEmpty(s)) { return null; }
+        if (string.IsNullOrEmpty(s)) { return null; }
 
         return GenerateAndAdd(s, valueOfCellInFirstColumn, fc, true, comment);
     }
@@ -496,7 +495,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Null!");
         }
 
-        if (item.CellFirstString() != db.Column?.First()?.AutoCorrect(valueOfCellInFirstColumn, true)) {
+        if (item.CellFirstString() != db.Column.First()?.AutoCorrect(valueOfCellInFirstColumn, true)) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 

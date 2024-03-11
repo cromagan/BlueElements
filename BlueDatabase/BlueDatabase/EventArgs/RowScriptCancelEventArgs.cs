@@ -30,7 +30,7 @@ public class RowScriptCancelEventArgs : RowEventArgs {
 
     #endregion
 
-        #region Properties
+    #region Properties
 
     public string CancelReason { get; }
     public bool SyntaxError { get; }

@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Globalization;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Globalization;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
@@ -35,7 +35,7 @@ internal class Method_SortNum : Method {
     public override List<List<string>> Args => [ListStringVar, FloatVal];
     public override string Command => "sortnum";
     public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;

@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -24,8 +26,6 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueControls.Enums;
 
 #nullable enable
 
@@ -244,8 +244,7 @@ public class GenericControl : Control {
         if (IsDisposed || Disposing) { return false; }
         if (_pform == null || _pform.IsDisposed || !_pform.Visible) { return false; }
         if (_pform is BlueControls.Forms.Form bf && bf.isClosing) { return false; }
-        if (!Visible) { return false; }
-        return true;
+        return Visible;
     }
 
     public void DoQuickInfo() {
@@ -269,8 +268,7 @@ public class GenericControl : Control {
         if (InvokeRequired) {
             return (Point)Invoke(new Func<Point>(MousePos));
         }
-        if (!DoDrawings()) { return default; }
-        return PointToClient(Cursor.Position);
+        return !DoDrawings() ? default : PointToClient(Cursor.Position);
     }
 
     public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);

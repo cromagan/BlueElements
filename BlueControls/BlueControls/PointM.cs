@@ -17,18 +17,18 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
-using static BlueBasics.Constants;
 
 namespace BlueControls;
 

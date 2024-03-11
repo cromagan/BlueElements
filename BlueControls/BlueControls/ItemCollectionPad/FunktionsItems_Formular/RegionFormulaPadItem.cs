@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,6 +29,12 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 #nullable enable
@@ -143,7 +143,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     public override Control CreateControl(ConnectedFormulaView parent) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
-        string txt = "?";
+        var txt = "?";
 
         if (_child.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
             cf = ConnectedFormula.ConnectedFormula.GetByFilename(_child);
@@ -190,13 +190,13 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
         u.AddRange(typeof(GroupBoxStyle));
 
         List<GenericControl> l =
-            [ .. _itemAccepts.GetStyleOptions(this, widthOfControl),
-              new FlexiControl("Eigenschaften:", widthOfControl, true),
-              new FlexiControlForProperty<string>(() => Child, cl),
+            [.. _itemAccepts.GetStyleOptions(this, widthOfControl),
+                new FlexiControl("Eigenschaften:", widthOfControl, true),
+                new FlexiControlForProperty<string>(() => Child, cl),
 
-                            new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u),
-              .. base.GetStyleOptions(widthOfControl),
-        ];
+                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u),
+                .. base.GetStyleOptions(widthOfControl),
+            ];
 
         return l;
     }

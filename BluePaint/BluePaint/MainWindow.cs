@@ -17,18 +17,18 @@
 
 #nullable enable
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
-using static BlueBasics.IO;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 using static BlueBasics.Extensions;
+using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
@@ -303,6 +303,7 @@ public partial class MainWindow {
         btnRückgänig.Enabled = false;
         _isSaved = false;
         var bmp = P.Bmp;
+        if (bmp == null) { return; }
         Generic.Swap(ref bmp, ref _picUndo);
         P.Bmp = bmp;
         if (P.Bmp.Width != _picUndo.Width || P.Bmp.Height != _picUndo.Height) {

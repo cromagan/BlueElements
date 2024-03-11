@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
+using System.Collections.Generic;
 
 namespace BlueScript.Structures;
 

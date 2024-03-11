@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,6 +29,12 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using static BlueBasics.IO;
 
 namespace BlueControls.Controls;
@@ -68,7 +68,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         EditType = editType;
         ColumnName = column;
         //((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        this.RegisterEvents();
         CheckEnabledState();
     }
 
@@ -104,9 +104,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
+            this.RegisterEvents();
         }
     }
 

@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -24,12 +30,6 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueDatabase;
 using static BlueBasics.Polygons;
 
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
@@ -1239,12 +1239,7 @@ public static class Skin {
         return rahms;
     }
 
-    public static Color IdColor(List<int>? id) {
-        if (id == null || id.Count == 0) {
-            return IdColor(-1);
-        }
-        return IdColor(id[0]);
-    }
+    public static Color IdColor(List<int>? id) => id == null || id.Count == 0 ? IdColor(-1) : IdColor(id[0]);
 
     public static Color IdColor(int id) {
         if (id < 0) { return Color.White; }

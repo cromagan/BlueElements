@@ -17,16 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -37,13 +27,23 @@ using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Converter;
-using static BlueBasics.IO;
-using static BlueBasics.Generic;
-using static BlueBasics.Constants;
-using Timer = System.Threading.Timer;
-using static BlueBasics.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
+using static BlueBasics.Constants;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
+using static BlueBasics.Generic;
+using static BlueBasics.IO;
+using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
 
@@ -708,9 +708,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (tablename == "ALL_TAB_COLS") { return false; } // system-name
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
-        if (t.Length > 100) { return false; }
-
-        return true;
+        return t.Length <= 100;
     }
 
     /// <summary>
@@ -2277,9 +2275,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual bool IsThereNeedToMakeMeMaster() {
         if (!MultiUser) { return false; }
 
-        if (HasValueChangedScript()) { return false; }
-
-        return true;
+        return !HasValueChangedScript();
     }
 
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];

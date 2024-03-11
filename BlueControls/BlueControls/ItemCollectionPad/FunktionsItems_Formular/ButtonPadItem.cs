@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -34,6 +30,10 @@ using BlueScript;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
 using BlueScript.Methods;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
 

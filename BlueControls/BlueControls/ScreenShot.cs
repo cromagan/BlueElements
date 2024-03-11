@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueControls.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueControls.Forms;
 using static BlueBasics.BitmapExt;
 using Form = System.Windows.Forms.Form;
 

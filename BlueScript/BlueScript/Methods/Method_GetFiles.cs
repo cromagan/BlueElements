@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -36,7 +36,7 @@ internal class Method_GetFiles : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "getfiles";
     public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO;
     public override bool MustUseReturnValue => true;

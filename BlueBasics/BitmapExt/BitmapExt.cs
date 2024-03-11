@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,8 +31,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.Extensions;
 
 namespace BlueBasics;
@@ -241,11 +241,11 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public static Color GetPixel(BitmapData bitmapData, byte[] bits, int x, int y) {
-        int index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
-        byte b = bits[index];
-        byte g = bits[index + 1];
-        byte r = bits[index + 2];
-        byte a = bits[index + 3];
+        var index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+        var b = bits[index];
+        var g = bits[index + 1];
+        var r = bits[index + 2];
+        var a = bits[index + 3];
         return Color.FromArgb(a, r, g, b);
     }
 
@@ -361,7 +361,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public static void SetPixel(BitmapData bitmapData, byte[] bits, int x, int y, Color color) {
-        int index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+        var index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
         bits[index] = color.B;
         bits[index + 1] = color.G;
         bits[index + 2] = color.R;

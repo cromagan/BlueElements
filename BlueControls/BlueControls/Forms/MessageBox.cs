@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueDatabase;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
 
@@ -100,9 +100,7 @@ public partial class MessageBox : Form {
             }
         }
 
-        if (mb._pressed == null) { return -1; }
-
-        return IntParse(mb._pressed.Name);
+        return mb._pressed == null ? -1 : IntParse(mb._pressed.Name);
     }
 
     public List<Button> Generate_Buttons(string[] names) {

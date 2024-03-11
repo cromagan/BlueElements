@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,6 +24,11 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -56,7 +56,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     public Filterleiste() {
         InitializeComponent();
         FillFilters();
-        ((IControlSendFilter)this).RegisterEvents();
+        this.RegisterEvents();
     }
 
     #endregion

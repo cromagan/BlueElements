@@ -17,18 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -45,11 +33,23 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using Clipboard = System.Windows.Clipboard;
 using MessageBox = BlueControls.Forms.MessageBox;
-using static BlueBasics.Constants;
 
 namespace BlueControls.Controls;
 
@@ -254,7 +254,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
             ((IControlAcceptFilter)this).RegisterEvents();
         }
@@ -2019,9 +2019,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!ml) { return false; }
 
         if (txt.Contains("\r")) { return true; }
-        if (txt.Contains("<br>")) { return true; }
-
-        return false;
+        return txt.Contains("<br>");
     }
 
     private static void UserEdited(Table table, string newValue, ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {

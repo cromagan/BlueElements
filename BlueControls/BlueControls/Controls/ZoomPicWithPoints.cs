@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,16 +32,10 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollectionList;
-using static BlueBasics.IO;
-using static BlueBasics.Extensions;
-using Orientation = BlueBasics.Enums.Orientation;
 using static BlueBasics.Constants;
+using static BlueBasics.Extensions;
+using static BlueBasics.IO;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 

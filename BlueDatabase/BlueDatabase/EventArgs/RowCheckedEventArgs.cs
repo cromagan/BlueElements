@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs;
 

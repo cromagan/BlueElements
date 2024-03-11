@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
@@ -30,6 +27,9 @@ using BlueScript.Enums;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
 using FastColoredTextBoxNS;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace BlueControls;
 

@@ -17,14 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -35,6 +27,14 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Printing;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 
@@ -539,10 +539,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         // Ganz wichtig diese Routine!
         keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
-    protected override RectangleF MaxBounds() {
-        if (_item == null) { return new RectangleF(0, 0, 0, 0); }
-        return _item.MaxBounds(_currentPage);
-    }
+    protected override RectangleF MaxBounds() => _item?.MaxBounds(_currentPage) ?? new RectangleF(0, 0, 0, 0);
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 

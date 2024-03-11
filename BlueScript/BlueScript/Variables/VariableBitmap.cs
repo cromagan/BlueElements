@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Drawing;
 using BlueScript.Structures;
+using System.Drawing;
 using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;

@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text;
 
 namespace BlueScript.Methods;
 
@@ -38,7 +38,7 @@ internal class Method_LoadTextFile : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "loadtextfile";
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
-     public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;

@@ -19,15 +19,15 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls;
 
@@ -54,7 +54,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
     public TextGenerator() : base() {
         InitializeComponent();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        this.RegisterEvents();
     }
 
     #endregion
@@ -102,9 +102,9 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
+            this.RegisterEvents();
         }
     }
 

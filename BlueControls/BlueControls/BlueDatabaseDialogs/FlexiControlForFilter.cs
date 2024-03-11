@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -31,6 +27,10 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
 #nullable enable
 
@@ -104,7 +104,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
             ((IControlAcceptFilter)this).RegisterEvents();
         }

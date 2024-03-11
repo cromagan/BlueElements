@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
@@ -128,14 +128,12 @@ public sealed class ItemAcceptFilter {
 
     public Database? DatabaseInput(IItemAcceptFilter item) {
         if (item.DatabaseInputMustMatchOutputDatabase) {
-            if (item is IItemSendFilter iiss) { return iiss.DatabaseOutput; }
-            return null;
+            return item is IItemSendFilter iiss ? iiss.DatabaseOutput : null;
         }
 
         var g = GetFilterFromGet(item);
 
-        if (g.Count == 0) { return null; }
-        return g[0].DatabaseOutput;
+        return g.Count == 0 ? null : g[0].DatabaseOutput;
     }
 
     public void DoCreativePadAddedToCollection(IItemAcceptFilter item) {

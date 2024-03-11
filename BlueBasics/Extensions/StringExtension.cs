@@ -17,16 +17,16 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+using static BlueBasics.Converter;
 
 namespace BlueBasics;
 
@@ -526,10 +526,10 @@ public static partial class Extensions {
             return string.Empty;
         }
 
-        StringBuilder result = new StringBuilder();
+        var result = new StringBuilder();
         char? previousChar = null;
 
-        foreach (char currentChar in input) {
+        foreach (var currentChar in input) {
             if (previousChar != currentChar) {
                 result.Append(currentChar);
                 previousChar = currentChar;

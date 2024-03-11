@@ -17,21 +17,21 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Linq.Expressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
-using BlueDatabase.Enums;
-using static BlueBasics.Converter;
-using static BlueBasics.Constants;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Globalization;
+using System.Linq.Expressions;
+using System.Windows.Forms;
+using static BlueBasics.Constants;
+using static BlueBasics.Converter;
 
 #nullable enable
 
@@ -134,7 +134,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
                         var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                        var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
+                        var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
                         StyleComboBox(CreateSubControls() as ComboBox, list.ItemOrder, ComboBoxStyle.DropDownList, true);

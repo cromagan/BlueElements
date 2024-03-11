@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 // ReSharper disable All
 
@@ -116,7 +116,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
     public void Repair() {
         if (Columns.Count == 0) { return; }
 
-        for (int i = 0; i < Columns.Count; i++) {
+        for (var i = 0; i < Columns.Count; i++) {
             if (Columns[i] is not ColumnItem c || c.IsDisposed) {
                 Columns.RemoveAt(i);
                 OnChanged();

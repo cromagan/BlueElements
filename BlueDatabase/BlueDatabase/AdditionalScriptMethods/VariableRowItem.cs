@@ -38,7 +38,7 @@ public class VariableRowItem : Variable {
     public VariableRowItem(string name, RowItem? value, bool ronly, string comment) : base(name, ronly, comment) {
         _row = value;
         GetText();
-    } 
+    }
 
     public VariableRowItem(RowItem? value) : this(DummyName(), value, true, string.Empty) { }
 

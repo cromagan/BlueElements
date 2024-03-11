@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -27,10 +29,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using static BlueBasics.IO;
 using static BlueBasics.Converter;
+using static BlueBasics.IO;
 
 #nullable enable
 

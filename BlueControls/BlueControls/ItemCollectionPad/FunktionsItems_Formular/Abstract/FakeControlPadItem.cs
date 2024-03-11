@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,11 +26,15 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
-using static BlueBasics.Polygons;
-using static BlueBasics.Generic;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
+using static BlueBasics.Converter;
+using static BlueBasics.Generic;
+using static BlueBasics.Polygons;
 
 #nullable enable
 

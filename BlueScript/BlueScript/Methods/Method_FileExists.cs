@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -36,8 +36,8 @@ internal class Method_FileExists : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "fileexists";
     public override string Description => "Prüft, ob eine Datei existiert";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;

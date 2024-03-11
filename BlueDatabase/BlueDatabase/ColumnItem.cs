@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,16 +31,10 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
+using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.Database;
-using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
@@ -1955,10 +1955,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //        case FormatHolder.Url:
     //            SetFormatForUrl();
     //            break;
-    public override string ToString() {
-        if (IsDisposed) { return string.Empty; }
-        return _name + " -> " + Caption;
-    }
+    public override string ToString() => IsDisposed ? string.Empty : _name + " -> " + Caption;
 
     public string Useage() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }

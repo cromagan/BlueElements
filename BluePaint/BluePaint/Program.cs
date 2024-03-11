@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using System;
+using System.Windows.Forms;
 
 namespace BluePaint;
 

@@ -29,7 +29,7 @@ internal class ImageFilter_Intensify : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter( BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Schleife über alle Pixel im Bild
         unsafe {
             for (var y = 0; y < bitmapData.Height; y++) {

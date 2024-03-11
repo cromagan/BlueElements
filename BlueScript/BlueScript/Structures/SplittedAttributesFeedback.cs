@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueScript.Enums;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using BlueScript.Enums;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Structures;
@@ -59,43 +59,37 @@ public readonly struct SplittedAttributesFeedback {
     public string MyClassId(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        if (Attributes[varno] is Variable vs) { return vs.MyClassId; }
-        return string.Empty;
+        return Attributes[varno] is Variable vs ? vs.MyClassId : string.Empty;
     }
 
     public string Name(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        if (Attributes[varno] is Variable vs) { return vs.KeyName; }
-        return string.Empty;
+        return Attributes[varno] is Variable vs ? vs.KeyName : string.Empty;
     }
 
     public string ReadableText(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        if (Attributes[varno] is Variable vs) { return vs.ReadableText; }
-        return string.Empty;
+        return Attributes[varno] is Variable vs ? vs.ReadableText : string.Empty;
     }
 
     public bool ReadOnly(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return true; }
 
-        if (Attributes[varno] is Variable vs) { return vs.ReadOnly; }
-        return true;
+        return Attributes[varno] is Variable vs ? vs.ReadOnly : true;
     }
 
     public Bitmap? ValueBitmapGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return null; }
 
-        if (Attributes[varno] is VariableBitmap vs) { return vs.ValueBitmap; }
-        return null;
+        return Attributes[varno] is VariableBitmap vs ? vs.ValueBitmap : null;
     }
 
     public bool ValueBoolGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return false; }
 
-        if (Attributes[varno] is VariableBool vs) { return vs.ValueBool; }
-        return false;
+        return Attributes[varno] is VariableBool vs ? vs.ValueBool : false;
     }
 
     public DateTime? ValueDateGet(int varno) {
@@ -110,15 +104,13 @@ public readonly struct SplittedAttributesFeedback {
     public int ValueIntGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
-        if (Attributes[varno] is VariableFloat vs) { return vs.ValueInt; }
-        return 0;
+        return Attributes[varno] is VariableFloat vs ? vs.ValueInt : 0;
     }
 
     public List<string> ValueListStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return []; }
 
-        if (Attributes[varno] is VariableListString vs) { return vs.ValueList; }
-        return [];
+        return Attributes[varno] is VariableListString vs ? vs.ValueList : ([]);
     }
 
     public DoItFeedback? ValueListStringSet(int varno, List<string> value, LogData ld) {
@@ -134,15 +126,13 @@ public readonly struct SplittedAttributesFeedback {
     public double ValueNumGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
-        if (Attributes[varno] is VariableFloat vs) { return vs.ValueNum; }
-        return 0;
+        return Attributes[varno] is VariableFloat vs ? vs.ValueNum : 0;
     }
 
     public string ValueStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        if (Attributes[varno] is VariableString vs) { return vs.ValueString; }
-        return string.Empty;
+        return Attributes[varno] is VariableString vs ? vs.ValueString : string.Empty;
     }
 
     internal DoItFeedback? ValueBoolSet(int varno, bool value, LogData ld) {

@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -27,6 +25,8 @@ using BlueControls.Forms;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.IO;
 
 namespace BlueControls.BlueDatabaseDialogs;

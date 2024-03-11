@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace BlueControls;
 

@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -35,6 +30,11 @@ using BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -110,7 +110,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     public ColumnViewCollection? CloneOfCurrentArrangement() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         var ca = db.ColumnArrangements.Get(_arrangement);
-        return ca == null ? null : (ColumnViewCollection)ca.Clone();
+        return (ColumnViewCollection)ca?.Clone();
     }
 
     public int IndexOfCurrentArr() {

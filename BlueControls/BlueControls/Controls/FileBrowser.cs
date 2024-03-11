@@ -17,16 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -38,6 +28,16 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueScript.Variables;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -66,7 +66,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     public FileBrowser() {
         InitializeComponent();
         //((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        this.RegisterEvents();
     }
 
     #endregion
@@ -113,9 +113,9 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
+            this.RegisterEvents();
         }
     }
 
@@ -179,9 +179,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         if (exekey == null) { return string.Empty; }
 
         exekey = exekey.OpenSubKey("command");
-        if (exekey == null) { return string.Empty; }
-
-        return exekey.GetValue("").ToString();
+        return exekey == null ? string.Empty : exekey.GetValue("").ToString();
     }
 
     public void HandleChangesNow() {
@@ -249,8 +247,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         //if (fi.Attributes.HasFlag(FileAttributes.Hidden)) { return false; }
 
         if (fi.Exists) {
-            if (fi.DirectoryName == null || fi.DirectoryName.FilePath() == "C:\\") { return false; }
-            return true;
+            return fi.DirectoryName != null && fi.DirectoryName.FilePath() != "C:\\";
         }
 
         if (fi.DirectoryName != null) {
@@ -341,9 +338,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) { return DragDropEffects.Move; }
 
-        if (e.AllowedEffect.HasFlag(DragDropEffects.Copy)) { return DragDropEffects.Copy; }
-
-        return DragDropEffects.None;
+        return e.AllowedEffect.HasFlag(DragDropEffects.Copy) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {

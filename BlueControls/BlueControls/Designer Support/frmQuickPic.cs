@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Designer_Support;

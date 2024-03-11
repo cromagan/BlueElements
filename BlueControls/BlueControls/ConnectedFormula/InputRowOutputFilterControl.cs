@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BlueControls.Controls;
 
@@ -66,7 +66,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            this.UnRegisterEventsAndDispose();
             _filterInput = value;
             ((IControlAcceptFilter)this).RegisterEvents();
         }

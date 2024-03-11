@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Variables;
 using CefSharp;
 using CefSharp.OffScreen;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -67,7 +67,7 @@ public abstract class Method_WebPage : Method {
         while (!browser.IsLoading) {
             //Develop.DoEvents();
             if (DateTime.UtcNow.Subtract(d).TotalSeconds > 2) {
-               break;
+                break;
             }
         }
 

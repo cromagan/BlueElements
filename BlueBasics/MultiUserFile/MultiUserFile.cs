@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,9 +28,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 

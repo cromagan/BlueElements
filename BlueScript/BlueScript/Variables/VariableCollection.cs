@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
 
 namespace BlueScript.Variables;
 

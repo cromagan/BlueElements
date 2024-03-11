@@ -17,16 +17,16 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
 using static BlueBasics.Constants;
 
 namespace BlueDatabase;
@@ -224,10 +224,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public int IndexOf(ColumnViewItem? columnViewItem) {
-        if (columnViewItem == null) { return -1; }
-        return _internal.IndexOf(columnViewItem);
-    }
+    public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem == null ? -1 : _internal.IndexOf(columnViewItem);
 
     public void Invalidate_DrawWithOfAllItems() {
         foreach (var thisViewItem in _internal) {
