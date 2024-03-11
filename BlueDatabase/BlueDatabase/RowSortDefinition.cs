@@ -113,6 +113,18 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
         return false;
     }
 
+    public void Repair() {
+        if (Columns.Count == 0) { return; }
+
+        for (int i = 0; i < Columns.Count; i++) {
+            if (Columns[i] is not ColumnItem c || c.IsDisposed) {
+                Columns.RemoveAt(i);
+                OnChanged();
+                Repair();
+            }
+        }
+    }
+
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("Reverse", Reverse);

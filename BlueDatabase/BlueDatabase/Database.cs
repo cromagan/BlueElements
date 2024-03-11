@@ -135,6 +135,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Cell = new CellCollection(this);
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
+
+        Column.ColumnDisposed += Column_ColumnDisposed;
+        Column.ColumnRemoving += Column_ColumnRemoving;
+
         Undo = [];
 
         //_columnArrangements.Clear();
@@ -238,6 +242,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public CellCollection Cell { get; }
+
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -977,13 +982,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    //public static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
-
-    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
-    //    if (!FileExists(ci.AdditionalData)) { return null; }
-
     //    var db = new Database(ci.TableName);
     //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
     //    return db;
@@ -1007,6 +1005,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return DateTime.UtcNow.Subtract(d).TotalMinutes is > 5 and < 55;
     }
 
+    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
+    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
+    //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
     /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
@@ -1039,6 +1040,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
+    //public static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
     public string CheckScriptError() {
         List<string> names = [];
 
@@ -2060,6 +2063,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
             }
         }
+
+        SortDefinition?.Repair();
     }
 
     public virtual bool Save() {
@@ -2965,6 +2970,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             _ = Save();
             _checkerTickCount = 0;
         }
+    }
+
+    private void Column_ColumnDisposed(object sender, ColumnEventArgs e) {
+        if (IsDisposed) { return; }
+        RepairAfterParse();
+    }
+
+    private void Column_ColumnRemoving(object sender, ColumnEventArgs e) {
+        if (IsDisposed) { return; }
+        RepairAfterParse();
     }
 
     /// <summary>

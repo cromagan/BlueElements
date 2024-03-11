@@ -38,7 +38,7 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName {
+public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtendedWithEvent {
 
     #region Fields
 
@@ -278,6 +278,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //private string _vorschlagsColumn;
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     public event EventHandler? Changed;
+
+    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -1491,6 +1493,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
+    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
     public string QuickInfoText(string additionalText) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
         var T = string.Empty;
@@ -2479,6 +2483,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
+                OnDisposingEvent();
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 Database = null;
                 Invalidate_LinkedDatabase();

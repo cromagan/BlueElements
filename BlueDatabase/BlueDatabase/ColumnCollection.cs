@@ -52,6 +52,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public event EventHandler<ColumnEventArgs>? ColumnAdded;
 
+    public event EventHandler<ColumnEventArgs>? ColumnDisposed;
+
     public event EventHandler<ColumnEventArgs>? ColumnInternalChanged;
 
     public event EventHandler? ColumnRemoved;
@@ -520,6 +522,15 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //        //}
     //        //L.Sort();
 
+    private void Column_DisposingEvent(object sender, System.EventArgs e) {
+        if (sender is ColumnItem c) {
+            c.DisposingEvent -= Column_DisposingEvent;
+            _internal.TryRemove(c.KeyName.ToUpper(), out _);
+            OnColumnDisposed(new ColumnEventArgs(c));
+            //Remove(c, "Disposing");
+        }
+    }
+
     //        if (index >= 0 && index < _internal.Count) {
     //            return _internal.ElementAt(index).Value;
     //        }
@@ -597,15 +608,19 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private void OnColumnAdded(ColumnEventArgs e) {
         e.Column.Changed += OnColumnChanged;
+        e.Column.DisposingEvent += Column_DisposingEvent;
         ColumnAdded?.Invoke(this, e);
     }
 
     private void OnColumnChanged(object sender, System.EventArgs e) => ColumnInternalChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
 
+    private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
+
     private void OnColumnRemoved() => ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
 
     private void OnColumnRemoving(ColumnEventArgs e) {
         e.Column.Changed -= OnColumnChanged;
+        e.Column.DisposingEvent -= Column_DisposingEvent;
         ColumnRemoving?.Invoke(this, e);
     }
 
