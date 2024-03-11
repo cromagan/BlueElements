@@ -629,18 +629,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public void Set(ColumnItem? column, RowItem? row, bool value) => Set(column, row, value.ToPlusMinus());
-
-    public void Set(ColumnItem? column, RowItem? row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
-
-    public void Set(ColumnItem? column, RowItem? row, IEnumerable<string> value) => Set(column, row, value.JoinWithCr());
-
-    public void Set(ColumnItem? column, RowItem? row, Point value) => Set(column, row, value.ToString());
-
-    public void Set(ColumnItem? column, RowItem? row, int value) => Set(column, row, value.ToString());
-
-    public void Set(ColumnItem? column, RowItem? row, double value) => Set(column, row, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
-
     public void SetSizeOfCellContent(ColumnItem column, RowItem row, Size contentSize) {
         var key = TextSizeKey(column, row.CellGetString(column));
 

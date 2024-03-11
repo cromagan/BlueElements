@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -268,33 +269,33 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
 
-    public void CellSet(string columnName, bool value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, bool value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToPlusMinus());
 
-    public void CellSet(ColumnItem column, bool value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, bool value) => Database?.Cell.Set(column, this, value.ToPlusMinus());
 
     public void CellSet(string columnName, string value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
     public void CellSet(ColumnItem? column, string value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, double value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, double value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
 
-    public void CellSet(ColumnItem column, double value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, double value) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
 
-    public void CellSet(string columnName, int value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, int value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString());
 
-    public void CellSet(ColumnItem column, int value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, int value) => Database?.Cell.Set(column, this, value.ToString());
 
-    public void CellSet(string columnName, Point value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, Point value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString());
 
-    public void CellSet(ColumnItem column, Point value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, Point value) => Database?.Cell.Set(column, this, value.ToString());
 
-    public void CellSet(string columnName, List<string>? value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, List<string>? value) => Database?.Cell.Set(Database?.Column[columnName], this, value.JoinWithCr());
 
-    public void CellSet(ColumnItem column, List<string>? value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, List<string>? value) => Database?.Cell.Set(column, this, value.JoinWithCr());
 
-    public void CellSet(string columnName, DateTime value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, DateTime value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
 
-    public void CellSet(ColumnItem column, DateTime value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, DateTime value) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
 
     public void CheckRowDataIfNeeded() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) {
