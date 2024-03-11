@@ -31,11 +31,11 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FilterVar];
+    public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
 
-    public List<List<string>> ArgsForButton => [StringVal];
+    public List<List<string>> ArgsForButton => [StringVal, StringVal];
 
-    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript"];
+    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
 
     public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
 
@@ -60,7 +60,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "CallFilter(SubName, Filter, ...);";
+    public override string Syntax => "CallFilter(SubName, Attribut0, Filter, ...);";
 
     #endregion
 
@@ -70,7 +70,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
@@ -80,12 +80,13 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
         var r = allFi.Rows;
         if (r.Count == 0) { return DoItFeedback.Null(); }
 
+        List<string> a = [attvar.ValueStringGet(1)];
         var vs = attvar.ValueStringGet(0);
 
         foreach (var thisR in r) {
             if (thisR != null && !thisR.IsDisposed) {
                 //s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ChangeValues, 0, null);
+                var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ChangeValues, 0, a);
                 if (!s2.AllOk) {
                     infos.Data.Protocol.AddRange(s2.Protocol);
                     return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");
