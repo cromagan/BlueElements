@@ -74,7 +74,7 @@ public class Method_CellSetFilter : Method_Database {
 
         value = columnToSet.AutoCorrect(value, true);
 
-        r[0].CellSet(columnToSet, value);
+        r[0].CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
 
         return r[0].CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

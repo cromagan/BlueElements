@@ -143,7 +143,7 @@ public partial class TableView : FormWithStatusBar {
             var didmenu = false;
 
             foreach (var thiss in db.EventScript) {
-                if (thiss != null && thiss.UserGroups.Count > 0 &&   db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
+                if (thiss != null && thiss.UserGroups.Count > 0 && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
                     if (!didmenu) {
                         _ = e.UserMenu.Add("Skripte", true);
                         didmenu = true;
@@ -210,7 +210,7 @@ public partial class TableView : FormWithStatusBar {
             case "ContentDelete":
                 if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
 
-                row?.CellSet(column, string.Empty);
+                row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
                 //tbl.Database.Cell.Delete(column, row?.KeyName);
                 break;
 

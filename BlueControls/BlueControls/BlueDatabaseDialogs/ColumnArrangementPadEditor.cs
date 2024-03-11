@@ -256,7 +256,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
             newc.CloneFrom(vorlage, false);
             if (mitDaten) {
                 foreach (var thisR in db.Row) {
-                    thisR.CellSet(newc, thisR.CellGetString(vorlage));
+                    thisR.CellSet(newc, thisR.CellGetString(vorlage), "Neue Spalte mit allem Daten");
                 }
             }
         }

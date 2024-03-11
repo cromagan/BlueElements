@@ -1317,7 +1317,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(allowedMethods, changevalues, s.Attributes(), addinfo);
+            var scp = new ScriptProperties(s.KeyName, allowedMethods, changevalues, s.Attributes(), addinfo);
 
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
@@ -1330,7 +1330,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (sc.Properties.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
-                    if (Column.SysRowChangeDate is not ColumnItem) {
+                    if (Column.SysRowChangeDate is null) {
                         return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
                     }
 
@@ -1339,7 +1339,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     }
 
                     foreach (var thisCol in Column) {
-                        row.VariableToCell(thisCol, vars);
+                        row.VariableToCell(thisCol, vars, s.KeyName);
                     }
                 }
 
@@ -1583,26 +1583,26 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         }
 
                         var w = thisr.CellGetString(thisc);
-                        r.CellSet(c, w);
+                        r.CellSet(c, w, "Import von " + thisFile);
                         if (r.CellGetString(c) != w) { return "Setzungsfehler!"; }
                     }
                 }
 
                 if (colForFilename != null) {
-                    r.CellSet(colForFilename, thisFile);
+                    r.CellSet(colForFilename, thisFile, "Dateiname, Import von " + thisFile);
 
                     if (r.CellGetString(colForFilename) != thisFile) { return "Setzungsfehler!"; }
                 }
             }
 
             //if (deleteImportet) {
-                Save();
+            Save();
 
-                if (HasPendingChanges) { return "Speicher-Fehler!"; }
-                db.Dispose();
-                //db = null;
-                var d = DeleteFile(thisFile, false);
-                if (!d) { return "Lösch-Fehler!"; }
+            if (HasPendingChanges) { return "Speicher-Fehler!"; }
+            db.Dispose();
+            //db = null;
+            var d = DeleteFile(thisFile, false);
+            if (!d) { return "Lösch-Fehler!"; }
             //}
         }
 
@@ -1779,7 +1779,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region Werte in die Spalten schreiben
 
             for (var colNo = 0; colNo < maxColCount; colNo++) {
-                row.CellSet(columns[colNo], thisD.Value[colNo].SplitAndCutBy("|").JoinWithCr());
+                row.CellSet(columns[colNo], thisD.Value[colNo].SplitAndCutBy("|").JoinWithCr(), "CSV-Import");
             }
 
             #endregion

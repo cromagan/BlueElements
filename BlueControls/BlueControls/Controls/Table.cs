@@ -408,7 +408,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None);
         if (v == null || v.Count != 1) { return; }
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
-        row.CellSet(column, v[0].Substring(5));
+        row.CellSet(column, v[0].Substring(5), "Undo-Befehl");
         row.Database?.Row.ExecuteValueChangedEvent(true);
     }
 
@@ -2090,7 +2090,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true, false);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
-            contentHolderCellRow.CellSet(contentHolderCellColumn, newValue);
+            contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }

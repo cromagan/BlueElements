@@ -159,7 +159,7 @@ internal sealed partial class SearchAndReplace : Form {
                     }
                     if (geändeterText != originalText) {
                         count++;
-                        thisRow.CellSet(thiscolumn, geändeterText);
+                        thisRow.CellSet(thiscolumn, geändeterText, "Suchen und Ersetzen");
                     }
                 }
             }

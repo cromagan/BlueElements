@@ -99,7 +99,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void TesteScript() {
+    public void TesteScript(string scriptname) {
         Message("Starte Skript");
 
         grpVariablen.Clear();
@@ -109,7 +109,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var scp = new ScriptProperties(MethodType.Standard, false, [], null);
+            var scp = new ScriptProperties("Skript-Editor: " + scriptname, MethodType.Standard, false, [], null);
             var s = new Script(null, string.Empty, scp);
             ex.Feedback = s.Parse(0, "Main", null);
         }

@@ -90,8 +90,8 @@ public partial class VariableEditor : UserControl {
             var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, null, "Neue Variable");
 
             if (ro != null) {
-                ro.CellSet("typ", thisv.MyClassId);
-                ro.CellSet("RO", thisv.ReadOnly);
+                ro.CellSet("typ", thisv.MyClassId, string.Empty);
+                ro.CellSet("RO", thisv.ReadOnly, string.Empty);
                 //ro.CellSet("System", thisv.SystemVariable);
 
                 var tmpi = thisv.ReadableText;
@@ -99,8 +99,8 @@ public partial class VariableEditor : UserControl {
                     tmpi = tmpi.Substring(0, 3990) + "...";
                 }
 
-                ro.CellSet("Inhalt", tmpi);
-                ro.CellSet("Kommentar", thisv.Comment);
+                ro.CellSet("Inhalt", tmpi, string.Empty);
+                ro.CellSet("Kommentar", thisv.Comment, string.Empty);
             }
         }
     }

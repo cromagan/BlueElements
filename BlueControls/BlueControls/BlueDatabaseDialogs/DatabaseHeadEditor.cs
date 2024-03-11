@@ -150,22 +150,22 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToString(), null, "New Undo Item");
         if (r == null) { return; }
 
-        r.CellSet("ColumnName", work.ColName);
-        r.CellSet("RowKey", work.RowKey);
+        r.CellSet("ColumnName", work.ColName, string.Empty);
+        r.CellSet("RowKey", work.RowKey, string.Empty);
         if (db.Column.Exists(work.ColName) is ColumnItem col && !col.IsDisposed) {
-            r.CellSet("columnCaption", col.Caption);
+            r.CellSet("columnCaption", col.Caption, string.Empty);
         }
         if (db.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
-            r.CellSet("RowFirst", row.CellFirstString());
+            r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
         } else if (!string.IsNullOrEmpty(work.RowKey)) {
-            r.CellSet("RowFirst", "[gelöscht]");
+            r.CellSet("RowFirst", "[gelöscht]", string.Empty);
         }
-        r.CellSet("Aenderer", work.User);
-        r.CellSet("AenderZeit", work.DateTimeUtc);
-        r.CellSet("Kommentar", work.Comment);
+        r.CellSet("Aenderer", work.User, string.Empty);
+        r.CellSet("AenderZeit", work.DateTimeUtc, string.Empty);
+        r.CellSet("Kommentar", work.Comment, string.Empty);
 
         if (work.Container.IsFormat(FormatHolder.FilepathAndName)) {
-            r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix());
+            r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix(), string.Empty);
         }
 
         var symb = ImageCode.Fragezeichen;
@@ -215,10 +215,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 symb = ImageCode.Person;
                 break;
         }
-        r.CellSet("Aenderung", work.Command.ToString());
-        r.CellSet("symbol", symb + "|24");
-        r.CellSet("Wertalt", alt);
-        r.CellSet("Wertneu", neu);
+        r.CellSet("Aenderung", work.Command.ToString(), string.Empty);
+        r.CellSet("symbol", symb + "|24", string.Empty);
+        r.CellSet("Wertalt", alt, string.Empty);
+        r.CellSet("Wertneu", neu, string.Empty);
     }
 
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));

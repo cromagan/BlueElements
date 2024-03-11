@@ -215,7 +215,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
                             #region Wert in leere Zellen reinscheiben
 
                             foreach (var thisR2 in rows) {
-                                if (string.IsNullOrEmpty(thisR2.CellGetString(thisC))) { thisR2.CellSet(thisC, wert); }
+                                if (string.IsNullOrEmpty(thisR2.CellGetString(thisC))) { thisR2.CellSet(thisC, wert, "Zeilenbereinigungs-Dialog"); }
                             }
 
                             #endregion
@@ -242,7 +242,6 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
                         return;
                     }
                 }
-
             }
         }
     }

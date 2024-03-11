@@ -301,33 +301,33 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
 
-    public void CellSet(string columnName, bool value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToPlusMinus());
+    public void CellSet(string columnName, bool value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToPlusMinus(), comment);
 
-    public void CellSet(ColumnItem column, bool value) => Database?.Cell.Set(column, this, value.ToPlusMinus());
+    public void CellSet(ColumnItem column, bool value, string comment) => Database?.Cell.Set(column, this, value.ToPlusMinus(), comment);
 
-    public void CellSet(string columnName, string value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
+    public void CellSet(string columnName, string value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value, comment);
 
-    public void CellSet(ColumnItem? column, string value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, string value, string comment) => Database?.Cell.Set(column, this, value, comment);
 
-    public void CellSet(string columnName, double value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
+    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture), comment);
 
-    public void CellSet(ColumnItem column, double value) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
+    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture), comment);
 
-    public void CellSet(string columnName, int value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString());
+    public void CellSet(string columnName, int value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(), comment);
 
-    public void CellSet(ColumnItem column, int value) => Database?.Cell.Set(column, this, value.ToString());
+    public void CellSet(ColumnItem column, int value, string comment) => Database?.Cell.Set(column, this, value.ToString(), comment);
 
-    public void CellSet(string columnName, Point value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString());
+    public void CellSet(string columnName, Point value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(), comment);
 
-    public void CellSet(ColumnItem column, Point value) => Database?.Cell.Set(column, this, value.ToString());
+    public void CellSet(ColumnItem column, Point value, string comment) => Database?.Cell.Set(column, this, value.ToString(), comment);
 
-    public void CellSet(string columnName, List<string>? value) => Database?.Cell.Set(Database?.Column[columnName], this, value.JoinWithCr());
+    public void CellSet(string columnName, List<string>? value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.JoinWithCr(), comment);
 
-    public void CellSet(ColumnItem column, List<string>? value) => Database?.Cell.Set(column, this, value.JoinWithCr());
+    public void CellSet(ColumnItem column, List<string>? value, string comment) => Database?.Cell.Set(column, this, value.JoinWithCr(), comment);
 
-    public void CellSet(string columnName, DateTime value) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
+    public void CellSet(string columnName, DateTime value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), comment);
 
-    public void CellSet(ColumnItem column, DateTime value) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
+    public void CellSet(ColumnItem column, DateTime value, string comment) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), comment);
 
     public void CheckRowDataIfNeeded() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) {
@@ -370,7 +370,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (db?.Column.SysCorrect != null) {
             if (IsNullOrEmpty(db.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(db.Column.SysCorrect)) {
-                CellSet(db.Column.SysCorrect, cols.Count == 0);
+                CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
             }
         }
 
@@ -390,7 +390,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in db.Column) {
             var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
 
-            _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, Generic.UserName, DateTime.UtcNow, string.Empty);
+            _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, Generic.UserName, DateTime.UtcNow, "Zeilen-Klonung");
 
             //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
         }
@@ -575,7 +575,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return erg;
     }
 
-    public void VariableToCell(ColumnItem? column, VariableCollection vars) {
+    public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not Database db || db.IsDisposed || column == null) { return; }
 
@@ -583,21 +583,23 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (columnVar == null || columnVar.ReadOnly) { return; }
         if (!column.Format.CanBeChangedByRules()) { return; }
 
+        var comment = "Skript '" + scriptname + "'";
+
         switch (columnVar) {
             case VariableFloat vf:
-                CellSet(column, vf.ValueNum);
+                CellSet(column, vf.ValueNum, comment);
                 break;
 
             case VariableListString vl:
-                CellSet(column, vl.ValueList);
+                CellSet(column, vl.ValueList, comment);
                 break;
 
             case VariableBool vb:
-                CellSet(column, vb.ValueBool);
+                CellSet(column, vb.ValueBool, comment);
                 break;
 
             case VariableString vs:
-                CellSet(column, vs.ValueString);
+                CellSet(column, vs.ValueString, comment);
                 break;
 
             default:
@@ -676,11 +678,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             OnDoSpecialRules(e);
 
             if (eventname is ScriptEventTypes.value_changed) {
-                CellSet(srs, db.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
+                CellSet(srs, db.EventScriptVersion, "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
             } else {
                 var l = db.EventScript.Get(ScriptEventTypes.value_changed);
                 if (l.Count == 1 && l[0].KeyName == scriptname) {
-                    CellSet(srs, db.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
+                    CellSet(srs, db.EventScriptVersion, "NACH Skript 'value_changed' (" + scriptname + ")"); // Nicht System set, diese Änderung muss geloggt werden
                 }
             }
         }
@@ -696,7 +698,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     var x = CellGetString(thisColum);
                     var x2 = thisColum.AutoCorrect(x, true);
                     if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
-                        db.Cell.Set(thisColum, this, x2);
+                        db.Cell.Set(thisColum, this, x2, "Nach Skript-Korrekturen");
                     } else {
                         if (!thisColum.IsFirst()) {
                             db.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);

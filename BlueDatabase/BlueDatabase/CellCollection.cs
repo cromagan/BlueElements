@@ -532,8 +532,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    public string Set(ColumnItem? column, RowItem? row, string value) // Main Method
-    {
+    public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank ungültig!"; }
 
         if (column == null || column.IsDisposed) { return "Spalte ungültig!"; }
@@ -546,7 +545,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
 
             //return db.ChangeData(DatabaseDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value);
+            lrow?.CellSet(lcolumn, value, "Verlinkung der Datenbank " + db.Caption + " (" + comment + ")");
             return string.Empty;
         }
 
@@ -556,7 +555,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         column.UcaseNamesSortedByLenght = null;
 
-        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, string.Empty);
+        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment);
 
         if (!string.IsNullOrEmpty(message)) { return message; }
 
@@ -792,7 +791,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         } else {
                             ex.Add(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
                         }
-                        thisRow.CellSet(column, ex.SortedDistinctList());
+                        thisRow.CellSet(column, ex.SortedDistinctList(), "Automatische Beziehungen von '" + row.CellFirstString() + "'");
                     }
                 }
             }
@@ -854,7 +853,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
                 if (oldvalue != newvalue) {
-                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, string.Empty);
+                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
                 }
             } else {
                 if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
@@ -965,7 +964,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                         t = ChangeTextFromRowId(t);
                         var t2 = t.SplitAndCutByCrToList().SortedDistinctList();
-                        thisRowItem.CellSet(columnToRepair, t2);
+                        thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                     }
                     if (t.ToUpper().Contains(newValue.ToUpper())) {
                         MakeNewRelations(columnToRepair, thisRowItem, new List<string>(), t.SplitAndCutByCrToList());
@@ -980,7 +979,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);
         if (currentString != GetString(column, row)) {
-            Set(column, row, currentString);
+            Set(column, row, currentString, "Bezugstextänderung");
             return;
         }
         var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
@@ -997,7 +996,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         } else {
                             _ = ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
                         }
-                        thisRow.CellSet(column, ex.SortedDistinctList());
+                        thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
                     }
                 }
             }

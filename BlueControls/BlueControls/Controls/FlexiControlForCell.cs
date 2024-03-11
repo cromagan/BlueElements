@@ -565,7 +565,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
         if (oldVal == newValue) { return; }
 
-        row.CellSet(column, newValue);
+        row.CellSet(column, newValue, "Über Formular bearbeitet (FlexiControl)");
         //if (oldVal != row.CellGetString(column)) {
         //    _ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, false, false, true, 1);
         //    row.Database?.AddBackgroundWork(row);

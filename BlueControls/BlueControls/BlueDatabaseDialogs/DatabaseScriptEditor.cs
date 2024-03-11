@@ -213,7 +213,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void btnAusführen_Click(object sender, System.EventArgs e) {
         testmode = false;
-        eventScriptEditor.TesteScript();
+        eventScriptEditor.TesteScript(txbName.Text);
     }
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
@@ -244,7 +244,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void btnTest_Click(object sender, System.EventArgs e) {
         testmode = true;
-        eventScriptEditor.TesteScript();
+        eventScriptEditor.TesteScript(txbName.Text);
     }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {

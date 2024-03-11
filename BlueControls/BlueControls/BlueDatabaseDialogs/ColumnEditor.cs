@@ -607,13 +607,13 @@ internal sealed partial class ColumnEditor {
             var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, null, "Neue Spalte");
 
             if (r != null) {
-                r.CellSet("Spalte", col.ReadableText() + " = ");
-                r.CellSet("SpalteName", col.KeyName);
+                r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
+                r.CellSet("SpalteName", col.KeyName, string.Empty);
 
                 if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
-                    r.CellSet("visible", true);
+                    r.CellSet("visible", true, string.Empty);
                 } else {
-                    r.CellSet("visible", false);
+                    r.CellSet("visible", false, string.Empty);
                 }
             }
         }
@@ -650,7 +650,7 @@ internal sealed partial class ColumnEditor {
         if (_column == null || _column.IsDisposed) { return; }
 
         foreach (var thisr in db.Row) {
-            thisr.CellSet("Such", string.Empty);
+            thisr.CellSet("Such", string.Empty, string.Empty);
         }
 
         var c = db.Column["SpalteName"];
@@ -663,7 +663,7 @@ internal sealed partial class ColumnEditor {
                 var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
 
                 if (r != null && r.CellGetBoolean("Visible")) {
-                    r.CellSet("Such", x[2].FromNonCritical());
+                    r.CellSet("Such", x[2].FromNonCritical(), string.Empty);
                 }
             }
         }

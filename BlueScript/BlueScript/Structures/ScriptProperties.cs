@@ -26,16 +26,17 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties() : this(MethodType.Standard, false, [], null) { }
+    public ScriptProperties() : this(string.Empty, MethodType.Standard, false, [], null) { }
 
-    public ScriptProperties(MethodType allowedMethods, bool changeValues, List<string> scriptAttributes, object? additionalInfo) {
+    public ScriptProperties(string scriptname, MethodType allowedMethods, bool changeValues, List<string> scriptAttributes, object? additionalInfo) {
+        ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ChangeValues = changeValues;
         ScriptAttributes = scriptAttributes;
         AdditionalInfo = additionalInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) : this(allowedMethods, scriptProperties.ChangeValues, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo) { }
+    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ChangeValues, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo) { }
 
     #endregion
 
@@ -48,6 +49,8 @@ public class ScriptProperties {
     /// Diese Attriute muss das nachfolgende Script mindestens erfüllen
     /// </summary>
     public List<string> ScriptAttributes { get; }
+
+    public string ScriptName { get; }
 
     internal MethodType AllowedMethods { get; }
 

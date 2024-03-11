@@ -34,8 +34,8 @@ public class Method_CellSetRow : Method_Database {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain], StringVal, RowVar];
     public override string Command => "cellsetrow";
     public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
@@ -71,7 +71,7 @@ public class Method_CellSetRow : Method_Database {
 
         value = columnToSet.AutoCorrect(value, true);
 
-        row.CellSet(columnToSet, value);
+        row.CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
         return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
