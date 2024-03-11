@@ -26,7 +26,9 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Point PointParse(this string toParse) {
+    public static Point PointParse(this string? toParse) {
+        if (toParse == null) { return Point.Empty; }
+
         toParse = toParse.RemoveChars("{}XYxy= ");
         Point p = new();
         if (string.IsNullOrEmpty(toParse)) {

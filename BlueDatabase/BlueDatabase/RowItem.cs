@@ -216,45 +216,77 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CellFirstString() => Database?.Column.First() is not ColumnItem fc ? string.Empty : CellGetString(fc);
 
-    public bool CellGetBoolean(string columnName) => Database?.Cell.GetBoolean(Database?.Column[columnName], this) ?? default;
+    public bool CellGetBoolean(string columnName) => CellGetBoolean(Database?.Column[columnName]);
 
-    public bool CellGetBoolean(ColumnItem? column) => Database?.Cell.GetBoolean(column, this) ?? default;
+    public bool CellGetBoolean(ColumnItem? column) => Database?.Cell.GetString(column, this).FromPlusMinus() ?? default;// Main Method
 
-    public Color CellGetColor(string columnName) => Database?.Cell.GetColor(Database?.Column[columnName], this) ?? default;
+    public Color CellGetColor(string columnName) => CellGetColor(Database?.Column[columnName]);
 
-    public Color CellGetColor(ColumnItem? column) => Database?.Cell.GetColor(column, this) ?? default;
+    public Color CellGetColor(ColumnItem? column) => Color.FromArgb(CellGetInteger(column)); // Main Method
 
-    public int CellGetColorBgr(ColumnItem? column) => Database?.Cell.GetColorBgr(column, this) ?? 0;
+    public int CellGetColorBgr(ColumnItem? column) {
+        var c = CellGetColor(column);
+        int colorBlue = c.B;
+        int colorGreen = c.G;
+        int colorRed = c.R;
+        return (colorBlue << 16) | (colorGreen << 8) | colorRed;
+    }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="columnName"></param>
     /// <returns>DateTime.MinValue bei Fehlern</returns>
-    public DateTime CellGetDateTime(string columnName) => Database?.Cell.GetDateTime(Database?.Column[columnName], this) ?? DateTime.MinValue;
+    public DateTime CellGetDateTime(string columnName) => CellGetDateTime(Database?.Column[columnName]);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns>DateTime.MinValue bei Fehlern</returns>
+    public DateTime CellGetDateTime(ColumnItem? column) {
+        var value = Database?.Cell.GetString(column, this);
+        return string.IsNullOrEmpty(value) ? default : DateTimeTryParse(value, out var d) ? d : DateTime.MinValue;
+    }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="column"></param>
-    /// <returns>DateTime.MinValue bei Fehlern</returns>
-    public DateTime CellGetDateTime(ColumnItem? column) => Database?.Cell.GetDateTime(column, this) ?? DateTime.MinValue;
+    /// <returns>0 bei Fehlern</returns>
+    public double CellGetDouble(string columnName) => CellGetDouble(Database?.Column[columnName]);
 
-    public double CellGetDouble(string columnName) => Database?.Cell.GetDouble(Database?.Column[columnName], this) ?? default;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns>0 bei Fehlern</returns>
+    public double CellGetDouble(ColumnItem? column) => DoubleParse(Database?.Cell.GetString(column, this));
 
-    public double CellGetDouble(ColumnItem column) => Database?.Cell.GetDouble(column, this) ?? default;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns>0 bei Fehlern</returns>
+    public int CellGetInteger(string columnName) => CellGetInteger(Database?.Column[columnName]);
 
-    public int CellGetInteger(string columnName) => Database?.Cell.GetInteger(Database?.Column[columnName], this) ?? default;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns>0 bei Fehlern</returns>
+    public int CellGetInteger(ColumnItem? column) => IntParse(Database?.Cell.GetString(column, this));
 
-    public int CellGetInteger(ColumnItem column) => Database?.Cell.GetInteger(column, this) ?? default;
+    public List<string> CellGetList(ColumnItem? column) => Database?.Cell.GetString(column, this).SplitAndCutByCrToList() ?? [];// Main Method
 
-    public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database?.Column[columnName], this) ?? [];
+    public List<string> CellGetList(string columnName) => CellGetList(Database?.Column[columnName]);
 
-    public List<string> CellGetList(ColumnItem column) => Database?.Cell.GetList(column, this) ?? [];
+    public Point CellGetPoint(ColumnItem? column) // Main Method
+{
+        var value = Database?.Cell.GetString(column, this);
+        return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
+    }
 
-    public Point CellGetPoint(string columnName) => Database?.Cell.GetPoint(Database?.Column[columnName], this) ?? Point.Empty;
-
-    public Point CellGetPoint(ColumnItem column) => Database?.Cell.GetPoint(column, this) ?? Point.Empty;
+    public Point CellGetPoint(string columnName) => CellGetPoint(Database?.Column[columnName]);
 
     public string CellGetString(string columnName) => Database?.Cell.GetString(Database?.Column[columnName], this) ?? string.Empty;
 

@@ -89,27 +89,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #endregion
 
-    //public static string AutomaticInitalValue(ColumnItem? column, RowItem? row) {
-    //    if (column == null || row == null) { return string.Empty; }
-
-    //    if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-    //        var (lcolumn, lrow, _) = LinkedCellData(column, row, true, true);
-    //        return AutomaticInitalValue(lcolumn, lrow);
-    //    }
-
-    //    if (column.VorschlagsColumn < 0) { return string.Empty; }
-    //    var cc = column.Database.Column.SearchByKey(column.VorschlagsColumn);
-    //    if (cc == null) { return string.Empty; }
-    //    FilterCollection f = new(column.Database)
-    //    {
-    //        new FilterItem(cc, FilterType.Istgleich_GroßKleinEgal, row.CellGetString(cc)),
-    //        new FilterItem(column, FilterType.Ungleich_MultiRowIgnorieren, string.Empty)
-    //    };
-    //    var rows = column.Database.Row.RowsFiltered(f);
-    //    rows.Remove(row);
-    //    return rows.Count == 0 ? string.Empty : rows[0].CellGetString(column);
-    //}
-
     #region Indexers
 
     /// <summary>
@@ -407,47 +386,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    public bool GetBoolean(ColumnItem? column, RowItem? row) => GetString(column, row).FromPlusMinus();// Main Method
-
-    public Color GetColor(ColumnItem? column, RowItem? row) => Color.FromArgb(GetInteger(column, row)); // Main Method
-
-    public int GetColorBgr(ColumnItem? column, RowItem? row) {
-        var c = GetColor(column, row);
-        int colorBlue = c.B;
-        int colorGreen = c.G;
-        int colorRed = c.R;
-        return (colorBlue << 16) | (colorGreen << 8) | colorRed;
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <returns>DateTime.MinValue bei Fehlern</returns>
-    public DateTime GetDateTime(ColumnItem? column, RowItem? row) {
-        var @string = GetString(column, row);
-        return string.IsNullOrEmpty(@string) ? default : DateTimeTryParse(@string, out var d) ? d : DateTime.MinValue;
-    }
-
-    public double GetDouble(ColumnItem? column, RowItem? row) {
-        var x = GetString(column, row);
-        return string.IsNullOrEmpty(x) ? 0 : DoubleParse(x);
-    }
-
-    public int GetInteger(ColumnItem? column, RowItem? row) {
-        var x = GetString(column, row);
-        return string.IsNullOrEmpty(x) ? 0 : IntParse(x);
-    }
-
-    public List<string> GetList(ColumnItem? column, RowItem? row) => GetString(column, row).SplitAndCutByCrToList();// Main Method
-
-    public Point GetPoint(ColumnItem? column, RowItem? row) // Main Method
-    {
-        var @string = GetString(column, row);
-        return string.IsNullOrEmpty(@string) ? Point.Empty : @string.PointParse();
-    }
-
     public Size? GetSizeOfCellContent(ColumnItem column, RowItem row) {
-        var txt = row.CellGetString(column);
+        var txt = GetString(column, row);
         if (string.IsNullOrEmpty(txt)) { return null; }
 
         var key = TextSizeKey(column, txt);
