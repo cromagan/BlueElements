@@ -184,7 +184,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
                 if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
 
                 // Spalte aus der Ziel-Datenbank ermitteln
-                var targetColumn = db2.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
+                var targetColumn = db2.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
                 if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
 
                 var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);

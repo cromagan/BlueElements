@@ -307,19 +307,6 @@ public static partial class Extensions {
         return did;
     }
 
-    ///// <summary>
-    ///// Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden!
-    ///// </summary>
-    ///// <typeparam name="T"></typeparam>
-    ///// <param name="L"></param>
-    ///// <param name="Value"></param>
-    // public static void Remove<T>(this List<T> L, List<T> Value) where T : IComparable
-    // {
-    //    foreach (var Item in Value)
-    //    {
-    //        L.Remove(Item);
-    //    }
-    // }
     public static void RemoveNullOrEmpty(this IList<string?> l) {
         if (l.Count == 0) { return; }
 

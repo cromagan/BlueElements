@@ -83,7 +83,7 @@ public class Method_Filter : Method_Database {
 
         #region Spalte ermitteln
 
-        var filterColumn = db.Column.Exists(attvar.ValueStringGet(1));
+        var filterColumn = db.Column[attvar.ValueStringGet(1)];
         if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Datenbank nicht gefunden"); }
 
         #endregion

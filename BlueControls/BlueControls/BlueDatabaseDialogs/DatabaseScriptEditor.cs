@@ -459,7 +459,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     //private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
     //    //Todo: Implementieren
     //    if (e.HotItem is string txt) {
-    //        var c = Database?.Column.Exists(txt);
+    //        var c = Database?.Column[txt);
     //        if (c is null) { return; }
     //        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
     //    }
@@ -469,7 +469,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     //    //Todo: Implementieren
     //    ColumnItem? c = null;
 
-    //    if (e.HotItem is string txt) { c = Database?.Column.Exists(txt); }
+    //    if (e.HotItem is string txt) { c = Database?.Column[txt); }
 
     //    switch (e.ClickedCommand.ToLower()) {
     //        case "spalteneigenschaftenbearbeiten":

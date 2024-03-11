@@ -180,11 +180,11 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
         _auswahlc.Clear();
         if (IsDisposed || FilterInput?.Database is not Database db || db.IsDisposed) { return; }
 
-        _textc = db.Column.Exists(_textSpalte);
+        _textc = db.Column[_textSpalte];
 
-        if (db.Column.Exists(_auswahlSpalte1) is ColumnItem c1) { _auswahlc.Add(c1); }
-        if (db.Column.Exists(_auswahlSpalte2) is ColumnItem c2) { _auswahlc.Add(c2); }
-        if (db.Column.Exists(_auswahlSpalte3) is ColumnItem c3) { _auswahlc.Add(c3); }
+        if (db.Column[_auswahlSpalte1] is ColumnItem c1) { _auswahlc.Add(c1); }
+        if (db.Column[_auswahlSpalte2] is ColumnItem c2) { _auswahlc.Add(c2); }
+        if (db.Column[_auswahlSpalte3] is ColumnItem c3) { _auswahlc.Add(c3); }
     }
 
     private void GenerateItemsAndText() {

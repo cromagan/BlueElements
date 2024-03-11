@@ -241,7 +241,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
         if (sho == null || sho.Count != 1) { return; }
 
-        var col2 = (db.Column.Exists(sho[0])?.KeyName ?? string.Empty).ToUpper();
+        var col2 = (db.Column[sho[0]]?.KeyName ?? string.Empty).ToUpper();
 
         if (col == col2) { return; }
         col = col2;

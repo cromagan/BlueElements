@@ -2239,7 +2239,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             //        var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, AddType.None, true);
             //        if (r == null || r.Count == 0) { return; }
 
-            //        var c = e.Column.Database.Column.Exists(r[0]);
+            //        var c = e.Column.Database.Column[r[0]);
 
             //        List<string> d = new();
             //        foreach (var thisR in ro) {

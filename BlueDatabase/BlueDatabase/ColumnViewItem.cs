@@ -110,8 +110,6 @@ public sealed class ColumnViewItem : IParseable {
             TmpDrawWidth = displayRectangleWoSlider.Width;
             return displayRectangleWoSlider.Width;
         }
-    
-
 
         if (TmpReduced) {
             TmpDrawWidth = pix16;
@@ -142,7 +140,7 @@ public sealed class ColumnViewItem : IParseable {
         switch (key) {
             case "column":
             case "columnname":// ColumnName wichtg, wegen CopyLayout
-                Column = db.Column.Exists(value);
+                Column = db.Column[value];
                 //Column?.Repair(); // Alte Formate reparieren
                 return true;
 

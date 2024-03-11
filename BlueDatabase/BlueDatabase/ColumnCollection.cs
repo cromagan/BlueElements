@@ -127,9 +127,20 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? this[string columnName] {
         get {
-            var colum = Exists(columnName);
-            if (colum is null) { Database?.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
-            return colum;
+            if (IsDisposed || Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+
+            try {
+                columnName = columnName.ToUpper();
+                var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;
+                if (col != null && col.IsDisposed) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
+                    return null;
+                }
+                return col;
+            } catch {
+                Develop.CheckStackForOverflow();
+                return this[columnName];
+            }
         }
     }
 
@@ -138,23 +149,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     #region Methods
 
     public void Dispose() => Dispose(true);
-
-    public ColumnItem? Exists(string? columnName) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
-
-        try {
-            columnName = columnName.ToUpper();
-            var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;
-            if (col != null && col.IsDisposed) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
-                return null;
-            }
-            return col;
-        } catch {
-            Develop.CheckStackForOverflow();
-            return Exists(columnName);
-        }
-    }
 
     public ColumnItem? First() {
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
@@ -193,7 +187,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    return null;
         //}
         _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, internalName, Generic.UserName, DateTime.UtcNow, string.Empty);
-        var item = Exists(internalName);
+        var item = this[internalName];
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
             return null;
@@ -224,7 +218,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem(params string[] sysnames) {
         foreach (var thisstring in sysnames) {
-            if (Exists(thisstring) == null) {
+            if (this[thisstring] == null) {
                 GenerateAndAddSystem(thisstring);
             }
         }
@@ -424,7 +418,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
-            var l = sourceDatabase.Column.Exists(thisColumn.KeyName);
+            var l = sourceDatabase.Column[thisColumn.KeyName];
             if (l == null) { names.Add(thisColumn); }
         }
         foreach (var thisname in names) {
@@ -433,7 +427,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
-            var l = Exists(thisColumn.KeyName) ??
+            var l = this[thisColumn.KeyName] ??
                 GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.QuickInfo);
 
             if (l != null) {
@@ -456,7 +450,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
-            var c = Exists(name);
+            var c = this[name];
             if (c != null && !c.IsDisposed) { return string.Empty; }//"Spalte " + name + " bereits vorhanden!"
 
             c = new ColumnItem(Database, name);
@@ -476,7 +470,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         if (type == DatabaseDataType.Command_RemoveColumn) {
-            var c = Exists(name);
+            var c = this[name];
             if (c == null) { return "Spalte nicht gefunden!"; }
 
             OnColumnRemoving(new ColumnEventArgs(c));
@@ -501,7 +495,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private string Add(ColumnItem column) {
-        if (Exists(column.KeyName) != null) { return "Hinzufügen fehlgeschlagen."; }
+        if (this[column.KeyName] != null) { return "Hinzufügen fehlgeschlagen."; }
 
         if (!_internal.TryAdd(column.KeyName, column)) { return "Hinzufügen fehlgeschlagen."; }
 
@@ -577,22 +571,22 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
         if (string.IsNullOrEmpty(preferedName)) { preferedName = "NewColumn"; }
 
-        if (Exists(preferedName) == null) { return preferedName; }
+        if (this[preferedName] == null) { return preferedName; }
 
         string testName;
         var nr = 0;
         do {
             nr++;
             testName = preferedName + "_" + nr;
-        } while (Exists(testName) != null);
+        } while (this[testName] != null);
         return testName;
     }
 
     private void GenerateAndAddSystem(string sysname) {
-        var c = Exists(sysname);
+        var c = this[sysname];
 
-        if (sysname == "SYS_DATECHANGED" && c == null) { c = Exists("SYS_CHANGEDATE"); }
-        if (sysname == "SYS_DATECREATED" && c == null) { c = Exists("SYS_CREATEDATE"); }
+        if (sysname == "SYS_DATECHANGED" && c == null) { c = this["SYS_CHANGEDATE"]; }
+        if (sysname == "SYS_DATECREATED" && c == null) { c = this["SYS_CREATEDATE"]; }
 
         if (c != null && !c.IsDisposed) {
             c.KeyName = sysname; // Wegen der Namensverbiegung oben...

@@ -107,7 +107,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public ColumnItem? Column {
         get {
-            var c = DatabaseInput?.Column.Exists(_columnName);
+            var c = DatabaseInput?.Column[_columnName];
             if (c == null || c.IsDisposed) {
                 return null;
             }

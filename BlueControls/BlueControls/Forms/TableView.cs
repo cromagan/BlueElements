@@ -1014,7 +1014,7 @@ public partial class TableView : FormWithStatusBar {
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#repaircolumn":
-                    var c = db.Column.Exists(com[1]);
+                    var c = db.Column[com[1]];
                     OpenColumnEditor(c, null);
                     UpdateScripts(db);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht

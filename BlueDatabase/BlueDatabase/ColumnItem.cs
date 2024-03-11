@@ -184,7 +184,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         Database = database;
 
-        var ex = database.Column.Exists(name);
+        var ex = database.Column[name];
         if (ex != null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
         }
@@ -672,7 +672,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 return;
             }
 
-            //if (Database?.Column.Exists(value) != null) {
+            //if (Database?.Column[value) != null) {
             //    Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
             //    return;
             //}
@@ -1217,7 +1217,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (!IsValidColumnName(nameToTest)) { return false; }
 
         if (nameToTest.Equals(_name, StringComparison.OrdinalIgnoreCase)) { return true; }
-        if (Database?.Column.Exists(nameToTest) != null) { return false; }
+        if (Database?.Column[nameToTest] != null) { return false; }
 
         return true;
     }
@@ -1326,7 +1326,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_format.NeedTargetDatabase()) {
             if (LinkedDatabase is not Database db2 || db2.IsDisposed) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
             if (db == db2) { return "Zirkelbezug mit verknüpfter Datenbank."; }
-            var c = db2.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+            var c = db2.Column[_linkedCell_ColumnNameOfLinkedDatabase];
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
             if (_linkedCellFilter.Count == 0) {
@@ -1602,7 +1602,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             #endregion
 
-            var c = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+            var c = LinkedDatabase?.Column[_linkedCell_ColumnNameOfLinkedDatabase];
             if (c != null && !c.IsDisposed) {
                 this.GetStyleFrom((IInputFormat)c);
                 BehaviorOfImageAndText = c.BehaviorOfImageAndText;
@@ -2025,7 +2025,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
                 //if (LinkedDatabase is not Database db) { return false; }
                 //if (string.IsNullOrEmpty_linkedCell_ColumnKeyOfLinkedDatabase < 0) { return false; }
-                var col = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+                var col = LinkedDatabase?.Column[_linkedCell_ColumnNameOfLinkedDatabase];
                 if (col == null) { return false; }
                 return col.UserEditDialogTypeInFormula(editTypeToCheck);
 

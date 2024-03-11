@@ -59,7 +59,7 @@ public abstract class Method_Database : Method {
         var c = attvar.Attributes[no];
         if (c == null) { return null; }
 
-        return MyDatabase(scp)?.Column.Exists(c.KeyName);
+        return MyDatabase(scp)?.Column[c.KeyName];
     }
 
     protected Database? DatabaseOf(ScriptProperties scp, string tableName) {

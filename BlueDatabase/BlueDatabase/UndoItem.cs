@@ -170,7 +170,7 @@ public class UndoItem : IParseable {
         return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUtc + ", " + User + ")</i>";
     }
 
-    internal bool LogsUndo(Database database) => database.Column.Exists(ColName) is ColumnItem c && c.ShowUndo;
+    internal bool LogsUndo(Database database) => database.Column[ColName] is ColumnItem c && c.ShowUndo;
 
     #endregion
 }

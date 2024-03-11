@@ -167,8 +167,8 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var i = _itemAccepts.DatabaseInput(this)?.Column.Exists(_eingangsWertSpalte);
-        var o = DatabaseOutput?.Column.Exists(_filterSpalte);
+        var i = _itemAccepts.DatabaseInput(this)?.Column[_eingangsWertSpalte];
+        var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(i, o, _filtertype) {
             Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe
         };
@@ -188,11 +188,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (DatabaseInput?.Column.Exists(_eingangsWertSpalte) == null) {
+        if (DatabaseInput?.Column[_eingangsWertSpalte] == null) {
             return "Die Spalte, aus der der Filterwert kommen soll, fehlt.";
         }
 
-        if (DatabaseOutput?.Column.Exists(_filterSpalte) == null) {
+        if (DatabaseOutput?.Column[_filterSpalte] == null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
         }
 

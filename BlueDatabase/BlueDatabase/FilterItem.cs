@@ -315,7 +315,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
             case "columnname":
             case "column":
-                _column = Database?.Column.Exists(value);
+                _column = Database?.Column[value];
                 _column?.RefreshColumnsData();
                 return true;
 

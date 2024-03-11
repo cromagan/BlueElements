@@ -53,8 +53,7 @@ public class Method_CellGetRow : Method_Database {
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
         if (row?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Fehler in der Zeile"); }
 
-        var c = db.Column.Exists(attvar.ValueStringGet(0));
-        if (c == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
+        if (db.Column[attvar.ValueStringGet(0)] is not ColumnItem c) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var v = RowItem.CellToVariable(c, row, true);
         if (v == null || v.Count != 1) {

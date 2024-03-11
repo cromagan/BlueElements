@@ -145,7 +145,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
             return;
         }
 
-        //if (_database.Column.Exists(cbxColDateiname.Text) == null) {
+        //if (_database.Column[cbxColDateiname.Text] == null) {
         //    txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
         //    btnImport.Enabled = false;
         //    return;
@@ -172,7 +172,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         if (_database is not Database db || db.IsDisposed) { return; }
         List<ColumnItem> columns = new List<ColumnItem>();
         foreach (var column in lstColumns.Checked) {
-            if (db.Column.Exists(column) is ColumnItem c) {
+            if (db.Column[column] is ColumnItem c) {
                 columns.Add(c);
             }
         }

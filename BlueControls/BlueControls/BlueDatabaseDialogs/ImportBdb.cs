@@ -113,7 +113,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
             return;
         }
 
-        if (_database.Column.Exists(cbxColDateiname.Text) == null) {
+        if (_database.Column[cbxColDateiname.Text] == null) {
             txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
             btnImport.Enabled = false;
             return;
@@ -153,7 +153,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
         var m = "Datenbank-Fehler";
 
         if (Database != null && !Database.IsDisposed) {
-            m = Database.ImportBdb(_files, _database.Column.Exists(cbxColDateiname.Text), btnDateienlöschen.Checked);
+            m = Database.ImportBdb(_files, _database.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

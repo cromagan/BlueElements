@@ -592,7 +592,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             RowItem? tmpRow;
 
             if (this.Database() is Database db && !db.IsDisposed) {
-                tmpColumn = db.Column.Exists(_columnName);
+                tmpColumn = db.Column[_columnName];
                 tmpRow = this.RowSingleOrNull();
             } else {
                 tmpColumn = null;

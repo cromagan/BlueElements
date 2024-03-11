@@ -370,7 +370,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in columnnames) {
-            var c = Database?.Column.Exists(thisColumn);
+            var c = Database?.Column[thisColumn];
 
             if (c != null && this[c] == null && this[c] == null && !c.IsDisposed) {
                 Add(new ColumnViewItem(c, ViewType.Column, this));

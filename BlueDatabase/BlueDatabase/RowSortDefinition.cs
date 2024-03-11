@@ -95,13 +95,13 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
             case "column":
             case "columnname": // ColumnName wichtig wegen CopyLayout
-                if (Database.Column.Exists(value) is ColumnItem c) { Columns.Add(c); }
+                if (Database.Column[value] is ColumnItem c) { Columns.Add(c); }
                 return true;
 
             case "columns":
                 var cols = value.FromNonCritical().SplitBy("|");
                 foreach (var thisc in cols) {
-                    if (Database.Column.Exists(thisc) is ColumnItem c2) { Columns.Add(c2); }
+                    if (Database.Column[thisc] is ColumnItem c2) { Columns.Add(c2); }
                 }
                 return true;
 
@@ -146,7 +146,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
     private void SetColumn(List<string> names) {
         Columns.Clear();
         foreach (var t in names) {
-            var c = Database.Column.Exists(t);
+            var c = Database.Column[t];
             if (c != null && !c.IsDisposed) { Columns.Add(c); }
         }
     }

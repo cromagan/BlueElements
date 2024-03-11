@@ -152,7 +152,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         r.CellSet("ColumnName", work.ColName, string.Empty);
         r.CellSet("RowKey", work.RowKey, string.Empty);
-        if (db.Column.Exists(work.ColName) is ColumnItem col && !col.IsDisposed) {
+        if (db.Column[work.ColName] is ColumnItem col && !col.IsDisposed) {
             r.CellSet("columnCaption", col.Caption, string.Empty);
         }
         if (db.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
@@ -272,7 +272,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             }
         }
 
-        if (x.Column.Exists("Symbol") is ColumnItem c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
+        if (x.Column["Symbol"] is ColumnItem c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
 
         x.RepairAfterParse();
 

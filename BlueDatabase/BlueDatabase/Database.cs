@@ -1578,7 +1578,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                 foreach (var thisc in db.Column) {
                     if (thisc != colForFilename) {
-                        var c = Column.Exists(thisc.KeyName);
+                        var c = Column[thisc.KeyName];
                         if (c == null) {
                             c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, string.Empty, null, string.Empty);
                             if (c == null) { return "Spalte konnte nicht generiert werden."; }
@@ -1661,7 +1661,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
                 zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
 
-                var col = Column.Exists(zeil[0][spaltNo]);
+                var col = Column[zeil[0][spaltNo]];
                 if (col == null) {
                     if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
                         OnDropMessage(FehlerArt.Warnung, "Abbruch, ungültiger Spaltenname.");
@@ -2019,7 +2019,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 thiscol.IsInCache = DateTime.UtcNow;
 
                 if (thiscol.LinkedDatabase is Database db && !db.IsDisposed &&
-                    db.Column.Exists(thiscol.LinkedCell_ColumnNameOfLinkedDatabase) is ColumnItem col) {
+                    db.Column[thiscol.LinkedCell_ColumnNameOfLinkedDatabase] is ColumnItem col) {
                     db.RefreshColumnsData(col);
                 }
             }
@@ -2380,7 +2380,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Command_RemoveColumn:
-                    var c = Column.Exists(value);
+                    var c = Column[value];
                     if (c == null) { return (string.Empty, null, null); }
                     return (Column.ExecuteCommand(type, c.KeyName, reason), c, null);
 
@@ -2388,7 +2388,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     var f2 = Column.ExecuteCommand(type, value, reason);
                     if (!string.IsNullOrEmpty(f2)) { return (f2, null, null); }
 
-                    var thisColumn = Column.Exists(value);
+                    var thisColumn = Column[value];
                     if (thisColumn == null) { return ("Hinzufügen fehlgeschlagen", null, null); }
 
                     return (string.Empty, column, null);
@@ -3034,7 +3034,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     Undo.Add(thisWork);
                     ChangesNotIncluded.Add(thisWork);
 
-                    var c = Column.Exists(thisWork.ColName);
+                    var c = Column[thisWork.ColName];
                     var r = Row.SearchByKey(thisWork.RowKey);
                     var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.UpdateChanges);
 
@@ -3278,14 +3278,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     //}
 
                     if (!string.IsNullOrEmpty(columname)) {
-                        column = Column.Exists(columname);
+                        column = Column[columname];
                         if (column == null || column.IsDisposed) {
                             if (command != DatabaseDataType.ColumnName) {
                                 Develop.DebugPrint(command + " an erster Stelle!");
                             }
 
                             _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
-                            column = Column.Exists(columname);
+                            column = Column[columname];
                         }
 
                         if (column == null || column.IsDisposed) {

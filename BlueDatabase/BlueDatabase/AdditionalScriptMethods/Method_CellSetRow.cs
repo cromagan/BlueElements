@@ -53,7 +53,7 @@ public class Method_CellSetRow : Method_Database {
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
         if (row?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Fehler in der Zeile"); }
 
-        var columnToSet = db.Column.Exists(attvar.ValueStringGet(1));
+        var columnToSet = db.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);

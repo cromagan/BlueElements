@@ -294,7 +294,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
         if (r == null || r.Count == 0) { return; }
-        ca.Add(db.Column.Exists(r[0]), false);
+        ca.Add(db.Column[r[0]], false);
         ChangeCurrentArrangementto(ca);
         ShowOrder();
     }
@@ -563,7 +563,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                                     }
                             }
 
-                            var c2 = c.LinkedDatabase.Column.Exists(c.LinkedCell_ColumnNameOfLinkedDatabase);
+                            var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
                                 var it2 = new ColumnPadItem(c2, false);
                                 Pad.Item.Add(it2);

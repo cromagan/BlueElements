@@ -205,7 +205,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
-            var c = linkedDatabase?.Column.Exists(x[0]);
+            var c = linkedDatabase?.Column[x[0]];
             if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
@@ -241,7 +241,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
-        column = column?.Database?.Column.Exists(column.KeyName);
+        column = column?.Database?.Column[column.KeyName];
         row = row?.Database?.Row.SearchByKey(row.KeyName);
 
         if (column != null && row != null) { return KeyOfCell(column.KeyName, row.KeyName); }
@@ -272,12 +272,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         var key = db.Cell.GetStringCore(column, row);
         if (string.IsNullOrEmpty(key)) {
-            return (linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase), null, "Keine Verlinkung vorhanden.", false);
+            return (linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase], null, "Keine Verlinkung vorhanden.", false);
         }
 
         if (key.Contains("|")) { return (null, null, "Falsches Format", false); }
 
-        var linkedColumn = linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase); // linkedDatabase.Column.SearchByKey(LongParse(v[0]));
+        var linkedColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
 
         if (linkedColumn != null) {
             linkedDatabase.RefreshColumnsData(linkedColumn);
@@ -296,7 +296,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
         var cd = cellKey.SplitBy("|");
         if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(FehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
-        column = Database?.Column.Exists(cd[0]);
+        column = Database?.Column[cd[0]];
         row = Database?.Row.SearchByKey(cd[1]);
     }
 
@@ -813,7 +813,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row == null || row.IsDisposed) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
 
-        targetColumn = linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
+        targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
         var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
