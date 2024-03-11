@@ -104,41 +104,41 @@ public partial class TableView : FormWithStatusBar {
 
         if (tbl != null && row != null) {
             _ = e.UserMenu.Add("Anheften", true);
-            if (row != null && tbl.PinnedRows.Contains(row)) {
+            if (tbl.PinnedRows.Contains(row)) {
                 _ = e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true);
             } else {
-                _ = e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
+                _ = e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), true);
             }
         }
 
         if (column != null) {
             _ = e.UserMenu.Add("Sortierung", true);
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column.Format.CanBeCheckedByRules());
             //_ = e.UserMenu.AddSeparator();
 
             _ = e.UserMenu.Add("Zelle", true);
-            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
-            _ = e.UserMenu.Add(ContextMenuCommands.SuchenUndErsetzen, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Format.CanBeChangedByRules() && column.ShowUndo);
+            _ = e.UserMenu.Add(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator());
             //_ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Spalte", true);
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator());
 
-            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, column != null && db.IsAdministrator());
-            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, db.IsAdministrator());
+            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, db.IsAdministrator());
 
-            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
-            _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator());
+            _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, db.IsAdministrator());
             //_ = e.UserMenu.AddSeparator();
         }
 
         if (row != null) {
             _ = e.UserMenu.Add("Zeile", true);
-            _ = e.UserMenu.Add(ContextMenuCommands.ZeileLöschen, row != null && db.IsAdministrator());
-            _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && db.HasPrepareFormulaCheckScript());
+            _ = e.UserMenu.Add(ContextMenuCommands.ZeileLöschen, db.IsAdministrator());
+            _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.HasPrepareFormulaCheckScript());
 
             var didmenu = false;
 
@@ -177,11 +177,11 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "SpaltenSortierungAZ":
-                if (column != null && !column.IsDisposed && tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, false); }
+                if (column != null && !column.IsDisposed && tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column.KeyName, false); }
                 break;
 
             case "SpaltenSortierungZA":
-                if (column != null && !column.IsDisposed && tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, true); }
+                if (column != null && !column.IsDisposed && tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column.KeyName, true); }
                 break;
 
             case "Skript":
@@ -267,7 +267,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "CopyAll": {
-                    if (!db.IsAdministrator() || column == null) { return; }
+                    if (!db.IsAdministrator() || column == null || tbl == null) { return; }
                     var txt = tbl.Export_CSV(FirstRow.Without, column);
                     //txt = txt.TrimStart("Deutsch;\r\n");
                     //txt = txt.TrimStart("Englisch;\r\n");
@@ -278,7 +278,7 @@ public partial class TableView : FormWithStatusBar {
                     break;
                 }
             case "CopyAll2": {
-                    if (!db.IsAdministrator() || column == null) { return; }
+                    if (!db.IsAdministrator() || column == null || tbl == null) { return; }
                     var txt = tbl.Export_CSV(FirstRow.Without, column);
                     //txt = txt.TrimStart("Deutsch;\r\n");
                     //txt = txt.TrimStart("Englisch;\r\n");

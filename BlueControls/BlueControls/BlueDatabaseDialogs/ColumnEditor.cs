@@ -546,10 +546,10 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(Database.UniqueKeyValue());
-            //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
+            if (vis == null || vis.IsDisposed) { return; }
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
             if (sp == null || sp.IsDisposed) { return; }
 
@@ -581,10 +581,6 @@ internal sealed partial class ColumnEditor {
 
             car[1].Add(sp, false);
             car[1].Add(b, false);
-
-            //car[1].ShowAllColumns();
-            //car[1].Hide("visible");
-            //car[1].HideSystemColumns();
 
             db.ColumnArrangements = car.AsReadOnly();
 

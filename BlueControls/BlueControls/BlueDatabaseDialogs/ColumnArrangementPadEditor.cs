@@ -108,9 +108,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     #region Methods
 
     public ColumnViewCollection? CloneOfCurrentArrangement() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+        // Überprüfen, ob die Datenbank oder das aktuelle Objekt verworfen wurde
+        if (IsDisposed || Database is not Database db || db.IsDisposed) {
+            return null;
+        }
+        // Versuchen, die aktuelle Anordnung zu klonen
         var ca = db.ColumnArrangements.Get(_arrangement);
-        return (ColumnViewCollection)ca?.Clone();
+        // Überprüfen, ob die Anordnung nicht null ist, bevor sie geklont wird
+        return ca?.Clone() as ColumnViewCollection;
     }
 
     public int IndexOfCurrentArr() {

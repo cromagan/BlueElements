@@ -248,24 +248,18 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {
+        // Überprüfen, ob die Datenbank oder die Instanz selbst verworfen wurde
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        //if (lstEventScripts.Checked.Count != 1) {
-        //    btnVerlauf.Enabled = false;
-        //    Item = null;
-        //    return;
-        //}
-
+        // Überprüfen, ob die Tabelle bearbeitet werden kann
         if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
             Item = null;
             btnVerlauf.Enabled = false;
             return;
         }
+        // Das ausgewählte Skript aus der Liste abrufen
         var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
-        ////Item = selectedlstEventScripts;
-        ////btnVerlauf.Enabled = true;
-        ///
         var l = new List<string>();
-
+        // Durchlaufen aller Undo-Operationen in der Datenbank
         foreach (var thisUndo in db.Undo) {
             if (thisUndo.Command == BlueDatabase.Enums.DatabaseDataType.EventScript) {
                 l.Add("############################################################################");
@@ -275,7 +269,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 l.Add("############################################################################");
                 l.Add(thisUndo.DateTimeUtc.ToString(Constants.Format_Date7) + " " + thisUndo.User);
 
-                List<string> ai = [.. thisUndo.ChangedTo.SplitAndCutByCr()];
+                l.Add(thisUndo.DateTimeUtc.ToString(Constants.Format_Date7) + " " + thisUndo.User);
+                // Überprüfen, ob das Skript geändert wurde
+                List<string> ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
                 var found = false;
                 foreach (var t in ai) {
                     var s = new DatabaseScriptDescription(db, t);
@@ -290,7 +286,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 }
             }
         }
-
+        // Schreiben der Liste in eine temporäre Datei
         l.WriteAllText(TempFile("", "Scrip.txt"), Win1252, true);
     }
 
@@ -429,20 +425,15 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (lstEventScripts.Checked.Count != 1) {
-            btnVerlauf.Enabled = false;
-            Item = null;
-            return;
+        DatabaseScriptDescription? newItem = null;
+        if (lstEventScripts.Checked.Count == 1 &&
+            !TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
+            if (lstEventScripts.Item[lstEventScripts.Checked[0]] is ReadableListItem selectedlstEventScripts) {
+                newItem = selectedlstEventScripts.Item as DatabaseScriptDescription;
+            }
         }
-
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
-            Item = null;
-            btnVerlauf.Enabled = false;
-            return;
-        }
-        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
-        Item = selectedlstEventScripts;
-        btnVerlauf.Enabled = true;
+        Item = newItem;
+        btnVerlauf.Enabled = Item != null;
     }
 
     private void lstPermissionExecute_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {

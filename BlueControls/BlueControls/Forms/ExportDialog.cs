@@ -32,6 +32,7 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -249,14 +250,14 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Database != null && !string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text))) {
+        if (Database == null || string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text)) || _rowsForExport == null || !_rowsForExport.Any()) {
+            padVorschau.Item?.Clear();
+        } else {
             padVorschau.ShowInPrintMode = true;
             padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text);
             padVorschau.Item.ResetVariables();
             padVorschau.Item.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();
-        } else {
-            padVorschau.Item.Clear();
         }
     }
 

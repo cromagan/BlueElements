@@ -94,13 +94,17 @@ public class CellLikeListItem : AbstractListItem {
     }
 
     protected override string GetCompareKey() {
-        // Die hauptklasse frägt nach diesem Kompare-Key
-        //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, ShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
+        // Die Hauptklasse fragt nach diesem Compare-Key
+        if (_styleLikeThis == null) {
+            // Wenn _styleLikeThis null ist, geben wir einen leeren String zurück
+            return string.Empty;
+        }
+        // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
         var txt = CellItem.ValueReadable(Internal, ShortenStyle.HTML, _styleLikeThis.Format, _bildTextverhalten, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
-
-        if (_styleLikeThis != null) { return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal; }
-        return string.Empty;
-        //Internal.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
+        // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils
+        var compareKey = txt.CompareKey(_styleLikeThis.SortType);
+        // Rückgabe des Compare-Keys mit dem internen Wert
+        return $"{compareKey}|{Internal}";
     }
 
     #endregion

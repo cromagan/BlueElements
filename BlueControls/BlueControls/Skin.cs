@@ -1187,7 +1187,7 @@ public static class Skin {
         }
         try {
             if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
-            if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
+            if (!string.IsNullOrEmpty(txt)) { bFont?.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
         } catch {
             // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird.
             //Develop.DebugPrint(ex);
@@ -1748,7 +1748,7 @@ public static class Skin {
     private static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
-            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column.KeyName + " - " + row.CellFirstString());
+            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column?.KeyName + " - " + row?.CellFirstString());
             return BlueFont.DefaultFont; // BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
         }
         return BlueFont.Get(@string);
