@@ -142,7 +142,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
     }
 
     public override string ErrorReason() {
-        if (Database?.IsDisposed ?? true) { return "Datenbank verworfen"; }
+        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         var b = base.ErrorReason();
 
@@ -169,9 +169,18 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
         }
 
+        if (_eventTypes.HasFlag(ScriptEventTypes.keyvalue_changed)) {
+            if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
+            if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
+            if (!db.Column.HasKeyColumns()) { return "Routinen wird nie ausgelöst, da keine Schlüsselspalten definiert sind."; }
+        }
+
         if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) {
             if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
+
+            if (_eventTypes.HasFlag(ScriptEventTypes.keyvalue_changed)) { return "Nach einer neuen Zeile wird sowieso 'Schlüsselwert geändert' ausgelöst."; }
+            if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { return "Nach einer neuen Zeile wird sowieso 'Wert geändert' ausgelöst."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) {
@@ -223,6 +232,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
         if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) { symb = ImageCode.Zeile; }
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { symb = ImageCode.Stift; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.keyvalue_changed)) { symb = ImageCode.Schlüssel; }
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 

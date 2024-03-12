@@ -254,7 +254,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
             _filterInput = value;
             ((IControlAcceptFilter)this).RegisterEvents();
         }
@@ -374,7 +374,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
-            if (row != null && column != null && column.Format.CanBeCheckedByRules()) {
+            if (row != null && column != null && column.Function.CanBeCheckedByRules()) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
@@ -393,7 +393,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
-        if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, true, false);
             if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
             return;
@@ -498,7 +498,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             var contentHolderCellColumn = column;
             var contentHolderCellRow = row?.Row;
-            if (column != null && column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column != null && column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                 (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, false, false);
             }
             var ist1 = string.Empty;
@@ -1679,7 +1679,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 case Keys.V:
                     if (e.Modifiers == Keys.Control) {
                         if (CursorPosColumn != null && CursorPosRow?.Row != null) {
-                            if (!CursorPosColumn.Format.TextboxEditPossible() && CursorPosColumn.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                            if (!CursorPosColumn.Function.TextboxEditPossible() && CursorPosColumn.Function != ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                 NotEditableInfo("Die Zelle hat kein passendes Format.");
                                 _isinKeyDown = false;
                                 return;
@@ -1785,10 +1785,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (_mouseOverColumn != null && e.Y < ca.HeadSize(_columnFont)) {
                     _mouseOverText = _mouseOverColumn.QuickInfoText(string.Empty);
                 } else if (_mouseOverColumn != null && _mouseOverRow != null) {
-                    if (_mouseOverColumn.Format.NeedTargetDatabase()) {
+                    if (_mouseOverColumn.Function.NeedTargetDatabase()) {
                         if (_mouseOverColumn.LinkedDatabase != null) {
-                            switch (_mouseOverColumn.Format) {
-                                case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                            switch (_mouseOverColumn.Function) {
+                                case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
 
                                     var (lcolumn, _, info, _) = CellCollection.LinkedCellData(_mouseOverColumn, _mouseOverRow?.Row, true, false);
                                     if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(_mouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
@@ -1800,11 +1800,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                                     break;
 
-                                case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                                case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                                     break;
 
                                 default:
-                                    Develop.DebugPrint(_mouseOverColumn.Format);
+                                    Develop.DebugPrint(_mouseOverColumn.Function);
                                     break;
                             }
                         } else {
@@ -1856,7 +1856,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         return;
                     }
 
-                    if (_mouseOverRow?.Row is RowItem r && _mouseOverColumn.Format == DataFormat.Button) {
+                    if (_mouseOverRow?.Row is RowItem r && _mouseOverColumn.Function == ColumnFunction.Button) {
                         OnButtonCellClicked(new CellEventArgs(_mouseOverColumn, r));
                         Invalidate();
                     }
@@ -1924,7 +1924,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 var y = 0;
                 for (var z = 0; z <= mei.GetUpperBound(0); z++) {
                     Draw_CellTransparentDirect_OneLine(gr, mei[z], contentHolderCellColumn, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, bildTextverhalten, state, scale);
-                    y += CellItem.ContentSize(contentHolderCellColumn.KeyName, contentHolderCellColumn.Format, mei[z], font, style, pix16 - 1, bildTextverhalten, contentHolderCellColumn.Prefix, contentHolderCellColumn.Suffix, contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace, scale, contentHolderCellColumn.ConstantHeightOfImageCode).Height;
+                    y += CellItem.ContentSize(contentHolderCellColumn.KeyName, mei[z], font, style, pix16 - 1, bildTextverhalten, contentHolderCellColumn.Prefix, contentHolderCellColumn.Suffix, contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace, scale, contentHolderCellColumn.ConstantHeightOfImageCode).Height;
                 }
             }
         }
@@ -1938,7 +1938,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
         }
 
-        var (text, qi) = CellItem.GetDrawingData(contentHolderColumnStyle.KeyName, contentHolderColumnStyle.Format, drawString, style, bildTextverhalten, contentHolderColumnStyle.Prefix, contentHolderColumnStyle.Suffix, contentHolderColumnStyle.DoOpticalTranslation, contentHolderColumnStyle.OpticalReplace, scale, contentHolderColumnStyle.ConstantHeightOfImageCode);
+        var (text, qi) = CellItem.GetDrawingData(contentHolderColumnStyle.KeyName, drawString, style, bildTextverhalten, contentHolderColumnStyle.Prefix, contentHolderColumnStyle.Suffix, contentHolderColumnStyle.DoOpticalTranslation, contentHolderColumnStyle.OpticalReplace, scale, contentHolderColumnStyle.ConstantHeightOfImageCode);
         var tmpImageCode = qi;
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
@@ -2032,7 +2032,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         var contentHolderCellColumn = cellInThisDatabaseColumn;
         var contentHolderCellRow = cellInThisDatabaseRow?.Row;
-        if (contentHolderCellRow != null && contentHolderCellColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        if (contentHolderCellRow != null && contentHolderCellColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return; } // Dummy prüfung
         }
@@ -2357,7 +2357,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var contentHolderCellColumn = cellInThisDatabaseColumn;
         var contentHolderCellRow = cellInThisDatabaseRow?.Row;
 
-        if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        if (cellInThisDatabaseColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
         }
 
@@ -2754,8 +2754,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 #region Draw_CellTransparent
 
-                switch (cellInThisDatabaseColumn.Format) {
-                    case DataFormat.Button:
+                switch (cellInThisDatabaseColumn.Function) {
+                    case ColumnFunction.Button:
                         ButtonCellEventArgs e = new(cellInThisDatabaseColumn, cellInThisDatabaseRow);
                         OnNeedButtonArgs(e);
 
@@ -2778,7 +2778,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         Button.DrawButton(this, gr, Design.Button_CheckBox, s, e.Image, Alignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
                         break;
 
-                    case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+                    case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                         var (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
 
                         if (contentHolderCellColumn != null && contentHolderCellRow != null) {

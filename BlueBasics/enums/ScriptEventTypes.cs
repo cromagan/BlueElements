@@ -29,5 +29,6 @@ public enum ScriptEventTypes {
     value_changed_extra_thread = 8,
     loaded = 16,
     export = 32,
-    clipboard_changed = 64
+    clipboard_changed = 64,
+    keyvalue_changed = 128
 }

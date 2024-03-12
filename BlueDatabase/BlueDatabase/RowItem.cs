@@ -127,12 +127,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (column == null || row == null) { return null; }
         if (column.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { return null; }
 
-        if (!column.Format.CanBeCheckedByRules()) { return null; }
+        if (!column.Function.CanBeCheckedByRules()) { return null; }
         //if (!column.SaveContent) { return null; }
 
         #region ReadOnly bestimmen
 
-        var ro = mustbeReadOnly || !column.Format.CanBeChangedByRules();
+        var ro = mustbeReadOnly || !column.Function.CanBeChangedByRules();
         //if (column == column.Database.Column.SysCorrect) { ro = true; }
         //if (column == column.Database.Column.SysRowChanger) { ro = true; }
         //if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
@@ -548,7 +548,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (column != null) {
                 if (erg.ToUpper().Contains("~" + column.KeyName.ToUpper())) {
                     var replacewith = CellGetString(column);
-                    if (replacedvalue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, column.Format, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
+                    if (replacedvalue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
                     if (removeLineBreaks && !replacedvalue) {
                         replacewith = replacewith.Replace("\r\n", " ");
                         replacewith = replacewith.Replace("\r", " ");
@@ -581,7 +581,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var columnVar = vars.Get(column.KeyName);
         if (columnVar == null || columnVar.ReadOnly) { return; }
-        if (!column.Format.CanBeChangedByRules()) { return; }
+        if (!column.Function.CanBeChangedByRules()) { return; }
 
         var comment = "Skript '" + scriptname + "'";
 
@@ -697,7 +697,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (fullCheck) {
                     var x = CellGetString(thisColum);
                     var x2 = thisColum.AutoCorrect(x, true);
-                    if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                    if (thisColum.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank && x != x2) {
                         db.Cell.Set(thisColum, this, x2, "Nach Skript-Korrekturen");
                     } else {
                         if (!thisColum.IsFirst()) {

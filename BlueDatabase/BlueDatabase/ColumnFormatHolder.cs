@@ -33,7 +33,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     #region Fields
 
     public static readonly ColumnFormatHolder BildCode = new(FormatHolder.Text) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -48,7 +48,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Bit = new(FormatHolder.Bit) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Zentriert,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -63,7 +63,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Date = new(FormatHolder.Date) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Datum_Uhrzeit,
         DoOpticalTranslation = TranslationType.Datum,
@@ -78,7 +78,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder DateTime = new(FormatHolder.DateTime) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Datum_Uhrzeit,
         DoOpticalTranslation = TranslationType.Datum,
@@ -93,7 +93,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Email = new(FormatHolder.Email) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -108,7 +108,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Float = new(FormatHolder.Float) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -124,7 +124,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     // ReSharper disable once UnusedMember.Global
     public new static readonly ColumnFormatHolder FloatPositive = new(FormatHolder.FloatPositive) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -139,7 +139,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Integer = new(FormatHolder.Integer) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -154,7 +154,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder IntegerPositive = new(FormatHolder.IntegerPositive) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -169,7 +169,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder PhoneNumber = new(FormatHolder.PhoneNumber) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -184,7 +184,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder SystemName = new(FormatHolder.SystemName) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -199,7 +199,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Text = new(FormatHolder.Text) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -215,7 +215,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     // ReSharper disable once UnusedMember.Global
     public new static readonly ColumnFormatHolder TextMitFormatierung = new(FormatHolder.TextMitFormatierung) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -230,7 +230,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static readonly ColumnFormatHolder TextOptions = new(FormatHolder.Text) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Übersetzen,
@@ -246,7 +246,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Url = new(FormatHolder.Url) {
-        Format = DataFormat.Text,
+        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -281,7 +281,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     public bool DropdownBearbeitungErlaubt { get; set; }
     public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
     public bool DropdownWerteAndererZellenAnzeigen { get; set; }
-    public DataFormat Format { get; set; }
+    public ColumnFunction Function { get; set; }
     public ScriptType ScriptType { get; set; }
     public SortierTyp SortType { get; set; }
     public bool TextBearbeitungErlaubt { get; set; }

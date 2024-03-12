@@ -500,6 +500,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null);
+        if (db.Column.HasKeyColumns()) {
+            _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null);
+        }
+        _ = item.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null);
+        _ = item.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0.1f, null);
 
         return item;
     }

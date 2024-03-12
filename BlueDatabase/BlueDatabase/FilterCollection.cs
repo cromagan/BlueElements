@@ -303,9 +303,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (column == null || column.IsDisposed) { return string.Empty; }
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
 
-        if (column.Format is not DataFormat.Text
-                        and not DataFormat.RelationText
-                        and not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
+        if (column.Function is not ColumnFunction.Normal
+                        and not ColumnFunction.RelationText
+                        and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
 
         if (!firstToo && db.Column.First() == column) { return string.Empty; }
 
@@ -316,8 +316,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == db.Column.SysRowCreateDate ||
             column == db.Column.SysLocked ||
             column == db.Column.SysRowState) { return string.Empty; }
-
-
 
         var fi = this[column];
 

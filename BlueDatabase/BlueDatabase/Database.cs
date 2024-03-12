@@ -708,7 +708,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (tablename == "ALL_TAB_COLS") { return false; } // system-name
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
-        return t.Length <= 100;
+        if (t.Length > 100) { return false; }
+
+        return true;
     }
 
     /// <summary>
@@ -1078,6 +1080,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
             return "Skript 'Wert geändert' mehrfach vorhanden";
+        }
+
+        if (l.Get(ScriptEventTypes.keyvalue_changed).Count > 1) {
+            return "Skript 'Schlüsselwert geändert' mehrfach vorhanden";
         }
 
         return string.Empty;
@@ -1669,7 +1675,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     col = Column.GenerateAndAdd(zeil[0][spaltNo]);
                     if (col != null) {
                         col.Caption = zeil[0][spaltNo];
-                        col.Format = DataFormat.Text;
+                        col.Function = ColumnFunction.Normal;
                     }
                 }
 
@@ -1686,7 +1692,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 var newc = Column.GenerateAndAdd();
                 if (newc != null) {
                     newc.Caption = newc.KeyName;
-                    newc.Format = DataFormat.Text;
+                    newc.Function = ColumnFunction.Normal;
                     newc.MultiLine = true;
                 }
 
@@ -1941,9 +1947,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thisColumn in Column) {
             thisColumn.Optimize();
 
-            if (thisColumn.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank and
-                                     not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems and
-                                     not DataFormat.Button) {
+            if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
+                                     not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
+                                     not ColumnFunction.Button) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
                     Column.Remove(thisColumn, "Automatische Optimierung");
@@ -2275,7 +2281,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual bool IsThereNeedToMakeMeMaster() {
         if (!MultiUser) { return false; }
 
-        return !HasValueChangedScript();
+        if (HasValueChangedScript()) { return false; }
+
+        return true;
     }
 
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
@@ -2807,7 +2815,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         SaveToByteList(l, DatabaseDataType.ColumnName, c.KeyName, name);
         SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
-        SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.ColumnFunction, ((int)c.Function).ToString(), name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);
@@ -3112,7 +3120,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         if (thisColumn != null) {
                             var lcColumn = thisColumn;
                             var lCrow = thisRow;
-                            if (thisColumn.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                            if (thisColumn.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                                 (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn, thisRow, false, false);
                             }
 

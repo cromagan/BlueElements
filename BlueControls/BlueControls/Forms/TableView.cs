@@ -113,15 +113,15 @@ public partial class TableView : FormWithStatusBar {
 
         if (column != null) {
             _ = e.UserMenu.Add("Sortierung", true);
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column.Format.CanBeCheckedByRules());
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules());
             //_ = e.UserMenu.AddSeparator();
 
             _ = e.UserMenu.Add("Zelle", true);
-            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Format.CanBeChangedByRules() && column.ShowUndo);
+            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Function.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo);
             _ = e.UserMenu.Add(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator());
             //_ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Spalte", true);
@@ -316,9 +316,9 @@ public partial class TableView : FormWithStatusBar {
 
         ColumnItem? columnLinked = null;
         var posError = false;
-        switch (column.Format) {
-            case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-            case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+        switch (column.Function) {
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                 posError = true;
                 break;

@@ -292,7 +292,7 @@ public class DatabaseMu : Database {
         return (null, null);
     }
 
-    protected override bool IsThereNeedToMakeMeMaster() => _mustMakeMaster ? true : base.IsThereNeedToMakeMeMaster();
+    protected override bool IsThereNeedToMakeMeMaster() => _mustMakeMaster || base.IsThereNeedToMakeMeMaster();
 
     protected override List<Database> LoadedDatabasesWithSameServer() {
         var oo = new List<Database>();

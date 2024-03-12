@@ -127,6 +127,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 txbTestZeile.Enabled = value.NeedRow;
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.new_row);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
+                chkAuslöser_keyvaluechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.keyvalue_changed);
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
@@ -324,6 +325,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         ScriptEventTypes tmp = 0;
         if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.new_row; }
         if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
+        if (chkAuslöser_keyvaluechanged.Checked) { tmp |= ScriptEventTypes.keyvalue_changed; }
         if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
         if (chkAuslöser_databaseloaded.Checked) { tmp |= ScriptEventTypes.loaded; }

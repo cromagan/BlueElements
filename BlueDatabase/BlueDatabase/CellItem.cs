@@ -54,8 +54,8 @@ public class CellItem {
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
-    public static Size ContentSize(string keyName, DataFormat format, string originalText, Font cellfont, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
-        var (s, qi) = GetDrawingData(keyName, format, originalText, style, bildTextverhalten, prefix, suffix, doOpticalTranslation, opticalReplace, scale, constantHeightOfImageCode);
+    public static Size ContentSize(string keyName, string originalText, Font cellfont, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
+        var (s, qi) = GetDrawingData(keyName, originalText, style, bildTextverhalten, prefix, suffix, doOpticalTranslation, opticalReplace, scale, constantHeightOfImageCode);
 
         return cellfont.FormatedText_NeededSize(s, qi, minSize);
     }
@@ -63,7 +63,7 @@ public class CellItem {
     public static Size ContentSize(ColumnItem column, RowItem row, Font cellFont, int pix16) {
         if (column.Database is not Database db || db.IsDisposed) { return new Size(pix16, pix16); }
 
-        if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
             return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, cellFont, pix16)
                 : new Size(pix16, pix16);
@@ -77,17 +77,17 @@ public class CellItem {
         if (column.MultiLine) {
             var tmp = db.Cell.GetString(column, row).SplitAndCutByCrAndBr();
             if (column.ShowMultiLineInOneLine) {
-                contentSize = ContentSize(column.KeyName, column.Format, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+                contentSize = ContentSize(column.KeyName, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
             } else {
                 foreach (var thisString in tmp) {
-                    var tmpSize = ContentSize(column.KeyName, column.Format, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+                    var tmpSize = ContentSize(column.KeyName, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
                     contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
                     contentSize.Height += Math.Max(tmpSize.Height, pix16);
                 }
             }
         } else {
             var txt = db.Cell.GetString(column, row);
-            contentSize = ContentSize(column.KeyName, column.Format, txt, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+            contentSize = ContentSize(column.KeyName, txt, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
         }
         contentSize.Width = Math.Max(contentSize.Width, pix16);
         contentSize.Height = Math.Max(contentSize.Height, pix16);
@@ -95,8 +95,8 @@ public class CellItem {
         return contentSize;
     }
 
-    public static (string text, QuickImage? qi) GetDrawingData(string additionalname, DataFormat format, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
-        var tmpText = ValueReadable(originalText, style, format, bildTextverhalten, true, prefix, suffix, doOpticalTranslation, opticalReplace);
+    public static (string text, QuickImage? qi) GetDrawingData(string additionalname, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
+        var tmpText = ValueReadable(originalText, style, bildTextverhalten, true, prefix, suffix, doOpticalTranslation, opticalReplace);
 
         #region  tmpImageCode
 
@@ -106,7 +106,7 @@ public class CellItem {
             var imgtxt = tmpText;
 
             if (bildTextverhalten == BildTextVerhalten.Nur_Bild) {
-                imgtxt = ValueReadable(originalText, style, format, BildTextVerhalten.Nur_Text, true, prefix, suffix, doOpticalTranslation, opticalReplace);
+                imgtxt = ValueReadable(originalText, style, BildTextVerhalten.Nur_Text, true, prefix, suffix, doOpticalTranslation, opticalReplace);
             }
 
             if (!string.IsNullOrEmpty(imgtxt)) {
@@ -142,7 +142,6 @@ public class CellItem {
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="style"></param>
-    /// <param name="format"></param>
     /// <param name="bildTextverhalten"></param>
     /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
     /// <param name="prefix"></param>
@@ -150,46 +149,17 @@ public class CellItem {
     /// <param name="doOpticalTranslation"></param>
     /// <param name="opticalReplace"></param>
     /// <returns></returns>
-    public static string ValueReadable(string txt, ShortenStyle style, DataFormat format, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
+    public static string ValueReadable(string txt, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
-        switch (format) {
-            case DataFormat.Text:
-            case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
-            case DataFormat.RelationText:
-            case DataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
-
-                txt = LanguageTool.PrepaireText(txt, style, prefix, suffix, doOpticalTranslation, opticalReplace);
-                if (removeLineBreaks) {
-                    txt = txt.Replace("\r\n", " ");
-                    txt = txt.Replace("\r", " ");
-                }
-                break;
-
-            case DataFormat.Button:
-                txt = LanguageTool.PrepaireText(txt, style, prefix, suffix, doOpticalTranslation, opticalReplace);
-                break;
-
-            //case DataFormat.FarbeInteger:
-            //    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(DataFormat.FarbeInteger)) {
-            //        var col = Color.FromArgb(IntParse(txt));
-            //        txt = col.ToHTMLCode().ToUpper();
-            //    }
-            //    txt = LanguageTool.ColumnReplace(txt, column, style);
-            //    break;
-
-            case DataFormat.Schrift:
-                //    Develop.DebugPrint_NichtImplementiert();
-                //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
-                //if (CompactView) { return string.Empty; }
-                //return BlueFont.Get(Txt).ReadableText();
-                return txt;
-
-            default:
-                Develop.DebugPrint(format);
-                break;
+        txt = LanguageTool.PrepaireText(txt, style, prefix, suffix, doOpticalTranslation, opticalReplace);
+        if (removeLineBreaks) {
+            txt = txt.Replace("\r\n", " ");
+            txt = txt.Replace("\r", " ");
         }
+
         if (style != ShortenStyle.HTML) { return txt; }
+
         txt = txt.Replace("\r\n", "<br>");
         txt = txt.Replace("\r", "<br>");
         while (txt.StartsWith(" ") || txt.StartsWith("<br>") || txt.EndsWith(" ") || txt.EndsWith("<br>")) {
@@ -202,23 +172,23 @@ public class CellItem {
     public static List<string>? ValuesReadable(ColumnItem? column, RowItem? row, ShortenStyle style) {
         if (column == null || row == null) { return null; }
 
-        if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             Develop.DebugPrint(FehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
         }
 
         List<string> ret = [];
         if (!column.MultiLine) {
-            ret.Add(ValueReadable(row.CellGetString(column), style, column.Format, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace));
+            ret.Add(ValueReadable(row.CellGetString(column), style, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace));
             return ret;
         }
 
         var x = row.CellGetList(column);
         foreach (var thisstring in x) {
-            ret.Add(ValueReadable(thisstring, style, column.Format, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace));
+            ret.Add(ValueReadable(thisstring, style, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace));
         }
 
         if (x.Count == 0) {
-            var tmp = ValueReadable(string.Empty, style, column.Format, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace);
+            var tmp = ValueReadable(string.Empty, style, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace);
             if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
         }
         return ret;

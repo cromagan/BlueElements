@@ -143,7 +143,7 @@ public enum DatabaseDataType : byte {
 
     ColumnCaption = 101,
     MultiLine = 102,
-    ColumnFormat = 103,
+    ColumnFunction = 103,
     ForeColor = 104,
     BackColor = 105,
     AdditionalFormatCheck = 106,

@@ -575,7 +575,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
         ColumnItem? gbColumn;
 
-        if (column?.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+        if (column?.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
         } else {
             gbColumn = column;
@@ -732,8 +732,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             return;
         }
 
-        switch (column.Format) {
-            case DataFormat.Verknüpfung_zu_anderer_Datenbank:
+        switch (column.Function) {
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                 _ = GetRealColumn(column, row);
                 ValueSet(row.CellGetString(column), true);
                 break;
@@ -755,7 +755,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         var (column, _) = GetTmpVariables();
 
         if (column == null || column.IsDisposed) { return; }
-        if (column.Format != DataFormat.RelationText) { return; }
+        if (column.Function != ColumnFunction.RelationText) { return; }
         Marker.RunWorkerAsync();
     }
 

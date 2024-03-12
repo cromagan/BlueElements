@@ -24,6 +24,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -51,7 +52,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumnItem in db.Column) {
-            if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
+            if (thisColumnItem != null && thisColumnItem.Function == ColumnFunction.RelationText) {
                 _column = thisColumnItem;
                 break;
             }

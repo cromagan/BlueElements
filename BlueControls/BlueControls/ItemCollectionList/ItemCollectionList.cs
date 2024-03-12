@@ -178,8 +178,8 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         l.AddRange(column.DropDownItems);
         if (column.DropdownWerteAndererZellenAnzeigen) { l.AddRange(column.Contents()); }
 
-        switch (column.Format) {
-            case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
+        switch (column.Function) {
+            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 var db2 = column.LinkedDatabase;
                 if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
 

@@ -136,7 +136,6 @@
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="MultiUserFile\MultiUserFile.cs" />
     <Compile Include="Enums\SW.cs" />
-    <Compile Include="Enums\DataFormat.cs" />
     <Compile Include="Enums\FehlerArt.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="ParsebleItem.cs" />

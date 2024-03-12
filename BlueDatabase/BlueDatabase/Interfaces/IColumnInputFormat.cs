@@ -36,7 +36,7 @@ public interface IColumnInputFormat : IInputFormat {
     public bool DropdownBearbeitungErlaubt { get; set; }
     public ReadOnlyCollection<string> DropDownItems { get; set; }
     public bool DropdownWerteAndererZellenAnzeigen { get; set; }
-    public DataFormat Format { get; set; }
+    public ColumnFunction Function { get; set; }
     public ScriptType ScriptType { get; set; }
     public SortierTyp SortType { get; set; }
     public bool TextBearbeitungErlaubt { get; set; }
@@ -61,7 +61,7 @@ public static class ColumnInputFormatExtensions {
         t.DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
         t.DropDownItems = source.DropDownItems;
         t.DropdownWerteAndererZellenAnzeigen = source.DropdownWerteAndererZellenAnzeigen;
-        t.Format = source.Format;
+        t.Function = source.Function;
         t.ScriptType = source.ScriptType;
         t.SortType = source.SortType;
         t.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;

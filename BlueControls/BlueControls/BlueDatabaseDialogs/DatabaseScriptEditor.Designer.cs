@@ -35,6 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAendertWerte = new BlueControls.Controls.Button();
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
+            this.chkAuslöser_keyvaluechanged = new BlueControls.Controls.Button();
             this.chkAuslöser_databaseloaded = new BlueControls.Controls.Button();
             this.chkAuslöser_export = new BlueControls.Controls.Button();
             this.chkAuslöser_newrow = new BlueControls.Controls.Button();
@@ -248,6 +249,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpAuslöser
             // 
             this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpAuslöser.Controls.Add(this.chkAuslöser_keyvaluechanged);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_databaseloaded);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
@@ -260,6 +262,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAuslöser.TabIndex = 23;
             this.grpAuslöser.TabStop = false;
             this.grpAuslöser.Text = "Auslöser";
+            // 
+            // chkAuslöser_keyvaluechanged
+            // 
+            this.chkAuslöser_keyvaluechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslöser_keyvaluechanged.Location = new System.Drawing.Point(8, 96);
+            this.chkAuslöser_keyvaluechanged.Name = "chkAuslöser_keyvaluechanged";
+            this.chkAuslöser_keyvaluechanged.QuickInfo = "Das Skript wird nach dem Ändern eines\r\nWertes einer Zelle ausgeführt, wenn die Sp" +
+    "alte\r\nals Schlüsselspalte definiert ist.";
+            this.chkAuslöser_keyvaluechanged.Size = new System.Drawing.Size(176, 32);
+            this.chkAuslöser_keyvaluechanged.TabIndex = 23;
+            this.chkAuslöser_keyvaluechanged.Text = "Schlüsselspalte -Wert geändert";
+            this.chkAuslöser_keyvaluechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_databaseloaded
             // 
@@ -276,7 +290,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_export
             // 
             this.chkAuslöser_export.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 120);
+            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 152);
             this.chkAuslöser_export.Name = "chkAuslöser_export";
             this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
     " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
@@ -321,7 +335,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_prepaireformula
             // 
             this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 104);
+            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 136);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
             this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird verwendet zur Datenkonsitenzprüfung\r\nund für Variablen für Formul" +
     "are.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen oder\r\nlange dauernd" +
@@ -384,7 +398,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstEventScripts.CheckBehavior = BlueControls.Enums.CheckBehavior.SingleSelection;
+            this.lstEventScripts.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
             this.lstEventScripts.Location = new System.Drawing.Point(8, 16);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
@@ -648,5 +662,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capQuickInfo;
         private Caption capImage;
         private TextBox txbQuickInfo;
+        private Button chkAuslöser_keyvaluechanged;
     }
 }

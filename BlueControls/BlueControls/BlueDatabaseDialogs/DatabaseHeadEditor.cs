@@ -326,8 +326,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
 
         _ = e.UserMenu.Add("Sortierung", true);
-        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
-        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Function.CanBeChangedByRules());
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Function.CanBeChangedByRules());
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

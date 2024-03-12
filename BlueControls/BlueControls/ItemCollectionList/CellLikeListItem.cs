@@ -75,13 +75,13 @@ public class CellLikeListItem : AbstractListItem {
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
         if (_styleLikeThis == null) { return false; }
-        var txt = CellItem.ValueReadable(Internal, ShortenStyle.Both, _styleLikeThis.Format, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = CellItem.ValueReadable(Internal, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         return txt.ToUpper().Contains(filterText.ToUpper());
     }
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => CellItem.ContentSize(_styleLikeThis.KeyName, _styleLikeThis.Format, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => CellItem.ContentSize(_styleLikeThis.KeyName, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
@@ -100,7 +100,7 @@ public class CellLikeListItem : AbstractListItem {
             return string.Empty;
         }
         // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
-        var txt = CellItem.ValueReadable(Internal, ShortenStyle.HTML, _styleLikeThis.Format, _bildTextverhalten, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = CellItem.ValueReadable(Internal, ShortenStyle.HTML, _bildTextverhalten, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils
         var compareKey = txt.CompareKey(_styleLikeThis.SortType);
         // Rückgabe des Compare-Keys mit dem internen Wert

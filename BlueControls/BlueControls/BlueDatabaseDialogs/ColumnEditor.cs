@@ -212,7 +212,7 @@ internal sealed partial class ColumnEditor {
     }
 
     private void ButtonCheck() {
-        var tmpFormat = (DataFormat)IntParse(cbxFormat.Text);
+        var tmpFormat = (ColumnFunction)IntParse(cbxFunction.Text);
         // Mehrzeilig
         btnMultiline.Enabled = tmpFormat.MultilinePossible();
         if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
@@ -241,7 +241,7 @@ internal sealed partial class ColumnEditor {
         //grpVerlinkteZellen.Enabled = tmpFormat is DataFormat.Verknüpfung_zu_anderer_Datenbank;
     }
 
-    private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
+    private void cbxFunction_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
 
     /// <summary>
     /// Kümmert sich um erlaubte Spalten für LinkedCell
@@ -266,7 +266,7 @@ internal sealed partial class ColumnEditor {
             //    //}
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
-                if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Format.CanBeChangedByRules() && !thisLinkedColumn.Format.NeedTargetDatabase()) {
+                if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Function.CanBeChangedByRules() && !thisLinkedColumn.Function.NeedTargetDatabase()) {
                     _ = cbxTargetColumn.Item.Add(thisLinkedColumn);
                 }
             }
@@ -290,7 +290,7 @@ internal sealed partial class ColumnEditor {
 
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
-        cbxFormat.Item.AddRange(typeof(DataFormat));
+        cbxFunction.Item.AddRange(typeof(ColumnFunction));
         cbxRandLinks.Item.AddRange(typeof(ColumnLineStyle));
         cbxRandRechts.Item.AddRange(typeof(ColumnLineStyle));
         cbxBildTextVerhalten.Item.AddRange(typeof(BildTextVerhalten));
@@ -344,7 +344,7 @@ internal sealed partial class ColumnEditor {
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToString();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).ToString();
         btnMultiline.Checked = _column.MultiLine;
-        cbxFormat.Text = ((int)_column.Format).ToString();
+        cbxFunction.Text = ((int)_column.Function).ToString();
         cbxRandLinks.Text = ((int)_column.LineLeft).ToString();
         cbxRandRechts.Text = ((int)_column.LineRight).ToString();
         cbxAlign.Text = ((int)_column.Align).ToString();
@@ -443,7 +443,7 @@ internal sealed partial class ColumnEditor {
         }
 
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-        _column.Format = (DataFormat)IntParse(cbxFormat.Text);
+        _column.Function = (ColumnFunction)IntParse(cbxFunction.Text);
         _column.QuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
         _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
         _column.Suffix = cbxEinheit.Text;
@@ -546,6 +546,7 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(Database.UniqueKeyValue());
+            //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
@@ -567,7 +568,7 @@ internal sealed partial class ColumnEditor {
             var or = b.OpticalReplace.Clone();
 
             foreach (var thisColumn in db2.Column) {
-                if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine) {
+                if (thisColumn.Function.CanBeCheckedByRules() && !thisColumn.MultiLine) {
                     dd.Add("~" + thisColumn.KeyName.ToLower() + "~");
                     or.Add("~" + thisColumn.KeyName.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
@@ -581,6 +582,10 @@ internal sealed partial class ColumnEditor {
 
             car[1].Add(sp, false);
             car[1].Add(b, false);
+
+            //car[1].ShowAllColumns();
+            //car[1].Hide("visible");
+            //car[1].HideSystemColumns();
 
             db.ColumnArrangements = car.AsReadOnly();
 
@@ -606,7 +611,7 @@ internal sealed partial class ColumnEditor {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
                 r.CellSet("SpalteName", col.KeyName, string.Empty);
 
-                if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
+                if (col.Function.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Function.NeedTargetDatabase() && !col.IsSystemColumn()) {
                     r.CellSet("visible", true, string.Empty);
                 } else {
                     r.CellSet("visible", false, string.Empty);

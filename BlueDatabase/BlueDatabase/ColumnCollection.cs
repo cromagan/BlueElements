@@ -250,7 +250,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(thisColumnItem.Column.KeyName);
                 da.CellAdd(thisColumnItem.Column.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.Column.CaptionGroup1 + "/" + thisColumnItem.Column.CaptionGroup2 + "/" + thisColumnItem.Column.CaptionGroup3 + "/").TrimEnd("/"));
-                var name = "{" + thisColumnItem.Column.Format + "}";
+                var name = "{" + thisColumnItem.Column.Function + "}";
                 foreach (var thisFormat in FormatHolder.AllFormats) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem.Column)) { name = thisFormat.Name; }
                 }
@@ -490,6 +490,15 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         return "Befehl unbekannt";
+    }
+
+    internal bool HasKeyColumns() {
+        foreach (var thisColumn in _internal) {
+            if (thisColumn.Value.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();

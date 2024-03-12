@@ -77,7 +77,7 @@ public readonly struct SplittedAttributesFeedback {
     public bool ReadOnly(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return true; }
 
-        return Attributes[varno] is Variable vs ? vs.ReadOnly : true;
+        return Attributes[varno] is not Variable vs || vs.ReadOnly;
     }
 
     public Bitmap? ValueBitmapGet(int varno) {
@@ -89,7 +89,7 @@ public readonly struct SplittedAttributesFeedback {
     public bool ValueBoolGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return false; }
 
-        return Attributes[varno] is VariableBool vs ? vs.ValueBool : false;
+        return Attributes[varno] is VariableBool vs && vs.ValueBool;
     }
 
     public DateTime? ValueDateGet(int varno) {

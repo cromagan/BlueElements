@@ -23,6 +23,7 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -97,7 +98,7 @@ internal sealed partial class SearchAndReplace : Form {
             if (_table.CursorPosColumn == null) {
                 canDo = false;
             } else {
-                if (!_table.CursorPosColumn.Format.CanBeCheckedByRules()) { canDo = false; }
+                if (!_table.CursorPosColumn.Function.CanBeCheckedByRules()) { canDo = false; }
             }
         }
         if (Alt.Text == Neu.Text) {
@@ -120,7 +121,7 @@ internal sealed partial class SearchAndReplace : Form {
         if (NurinAktuellerSpalte.Checked) {
             if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
         } else {
-            sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
+            sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
             if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToList())) {

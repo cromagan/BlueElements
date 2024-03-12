@@ -73,8 +73,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnFormatierungErlaubt = new BlueControls.Controls.Button();
             this.cbxAdditionalCheck = new BlueControls.Controls.ComboBox();
             this.capcbxAdditionalCheck = new BlueControls.Controls.Caption();
-            this.cbxFormat = new BlueControls.Controls.ComboBox();
-            this.capFormat = new BlueControls.Controls.Caption();
+            this.cbxFunction = new BlueControls.Controls.ComboBox();
+            this.capFunction = new BlueControls.Controls.Caption();
             this.btnMultiline = new BlueControls.Controls.Button();
             this.tabBearbeitung = new System.Windows.Forms.TabPage();
             this.grpAuswahlmenuOptionen = new BlueControls.Controls.GroupBox();
@@ -590,26 +590,26 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capcbxAdditionalCheck.Text = "Zusätzliche Prüfung, ob der eingegeben Wert konsitent ist zu:";
             this.capcbxAdditionalCheck.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // cbxFormat
+            // cbxFunction
             // 
-            this.cbxFormat.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxFormat.Location = new System.Drawing.Point(8, 32);
-            this.cbxFormat.Name = "cbxFormat";
-            this.cbxFormat.RaiseChangeDelay = 0;
-            this.cbxFormat.Regex = null;
-            this.cbxFormat.Size = new System.Drawing.Size(312, 24);
-            this.cbxFormat.TabIndex = 27;
-            this.cbxFormat.TextChanged += new System.EventHandler(this.cbxFormat_TextChanged);
+            this.cbxFunction.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxFunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxFunction.Location = new System.Drawing.Point(8, 32);
+            this.cbxFunction.Name = "cbxFunction";
+            this.cbxFunction.RaiseChangeDelay = 0;
+            this.cbxFunction.Regex = null;
+            this.cbxFunction.Size = new System.Drawing.Size(312, 24);
+            this.cbxFunction.TabIndex = 27;
+            this.cbxFunction.TextChanged += new System.EventHandler(this.cbxFunction_TextChanged);
             // 
-            // capFormat
+            // capFunction
             // 
-            this.capFormat.CausesValidation = false;
-            this.capFormat.Location = new System.Drawing.Point(8, 16);
-            this.capFormat.Name = "capFormat";
-            this.capFormat.Size = new System.Drawing.Size(136, 16);
-            this.capFormat.Text = "Funktion:";
-            this.capFormat.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capFunction.CausesValidation = false;
+            this.capFunction.Location = new System.Drawing.Point(8, 16);
+            this.capFunction.Name = "capFunction";
+            this.capFunction.Size = new System.Drawing.Size(136, 16);
+            this.capFunction.Text = "Funktion:";
+            this.capFunction.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnMultiline
             // 
@@ -1315,8 +1315,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDatenFormat.Controls.Add(this.capcbxAdditionalCheck);
             this.tabDatenFormat.Controls.Add(this.cbxScriptType);
             this.tabDatenFormat.Controls.Add(this.capScriptType);
-            this.tabDatenFormat.Controls.Add(this.cbxFormat);
-            this.tabDatenFormat.Controls.Add(this.capFormat);
+            this.tabDatenFormat.Controls.Add(this.cbxFunction);
+            this.tabDatenFormat.Controls.Add(this.capFunction);
             this.tabDatenFormat.Controls.Add(this.btnMultiline);
             this.tabDatenFormat.Location = new System.Drawing.Point(4, 25);
             this.tabDatenFormat.Name = "tabDatenFormat";
@@ -1627,13 +1627,13 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption Caption13;
         private TextBox txbAllowedChars;
         private Caption capImmerWerte;
-        private Caption capFormat;
+        private Caption capFunction;
         private Caption Caption18;
         private TextBox txbAdminInfo;
         private Caption Caption17;
         private Button btnOtherValuesToo;
         private ListBox lbxCellEditor;
-        private ComboBox cbxFormat;
+        private ComboBox cbxFunction;
         private TextBox txbTags;
         private TabControl tabControl;
         private TabPage tabAnzeige;
