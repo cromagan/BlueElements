@@ -17,8 +17,11 @@
 
 #nullable enable
 
+using System;
+
 namespace BlueControls.Enums;
 
+[Flags]
 public enum AllowedInputFilter {
     None = 1,
     One = 2,

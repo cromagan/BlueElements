@@ -36,9 +36,9 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
 
     public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false);
 
-    internal Brush? BrushColorMain;
+    internal Brush BrushColorMain = Brushes.Red;
 
-    internal Brush? BrushColorOutline;
+    internal Brush BrushColorOutline = Brushes.Red;
 
     private static readonly List<BlueFont> FontsAll = [];
 
@@ -482,21 +482,24 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     }
 
     internal SizeF Compute_Size(char c) {
-        if (c is >= (char)0 and <= (char)31) { return new SizeF(0, _zeilenabstand); }
-
-        SizeF s;
-
-        if (Kapitälchen && char.ToUpper(c) != c) {
-            s = MeasureString("." + char.ToUpper(c) + ".", StringFormat.GenericTypographic);
-            s = s with { Width = s.Width * 0.8f };
-        } else if (OnlyUpper) {
-            s = _fontOl.MeasureString("." + char.ToUpper(c) + ".", StringFormat.GenericTypographic);
-        } else if (OnlyLower) {
-            s = _fontOl.MeasureString("." + char.ToLower(c) + ".", StringFormat.GenericTypographic);
-        } else {
-            s = _fontOl.MeasureString("." + c + ".", StringFormat.GenericTypographic);
+        if (c <= (char)31) {
+            return new SizeF(0, _zeilenabstand);
         }
 
+        string characterToMeasure;
+        if (Kapitälchen && char.ToUpper(c) != c) {
+            characterToMeasure = char.ToUpper(c).ToString();
+        } else if (OnlyUpper) {
+            characterToMeasure = char.ToUpper(c).ToString();
+        } else if (OnlyLower) {
+            characterToMeasure = char.ToLower(c).ToString();
+        } else {
+            characterToMeasure = char.ToString(c);
+        }
+        var s = _fontOl.MeasureString($".{characterToMeasure}.", StringFormat.GenericTypographic);
+        if (Kapitälchen && char.ToUpper(c) != c) {
+            s = s with { Width = s.Width * 0.8f };
+        }
         return new SizeF(s.Width - _widthOf2Points, _zeilenabstand);
     }
 
@@ -527,7 +530,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     }
 
     private Pen GeneratePen(float zoom) {
-        var linDi = _zeilenabstand / 10 * zoom;
+        var linDi = (float)_zeilenabstand / 10 * zoom;
         if (Bold) { linDi *= 1.5F; }
         return new Pen(ColorMain, linDi);
     }

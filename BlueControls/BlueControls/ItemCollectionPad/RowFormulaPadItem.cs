@@ -208,7 +208,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             pad.ShowInPrintMode = true;
             pad.Unselect();
-            if (Parent.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
+            if (Parent?.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
             pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, string.Empty);
             GeneratedBitmap = generatedBitmap;
         }

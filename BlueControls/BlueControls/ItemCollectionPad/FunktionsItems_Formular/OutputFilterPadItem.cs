@@ -45,10 +45,9 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendSomething _itemSends;
-    private ColumnItem? _column;
     private string _columnName = string.Empty;
-    private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
-    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+    private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
+    private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     //private string _anzeige = string.Empty;
     //private string _überschrift = string.Empty;
@@ -77,16 +76,6 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public static string ClassId => "FI-InputOutputElement";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
-    //[Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
-    //public string Anzeige {
-    //    get => _anzeige;
-    //    set {
-    //        if (IsDisposed) { return; }
-    //        if (_anzeige == value) { return; }
-    //        _anzeige = value;
-    //        OnChanged();
-    //    }
-    //}
 
     public bool AutoSizeableHeight => false;
 
@@ -135,11 +124,11 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.";
 
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
-        get => _filterart_bei_texteingabe;
+        get => _filterart_Bei_Texteingabe;
         set {
             if (IsDisposed) { return; }
-            if (_filterart_bei_texteingabe == value) { return; }
-            _filterart_bei_texteingabe = value;
+            if (_filterart_Bei_Texteingabe == value) { return; }
+            _filterart_Bei_Texteingabe = value;
             OnChanged();
         }
     }
@@ -161,24 +150,14 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-        get => _standard_bei_keiner_Eingabe;
+        get => _standard_Bei_Keiner_Eingabe;
         set {
             if (IsDisposed) { return; }
-            if (_standard_bei_keiner_Eingabe == value) { return; }
-            _standard_bei_keiner_Eingabe = value;
+            if (_standard_Bei_Keiner_Eingabe == value) { return; }
+            _standard_Bei_Keiner_Eingabe = value;
             OnChanged();
         }
     }
-
-    //public string Überschrift {
-    //    get => _überschrift;
-    //    set {
-    //        if (IsDisposed) { return; }
-    //        if (_überschrift == value) { return; }
-    //        _überschrift = value;
-    //        OnChanged();
-    //    }
-    //}
 
     protected override int SaveOrder => 1;
 
@@ -199,8 +178,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlForFilter(Column, _überschriftanordung) {
-            Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe,
-            Filterart_bei_Texteingabe = _filterart_bei_texteingabe,
+            Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
+            Filterart_bei_Texteingabe = _filterart_Bei_Texteingabe,
         };
         //return con;
         con.DoOutputSettings(this);
@@ -283,11 +262,11 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
                 return true;
 
             case "defaultemptyfilter":
-                _standard_bei_keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
+                _standard_Bei_Keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
                 return true;
 
             case "defaulttextfilter":
-                _filterart_bei_texteingabe = (FlexiFilterDefaultFilter)IntParse(value);
+                _filterart_Bei_Texteingabe = (FlexiFilterDefaultFilter)IntParse(value);
                 return true;
 
                 //case "captiontext":
@@ -329,8 +308,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         //result.ParseableAdd("CaptionText", _überschrift);
         //result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("Caption", _überschriftanordung);
-        result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
-        result.ParseableAdd("DefaultTextFilter", _filterart_bei_texteingabe);
+        result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
+        result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
 
         return result.Parseable(base.ToString());
     }

@@ -56,7 +56,6 @@ public class CellItem {
     /// </summary>
     public static Size ContentSize(string keyName, string originalText, Font cellfont, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
         var (s, qi) = GetDrawingData(keyName, originalText, style, bildTextverhalten, prefix, suffix, doOpticalTranslation, opticalReplace, scale, constantHeightOfImageCode);
-
         return cellfont.FormatedText_NeededSize(s, qi, minSize);
     }
 

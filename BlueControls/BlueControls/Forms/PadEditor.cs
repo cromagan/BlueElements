@@ -176,8 +176,6 @@ public partial class PadEditor : PadEditorReadOnly {
         if (bpi is IErrorCheckable iec && !iec.IsOk()) {
             flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
             flexis.Insert(0, new FlexiControl("Achtung!", stdWidth, true));
-
-
         }
 
         flexis.Insert(0, new FlexiControl(bpi.Description, stdWidth, false)); // Beschreibung
@@ -231,7 +229,11 @@ public partial class PadEditor : PadEditorReadOnly {
         }
     }
 
-    private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
+    private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        if (Pad?.Item != null && Skin.StyleDb?.Row != null) {
+            Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
+        }
+    }
 
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterAnzeige.Text.IsNumeral()) { return; }

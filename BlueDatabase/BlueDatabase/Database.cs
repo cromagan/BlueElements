@@ -1602,15 +1602,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-            //if (deleteImportet) {
-            Save();
-
-            if (HasPendingChanges) { return "Speicher-Fehler!"; }
-            db.Dispose();
-            //db = null;
-            var d = DeleteFile(thisFile, false);
-            if (!d) { return "Lösch-Fehler!"; }
-            //}
+            if (deleteImportet) {
+                Save();
+                if (HasPendingChanges) { return "Speicher-Fehler!"; }
+                db.Dispose();
+                var d = DeleteFile(thisFile, false);
+                if (!d) { return "Lösch-Fehler!"; }
+            }
         }
 
         return string.Empty;
