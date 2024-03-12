@@ -79,6 +79,24 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
             return new DoItFeedback(infos.Data, "Fehler im Filter");
         }
 
+        foreach (var thisFi in allFi) {
+            if (thisFi.Column is not ColumnItem c) {
+                return new DoItFeedback(infos.Data, "Fehler im Filter, Spalte ungültig");
+            }
+
+            if (thisFi.FilterType is not Enums.FilterType.Istgleich and not Enums.FilterType.Istgleich_GroßKleinEgal) {
+                return new DoItFeedback(infos.Data, "Fehler im Filter, nur 'is' ist erlaubt");
+            }
+
+            if (thisFi.SearchValue.Count != 1) {
+                return new DoItFeedback(infos.Data, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
+            }
+            var l = allFi.InitValue(c, true);
+            if (thisFi.SearchValue[0] != l) {
+                return new DoItFeedback(infos.Data, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
+            }
+        }
+
         var r = allFi.Rows;
 
         if (r.Count > 1) {

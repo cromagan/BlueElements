@@ -2400,6 +2400,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             case ColumnFunction.Button:
                 return EditTypeTable.None;
 
+            case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
+                return EditTypeTable.None;
+
             default:
                 if (function.TextboxEditPossible()) {
                     if (!doDropDown) {

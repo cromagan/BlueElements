@@ -47,7 +47,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private AddType _addAlloweds = AddType.Text;
     private ListBoxAppearance _appearance;
     private bool _autosort = true;
-    private CheckBehavior _checkBehavior;
+    private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
     private List<string> _checked = [];
     private string _filterText = string.Empty;
 
@@ -476,7 +476,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void btnMinus_Click(object sender, System.EventArgs e) {
         if (_mouseOverItem == null) { return; }
 
-        //if (_checkBehavior == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
+        //if (_checkBehaviorx == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
         if (CheckboxDesign() != Design.Undefiniert) { return; }
 
         UnCheck(_mouseOverItem);

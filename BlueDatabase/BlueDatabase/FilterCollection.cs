@@ -299,13 +299,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <param name="column"></param>
     /// <returns></returns>
     public string InitValue(ColumnItem column, bool firstToo) {
-        if (this.Count == 0) { return string.Empty; }
+        if (Count == 0) { return string.Empty; }
         if (column == null || column.IsDisposed) { return string.Empty; }
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
 
         if (column.Function is not ColumnFunction.Normal
-                        and not ColumnFunction.RelationText
-                        and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
+                           and not ColumnFunction.RelationText
+                           and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
 
         if (!firstToo && db.Column.First() == column) { return string.Empty; }
 
@@ -318,15 +318,15 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == db.Column.SysRowState) { return string.Empty; }
 
         var fi = this[column];
-
         if (fi == null) { return string.Empty; }
+
         if (fi.FilterType is not FilterType.Istgleich
-                        and not FilterType.Istgleich_GroﬂKleinEgal
-                        and not FilterType.Istgleich_ODER_GroﬂKleinEgal
-                        and not FilterType.Istgleich_UND_GroﬂKleinEgal
-                        and not FilterType.Instr
-                        and not FilterType.Instr_GroﬂKleinEgal
-                        and not FilterType.Instr_UND_GroﬂKleinEgal) { return string.Empty; }
+                         and not FilterType.Istgleich_GroﬂKleinEgal
+                         and not FilterType.Istgleich_ODER_GroﬂKleinEgal
+                         and not FilterType.Istgleich_UND_GroﬂKleinEgal
+                         and not FilterType.Instr
+                         and not FilterType.Instr_GroﬂKleinEgal
+                         and not FilterType.Instr_UND_GroﬂKleinEgal) { return string.Empty; }
 
         return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
     }
