@@ -42,7 +42,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
-public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedback {
+public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -76,8 +76,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     public event PrintEventHandler? BeginnPrint;
 
-    public event EventHandler? Changed;
-
     public event EventHandler? ClickedItemChanged;
 
     public event EventHandler? ClickedItemChanging;
@@ -99,6 +97,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     public event EventHandler<ListEventArgs>? ItemRemoving;
 
     public event PrintPageEventHandler? PrintPage;
+
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -134,14 +134,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 _item.ItemRemoved -= _Item_ItemRemoved;
                 _item.ItemRemoving -= _Item_ItemRemoving;
                 _item.ItemAdded -= _Item_ItemAdded;
-                _item.Changed -= Item_Changed;
+                _item.PropertyChanged -= Item_PropertyChanged;
             }
             _item = value;
             if (_item != null) {
                 _item.ItemRemoved += _Item_ItemRemoved;
                 _item.ItemRemoving += _Item_ItemRemoving;
                 _item.ItemAdded += _Item_ItemAdded;
-                _item.Changed += Item_Changed;
+                _item.PropertyChanged += Item_PropertyChanged;
             }
             Invalidate();
             OnGotNewItemCollection();
@@ -293,8 +293,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                                         thisItem.Contains(p, Zoom)).ToList();
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
@@ -305,6 +303,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
     public void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
+
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void OpenSaveDialog(string title) {
         title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
@@ -609,10 +609,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
-    private void Item_Changed(object sender, System.EventArgs e) {
+    private void Item_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {

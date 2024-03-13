@@ -128,7 +128,7 @@ public class DimensionPadItem : AbstractPadItem {
             if (IsDisposed) { return; }
             if (_textOben == Länge_In_Mm.ToString(CultureInfo.InvariantCulture)) { value = string.Empty; }
             _textOben = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 

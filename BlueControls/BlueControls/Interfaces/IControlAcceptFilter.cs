@@ -238,14 +238,14 @@ public static class ControlAcceptFilterExtension {
     public static void RegisterEvents(this IControlAcceptFilter icaf) {
         if (icaf.FilterInput == null || icaf.FilterInput.IsDisposed) { return; }
         icaf.FilterInput.RowsChanged += icaf.FilterInput_RowsChanged;
-        //icaf.FilterInput.Changed += icaf.FilterOutput_Changed;
+        //icaf.FilterInput.Changed += icaf.FilterOutput_PropertyChanged;
         icaf.FilterInput.DisposingEvent += icaf.FilterInput_DispodingEvent;
     }
 
     public static void UnRegisterEventsAndDispose(this IControlAcceptFilter icaf) {
         if (icaf.FilterInput == null) { return; }
         icaf.FilterInput.RowsChanged -= icaf.FilterInput_RowsChanged;
-        //icaf.FilterInput.Changed -= icaf.FilterOutput_Changed;
+        //icaf.FilterInput.Changed -= icaf.FilterOutput_PropertyChanged;
         icaf.FilterInput.DisposingEvent -= icaf.FilterInput_DispodingEvent;
 
         if (icaf.Parents.Count != 1 && icaf.FilterInput != null) {

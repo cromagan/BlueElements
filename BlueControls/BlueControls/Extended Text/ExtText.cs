@@ -54,7 +54,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtended {
+public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended {
 
     #region Fields
 
@@ -105,7 +105,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -123,7 +123,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             _design = value;
 
             _ = Parallel.ForEach(this, ch => { ch.Design = _design; });
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -146,7 +146,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             if (IsDisposed) { return; }
             if (HtmlText == value) { return; }
             ConvertTextToChar(value, true);
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -166,7 +166,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             if (IsDisposed) { return; }
             if (PlainText == value) { return; }
             ConvertTextToChar(value, false);
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -182,7 +182,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
                     if (ch != null) { ch.State = _state; }
                 });
             } catch { }
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -196,7 +196,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             if (_textDimensions.Width == value.Width && _textDimensions.Height == value.Height) { return; }
             _textDimensions = value;
             ResetPosition(false);
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -207,7 +207,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             if (Math.Abs(value - _zeilenabstand) < 0.01) { return; }
             _zeilenabstand = value;
             ResetPosition(false);
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -355,7 +355,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         return _height == null || _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width + 1, (int)_height + 1);
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void StufeÄndern(int first, int last, int stufe) {
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
@@ -961,7 +961,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             _tmpHtmlText = null;
             _tmpPlainText = null;
         }
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private float Row_SetOnLine(int first, int last) {

@@ -85,7 +85,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
             _überschriftanordung = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -107,7 +107,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             if (IsDisposed) { return; }
             if (_columnName == value) { return; }
             _columnName = value;
-            OnChanged();
+            OnPropertyChanged();
             UpdateSideOptionMenu();
         }
     }
@@ -129,7 +129,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             if (IsDisposed) { return; }
             if (_filterart_Bei_Texteingabe == value) { return; }
             _filterart_Bei_Texteingabe = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -155,7 +155,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             if (IsDisposed) { return; }
             if (_standard_Bei_Keiner_Eingabe == value) { return; }
             _standard_Bei_Keiner_Eingabe = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 

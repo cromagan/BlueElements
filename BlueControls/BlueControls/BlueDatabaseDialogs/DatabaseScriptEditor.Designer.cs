@@ -96,7 +96,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.eventScriptEditor.Size = new System.Drawing.Size(1046, 508);
             this.eventScriptEditor.TabIndex = 6;
             this.eventScriptEditor.TabStop = false;
-            this.eventScriptEditor.Changed += new System.EventHandler(this.ScriptEditor_Changed);
+            this.eventScriptEditor.PropertyChanged += new System.EventHandler(this.ScriptEditor_PropertyChanged);
             this.eventScriptEditor.ExecuteScript += new System.EventHandler<BlueScript.EventArgs.ScriptEventArgs>(this.eventScriptEditor_ExecuteScript);
             // 
             // tbcScriptEigenschaften

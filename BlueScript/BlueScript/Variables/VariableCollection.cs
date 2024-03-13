@@ -106,9 +106,9 @@ public class VariableCollection : IEnumerable<Variable> {
             var v = newValues.Get(newValsPrefix + thisvar.KeyName);
 
             if (v is VariableString vs) {
-                thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
+                thisvar.ReadOnly = false; // weil kein OnPropertyChanged vorhanden ist
                 thisvar.ValueString = vs.ValueString;
-                thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
+                thisvar.ReadOnly = true; // weil kein OnPropertyChanged vorhanden ist
             }
         }
 
@@ -123,9 +123,9 @@ public class VariableCollection : IEnumerable<Variable> {
     //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
 
     //        if (v is VariableString vs) {
-    //            thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
+    //            thisvar.ReadOnly = false; // weil kein OnPropertyChanged vorhanden ist
     //            thisvar.ValueString = vs.ValueString;
-    //            thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
+    //            thisvar.ReadOnly = true; // weil kein OnPropertyChanged vorhanden ist
     //        } else {
     //            vaa.Add((VariableString)thisvar.Clone());
     //        }

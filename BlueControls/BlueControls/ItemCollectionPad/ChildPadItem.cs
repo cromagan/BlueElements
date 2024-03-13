@@ -77,7 +77,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
             if (IsDisposed) { return; }
             if (value == _name) { return; }
             _name = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -85,11 +85,11 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         get => _padInternal;
         set {
             if (_padInternal?.Item != null) {
-                _padInternal.Item.Changed -= _Pad_DoInvalidate;
+                _padInternal.Item.PropertyChanged -= _Pad_DoInvalidate;
             }
             _padInternal = value;
             if (_padInternal?.Item != null) {
-                _padInternal.Item.Changed += _Pad_DoInvalidate;
+                _padInternal.Item.PropertyChanged += _Pad_DoInvalidate;
             }
         }
     }
@@ -259,7 +259,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         if (IsDisposed) { return false; }
         if (PadInternal?.Item == null) { return false; }
         var b = PadInternal.Item.ReplaceVariable(variable);
-        if (b) { OnChanged(); }
+        if (b) { OnPropertyChanged(); }
         return b;
     }
 
@@ -267,7 +267,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         if (IsDisposed) { return false; }
         if (PadInternal?.Item == null) { return false; }
         var b = PadInternal.Item.ResetVariables();
-        if (b) { OnChanged(); }
+        if (b) { OnPropertyChanged(); }
         return b;
     }
 
@@ -369,7 +369,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     //    return null;
     //}
 
-    private void _Pad_DoInvalidate(object sender, System.EventArgs e) => OnChanged();
+    private void _Pad_DoInvalidate(object sender, System.EventArgs e) => OnPropertyChanged();
 
     private void RemovePic() {
         if (_tmpBmp != null) {

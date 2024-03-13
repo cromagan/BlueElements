@@ -40,9 +40,9 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
 
     #region Methods
 
-    void FilterOutput_Changed(object sender, System.EventArgs e);
-
     void FilterOutput_DispodingEvent(object sender, System.EventArgs e);
+
+    void FilterOutput_PropertyChanged(object sender, System.EventArgs e);
 
     #endregion
 }
@@ -75,7 +75,18 @@ public static class ControlSendSomethingExtension {
 
     public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) => dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
 
-    public static void FilterOutput_Changed(this IControlSendFilter icsf) {
+    public static void FilterOutput_DispodingEvent(this IControlSendFilter icsf) {
+        if (icsf.IsDisposed) { return; }
+        icsf.FilterOutput.PropertyChanged -= icsf.FilterOutput_PropertyChanged;
+        icsf.FilterOutput.DisposingEvent -= icsf.FilterOutput_DispodingEvent;
+
+        if (!icsf.FilterOutput.IsDisposed) {
+            icsf.FilterOutput.Database = null;
+            icsf.FilterOutput.Dispose();
+        }
+    }
+
+    public static void FilterOutput_PropertyChanged(this IControlSendFilter icsf) {
         if (icsf.IsDisposed) { return; }
 
         foreach (var thisChild in icsf.Childs) {
@@ -91,21 +102,10 @@ public static class ControlSendSomethingExtension {
         }
     }
 
-    public static void FilterOutput_DispodingEvent(this IControlSendFilter icsf) {
-        if (icsf.IsDisposed) { return; }
-        icsf.FilterOutput.Changed -= icsf.FilterOutput_Changed;
-        icsf.FilterOutput.DisposingEvent -= icsf.FilterOutput_DispodingEvent;
-
-        if (!icsf.FilterOutput.IsDisposed) {
-            icsf.FilterOutput.Database = null;
-            icsf.FilterOutput.Dispose();
-        }
-    }
-
     public static void Invalidate_FilterOutput(this IControlSendFilter icsf) => icsf.FilterOutput.Clear();
 
     public static void RegisterEvents(this IControlSendFilter dest) {
-        dest.FilterOutput.Changed += dest.FilterOutput_Changed;
+        dest.FilterOutput.PropertyChanged += dest.FilterOutput_PropertyChanged;
         dest.FilterOutput.DisposingEvent += dest.FilterOutput_DispodingEvent;
     }
 

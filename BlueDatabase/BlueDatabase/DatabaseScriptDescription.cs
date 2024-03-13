@@ -47,7 +47,7 @@ public static class EventScriptExtension {
     #endregion
 }
 
-public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IChangedFeedback {
+public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -105,7 +105,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (IsDisposed) { return; }
             if (_eventTypes == value) { return; }
             _eventTypes = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -115,7 +115,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (IsDisposed) { return; }
             if (_needRow == value) { return; }
             _needRow = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 

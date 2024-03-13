@@ -27,7 +27,7 @@ using static BlueDatabase.Database;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendFilter : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName, IItemToControl, IErrorCheckable {
+public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IItemToControl, IErrorCheckable {
 
     #region Properties
 
@@ -106,7 +106,7 @@ public sealed class ItemSendSomething {
         _childIds.AddRange(value);
         item.RaiseVersion();
         item.DoChilds();
-        item.OnChanged();
+        item.OnPropertyChanged();
     }
 
     public Database? DatabaseOutputGet() => _databaseOutput;
@@ -118,7 +118,7 @@ public sealed class ItemSendSomething {
         _databaseOutput = value;
         item.RaiseVersion();
         item.DoChilds();
-        item.OnChanged();
+        item.OnPropertyChanged();
         item.UpdateSideOptionMenu();
     }
 
@@ -129,7 +129,7 @@ public sealed class ItemSendSomething {
             item.OutputColorId = item.Parent.GetFreeColorId(item.Page);
         }
         item.DoChilds();
-        item.OnChanged();
+        item.OnPropertyChanged();
     }
 
     public List<GenericControl> GetStyleOptions(IItemSendFilter item, int widthOfControl) {
@@ -157,7 +157,7 @@ public sealed class ItemSendSomething {
         if (_outputColorId == value) { return; }
 
         _outputColorId = value;
-        item.OnChanged();
+        item.OnPropertyChanged();
     }
 
     public List<string> ParsableTags() {

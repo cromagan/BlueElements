@@ -82,7 +82,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             if (value == _ausrichtung) { return; }
             _ausrichtung = value;
             InvalidateText();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -105,7 +105,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             _textReplaced = value;
             InvalidateText();
             SizeChanged();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -178,7 +178,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         if (nt == _textReplaced) { return false; }
         _textReplaced = nt;
         InvalidateText();
-        OnChanged();
+        OnPropertyChanged();
         return true;
     }
 
@@ -187,7 +187,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         if (_textOriginal == _textReplaced) { return false; }
         _textReplaced = _textOriginal;
         InvalidateText();
-        OnChanged();
+        OnPropertyChanged();
         return true;
     }
 

@@ -28,8 +28,8 @@ public class ReadableListItem : TextListItem {
     public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, userDefCompareKey) {
         Item = item;
 
-        if (item is IChangedFeedback it2) {
-            it2.Changed += Item_Changed;
+        if (item is IPropertyChangedFeedback it2) {
+            it2.PropertyChanged += Item_PropertyChanged;
         }
     }
 
@@ -50,11 +50,11 @@ public class ReadableListItem : TextListItem {
         return l;
     }
 
-    private void Item_Changed(object sender, System.EventArgs e) {
+    private void Item_PropertyChanged(object sender, System.EventArgs e) {
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();
         Internal = Item.KeyName;
-        OnChanged(); // Um den Refresh zu bewirken
+        OnPropertyChanged(); // Um den Refresh zu bewirken
     }
 
     #endregion

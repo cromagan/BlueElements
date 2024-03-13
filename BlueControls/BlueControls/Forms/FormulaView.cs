@@ -114,7 +114,7 @@ public partial class FormulaView : FormWithStatusBar {
         //    if (oldf != null) {
         //        RemoveRow();
         //        oldf.Loaded -= _cf_Loaded;
-        //        oldf.Changed -= _cf_Changed;
+        //        oldf.Changed -= _cf_PropertyChanged;
         //    }
 
         //    InvalidateView();
@@ -122,7 +122,7 @@ public partial class FormulaView : FormWithStatusBar {
 
         //    if (cf != null) {
         //        cf.Loaded += _cf_Loaded;
-        //        cf.Changed += _cf_Changed;
+        //        cf.Changed += _cf_PropertyChanged;
         //    }
         //}
 

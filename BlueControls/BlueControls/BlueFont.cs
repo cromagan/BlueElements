@@ -30,7 +30,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
-public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseable {
+public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IParseable {
 
     #region Fields
 
@@ -70,7 +70,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -285,7 +285,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         return _nameInStyleSym;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) {
         KeyName = parsed.Replace(" ", string.Empty).ToUpper();

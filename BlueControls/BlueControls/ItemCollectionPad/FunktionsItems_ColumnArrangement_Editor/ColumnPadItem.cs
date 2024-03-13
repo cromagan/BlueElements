@@ -45,7 +45,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         Permanent = permanent;
 
         if (Column != null && !Column.IsDisposed) {
-            Column.Changed += Column_Changed;
+            Column.PropertyChanged += Column_PropertyChanged;
         }
     }
 
@@ -136,7 +136,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         base.Dispose(disposing);
         if (disposing) {
             if (Column != null && !Column.IsDisposed) {
-                Column.Changed -= Column_Changed;
+                Column.PropertyChanged -= Column_PropertyChanged;
             }
             //Column = null;
         }
@@ -188,10 +188,10 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //    return null;
     //}
 
-    private void Column_Changed(object sender, System.EventArgs e) {
+    private void Column_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         RemovePic();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     #endregion

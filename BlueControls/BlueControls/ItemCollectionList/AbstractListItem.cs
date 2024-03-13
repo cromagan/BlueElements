@@ -26,7 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 
-public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, IChangedFeedback {
+public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -68,7 +68,7 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     public event EventHandler? CompareKeyChanged;
 
@@ -81,7 +81,7 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
         set {
             if (_enabled == value) { return; }
             _enabled = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
         set {
             if (_internal == value) { return; }
             _internal = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
         protected set {
             if (_isCaption == value) { return; }
             _isCaption = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -116,7 +116,7 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
             if (_userDefCompareKey == value) { return; }
             _userDefCompareKey = value;
             OnCompareKeyChanged();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -199,13 +199,13 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
     public virtual bool IsClickable() => !IsCaption;
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void SetCoordinates(Rectangle r) {
         Pos = r;
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public Size SizeUntouchedForListBox(Design itemdesign) {

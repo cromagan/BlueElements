@@ -32,7 +32,7 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedback {
+public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -92,7 +92,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     public event EventHandler<MoveEventArgs>? Moved;
 
@@ -111,7 +111,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
         set {
             if (_parent == value) { return; }
             _parent = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -120,7 +120,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
         set {
             if (_tag == value) { return; }
             _tag = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -179,7 +179,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
         SetTo(_x / magnitude, _y / magnitude);
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
@@ -233,7 +233,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
         _x = x;
         _y = y;
         OnMoved(new MoveEventArgs(mx, my));
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public void SetTo(PointM startPoint, float länge, float alpha) {

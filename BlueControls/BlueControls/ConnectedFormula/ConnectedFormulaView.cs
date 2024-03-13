@@ -140,9 +140,9 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void GenerateView() {
         if (IsDisposed) { return; }
@@ -284,7 +284,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
         if (oldf != cf) {
             if (oldf != null) {
                 oldf.Loaded -= _cf_Loaded;
-                oldf.Changed -= _cf_Changed;
+                oldf.PropertyChanged -= _cf_PropertyChanged;
             }
 
             InvalidateView();
@@ -292,7 +292,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
             if (cf != null) {
                 cf.Loaded += _cf_Loaded;
-                cf.Changed += _cf_Changed;
+                cf.PropertyChanged += _cf_PropertyChanged;
             }
         }
 
@@ -394,9 +394,9 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
         Invalidate();
     }
 
-    private void _cf_Changed(object sender, System.EventArgs e) => InvalidateView();
-
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
+
+    private void _cf_PropertyChanged(object sender, System.EventArgs e) => InvalidateView();
 
     private void _database_Disposing(object sender, System.EventArgs e) => InitFormula(null, null);
 

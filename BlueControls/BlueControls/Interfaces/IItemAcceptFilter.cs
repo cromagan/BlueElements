@@ -31,7 +31,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptFilter : IHasKeyName, IChangedFeedback, IHasVersion, IItemToControl, IErrorCheckable {
+public interface IItemAcceptFilter : IHasKeyName, IPropertyChangedFeedback, IHasVersion, IItemToControl, IErrorCheckable {
 
     #region Properties
 
@@ -101,7 +101,7 @@ public sealed class ItemAcceptFilter {
     //    if (!_inputColorId.IsDifferentTo(value)) { return; }
 
     //    _inputColorId = value;
-    //    item.OnChanged();
+    //    item.OnPropertyChanged();
     //}
 
     #region Fields
@@ -122,7 +122,7 @@ public sealed class ItemAcceptFilter {
 
         if (nl.IsDifferentTo(_inputColorId)) {
             _inputColorId = nl;
-            item.OnChanged();
+            item.OnPropertyChanged();
         }
     }
 
@@ -142,7 +142,7 @@ public sealed class ItemAcceptFilter {
         foreach (var thiss in l) {
             thiss.DoChilds();
         }
-        item.OnChanged();
+        item.OnPropertyChanged();
     }
 
     public string ErrorReason(IItemAcceptFilter item) =>
@@ -200,7 +200,7 @@ public sealed class ItemAcceptFilter {
         }
 
         item.CalculateInputColorIds();
-        item.OnChanged();
+        item.OnPropertyChanged();
         item.UpdateSideOptionMenu();
     }
 

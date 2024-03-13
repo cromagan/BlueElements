@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace BlueBasics;
 
-public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
+public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -43,7 +43,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -54,7 +54,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
         set {
             if (_keyName == value) { return; }
             _keyName = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
         return default;
     }
 
-    public virtual void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public virtual void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public virtual void ParseFinished(string parsed) { }
 

@@ -30,7 +30,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 
-public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName, IChangedFeedback {
+public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -62,7 +62,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         set {
             if (_comment == value) { return; }
             _comment = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -80,7 +80,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         set {
             if (_readOnly == value) { return; }
             _readOnly = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 

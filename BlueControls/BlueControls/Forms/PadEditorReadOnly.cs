@@ -102,8 +102,6 @@ public partial class PadEditorReadOnly : FormWithStatusBar {
         } catch { }
     }
 
-    private void Pad_Changed(object sender, System.EventArgs e) => DoPages();
-
     private void Pad_DrawModChanged(object sender, System.EventArgs e) {
         btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
@@ -120,6 +118,8 @@ public partial class PadEditorReadOnly : FormWithStatusBar {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }
+
+    private void Pad_PropertyChanged(object sender, System.EventArgs e) => DoPages();
 
     private void tabSeiten_Selected(object sender, TabControlEventArgs e) {
         var s = string.Empty;

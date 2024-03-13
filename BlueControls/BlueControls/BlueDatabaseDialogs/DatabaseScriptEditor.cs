@@ -444,7 +444,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         Item.UserGroups = new(tmp);
     }
 
-    private void ScriptEditor_Changed(object sender, System.EventArgs e) {
+    private void ScriptEditor_PropertyChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.ScriptText = eventScriptEditor.ScriptText;
     }

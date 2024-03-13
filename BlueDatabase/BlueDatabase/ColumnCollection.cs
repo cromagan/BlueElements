@@ -610,19 +610,19 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
     private void OnColumnAdded(ColumnEventArgs e) {
-        e.Column.Changed += OnColumnChanged;
+        e.Column.PropertyChanged += OnColumnPropertyChanged;
         e.Column.DisposingEvent += Column_DisposingEvent;
         ColumnAdded?.Invoke(this, e);
     }
 
-    private void OnColumnChanged(object sender, System.EventArgs e) => ColumnInternalChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
-
     private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
+
+    private void OnColumnPropertyChanged(object sender, System.EventArgs e) => ColumnInternalChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
 
     private void OnColumnRemoved() => ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
 
     private void OnColumnRemoving(ColumnEventArgs e) {
-        e.Column.Changed -= OnColumnChanged;
+        e.Column.PropertyChanged -= OnColumnPropertyChanged;
         e.Column.DisposingEvent -= Column_DisposingEvent;
         ColumnRemoving?.Invoke(this, e);
     }

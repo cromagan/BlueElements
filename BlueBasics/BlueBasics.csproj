@@ -131,7 +131,7 @@
     <Compile Include="Interfaces\IDisposableExtended.cs" />
     <Compile Include="Interfaces\IInputFormat.cs" />
     <Compile Include="Interfaces\IReadableTextWithKey.cs" />
-    <Compile Include="Interfaces\IReadableTextWithChangingAndKey.cs" />
+    <Compile Include="Interfaces\IReadableTextWithPropertyChangingAndKey.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="MultiUserFile\MultiUserFile.cs" />
@@ -155,10 +155,10 @@
     <Compile Include="Enums\Orientation.cs" />
     <Compile Include="Enums\KeyCode.cs" />
     <Compile Include="IO.cs" />
-    <Compile Include="Interfaces\IChangedFeedback.cs" />
+    <Compile Include="Interfaces\IPropertyChangedFeedback.cs" />
     <Compile Include="Extensions\CollectionExtension.cs" />
     <Compile Include="Interfaces\IParseable.cs" />
-    <Compile Include="Interfaces\IReadableTextWithChanging.cs" />
+    <Compile Include="Interfaces\IReadableTextWithPropertyChanging.cs" />
     <Compile Include="Extensions\ListOfExtension.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Extensions\PaddingExtension.cs" />

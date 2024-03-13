@@ -202,6 +202,8 @@ public static class IO {
         return did;
     }
 
+    public static bool DeleteFile(string file, int tries, bool toBeSure) => ProcessFile(TryDeleteFile, file, file, tries, toBeSure);
+
     public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, 5, toBeSure);
 
     public static bool DirectoryExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());

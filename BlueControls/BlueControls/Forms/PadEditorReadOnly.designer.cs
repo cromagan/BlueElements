@@ -91,7 +91,7 @@ namespace BlueControls.Forms {
             this.Pad.Size = new Size(884, 200);
             this.Pad.TabIndex = 0;
             this.Pad.Zoom = 1F;
-            this.Pad.Changed += new EventHandler(this.Pad_Changed);
+            this.Pad.PropertyChanged += new EventHandler(this.Pad_PropertyChanged);
             this.Pad.DrawModeChanged += new EventHandler(this.Pad_DrawModChanged);
             this.Pad.GotNewItemCollection += new EventHandler(this.Pad_GotNewItemCollection);
             this.Pad.MouseUp += new MouseEventHandler(this.Pad_MouseUp);

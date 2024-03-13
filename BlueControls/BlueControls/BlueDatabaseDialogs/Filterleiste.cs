@@ -130,9 +130,9 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
 
     #region Methods
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     internal void FillFilters() {
         if (IsDisposed) { return; }
@@ -246,8 +246,8 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                             flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
                             //flx.DoOutputSettings(this);
                             //flx.DoInputSettings(parent, this);
-                            flx.FilterOutput.Changing += FlexSingeFilter_FilterOutput_Changing;
-                            flx.FilterOutput.Changed += FlexSingeFilter_FilterOutput_Changed;
+                            flx.FilterOutput.PropertyChanging += FlexSingeFilter_FilterOutput_PropertyChanging;
+                            flx.FilterOutput.PropertyChanged += FlexSingeFilter_FilterOutput_PropertyChanged;
                             Controls.Add(flx);
                         }
 
@@ -275,8 +275,8 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
 
         foreach (var thisFlexi in flexsToDelete) {
             thisFlexi.DisconnectChildParents(this);
-            thisFlexi.FilterOutput.Changing -= FlexSingeFilter_FilterOutput_Changing;
-            thisFlexi.FilterOutput.Changed -= FlexSingeFilter_FilterOutput_Changed;
+            thisFlexi.FilterOutput.PropertyChanging -= FlexSingeFilter_FilterOutput_PropertyChanging;
+            thisFlexi.FilterOutput.PropertyChanged -= FlexSingeFilter_FilterOutput_PropertyChanged;
             thisFlexi.Visible = false;
             Controls.Remove(thisFlexi);
             thisFlexi.Dispose();
@@ -434,7 +434,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
         return null;
     }
 
-    private void FlexSingeFilter_FilterOutput_Changed(object sender, System.EventArgs e) {
+    private void FlexSingeFilter_FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (sender is not FilterCollection fo) { return; }
         if (IsDisposed || _table?.Database is not Database db || db.IsDisposed) { return; }
 
@@ -454,13 +454,13 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
         _prevFilter = null;
     }
 
-    private void FlexSingeFilter_FilterOutput_Changing(object sender, System.EventArgs e) {
+    private void FlexSingeFilter_FilterOutput_PropertyChanging(object sender, System.EventArgs e) {
         _prevFilter?.Dispose();
         _prevFilter = null;
 
         if (sender is not FilterCollection fo) { return; }
 
-        _prevFilter = (FilterCollection?)fo.Clone("FlexSingeFilter_FilterOutput_Changing");
+        _prevFilter = (FilterCollection?)fo.Clone("FlexSingeFilter_FilterOutput_PropertyChanging");
 
         //if (fo.Count != 1) { return; }
         //if (_table?.Database is not Database db || db.IsDisposed) { return; }

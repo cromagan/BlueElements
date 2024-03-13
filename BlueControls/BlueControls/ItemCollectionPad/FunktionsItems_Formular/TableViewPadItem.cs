@@ -93,7 +93,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (IsDisposed) { return; }
             if (_filterOutputType == value) { return; }
             _filterOutputType = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -120,7 +120,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (IsDisposed) { return; }
             if (_defaultArrangement == value) { return; }
             _defaultArrangement = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -224,7 +224,9 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
+
+            //return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);

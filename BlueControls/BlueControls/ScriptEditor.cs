@@ -33,7 +33,7 @@ using System.Windows.Forms;
 
 namespace BlueControls;
 
-public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //UserControl, IContextMenu//
+public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
 {
     #region Fields
 
@@ -52,7 +52,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
@@ -93,7 +93,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -139,7 +139,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
         }
     }
 
-    private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => OnChanged();
+    private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => OnPropertyChanged();
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
         if (Script.Commands == null) { return; }

@@ -30,7 +30,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IChangedFeedback, ICloneable {
+public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, IReadableTextWithPropertyChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IPropertyChangedFeedback, ICloneable {
 
     #region Fields
 
@@ -133,9 +133,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
-    public event EventHandler? Changing;
+    public event EventHandler? PropertyChanging;
 
     #endregion
 
@@ -149,7 +149,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             OnChanging();
             _column = value;
             _column?.RefreshColumnsData();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -180,7 +180,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             if (value == _filterType) { return; }
             OnChanging();
             _filterType = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -195,7 +195,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             if (value == _origin) { return; }
             OnChanging();
             _origin = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -210,7 +210,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             if (!value.IsDifferentTo(_searchValue)) { return; }
             OnChanging();
             _searchValue = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -225,7 +225,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         OnChanging();
         _filterType = type;
         _searchValue = svl.AsReadOnly();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public void Changeto(FilterType type, string searchvalue) => Changeto(type, new List<string> { searchvalue });
@@ -283,14 +283,14 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public bool IsNullOrEmpty() => !this.IsOk();
 
-    public void OnChanged() {
-        if (IsDisposed) { return; }
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
-
     public void OnChanging() {
         if (IsDisposed) { return; }
-        Changing?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanging?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    public void OnPropertyChanged() {
+        if (IsDisposed) { return; }
+        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void ParseFinished(string parsed) {

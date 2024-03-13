@@ -90,7 +90,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
             if (IsDisposed) { return; }
             if (_child == value) { return; }
             _child = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -121,7 +121,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
         set {
             if (_rahmenStil == value) { return; }
             _rahmenStil = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -328,7 +328,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
             Child = string.Empty;
         }
 
-        //OnChanged();
+        //OnPropertyChanged();
     }
 
     #endregion

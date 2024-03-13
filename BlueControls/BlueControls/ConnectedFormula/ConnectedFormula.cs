@@ -41,7 +41,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.ConnectedFormula;
 
-public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages {
+public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages {
 
     #region Fields
 
@@ -115,8 +115,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
     #region Events
 
-    public event EventHandler? Changed;
-
     public event EventHandler<MessageEventArgs>? DropMessage;
 
     public event EventHandler<EditingEventArgs>? Editing;
@@ -126,6 +124,8 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     public event EventHandler? Loading;
 
     public event EventHandler? NotAllowedChildsChanged;
+
+    public event EventHandler? PropertyChanged;
 
     public event EventHandler? SavedToDisk;
 
@@ -166,11 +166,11 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
             if (_padData == value) { return; }
 
             if (_padData != null) {
-                _padData.Changed -= PadData_Changed;
+                _padData.PropertyChanged -= PadData_PropertyChanged;
             }
             _padData = value;
             if (_padData != null) {
-                _padData.Changed += PadData_Changed;
+                _padData.PropertyChanged += PadData_PropertyChanged;
             }
 
             if (_saving || (_muf?.IsLoading ?? false)) { return; }
@@ -467,9 +467,9 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         return false;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
     public void OnNotAllowedChildsChanged() => NotAllowedChildsChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void Repair() {
         // Reparatur-Routine
@@ -684,12 +684,12 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         SavedToDisk?.Invoke(this, e);
     }
 
-    private void PadData_Changed(object sender, System.EventArgs e) {
+    private void PadData_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         _saved = false;
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private void ParseExternal(object sender, MultiUserParseEventArgs e) {

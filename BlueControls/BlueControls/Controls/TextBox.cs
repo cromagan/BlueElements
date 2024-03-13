@@ -81,7 +81,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         _eTxt = new ExtText(Design.TextBox, States.Standard); // Design auf Standard setzen wegen Virtal member call
-        _eTxt.Changed += _eTxt_Changed;
+        _eTxt.PropertyChanged += _eTxt_PropertyChanged;
 
         MouseHighlight = false;
     }
@@ -537,7 +537,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _cursorVisible = false;
             //_suffix = string.Empty;
 
-            _eTxt.Changed -= _eTxt_Changed;
+            _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
             _eTxt?.Dispose();
         }
     }
@@ -835,7 +835,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnVisibleChanged(e);
     }
 
-    private void _eTxt_Changed(object sender, System.EventArgs e) => Invalidate();
+    private void _eTxt_PropertyChanged(object sender, System.EventArgs e) => Invalidate();
 
     private void AbortSpellChecking() {
         if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }

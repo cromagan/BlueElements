@@ -247,7 +247,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         col = col2;
 
         UpdateSideOptionMenu();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     #endregion

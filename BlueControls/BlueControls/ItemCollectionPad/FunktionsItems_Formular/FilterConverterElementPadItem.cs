@@ -94,7 +94,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (value == _eingangsWertSpalte) { return; }
             _eingangsWertSpalte = value;
             this.DoChilds();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -107,7 +107,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (value == _filtertype) { return; }
             _filtertype = value;
             this.DoChilds();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -120,7 +120,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (value == _filterSpalte) { return; }
             _filterSpalte = value;
             this.DoChilds();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -145,7 +145,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (IsDisposed) { return; }
             if (_standard_bei_keiner_Eingabe == value) { return; }
             _standard_bei_keiner_Eingabe = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -285,8 +285,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
+      
         if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
+
+            //return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);

@@ -77,7 +77,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
             if (IsDisposed) { return; }
             if (_drehwinkel == value) { return; }
             _drehwinkel = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 

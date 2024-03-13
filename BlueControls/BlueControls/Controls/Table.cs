@@ -150,8 +150,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         InitializeSkin();
         MouseHighlight = false;
-        Filter.Changed += Filter_Changed;
-        Filter.RowsChanged += Filter_Changed;
+        Filter.PropertyChanged += Filter_PropertyChanged;
+        Filter.RowsChanged += Filter_PropertyChanged;
         ((IControlSendFilter)this).RegisterEvents();
     }
 
@@ -791,7 +791,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
-            //db1.Row.RowRemoved -= Row_RowRemoved; // macht Filter_Changed
+            //db1.Row.RowRemoved -= Row_RowRemoved; // macht Filter_PropertyChanged
             db1.Row.RowGotData -= _Database_Row_RowGotData;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
@@ -819,7 +819,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
-            //db2.Row.RowRemoved += Row_RowRemoved; // macht Filter_Changed
+            //db2.Row.RowRemoved += Row_RowRemoved; // macht Filter_PropertyChanged
             db2.Row.RowGotData += _Database_Row_RowGotData;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
@@ -1051,9 +1051,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
@@ -1386,8 +1386,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                Filter.Changed -= Filter_Changed;
-                Filter.RowsChanged -= Filter_Changed;
+                Filter.PropertyChanged -= Filter_PropertyChanged;
+                Filter.RowsChanged -= Filter_PropertyChanged;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
                 ((IControlSendFilter)this).DoDispose();
                 ((IControlAcceptFilter)this).DoDispose();
@@ -3084,7 +3084,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return true;
     }
 
-    private void Filter_Changed(object sender, System.EventArgs e) {
+    private void Filter_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in db.Column) {
@@ -3207,16 +3207,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "filters":
-                        Filter.Changed -= Filter_Changed;
-                        Filter.RowsChanged -= Filter_Changed;
+                        Filter.PropertyChanged -= Filter_PropertyChanged;
+                        Filter.RowsChanged -= Filter_PropertyChanged;
                         Filter.Database = Database;
                         var code = pair.Value.FromNonCritical();
                         Filter.Clear();
                         Filter.Parse(code);
                         Filter.ParseFinished(code);
-                        Filter.Changed += Filter_Changed;
-                        Filter.RowsChanged += Filter_Changed;
-                        Filter_Changed(this, System.EventArgs.Empty);
+                        Filter.PropertyChanged += Filter_PropertyChanged;
+                        Filter.RowsChanged += Filter_PropertyChanged;
+                        Filter_PropertyChanged(this, System.EventArgs.Empty);
                         break;
 
                     case "sliderx":

@@ -34,7 +34,7 @@ namespace BlueDatabase;
 
 #nullable enable
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -71,11 +71,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Events
 
-    public event EventHandler? Changed;
-
-    public event EventHandler? Changing;
-
     public event EventHandler? DisposingEvent;
+
+    public event EventHandler? PropertyChanged;
+
+    public event EventHandler? PropertyChanging;
 
     public event EventHandler? RowsChanged;
 
@@ -102,7 +102,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             RegisterDatabaseEvents();
 
             Invalidate_FilteredRows();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -176,7 +176,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         AddAndRegisterEvents(fi);
         Invalidate_FilteredRows();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public void AddIfNotExists(FilterItem fi) {
@@ -193,7 +193,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             OnChanging();
             AddAndRegisterEvents(newItems);
             Invalidate_FilteredRows();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -217,7 +217,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
         Invalidate_FilteredRows();
 
-        OnChanged();
+        OnPropertyChanged();
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             Invalidate_FilteredRows();
         }
 
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public void Clear() {
@@ -260,7 +260,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         List<FilterItem> t = [.. _internal];
         _internal.Clear();
         Invalidate_FilteredRows();
-        OnChanged();
+        OnPropertyChanged();
 
         // Aufräumen
         UnRegisterEvents(t);
@@ -357,9 +357,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
-    public void OnChanged() {
+    public void OnPropertyChanged() {
         if (IsDisposed) { return; }
-        Changed?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnRowsChanged() {
@@ -396,7 +396,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         UnRegisterEvents(fi);
         _internal.Remove(fi);
         Invalidate_FilteredRows();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
@@ -438,7 +438,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
         AddAndRegisterEvents(fi);
         Invalidate_FilteredRows();
-        OnChanged();
+        OnPropertyChanged();
     }
 
     /// <summary>
@@ -482,7 +482,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (did) {
             Invalidate_FilteredRows();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -533,8 +533,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi.Parent != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelte Filterverwendung!"); }
         fi.Parent = this;
 
-        fi.Changing += Filter_Changing;
-        fi.Changed += Filter_Changed;
+        fi.PropertyChanging += Filter_PropertyChanging;
+        fi.PropertyChanged += Filter_PropertyChanged;
         _internal.Add(fi);
         Invalidate_FilteredRows();
     }
@@ -596,13 +596,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return false;
     }
 
-    private void Filter_Changed(object sender, System.EventArgs e) {
+    private void Filter_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate_FilteredRows();
-        OnChanged();
+        OnPropertyChanged();
     }
 
-    private void Filter_Changing(object sender, System.EventArgs e) {
+    private void Filter_PropertyChanging(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnChanging();
     }
@@ -615,7 +615,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void OnChanging() {
         if (IsDisposed) { return; }
-        Changing?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanging?.Invoke(this, System.EventArgs.Empty);
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
@@ -658,8 +658,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void UnRegisterEvents(FilterItem fi) {
-        fi.Changing += Filter_Changing;
-        fi.Changed += Filter_Changed;
+        fi.PropertyChanging += Filter_PropertyChanging;
+        fi.PropertyChanged += Filter_PropertyChanged;
     }
 
     #endregion

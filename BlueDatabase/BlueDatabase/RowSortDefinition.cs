@@ -28,7 +28,7 @@ using System.Linq;
 
 namespace BlueDatabase;
 
-public sealed class RowSortDefinition : IParseable, IChangedFeedback {
+public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -63,7 +63,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -75,7 +75,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     #region Methods
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 
@@ -119,7 +119,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
         for (var i = 0; i < Columns.Count; i++) {
             if (Columns[i] is not ColumnItem c || c.IsDisposed) {
                 Columns.RemoveAt(i);
-                OnChanged();
+                OnPropertyChanged();
                 Repair();
             }
         }

@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IHasKeyName, IChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
+public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IHasKeyName, IPropertyChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
 
     #region Fields
 
@@ -90,7 +90,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         var anzbr = IntParse(doit[0]);
         var npos = IntParse(doit[1]);
         SetXPosition(anzbr, npos);
-        OnChanged();
+        OnPropertyChanged();
     }
 
     //public abstract int InputColorId { get; set; }
@@ -156,9 +156,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return false;
     }
 
-    public override void OnChanged() {
+    public override void OnPropertyChanged() {
         if (IsDisposed) { return; }
-        base.OnChanged();
+        base.OnPropertyChanged();
         this.RaiseVersion();
     }
 
@@ -197,7 +197,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         if (x.Height < he) { x.Height = he; }
         SetCoordinates(x, true);
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public abstract QuickImage? SymbolForReadableText();

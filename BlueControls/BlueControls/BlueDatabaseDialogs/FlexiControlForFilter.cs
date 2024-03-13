@@ -143,7 +143,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 

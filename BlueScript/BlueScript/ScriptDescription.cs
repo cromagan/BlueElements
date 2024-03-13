@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace BlueScript;
 
-public abstract class ScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, IErrorCheckable, IHasKeyName, IChangedFeedback, IComparable {
+public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IErrorCheckable, IHasKeyName, IPropertyChangedFeedback, IComparable {
 
     #region Fields
 
@@ -73,7 +73,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -86,7 +86,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (_admininfo == value) { return; }
             _admininfo = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -96,7 +96,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (_changeValues == value) { return; }
             _changeValues = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -108,7 +108,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (_image == value) { return; }
             _image = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -120,7 +120,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (_keyName == value) { return; }
             _keyName = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -130,7 +130,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (_quickinfo == value) { return; }
             _quickinfo = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -140,7 +140,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (_scriptText == value) { return; }
             _scriptText = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -150,7 +150,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return; }
             if (!_usergroups.IsDifferentTo(value)) { return; }
             _usergroups = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -174,7 +174,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         return string.Empty;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 

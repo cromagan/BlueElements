@@ -77,7 +77,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             if (IsDisposed) { return; }
             if (_anzeige == value) { return; }
             _anzeige = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -89,7 +89,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
             _überschriftanordung = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -127,7 +127,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             if (IsDisposed) { return; }
             if (_überschrift == value) { return; }
             _überschrift = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 

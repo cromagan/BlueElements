@@ -168,7 +168,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         var ot = vbmp.ValueBitmap;
         if (ot != null) {
             Bitmap = ot;
-            OnChanged();
+            OnPropertyChanged();
             return true;
         }
 
@@ -180,7 +180,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
             Bitmap?.Dispose();
             Bitmap = null;
-            OnChanged();
+            OnPropertyChanged();
             return true;
         }
         return false;

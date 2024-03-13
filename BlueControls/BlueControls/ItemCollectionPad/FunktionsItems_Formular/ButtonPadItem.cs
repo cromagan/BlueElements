@@ -77,7 +77,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_action == value) { return; }
             _action = value;
-            OnChanged();
+            OnPropertyChanged();
             UpdateSideOptionMenu();
         }
     }
@@ -91,7 +91,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_arg1 == value) { return; }
             _arg1 = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -102,7 +102,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_arg2 == value) { return; }
             _arg2 = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -113,7 +113,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_arg3 == value) { return; }
             _arg3 = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -124,7 +124,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_arg4 == value) { return; }
             _arg4 = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -137,7 +137,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_anzeige == value) { return; }
             _anzeige = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -148,7 +148,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_image == value) { return; }
             _image = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -164,7 +164,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
             if (!ButtonPadItem.PossibleFor(Script.Commands.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
-            OnChanged();
+            OnPropertyChanged();
             UpdateSideOptionMenu();
         }
     }

@@ -32,6 +32,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -67,8 +68,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Item = new ItemCollectionList.ItemCollectionList(true);
-        Item.Changed += Item_Changed;
-        Item.CollectionChanged += Item_CollectionChanged;
+        RegisterEvents();
         _appearance = ListBoxAppearance.Listbox;
     }
 
@@ -263,6 +263,19 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
+    public void Swap(int index1, int index2) {
+        if (index1 == index2) { return; }
+        if (Item.AutoSort) { return; }
+
+        UnRegisterEvents();
+        (Item[index1], Item[index2]) = (Item[index2], Item[index1]);
+        RegisterEvents();
+
+        Invalidate();
+        DoMouseMovement();
+        ValidateCheckStates(Item.ItemOrder.ToListOfString(), string.Empty);
+    }
+
     public void UnCheck(IEnumerable<string> ali) {
         foreach (var thiss in ali) {
             UnCheck(thiss);
@@ -286,10 +299,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     internal void AddAndCheck(AbstractListItem? ali) {
         if (ali == null) { return; }
 
+        if (Item[ali.KeyName] != null) { return; }
+
         var tmp = _checkBehavior;
         _checkBehavior = CheckBehavior.MultiSelection;
 
-        Item.Remove(ali.KeyName);
+        //Item.Remove(ali.KeyName);
 
         Item.Add(ali);
         _checkBehavior = tmp;
@@ -325,8 +340,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         try {
             if (disposing) {
             }
-            Item.Changed -= Item_Changed;
-            Item.CollectionChanged -= Item_CollectionChanged;
+            UnRegisterEvents();
         } finally {
             base.Dispose(disposing);
         }
@@ -463,10 +477,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         for (var z = Item.ItemOrder.Count - 1; z >= 0; z--) {
             if (Item[z] == _mouseOverItem) {
                 if (ln < 0) { return; }// Befehl verwerfen...
-                Item.Swap(ln, z);
-                Refresh(); // Um die Item-Positionen neu zu berechnen
-                ValidateCheckStates(Item.ItemOrder.ToListOfString(), string.Empty);
-                DoMouseMovement();
+                Swap(ln, z);
                 return;
             }
             ln = z;
@@ -516,10 +527,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         foreach (var thisItem in Item.ItemOrder) {
             if (thisItem == _mouseOverItem) {
                 if (ln == null) { return; }// Befehl verwerfen...
-                Item.Swap(Item.IndexOf(ln), Item.IndexOf(thisItem));
-                Refresh(); // Um die Item-Positionen neu zu berechnen
-                ValidateCheckStates(Item.ItemOrder.ToListOfString(), string.Empty);
-                DoMouseMovement();
+                Swap(Item.IndexOf(ln), Item.IndexOf(thisItem));
                 return;
             }
             ln = thisItem;
@@ -642,11 +650,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private bool IsChecked(string name) => _checked.Contains(name);
 
-    private void Item_Changed(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-    }
-
     private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
         var last = string.Empty;
         if (e.NewItems != null && e.NewItems.Count > 0) {
@@ -665,6 +668,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
+    private void Item_PropertyChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
+    }
+
     private AbstractListItem? MouseOverNode(int x, int y) => Item[x, (int)(y + SliderY.Value)];
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
@@ -673,11 +681,21 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 
+    private void RegisterEvents() {
+        Item.PropertyChanged += Item_PropertyChanged;
+        Item.CollectionChanged += Item_CollectionChanged;
+    }
+
     private void SliderY_ValueChange(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         _mouseOverItem = null; // Damit die Buttons neu berechnet werden.
         DoMouseMovement();
         Invalidate();
+    }
+
+    private void UnRegisterEvents() {
+        Item.PropertyChanged -= Item_PropertyChanged;
+        Item.CollectionChanged -= Item_CollectionChanged;
     }
 
     private void ValidateCheckStates(List<string> newCheckedItems, string lastaddeditem) {

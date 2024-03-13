@@ -84,7 +84,7 @@ public class DatabaseMu : Database {
         if (FileExists(fileNameToLoad)) {
             Filename = fileNameToLoad;
             Directory.CreateDirectory(FragmengtsPath());
-            Directory.CreateDirectory(OldFragmengtsPath());
+            //Directory.CreateDirectory(OldFragmengtsPath());
             Filename = string.Empty;
         }
 
@@ -156,7 +156,7 @@ public class DatabaseMu : Database {
         _mustMakeMaster = files.Count > 8 || ChangesNotIncluded.Count > 40;
 
         if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { return; }
-        if (!Directory.Exists(OldFragmengtsPath())) { return; }
+        //if (!Directory.Exists(OldFragmengtsPath())) { return; }
 
         #region Dateien, mit jungen Änderungen wieder entfernen, damit andere Datenbanken noch Zugriff haben
 
@@ -201,13 +201,14 @@ public class DatabaseMu : Database {
 
         #endregion
 
-        var pf = OldFragmengtsPath();
+        //var pf = OldFragmengtsPath();
 
         files.Shuffle();
 
         foreach (var thisf in files) {
             OnDropMessage(FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-            MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
+            DeleteFile(thisf, 1, false);
+            //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
             if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { break; }
         }
     }
@@ -341,7 +342,7 @@ public class DatabaseMu : Database {
         if (string.IsNullOrEmpty(Filename)) { return; }
 
         Directory.CreateDirectory(FragmengtsPath());
-        Directory.CreateDirectory(OldFragmengtsPath());
+        //Directory.CreateDirectory(OldFragmengtsPath());
     }
 
     private string FragmengtsPath() {
@@ -349,10 +350,10 @@ public class DatabaseMu : Database {
         return Filename.FilePath() + "Frgm\\";
     }
 
-    private string OldFragmengtsPath() {
-        if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-        return Filename.FilePath() + "Frgm-Done\\";
-    }
+    //private string OldFragmengtsPath() {
+    //    if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
+    //    return Filename.FilePath() + "Frgm-Done\\";
+    //}
 
     private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {

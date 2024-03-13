@@ -124,7 +124,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// </summary>
     public string AdditionalData { get; } = string.Empty;
 
-    //public event EventHandler? Changed;
+    //public event EventHandler? PropertyChanged;
     /// <summary>
     /// Eine Kennung, die von von Database abgeleiten Klassen erkannt werden kann.
     /// Enthält nur einen Wert wie z.B. DatabaseSQL.
@@ -163,7 +163,7 @@ public class ConnectionInfo : IReadableTextWithKey {
 
     #endregion
 
-    //public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    //public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     #region Methods
 

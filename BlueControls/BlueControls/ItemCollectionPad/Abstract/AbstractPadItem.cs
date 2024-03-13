@@ -38,7 +38,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
+public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IPropertyChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
 
     #region Fields
 
@@ -83,7 +83,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
             if (IsDisposed) { return; }
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         set {
             if (_page == value) { return; }
             _page = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -139,7 +139,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
             if (_style == value) { return; }
             _style = value;
             ProcessStyleChange();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -162,7 +162,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         set {
             if (_zoomPadding == value) { return; }
             _zoomPadding = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -322,15 +322,15 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         foreach (var t in PointsForSuccesfullyMove) {
             t.Move(x, y);
         }
-        OnChanged();
+        OnPropertyChanged();
     }
 
     /// <summary>
     /// Invalidiert UsedArea und löst das Ereignis Changed aus
     /// </summary>
-    public override void OnChanged() {
+    public override void OnPropertyChanged() {
         _usedArea = default;
-        base.OnChanged();
+        base.OnPropertyChanged();
     }
 
     //public void Parse(List<KeyValuePair<string, string>> toParse, string parsestring) {
@@ -416,7 +416,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         return false;
     }
 
-    public virtual void PointMoved(object sender, MoveEventArgs e) => OnChanged();
+    public virtual void PointMoved(object sender, MoveEventArgs e) => OnPropertyChanged();
 
     public void PointMoving(object sender, MoveEventArgs e) { }
 

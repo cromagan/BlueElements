@@ -36,7 +36,7 @@ using System.Windows.Data;
 
 namespace BlueControls.ItemCollectionList;
 
-public class ItemCollectionList : ObservableCollection<AbstractListItem>, ICloneable, IChangedFeedback {
+public class ItemCollectionList : ObservableCollection<AbstractListItem>, ICloneable, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -84,7 +84,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -97,7 +97,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
             _appearance = value;
             GetDesigns();
             //DesignOrStyleChanged();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -108,7 +108,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
             _autoSort = value;
             _maxNeededItemSize = Size.Empty;
             _itemOrder = null;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -278,7 +278,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
         base.Add(item);
 
-        item.Changed += Item_Changed;
+        item.PropertyChanged += Item_PropertyChanged;
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
@@ -435,7 +435,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         return null;
     }
 
-    public TextListItem Add(ColumnItem column) => Add((IReadableTextWithChangingAndKey)column);
+    public TextListItem Add(ColumnItem column) => Add((IReadableTextWithPropertyChangingAndKey)column);
 
     public void AddClonesFrom(ICollection<AbstractListItem>? itemstoclone) {
         if (itemstoclone == null || itemstoclone.Count == 0) { return; }
@@ -561,30 +561,21 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         return x;
     }
 
-    public void OnChanged() {
+    public void OnPropertyChanged() {
         _maxNeededItemSize = Size.Empty;
         _itemOrder = null;
 
-        Changed?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void Remove(string internalnam) => Remove(this[internalnam]);
 
     public new void Remove(AbstractListItem? item) {
         if (item == null || !Contains(item)) { return; }
-        item.Changed -= Item_Changed;
+        item.PropertyChanged -= Item_PropertyChanged;
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         _ = base.Remove(item);
-        OnChanged();
-    }
-
-    public void Swap(int index1, int index2) {
-        if (index1 == index2) { return; }
-        //var l = ItemOrder.ToList();
-        (this[index1], this[index2]) = (this[index2], this[index1]);
-        _maxNeededItemSize = Size.Empty;
-        _itemOrder = null;
-        OnChanged();
+        OnPropertyChanged();
     }
 
     internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, int addy) {
@@ -840,7 +831,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         }
     }
 
-    private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
+    private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
     private void PreComputeSize() {
         try {

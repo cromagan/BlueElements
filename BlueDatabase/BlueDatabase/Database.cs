@@ -435,7 +435,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var l = new List<VariableString>();
             l.AddRange(value.ToListVariableString());
             foreach (var thisv in l) {
-                thisv.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
+                thisv.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
             }
             l.Sort();
             if (_variableTmp == l.ToString(true)) { return; }
@@ -1278,9 +1278,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public void EventScript_Add(DatabaseScriptDescription ev, bool isLoading) {
         _eventScript.Add(ev);
-        ev.Changed += EventScript_Changed;
+        ev.PropertyChanged += EventScript_PropertyChanged;
 
-        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+        if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
 
         foreach (var thisCom in Script.Commands) {
             if (thisCom.Verwendung.Count < 3) {
@@ -2142,7 +2142,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //public void Variables_RemoveAll(bool isLoading) {
     //    //while (_variables.Count > 0) {
     //    //    //var va = _variables[_eventScript.Count - 1];
-    //    //    //ev.Changed -= EventScript_Changed;
+    //    //    //ev.Changed -= EventScript_PropertyChanged;
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
         if (IsDisposed) { return; }
         ProgressbarInfo?.Invoke(this, e);
@@ -2519,7 +2519,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 foreach (var t in va) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
-                    l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
+                    l.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
                     _variables.Add(l);
                 }
                 _variables.Sort();
@@ -3072,17 +3072,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
+    private void EventScript_PropertyChanged(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
 
     private void EventScript_RemoveAll(bool isLoading) {
         while (_eventScript.Count > 0) {
             var ev = _eventScript[_eventScript.Count - 1];
-            ev.Changed -= EventScript_Changed;
+            ev.PropertyChanged -= EventScript_PropertyChanged;
 
             _eventScript.RemoveAt(_eventScript.Count - 1);
         }
 
-        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+        if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
     }
 
     private bool Export_HTML(string filename, List<ColumnItem>? columnList, ICollection<RowItem> sortedRows, bool execute) {

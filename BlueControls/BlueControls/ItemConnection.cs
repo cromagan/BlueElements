@@ -29,7 +29,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
-public class ItemConnection : IStringable, IChangedFeedback {
+public class ItemConnection : IStringable, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -60,7 +60,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     #region Events
 
-    public event EventHandler? Changed;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -72,7 +72,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
         set {
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -100,7 +100,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
         }
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     internal new string ToString() {
         List<string> result = [];

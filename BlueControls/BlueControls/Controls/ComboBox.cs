@@ -67,7 +67,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         MouseHighlight = true;
         SetStyle(ControlStyles.ContainerControl, true);
-        Item.Changed += Item_Changed;
+        Item.PropertyChanged += Item_PropertyChanged;
         btnDropDown.Left = Width - btnDropDown.Width;
         btnDropDown.Top = 0;
         btnDropDown.Height = Height;
@@ -301,7 +301,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         _ = Focus();
     }
 
-    private void Item_Changed(object sender, System.EventArgs e) {
+    private void Item_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (_btnDropDownIsIn) { return; }
         FloatingForm.Close(this);

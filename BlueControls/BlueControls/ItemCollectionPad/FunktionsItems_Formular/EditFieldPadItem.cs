@@ -85,7 +85,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (IsDisposed) { return; }
             if (_autoX == value) { return; }
             _autoX = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -95,7 +95,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
             _überschriftanordung = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -112,7 +112,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (IsDisposed) { return; }
             if (_columnName == value) { return; }
             _columnName = value;
-            OnChanged();
+            OnPropertyChanged();
             UpdateSideOptionMenu();
         }
     }
@@ -128,7 +128,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (IsDisposed) { return; }
             if (_bearbeitung == value) { return; }
             _bearbeitung = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -329,7 +329,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     //    var ot = vbmp.ValueBitmap;
     //    if (ot is Bitmap bmp) {
     //        Bitmap = bmp;
-    //        OnChanged();
+    //        OnPropertyChanged();
     //        return true;
     //    }
     //protected override AbstractPadItem? TryCreate(string id, string name) {

@@ -221,13 +221,13 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     #region Events
 
-    public event EventHandler? Changed;
-
     public event EventHandler<ListEventArgs>? ItemAdded;
 
     public event EventHandler? ItemRemoved;
 
     public event EventHandler<ListEventArgs>? ItemRemoving;
+
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -247,7 +247,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (IsDisposed) { return; }
             if (Math.Abs(_gridShow - value) < FineTolerance) { return; }
             _gridShow = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -261,7 +261,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (IsDisposed) { return; }
             if (Math.Abs(_gridsnap - value) < FineTolerance) { return; }
             _gridsnap = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -288,7 +288,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                 Math.Abs(value.Height - _sheetSizeInMm.Height) < FineTolerance) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
             GenPoints();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -309,7 +309,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             ApplyDesignToItems();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -322,7 +322,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (Math.Abs(_sheetStyleScale - value) < DefaultTolerance) { return; }
             _sheetStyleScale = value;
             ApplyDesignToItems();
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -333,7 +333,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (IsDisposed) { return; }
             if (_snapMode == value) { return; }
             _snapMode = value;
-            OnChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -387,7 +387,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         IsSaved = false;
         OnItemAdded(item);
         item.AddedToCollection();
-        item.Changed += Item_Changed;
+        item.PropertyChanged += Item_PropertyChanged;
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
         //item.CheckedChanged += Item_CheckedChanged;
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
@@ -533,9 +533,9 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return l;
     }
 
-    public void OnChanged() {
+    public void OnPropertyChanged() {
         IsSaved = false;
-        Changed?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public IEnumerable<string> Permission_AllUsed() {
@@ -558,7 +558,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public new void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
         if (item == null || !Contains(item)) { return; }
-        item.Changed -= Item_Changed;
+        item.PropertyChanged -= Item_PropertyChanged;
         //item.CheckedChanged -= Item_CheckedChanged;
         //item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         OnItemRemoving(item);
@@ -574,7 +574,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             }
         }
 
-        OnChanged();
+        OnPropertyChanged();
     }
 
     public void RemoveRange(List<AbstractPadItem> remove) {
@@ -616,7 +616,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                 if (variables.ResetVariables()) { did = true; }
             }
         }
-        if (did) { OnChanged(); }
+        if (did) { OnPropertyChanged(); }
         return did;
     }
 
@@ -650,7 +650,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         (this[index1], this[index2]) = (this[index2], this[index1]);
         //_maxNeededItemSize = Size.Empty;
         //_itemOrder = null;
-        //OnChanged();
+        //OnPropertyChanged();
     }
 
     public Bitmap? ToBitmap(float scale, string page) {
@@ -816,14 +816,14 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         foreach (var thisItem in this) {
             thisItem?.ProcessStyleChange();
         }
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is ItemConnection x) {
-                    x.Item2.Changed += Item_Changed;
+                    x.Item2.PropertyChanged += Item_PropertyChanged;
                 }
             }
         }
@@ -831,7 +831,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
                 if (thisit is ItemConnection x) {
-                    x.Item2.Changed -= Item_Changed;
+                    x.Item2.PropertyChanged -= Item_PropertyChanged;
                 }
             }
         }
@@ -841,7 +841,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
 
         if (IsDisposed) { return; }
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private void CreateConnection(string toParse) {
@@ -915,7 +915,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     private void Dispose(bool disposing) {
         IsDisposed = true;
         foreach (var thisIt in this) {
-            thisIt.Changed -= Item_Changed;
+            thisIt.PropertyChanged -= Item_PropertyChanged;
             thisIt.Dispose();
         }
 
@@ -980,7 +980,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         _prLu.SetTo(rl, ssh - ru);
     }
 
-    private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
+    private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
     private RectangleF MaximumBounds(ICollection<AbstractPadItem>? zoomItems) {
         var x1 = float.MaxValue;
@@ -1006,13 +1006,13 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     private void OnItemAdded(AbstractPadItem item) {
         if (IsDisposed) { return; }
         ItemAdded?.Invoke(this, new ListEventArgs(item));
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private void OnItemRemoved() {
         ItemRemoved?.Invoke(this, System.EventArgs.Empty);
         if (IsDisposed) { return; }
-        OnChanged();
+        OnPropertyChanged();
     }
 
     private void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));

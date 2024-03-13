@@ -424,7 +424,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         if (IsDisposed) { return; }
         _childs.Clear();
         _childs.AddRange(((ListBox)sender).Checked);
-        OnChanged();
+        OnPropertyChanged();
         this.RaiseVersion();
         UpdateSideOptionMenu();
     }
@@ -437,7 +437,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             _ = _childs.Remove(thisl);
         }
 
-        OnChanged();
+        OnPropertyChanged();
     }
 
     #endregion
