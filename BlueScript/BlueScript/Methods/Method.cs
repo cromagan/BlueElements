@@ -80,8 +80,8 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     public string QuickInfo => HintText();
     public abstract string Returns { get; }
     public abstract string StartSequence { get; }
-
     public abstract string Syntax { get; }
+    public List<string> Verwendung { get; } = new List<string>();
 
     #endregion
 
@@ -377,7 +377,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
             co = co + "  - Argument " + (z + 1) + ": " + a;
 
-            if (z == Args.Count - 1 && LastArgMinCount > 0) {
+            if (z == Args.Count - 1) {
                 switch (LastArgMinCount) {
                     case -1:
                         break; // genau einmal
@@ -399,7 +399,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         }
         co += "\r\n";
         co += "Rückgabe:\r\n";
-        co += "~~~~~~~~~\r\n";
+        co += "~~~~~~~~\r\n";
         if (string.IsNullOrEmpty(Returns)) {
             co += "  - Rückgabetyp: -\r\n";
         } else {
@@ -412,7 +412,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         co += "\r\n";
         co += "Beschreibung:\r\n";
-        co += "~~~~~~~~~~~~\r\n";
+        co += "~~~~~~~~~~~\r\n";
         co = co + Description + "\r\n";
 
         if (this is IUseableForButton) {
@@ -420,6 +420,13 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
             co += "Hinweis:\r\n";
             co += "~~~~~~~~~~~~\r\n";
             co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
+        }
+
+        if (Verwendung.Count > 0) {
+            co += "\r\n";
+            co += "Aktuelle Verwendung in Skripten:\r\n";
+            co += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n";
+            co += Verwendung.JoinWithCr();
         }
 
         return co;

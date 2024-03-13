@@ -1281,6 +1281,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         ev.Changed += EventScript_Changed;
 
         if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+
+        foreach (var thisCom in Script.Commands) {
+            if (thisCom.Verwendung.Count < 3) {
+                if (ev.ScriptText.ContainsWord(thisCom.Command, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
+                    thisCom.Verwendung.AddIfNotExists($"Datenbank: {Caption} / {ev.KeyName}");
+                    if (thisCom.LastArgMinCount == 3) {
+                        thisCom.Verwendung.Add("[WEITERE VERWENDUNGEN VORHANDEN]");
+                    }
+                }
+            }
+        }
     }
 
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes) {

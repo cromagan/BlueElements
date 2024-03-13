@@ -304,6 +304,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
 
         if (column.Function is not ColumnFunction.Normal
+                           and not ColumnFunction.Schlüsselspalte_NurDatenprüfung
                            and not ColumnFunction.RelationText
                            and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
 
