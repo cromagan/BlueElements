@@ -540,8 +540,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //        newFiles.GenerateAndAdd(neu);
     //        delList.GenerateAndAdd(thisf);
     //    }
-    public static ItemCollectionList.ItemCollectionList UndoItems(Database? db, string cellkey) {
-        ItemCollectionList.ItemCollectionList i = new(ListBoxAppearance.KontextMenu, false);
+    public static List<AbstractListItem> UndoItems(Database? db, string cellkey) {
+        List<AbstractListItem> i = [];
 
         if (db != null && !db.IsDisposed) {
             //database.GetUndoCache();
@@ -1066,7 +1066,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         hotItem = null;
         if (e == null) { return; }
 
@@ -2471,11 +2471,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        ItemCollectionList.ItemCollectionList t = new(true) {
+        List<AbstractListItem> t = new(true) {
             Appearance = ListBoxAppearance.DropdownSelectbox
         };
 
-        ItemCollectionList.ItemCollectionList.GetItemCollection(t, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
+        List<AbstractListItem>.GetItemCollection(t, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, false); } else {
@@ -2540,7 +2540,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         box.Tag = new List<object?> { cellInThisDatabaseColumn, cellInThisDatabaseRow };
 
         if (box is ComboBox cbox) {
-            ItemCollectionList.ItemCollectionList.GetItemCollection(cbox.Item, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
+            List<AbstractListItem>.GetItemCollection(cbox.Item, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
             if (cbox.Item.Count == 0) {
                 return Cell_Edit_TextBox(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
             }

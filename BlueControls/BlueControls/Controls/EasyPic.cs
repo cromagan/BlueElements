@@ -32,6 +32,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -192,7 +193,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         hotItem = null;
         if (_bitmap != null) {
             _ = items.Add("Externes Fenster öffnen", "ExF");

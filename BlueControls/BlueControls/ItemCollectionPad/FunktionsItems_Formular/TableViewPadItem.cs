@@ -167,13 +167,11 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         List<GenericControl> l = [];
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
-            var u = new ItemCollectionList.ItemCollectionList(false);
+            var u = List<AbstractListItem>();
             u.AddRange(typeof(Filterausgabe));
             l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
 
-            var u2 = new ItemCollectionList.ItemCollectionList(false) {
-                AutoSort = false
-            };
+            var u2 = List<AbstractListItem>();
             foreach (var thisC in db.ColumnArrangements) {
                 u2.Add(thisC);
             }

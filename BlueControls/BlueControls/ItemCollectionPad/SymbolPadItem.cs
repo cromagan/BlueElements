@@ -25,6 +25,7 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 
@@ -60,14 +61,12 @@ public class SymbolPadItem : RectanglePadItem {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        ItemCollectionList.ItemCollectionList comms = new(false)
-        {
-            { "Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
-            { "Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
-            { "Rechteck gerundet", ((int)Symbol.Rechteck_gerundet).ToString() },
-            { "Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
-            { "Bruchlinie", ((int)Symbol.Bruchlinie).ToString() }
-        };
+        List<AbstractListItem> comms = new(false);
+        comms.Add("Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32"));
+        comms.Add("Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32"));
+        comms.Add("Rechteck gerundet", ((int)Symbol.Rechteck_gerundet).ToString());
+        comms.Add("Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32"));
+        comms.Add("Bruchlinie", ((int)Symbol.Bruchlinie).ToString());
         List<GenericControl> l =
         [
             new FlexiControlForProperty<Symbol>(() => Symbol, comms),

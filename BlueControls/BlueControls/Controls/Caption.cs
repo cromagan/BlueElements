@@ -28,9 +28,11 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using Form = BlueControls.Forms.Form;
 
 namespace BlueControls.Controls;
@@ -170,7 +172,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) => hotItem = null;
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) => hotItem = null;
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 

@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
@@ -26,6 +27,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Specialized;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -60,8 +62,8 @@ public static class Allgemein {
         var par = o.ParentControl<IContextMenu>();
         if (par == null) { return null; }
 
-        ItemCollectionList.ItemCollectionList thisContextMenu = new(ListBoxAppearance.KontextMenu, false);
-        ItemCollectionList.ItemCollectionList userMenu = new(ListBoxAppearance.KontextMenu, false);
+        List<AbstractListItem> thisContextMenu = []
+        List<AbstractListItem> userMenu = []
 
         var cancel = false;
         par.GetContextMenuItems(null, thisContextMenu, out var hotItem);

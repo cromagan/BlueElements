@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -43,7 +44,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
+    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, _controlDesign) {
         InitializeComponent();
         Tag = hotitem;
         // Design = Items.ControlDesign;
@@ -75,8 +76,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Close(ListBoxAppearance.KontextMenu);
         Close(control);
 
-        ItemCollectionList.ItemCollectionList thisContextMenu = new(ListBoxAppearance.KontextMenu, false);
-        ItemCollectionList.ItemCollectionList userMenu = new(ListBoxAppearance.KontextMenu, false);
+        List<AbstractListItem> thisContextMenu = new(ListBoxAppearance.KontextMenu, false);
+        List<AbstractListItem> userMenu = new(ListBoxAppearance.KontextMenu, false);
 
         var translate = true;
         control.GetContextMenuItems(e, thisContextMenu, out var hotItem);
@@ -111,14 +112,14 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, object tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object tag, Control? connectedControl, bool translate) =>
         new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
             connectedControl, translate);
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
         new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-    public void Generate_ListBox1(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate) {
+    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate) {
         var (biggestItemX, _, heightAdded, _) = items.ItemData();
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = (ListBoxAppearance)items.ControlDesign;
@@ -164,7 +165,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (e.HotItem == null) { return; }
 
         var infos = (List<object>)e.HotItem;
-        var userMmenu = (ItemCollectionList.ItemCollectionList)infos[0];
+        var userMmenu = (List<AbstractListItem>)infos[0];
         var hotItem = infos[1];
         //var tags = (List<string>)infos[2];
         var ob = (IContextMenu)infos[2];

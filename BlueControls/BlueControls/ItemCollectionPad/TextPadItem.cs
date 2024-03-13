@@ -28,6 +28,7 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
@@ -122,12 +123,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         [
             new FlexiControlForProperty<string>(() => Text, 5)
         ];
-        ItemCollectionList.ItemCollectionList aursicht = new(false)
-        {
-            { "Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig },
-            { "Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren },
-            { "Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig }
-        };
+        List<AbstractListItem> aursicht = new(false);
+        aursicht.Add("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig);
+        aursicht.Add("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren);
+        aursicht.Add("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig);
         //aursicht.Sort();
         l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
         l.Add(new FlexiControlForProperty<float>(() => Skalierung));

@@ -35,6 +35,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -539,7 +540,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
     /// </summary>
     /// <param name="list"></param>
     /// <param name="notAllowedChilds"></param>
-    internal void AddChilds(ItemCollectionList.ItemCollectionList list, ReadOnlyCollection<string> notAllowedChilds) {
+    internal void AddChilds(List<AbstractListItem> list, ReadOnlyCollection<string> notAllowedChilds) {
         list.Clear();
 
         if (File.Exists(Filename)) {

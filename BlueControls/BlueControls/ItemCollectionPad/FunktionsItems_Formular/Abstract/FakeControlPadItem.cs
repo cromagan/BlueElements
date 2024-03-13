@@ -72,7 +72,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     //public abstract Database? DatabaseInput { get; }
     public void Breite_berechnen() {
-        var li = new ItemCollectionList.ItemCollectionList(true);
+        var li =  List<AbstractListItem>();
         for (var br = 1; br <= 20; br++) {
             _ = li.Add(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar);
 
@@ -116,7 +116,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
-            var vf = new ItemCollectionList.ItemCollectionList(false);
+            var vf =  List<AbstractListItem>();
             vf.AddRange(BlueControls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed());
             l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
         }

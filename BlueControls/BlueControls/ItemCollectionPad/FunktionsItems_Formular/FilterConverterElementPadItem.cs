@@ -29,7 +29,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
+using System;
 
 #nullable enable
 
@@ -206,16 +208,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
-            var ic = new ItemCollectionList.ItemCollectionList(true);
+            var ic = List<AbstractListItem>();
             ic.AddRange(dbin.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
 
-            var ic2 = new ItemCollectionList.ItemCollectionList(true);
+            var ic2 = List<AbstractListItem>();
             ic2.AddRange(typeof(FilterTypeRowInputItem));
             l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
         }
 
-        var u2 = new ItemCollectionList.ItemCollectionList(false);
+        var u2 = List<AbstractListItem>();
         u2.AddRange(typeof(FlexiFilterDefaultOutput));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
@@ -223,7 +225,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
-            var ic = new ItemCollectionList.ItemCollectionList(true);
+            var ic = new List<AbstractListItem>();
             ic.AddRange(dbout.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
         }
@@ -285,7 +287,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
-      
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 

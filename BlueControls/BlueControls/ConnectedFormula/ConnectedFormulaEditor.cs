@@ -308,7 +308,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         if (l == null || l.Count == 0) { return; }
 
-        var i = new ItemCollectionList.ItemCollectionList(true);
+        var i = List<AbstractListItem>();
 
         foreach (var thisl in l) {
             i.Add(thisl);

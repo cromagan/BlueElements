@@ -30,6 +30,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -57,7 +58,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
@@ -83,7 +84,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior, AddType addallowed) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -236,7 +237,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         base.OnValueChanged();
     }
 
-    protected void StyleListBox(ListBox? control, ItemCollectionList.ItemCollectionList? list, CheckBehavior checkBehavior, AddType addallowed) {
+    protected void StyleListBox(ListBox? control, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed) {
         if (control == null) { return; }
 
         control.Enabled = Enabled;
@@ -257,9 +258,9 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         //control.CheckBehavior = CheckBehavior.MultiSelection;
         //if (column == null || column.IsDisposed) { return; }
 
-        //ItemCollectionList.ItemCollectionList item = new(true);
+        // List<AbstractListItem> item = new(true);
         //if (column.DropdownBearbeitungErlaubt) {
-        //    ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        //     List<AbstractListItem>.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         //    if (!column.DropdownWerteAndererZellenAnzeigen) {
         //        bool again;
         //        do {

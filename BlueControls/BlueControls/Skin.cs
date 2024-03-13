@@ -30,6 +30,7 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Polygons;
 
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
@@ -1207,24 +1208,22 @@ public static class Skin {
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
 
-    public static ItemCollectionList.ItemCollectionList GetFonts(RowItem? sheetStyle) {
-        ItemCollectionList.ItemCollectionList rahms = new(false)
-        {
-            //   Rahms.GenerateAndAdd(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
-            { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText() },
-            { "Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolForReadableText() },
-            { "Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, sheetStyle).SymbolForReadableText() },
-            { "Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, sheetStyle).SymbolForReadableText() },
-            { "Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, sheetStyle).SymbolForReadableText() },
-            { "Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolForReadableText() },
-            { "Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolForReadableText() }
-        };
+    public static List<AbstractListItem> GetFonts(RowItem? sheetStyle) {
+        List<AbstractListItem> rahms = new(false);
+        //   Rahms.GenerateAndAdd(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
+        rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText());
+        rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolForReadableText());
+        rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, sheetStyle).SymbolForReadableText());
+        rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, sheetStyle).SymbolForReadableText());
+        rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, sheetStyle).SymbolForReadableText());
+        rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolForReadableText());
+        rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolForReadableText());
         //rahms.Sort();
         return rahms;
     }
 
-    public static ItemCollectionList.ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
-        ItemCollectionList.ItemCollectionList rahms = new(false);
+    public static List<AbstractListItem> GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
+        List<AbstractListItem> rahms = new(false);
         if (mitOhne) {
             _ = rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
         }

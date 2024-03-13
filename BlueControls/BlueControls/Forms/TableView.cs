@@ -70,7 +70,6 @@ public partial class TableView : FormWithStatusBar {
 
         if (btnDrucken != null) {
             btnDrucken.Item.Clear();
-            btnDrucken.Item.AutoSort = false;
             _ = btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
             _ = btnDrucken.Item.AddSeparator();
             _ = btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));

@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 
 #nullable enable
 
@@ -143,9 +144,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
 
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void HandleChangesNow() {
         if (IsDisposed) { return; }
@@ -184,7 +185,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     public void ParentFilterOutput_Changed() => HandleChangesNow();
 
-    //public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+    //public void GetContextMenuItems(MouseEventArgs? e,  List<AbstractListItem> items, out object? hotItem) {
     //    hotItem = null;
     //    if (FilterSingleColumn?.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) { return; }
 
@@ -239,7 +240,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         base.OnControlAdded(e);
 
         if (e.Control is ComboBox cbx) {
-            ItemCollectionList.ItemCollectionList item2 = new(true)
+            List<AbstractListItem> item2 = new()
             {
                 { "Keine weiteren Einträge vorhanden", "|~" }
             };

@@ -165,7 +165,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
@@ -298,10 +298,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
         switch (e.Control) {
             case ComboBox comboBox:
-                ItemCollectionList.ItemCollectionList item2 = new(true);
+                List<AbstractListItem> item2 = new();
 
                 if (column1 != null) {
-                    ItemCollectionList.ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
+                    List<AbstractListItem>.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
                 }
 
                 if (column1 != null && column1.TextBearbeitungErlaubt) {
@@ -398,9 +398,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         control.CheckBehavior = CheckBehavior.MultiSelection;
         if (column == null || column.IsDisposed) { return; }
 
-        ItemCollectionList.ItemCollectionList item = new(true);
+        List<AbstractListItem> item = new(true);
         if (column.DropdownBearbeitungErlaubt) {
-            ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+            List<AbstractListItem>.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
                 do {
@@ -450,8 +450,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         control.UnCheck();
         control.SuggestionsClear();
         if (column == null || column.IsDisposed) { return; }
-        ItemCollectionList.ItemCollectionList item = new(true);
-        ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        List<AbstractListItem> item = new(true);
+        List<AbstractListItem>.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:

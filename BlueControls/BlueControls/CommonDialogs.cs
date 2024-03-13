@@ -17,7 +17,9 @@
 
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
+using System;
 
 #nullable enable
 
@@ -30,7 +32,7 @@ internal static class CommonDialogs {
     public static Database? ChooseKnownDatabase(string caption, string mustbefreezed) {
         var l = Database.AllAvailableTables(mustbefreezed);
 
-        var l2 = new ItemCollectionList.ItemCollectionList(true);
+        var l2 = List<AbstractListItem>();
 
         foreach (var thisd in l) {
             _ = l2.Add(thisd);
@@ -42,6 +44,8 @@ internal static class CommonDialogs {
 
         return Database.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword, true);
     }
+
+    private static List<T> List<T>() => throw new NotImplementedException();
 
     #endregion
 }

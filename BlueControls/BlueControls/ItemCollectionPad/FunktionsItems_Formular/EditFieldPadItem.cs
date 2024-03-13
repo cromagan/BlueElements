@@ -211,19 +211,19 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
-        var lst = new ItemCollectionList.ItemCollectionList(true);
+        var lst =  List<AbstractListItem>();
         lst.AddRange(db.Column, false);
 
         l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
         if (Column == null || Column.IsDisposed) { return l; }
 
-        var u = new ItemCollectionList.ItemCollectionList(false);
+        var u =  List<AbstractListItem>();
         u.AddRange(typeof(CaptionPosition));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
         l.Add(new FlexiControlForProperty<bool>(() => AutoX));
 
-        var b = new ItemCollectionList.ItemCollectionList(false, GetAllowedEditTypes(Column));
+        var b = new  List<AbstractListItem>(false, GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
         //l.Add(new FlexiControl());

@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 
@@ -110,12 +111,10 @@ public class LinePadItem : AbstractPadItem {
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = [];
 
-        ItemCollectionList.ItemCollectionList verhalt = new(false)
-        {
-            { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie) },
-            { "Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie) },
-            { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie) }
-        };
+        List<AbstractListItem> verhalt = new(false);
+        verhalt.Add("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie));
+        verhalt.Add("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie));
+        verhalt.Add("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie));
         l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
         AddLineStyleOption(l);
         l.AddRange(base.GetStyleOptions(widthOfControl));

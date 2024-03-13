@@ -30,6 +30,7 @@ using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -52,13 +53,13 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
-
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     public event EventHandler<ScriptEventArgs>? ExecuteScript;
+
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -83,7 +84,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             _ = items.Add("Variableninhalt kopieren");
         }
@@ -93,11 +94,11 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
-
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void TesteScript(string scriptname) {
         Message("Starte Skript");

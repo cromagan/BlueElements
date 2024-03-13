@@ -71,7 +71,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
     }
 
-    internal void SuggestionsAdd(ItemCollectionList.ItemCollectionList? item) {
+    internal void SuggestionsAdd( List<AbstractListItem>? item) {
         if (item == null) { return; }
 
         foreach (var thisi in item) {

@@ -222,7 +222,7 @@ public sealed class ItemAcceptFilter {
         } else {
             //l.Add(new FlexiControlForProperty<>(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
 
-            var x = new ItemCollectionList.ItemCollectionList(false);
+            var x =  List<AbstractListItem>();
 
             // Die Items, die man noch wählen könnte
             foreach (var thisR in item.Parent) {

@@ -35,6 +35,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 
@@ -269,7 +270,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? selectedHotItem) {
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? selectedHotItem) {
         CheckHotItem(e, true);
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {

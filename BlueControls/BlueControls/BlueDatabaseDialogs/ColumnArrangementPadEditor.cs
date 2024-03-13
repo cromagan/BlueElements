@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -181,7 +182,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
 
-        ItemCollectionList.ItemCollectionList aa = new(true);
+        List<AbstractListItem> aa = [];
         aa.AddRange(Database.Permission_AllUsed(false));
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text);
         if (b == null) { return; }
@@ -288,7 +289,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
 
-        ItemCollectionList.ItemCollectionList ic = new(true);
+        List<AbstractListItem> ic = [];
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem != null && ca[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
         }

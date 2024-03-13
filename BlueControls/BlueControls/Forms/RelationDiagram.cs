@@ -28,6 +28,7 @@ using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -346,7 +347,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     private void Hinzu_Click(object sender, System.EventArgs e) {
         if (Database?.Column.First() is not ColumnItem c) { return; }
 
-        ItemCollectionList.ItemCollectionList il = new(true);
+        List<AbstractListItem> il = new(true);
         il.AddRange(c.Contents());
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, CheckBehavior.SingleSelection, null, AddType.None);
         if (i == null || i.Count != 1) { return; }

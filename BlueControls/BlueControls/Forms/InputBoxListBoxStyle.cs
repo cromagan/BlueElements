@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueControls.Enums;
 using System.Collections.Generic;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -33,9 +34,9 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), CheckBehavior.SingleSelection, null, AddType.None) { }
+    private InputBoxListBoxStyle() : this(string.Empty, new List<AbstractListItem>(true), CheckBehavior.SingleSelection, null, AddType.None) { }
 
-    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) : base(true, true) {
+    private InputBoxListBoxStyle(string txt, List<AbstractListItem> itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) : base(true, true) {
         InitializeComponent();
         if (itemsOriginal.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes) {
             Develop.DebugPrint("Design nicht Listbox");
@@ -61,14 +62,14 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
 
-        ItemCollectionList.ItemCollectionList x = new(ListBoxAppearance.Listbox, true);
+        List<AbstractListItem> x = new(ListBoxAppearance.Listbox, true);
         x.AddRange(items);
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }
 
-    public static List<string>? Show(string txt, ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
+    public static List<string>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
         InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed);
         _ = mb.ShowDialog();
         return mb._giveBack;

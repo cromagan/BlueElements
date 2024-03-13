@@ -19,7 +19,9 @@
 
 using BlueControls.EventArgs;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Interfaces;
 
@@ -60,7 +62,7 @@ public interface IContextMenu {
     /// <param name="e"></param>
     /// <param name="items"></param>
     /// <param name="hotItem"></param>
-    void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem);
+    void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem);
 
     /// <summary>
     /// Hier wird dem übergeordneten Steuerelement die Möglichkeit gegeben, Einträge in das Kontextmenu hinzuzufügen.

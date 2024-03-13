@@ -229,7 +229,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             return;
         }
 
-        var lst = new ItemCollectionList.ItemCollectionList(true);
+        var lst =  List<AbstractListItem>();
         lst.AddRange(db.Column, false);
 
         lst.Remove(_textc);

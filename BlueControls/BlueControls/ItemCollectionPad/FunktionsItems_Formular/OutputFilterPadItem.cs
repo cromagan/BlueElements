@@ -211,7 +211,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
-            var lst = new ItemCollectionList.ItemCollectionList(true);
+            var lst =  List<AbstractListItem>();
             lst.AddRange(db.Column, false);
 
             l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
@@ -219,15 +219,15 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
-        var u = new ItemCollectionList.ItemCollectionList(false);
+        var u =  List<AbstractListItem>();
         u.AddRange(typeof(CaptionPosition));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
-        var u2 = new ItemCollectionList.ItemCollectionList(false);
+        var u2 =  List<AbstractListItem>();
         u2.AddRange(typeof(FlexiFilterDefaultOutput));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
-        var u3 = new ItemCollectionList.ItemCollectionList(false);
+        var u3 =  List<AbstractListItem>();
         u3.AddRange(typeof(FlexiFilterDefaultFilter));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 

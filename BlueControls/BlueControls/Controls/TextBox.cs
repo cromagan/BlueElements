@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Controls;
@@ -369,7 +370,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         if (e == null) {
             hotItem = null;
             return;
@@ -845,8 +846,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = _cursorCharPos;
         MultiUserFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
-        ItemCollectionList.ItemCollectionList i = new(ListBoxAppearance.Listbox, false)
-        {
+        List<AbstractListItem> i = new(ListBoxAppearance.Listbox, false)
+       {
             //if (e.File is Database DB && DB.Bins.Count > 0) {
             //    foreach (var bmp in DB.Bins) {
             //        if (bmp.Picture != null) {

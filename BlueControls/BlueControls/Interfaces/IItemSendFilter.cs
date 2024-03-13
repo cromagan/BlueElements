@@ -139,7 +139,7 @@ public sealed class ItemSendSomething {
 
         var ld = Database.AllAvailableTables(string.Empty);
 
-        var ld2 = new ItemCollectionList.ItemCollectionList(true);
+        var ld2 =  List<AbstractListItem>();
 
         foreach (var thisd in ld) {
             _ = ld2.Add(thisd);

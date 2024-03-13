@@ -97,7 +97,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         }
     }
 
-    //public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
     protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, BoundsSpecified specified) => tbounds;
 
     // NIX TUN!!!!

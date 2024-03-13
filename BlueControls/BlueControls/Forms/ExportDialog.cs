@@ -105,7 +105,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, Database? db) {
+    public static void AddLayoutsOff(List<AbstractListItem> addHere, Database? db) {
         if (db is null || db.IsDisposed) { return; }
         var r = db.GetAllLayouts();
 

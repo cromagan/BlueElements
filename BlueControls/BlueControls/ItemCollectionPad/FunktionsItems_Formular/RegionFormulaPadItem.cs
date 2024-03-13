@@ -182,11 +182,11 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        var cl = new ItemCollectionList.ItemCollectionList(true);
+        var cl =  List<AbstractListItem>();
 
         CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
 
-        var u = new ItemCollectionList.ItemCollectionList(false);
+        var u =  List<AbstractListItem>();
         u.AddRange(typeof(GroupBoxStyle));
 
         List<GenericControl> l =

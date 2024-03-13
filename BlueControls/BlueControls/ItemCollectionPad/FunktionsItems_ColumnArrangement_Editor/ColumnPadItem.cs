@@ -107,7 +107,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         //    l.AddRange(AdditionalStyleOptions);
         //}
 
-        //ItemCollectionList.ItemCollectionList layouts = new();
+        // List<AbstractListItem> layouts = new();
         //foreach (var thisLayouts in Row.Database.Layouts) {
         //    ItemCollectionPad p = new(thisLayouts, string.Empty);
         //    layouts.GenerateAndAdd(p.Caption, p.Id, ImageCode.Stern);

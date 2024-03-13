@@ -17,13 +17,16 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using BlueControls.ItemCollectionList;
+
 namespace BlueControls.EventArgs;
 
 public class ContextMenuInitEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ContextMenuInitEventArgs(object? hotItem, ItemCollectionList.ItemCollectionList userMenu) {
+    public ContextMenuInitEventArgs(object? hotItem, List<AbstractListItem> userMenu) {
         UserMenu = userMenu;
         HotItem = hotItem;
         Translate = true;
@@ -37,7 +40,7 @@ public class ContextMenuInitEventArgs : System.EventArgs {
     public bool Cancel { get; }
     public object? HotItem { get; }
     public bool Translate { get; }
-    public ItemCollectionList.ItemCollectionList UserMenu { get; }
+    public List<AbstractListItem> UserMenu { get; }
 
     #endregion
 }

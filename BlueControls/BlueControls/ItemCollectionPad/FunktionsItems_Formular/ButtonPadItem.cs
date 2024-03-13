@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
 
@@ -303,14 +304,14 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         var im = QuickImage.Images();
 
-        var c = new ItemCollectionList.ItemCollectionList(true);
+        var c = List<AbstractListItem>();
         foreach (var thisIm in im) {
             c.Add(thisIm, thisIm, QuickImage.Get(thisIm, 16));
         }
 
         l.Add(new FlexiControlForProperty<string>(() => Bild, c));
 
-        //var sn = new ItemCollectionList.ItemCollectionList(true) {
+        //var sn = new  List<AbstractListItem>(true) {
         //    "#Neue Zeile in der Datenbank anlegen"
         //};
 
@@ -320,16 +321,15 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         //l.Add(new FlexiControlForProperty<string>(() => SkriptName, sn));
 
-        var za = new ItemCollectionList.ItemCollectionList(true) {
-            {  "...egal - immer", ((int)ButtonArgs.Egal).ToString()},
-            {  "...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()},
-            {  "...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()},
-             {  "...genau eine oder mehr Zeilen gefunden wurden",((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString() }
-        };
+        var za = List<AbstractListItem>();
+        za.Add("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString());
+        za.Add("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString());
+        za.Add("...genau eine oder mehr Zeilen gefunden wurden", ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString());
+        za.Add("...egal - immer", ((int)ButtonArgs.Egal).ToString());
 
         l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 
-        var co = new ItemCollectionList.ItemCollectionList(true);
+        var co = List<AbstractListItem>();
 
         if (Script.Commands != null) {
             foreach (var cmd in Script.Commands) {
