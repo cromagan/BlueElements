@@ -165,7 +165,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
-            if (!ButtonPadItem.PossibleFor(Script.Commands.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
+            if (!PossibleFor(Script.Commands.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
             OnPropertyChanged();
             UpdateSideOptionMenu();
         }

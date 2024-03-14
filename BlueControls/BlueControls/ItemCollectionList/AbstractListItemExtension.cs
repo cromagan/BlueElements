@@ -208,7 +208,7 @@ public static class AbstractListItemExtension {
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
 
-    public static List<CellLikeListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -253,8 +253,8 @@ public static class AbstractListItemExtension {
         return ItemsOf(l, column, style, column.BehaviorOfImageAndText);
     }
 
-    public static List<TextListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
-        var l = new List<TextListItem>();
+    public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
+        var l = new List<AbstractListItem>();
 
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
@@ -286,8 +286,8 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<TextListItem> ItemsOf(IEnumerable<string>? list) {
-        var l = new List<TextListItem>();
+    public static List<AbstractListItem> ItemsOf(IEnumerable<string>? list) {
+        var l = new List<AbstractListItem>();
         if (list == null) { return l; }
 
         foreach (var thisitem in list) {
@@ -296,8 +296,8 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<CellLikeListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
-        var l = new List<CellLikeListItem>();
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+        var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }
         if (values.Count > 10000) {
@@ -316,8 +316,8 @@ public static class AbstractListItemExtension {
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static List<TextListItem> ItemsOf(Type type) {
-        var l = new List<TextListItem>();
+    public static List<AbstractListItem> ItemsOf(Type type) {
+        var l = new List<AbstractListItem>();
         var underlyingType = Enum.GetUnderlyingType(type);
 
         if (underlyingType == typeof(int)) {

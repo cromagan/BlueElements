@@ -28,6 +28,7 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
@@ -161,9 +162,16 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Methods
 
-    public void ItemAdd(AbstractListItem textListItem) => throw new NotImplementedException();
+    public void ItemAdd(AbstractListItem item) {
+        _item.Add(item);
+        Invalidate();
+    }
 
-    public void ItemClear() => throw new NotImplementedException();
+    public void ItemClear() {
+        if (_item.Count == 0) { return; }
+        _item.Clear();
+        Invalidate();
+    }
 
     public void ShowMenu(object? sender, MouseEventArgs? e) {
         if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
@@ -187,11 +195,22 @@ public partial class ComboBox : TextBox, ITranslateable {
         _btnDropDownIsIn = false;
     }
 
-    internal void ItemAddRange(IEnumerable<AbstractListItem>? textListItems) => throw new NotImplementedException();
+    internal void ItemAddRange(ICollection<AbstractListItem>? items) {
+        if (items == null || items.Count == 0) { return; }
 
-    internal IEnumerable<AbstractListItem> Items() => throw new NotImplementedException();
+        foreach (var thisIt in items) {
+            _item.Remove(thisIt.KeyName);
+            ItemAdd(thisIt);
+        }
+    }
 
-    internal void Remove(AbstractListItem thisit) => throw new NotImplementedException();
+    internal ReadOnlyCollection<AbstractListItem> Items() => _item.AsReadOnly();
+
+    internal void Remove(AbstractListItem thisit) {
+        if (!_item.Contains(thisit)) { return; }
+        _item.Remove(thisit);
+        Invalidate();
+    }
 
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 

@@ -796,7 +796,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return tmp;
     }
 
-    public static IEnumerable<string> Permission_AllUsed(bool cellLevel) {
+    public static List<string> Permission_AllUsed(bool cellLevel) {
         var l = new List<string>();
 
         foreach (var thisDB in AllFiles) {

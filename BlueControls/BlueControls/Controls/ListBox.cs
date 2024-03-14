@@ -35,8 +35,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Forms;
-
 using BlueDatabase;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -448,30 +448,53 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
-    public void ItemAddRange(IEnumerable<AbstractListItem>? list) => throw new NotImplementedException();
+    public void ItemAddRange(List<AbstractListItem>? list) {
+        if (list == null || list.Count == 0) { return; }
 
-    public void ItemAddRange(IEnumerable<string>? list) {
-        if (list == null) { return; }
+        InvalidateItemOrder();
+        ValidateCheckStates(_checked, list[0].KeyName);
+    }
+
+    public void ItemAddRange(List<string>? list) {
+        if (list == null || list.Count == 0) { return; }
 
         foreach (var thisstring in list) {
             if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
-                ItemAdd(BlueControls.ItemCollectionList.AbstractListItemExtension.ItemOf(thisstring, thisstring));
+                _item.Add(ItemOf(thisstring, thisstring));
             }
         }
+
+        InvalidateItemOrder();
+        ValidateCheckStates(_checked, list[0]);
     }
 
-    public void ItemClear() => throw new NotImplementedException();
+    public void ItemClear() {
+        if (_item.Count == 0) { return; }
+        _item.Clear();
+        InvalidateItemOrder();
+        ValidateCheckStates(null, string.Empty);
+    }
 
     public virtual void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void Remove(string internalnam) => _item.Remove(this[internalnam]);
+    public void Remove(string internalnam) {
+        if (string.IsNullOrEmpty(internalnam)) { return; }
+
+        _item.Remove(internalnam);
+        _checked.Remove(internalnam);
+        InvalidateItemOrder();
+        ValidateCheckStates(_checked, string.Empty);
+    }
 
     public void Remove(AbstractListItem? item) {
-        //if (item == null || !Contains(item)) { return; }
-        //_ = _item.Remove(item);
-        throw new NotImplementedException();
+        if (item == null) { return; }
+
+        _item.Remove(item);
+        _checked.Remove(item.KeyName);
+        InvalidateItemOrder();
+        ValidateCheckStates(_checked, string.Empty);
     }
 
     public void Swap(int index1, int index2) {
@@ -480,19 +503,17 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         (_item[index1], _item[index2]) = (_item[index2], _item[index1]);
 
-        Invalidate();
-        DoMouseMovement();
-        ValidateCheckStates(_itemOrder.ToListOfString(), string.Empty);
-    }
-
-    public void UnCheck(IEnumerable<string> ali) {
-        foreach (var thiss in ali) {
-            UnCheck(thiss);
-        }
+        InvalidateItemOrder();
+        ValidateCheckStates(ItemOrder.ToListOfString(), string.Empty);
     }
 
     public void UnCheck(AbstractListItem ali) => UnCheck(ali.KeyName);
 
+    //public void UnCheck(IEnumerable<string> ali) {
+    //    foreach (var thiss in ali) {
+    //        UnCheck(thiss);
+    //    }
+    //}
     public void UnCheck(string name) {
         if (!IsChecked(name)) { return; }
 
@@ -513,9 +534,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         var tmp = _checkBehavior;
         _checkBehavior = CheckBehavior.MultiSelection;
 
-        //Item.Remove(ali.KeyName);
+        ItemAdd(ali);
+        //_item.Remove(ali.KeyName);
 
-        _item.Add(ali);
+        //_item.Add(ali);
         _checkBehavior = tmp;
         Check(ali);
     }
@@ -655,10 +677,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    internal void Item_CompareKeyChangedChanged(object sender, System.EventArgs e) {
-        _maxNeededItemSize = Size.Empty;
-        _itemOrder = null;
-    }
+    internal void Item_CompareKeyChangedChanged(object sender, System.EventArgs e) => InvalidateItemOrder();
 
     internal void SetValuesTo(List<string> values) {
         var ist = _item.ToListOfString();
@@ -730,7 +749,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
 
-        Parallel.ForEach(_itemOrder, thisItem => {
+        Parallel.ForEach(ItemOrder, thisItem => {
             var currentItem = thisItem;
             if (currentItem.Pos.IntersectsWith(visArea)) {
                 var itemState = tmpState;
@@ -1030,6 +1049,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
         DoQuickInfo();
         Invalidate();
+    }
+
+    private void InvalidateItemOrder() {
+        _maxNeededItemSize = Size.Empty;
+        _itemOrder = null;
     }
 
     private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
