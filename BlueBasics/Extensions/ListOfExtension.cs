@@ -101,14 +101,12 @@ public static partial class Extensions {
     }
 
     public static int IndexOf<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
-        if (string.IsNullOrEmpty(name)) { return -1; }
+        if (string.IsNullOrEmpty(name) || items == null) { return -1; }
 
-        if (items != null) {
-            for (var z = 0; z < items.Count(); z++) {
-                var thisp = items.ElementAt(z);
-                if (thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase)) {
-                    return z;
-                }
+        for (var z = 0; z < items.Count(); z++) {
+            var thisp = items.ElementAt(z);
+            if (thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase)) {
+                return z;
             }
         }
 
@@ -259,6 +257,12 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
+
+    public static void Remove<T>(this List<T?> items, string name) where T : class, IHasKeyName {
+        if (string.IsNullOrEmpty(name) || items == null) { return; }
+
+        items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
+    }
 
     /// <summary>
     ///  Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden! Dafür kann RemoveString benutzt werden.

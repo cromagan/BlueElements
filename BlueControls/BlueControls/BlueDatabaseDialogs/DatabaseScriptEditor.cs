@@ -34,6 +34,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -135,7 +136,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.ScriptText;
 
-                lstPermissionExecute.Item.Clear();
+                lstPermissionExecute.ItemClear();
                 var l = Database.Permission_AllUsed(false).ToList();
                 l.AddIfNotExists(Constants.Administrator);
                 lstPermissionExecute.ItemAddRange(l);
@@ -494,7 +495,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
         var t2 = new List<DatabaseScriptDescription>();
-        t2.AddRange(lstEventScripts.Item.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
+        t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
         Database.EventScriptErrorMessage = string.Empty;
 

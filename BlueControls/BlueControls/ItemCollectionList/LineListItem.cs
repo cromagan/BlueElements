@@ -41,12 +41,6 @@ public class LineListItem : AbstractListItem {
 
     #region Methods
 
-    public override object Clone() {
-        var x = new LineListItem(Internal, UserDefCompareKey);
-        x.CloneBasicStatesFrom(this);
-        return x;
-    }
-
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
 
     public override bool IsClickable() => false;

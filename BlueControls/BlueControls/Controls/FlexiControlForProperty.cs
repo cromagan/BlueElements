@@ -133,7 +133,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
-                        var (biggestItemX, biggestItemY, _, _) = ListBox.ItemData(list, list, ComboBoxStyle.DropDownList);
+                        var (biggestItemX, biggestItemY, _, _) = ListBox.ItemData(list, Design.ComboBox_Textbox);
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
@@ -246,7 +246,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
 
         control.CheckBehavior = checkBehavior;
         control.Appearance = ListBoxAppearance.Listbox_Boxes;
-        control.ItemAddClonesFrom(list);
+        control.ItemAddRange(list);
         control.AddAllowed = addallowed;
         control.RemoveAllowed = false;
 

@@ -554,7 +554,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
         foreach (var thisf in ConnectedFormula.AllFiles) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
-                if (list[thisf.Filename] == null) {
+                if (list.Get(thisf.Filename) == null) {
                     list.Add(Add(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette));
                 }
             }

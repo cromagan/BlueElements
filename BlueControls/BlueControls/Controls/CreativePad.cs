@@ -277,9 +277,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         if (selectedHotItem != null) {
             items.Add(Add("Allgemeine Element-Aktionen", true));
             //items.GenerateAndAdd("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
-            //items.AddSeparator();
+            //items.Add(AddSeparator());
             items.Add(Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable));
-            items.AddSeparator();
+            items.Add(AddSeparator());
             items.Add(Add("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
             items.Add(Add("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
             items.Add(Add("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));

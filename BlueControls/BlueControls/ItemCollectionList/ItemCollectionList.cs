@@ -288,7 +288,7 @@ public static class ItemCollectionList {
         foreach (var thisitem in list) {
             if (thisitem != null) { l.Add(Add(thisitem)); }
         }
-        return l
+        return l;
     }
 
     public static List<RowFormulaListItem> AddRange(IEnumerable<RowItem?>? list, string layoutId) {
@@ -342,11 +342,11 @@ public static class ItemCollectionList {
         switch (column.Function) {
             case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 var db2 = column.LinkedDatabase;
-                if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
+                if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return []; }
 
                 // Spalte aus der Ziel-Datenbank ermitteln
                 var targetColumn = db2.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
-                if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
+                if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return []; }
 
                 var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
                 if (!string.IsNullOrEmpty(info)) {

@@ -111,8 +111,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
             new FlexiControlForProperty<Color>(() => Randfarbe)
         ];
         var lage = new List<AbstractListItem>();
-        lage.Add("ohne", "-1");
-        lage.Add("Links oben", ((int)Alignment.Top_Left).ToString());
+        lage.Add(Add("ohne", "-1"));
+        lage.Add(Add("Links oben", ((int)Alignment.Top_Left).ToString()));
         l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
         l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
         l.AddRange(base.GetStyleOptions(widthOfControl));

@@ -393,36 +393,36 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             items.Add(Add("Rechtschreibprüfung", true));
             if (Dictionary.IsSpellChecking) {
                 items.Add(Add("Gerade ausgelastet...", "Gerade ausgelastet...", false));
-                //_ = items.AddSeparator();
+                //_ = items.Add(AddSeparator());
             } else {
                 var sim = Dictionary.SimilarTo(tmpWord);
                 if (sim != null) {
                     foreach (var thisS in sim) {
                         items.Add(Add(" - " + thisS, "#ChangeTo:" + thisS));
                     }
-                    items.AddSeparator();
+                    items.Add(AddSeparator());
                 }
-                items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
+                items.Add(Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable()));
                 if (tmpWord.ToLower() != tmpWord) {
-                    items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
+                    items.Add(Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable()));
                 }
-                items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
-                items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
-                items.AddSeparator();
+                items.Add(Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable()));
+                items.Add(Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable()));
+                items.Add(AddSeparator());
             }
         }
         if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
-            items.Add(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled);
-            items.Add(ContextMenuCommands.Kopieren, _markStart >= 0);
-            items.Add(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled);
+            items.Add(Add(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled));
+            items.Add(Add(ContextMenuCommands.Kopieren, _markStart >= 0));
+            items.Add(Add(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled));
             if (_formatierungErlaubt) {
-                items.AddSeparator();
-                items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
+                items.Add(AddSeparator());
+                items.Add(Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
                 if (_markEnd > -1) {
-                    items.AddSeparator();
-                    items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
-                    items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1);
-                    items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                    items.Add(AddSeparator());
+                    items.Add(Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                    items.Add(Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                    items.Add(Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1));
                 }
             }
         }
@@ -858,7 +858,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         //            }
         //        }
         //    }
-        //    i.AddSeparator();
+        //    i.Add(AddSeparator());
         //}
         i.Add(Add("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)));
         i.Add(Add("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)));

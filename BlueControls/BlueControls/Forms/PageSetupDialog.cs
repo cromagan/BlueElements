@@ -47,10 +47,10 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _doing = true;
         // _NurHoch = NurHochformat
-        Format.Item.Clear();
+        Format.ItemClear();
         foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
             var nn = ps.Width + ";" + ps.Height;
-            if (Format.Item[nn] == null) {
+            if (Format[nn] == null) {
                 Format.ItemAdd(Add(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName));
             }
         }
@@ -163,9 +163,9 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
     private void FillHöheBreite(double b, double h) {
         var nn1 = b + ";" + h;
         var nn2 = h + ";" + b;
-        if (Format.Item[nn1] != null) {
+        if (Format[nn1] != null) {
             Format.Text = nn1;
-        } else if (Format.Item[nn2] != null) {
+        } else if (Format[nn2] != null) {
             Format.Text = nn2;
         } else {
             Format.Text = "neu";

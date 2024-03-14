@@ -44,12 +44,6 @@ public class ReadableListItem : TextListItem {
 
     #region Methods
 
-    public override object Clone() {
-        var l = new ReadableListItem(Item, IsCaption, Enabled, UserDefCompareKey);
-        l.CloneBasicStatesFrom(this);
-        return l;
-    }
-
     private void Item_PropertyChanged(object sender, System.EventArgs e) {
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();

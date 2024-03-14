@@ -120,9 +120,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             new FlexiControl()
         ];
         var comms = new List<AbstractListItem>();
-        comms.Add("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32"));
-        comms.Add("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32"));
-        comms.Add("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32"));
+        comms.Add(Add("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32")));
+        comms.Add(Add("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
+        comms.Add(Add("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
         l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
         l.Add(new FlexiControl());
         AddLineStyleOption(l);

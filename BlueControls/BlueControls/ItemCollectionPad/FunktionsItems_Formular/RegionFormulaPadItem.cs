@@ -188,7 +188,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
         CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
 
         var u = new List<AbstractListItem>();
-        u.AddRange(typeof(GroupBoxStyle));
+        u.AddRange(AddRange(typeof(GroupBoxStyle)));
 
         List<GenericControl> l =
             [.. _itemAccepts.GetStyleOptions(this, widthOfControl),
@@ -306,7 +306,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     //    return null;
     //}
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuCommands.Bearbeiten);
+    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(Add(ContextMenuCommands.Bearbeiten));
 
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not AbstractListItem it) { return; }

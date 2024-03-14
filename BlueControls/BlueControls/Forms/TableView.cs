@@ -74,12 +74,12 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (btnDrucken != null) {
-            btnDrucken.Item.Clear();
+            btnDrucken.ItemClear();
             btnDrucken.ItemAdd(Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28)));
-            //_ = btnDrucken.ItemAddSeparator();
+            btnDrucken.ItemAdd(AddSeparator());
             btnDrucken.ItemAdd(Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28)));
             btnDrucken.ItemAdd(Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28)));
-            //_ = btnDrucken.ItemAddSeparator();
+            btnDrucken.ItemAdd(AddSeparator());
             btnDrucken.ItemAdd(Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
         }
 
@@ -119,7 +119,7 @@ public partial class TableView : FormWithStatusBar {
             e.UserMenu.Add(Add("Sortierung", true));
             e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
             e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
-            //_ = e.UserMenu.AddSeparator();
+            //_ = e.UserMenu.Add(AddSeparator());
 
             e.UserMenu.Add(Add("Zelle", true));
             e.UserMenu.Add(Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules()));
@@ -127,7 +127,7 @@ public partial class TableView : FormWithStatusBar {
             e.UserMenu.Add(Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules()));
             e.UserMenu.Add(Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo));
             e.UserMenu.Add(Add(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
-            //_ = e.UserMenu.AddSeparator();
+            //_ = e.UserMenu.Add(AddSeparator());
             e.UserMenu.Add(Add("Spalte", true));
             e.UserMenu.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
 
@@ -136,7 +136,7 @@ public partial class TableView : FormWithStatusBar {
 
             e.UserMenu.Add(Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
             e.UserMenu.Add(Add("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
-            //_ = e.UserMenu.AddSeparator();
+            //_ = e.UserMenu.Add(AddSeparator());
         }
 
         if (row != null) {
@@ -492,11 +492,11 @@ public partial class TableView : FormWithStatusBar {
         lstAufgaben.Enabled = datenbankDa;
         btnSaveAs.Enabled = datenbankDa;
 
-        if (btnDrucken.Item["csv"] is AbstractListItem bli1) {
+        if (btnDrucken["csv"] is AbstractListItem bli1) {
             bli1.Enabled = datenbankDa;
         }
 
-        if (btnDrucken.Item["html"] is AbstractListItem bli2) {
+        if (btnDrucken["html"] is AbstractListItem bli2) {
             bli2.Enabled = datenbankDa;
         }
 
@@ -1157,7 +1157,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void UpdateScripts(Database? db) {
-        lstAufgaben.Item.Clear();
+        lstAufgaben.ItemClear();
 
         if (db == null || db.IsDisposed || !string.IsNullOrEmpty(db.FreezedReason)) {
             lstAufgaben.Enabled = false;
@@ -1180,22 +1180,25 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (!string.IsNullOrEmpty(db.EventScriptErrorMessage) || !string.IsNullOrEmpty(db.CheckScriptError())) {
-            var d = lstAufgaben.ItemAdd(Add("Skripte reparieren", "#repairscript", ImageCode.Kritisch));
+            var d = Add("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
+            lstAufgaben.ItemAdd(d);
             lstAufgaben.Enabled = true;
             return;
         }
 
         if (!db.IsRowScriptPossible(false)) {
-            var d = lstAufgaben.ItemAdd(Add("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte));
+            var d = Add("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
             d.Enabled = db.IsAdministrator();
+            lstAufgaben.ItemAdd(d);
             lstAufgaben.Enabled = true;
             return;
         }
 
         foreach (var thiss in db.EventScript) {
             if (thiss != null && thiss.UserGroups.Count > 0) {
-                var d = lstAufgaben.ItemAdd(thiss);
+                var d = Add(thiss);
+                lstAufgaben.ItemAdd(d);
                 d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
 
                 if (d.Enabled && thiss.NeedRow && !db.IsRowScriptPossible(true)) {
@@ -1211,13 +1214,14 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (db.IsAdministrator()) {
-            var d = lstAufgaben.ItemAdd(Add("Skripte bearbeiten", "#editscript", ImageCode.Skript));
+            var d = Add("Skripte bearbeiten", "#editscript", ImageCode.Skript);
+            lstAufgaben.ItemAdd(d);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.Enabled = true;
             return;
         }
 
-        lstAufgaben.Enabled = lstAufgaben.Item.Count > 0;
+        lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;
     }
 
     #endregion

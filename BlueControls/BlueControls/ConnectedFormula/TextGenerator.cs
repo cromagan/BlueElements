@@ -220,13 +220,13 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
             bool again;
             do {
                 again = false;
-                foreach (var thisit in lstAuswahl.Item) {
+                foreach (var thisit in lstAuswahl.Items) {
                     if (thisit.Internal.CountString(";") >= stufe) {
                         var ok = false;
                         foreach (var thisall in allowed) {
                             if (thisit.Internal.StartsWith(thisall)) { ok = true; }
                         }
-                        if (!ok) { lstAuswahl.Item.Remove(thisit); again = true; break; }
+                        if (!ok) { lstAuswahl.Remove(thisit); again = true; break; }
                     }
                 }
             } while (again);
@@ -253,7 +253,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
         foreach (var thisRow in allr) {
             var r = RowString(thisRow);
 
-            if (lstAuswahl.Item[r] == null) {
+            if (lstAuswahl[r] == null) {
                 var add = false;
                 foreach (var thisChecked in chk) {
                     if (thisChecked.CountString(";") + 1 == r.CountString(";") && r.StartsWith(thisChecked)) { add = true; }

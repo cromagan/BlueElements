@@ -31,6 +31,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.ItemCollectionList;
+
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -673,7 +674,7 @@ internal sealed partial class ColumnEditor {
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
 
-        if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
+        if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.ItemCount == 0) {
             var l = Database.AllAvailableTables(db.FreezedReason);
 
             foreach (var thisString in l) {

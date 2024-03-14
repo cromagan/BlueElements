@@ -45,13 +45,13 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, _controlDesign) {
+    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) : base(connectedControl, (Design)controlDesign) {
         InitializeComponent();
         Tag = hotitem;
         // Design = Items.ControlDesign;
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
-        Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate);
+        Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort);
         //UnloadLostFocus = true;
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
         //Develop.DoEvents();
@@ -87,16 +87,16 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         control.OnContextMenuInit(ec);
         if (ec.Cancel) { return; }
         if (!ec.Translate) { translate = false; }
-        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { _ = thisContextMenu.AddSeparator(); }
-        if (userMenu.Count > 0) { thisContextMenu.AddClonesFrom(userMenu); }
+        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { thisContextMenu.Add(AddSeparator()); }
+        if (userMenu.Count > 0) { thisContextMenu.AddRange(userMenu); }
 
         var par = control.ParentControlWithCommands();
         if (thisContextMenu.Count > 0) {
             if (par != null) {
-                _ = thisContextMenu.AddSeparator();
+                thisContextMenu.Add(AddSeparator());
                 thisContextMenu.Add(Add(ContextMenuCommands.WeitereBefehle));
             }
-            _ = thisContextMenu.AddSeparator();
+            thisContextMenu.Add(AddSeparator());
             thisContextMenu.Add(Add(ContextMenuCommands.Abbruch));
             List<object?> infos =
             [
@@ -104,7 +104,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
                 hotItem,
                 control
             ];
-            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, infos, (Control)control, translate);
+            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, infos, (Control)control, translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         } else {
             if (par != null) {
@@ -113,17 +113,17 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) =>
         new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
-            connectedControl, translate);
+            connectedControl, translate, controlDesign, itemDesign, autosort);
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
-        new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate);
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) =>
+        new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate, controlDesign, itemDesign, autosort);
 
-    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, bool autosort) {
-        var (biggestItemX, _, heightAdded, _) = BlueControls.Controls.ListBox.ItemData(items, controlDesign);
+    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) {
+        var (biggestItemX, _, heightAdded, _) = BlueControls.Controls.ListBox.ItemData(items, itemDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
-        lstbx.Appearance = (ListBoxAppearance)items.ControlDesign;
+        lstbx.Appearance = controlDesign;
         lstbx.Translate = translate;
         lstbx.AutoSort = autosort;
 
@@ -151,7 +151,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
         lstbx.CheckBehavior = CheckBehavior.MultiSelection;
-        lstbx.ItemAddClonesFrom(items);
+        lstbx.ItemAddRange(items);
         if (check != null) { lstbx.Check(check); }
         lstbx.CheckBehavior = checkBehavior;
     }
@@ -183,7 +183,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         ContextMenuItemClickedEventArgs ex = new(e.ClickedCommand, hotItem);
         bool done;
-        if (userMmenu[e.ClickedCommand] == null) {
+        if (userMmenu.Get(e.ClickedCommand) == null) {
             done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
         } else {
             done = true; //keine Prüfung implementiert

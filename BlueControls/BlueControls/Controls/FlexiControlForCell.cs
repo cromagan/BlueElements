@@ -169,17 +169,17 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
-            items.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
+            items.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten));
         }
         if (column?.Database != null && row != null && column.Database.IsAdministrator()) {
-            items.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen);
+            items.Add(Add(ContextMenuCommands.VorherigenInhaltWiederherstellen));
         }
         //if (Parent is Formula f) {
         //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu, false);
         //    f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
         //    if (x.Count > 0) {
         //        if (items.Count > 0) {
-        //            items.AddSeparator();
+        //            items.Add(AddSeparator());
         //        }
         //        items.AddClonesFrom(x);
         //    }
@@ -416,7 +416,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 } while (again);
             }
         }
-        control.AddRange(item);
+        control.ItemAddRange(item);
 
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:

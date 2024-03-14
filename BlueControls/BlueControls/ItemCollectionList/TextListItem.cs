@@ -49,12 +49,6 @@ public class TextListItem : AbstractListItem {
 
     #region Methods
 
-    public override object Clone() {
-        var l = new TextListItem(Text, Internal, Symbol, IsCaption, Enabled, UserDefCompareKey);
-        l.CloneBasicStatesFrom(this);
-        return l;
-    }
-
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;

@@ -98,16 +98,16 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        PermissionGroups_NewRow.Item.Clear();
+        PermissionGroups_NewRow.ItemClear();
         PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.ItemAddRange(Database.Permission_AllUsed(false));
 
-        DatenbankAdmin.Item.Clear();
+        DatenbankAdmin.ItemClear();
         DatenbankAdmin.Check(db.DatenbankAdmin);
 
         txbKennwort.Text = db.GlobalShowPass;
-        lbxSortierSpalten.Item.Clear();
+        lbxSortierSpalten.ItemClear();
 
         if (db.SortDefinition != null) {
             btnSortRichtung.Checked = db.SortDefinition.Reverse;
@@ -131,7 +131,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         DatenbankAdmin.ItemAddRange(Database.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(db.Column, false);
+        lbxSortierSpalten.Suggestions.AddRange(AddRange(db.Column, false));
 
         variableEditor.WriteVariablesToTable(Database?.Variables);
 
@@ -377,7 +377,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         #region Sortierung
 
-        var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).KeyName).ToList();
+        var colnam = lbxSortierSpalten.Items.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).KeyName).ToList();
         Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
 
         #endregion

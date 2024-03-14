@@ -19,7 +19,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -37,15 +38,11 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private ItemSelect(List<AbstractListItem?> items) : base(true, true) {
+    private ItemSelect(List<AbstractListItem> items) : base(true, true) {
         InitializeComponent();
 
-        List.Item.Clear();
-        foreach (var thisItem in items) {
-            List.ItemAdd(thisItem);
-        }
-
-        //List.Item.Sort();
+        List.ItemClear();
+        List.ItemAddRange(items);
 
         Setup(400, List.Bottom);
     }
@@ -94,7 +91,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         var l = List.Checked;
         if (l.Count != 1) { return; }
 
-        _giveBack = List.Item[l[0]];
+        _giveBack = List[l[0]];
     }
 
     #endregion

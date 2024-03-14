@@ -65,13 +65,6 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Methods
 
-    // unveränderter Text
-    public override object Clone() {
-        var x = new CellLikeListItem(Internal, _styleLikeThis, _style, Enabled, _bildTextverhalten);
-        x.CloneBasicStatesFrom(this);
-        return x;
-    }
-
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
         if (_styleLikeThis == null) { return false; }

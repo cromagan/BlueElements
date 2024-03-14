@@ -30,7 +30,8 @@ using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -86,7 +87,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
 
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-           items.Add("Variableninhalt kopieren");
+            items.Add(Add("Variableninhalt kopieren"));
         }
 
         hotItem = _lastWord;

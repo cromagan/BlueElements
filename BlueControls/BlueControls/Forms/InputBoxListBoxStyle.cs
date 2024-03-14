@@ -35,22 +35,19 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, new List<AbstractListItem>(true), CheckBehavior.SingleSelection, null, AddType.None) { }
+    private InputBoxListBoxStyle() : this(string.Empty, null, CheckBehavior.SingleSelection, null, AddType.None, true) { }
 
-    private InputBoxListBoxStyle(string txt, List<AbstractListItem> itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) : base(true, true) {
+    private InputBoxListBoxStyle(string txt, List<AbstractListItem>? itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool autosort) : base(true, true) {
         InitializeComponent();
-        if (itemsOriginal.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes) {
-            Develop.DebugPrint("Design nicht Listbox");
-        }
-        //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
+
         txbText.CheckBehavior = checkBehavior;
-        txbText.ItemAddClonesFrom(itemsOriginal);
+        txbText.ItemAddRange(itemsOriginal);
         if (check != null) { txbText.Check(check); }
         txbText.MoveAllowed = false;
         txbText.RemoveAllowed = false;
         txbText.AddAllowed = addNewAllowed;
         txbText.AddAllowed = addNewAllowed;
-        txbText.AutoSort = itemsOriginal.AutoSort;
+        txbText.AutoSort = autosort;
         Setup(txt, txbText, 250);
     }
 
@@ -64,14 +61,14 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         }
 
         List<AbstractListItem> x = [];
-        x.AddRange(items);
+        x.AddRange(AddRange(items));
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }
 
     public static List<string>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
-        InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed);
+        InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed, true);
         _ = mb.ShowDialog();
         return mb._giveBack;
     }

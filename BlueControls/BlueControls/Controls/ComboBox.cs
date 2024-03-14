@@ -137,8 +137,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     public AbstractListItem? this[string @internal] {
         get {
             try {
-                if (string.IsNullOrEmpty(@internal)) { return null; }
-                d
                 return _item.Get(@internal);
             } catch {
                 Develop.CheckStackForOverflow();
@@ -184,13 +182,13 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         List<string> itc = [];
         if (_drawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;
     }
 
-    internal void ItemAddRange(List<AbstractListItem> textListItems) => throw new NotImplementedException();
+    internal void ItemAddRange(IEnumerable<AbstractListItem>? textListItems) => throw new NotImplementedException();
 
     internal IEnumerable<AbstractListItem> Items() => throw new NotImplementedException();
 
@@ -251,7 +249,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.Pos;
-            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(_itemDesign).Height) / 2.0);
+            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
             i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(_itemDesign).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
             i.SetCoordinates(r);

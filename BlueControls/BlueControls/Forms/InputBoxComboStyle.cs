@@ -39,9 +39,8 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
     private InputBoxComboStyle(string txt, string vorschlagsText, List<AbstractListItem>? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
         InitializeComponent();
         cbxText.Text = vorschlagsText;
-        if (suggestOriginal != null) {
-            cbxText.ItemAddClonesFrom(suggestOriginal);
-        }
+        cbxText.ItemAddRange(suggestOriginal);
+
         cbxText.DropDownStyle = texteingabeErlaubt ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
         Setup(txt, cbxText, 250);
         _giveBack = vorschlagsText;
@@ -55,7 +54,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
         var Suggest = new List<AbstractListItem>();
-        Suggest.AddRange(suggest);
+        Suggest.AddRange(AddRange(suggest));
         //Suggest.Sort();
         return Show(txt, string.Empty, Suggest, texteingabeErlaubt);
     }

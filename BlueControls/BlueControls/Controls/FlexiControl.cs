@@ -23,7 +23,8 @@ using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
@@ -698,14 +699,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.DropDownStyle = style;
-        control.Item.Clear();
+        control.ItemClear();
         if (list != null) {
-            control.ItemAddClonesFrom(list);
+            control.ItemAddRange(list);
         }
         //control.Item.Sort();
 
         if (removevalueIfNotExists) {
-            if (control.Item[Value] == null) {
+            if (control[Value] == null) {
                 ValueSet(string.Empty, true);
             }
         }
@@ -862,7 +863,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ListBox control = new() {
             Enabled = Enabled
         };
-        control.Item.Clear();
+        control.ItemClear();
         control.CheckBehavior = CheckBehavior.MultiSelection;
         StandardBehandlung(control);
         UpdateValueToControl();

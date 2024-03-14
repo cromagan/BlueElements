@@ -17,18 +17,63 @@
 
 #nullable enable
 
+using BlueBasics;
+
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
+
 using BlueDatabase;
 using BlueDatabase.Enums;
+
 using System.Collections.Generic;
+
 using System.ComponentModel;
+
 using System.Drawing;
+
 using static BlueBasics.Extensions;
+
+using BlueBasics;
+
+using BlueBasics.Enums;
+
+using BlueDatabase.EventArgs;
+
+using BlueScript.Variables;
+
+using System;
+
+using System.Collections.Specialized;
+
+using System.Diagnostics;
+
+using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using static BlueBasics.Constants;
+using static BlueBasics.Develop;
+using static BlueBasics.Generic;
+using static BlueBasics.IO;
+using static BlueControls.FormManager;
+
+//using static BlueDatabase.Database;
+using static BlueBasics.Converter;
+
+using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 #nullable enable
 
@@ -40,20 +85,20 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     private readonly string _showformat;
 
-    private FilterCollection? _filterInput;
+    private BlueDatabase.FilterCollection? _filterInput;
 
     #endregion
 
     #region Constructors
 
-    public FlexiControlRowSelector(Database? database, string caption, string showFormat) : base() {
+    public FlexiControlRowSelector(BlueDatabase.Database? database, string caption, string showFormat) : base() {
         CaptionPosition = CaptionPosition.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
         Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
+        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is BlueDatabase.ColumnItem fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
         ((IControlSendFilter)this).RegisterEvents();
@@ -70,7 +115,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
+    public BlueDatabase.FilterCollection? FilterInput {
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
@@ -82,11 +127,11 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public bool FilterInputChangedHandled { get; set; }
 
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
+    public BlueDatabase.FilterCollection FilterOutput { get; } = new("FilterOutput 04");
 
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public List<RowItem>? RowsInput { get; set; }
+    public List<BlueDatabase.RowItem>? RowsInput { get; set; }
 
     public bool RowsInputChangedHandled { get; set; }
 
@@ -134,7 +179,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         if (cb == null) { return; }
 
-        var ex = cb.Items();
+        var ex = cb.Items().ToList();
 
         #region Zeilen erzeugen
 
@@ -145,12 +190,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
                 cb.ItemAdd(Add(tmpQuickInfo, thisR.KeyName));
             } else {
-                foreach (var thisIt in ex) {
-                    if (thisIt.KeyName == thisR.KeyName) {
-                        _ = ex.Remove(thisIt);
-                        break;
-                    }
-                }
+                ex.Remove(thisR.KeyName);
             }
         }
 
@@ -219,7 +259,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
             return;
         }
 
-        FilterOutput.ChangeTo(new FilterItem(row));
+        FilterOutput.ChangeTo(new BlueDatabase.FilterItem(row));
     }
 
     #endregion

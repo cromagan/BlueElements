@@ -110,11 +110,6 @@ public class BitmapListItem : AbstractListItem {
 
     #region Methods
 
-    public override object? Clone() {
-        Develop.DebugPrint_NichtImplementiert();
-        return null;
-    }
-
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || _imageFilename.ToUpper().Contains(filterText.ToUpper());
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {

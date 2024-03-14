@@ -93,12 +93,6 @@ public class RowFormulaListItem : AbstractListItem {
 
     #region Methods
 
-    public override object Clone() {
-        var x = new RowFormulaListItem(_row, _layoutId, UserDefCompareKey);
-        x.CloneBasicStatesFrom(this);
-        return x;
-    }
-
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (_tmpBmp == null) { GeneratePic(); }
         return _tmpBmp?.Height ?? 200;

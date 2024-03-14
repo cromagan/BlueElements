@@ -88,7 +88,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
             RemoveWatcher();
             if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
-            lsbFiles.Item.Clear();
+            lsbFiles.ItemClear();
 
             _directory = value;
             _lastcheck = string.Empty;
@@ -238,7 +238,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
-        lsbFiles.Item.Clear();
+        lsbFiles.ItemClear();
         _lastcheck = string.Empty;
         base.OnVisibleChanged(e);
     }
@@ -348,10 +348,10 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         //_ = e.UserMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         //_ = e.UserMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
-        //_ = e.UserMenu.AddSeparator();
+        //_ = e.UserMenu.Add(AddSeparator());
         e.UserMenu.Add(Add(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
         e.UserMenu.Add(Add(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
-        _ = e.UserMenu.AddSeparator();
+        e.UserMenu.Add(AddSeparator());
         e.UserMenu.Add(Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
     }
 
@@ -469,7 +469,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
                 case FileFormat.Image:
                     var l = new List<string>();
-                    foreach (var thisS in lsbFiles.Item) {
+                    foreach (var thisS in lsbFiles.Items) {
                         if (thisS.KeyName.FileType() == FileFormat.Image && FileExists(thisS.KeyName)) {
                             l.Add(thisS.KeyName);
                         }
@@ -696,7 +696,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
             case "image":
                 var file = (string)gb[1];
-                var item = lsbFiles.Item[file];
+                var item = lsbFiles[file];
                 if (item == null) { return; }
                 var bItem = (BitmapListItem)item;
                 if (gb[2] is Bitmap bmp) {

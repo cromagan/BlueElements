@@ -128,9 +128,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             new FlexiControlForProperty<string>(() => Text, 5)
         ];
         var aursicht = new List<AbstractListItem>();
-        aursicht.Add("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig);
-        aursicht.Add("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren);
-        aursicht.Add("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig);
+        aursicht.Add(Add("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig));
+        aursicht.Add(Add("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren));
+        aursicht.Add(Add("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig));
         //aursicht.Sort();
         l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
         l.Add(new FlexiControlForProperty<float>(() => Skalierung));

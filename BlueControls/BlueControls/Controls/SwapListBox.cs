@@ -21,7 +21,8 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -71,12 +72,12 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
     }
 
-    internal void SuggestionsAdd( List<AbstractListItem>? item) {
+    internal void SuggestionsAdd(List<AbstractListItem>? item) {
         if (item == null) { return; }
 
         foreach (var thisi in item) {
-            if (Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null) {
-                Suggest.AddAndCheck(thisi.Clone() as AbstractListItem);
+            if (Main[thisi.KeyName] == null && Suggest[thisi.KeyName] == null) {
+                Suggest.AddAndCheck(thisi);
             }
         }
     }
@@ -94,12 +95,12 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     protected override void DrawControl(Graphics gr, States state) { }
 
     protected void MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove) {
-        var sourceItem = source.Item[@internal];
-        var targetItem = target.Item[@internal];
+        var sourceItem = source[@internal];
+        var targetItem = target[@internal];
 
         var did = false;
         if (sourceItem != null && targetItem == null) {
-            target.AddAndCheck(sourceItem.Clone() as AbstractListItem);
+            target.AddAndCheck(sourceItem);
             did = true;
         } else if (sourceItem == null && targetItem == null) {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);

@@ -153,7 +153,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             return;
         }
 
-        if (cbxLayout.Item.Count > 0) {
+        if (cbxLayout.ItemCount > 0) {
             cbxLayout.Enabled = true;
         } else {
             cbxLayout.Enabled = false;

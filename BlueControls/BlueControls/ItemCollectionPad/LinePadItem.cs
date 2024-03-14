@@ -113,9 +113,9 @@ public class LinePadItem : AbstractPadItem {
         List<GenericControl> l = [];
 
         var verhalt = new List<AbstractListItem>();
-        verhalt.Add("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie));
-        verhalt.Add("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie));
-        verhalt.Add("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie));
+        verhalt.Add(Add("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie)));
+        verhalt.Add(Add("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie)));
+        verhalt.Add(Add("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie)));
         l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
         AddLineStyleOption(l);
         l.AddRange(base.GetStyleOptions(widthOfControl));

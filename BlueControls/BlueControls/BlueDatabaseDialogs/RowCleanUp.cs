@@ -60,7 +60,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
 
         if (_database is Database db && !db.IsDisposed) {
             //var lst =  List<AbstractListItem>();
-            lstColumns.ItemAddRange(Add(db.Column, false));
+            lstColumns.ItemAddRange(AddRange(db.Column, false));
             //cbxColDateiname.Item = lst;
         }
 

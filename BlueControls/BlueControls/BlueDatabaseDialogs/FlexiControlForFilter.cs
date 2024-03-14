@@ -328,12 +328,12 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
-        cbx.Item.Clear();
+        cbx.ItemClear();
         var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {
-            if (FilterSingleColumn != null) { cbx.ItemAddRange(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText); }
+            if (FilterSingleColumn != null) { cbx.ItemAddRange(AddRange(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText)); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             cbx.ItemAdd(Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false));

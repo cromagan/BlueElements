@@ -24,6 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -213,7 +214,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
             var lst = new List<AbstractListItem>();
-            lst.AddRange(db.Column, false);
+            lst.AddRange(AddRange(db.Column, false));
 
             l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }
@@ -221,15 +222,15 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         var u = new List<AbstractListItem>();
-        u.AddRange(typeof(CaptionPosition));
+        u.AddRange(AddRange(typeof(CaptionPosition)));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         var u2 = new List<AbstractListItem>();
-        u2.AddRange(typeof(FlexiFilterDefaultOutput));
+        u2.AddRange(AddRange(typeof(FlexiFilterDefaultOutput)));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
         var u3 = new List<AbstractListItem>();
-        u3.AddRange(typeof(FlexiFilterDefaultFilter));
+        u3.AddRange(AddRange(typeof(FlexiFilterDefaultFilter)));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 
         l.Add(new FlexiControl());

@@ -156,7 +156,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                     icp.ReplaceVariables(rowsForExport[startNr]);
                 }
 
-                Pad.Item.Add(it);
+                pad.Item.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
@@ -288,7 +288,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         cbxLayoutWahl.Text = string.Empty;
         TableView.OpenLayoutEditor(Database, n);
         BefülleLayoutDropdowns();
-        if (cbxLayoutWahl.Item[n] != null) {
+        if (cbxLayoutWahl[n] != null) {
             cbxLayoutWahl.Text = n;
         }
         Enabled = true;

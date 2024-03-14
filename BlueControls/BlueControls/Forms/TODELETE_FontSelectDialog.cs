@@ -97,10 +97,10 @@ public partial class FontSelectDialog {
         set {
             _adding = true;
             value ??= BlueFont.Get(Skin.DummyStandardFont);
-            if (FName.Item[value.FontName] == null) { FName.ItemAdd(Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
+            if (FName[value.FontName] == null) { FName.ItemAdd(Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
             FName.UncheckAll();
             FName.Check(value.FontName);
-            if (FSize.Item[value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture)] == null) { FSize.ItemAdd(Add(value.Size.ToString(Constants.Format_Float1))); }
+            if (FSize[value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture)] == null) { FSize.ItemAdd(Add(value.Size.ToString(Constants.Format_Float1))); }
             FSize.UncheckAll();
             FSize.Check(value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
             fFett.Checked = value.Bold;

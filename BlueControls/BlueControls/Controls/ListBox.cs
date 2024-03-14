@@ -212,6 +212,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    public int ItemCount => _item.Count;
+
     /// <summary>
     /// Itemdesign wird durch Appearance gesetzt
     /// </summary>
@@ -230,6 +232,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             return _itemOrder;
         }
     }
+
+    public ReadOnlyCollection<AbstractListItem> Items => _item.AsReadOnly();
 
     [DefaultValue(false)]
     public bool MoveAllowed {
@@ -412,6 +416,47 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
+    public void GetDesigns() {
+        _controlDesign = (Design)_appearance;
+        switch (_appearance) {
+            case ListBoxAppearance.Autofilter:
+                _itemDesign = Design.Item_Autofilter;
+                break;
+
+            case ListBoxAppearance.DropdownSelectbox:
+                _itemDesign = Design.Item_DropdownMenu;
+                break;
+
+            case ListBoxAppearance.Gallery:
+                _itemDesign = Design.Item_Listbox;
+                _controlDesign = Design.ListBox;
+                break;
+
+            case ListBoxAppearance.FileSystem:
+                _itemDesign = Design.Item_Listbox;
+                _controlDesign = Design.ListBox;
+                break;
+
+            case ListBoxAppearance.Listbox_Boxes:
+            case ListBoxAppearance.Listbox:
+                _itemDesign = Design.Item_Listbox;
+                _controlDesign = Design.ListBox;
+                break;
+
+            case ListBoxAppearance.KontextMenu:
+                _itemDesign = Design.Item_KontextMenu;
+                break;
+
+            case ListBoxAppearance.ComboBox_Textbox:
+                _itemDesign = Design.ComboBox_Textbox;
+                break;
+
+            default:
+                Develop.DebugPrint(FehlerArt.Fehler, "Unbekanntes Design: " + _appearance);
+                break;
+        }
+    }
+
     public void ItemAdd(AbstractListItem? item) {
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
         if (_item.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
@@ -420,7 +465,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
         _item.Add(item);
 
-        item.PropertyChanged += Item_PropertyChanged;
+        //item.PropertyChanged += Item_PropertyChanged;
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
@@ -445,8 +490,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public void Remove(string internalnam) => _item.Remove(this[internalnam]);
 
     public void Remove(AbstractListItem? item) {
-        if (item == null || !Contains(item)) { return; }
-        _ = _item.Remove(item);
+        //if (item == null || !Contains(item)) { return; }
+        //_ = _item.Remove(item);
         throw new NotImplementedException();
     }
 
@@ -484,7 +529,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     internal void AddAndCheck(AbstractListItem? ali) {
         if (ali == null) { return; }
 
-        if (_item[ali.KeyName] != null) { return; }
+        if (_item.Get(ali.KeyName) != null) { return; }
 
         var tmp = _checkBehavior;
         _checkBehavior = CheckBehavior.MultiSelection;
@@ -507,8 +552,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 _maxNeededItemSize = Size.Empty;
                 return Size.Empty;
             }
-            PreComputeSize();
+
             if (_itemDesign == Design.Undefiniert) { GetDesigns(); }
+            PreComputeSize(_item, _itemDesign);
+
             if (BreakAfterItems < 1) { senkrechtAllowed = Orientation.Waagerecht; }
             var sliderWidth = 0;
             if (sliderY != null) {
@@ -833,7 +880,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 break;
 
             case AddType.Text:
-                _ = Add_Text();
+                Add_Text();
                 break;
 
             case AddType.OnlySuggests:
@@ -1004,47 +1051,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
         DoQuickInfo();
         Invalidate();
-    }
-
-    private void GetDesigns() {
-        _controlDesign = (Design)_appearance;
-        switch (_appearance) {
-            case ListBoxAppearance.Autofilter:
-                _itemDesign = Design.Item_Autofilter;
-                break;
-
-            case ListBoxAppearance.DropdownSelectbox:
-                _itemDesign = Design.Item_DropdownMenu;
-                break;
-
-            case ListBoxAppearance.Gallery:
-                _itemDesign = Design.Item_Listbox;
-                _controlDesign = Design.ListBox;
-                break;
-
-            case ListBoxAppearance.FileSystem:
-                _itemDesign = Design.Item_Listbox;
-                _controlDesign = Design.ListBox;
-                break;
-
-            case ListBoxAppearance.Listbox_Boxes:
-            case ListBoxAppearance.Listbox:
-                _itemDesign = Design.Item_Listbox;
-                _controlDesign = Design.ListBox;
-                break;
-
-            case ListBoxAppearance.KontextMenu:
-                _itemDesign = Design.Item_KontextMenu;
-                break;
-
-            case ListBoxAppearance.ComboBox_Textbox:
-                _itemDesign = Design.ComboBox_Textbox;
-                break;
-
-            default:
-                Develop.DebugPrint(FehlerArt.Fehler, "Unbekanntes Design: " + _appearance);
-                break;
-        }
     }
 
     private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);

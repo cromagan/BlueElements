@@ -405,7 +405,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
             return;
         }
-        i.Appearance = ListBoxAppearance.Listbox;
         var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None);
         if (v == null || v.Count != 1) { return; }
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
@@ -584,8 +583,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Database? database, string showingKey) {
         if (columnArrangementSelector == null || columnArrangementSelector.IsDisposed) { return; }
 
-        columnArrangementSelector.Item.Clear();
-        columnArrangementSelector.Item.AutoSort = false;
+        columnArrangementSelector.ItemClear();
         columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
         if (database is Database db && !db.IsDisposed) {
@@ -596,11 +594,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        columnArrangementSelector.Enabled = columnArrangementSelector.Item.Count > 1;
+        columnArrangementSelector.Enabled = columnArrangementSelector.ItemCount > 1;
 
-        if (columnArrangementSelector.Item[showingKey] == null) {
-            if (columnArrangementSelector.Item.Count > 1) {
-                showingKey = columnArrangementSelector.Item[1].KeyName;
+        if (columnArrangementSelector[showingKey] == null) {
+            if (columnArrangementSelector.ItemCount > 1) {
+                showingKey = columnArrangementSelector[1].KeyName;
             } else {
                 showingKey = string.Empty;
             }
@@ -2489,7 +2487,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 return;
             }
             t.Add(Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
-            _ = t.AddSeparator(FirstSortChar + "2");
+            t.Add(AddSeparator(FirstSortChar + "2"));
         }
 
         List<string> toc = [];
@@ -2498,7 +2496,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             toc.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
         }
 
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.SingleSelection, toc, new CellExtEventArgs(cellInThisDatabaseColumn, cellInThisDatabaseRow), this, Translate);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.SingleSelection, toc, new CellExtEventArgs(cellInThisDatabaseColumn, cellInThisDatabaseRow), this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         Develop.Debugprint_BackgroundThread();
     }

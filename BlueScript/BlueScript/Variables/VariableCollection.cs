@@ -197,12 +197,6 @@ public class VariableCollection : IEnumerable<Variable> {
 
     //public object Clone() => new VariableCollection(ToList(), ReadOnly);
 
-    public Variable? Get(string name) {
-        if (_internal.Count == 0) { return null; }
-
-        return _internal.FirstOrDefault(thisv => string.Equals(thisv.KeyName, name, StringComparison.OrdinalIgnoreCase));
-    }
-
     public IEnumerator<Variable> GetEnumerator() => _internal.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
