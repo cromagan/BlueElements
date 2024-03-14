@@ -10,12 +10,7 @@ public class InputFormatConverter : TypeConverter {
 
     #region Methods
 
-    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) {
-        if (sourceType == typeof(string)) {
-            return true;
-        }
-        return base.CanConvertFrom(context, sourceType);
-    }
+    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
     public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) {
         if (destinationType == typeof(string)) {

@@ -30,7 +30,7 @@ public class WindowsThumbnailProvider {
 
     #region Fields
 
-    private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
+    private const string ShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
     #endregion
 
@@ -52,7 +52,7 @@ public class WindowsThumbnailProvider {
         AccessDenied = unchecked((int)0x80030005)
     }
 
-    internal enum SIGDN : uint {
+    internal enum Sigdn : uint {
         NORMALDISPLAY = 0,
         PARENTRELATIVEPARSING = 0x80018001,
         PARENTRELATIVEFORADDRESSBAR = 0x8001c001,
@@ -79,7 +79,7 @@ public class WindowsThumbnailProvider {
 
         void GetParent(out IShellItem ppsi);
 
-        void GetDisplayName(SIGDN sigdnName, out IntPtr ppszName);
+        void GetDisplayName(Sigdn sigdnName, out IntPtr ppszName);
 
         void GetAttributes(uint sfgaoMask, out uint psfgaoAttribs);
 
@@ -176,7 +176,7 @@ public class WindowsThumbnailProvider {
     //    public byte rgbReserved;
     //}
     private static IntPtr? GetHBitmap(string fileName, int width, int height, ThumbnailOptions options) {
-        var shellItem2Guid = new Guid(IShellItem2Guid);
+        var shellItem2Guid = new Guid(ShellItem2Guid);
         var retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out var nativeShellItem);
 
         if (retCode != 0) { return null; }

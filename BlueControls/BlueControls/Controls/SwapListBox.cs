@@ -57,7 +57,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    internal void Check(IEnumerable<string> toCheck) {
+    internal void Check(List<string> toCheck) {
         foreach (var thisCheck in toCheck) {
             MoveItemBetweenList(Suggest, Main, thisCheck, true);
         }

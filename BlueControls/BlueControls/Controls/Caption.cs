@@ -154,20 +154,20 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Methods
 
-    public static Size RequiredTextSize(string text, SteuerelementVerhalten textAnzeigeverhalten, Design design, ExtText? _eText, bool translate, int maxwidth) {
+    public static Size RequiredTextSize(string text, SteuerelementVerhalten textAnzeigeverhalten, Design design, ExtText? eText, bool translate, int maxwidth) {
         if (QuickModePossible(text, textAnzeigeverhalten)) {
             var s = Skin.GetBlueFont(design, States.Standard).MeasureString(text);
             return new Size((int)(s.Width + 1), (int)(s.Height + 1));
         }
 
-        _eText ??= new ExtText(design, States.Standard);
+        eText ??= new ExtText(design, States.Standard);
 
-        _eText.Design = design;
-        _eText.HtmlText = LanguageTool.DoTranslate(text, translate);
-        _eText.Multiline = true;
-        _eText.TextDimensions = new Size(maxwidth, _eText.TextDimensions.Height);
+        eText.Design = design;
+        eText.HtmlText = LanguageTool.DoTranslate(text, translate);
+        eText.Multiline = true;
+        eText.TextDimensions = new Size(maxwidth, eText.TextDimensions.Height);
 
-        return _eText?.LastSize() ?? new Size(1, 1);
+        return eText.LastSize();
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;

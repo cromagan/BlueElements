@@ -31,25 +31,23 @@ internal class ImageFilter_Invert : ImageFilter {
 
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Schleife über alle Pixel im Bild
-        unsafe {
-            for (var i = 0; i < bits.Length; i += 4) {
-                // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
-                var a = bits[i + 3];
-                var r = bits[i + 2];
-                var g = bits[i + 1];
-                var b = bits[i];
+        for (var i = 0; i < bits.Length; i += 4) {
+            // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+            var a = bits[i + 3];
+            var r = bits[i + 2];
+            var g = bits[i + 1];
+            var b = bits[i];
 
-                // Invertieren der Farbwerte für jeden Farbkanal
-                r = (byte)(255 - r);
-                g = (byte)(255 - g);
-                b = (byte)(255 - b);
+            // Invertieren der Farbwerte für jeden Farbkanal
+            r = (byte)(255 - r);
+            g = (byte)(255 - g);
+            b = (byte)(255 - b);
 
-                // Setzen der invertierten Farbwerte für den aktuellen Pixel
-                bits[i + 2] = r; // Rot-Komponente
-                bits[i + 1] = g; // Grün-Komponente
-                bits[i] = b;     // Blau-Komponente
-                // Alpha-Kanal bleibt unverändert (bits[i + 3])
-            }
+            // Setzen der invertierten Farbwerte für den aktuellen Pixel
+            bits[i + 2] = r; // Rot-Komponente
+            bits[i + 1] = g; // Grün-Komponente
+            bits[i] = b;     // Blau-Komponente
+            // Alpha-Kanal bleibt unverändert (bits[i + 3])
         }
     }
 

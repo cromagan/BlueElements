@@ -74,7 +74,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         return x != null ? x.KeyName : string.Empty;
     }
 
-    public static AbstractListItem? Show(List<AbstractListItem?>? items) {
+    public static AbstractListItem? Show(List<AbstractListItem>? items) {
         if (items == null || items.Count == 0) { return null; }
 
         var x = new ItemSelect(items);

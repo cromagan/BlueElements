@@ -203,7 +203,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private void butFertig_Click(object sender, System.EventArgs e) {
         var searchValue = lsbFilterItems.Checked;
-        ;
+
         if (searchValue.Count == 0) {
             CloseAndDispose("FilterDelete", null);
             return;

@@ -259,11 +259,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
     #region Events
 
+    public event EventHandler? DisposingEvent;
+
     //private string _vorschlagsColumn;
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     public event EventHandler? PropertyChanged;
-
-    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -1474,9 +1474,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             "SYS_LOCKED" or
             "SYS_ROWSTATE";
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, new ColumnEventArgs(this));
-
     public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, new ColumnEventArgs(this));
 
     public string QuickInfoText(string additionalText) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
@@ -2502,8 +2502,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
 
         if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName, false)) {
-            var sr = string.Empty;
-            if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
+            //var sr = string.Empty;
+            //if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
             _linkedDatabase = Database.GetOtherTable(_linkedDatabaseTableName, false);
         }
 

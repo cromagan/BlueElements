@@ -52,7 +52,7 @@ public class GenericControl : Control {
 
     private PartentType _myParentType = PartentType.Unbekannt;
 
-    private Form? _pform = null;
+    private Form? _pform;
 
     // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
     private string _quickInfo = string.Empty;
@@ -120,24 +120,6 @@ public class GenericControl : Control {
     #endregion
 
     #region Methods
-
-    public static Form? ParentForm(Control? o) {
-        if (o == null || o.IsDisposed) { return null; }
-
-        do {
-            switch (o) {
-                case System.Windows.Forms.Form frm:
-                    return frm;
-
-                case null:
-                    return null;
-
-                default:
-                    o = o.Parent; //Manchmal ist o null. MultiThreading?
-                    break;
-            }
-        } while (true);
-    }
 
     public static PartentType Typ(Control control) {
         switch (control) {
@@ -479,8 +461,6 @@ public class GenericControl : Control {
         UpdateStyles();
     }
 
-    //MyBase.GetScaledBounds(bounds, factor, specified)
-
     protected void SetNotFocusable() {
         if (IsDisposed) { return; }
         TabStop = false;
@@ -491,12 +471,31 @@ public class GenericControl : Control {
         //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
     }
 
+    //MyBase.GetScaledBounds(bounds, factor, specified)
     protected override void WndProc(ref Message m) {
         try {
             //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
             if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
         } catch { }
+    }
+
+    private static Form? ParentForm(Control? o) {
+        if (o == null || o.IsDisposed) { return null; }
+
+        do {
+            switch (o) {
+                case Form frm:
+                    return frm;
+
+                case null:
+                    return null;
+
+                default:
+                    o = o.Parent; //Manchmal ist o null. MultiThreading?
+                    break;
+            }
+        } while (true);
     }
 
     private void DoDraw(Graphics gr) {

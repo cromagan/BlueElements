@@ -106,7 +106,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(BlueControls.Controls.ComboBox addHere, Database? db) {
+    public static void AddLayoutsOff(Controls.ComboBox addHere, Database? db) {
         if (db is null || db.IsDisposed) { return; }
         var r = db.GetAllLayouts();
 
@@ -184,9 +184,13 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
-        padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
-        padSchachteln.Item.RandinMm = Padding.Empty;
-        padSchachteln.Item.BackColor = Color.Transparent;
+
+        if (padSchachteln.Item != null) {
+            padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
+            padSchachteln.Item.RandinMm = Padding.Empty;
+            padSchachteln.Item.BackColor = Color.Transparent;
+        }
+
         _ = GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
     }
 

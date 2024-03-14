@@ -33,7 +33,7 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
 
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
         // Überprüfen der Eingabeparameter
-        if (bits == null || bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || factor <= 0) { return; }
+        if (bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || factor <= 0) { return; }
 
         var staerke = (int)factor;
 

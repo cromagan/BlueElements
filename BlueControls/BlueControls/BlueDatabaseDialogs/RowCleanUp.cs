@@ -26,7 +26,6 @@ using BlueDatabase.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -132,7 +131,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
             return;
         }
 
-        var r = _table.RowsVisibleUnique()?.Count ?? 0;
+        var r = _table.RowsVisibleUnique().Count;
 
         if (r == 0) {
             txtInfo.Text = "Keine Zeilen angezeigt.";

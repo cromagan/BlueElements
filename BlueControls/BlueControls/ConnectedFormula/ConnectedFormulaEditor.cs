@@ -33,7 +33,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 #nullable enable
@@ -307,7 +306,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnWeitere_Click(object sender, System.EventArgs e) {
         var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty);
 
-        if (l == null || l.Count == 0) { return; }
+        if (l.Count == 0) { return; }
 
         var i = new List<AbstractListItem>();
 

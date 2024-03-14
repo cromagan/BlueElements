@@ -160,7 +160,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
         }
 
         con.DoInputSettings(parent, this);
-        con.InitFormula(cf, this.DatabaseInput);
+        con.InitFormula(cf, DatabaseInput);
 
         return con;
     }

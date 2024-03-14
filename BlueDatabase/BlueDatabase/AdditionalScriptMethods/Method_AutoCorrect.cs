@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -66,7 +65,7 @@ internal class Method_AutoCorrect : Method_Database {
             var columnVar = attvar.Attributes[n];
 
             if (columnVar == null || columnVar.ReadOnly) { return new DoItFeedback(infos.Data, "Variable Schreibgeschützt."); }
-            if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback(infos.Data, "Spalte nicht veränderbar."); ; }
+            if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback(infos.Data, "Spalte nicht veränderbar."); }
 
             var s = string.Empty;
             switch (columnVar) {

@@ -25,7 +25,7 @@ using BlueScript.Methods;
 
 namespace BlueControls;
 
-public partial class Befehlsreferenz : BlueControls.Forms.Form {
+public partial class Befehlsreferenz : Forms.Form {
 
     #region Constructors
 
@@ -55,8 +55,6 @@ public partial class Befehlsreferenz : BlueControls.Forms.Form {
 
     private void WriteCommandsToList() {
         lstCommands.ItemClear();
-
-        if (Script.Commands == null) { return; }
 
         foreach (var thisc in Script.Commands) {
             lstCommands.ItemAdd(ItemOf(thisc));

@@ -36,7 +36,7 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBackgroundNone, IControlUsesRow, IControlSendFilter, IDisposable {
+public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlUsesRow, IControlSendFilter, IDisposable {
 
     #region Fields
 
@@ -119,7 +119,7 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
     public bool RowsInputChangedHandled { get; set; }
 
-    public bool RowsInputManualSeted { get; set; } = false;
+    public bool RowsInputManualSeted { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

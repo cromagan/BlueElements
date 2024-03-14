@@ -28,14 +28,12 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Forms;
-using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -76,7 +74,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private bool _moveAllowed;
     private bool _removeAllowed;
-    private bool _sorted = false;
+    private bool _sorted;
 
     #endregion
 
@@ -111,9 +109,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemDoubleClick;
-
     #endregion
+
+    //public event EventHandler<AbstractListItemEventArgs>? ItemDoubleClick;
 
     #region Properties
 
@@ -473,9 +471,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         ValidateCheckStates(null, string.Empty);
     }
 
-    public virtual void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void Remove(string internalnam) {
         if (string.IsNullOrEmpty(internalnam)) { return; }
@@ -705,7 +703,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         // und die Mains auffüllen
         foreach (var thisString in zuwenig) {
-            AbstractListItem? it = null;
+            AbstractListItem? it;
             if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
                     it = ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix());
@@ -716,11 +714,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 it = Item(thisString);
             }
 
-            if (it != null) {
-                it.CompareKeyChanged += Item_CompareKeyChangedChanged;
-                _item.Add(it);
-            }
-
+            it.CompareKeyChanged += Item_CompareKeyChangedChanged;
+            _item.Add(it);
         }
 
         InvalidateItemOrder();
@@ -796,12 +791,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //}
     }
 
-    protected override void OnDoubleClick(System.EventArgs e) {
-        if (!Enabled) { return; }
-        var nd = MouseOverNode(MousePos().X, MousePos().Y);
-        if (nd == null) { return; }
-        OnItemDoubleClick(new AbstractListItemEventArgs(nd));
-    }
+    //protected override void OnDoubleClick(System.EventArgs e) {
+    //    if (!Enabled) { return; }
+    //    var nd = MouseOverNode(MousePos().X, MousePos().Y);
+    //    if (nd == null) { return; }
+    //    OnItemDoubleClick(new AbstractListItemEventArgs(nd));
+    //}
 
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
@@ -1082,7 +1077,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
+    //private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 
     private void SliderY_ValueChange(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

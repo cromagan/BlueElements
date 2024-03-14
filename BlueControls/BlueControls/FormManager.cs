@@ -33,22 +33,20 @@ public class FormManager : ApplicationContext {
 
     #region Fields
 
-    public static Type? _lastWindow;
-    public static dExecuteAtEnd? ExecuteAtEnd = null;
+    public static DExecuteAtEnd? ExecuteAtEnd = null;
+    private static readonly List<Form> Forms = [];
 
     //public static dNewModeSelectionForm? NewModeSelectionForm = null;
-
-    private static readonly List<Form> _forms = [];
-
     private static FormManager? _current;
 
+    private static Type? _lastWindow;
     private Form? _lastStartForm;
 
     #endregion
 
     #region Delegates
 
-    public delegate void dExecuteAtEnd();
+    public delegate void DExecuteAtEnd();
 
     #endregion
 
@@ -111,9 +109,9 @@ public class FormManager : ApplicationContext {
     }
 
     //When each form closes, close the application if no other open forms
-    private void onFormClosed(object sender, System.EventArgs e) {
-        _ = _forms.Remove((Form)sender);
-        if (!_forms.Any()) {
+    private void OnFormClosed(object sender, System.EventArgs e) {
+        _ = Forms.Remove((Form)sender);
+        if (!Forms.Any()) {
             if (sender != _lastStartForm) {
                 _lastStartForm = CreateForm(_lastWindow, _current);
                 if (_lastStartForm != null) { return; }
@@ -137,10 +135,10 @@ public class FormManager : ApplicationContext {
     }
 
     private void RegisterFormInternal(Form frm) {
-        if (_forms.Contains(frm)) { return; }
+        if (Forms.Contains(frm)) { return; }
 
-        frm.FormClosed += onFormClosed;
-        _forms.Add(frm);
+        frm.FormClosed += OnFormClosed;
+        Forms.Add(frm);
     }
 
     #endregion
