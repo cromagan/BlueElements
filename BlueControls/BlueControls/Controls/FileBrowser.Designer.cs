@@ -47,6 +47,7 @@ namespace BlueControls.Controls {
             this.lsbFiles.AddAllowed = AddType.None;
             this.lsbFiles.AllowDrop = true;
             this.lsbFiles.Appearance = ListBoxAppearance.FileSystem;
+            this.lsbFiles.AutoSort = true;
             this.lsbFiles.CheckBehavior = CheckBehavior.NoSelection;
             this.lsbFiles.Dock = DockStyle.Fill;
             this.lsbFiles.Location = new Point(0, 32);

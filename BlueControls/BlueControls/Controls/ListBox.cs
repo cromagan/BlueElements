@@ -424,8 +424,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (this[item.Internal] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
 
         if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
-        _item.Add(item);
-        item.CompareKeyChanged += Item_CompareKeyChangedChanged;
+        AddAndRegister(item);
         InvalidateItemOrder();
         ValidateCheckStates(_checked, item.KeyName);
     }
@@ -434,8 +433,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (items == null || items.Count == 0) { return; }
 
         foreach (var thisIt in items) {
-            thisIt.CompareKeyChanged += Item_CompareKeyChangedChanged;
-            _item.Add(thisIt);
+            AddAndRegister(thisIt);
         }
 
         InvalidateItemOrder();
@@ -448,8 +446,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         foreach (var thisstring in list) {
             if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
                 var it = ItemOf(thisstring, thisstring);
-                it.CompareKeyChanged += Item_CompareKeyChangedChanged;
-                _item.Add(it);
+                AddAndRegister(it);
             }
         }
 
@@ -480,18 +477,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         var nl = new List<AbstractListItem>();
         nl.AddRange(_item);
-        _item.Clear();
 
         foreach (var thisItem in nl) {
             if (thisItem.KeyName.Equals(internalnam, StringComparison.OrdinalIgnoreCase)) {
-                thisItem.CompareKeyChanged -= Item_CompareKeyChangedChanged;
-                _checked.Remove(internalnam);
-            } else {
-                _item.Add(thisItem); // Events noch vorhanden
+                RemoveAndUnRegister(thisItem);
             }
         }
 
-        InvalidateItemOrder();
         ValidateCheckStates(_checked, string.Empty);
     }
 
@@ -499,11 +491,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (item == null) { return; }
         if (!_item.Contains(item)) { return; }
 
-        item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
+        RemoveAndUnRegister(item);
 
-        _item.Remove(item);
-        _checked.Remove(item.KeyName);
-        InvalidateItemOrder();
         ValidateCheckStates(_checked, string.Empty);
     }
 
@@ -545,9 +534,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         _checkBehavior = CheckBehavior.MultiSelection;
 
         ItemAdd(ali);
-        //_item.Remove(ali.KeyName);
+        //_itemx.Remove(ali.KeyName);
 
-        //_item.Add(ali);
+        //_itemx.Add(ali);
         _checkBehavior = tmp;
         Check(ali);
     }
@@ -714,8 +703,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 it = Item(thisString);
             }
 
-            it.CompareKeyChanged += Item_CompareKeyChangedChanged;
-            _item.Add(it);
+            AddAndRegister(it);
         }
 
         InvalidateItemOrder();
@@ -791,15 +779,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //}
     }
 
+    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
     //protected override void OnDoubleClick(System.EventArgs e) {
     //    if (!Enabled) { return; }
     //    var nd = MouseOverNode(MousePos().X, MousePos().Y);
     //    if (nd == null) { return; }
     //    OnItemDoubleClick(new AbstractListItemEventArgs(nd));
     //}
-
-    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
 
@@ -855,6 +842,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     protected override void OnVisibleChanged(System.EventArgs e) {
         DoMouseMovement();
         base.OnVisibleChanged(e);
+    }
+
+    private void AddAndRegister(AbstractListItem item) {
+        _item.Add(item);
+        item.CompareKeyChanged += Item_CompareKeyChangedChanged;
+        item.PropertyChanged += Item_PropertyChanged;
     }
 
     private void btnDown_Click(object sender, System.EventArgs e) {
@@ -1071,11 +1064,21 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private bool IsChecked(string name) => _checked.Contains(name);
 
-    private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y));
+    private void Item_PropertyChanged(object sender, System.EventArgs e) => Invalidate();
+
+    private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y + (int)SliderY.Value));
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void RemoveAndUnRegister(AbstractListItem item) {
+        item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
+        item.PropertyChanged -= Item_PropertyChanged;
+        _item.Remove(item);
+        _checked.Remove(item.KeyName);
+        InvalidateItemOrder();
+    }
 
     //private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 
