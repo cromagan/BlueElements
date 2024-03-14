@@ -326,7 +326,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public void Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
         var it = Item(val);
-        ItemAdd(it);
+        AddAndCheck(it);
     }
 
     public void Add_TextBySuggestion() {
@@ -430,13 +430,18 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         //item.PropertyChanged += Item_PropertyChanged;
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
+        InvalidateItemOrder();
     }
 
-    public void ItemAddRange(List<AbstractListItem>? list) {
-        if (list == null || list.Count == 0) { return; }
+    public void ItemAddRange(List<AbstractListItem>? items) {
+        if (items == null || items.Count == 0) { return; }
+
+        foreach (var thisIt in items) {
+            _item.Add(thisIt);
+        }
 
         InvalidateItemOrder();
-        ValidateCheckStates(_checked, list[0].KeyName);
+        ValidateCheckStates(_checked, items[0].KeyName);
     }
 
     public void ItemAddRange(List<string>? list) {
@@ -671,7 +676,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         // Zu viele im Mains aus der Liste löschen
         foreach (var thisString in zuviel) {
             if (!values.Contains(thisString)) {
-                Remove(thisString);
+                _item.Remove(thisString);
             }
         }
 
@@ -687,6 +692,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 _item.Add(Item(thisString));
             }
         }
+
+        InvalidateItemOrder();
+
     }
 
     protected override void Dispose(bool disposing) {
@@ -846,10 +854,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         UnCheck(_mouseOverItem);
 
-        if (_checkBehavior != CheckBehavior.AllSelected) {
-            _item.Remove(_mouseOverItem);
-            //Check(string.Empty);
-        }
+        //if (_checkBehavior == CheckBehavior.AllSelected) {
+        //    Remove(_mouseOverItem);
+        //    //Check(string.Empty);
+        //}
     }
 
     private void btnPlus_Click(object sender, System.EventArgs e) {
@@ -1004,6 +1012,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             var removeok = _removeAllowed;
 
             if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
+            if(CheckBehavior == CheckBehavior.MultiSelection) {  removeok = false; }
 
             if (removeok) {
                 btnMinus.Width = 16;
