@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
@@ -105,12 +106,12 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(List<AbstractListItem> addHere, Database? db) {
+    public static void AddLayoutsOff(BlueControls.Controls.ComboBox addHere, Database? db) {
         if (db is null || db.IsDisposed) { return; }
         var r = db.GetAllLayouts();
 
         foreach (var thisFile in r) {
-            if (addHere[thisFile] == null) { _ = addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
+            if (addHere[thisFile] == null) { addHere.ItemAdd(Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
         }
     }
 
@@ -155,7 +156,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                     icp.ReplaceVariables(rowsForExport[startNr]);
                 }
 
-                pad.Item.Add(it);
+                Pad.Item.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
@@ -190,8 +191,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void Bef¸lleLayoutDropdowns() {
-        cbxLayoutWahl.Item.Clear();
-        AddLayoutsOff(cbxLayoutWahl.Item, Database);
+        cbxLayoutWahl.ItemClear();
+        AddLayoutsOff(cbxLayoutWahl, Database);
     }
 
     private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
@@ -238,7 +239,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         tabBildSchachteln.Enabled = false;
         tabDateiExport.Enabled = true;
         Tabs.SelectedTab = tabDateiExport;
-        lstExported.Item.AddRange(l);
+        lstExported.ItemAddRange(l);
     }
 
     private void Button_PageSetup_Click(object? sender, System.EventArgs e) {
@@ -294,8 +295,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        _ = e.UserMenu.Add(ContextMenuCommands.DateiPfad÷ffnen);
-        _ = e.UserMenu.Add(ContextMenuCommands.Kopieren);
+        e.UserMenu.Add(Add(ContextMenuCommands.DateiPfad÷ffnen));
+        e.UserMenu.Add(Add(ContextMenuCommands.Kopieren));
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -369,7 +370,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             var (files, error) = !string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text))
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
                 : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
-            lstExported.Item.AddRange(files);
+            lstExported.ItemAddRange(files);
 
             if (!string.IsNullOrEmpty(error)) {
                 MessageBox.Show(error);

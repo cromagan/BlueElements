@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -183,7 +184,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
 
         List<AbstractListItem> aa = [];
-        aa.AddRange(Database.Permission_AllUsed(false));
+        aa.AddRange(AddRange(Database.Permission_AllUsed(false)));
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text);
         if (b == null) { return; }
 
@@ -291,7 +292,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         List<AbstractListItem> ic = [];
         foreach (var thisColumnItem in db.Column) {
-            if (thisColumnItem != null && ca[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
+            if (thisColumnItem != null && ca[thisColumnItem] == null) { ic.Add(Add(thisColumnItem)); }
         }
         if (ic.Count == 0) {
             MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");

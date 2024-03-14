@@ -25,6 +25,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -168,10 +169,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
-            _ = items.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
+            items.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
         }
         if (column?.Database != null && row != null && column.Database.IsAdministrator()) {
-            _ = items.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen);
+            items.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen);
         }
         //if (Parent is Formula f) {
         //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu, false);
@@ -298,10 +299,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
         switch (e.Control) {
             case ComboBox comboBox:
-                List<AbstractListItem> item2 = new();
+                var item2 = new List<AbstractListItem>();
 
                 if (column1 != null) {
-                    List<AbstractListItem>.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
+                    item2.AddRange(GetItemCollection(column1, null, ShortenStyle.Replaced, 10000));
                 }
 
                 if (column1 != null && column1.TextBearbeitungErlaubt) {
@@ -394,13 +395,13 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     protected void StyleListBox(ListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
-        control.Item.Clear();
+        control.ItemClear();
         control.CheckBehavior = CheckBehavior.MultiSelection;
         if (column == null || column.IsDisposed) { return; }
 
-        List<AbstractListItem> item = new(true);
+        var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
-            List<AbstractListItem>.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+            item.AddRange(GetItemCollection(column, null, ShortenStyle.Replaced, 10000));
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
                 do {
@@ -415,7 +416,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 } while (again);
             }
         }
-        control.Item.AddClonesFrom(item);
+        control.AddRange(item);
 
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:
@@ -450,8 +451,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         control.UnCheck();
         control.SuggestionsClear();
         if (column == null || column.IsDisposed) { return; }
-        List<AbstractListItem> item = new(true);
-        List<AbstractListItem>.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        var item = new List<AbstractListItem>();
+        item.AddRange(GetItemCollection(column, null, ShortenStyle.Replaced, 10000));
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:
@@ -471,11 +472,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.KeyName)) {
-                _ = e.UserMenu.Add(ContextMenuCommands.DateiÖffnen);
+                e.UserMenu.Add(Add(ContextMenuCommands.DateiÖffnen));
             }
         }
         if (e.HotItem is BitmapListItem) {
-            _ = e.UserMenu.Add("Bild öffnen");
+            e.UserMenu.Add(Add("Bild öffnen"));
         }
     }
 

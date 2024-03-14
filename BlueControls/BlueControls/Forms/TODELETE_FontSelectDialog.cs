@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Globalization;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -45,7 +46,7 @@ public partial class FontSelectDialog {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         if (_fnList == null) {
-            _fnList = List<AbstractListItem>();
+            _fnList = new List<AbstractListItem>();
             foreach (var f in FontFamily.Families) {
                 if (string.IsNullOrEmpty(f.Name)) {
                     continue;
@@ -55,33 +56,33 @@ public partial class FontSelectDialog {
                     Font fo = new(f.Name, 100);
                     try {
                         _ = fo.MeasureString("T");
-                        _ = _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
+                        _fnList.Add(Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true));
                     } catch (Exception) { }
                 }
             }
             //_fnList.Sort();
-            _fsList = List<AbstractListItem>();
-            _fsList.Add("8", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("9", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("10", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("11", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("12", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("14", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("16", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("18", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("20", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("22", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("24", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("26", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("28", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("36", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("48", SortierTyp.ZahlenwertFloat);
-            _fsList.Add("72", SortierTyp.ZahlenwertFloat);
+            _fsList = new List<AbstractListItem>();
+            _fsList.Add(Add("8", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("9", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("10", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("11", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("12", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("14", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("16", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("18", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("20", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("22", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("24", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("26", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("28", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("36", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("48", SortierTyp.ZahlenwertFloat));
+            _fsList.Add(Add("72", SortierTyp.ZahlenwertFloat));
             //_fsList.Sort();
         }
-        FName.Item.AddRange(_fnList);
+        FName.ItemAddRange(_fnList);
         //FName.Item.Sort();
-        FSize.Item.AddRange(_fsList);
+        FSize.ItemAddRange(_fsList);
         //FSize.Item.Sort();
         Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
         UpdateSampleText();
@@ -96,10 +97,10 @@ public partial class FontSelectDialog {
         set {
             _adding = true;
             value ??= BlueFont.Get(Skin.DummyStandardFont);
-            if (FName.Item[value.FontName] == null) { _ = FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
+            if (FName.Item[value.FontName] == null) { FName.ItemAdd(Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
             FName.UncheckAll();
             FName.Check(value.FontName);
-            if (FSize.Item[value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture)] == null) { _ = FSize.Item.Add(value.Size.ToString(Constants.Format_Float1)); }
+            if (FSize.Item[value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture)] == null) { FSize.ItemAdd(Add(value.Size.ToString(Constants.Format_Float1))); }
             FSize.UncheckAll();
             FSize.Check(value.Size.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture));
             fFett.Checked = value.Bold;

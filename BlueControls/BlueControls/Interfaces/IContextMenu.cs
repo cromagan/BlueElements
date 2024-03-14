@@ -21,7 +21,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Interfaces;
 

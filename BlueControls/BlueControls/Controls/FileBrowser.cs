@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueScript.Variables;
@@ -348,10 +349,10 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         //_ = e.UserMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         //_ = e.UserMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
         //_ = e.UserMenu.AddSeparator();
-        _ = e.UserMenu.Add(ContextMenuCommands.Umbenennen, FileExists(it.KeyName));
-        _ = e.UserMenu.Add(ContextMenuCommands.Löschen, FileExists(it.KeyName));
+        e.UserMenu.Add(Add(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
+        e.UserMenu.Add(Add(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
         _ = e.UserMenu.AddSeparator();
-        _ = e.UserMenu.Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner));
+        e.UserMenu.Add(Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -690,7 +691,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
             case "add":
                 var ob = (BitmapListItem)gb[1];
-                lsbFiles.Item.Add(ob);
+                lsbFiles.ItemAdd(ob);
                 return;
 
             case "image":

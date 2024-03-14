@@ -29,6 +29,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
+using static BlueControls.ItemCollectionList.ItemCollectionList;
+
 namespace BlueControls.Controls;
 
 public partial class TextGenerator : GenericControl, IControlAcceptFilter {
@@ -259,7 +261,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
                 if (add) {
                     var rvis = string.Empty.PadLeft((r.CountString(";") - 2) * 5) + r.Substring(r.LastIndexOf(";", StringComparison.Ordinal) + 1);
 
-                    _ = lstAuswahl.Item.Add(rvis, r);
+                    lstAuswahl.ItemAdd(Add(rvis, r));
                 }
             }
 

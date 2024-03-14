@@ -23,7 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
@@ -700,7 +700,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.DropDownStyle = style;
         control.Item.Clear();
         if (list != null) {
-            control.Item.AddClonesFrom(list);
+            control.ItemAddClonesFrom(list);
         }
         //control.Item.Sort();
 
@@ -722,7 +722,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
         foreach (var thisc in Controls) {
             if (thisc is ComboBox cbx) {
-                _ = cbx.Focus();
+                cbx.Focus();
                 cbx.ShowMenu(null, null);
                 return;
             }

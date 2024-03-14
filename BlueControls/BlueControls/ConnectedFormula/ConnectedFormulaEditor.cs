@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -308,7 +308,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         if (l == null || l.Count == 0) { return; }
 
-        var i = List<AbstractListItem>();
+        var i = new  List<AbstractListItem>();
 
         foreach (var thisl in l) {
             i.Add(thisl);

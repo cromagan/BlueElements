@@ -119,8 +119,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     private void BefülleLayoutDropdown() {
         if (Database != null && !Database.IsDisposed) {
-            cbxLayout.Item.Clear();
-            ExportDialog.AddLayoutsOff(cbxLayout.Item, Database);
+            cbxLayout.ItemClear();
+            ExportDialog.AddLayoutsOff(cbxLayout, Database);
         }
     }
 

@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -211,19 +212,20 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
-        var lst =  List<AbstractListItem>();
-        lst.AddRange(db.Column, false);
+        var lst = new List<AbstractListItem>();
+        lst.AddRange(AddRange(db.Column, false));
 
         l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
         if (Column == null || Column.IsDisposed) { return l; }
 
-        var u =  List<AbstractListItem>();
-        u.AddRange(typeof(CaptionPosition));
+        var u = new List<AbstractListItem>();
+        u.AddRange(AddRange(typeof(CaptionPosition)));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
         l.Add(new FlexiControlForProperty<bool>(() => AutoX));
 
-        var b = new  List<AbstractListItem>(false, GetAllowedEditTypes(Column));
+        var b = new List<AbstractListItem>();
+        b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
         //l.Add(new FlexiControl());

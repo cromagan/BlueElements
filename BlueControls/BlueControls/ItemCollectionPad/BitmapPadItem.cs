@@ -30,6 +30,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -118,7 +119,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
             new FlexiControl()
         ];
-        List<AbstractListItem> comms = new(false);
+        var comms = new List<AbstractListItem>();
         comms.Add("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32"));
         comms.Add("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32"));
         comms.Add("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32"));

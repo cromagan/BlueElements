@@ -25,6 +25,8 @@ using BlueControls.Enums;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 namespace BlueControls.Interfaces;
 
@@ -222,14 +224,14 @@ public sealed class ItemAcceptFilter {
         } else {
             //l.Add(new FlexiControlForProperty<>(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
 
-            var x =  List<AbstractListItem>();
+            var x = new List<AbstractListItem>();
 
             // Die Items, die man noch wählen könnte
             foreach (var thisR in item.Parent) {
                 if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
                     //if (outp == null || outp == rfp.DatabaseOutput) {
                     if (rfp != item && rfp.IsOk()) {
-                        _ = x.Add(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
+                        x.Add(Add(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                     }
 
                     //}

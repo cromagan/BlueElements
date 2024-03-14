@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
         List.Item.Clear();
         foreach (var thisItem in items) {
-            List.Item.Add(thisItem);
+            List.ItemAdd(thisItem);
         }
 
         //List.Item.Sort();

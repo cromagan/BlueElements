@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 using Form = BlueControls.Forms.Form;
 
 namespace BlueControls.Controls;

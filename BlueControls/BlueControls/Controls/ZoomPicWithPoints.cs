@@ -22,7 +22,11 @@ using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
+
+using BlueControls.ItemCollectionList;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

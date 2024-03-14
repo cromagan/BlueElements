@@ -27,6 +27,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Specialized;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
@@ -62,8 +63,8 @@ public static class Allgemein {
         var par = o.ParentControl<IContextMenu>();
         if (par == null) { return null; }
 
-        List<AbstractListItem> thisContextMenu = []
-        List<AbstractListItem> userMenu = []
+        List<AbstractListItem> thisContextMenu = [];
+        List<AbstractListItem> userMenu = [];
 
         var cancel = false;
         par.GetContextMenuItems(null, thisContextMenu, out var hotItem);

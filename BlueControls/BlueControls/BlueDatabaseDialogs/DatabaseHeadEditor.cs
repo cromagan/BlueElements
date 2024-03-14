@@ -24,6 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -100,7 +101,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         PermissionGroups_NewRow.Item.Clear();
         PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
         PermissionGroups_NewRow.Suggestions.Clear();
-        PermissionGroups_NewRow.Item.AddRange(Database.Permission_AllUsed(false));
+        PermissionGroups_NewRow.ItemAddRange(Database.Permission_AllUsed(false));
 
         DatenbankAdmin.Item.Clear();
         DatenbankAdmin.Check(db.DatenbankAdmin);
@@ -113,7 +114,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             if (db.SortDefinition?.Columns != null) {
                 foreach (var thisColumn in db.SortDefinition.Columns) {
                     if (thisColumn != null && !thisColumn.IsDisposed) {
-                        _ = lbxSortierSpalten.Item.Add(thisColumn);
+                        lbxSortierSpalten.ItemAdd(Add(thisColumn));
                     }
                 }
             }
@@ -127,7 +128,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
 
         DatenbankAdmin.Suggestions.Clear();
-        DatenbankAdmin.Item.AddRange(Database.Permission_AllUsed(false));
+        DatenbankAdmin.ItemAddRange(Database.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(db.Column, false);
@@ -325,9 +326,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
 
-        _ = e.UserMenu.Add("Sortierung", true);
-        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Function.CanBeChangedByRules());
-        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Function.CanBeChangedByRules());
+        e.UserMenu.Add(Add("Sortierung", true));
+        e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Function.CanBeChangedByRules()));
+        e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Function.CanBeChangedByRules()));
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

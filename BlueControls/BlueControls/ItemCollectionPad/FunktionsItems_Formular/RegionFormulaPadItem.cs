@@ -26,6 +26,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -182,11 +183,11 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        var cl =  List<AbstractListItem>();
+        var cl = new List<AbstractListItem>();
 
         CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
 
-        var u =  List<AbstractListItem>();
+        var u = new List<AbstractListItem>();
         u.AddRange(typeof(GroupBoxStyle));
 
         List<GenericControl> l =

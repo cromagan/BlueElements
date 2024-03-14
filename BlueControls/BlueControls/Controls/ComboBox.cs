@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using System;
@@ -55,6 +56,8 @@ public partial class ComboBox : TextBox, ITranslateable {
     /// </summary>
     private string _initialtext = string.Empty;
 
+    private List<AbstractListItem> _item = new();
+    private Design _itemDesign;
     private string? _lastClickedText;
 
     #endregion
@@ -67,7 +70,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         MouseHighlight = true;
         SetStyle(ControlStyles.ContainerControl, true);
-        Item.PropertyChanged += Item_PropertyChanged;
         btnDropDown.Left = Width - btnDropDown.Width;
         btnDropDown.Top = 0;
         btnDropDown.Height = Height;
@@ -123,20 +125,54 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public List<AbstractListItem> Item { get; } = new(ListBoxAppearance.DropdownSelectbox, true);
+    public int ItemCount { get; internal set; }
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
     #endregion
 
+    #region Indexers
+
+    public AbstractListItem? this[string @internal] {
+        get {
+            try {
+                if (string.IsNullOrEmpty(@internal)) { return null; }
+                d
+                return _item.Get(@internal);
+            } catch {
+                Develop.CheckStackForOverflow();
+                return this[@internal];
+            }
+        }
+    }
+
+    public AbstractListItem? this[int no] {
+        get {
+            try {
+                if (no < 0 || no > _item.Count) { return null; }
+
+                return _item[no];
+            } catch {
+                Develop.CheckStackForOverflow();
+                return this[no];
+            }
+        }
+    }
+
+    #endregion
+
     #region Methods
+
+    public void ItemAdd(AbstractListItem textListItem) => throw new NotImplementedException();
+
+    public void ItemClear() => throw new NotImplementedException();
 
     public void ShowMenu(object? sender, MouseEventArgs? e) {
         if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
         _btnDropDownIsIn = true;
         OnDropDownShowing();
-        if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
+        if (_item.Count == 0) { _btnDropDownIsIn = false; return; }
         int x, y;
         if (sender is Button but) {
             x = Cursor.Position.X - but.MousePos().X - but.Location.X;
@@ -148,17 +184,23 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         List<string> itc = [];
         if (_drawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;
     }
 
+    internal void ItemAddRange(List<AbstractListItem> textListItems) => throw new NotImplementedException();
+
+    internal IEnumerable<AbstractListItem> Items() => throw new NotImplementedException();
+
+    internal void Remove(AbstractListItem thisit) => throw new NotImplementedException();
+
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
-            if (Item.Count == 0) {
+            if (_item.Count == 0) {
                 state = States.Standard_Disabled;
             }
         }
@@ -173,13 +215,13 @@ public partial class ComboBox : TextBox, ITranslateable {
             return;
         }
 
-        btnDropDown.Enabled = Item.Count > 0;
+        btnDropDown.Enabled = _item.Count > 0;
         var vType = Design.ComboBox_Textbox;
         if (ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage) {
             vType = Design.Ribbon_ComboBox_Textbox;
         }
 
-        var i = Item[Text];
+        var i = _item.Get(Text);
         if (i == null) {
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
@@ -209,8 +251,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.Pos;
-            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Item.ItemDesign).Height) / 2.0);
-            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Item.ItemDesign).Height));
+            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(_itemDesign).Height) / 2.0);
+            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(_itemDesign).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
             i.SetCoordinates(r);
         }
@@ -293,7 +335,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
-        if (!string.IsNullOrEmpty(e.ClickedCommand) && Item[e.ClickedCommand] is AbstractListItem bli) {
+        if (!string.IsNullOrEmpty(e.ClickedCommand) && _item.Get(e.ClickedCommand) is AbstractListItem bli) {
             _lastClickedText = e.ClickedCommand;
             Text = e.ClickedCommand;
             OnItemClicked(new AbstractListItemEventArgs(bli));

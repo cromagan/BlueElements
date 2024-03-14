@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using static BlueBasics.Extensions;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -59,7 +60,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
 
         if (_database is Database db && !db.IsDisposed) {
             //var lst =  List<AbstractListItem>();
-            lstColumns.Item.AddRange(db.Column, false);
+            lstColumns.ItemAddRange(Add(db.Column, false));
             //cbxColDateiname.Item = lst;
         }
 

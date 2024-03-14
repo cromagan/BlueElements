@@ -24,6 +24,7 @@ using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -32,6 +33,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -185,8 +187,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             new FlexiControlForProperty<string>(() => Anzeige),
         ];
 
-        var u =  List<AbstractListItem>();
-        u.AddRange(typeof(CaptionPosition));
+        var u = new List<AbstractListItem>();
+        u.AddRange(AddRange(typeof(CaptionPosition)));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());

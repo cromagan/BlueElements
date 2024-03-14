@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -39,7 +40,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         InitializeComponent();
         cbxText.Text = vorschlagsText;
         if (suggestOriginal != null) {
-            cbxText.Item.AddClonesFrom(suggestOriginal);
+            cbxText.ItemAddClonesFrom(suggestOriginal);
         }
         cbxText.DropDownStyle = texteingabeErlaubt ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
         Setup(txt, cbxText, 250);
@@ -53,7 +54,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
     public static string Show(string txt, List<AbstractListItem>? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
 
     public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
-        List<AbstractListItem> Suggest = new(true);
+        var Suggest = new List<AbstractListItem>();
         Suggest.AddRange(suggest);
         //Suggest.Sort();
         return Show(txt, string.Empty, Suggest, texteingabeErlaubt);

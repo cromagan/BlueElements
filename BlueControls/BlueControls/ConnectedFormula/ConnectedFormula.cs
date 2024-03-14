@@ -35,10 +35,11 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -546,7 +547,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         if (File.Exists(Filename)) {
             foreach (var thisf in Directory.GetFiles(Filename.FilePath(), "*.cfo")) {
                 if (!notAllowedChilds.Contains(thisf)) {
-                    _ = list.Add(thisf, ImageCode.Diskette);
+                    list.Add(Add(thisf, ImageCode.Diskette));
                 }
             }
         }
@@ -554,7 +555,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         foreach (var thisf in ConnectedFormula.AllFiles) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
                 if (list[thisf.Filename] == null) {
-                    _ = list.Add(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette);
+                    list.Add(Add(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette));
                 }
             }
         }

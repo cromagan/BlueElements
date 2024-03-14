@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 
@@ -389,39 +390,39 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         hotItem = tags;
 
         if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
-            _ = items.Add("Rechtschreibprüfung", true);
+            items.Add(Add("Rechtschreibprüfung", true));
             if (Dictionary.IsSpellChecking) {
-                _ = items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
-                _ = items.AddSeparator();
+                items.Add(Add("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                //_ = items.AddSeparator();
             } else {
                 var sim = Dictionary.SimilarTo(tmpWord);
                 if (sim != null) {
                     foreach (var thisS in sim) {
-                        _ = items.Add(" - " + thisS, "#ChangeTo:" + thisS);
+                        items.Add(Add(" - " + thisS, "#ChangeTo:" + thisS));
                     }
-                    _ = items.AddSeparator();
+                    items.AddSeparator();
                 }
-                _ = items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
+                items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
                 if (tmpWord.ToLower() != tmpWord) {
-                    _ = items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
+                    items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
                 }
-                _ = items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
-                _ = items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
-                _ = items.AddSeparator();
+                items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
+                items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
+                items.AddSeparator();
             }
         }
         if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
-            _ = items.Add(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled);
-            _ = items.Add(ContextMenuCommands.Kopieren, _markStart >= 0);
-            _ = items.Add(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled);
+            items.Add(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled);
+            items.Add(ContextMenuCommands.Kopieren, _markStart >= 0);
+            items.Add(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled);
             if (_formatierungErlaubt) {
-                _ = items.AddSeparator();
-                _ = items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
+                items.AddSeparator();
+                items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
                 if (_markEnd > -1) {
-                    _ = items.AddSeparator();
-                    _ = items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
-                    _ = items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1);
-                    _ = items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                    items.AddSeparator();
+                    items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                    items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                    items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1);
                 }
             }
         }
@@ -846,25 +847,25 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = _cursorCharPos;
         MultiUserFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
-        List<AbstractListItem> i = new(ListBoxAppearance.Listbox, false)
-       {
-            //if (e.File is Database DB && DB.Bins.Count > 0) {
-            //    foreach (var bmp in DB.Bins) {
-            //        if (bmp.Picture != null) {
-            //            if (!string.IsNullOrEmpty(bmp.Name)) {
-            //                var crc = "DB_" + bmp.Name;
-            //                i.GenerateAndAdd(bmp.Name, crc, QuickImage.Get(crc, 20));
-            //            }
-            //        }
-            //    }
-            //    i.AddSeparator();
-            //}
-            { "Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20) },
-            { "Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20) },
-            { "Information", "Information", QuickImage.Get(ImageCode.Information, 20) },
-            { "Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20) },
-            { "Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20) }
-        };
+        var i = new List<AbstractListItem>();
+
+        //if (e.File is Database DB && DB.Bins.Count > 0) {
+        //    foreach (var bmp in DB.Bins) {
+        //        if (bmp.Picture != null) {
+        //            if (!string.IsNullOrEmpty(bmp.Name)) {
+        //                var crc = "DB_" + bmp.Name;
+        //                i.GenerateAndAdd(bmp.Name, crc, QuickImage.Get(crc, 20));
+        //            }
+        //        }
+        //    }
+        //    i.AddSeparator();
+        //}
+        i.Add(Add("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)));
+        i.Add(Add("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)));
+        i.Add(Add("Information", "Information", QuickImage.Get(ImageCode.Information, 20)));
+        i.Add(Add("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)));
+        i.Add(Add("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20)));
+
         var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
         _cursorCharPos = x;
         if (r == null || r.Count != 1) { return; }

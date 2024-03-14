@@ -21,6 +21,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -103,9 +104,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void HandleChangesNow() {
         if (IsDisposed) { return; }
@@ -133,17 +134,16 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         if (cb == null) { return; }
 
-        List<AbstractListItem> ex = [.. cb.Item];
+        var ex = cb.Items();
 
         #region Zeilen erzeugen
 
         if (RowsInput == null || !RowsInputChangedHandled) { return; }
 
         foreach (var thisR in RowsInput) {
-            if (cb?.Item?[thisR.KeyName] == null) {
+            if (cb[thisR.KeyName] == null) {
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                _ = cb?.Item?.Add(tmpQuickInfo, thisR.KeyName);
-                //cb.Item.Add(thisR, string.Empty);
+                cb.ItemAdd(Add(tmpQuickInfo, thisR.KeyName));
             } else {
                 foreach (var thisIt in ex) {
                     if (thisIt.KeyName == thisR.KeyName) {
@@ -159,7 +159,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         #region Veraltete Zeilen entfernen
 
         foreach (var thisit in ex) {
-            cb?.Item?.Remove(thisit);
+            cb?.Remove(thisit);
         }
 
         #endregion
@@ -167,11 +167,11 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         #region Nur eine Zeile? auswählen!
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
-        if (cb?.Item != null && cb.Item.Count == 1) {
-            ValueSet(cb.Item[0].KeyName, true);
+        if (cb.ItemCount == 1) {
+            ValueSet(cb[0].KeyName, true);
         }
 
-        if (cb?.Item == null || cb.Item.Count < 2) {
+        if (cb.ItemCount < 2) {
             DisabledReason = "Keine Auswahl möglich.";
         } else {
             DisabledReason = string.Empty;
@@ -183,7 +183,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         // am Ende auf null setzen, um Blinki zu vermeiden
 
-        if (cb?.Item?[Value] == null) {
+        if (cb[Value] == null) {
             ValueSet(string.Empty, true);
         }
 

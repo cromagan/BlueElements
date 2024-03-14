@@ -24,7 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -61,6 +61,7 @@ using System.Windows.Data;
 
 using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Controls;
 
@@ -83,6 +84,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private Design _controlDesign;
 
     private string _filterText = string.Empty;
+
+    private List<AbstractListItem> _item = [];
 
     private Design _itemDesign;
 
@@ -107,9 +110,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        Item = List<AbstractListItem>();
 
-        BindingOperations.EnableCollectionSynchronization(Item, new object());
+        BindingOperations.EnableCollectionSynchronization(_item, new object());
 
         _maxNeededItemSize = Size.Empty;
         _appearance = ListBoxAppearance.Listbox;
@@ -119,7 +121,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //_autoSort = autosort;
         GetDesigns();
 
-        RegisterEvents();
+        //RegisterEvents();
         _appearance = ListBoxAppearance.Listbox;
     }
 
@@ -210,12 +212,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    //public string LastFilePath { get; set; }
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<AbstractListItem> Item { get; }
-
     /// <summary>
     /// Itemdesign wird durch Appearance gesetzt
     /// </summary>
@@ -282,21 +278,87 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #endregion
 
-    #region Methods
+    #region Indexers
 
-    public TextListItem? Add_Text(string? val) {
-        if (val == null || string.IsNullOrEmpty(val)) { return null; }
-        if (Item.Any(thisItem => thisItem != null && string.Equals(thisItem.KeyName, val, StringComparison.OrdinalIgnoreCase))) {
-            return null;
+    public AbstractListItem? this[string @internal] {
+        get {
+            try {
+                return _item.Get(@internal);
+            } catch {
+                Develop.CheckStackForOverflow();
+                return this[@internal];
+            }
         }
-        var i = Item.Add(val, val);
-        Check(i);
-        return i;
     }
 
-    public TextListItem? Add_Text() {
+    public AbstractListItem? this[int no] {
+        get {
+            try {
+                if (no < 0 || no > _item.Count) { return null; }
+
+                return _item[no];
+            } catch {
+                Develop.CheckStackForOverflow();
+                return this[no];
+            }
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+    /// </summary>
+    /// <returns></returns>
+    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData(List<AbstractListItem> item, Design itemDesign) {
+        try {
+            var w = 16;
+            var h = 0;
+            var hall = 0;
+            var sameh = -1;
+            var or = Orientation.Senkrecht;
+            PreComputeSize(item, itemDesign);
+
+            foreach (var thisItem in item) {
+                if (thisItem != null) {
+                    var s = thisItem.SizeUntouchedForListBox(itemDesign);
+                    w = Math.Max(w, s.Width);
+                    h = Math.Max(h, s.Height);
+                    hall += s.Height;
+                    if (sameh < 0) {
+                        sameh = thisItem.SizeUntouchedForListBox(itemDesign).Height;
+                    } else {
+                        if (sameh != thisItem.SizeUntouchedForListBox(itemDesign).Height) { or = Orientation.Waagerecht; }
+                        sameh = thisItem.SizeUntouchedForListBox(itemDesign).Height;
+                    }
+                    if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
+                }
+            }
+
+            return (w, h, hall, or);
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ItemData(item, itemDesign);
+        }
+    }
+
+    public static void PreComputeSize(List<AbstractListItem> item, Design itemDesign) {
+        try {
+            _ = Parallel.ForEach(item, thisItem => {
+                _ = thisItem?.SizeUntouchedForListBox(itemDesign);
+            });
+        } catch {
+            Develop.CheckStackForOverflow();
+            PreComputeSize(item, itemDesign);
+        }
+    }
+
+    public void Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
-        return Add_Text(val);
+        var it = BlueControls.ItemCollectionList.ItemCollectionList.Add(val);
+        ItemAdd(it);
     }
 
     public void Add_TextBySuggestion() {
@@ -309,14 +371,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (rück == null || rück.Count == 0) { return; }
 
-        var sg = Suggestions[rück[0]];
+        var sg = Suggestions.Get(rück[0]);
         if (sg == null) { return; }
 
-        AddAndCheck(sg.Clone() as AbstractListItem);
+        AddAndCheck(sg);
     }
 
     public Size CalculateColumnAndSize() {
-        var (biggestItemX, _, heightAdded, orienation) = ItemData();
+        var (biggestItemX, _, heightAdded, orienation) = ItemData(_item, _itemDesign);
         if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
         return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation, 0);
@@ -350,17 +412,49 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
+    public void ItemAdd(AbstractListItem? item) {
+        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
+        if (_item.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
+        if (this[item.Internal] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
+
+        if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
+        _item.Add(item);
+
+        item.PropertyChanged += Item_PropertyChanged;
+        item.CompareKeyChanged += Item_CompareKeyChangedChanged;
+    }
+
+    public void ItemAddRange(IEnumerable<AbstractListItem>? list) => throw new NotImplementedException();
+
+    public void ItemAddRange(IEnumerable<string>? list) {
+        if (list == null) { return; }
+
+        foreach (var thisstring in list) {
+            if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
+                ItemAdd(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisstring, thisstring));
+            }
+        }
+    }
+
+    public void ItemClear() => throw new NotImplementedException();
+
     public virtual void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void Remove(string internalnam) => _item.Remove(this[internalnam]);
+
+    public void Remove(AbstractListItem? item) {
+        if (item == null || !Contains(item)) { return; }
+        _ = _item.Remove(item);
+        throw new NotImplementedException();
+    }
 
     public void Swap(int index1, int index2) {
         if (index1 == index2) { return; }
         if (_autoSort) { return; }
 
-        UnRegisterEvents();
-        (Item[index1], Item[index2]) = (Item[index2], Item[index1]);
-        RegisterEvents();
+        (_item[index1], _item[index2]) = (_item[index2], _item[index1]);
 
         Invalidate();
         DoMouseMovement();
@@ -390,14 +484,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     internal void AddAndCheck(AbstractListItem? ali) {
         if (ali == null) { return; }
 
-        if (Item[ali.KeyName] != null) { return; }
+        if (_item[ali.KeyName] != null) { return; }
 
         var tmp = _checkBehavior;
         _checkBehavior = CheckBehavior.MultiSelection;
 
         //Item.Remove(ali.KeyName);
 
-        Item.Add(ali);
+        _item.Add(ali);
         _checkBehavior = tmp;
         Check(ali);
     }
@@ -409,7 +503,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 _maxNeededItemSize = Size.Empty;
             }
             if (!_maxNeededItemSize.IsEmpty) { return _maxNeededItemSize; }
-            if (Item.Count == 0) {
+            if (_item.Count == 0) {
                 _maxNeededItemSize = Size.Empty;
                 return Size.Empty;
             }
@@ -440,8 +534,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                     if (BreakAfterItems < 1) {
                         colWidth = controlDrawingArea.Width - sliderWidth;
                     } else {
-                        var colCount = Item.Count / BreakAfterItems;
-                        var r = Item.Count % colCount;
+                        var colCount = _item.Count / BreakAfterItems;
+                        var r = _item.Count % colCount;
                         if (r != 0) { colCount++; }
                         colWidth = controlDrawingArea.Width < 5 ? biggestItemX : (controlDrawingArea.Width - sliderWidth) / colCount;
                     }
@@ -540,50 +634,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         _itemOrder = null;
     }
 
-    /// <summary>
-    ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-    /// </summary>
-    /// <returns></returns>
-    internal (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData() {
-        try {
-            var w = 16;
-            var h = 0;
-            var hall = 0;
-            var sameh = -1;
-            var or = Orientation.Senkrecht;
-            PreComputeSize();
-
-            foreach (var thisItem in ItemOrder) {
-                if (thisItem != null) {
-                    var s = thisItem.SizeUntouchedForListBox(ItemDesign);
-                    w = Math.Max(w, s.Width);
-                    h = Math.Max(h, s.Height);
-                    hall += s.Height;
-                    if (sameh < 0) {
-                        sameh = thisItem.SizeUntouchedForListBox(ItemDesign).Height;
-                    } else {
-                        if (sameh != thisItem.SizeUntouchedForListBox(ItemDesign).Height) { or = Orientation.Waagerecht; }
-                        sameh = thisItem.SizeUntouchedForListBox(ItemDesign).Height;
-                    }
-                    if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
-                }
-            }
-
-            return (w, h, hall, or);
-        } catch {
-            Develop.CheckStackForOverflow();
-            return ItemData();
-        }
-    }
-
     internal void SetValuesTo(List<string> values) {
-        var ist = Item.ToListOfString();
+        var ist = _item.ToListOfString();
         var zuviel = ist.Except(values).ToList();
         var zuwenig = values.Except(ist).ToList();
         // Zu viele im Mains aus der Liste löschen
         foreach (var thisString in zuviel) {
             if (!values.Contains(thisString)) {
-                Item.Remove(thisString);
+                Remove(thisString);
             }
         }
 
@@ -591,12 +649,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         foreach (var thisString in zuwenig) {
             if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
-                    _ = Item.Add(thisString, thisString, thisString.FileNameWithoutSuffix());
+                    _item.Add(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisString, thisString, thisString.FileNameWithoutSuffix()));
                 } else {
-                    _ = Item.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
+                    _item.Add(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48)));
                 }
             } else {
-                _ = Item.Add(thisString);
+                _item.Add(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisString));
             }
         }
     }
@@ -605,7 +663,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         try {
             if (disposing) {
             }
-            UnRegisterEvents();
+            _item.Clear();
         } finally {
             base.Dispose(disposing);
         }
@@ -625,13 +683,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (_addAlloweds != AddType.None) { addy = 32; }
 
-        if (Item.Count == 0) {
+        if (_item.Count == 0) {
             SliderY.Visible = false;
             SliderY.Value = 0;
             addy = 0;
         }
 
-        var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData();
+        var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData(_item, _itemDesign);
         _ = ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
@@ -745,7 +803,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void btnDown_Click(object sender, System.EventArgs e) {
         var ln = -1;
         for (var z = _itemOrder.Count - 1; z >= 0; z--) {
-            if (Item[z] == _mouseOverItem) {
+            if (_item[z] == _mouseOverItem) {
                 if (ln < 0) { return; }// Befehl verwerfen...
                 Swap(ln, z);
                 return;
@@ -763,7 +821,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         UnCheck(_mouseOverItem);
 
         if (_checkBehavior != CheckBehavior.AllSelected) {
-            Item.Remove(_mouseOverItem);
+            _item.Remove(_mouseOverItem);
             //Check(string.Empty);
         }
     }
@@ -797,7 +855,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         foreach (var thisItem in _itemOrder) {
             if (thisItem == _mouseOverItem) {
                 if (ln == null) { return; }// Befehl verwerfen...
-                Swap(Item.IndexOf(ln), Item.IndexOf(thisItem));
+                Swap(_item.IndexOf(ln), _item.IndexOf(thisItem));
                 return;
             }
             ln = thisItem;
@@ -808,11 +866,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (orientation != Orientation.Senkrecht) {
             Develop.DebugPrint(FehlerArt.Fehler, "Nur 'senkrecht' erlaubt mehrere Spalten");
         }
-        if (Item.Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
-        var dithemh = allItemsHeight / Item.Count;
+        if (_item.Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
+        var dithemh = allItemsHeight / _item.Count;
         for (var testSp = 10; testSp >= 1; testSp--) {
-            var colc = Item.Count / testSp;
-            var rest = Item.Count % colc;
+            var colc = _item.Count / testSp;
+            var rest = _item.Count % colc;
             var ok = !(rest > 0 && rest < colc / 2);
             if (colc < 5) { ok = false; }
             if (colc > 20) { ok = false; }
@@ -829,7 +887,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private ReadOnlyCollection<AbstractListItem> CalculateItemOrder() {
         var l = new List<AbstractListItem>();
-        l.AddRange(Item);
+        l.AddRange(_item);
 
         if (_autoSort) { l.Sort(); }
 
@@ -888,14 +946,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             //btnUp.Enabled = Item[0].KeyName != nr[0];
             //btnDown.Enabled = Item[Item.Count - 1].KeyName != nr[0];
 
-            if (_moveAllowed && !_autoSort && Item.Count > 1) {
+            if (_moveAllowed && !_autoSort && _item.Count > 1) {
                 btnDown.Width = 16;
                 btnDown.Height = 16;
                 pos -= btnDown.Width;
                 btnDown.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
                 btnDown.Left = pos;
                 btnDown.Visible = true;
-                btnDown.Enabled = Item[Item.Count - 1] != _mouseOverItem;
+                btnDown.Enabled = _item[_item.Count - 1] != _mouseOverItem;
             } else {
                 btnDown.Visible = false;
             }
@@ -904,14 +962,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             #region Up-Button
 
-            if (_moveAllowed && !_autoSort && Item.Count > 1) {
+            if (_moveAllowed && !_autoSort && _item.Count > 1) {
                 btnUp.Width = 16;
                 btnUp.Height = 16;
                 pos -= btnUp.Width;
                 btnUp.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
                 btnUp.Left = pos;
                 btnUp.Visible = true;
-                btnUp.Enabled = Item[0] != _mouseOverItem;
+                btnUp.Enabled = _item[0] != _mouseOverItem;
             } else {
                 btnUp.Visible = false;
             }
@@ -1003,7 +1061,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         var l = new List<string>();
         foreach (var thisc in _checked) {
-            if (Item[thisc] != null) { l.Add(thisc); }
+            if (_item.Get(thisc) != null) { l.Add(thisc); }
         }
 
         ValidateCheckStates(l, last);
@@ -1011,34 +1069,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    private void Item_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-    }
-
-    private AbstractListItem? MouseOverNode(int x, int y) => Item[x, (int)(y + SliderY.Value)];
+    private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y));
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
-
-    private void PreComputeSize() {
-        try {
-            _ = Parallel.ForEach(Item, thisItem => {
-                _ = thisItem?.SizeUntouchedForListBox(ItemDesign);
-            });
-        } catch {
-            Develop.CheckStackForOverflow();
-            PreComputeSize();
-        }
-    }
-
-    private void RegisterEvents() {
-        Item.PropertyChanged += Item_PropertyChanged;
-        Item.CollectionChanged += Item_CollectionChanged;
-    }
 
     private void SliderY_ValueChange(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
@@ -1047,18 +1084,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    private void UnRegisterEvents() {
-        Item.PropertyChanged -= Item_PropertyChanged;
-        Item.CollectionChanged -= Item_CollectionChanged;
-    }
-
     private void ValidateCheckStates(List<string> newCheckedItems, string lastaddeditem) {
         newCheckedItems = newCheckedItems.SortedDistinctList();
 
         switch (_checkBehavior) {
             case CheckBehavior.AllSelected:
                 SetValuesTo(newCheckedItems);
-                newCheckedItems = Item.ToListOfString();
+                newCheckedItems = _item.ToListOfString();
                 break;
 
             case CheckBehavior.NoSelection:
@@ -1097,7 +1129,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = Item[thisit] ?? Item.Add(thisit);
+            var it = _item.Get(thisit) ?? BlueControls.ItemCollectionList.ItemCollectionList.Add(thisit);
 
             if (it.IsClickable()) {
                 newList.Add(thisit);

@@ -25,6 +25,7 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
@@ -61,7 +62,7 @@ public class SymbolPadItem : RectanglePadItem {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<AbstractListItem> comms = new(false);
+        var comms = new List<AbstractListItem>();
         comms.Add("Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32"));
         comms.Add("Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32"));
         comms.Add("Rechteck gerundet", ((int)Symbol.Rechteck_gerundet).ToString());

@@ -26,7 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 
-public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, IPropertyChangedFeedback {
+public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -68,9 +68,9 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
-
     public event EventHandler? CompareKeyChanged;
+
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -123,15 +123,6 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
     #endregion
 
     #region Methods
-
-    //public ItemCollectionList? Parent {
-    //    get => _parent;
-    //    set {
-    //        if (_parent == null || _parent == value) {
-    //            _parent = value;
-    //            return;
-    //        }
-    public abstract object? Clone();
 
     public void CloneBasicStatesFrom(AbstractListItem sourceItem) {
         Enabled = sourceItem.Enabled;
@@ -199,9 +190,9 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
     public virtual bool IsClickable() => !IsCaption;
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
-
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void SetCoordinates(Rectangle r) {
         Pos = r;

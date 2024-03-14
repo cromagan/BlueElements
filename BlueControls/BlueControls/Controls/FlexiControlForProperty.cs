@@ -30,6 +30,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
@@ -130,15 +131,13 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
             {
                     if (list != null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        list.Appearance = ListBoxAppearance.ComboBox_Textbox;
-                        //var s2 = MeasureStringOfCaption(Caption);
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
-                        var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                        var (biggestItemX, biggestItemY, _, _) = ListBox.ItemData(list, list, ComboBoxStyle.DropDownList);
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
-                        StyleComboBox(CreateSubControls() as ComboBox, list.ItemOrder, ComboBoxStyle.DropDownList, true);
+                        StyleComboBox(CreateSubControls() as ComboBox, list, ComboBoxStyle.DropDownList, true);
                     } else {
                         EditType = EditTypeFormula.Textfeld;
                         if (rowCount >= 2) {
@@ -247,7 +246,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
 
         control.CheckBehavior = checkBehavior;
         control.Appearance = ListBoxAppearance.Listbox_Boxes;
-        control.Item.AddClonesFrom(list);
+        control.ItemAddClonesFrom(list);
         control.AddAllowed = addallowed;
         control.RemoveAllowed = false;
 
@@ -258,9 +257,9 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         //control.CheckBehavior = CheckBehavior.MultiSelection;
         //if (column == null || column.IsDisposed) { return; }
 
-        // List<AbstractListItem> item = new(true);
+        //var item =  new List<AbstractListItem>();;
         //if (column.DropdownBearbeitungErlaubt) {
-        //     List<AbstractListItem>.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        //    item.AddRange(GetItemCollection(column, null, ShortenStyle.Replaced, 10000));
         //    if (!column.DropdownWerteAndererZellenAnzeigen) {
         //        bool again;
         //        do {

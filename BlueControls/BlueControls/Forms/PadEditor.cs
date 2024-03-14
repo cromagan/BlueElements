@@ -31,6 +31,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -43,27 +44,27 @@ public partial class PadEditor : PadEditorReadOnly {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        PadDesign.Item.Clear();
-        PadDesign.Item.AddRange(Skin.AllStyles());
-        PadDesign.Text = PadDesign.Item[0].KeyName;
+        PadDesign.ItemClear();
+        PadDesign.ItemAddRange(AddRange(Skin.AllStyles()));
+        PadDesign.Text = PadDesign[0].KeyName;
 
         if (Pad?.Item != null && Skin.StyleDb != null) {
             Pad.Item.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
         }
 
-        _ = cbxSchriftGröße.Item.Add("30%", "030");
-        _ = cbxSchriftGröße.Item.Add("40%", "040");
-        _ = cbxSchriftGröße.Item.Add("50%", "050");
-        _ = cbxSchriftGröße.Item.Add("60%", "060");
-        _ = cbxSchriftGröße.Item.Add("70%", "070");
-        _ = cbxSchriftGröße.Item.Add("80%", "080");
-        _ = cbxSchriftGröße.Item.Add("90%", "090");
-        _ = cbxSchriftGröße.Item.Add("100%", "100");
-        _ = cbxSchriftGröße.Item.Add("110%", "110");
-        _ = cbxSchriftGröße.Item.Add("120%", "120");
-        _ = cbxSchriftGröße.Item.Add("130%", "130");
-        _ = cbxSchriftGröße.Item.Add("140%", "140");
-        _ = cbxSchriftGröße.Item.Add("150%", "150");
+        cbxSchriftGröße.ItemAdd(Add("30%", "030"));
+        cbxSchriftGröße.ItemAdd(Add("40%", "040"));
+        cbxSchriftGröße.ItemAdd(Add("50%", "050"));
+        cbxSchriftGröße.ItemAdd(Add("60%", "060"));
+        cbxSchriftGröße.ItemAdd(Add("70%", "070"));
+        cbxSchriftGröße.ItemAdd(Add("80%", "080"));
+        cbxSchriftGröße.ItemAdd(Add("90%", "090"));
+        cbxSchriftGröße.ItemAdd(Add("100%", "100"));
+        cbxSchriftGröße.ItemAdd(Add("110%", "110"));
+        cbxSchriftGröße.ItemAdd(Add("120%", "120"));
+        cbxSchriftGröße.ItemAdd(Add("130%", "130"));
+        cbxSchriftGröße.ItemAdd(Add("140%", "140"));
+        cbxSchriftGröße.ItemAdd(Add("150%", "150"));
         cbxSchriftGröße.Text = "100";
     }
 

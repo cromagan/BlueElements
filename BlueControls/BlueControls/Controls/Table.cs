@@ -28,6 +28,7 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -573,8 +574,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (las != null) {
                 co++;
-                _ = i.Add("vor " + db.Undo[lasNr].DateTimeUtc + " UTC",
-                    co.ToString(Format_Integer5) + db.Undo[lasNr].PreviousValue);
+                i.Add(Add("vor " + db.Undo[lasNr].DateTimeUtc + " UTC", co.ToString(Format_Integer5) + db.Undo[lasNr].PreviousValue));
             }
         }
 
@@ -591,7 +591,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (database is Database db && !db.IsDisposed) {
             foreach (var thisArrangement in db.ColumnArrangements) {
                 if (db.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
-                    _ = columnArrangementSelector.Item.Add(thisArrangement);
+                    columnArrangementSelector.ItemAdd(Add(thisArrangement));
                 }
             }
         }
@@ -2471,11 +2471,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        List<AbstractListItem> t = new(true) {
-            Appearance = ListBoxAppearance.DropdownSelectbox
-        };
+        var t = new List<AbstractListItem>();
 
-        List<AbstractListItem>.GetItemCollection(t, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
+        t.AddRange(GetItemCollection(contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, false); } else {
@@ -2490,7 +2488,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Cell_Edit(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, false);
                 return;
             }
-            _ = t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
+            t.Add(Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
             _ = t.AddSeparator(FirstSortChar + "2");
         }
 
@@ -2540,8 +2538,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         box.Tag = new List<object?> { cellInThisDatabaseColumn, cellInThisDatabaseRow };
 
         if (box is ComboBox cbox) {
-            List<AbstractListItem>.GetItemCollection(cbox.Item, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
-            if (cbox.Item.Count == 0) {
+            cbox.ItemAddRange(GetItemCollection(contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000));
+            if (cbox.ItemCount == 0) {
                 return Cell_Edit_TextBox(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
             }
         }

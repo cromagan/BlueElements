@@ -21,7 +21,7 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -131,7 +131,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     //    //    foreach (var thisit in e.OldItems) {
     //    //        if (thisit is AbstractListItem bli) {
     //    //            if (Suggest.Item[bli.KeyName] == null) {
-    //    //                Suggest.Item.Add(bli.Clone() as AbstractListItem);
+    //    //                Suggest.ItemAdd(bli.Clone() as AbstractListItem);
     //    //            }
     //    //        }
     //    //    }

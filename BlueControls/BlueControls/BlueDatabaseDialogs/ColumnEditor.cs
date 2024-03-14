@@ -30,6 +30,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -254,27 +255,27 @@ internal sealed partial class ColumnEditor {
 
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
-        cbxTargetColumn.Item.Clear();
+        cbxTargetColumn.ItemClear();
 
         if (_column.LinkedDatabase != null) {
             //foreach (var ThisColumn in _Column.Database.Column) {
             //    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
-            //        cbxRowKeyInColumn.Item.Add(ThisColumn);
+            //        cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    }
             //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
-            //    //    cbxRowKeyInColumn.Item.Add(ThisColumn);
+            //    //    cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    //}
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
                 if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Function.CanBeCheckedByRules() && !thisLinkedColumn.Function.NeedTargetDatabase()) {
-                    _ = cbxTargetColumn.Item.Add(thisLinkedColumn);
+                    cbxTargetColumn.ItemAdd(Add(thisLinkedColumn));
                 }
             }
         }
         //cbxTargetColumn.Item.Sort();
         cbxTargetColumn.Text = _column.LinkedCell_ColumnNameOfLinkedDatabase;
         //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedDatabase);
-        cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
+        cbxTargetColumn.Enabled = cbxTargetColumn.ItemCount > 0;
         capTargetColumn.Enabled = cbxTargetColumn.Enabled;
         if (!cbxTargetColumn.Enabled) {
             cbxTargetColumn.Text = string.Empty;
@@ -290,38 +291,38 @@ internal sealed partial class ColumnEditor {
 
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
-        cbxFunction.Item.AddRange(typeof(ColumnFunction));
-        cbxRandLinks.Item.AddRange(typeof(ColumnLineStyle));
-        cbxRandRechts.Item.AddRange(typeof(ColumnLineStyle));
-        cbxBildTextVerhalten.Item.AddRange(typeof(BildTextVerhalten));
-        cbxAlign.Item.AddRange(typeof(AlignmentHorizontal));
-        cbxAdditionalCheck.Item.AddRange(typeof(AdditionalCheck));
-        cbxScriptType.Item.AddRange(typeof(ScriptType));
-        cbxTranslate.Item.AddRange(typeof(TranslationType));
-        cbxSort.Item.AddRange(typeof(SortierTyp));
-        cbxLinkedDatabase.Item.Clear();
+        cbxFunction.ItemAddRange(AddRange(typeof(ColumnFunction)));
+        cbxRandLinks.ItemAddRange(AddRange(typeof(ColumnLineStyle)));
+        cbxRandRechts.ItemAddRange(AddRange(typeof(ColumnLineStyle)));
+        cbxBildTextVerhalten.ItemAddRange(AddRange(typeof(BildTextVerhalten)));
+        cbxAlign.ItemAddRange(AddRange(typeof(AlignmentHorizontal)));
+        cbxAdditionalCheck.ItemAddRange(AddRange(typeof(AdditionalCheck)));
+        cbxScriptType.ItemAddRange(AddRange(typeof(ScriptType)));
+        cbxTranslate.ItemAddRange(AddRange(typeof(TranslationType)));
+        cbxSort.ItemAddRange(AddRange(typeof(SortierTyp)));
+        cbxLinkedDatabase.ItemClear();
 
-        if (cbxEinheit.Item.Count < 1) {
-            _ = cbxEinheit.Item.Add("µm", ImageCode.Lineal);
-            _ = cbxEinheit.Item.Add("mm", ImageCode.Lineal);
-            _ = cbxEinheit.Item.Add("cm", ImageCode.Lineal);
-            _ = cbxEinheit.Item.Add("dm", ImageCode.Lineal);
-            _ = cbxEinheit.Item.Add("m", ImageCode.Lineal);
-            _ = cbxEinheit.Item.Add("km", ImageCode.Lineal);
-            _ = cbxEinheit.Item.Add("mm²", ImageCode.GrößeÄndern);
-            _ = cbxEinheit.Item.Add("m²", ImageCode.GrößeÄndern);
-            _ = cbxEinheit.Item.Add("µg", ImageCode.Gewicht);
-            _ = cbxEinheit.Item.Add("mg", ImageCode.Gewicht);
-            _ = cbxEinheit.Item.Add("g", ImageCode.Gewicht);
-            _ = cbxEinheit.Item.Add("kg", ImageCode.Gewicht);
-            _ = cbxEinheit.Item.Add("t", ImageCode.Gewicht);
-            _ = cbxEinheit.Item.Add("h", ImageCode.Uhr);
-            _ = cbxEinheit.Item.Add("min", ImageCode.Uhr);
-            _ = cbxEinheit.Item.Add("St.", ImageCode.Eins);
+        if (cbxEinheit.ItemCount < 1) {
+            cbxEinheit.ItemAdd(Add("µm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(Add("mm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(Add("cm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(Add("dm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(Add("m", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(Add("km", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(Add("mm²", ImageCode.GrößeÄndern));
+            cbxEinheit.ItemAdd(Add("m²", ImageCode.GrößeÄndern));
+            cbxEinheit.ItemAdd(Add("µg", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(Add("mg", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(Add("g", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(Add("kg", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(Add("t", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(Add("h", ImageCode.Uhr));
+            cbxEinheit.ItemAdd(Add("min", ImageCode.Uhr));
+            cbxEinheit.ItemAdd(Add("St.", ImageCode.Eins));
         }
         lbxCellEditor.Suggestions.Clear();
 
-        lbxCellEditor.Item.AddRange(Database.Permission_AllUsed(true));
+        lbxCellEditor.ItemAddRange(Database.Permission_AllUsed(true));
         if (_table?.CurrentArrangement != null) {
             butAktuellZurueck.Enabled = _table.CurrentArrangement[_column]?.PreviewsVisible() != null;
             butAktuellVor.Enabled = _table.CurrentArrangement[_column]?.NextVisible() != null;
@@ -402,19 +403,19 @@ internal sealed partial class ColumnEditor {
         //butSaveContent.Checked = _column.SaveContent;
 
         //cbxSchlüsselspalte.Item.Clear();
-        //cbxSchlüsselspalte.Item.Add("#Ohne", "-1");
+        //cbxSchlüsselspalte.ItemAdd(Add("#Ohne", "-1"));
         //cbxDropDownKey.Item.Clear();
-        //cbxDropDownKey.Item.Add("#Ohne", "-1");
+        //cbxDropDownKey.ItemAdd(Add("#Ohne", "-1"));
         //cbxVorschlagSpalte.Item.Clear();
-        //cbxVorschlagSpalte.Item.Add("#Ohne", "-1");
+        //cbxVorschlagSpalte.ItemAdd(Add("#Ohne", "-1"));
         // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
         // siehe Ende dieser Routine
         //foreach (var thisColumn in _column.Database.Column) {
         //    if (thisColumn.IsOk() && thisColumn.Format.CanBeCheckedByRules()) {
-        //        //if (thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) { cbxSchlüsselspalte.Item.Add(thisColumn); }
+        //        //if (thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) { cbxSchlüsselspalte.ItemAdd(thisColumn); }
         //        if (!thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
-        //            //cbxDropDownKey.Item.Add(thisColumn);
-        //            //cbxVorschlagSpalte.Item.Add(thisColumn);
+        //            //cbxDropDownKey.ItemAdd(thisColumn);
+        //            //cbxVorschlagSpalte.ItemAdd(thisColumn);
         //        }
         //    }
         //}
@@ -676,7 +677,7 @@ internal sealed partial class ColumnEditor {
             var l = Database.AllAvailableTables(db.FreezedReason);
 
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.UniqueId, db.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueId); }
+                if (!string.Equals(thisString.UniqueId, db.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.ItemAdd(Add(thisString.TableName, thisString.UniqueId)); }
             }
         }
     }

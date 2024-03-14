@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -134,10 +135,10 @@ public sealed class LastFilesCombo : ComboBox {
     private void GenerateMenu() {
         var nr = -1;
         var vis = false;
-        Item.Clear();
+        ItemClear();
         for (var z = _settings.Count - 1; z >= 0; z--) {
             var x = _settings[z].SplitAndCutBy("|");
-            if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
+            if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null) {
                 if (!_mustExists || FileExists(x[0])) {
                     nr++;
                     if (nr < MaxCount) {
@@ -155,7 +156,7 @@ public sealed class LastFilesCombo : ComboBox {
                             nr.ToString(Constants.Format_Integer3));
                         List<string> t = [x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty];
                         it.Tag = t;
-                        Item.Add(it);
+                        ItemAdd(it);
                     }
                 }
             }

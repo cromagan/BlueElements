@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using BlueControls.ItemCollectionList;
+using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using System;
 
@@ -208,16 +208,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
-            var ic = List<AbstractListItem>();
+            var ic = new  List<AbstractListItem>();
             ic.AddRange(dbin.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
 
-            var ic2 = List<AbstractListItem>();
+            var ic2 = new  List<AbstractListItem>();
             ic2.AddRange(typeof(FilterTypeRowInputItem));
             l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
         }
 
-        var u2 = List<AbstractListItem>();
+        var u2 = new  List<AbstractListItem>();
         u2.AddRange(typeof(FlexiFilterDefaultOutput));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 

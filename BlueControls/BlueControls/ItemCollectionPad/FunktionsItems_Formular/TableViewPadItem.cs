@@ -24,6 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
@@ -167,11 +168,11 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         List<GenericControl> l = [];
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
-            var u = List<AbstractListItem>();
+            var u = new List<AbstractListItem>();
             u.AddRange(typeof(Filterausgabe));
             l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
 
-            var u2 = List<AbstractListItem>();
+            var u2 = new List<AbstractListItem>();
             foreach (var thisC in db.ColumnArrangements) {
                 u2.Add(thisC);
             }

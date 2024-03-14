@@ -50,7 +50,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
 
         if (database != null) {
             //var lst =  List<AbstractListItem>();
-            cbxColDateiname.Item.AddRange(database.Column, false);
+            cbxColDateiname.ItemAddRange(database.Column, false);
             //cbxColDateiname.Item = lst;
         }
 

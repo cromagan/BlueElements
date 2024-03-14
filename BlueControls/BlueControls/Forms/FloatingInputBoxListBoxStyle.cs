@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -76,8 +77,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Close(ListBoxAppearance.KontextMenu);
         Close(control);
 
-        List<AbstractListItem> thisContextMenu = new(ListBoxAppearance.KontextMenu, false);
-        List<AbstractListItem> userMenu = new(ListBoxAppearance.KontextMenu, false);
+        var thisContextMenu = new List<AbstractListItem>();
+        var userMenu = new List<AbstractListItem>();
 
         var translate = true;
         control.GetContextMenuItems(e, thisContextMenu, out var hotItem);
@@ -93,10 +94,10 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (thisContextMenu.Count > 0) {
             if (par != null) {
                 _ = thisContextMenu.AddSeparator();
-                _ = thisContextMenu.Add(ContextMenuCommands.WeitereBefehle);
+                thisContextMenu.Add(Add(ContextMenuCommands.WeitereBefehle));
             }
             _ = thisContextMenu.AddSeparator();
-            _ = thisContextMenu.Add(ContextMenuCommands.Abbruch);
+            thisContextMenu.Add(Add(ContextMenuCommands.Abbruch));
             List<object?> infos =
             [
                 userMenu,
@@ -119,12 +120,12 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
         new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate) {
-        var (biggestItemX, _, heightAdded, _) = items.ItemData();
+    public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, bool autosort) {
+        var (biggestItemX, _, heightAdded, _) = BlueControls.Controls.ListBox.ItemData(items, controlDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = (ListBoxAppearance)items.ControlDesign;
         lstbx.Translate = translate;
-        lstbx.AutoSort = items.AutoSort;
+        lstbx.AutoSort = autosort;
 
         //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
         //{
@@ -150,7 +151,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
         lstbx.CheckBehavior = CheckBehavior.MultiSelection;
-        lstbx.Item.AddClonesFrom(items);
+        lstbx.ItemAddClonesFrom(items);
         if (check != null) { lstbx.Check(check); }
         lstbx.CheckBehavior = checkBehavior;
     }

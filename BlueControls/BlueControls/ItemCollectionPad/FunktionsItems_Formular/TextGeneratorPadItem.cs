@@ -25,6 +25,8 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
@@ -229,8 +231,8 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             return;
         }
 
-        var lst =  List<AbstractListItem>();
-        lst.AddRange(db.Column, false);
+        var lst = new List<AbstractListItem>();
+        lst.AddRange(AddRange(db.Column, false));
 
         lst.Remove(_textc);
         lst.Remove(_auswahl1);

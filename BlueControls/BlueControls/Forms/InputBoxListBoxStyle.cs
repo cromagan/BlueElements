@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueControls.Enums;
 using System.Collections.Generic;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -43,7 +44,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         }
         //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
         txbText.CheckBehavior = checkBehavior;
-        txbText.Item.AddClonesFrom(itemsOriginal);
+        txbText.ItemAddClonesFrom(itemsOriginal);
         if (check != null) { txbText.Check(check); }
         txbText.MoveAllowed = false;
         txbText.RemoveAllowed = false;
@@ -62,7 +63,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
 
-        List<AbstractListItem> x = new(ListBoxAppearance.Listbox, true);
+        List<AbstractListItem> x = [];
         x.AddRange(items);
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);

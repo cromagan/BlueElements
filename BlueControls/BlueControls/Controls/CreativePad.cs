@@ -35,9 +35,10 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Windows.Forms;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Controls;
 
@@ -274,15 +275,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         CheckHotItem(e, true);
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {
-            _ = items.Add("Allgemeine Element-Aktionen", true);
+            items.Add(Add("Allgemeine Element-Aktionen", true));
             //items.GenerateAndAdd("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
             //items.AddSeparator();
-            _ = items.Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable);
-            _ = items.AddSeparator();
-            _ = items.Add("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund);
-            _ = items.Add("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund);
-            _ = items.Add("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne);
-            _ = items.Add("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten);
+            items.Add(Add("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable));
+            items.AddSeparator();
+            items.Add(Add("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
+            items.Add(Add("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
+            items.Add(Add("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));
+            items.Add(Add("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten));
         }
     }
 

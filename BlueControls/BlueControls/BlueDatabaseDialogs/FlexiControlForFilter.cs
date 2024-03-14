@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 
 #nullable enable
@@ -190,7 +191,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     //    if (FilterSingleColumn?.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) { return; }
 
     //    hotItem = FilterSingleColumn;
-    //    _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
+    //   items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
     //}
 
     protected override void CommandButton_Click(object sender, System.EventArgs e) {
@@ -240,10 +241,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         base.OnControlAdded(e);
 
         if (e.Control is ComboBox cbx) {
-            List<AbstractListItem> item2 = new()
-            {
-                { "Keine weiteren Einträge vorhanden", "|~" }
-            };
+            var item2 = new List<AbstractListItem>();
+            item2.Add(Add("Keine weiteren Einträge vorhanden", "|~"));
+
             //var c = Filter.Column.Contents(null);
             //foreach (var thiss in c)
             //{
@@ -331,12 +331,12 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         cbx.Item.Clear();
         var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
         if (listFilterString.Count == 0) {
-            _ = cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
+            cbx.ItemAdd(Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {
-            if (FilterSingleColumn != null) { cbx.Item.AddRange(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText); }
+            if (FilterSingleColumn != null) { cbx.ItemAddRange(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
-            _ = cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);
+            cbx.ItemAdd(Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }
     }
 

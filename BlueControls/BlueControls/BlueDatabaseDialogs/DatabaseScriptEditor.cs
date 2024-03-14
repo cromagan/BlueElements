@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
@@ -138,7 +138,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 lstPermissionExecute.Item.Clear();
                 var l = Database.Permission_AllUsed(false).ToList();
                 l.AddIfNotExists(Constants.Administrator);
-                lstPermissionExecute.Item.AddRange(l);
+                lstPermissionExecute.ItemAddRange(l);
                 lstPermissionExecute.Check(value.UserGroups);
                 lstPermissionExecute.Suggestions.Clear();
 
@@ -189,15 +189,15 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         var im = QuickImage.Images();
         foreach (var thisIm in im) {
-            cbxPic.Item.Add(thisIm, thisIm, QuickImage.Get(thisIm, 16));
+            cbxPic.ItemAdd(Add(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
-        lstEventScripts.Item.Clear();
+        lstEventScripts.ItemClear();
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisSet in Database.EventScript) {
             if (thisSet != null) {
-                _ = lstEventScripts.Item.Add(thisSet);
+                lstEventScripts.ItemAdd(Add(thisSet));
 
                 if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
                     didMessage = true;
@@ -258,7 +258,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             return;
         }
         // Das ausgewählte Skript aus der Liste abrufen
-        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
+        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts[lstEventScripts.Checked[0]]).Item;
         var l = new List<string>();
         // Durchlaufen aller Undo-Operationen in der Datenbank
         foreach (var thisUndo in db.Undo) {
@@ -419,8 +419,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        var newScriptItem = lstEventScripts.Item.Add(new DatabaseScriptDescription(Database));
-
+        var newScriptItem = Add(new DatabaseScriptDescription(Database));
+        lstEventScripts.ItemAdd(newScriptItem);
         WriteInfosBack();
 
         lstEventScripts.Check(newScriptItem);
@@ -430,7 +430,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         DatabaseScriptDescription? newItem = null;
         if (lstEventScripts.Checked.Count == 1 &&
             !TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
-            if (lstEventScripts.Item[lstEventScripts.Checked[0]] is ReadableListItem selectedlstEventScripts) {
+            if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem selectedlstEventScripts) {
                 newItem = selectedlstEventScripts.Item as DatabaseScriptDescription;
             }
         }
@@ -454,7 +454,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     //    if (e.HotItem is string txt) {
     //        var c = Database?.Column[txt);
     //        if (c is null) { return; }
-    //        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
+    //       e.UserMenu.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
     //    }
     //}
 
