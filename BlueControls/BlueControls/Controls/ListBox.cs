@@ -24,7 +24,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,31 +32,11 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Forms;
 
-using BlueBasics;
-using BlueBasics.Enums;
-
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-
-using BlueControls.Enums;
-using BlueControls.Forms;
-
 using BlueDatabase;
-using BlueDatabase.Enums;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Data;
 
 using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -361,7 +340,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
-        var it = BlueControls.ItemCollectionList.ItemCollectionList.Add(val);
+        var it = BlueControls.ItemCollectionList.AbstractListItemExtension.Item(val);
         ItemAdd(it);
     }
 
@@ -476,7 +455,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         foreach (var thisstring in list) {
             if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
-                ItemAdd(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisstring, thisstring));
+                ItemAdd(BlueControls.ItemCollectionList.AbstractListItemExtension.ItemOf(thisstring, thisstring));
             }
         }
     }
@@ -696,12 +675,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         foreach (var thisString in zuwenig) {
             if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
-                    _item.Add(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisString, thisString, thisString.FileNameWithoutSuffix()));
+                    _item.Add(BlueControls.ItemCollectionList.AbstractListItemExtension.ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix()));
                 } else {
-                    _item.Add(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48)));
+                    _item.Add(BlueControls.ItemCollectionList.AbstractListItemExtension.ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48)));
                 }
             } else {
-                _item.Add(BlueControls.ItemCollectionList.ItemCollectionList.Add(thisString));
+                _item.Add(BlueControls.ItemCollectionList.AbstractListItemExtension.Item(thisString));
             }
         }
     }
@@ -1135,7 +1114,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = _item.Get(thisit) ?? BlueControls.ItemCollectionList.ItemCollectionList.Add(thisit);
+            var it = _item.Get(thisit) ?? BlueControls.ItemCollectionList.AbstractListItemExtension.Item(thisit);
 
             if (it.IsClickable()) {
                 newList.Add(thisit);

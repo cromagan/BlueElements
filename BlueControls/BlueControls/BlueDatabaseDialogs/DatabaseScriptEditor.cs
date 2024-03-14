@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
@@ -190,7 +190,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         var im = QuickImage.Images();
         foreach (var thisIm in im) {
-            cbxPic.ItemAdd(Add(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
+            cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
         lstEventScripts.ItemClear();
@@ -198,7 +198,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         foreach (var thisSet in Database.EventScript) {
             if (thisSet != null) {
-                lstEventScripts.ItemAdd(Add(thisSet));
+                lstEventScripts.ItemAdd(ItemOf(thisSet));
 
                 if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
                     didMessage = true;
@@ -420,7 +420,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        var newScriptItem = Add(new DatabaseScriptDescription(Database));
+        var newScriptItem = ItemOf(new DatabaseScriptDescription(Database));
         lstEventScripts.ItemAdd(newScriptItem);
         WriteInfosBack();
 

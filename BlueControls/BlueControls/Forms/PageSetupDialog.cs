@@ -26,7 +26,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Globalization;
 using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -51,10 +51,10 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
             var nn = ps.Width + ";" + ps.Height;
             if (Format[nn] == null) {
-                Format.ItemAdd(Add(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName));
+                Format.ItemAdd(ItemOf(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName));
             }
         }
-        Format.ItemAdd(Add("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString()));
+        Format.ItemAdd(ItemOf("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString()));
         //Format.Item.Sort();
         if (nurHochformat) {
             Hochformat.Checked = true;

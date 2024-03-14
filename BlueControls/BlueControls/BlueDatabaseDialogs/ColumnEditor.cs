@@ -30,7 +30,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -269,7 +269,7 @@ internal sealed partial class ColumnEditor {
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
                 if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Function.CanBeCheckedByRules() && !thisLinkedColumn.Function.NeedTargetDatabase()) {
-                    cbxTargetColumn.ItemAdd(Add(thisLinkedColumn));
+                    cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
                 }
             }
         }
@@ -292,34 +292,34 @@ internal sealed partial class ColumnEditor {
 
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
-        cbxFunction.ItemAddRange(AddRange(typeof(ColumnFunction)));
-        cbxRandLinks.ItemAddRange(AddRange(typeof(ColumnLineStyle)));
-        cbxRandRechts.ItemAddRange(AddRange(typeof(ColumnLineStyle)));
-        cbxBildTextVerhalten.ItemAddRange(AddRange(typeof(BildTextVerhalten)));
-        cbxAlign.ItemAddRange(AddRange(typeof(AlignmentHorizontal)));
-        cbxAdditionalCheck.ItemAddRange(AddRange(typeof(AdditionalCheck)));
-        cbxScriptType.ItemAddRange(AddRange(typeof(ScriptType)));
-        cbxTranslate.ItemAddRange(AddRange(typeof(TranslationType)));
-        cbxSort.ItemAddRange(AddRange(typeof(SortierTyp)));
+        cbxFunction.ItemAddRange(ItemsOf(typeof(ColumnFunction)));
+        cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
+        cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
+        cbxBildTextVerhalten.ItemAddRange(ItemsOf(typeof(BildTextVerhalten)));
+        cbxAlign.ItemAddRange(ItemsOf(typeof(AlignmentHorizontal)));
+        cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
+        cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
+        cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
+        cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
 
         if (cbxEinheit.ItemCount < 1) {
-            cbxEinheit.ItemAdd(Add("µm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(Add("mm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(Add("cm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(Add("dm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(Add("m", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(Add("km", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(Add("mm²", ImageCode.GrößeÄndern));
-            cbxEinheit.ItemAdd(Add("m²", ImageCode.GrößeÄndern));
-            cbxEinheit.ItemAdd(Add("µg", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(Add("mg", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(Add("g", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(Add("kg", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(Add("t", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(Add("h", ImageCode.Uhr));
-            cbxEinheit.ItemAdd(Add("min", ImageCode.Uhr));
-            cbxEinheit.ItemAdd(Add("St.", ImageCode.Eins));
+            cbxEinheit.ItemAdd(ItemOf("µm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(ItemOf("mm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(ItemOf("cm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(ItemOf("dm", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(ItemOf("m", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(ItemOf("km", ImageCode.Lineal));
+            cbxEinheit.ItemAdd(ItemOf("mm²", ImageCode.GrößeÄndern));
+            cbxEinheit.ItemAdd(ItemOf("m²", ImageCode.GrößeÄndern));
+            cbxEinheit.ItemAdd(ItemOf("µg", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(ItemOf("mg", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(ItemOf("g", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(ItemOf("kg", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(ItemOf("t", ImageCode.Gewicht));
+            cbxEinheit.ItemAdd(ItemOf("h", ImageCode.Uhr));
+            cbxEinheit.ItemAdd(ItemOf("min", ImageCode.Uhr));
+            cbxEinheit.ItemAdd(ItemOf("St.", ImageCode.Eins));
         }
         lbxCellEditor.Suggestions.Clear();
 
@@ -678,7 +678,7 @@ internal sealed partial class ColumnEditor {
             var l = Database.AllAvailableTables(db.FreezedReason);
 
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.UniqueId, db.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.ItemAdd(Add(thisString.TableName, thisString.UniqueId)); }
+                if (!string.Equals(thisString.UniqueId, db.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.ItemAdd(ItemOf(thisString.TableName, thisString.UniqueId)); }
             }
         }
     }

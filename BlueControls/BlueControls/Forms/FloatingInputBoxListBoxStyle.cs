@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -87,17 +87,17 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         control.OnContextMenuInit(ec);
         if (ec.Cancel) { return; }
         if (!ec.Translate) { translate = false; }
-        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { thisContextMenu.Add(AddSeparator()); }
+        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { thisContextMenu.Add(Separator()); }
         if (userMenu.Count > 0) { thisContextMenu.AddRange(userMenu); }
 
         var par = control.ParentControlWithCommands();
         if (thisContextMenu.Count > 0) {
             if (par != null) {
-                thisContextMenu.Add(AddSeparator());
-                thisContextMenu.Add(Add(ContextMenuCommands.WeitereBefehle));
+                thisContextMenu.Add(Separator());
+                thisContextMenu.Add(ItemOf(ContextMenuCommands.WeitereBefehle));
             }
-            thisContextMenu.Add(AddSeparator());
-            thisContextMenu.Add(Add(ContextMenuCommands.Abbruch));
+            thisContextMenu.Add(Separator());
+            thisContextMenu.Add(ItemOf(ContextMenuCommands.Abbruch));
             List<object?> infos =
             [
                 userMenu,

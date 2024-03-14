@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using System.Collections.Generic;
 using System.ComponentModel;

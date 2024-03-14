@@ -26,10 +26,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
-using BlueControls.ItemCollectionList;
-
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 using BlueDatabase;
@@ -75,12 +72,12 @@ public partial class TableView : FormWithStatusBar {
 
         if (btnDrucken != null) {
             btnDrucken.ItemClear();
-            btnDrucken.ItemAdd(Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28)));
-            btnDrucken.ItemAdd(AddSeparator());
-            btnDrucken.ItemAdd(Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28)));
-            btnDrucken.ItemAdd(Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28)));
-            btnDrucken.ItemAdd(AddSeparator());
-            btnDrucken.ItemAdd(Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
+            btnDrucken.ItemAdd(ItemOf("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28)));
+            btnDrucken.ItemAdd(Separator());
+            btnDrucken.ItemAdd(ItemOf("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28)));
+            btnDrucken.ItemAdd(ItemOf("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28)));
+            btnDrucken.ItemAdd(Separator());
+            btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
         }
 
         Check_OrderButtons();
@@ -107,52 +104,52 @@ public partial class TableView : FormWithStatusBar {
         var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
 
         if (tbl != null && row != null) {
-            e.UserMenu.Add(Add("Anheften", true));
+            e.UserMenu.Add(ItemOf("Anheften", true));
             if (tbl.PinnedRows.Contains(row)) {
-                e.UserMenu.Add(Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
+                e.UserMenu.Add(ItemOf("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
             } else {
-                e.UserMenu.Add(Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
+                e.UserMenu.Add(ItemOf("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
             }
         }
 
         if (column != null) {
-            e.UserMenu.Add(Add("Sortierung", true));
-            e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
-            e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
+            e.UserMenu.Add(ItemOf("Sortierung", true));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
             //_ = e.UserMenu.Add(AddSeparator());
 
-            e.UserMenu.Add(Add("Zelle", true));
-            e.UserMenu.Add(Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules()));
-            e.UserMenu.Add(Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Function.CanBeChangedByRules()));
-            e.UserMenu.Add(Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules()));
-            e.UserMenu.Add(Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo));
-            e.UserMenu.Add(Add(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Zelle", true));
+            e.UserMenu.Add(ItemOf("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules()));
+            e.UserMenu.Add(ItemOf("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Function.CanBeChangedByRules()));
+            e.UserMenu.Add(ItemOf("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules()));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
             //_ = e.UserMenu.Add(AddSeparator());
-            e.UserMenu.Add(Add("Spalte", true));
-            e.UserMenu.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Spalte", true));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
 
-            e.UserMenu.Add(Add("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, db.IsAdministrator()));
-            e.UserMenu.Add(Add("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, db.IsAdministrator()));
 
-            e.UserMenu.Add(Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
-            e.UserMenu.Add(Add("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
             //_ = e.UserMenu.Add(AddSeparator());
         }
 
         if (row != null) {
-            e.UserMenu.Add(Add("Zeile", true));
-            e.UserMenu.Add(Add(ContextMenuCommands.ZeileLöschen, db.IsAdministrator()));
-            e.UserMenu.Add(Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.HasPrepareFormulaCheckScript()));
+            e.UserMenu.Add(ItemOf("Zeile", true));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator()));
+            e.UserMenu.Add(ItemOf("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.HasPrepareFormulaCheckScript()));
 
             var didmenu = false;
 
             foreach (var thiss in db.EventScript) {
                 if (thiss != null && thiss.UserGroups.Count > 0 && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
                     if (!didmenu) {
-                        e.UserMenu.Add(Add("Skripte", true));
+                        e.UserMenu.Add(ItemOf("Skripte", true));
                         didmenu = true;
                     }
-                    e.UserMenu.Add(Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, thiss.SymbolForReadableText(), row != null && thiss.IsOk()));
+                    e.UserMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, thiss.SymbolForReadableText(), row != null && thiss.IsOk()));
                 }
             }
         }
@@ -1167,7 +1164,7 @@ public partial class TableView : FormWithStatusBar {
         var ok = true;
         foreach (var thisColumnItem in db.Column) {
             if (!thisColumnItem.IsOk()) {
-                var d = Add("Spalte ' " + thisColumnItem.KeyName + " ' reparieren", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
+                var d = ItemOf("Spalte ' " + thisColumnItem.KeyName + " ' reparieren", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
                 d.Enabled = db.IsAdministrator();
                 lstAufgaben.ItemAdd(d);
 
@@ -1180,7 +1177,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (!string.IsNullOrEmpty(db.EventScriptErrorMessage) || !string.IsNullOrEmpty(db.CheckScriptError())) {
-            var d = Add("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
+            var d = ItemOf("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);
             lstAufgaben.Enabled = true;
@@ -1188,7 +1185,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (!db.IsRowScriptPossible(false)) {
-            var d = Add("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
+            var d = ItemOf("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);
             lstAufgaben.Enabled = true;
@@ -1197,7 +1194,7 @@ public partial class TableView : FormWithStatusBar {
 
         foreach (var thiss in db.EventScript) {
             if (thiss != null && thiss.UserGroups.Count > 0) {
-                var d = Add(thiss);
+                var d = ItemOf(thiss);
                 lstAufgaben.ItemAdd(d);
                 d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
 
@@ -1210,11 +1207,11 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (db.HasPrepareFormulaCheckScript()) {
-            lstAufgaben.ItemAdd(Add("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
+            lstAufgaben.ItemAdd(ItemOf("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
         }
 
         if (db.IsAdministrator()) {
-            var d = Add("Skripte bearbeiten", "#editscript", ImageCode.Skript);
+            var d = ItemOf("Skripte bearbeiten", "#editscript", ImageCode.Skript);
             lstAufgaben.ItemAdd(d);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.Enabled = true;

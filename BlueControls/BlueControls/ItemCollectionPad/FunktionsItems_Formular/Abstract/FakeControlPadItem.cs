@@ -32,7 +32,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.Polygons;
@@ -76,10 +76,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public void Breite_berechnen() {
         var li = new List<AbstractListItem>();
         for (var br = 1; br <= 20; br++) {
-            li.Add(Add(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar));
+            li.Add(ItemOf(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar));
 
             for (var pos = 1; pos <= br; pos++) {
-                li.Add(Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToString(Constants.Format_Integer3) + Constants.SecondSortChar + pos.ToString(Constants.Format_Integer3)));
+                li.Add(ItemOf(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToString(Constants.Format_Integer3) + Constants.SecondSortChar + pos.ToString(Constants.Format_Integer3)));
             }
         }
 
@@ -119,7 +119,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
             var vf = new List<AbstractListItem>();
-            vf.AddRange(AddRange(BlueControls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
+            vf.AddRange(ItemsOf(BlueControls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
             l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
         }
 

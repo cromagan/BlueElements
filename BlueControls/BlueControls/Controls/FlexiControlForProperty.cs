@@ -30,7 +30,6 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;

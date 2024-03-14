@@ -34,7 +34,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
@@ -307,7 +307,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         var c = new List<AbstractListItem>();
         foreach (var thisIm in im) {
-            c.Add(Add(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
+            c.Add(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
         l.Add(new FlexiControlForProperty<string>(() => Bild, c));
@@ -323,10 +323,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         //l.Add(new FlexiControlForProperty<string>(() => SkriptName, sn));
 
         var za = new List<AbstractListItem>();
-        za.Add(Add("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()));
-        za.Add(Add("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()));
-        za.Add(Add("...genau eine oder mehr Zeilen gefunden wurden", ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()));
-        za.Add(Add("...egal - immer", ((int)ButtonArgs.Egal).ToString()));
+        za.Add(ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()));
+        za.Add(ItemOf("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()));
+        za.Add(ItemOf("...genau eine oder mehr Zeilen gefunden wurden", ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()));
+        za.Add(ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString()));
 
         l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 
@@ -335,7 +335,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         if (Script.Commands != null) {
             foreach (var cmd in Script.Commands) {
                 if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
-                    co.Add(Add(ufb2.NiceTextForUser, ufb2.Command));
+                    co.Add(ItemOf(ufb2.NiceTextForUser, ufb2.Command));
                 }
             }
         }

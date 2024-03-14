@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using BlueControls.ItemCollectionList;
@@ -111,8 +111,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
             new FlexiControlForProperty<Color>(() => Randfarbe)
         ];
         var lage = new List<AbstractListItem>();
-        lage.Add(Add("ohne", "-1"));
-        lage.Add(Add("Links oben", ((int)Alignment.Top_Left).ToString()));
+        lage.Add(ItemOf("ohne", "-1"));
+        lage.Add(ItemOf("Links oben", ((int)Alignment.Top_Left).ToString()));
         l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
         l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
         l.AddRange(base.GetStyleOptions(widthOfControl));

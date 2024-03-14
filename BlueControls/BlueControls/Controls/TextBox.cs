@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 
@@ -390,39 +390,39 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         hotItem = tags;
 
         if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
-            items.Add(Add("Rechtschreibprüfung", true));
+            items.Add(ItemOf("Rechtschreibprüfung", true));
             if (Dictionary.IsSpellChecking) {
-                items.Add(Add("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                items.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
                 //_ = items.Add(AddSeparator());
             } else {
                 var sim = Dictionary.SimilarTo(tmpWord);
                 if (sim != null) {
                     foreach (var thisS in sim) {
-                        items.Add(Add(" - " + thisS, "#ChangeTo:" + thisS));
+                        items.Add(ItemOf(" - " + thisS, "#ChangeTo:" + thisS));
                     }
-                    items.Add(AddSeparator());
+                    items.Add(Separator());
                 }
-                items.Add(Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable()));
+                items.Add(ItemOf("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable()));
                 if (tmpWord.ToLower() != tmpWord) {
-                    items.Add(Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable()));
+                    items.Add(ItemOf("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable()));
                 }
-                items.Add(Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable()));
-                items.Add(Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable()));
-                items.Add(AddSeparator());
+                items.Add(ItemOf("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable()));
+                items.Add(ItemOf("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable()));
+                items.Add(Separator());
             }
         }
         if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
-            items.Add(Add(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled));
-            items.Add(Add(ContextMenuCommands.Kopieren, _markStart >= 0));
-            items.Add(Add(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled));
+            items.Add(ItemOf(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled));
+            items.Add(ItemOf(ContextMenuCommands.Kopieren, _markStart >= 0));
+            items.Add(ItemOf(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled));
             if (_formatierungErlaubt) {
-                items.Add(AddSeparator());
-                items.Add(Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
+                items.Add(Separator());
+                items.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
                 if (_markEnd > -1) {
-                    items.Add(AddSeparator());
-                    items.Add(Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1));
-                    items.Add(Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1));
-                    items.Add(Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                    items.Add(Separator());
+                    items.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                    items.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                    items.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1));
                 }
             }
         }
@@ -860,11 +860,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         //    }
         //    i.Add(AddSeparator());
         //}
-        i.Add(Add("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)));
-        i.Add(Add("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)));
-        i.Add(Add("Information", "Information", QuickImage.Get(ImageCode.Information, 20)));
-        i.Add(Add("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)));
-        i.Add(Add("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20)));
+        i.Add(ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)));
+        i.Add(ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)));
+        i.Add(ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)));
+        i.Add(ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)));
+        i.Add(ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20)));
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
         _cursorCharPos = x;

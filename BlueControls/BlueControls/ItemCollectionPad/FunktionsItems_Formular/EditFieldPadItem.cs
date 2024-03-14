@@ -23,7 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -213,14 +213,14 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
         var lst = new List<AbstractListItem>();
-        lst.AddRange(AddRange(db.Column, false));
+        lst.AddRange(ItemsOf(db.Column, false));
 
         l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
         if (Column == null || Column.IsDisposed) { return l; }
 
         var u = new List<AbstractListItem>();
-        u.AddRange(AddRange(typeof(CaptionPosition)));
+        u.AddRange(ItemsOf(typeof(CaptionPosition)));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
         l.Add(new FlexiControlForProperty<bool>(() => AutoX));
 

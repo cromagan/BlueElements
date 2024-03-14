@@ -19,7 +19,7 @@
 
 using System.Collections.Generic;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -54,7 +54,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
         var Suggest = new List<AbstractListItem>();
-        Suggest.AddRange(AddRange(suggest));
+        Suggest.AddRange(ItemsOf(suggest));
         //Suggest.Sort();
         return Show(txt, string.Empty, Suggest, texteingabeErlaubt);
     }

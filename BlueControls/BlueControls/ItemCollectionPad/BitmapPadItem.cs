@@ -30,7 +30,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -120,9 +120,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             new FlexiControl()
         ];
         var comms = new List<AbstractListItem>();
-        comms.Add(Add("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32")));
-        comms.Add(Add("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
-        comms.Add(Add("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
+        comms.Add(ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32")));
+        comms.Add(ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
+        comms.Add(ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
         l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
         l.Add(new FlexiControl());
         AddLineStyleOption(l);

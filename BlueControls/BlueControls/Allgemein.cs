@@ -20,14 +20,12 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Specialized;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls;

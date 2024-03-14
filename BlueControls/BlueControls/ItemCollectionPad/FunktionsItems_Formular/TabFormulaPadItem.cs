@@ -26,7 +26,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -397,7 +397,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return childs;
     }
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(Add(ContextMenuCommands.Bearbeiten));
+    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
 
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not AbstractListItem it) { return; }

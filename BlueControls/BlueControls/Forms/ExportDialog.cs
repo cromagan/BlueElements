@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
@@ -111,7 +111,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         var r = db.GetAllLayouts();
 
         foreach (var thisFile in r) {
-            if (addHere[thisFile] == null) { addHere.ItemAdd(Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
+            if (addHere[thisFile] == null) { addHere.ItemAdd(ItemOf(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
         }
     }
 
@@ -295,8 +295,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.UserMenu.Add(Add(ContextMenuCommands.DateiPfad÷ffnen));
-        e.UserMenu.Add(Add(ContextMenuCommands.Kopieren));
+        e.UserMenu.Add(ItemOf(ContextMenuCommands.DateiPfad÷ffnen));
+        e.UserMenu.Add(ItemOf(ContextMenuCommands.Kopieren));
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

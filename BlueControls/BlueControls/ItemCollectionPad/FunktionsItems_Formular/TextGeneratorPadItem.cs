@@ -26,7 +26,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.ItemCollectionList;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
@@ -232,7 +232,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         }
 
         var lst = new List<AbstractListItem>();
-        lst.AddRange(AddRange(db.Column, false));
+        lst.AddRange(ItemsOf(db.Column, false));
 
         lst.Remove(_textc);
         lst.Remove(_auswahl1);

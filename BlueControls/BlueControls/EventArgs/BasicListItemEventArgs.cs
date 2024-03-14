@@ -17,7 +17,7 @@
 
 #nullable enable
 
-using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.EventArgs;
 

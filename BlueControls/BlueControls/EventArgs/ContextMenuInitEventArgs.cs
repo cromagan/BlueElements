@@ -18,7 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
-using static  BlueControls.ItemCollectionList.ItemCollectionList;using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.EventArgs;
 

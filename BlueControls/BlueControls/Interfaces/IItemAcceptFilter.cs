@@ -26,7 +26,7 @@ using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using BlueControls.ItemCollectionList;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Interfaces;
 
@@ -231,7 +231,7 @@ public sealed class ItemAcceptFilter {
                 if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
                     //if (outp == null || outp == rfp.DatabaseOutput) {
                     if (rfp != item && rfp.IsOk()) {
-                        x.Add(Add(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
+                        x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                     }
 
                     //}

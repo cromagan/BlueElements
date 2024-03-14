@@ -28,7 +28,7 @@ using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -349,7 +349,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (Database?.Column.First() is not ColumnItem c) { return; }
 
         var il = new List<AbstractListItem>();
-        il.AddRange(AddRange(c.Contents()));
+        il.AddRange(ItemsOf(c.Contents()));
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, CheckBehavior.SingleSelection, null, AddType.None);
         if (i == null || i.Count != 1) { return; }
 
@@ -363,7 +363,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
         if (e.HotItem is not RowFormulaPadItem) { return; }
-        e.UserMenu.Add(Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", ImageCode.PlusZeichen));
+        e.UserMenu.Add(ItemOf("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", ImageCode.PlusZeichen));
     }
 
     private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

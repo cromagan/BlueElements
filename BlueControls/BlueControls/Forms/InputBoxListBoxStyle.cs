@@ -20,7 +20,7 @@
 using BlueBasics;
 using BlueControls.Enums;
 using System.Collections.Generic;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
@@ -61,7 +61,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         }
 
         List<AbstractListItem> x = [];
-        x.AddRange(AddRange(items));
+        x.AddRange(ItemsOf(items));
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];

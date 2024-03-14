@@ -32,7 +32,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -197,7 +197,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         hotItem = null;
         if (_bitmap != null) {
-            items.Add(Add("Externes Fenster öffnen", "ExF"));
+            items.Add(ItemOf("Externes Fenster öffnen", "ExF"));
         }
     }
 

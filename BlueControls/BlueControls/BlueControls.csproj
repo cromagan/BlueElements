@@ -569,7 +569,7 @@
     <Compile Include="ItemCollectionList\AbstractListItem.cs" />
     <Compile Include="ItemCollectionList\BitmapListItem.cs" />
     <Compile Include="ItemCollectionList\CellLikeListItem.cs" />
-    <Compile Include="ItemCollectionList\ItemCollectionList.cs" />
+    <Compile Include="ItemCollectionList\AbstractListItemExtension.cs" />
     <Compile Include="ItemCollectionList\LineListItem.cs" />
     <Compile Include="ItemCollectionList\RowFormulaListItem.cs" />
     <Compile Include="ItemCollectionList\TextListItem.cs" />

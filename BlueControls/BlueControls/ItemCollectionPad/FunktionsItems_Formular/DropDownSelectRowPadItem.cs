@@ -33,7 +33,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -188,7 +188,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         ];
 
         var u = new List<AbstractListItem>();
-        u.AddRange(AddRange(typeof(CaptionPosition)));
+        u.AddRange(ItemsOf(typeof(CaptionPosition)));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());

@@ -17,36 +17,10 @@
 
 using BlueControls.Controls;
 using BlueControls.Enums;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueDatabase;
-using System;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueControls.Designer_Support;
-
-using BlueControls.Enums;
-
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.Abstract;
-
-using System;
 
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Windows.Forms;
-
-using static BlueControls.ItemCollectionList.ItemCollectionList;
-
-using static BlueBasics.Geometry;
-using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 using BlueControls.ItemCollectionList;
 
 #nullable enable
@@ -63,7 +37,7 @@ internal static class CommonDialogs {
         var l2 = new List<AbstractListItem>();
 
         foreach (var thisd in l) {
-            l2.Add(Add(thisd));
+            l2.Add(ItemOf(thisd));
         }
 
         var x = InputBoxListBoxStyle.Show(caption, l2, CheckBehavior.SingleSelection, null, AddType.None);

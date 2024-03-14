@@ -29,10 +29,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
-using System;
 
 #nullable enable
 
@@ -210,16 +209,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
             var ic = new List<AbstractListItem>();
-            ic.AddRange(AddRange(dbin.Column, true));
+            ic.AddRange(ItemsOf(dbin.Column, true));
             l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
 
             var ic2 = new List<AbstractListItem>();
-            ic2.AddRange(AddRange(typeof(FilterTypeRowInputItem)));
+            ic2.AddRange(ItemsOf(typeof(FilterTypeRowInputItem)));
             l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
         }
 
         var u2 = new List<AbstractListItem>();
-        u2.AddRange(AddRange(typeof(FlexiFilterDefaultOutput)));
+        u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
         l.Add(new FlexiControl());
@@ -227,7 +226,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
         if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
             var ic = new List<AbstractListItem>();
-            ic.AddRange(AddRange(dbout.Column, true));
+            ic.AddRange(ItemsOf(dbout.Column, true));
             l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
         }
 

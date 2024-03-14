@@ -24,7 +24,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using System;

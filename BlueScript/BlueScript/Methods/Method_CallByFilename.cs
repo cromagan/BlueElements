@@ -27,33 +27,6 @@ using System.IO;
 using System.Text;
 using static BlueBasics.IO;
 using BlueBasics;
-using BlueBasics.Enums;
-
-using BlueScript.Variables;
-
-using System;
-
-using System.Collections.Generic;
-
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Globalization;
-
-using System.IO;
-
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static BlueBasics.Constants;
-using static BlueBasics.Develop;
-using static BlueBasics.Generic;
-
-using static BlueBasics.IO;
-
-using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
 

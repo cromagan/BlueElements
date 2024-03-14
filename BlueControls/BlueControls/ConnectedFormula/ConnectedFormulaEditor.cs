@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -312,7 +312,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var i = new List<AbstractListItem>();
 
         foreach (var thisl in l) {
-            i.Add(Add(thisl));
+            i.Add(ItemOf(thisl));
         }
 
         var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);

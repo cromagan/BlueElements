@@ -26,7 +26,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -188,7 +188,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
         CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
 
         var u = new List<AbstractListItem>();
-        u.AddRange(AddRange(typeof(GroupBoxStyle)));
+        u.AddRange(ItemsOf(typeof(GroupBoxStyle)));
 
         List<GenericControl> l =
             [.. _itemAccepts.GetStyleOptions(this, widthOfControl),
@@ -306,7 +306,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     //    return null;
     //}
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(Add(ContextMenuCommands.Bearbeiten));
+    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
 
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not AbstractListItem it) { return; }

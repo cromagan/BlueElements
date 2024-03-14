@@ -24,7 +24,7 @@ using BlueDatabase.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -51,7 +51,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
 
         if (database != null) {
             //var lst =  List<AbstractListItem>();
-            cbxColDateiname.ItemAddRange(AddRange(database.Column, false));
+            cbxColDateiname.ItemAddRange(ItemsOf(database.Column, false));
             //cbxColDateiname.Item = lst;
         }
 

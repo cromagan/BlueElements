@@ -24,7 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueScript.Variables;
@@ -349,10 +349,10 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         //_ = e.UserMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
         //_ = e.UserMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
         //_ = e.UserMenu.Add(AddSeparator());
-        e.UserMenu.Add(Add(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
-        e.UserMenu.Add(Add(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
-        e.UserMenu.Add(AddSeparator());
-        e.UserMenu.Add(Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
+        e.UserMenu.Add(ItemOf(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
+        e.UserMenu.Add(ItemOf(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
+        e.UserMenu.Add(Separator());
+        e.UserMenu.Add(ItemOf("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

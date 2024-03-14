@@ -25,7 +25,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -169,10 +169,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
-            items.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten));
+            items.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten));
         }
         if (column?.Database != null && row != null && column.Database.IsAdministrator()) {
-            items.Add(Add(ContextMenuCommands.VorherigenInhaltWiederherstellen));
+            items.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen));
         }
         //if (Parent is Formula f) {
         //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu, false);
@@ -302,7 +302,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 var item2 = new List<AbstractListItem>();
 
                 if (column1 != null) {
-                    item2.AddRange(GetItemCollection(column1, null, ShortenStyle.Replaced, 10000));
+                    item2.AddRange(ItemsOf(column1, null, ShortenStyle.Replaced, 10000));
                 }
 
                 if (column1 != null && column1.TextBearbeitungErlaubt) {
@@ -401,7 +401,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
-            item.AddRange(GetItemCollection(column, null, ShortenStyle.Replaced, 10000));
+            item.AddRange(ItemsOf(column, null, ShortenStyle.Replaced, 10000));
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
                 do {
@@ -452,7 +452,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         control.SuggestionsClear();
         if (column == null || column.IsDisposed) { return; }
         var item = new List<AbstractListItem>();
-        item.AddRange(GetItemCollection(column, null, ShortenStyle.Replaced, 10000));
+        item.AddRange(ItemsOf(column, null, ShortenStyle.Replaced, 10000));
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:
@@ -472,11 +472,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.KeyName)) {
-                e.UserMenu.Add(Add(ContextMenuCommands.DateiÖffnen));
+                e.UserMenu.Add(ItemOf(ContextMenuCommands.DateiÖffnen));
             }
         }
         if (e.HotItem is BitmapListItem) {
-            e.UserMenu.Add(Add("Bild öffnen"));
+            e.UserMenu.Add(Item("Bild öffnen"));
         }
     }
 

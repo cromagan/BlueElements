@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static BlueDatabase.Database;
 using BlueControls.ItemCollectionList;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Interfaces;
 
@@ -144,7 +144,7 @@ public sealed class ItemSendSomething {
         var ld2 = new List<AbstractListItem>();
 
         foreach (var thisd in ld) {
-            ld2.Add(Add(thisd));
+            ld2.Add(ItemOf(thisd));
         }
 
         l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, ld2));

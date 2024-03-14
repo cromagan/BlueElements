@@ -28,7 +28,7 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.ItemCollectionPad;
@@ -130,7 +130,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             var layouts = new List<AbstractListItem>();
             foreach (var thisLayouts in db.GetAllLayouts()) {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
-                layouts.Add(Add(p.Caption, p.KeyName, ImageCode.Stern));
+                layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }
             l.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
         }

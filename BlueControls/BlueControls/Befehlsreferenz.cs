@@ -16,7 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.EventArgs;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueScript;
 using BlueScript.Methods;
@@ -59,7 +59,7 @@ public partial class Befehlsreferenz : BlueControls.Forms.Form {
         if (Script.Commands == null) { return; }
 
         foreach (var thisc in Script.Commands) {
-            lstCommands.ItemAdd(Add(thisc));
+            lstCommands.ItemAdd(ItemOf(thisc));
         }
     }
 

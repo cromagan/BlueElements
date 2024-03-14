@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -107,10 +107,10 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
         if (listFilterString.Count < 400) {
-            lsbFilterItems.ItemAddRange(AddRange(listFilterString, lColumn, ShortenStyle.Replaced, lColumn.BehaviorOfImageAndText));
+            lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, lColumn, ShortenStyle.Replaced, lColumn.BehaviorOfImageAndText));
             //lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
-            lsbFilterItems.ItemAdd(Add("Zu viele Einträge", "x", ImageCode.Kreuz, false));
+            lsbFilterItems.ItemAdd(ItemOf("Zu viele Einträge", "x", ImageCode.Kreuz, false));
             nochOk = false;
         }
 
@@ -135,29 +135,29 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             }
             lsbStandardFilter.ItemClear();
             if (fc != null) {
-                lsbStandardFilter.ItemAdd(Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), fc[_column] != null, Constants.FirstSortChar + "01"));
+                lsbStandardFilter.ItemAdd(ItemOf("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), fc[_column] != null, Constants.FirstSortChar + "01"));
             } else {
-                lsbStandardFilter.ItemAdd(Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01"));
+                lsbStandardFilter.ItemAdd(ItemOf("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01"));
             }
 
             var tmp = CellItem.ValueReadable(string.Empty, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, lColumn.Prefix, lColumn.Suffix, lColumn.DoOpticalTranslation, lColumn.OpticalReplace);
             if (string.IsNullOrEmpty(tmp)) {
-                leere = Add("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
-                nichtleere = Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");
+                leere = ItemOf("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
+                nichtleere = ItemOf("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");
             } else {
-                leere = Add(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
-                nichtleere = Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
+                leere = ItemOf(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
+                nichtleere = ItemOf("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
             }
             lsbStandardFilter.ItemAdd(leere);
             lsbStandardFilter.ItemAdd(nichtleere);
 
-            lsbStandardFilter.ItemAdd(Add("aus der Zwischenablage", "clipboard", QuickImage.Get(ImageCode.Clipboard, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05"));
-            lsbStandardFilter.ItemAdd(Add("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && !_column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06"));
-            lsbStandardFilter.ItemAdd(Add("mehrfache UND-Auswahl aktivieren", "ModusMultiUnd", QuickImage.Get(ImageCode.PlusZeichen, 17, Color.Blue, Color.Transparent), lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "07"));
-            lsbStandardFilter.ItemAdd(Add("mehrfache ODER-Auswahl aktivieren", "ModusMultiOder", QuickImage.Get(ImageCode.PlusZeichen, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08"));
-            lsbStandardFilter.ItemAdd(Add("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(ImageCode.MinusZeichen, 17), !lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09"));
-            lsbStandardFilter.ItemAdd(Add("Einzigartige Einträge", "Einzigartig", QuickImage.Get(ImageCode.Eins, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && listFilterString.Count < 1000, Constants.FirstSortChar + "10"));
-            lsbStandardFilter.ItemAdd(Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11"));
+            lsbStandardFilter.ItemAdd(ItemOf("aus der Zwischenablage", "clipboard", QuickImage.Get(ImageCode.Clipboard, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05"));
+            lsbStandardFilter.ItemAdd(ItemOf("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && !_column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06"));
+            lsbStandardFilter.ItemAdd(ItemOf("mehrfache UND-Auswahl aktivieren", "ModusMultiUnd", QuickImage.Get(ImageCode.PlusZeichen, 17, Color.Blue, Color.Transparent), lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "07"));
+            lsbStandardFilter.ItemAdd(ItemOf("mehrfache ODER-Auswahl aktivieren", "ModusMultiOder", QuickImage.Get(ImageCode.PlusZeichen, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08"));
+            lsbStandardFilter.ItemAdd(ItemOf("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(ImageCode.MinusZeichen, 17), !lColumn.MultiLine && lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09"));
+            lsbStandardFilter.ItemAdd(ItemOf("Einzigartige Einträge", "Einzigartig", QuickImage.Get(ImageCode.Eins, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && listFilterString.Count < 1000, Constants.FirstSortChar + "10"));
+            lsbStandardFilter.ItemAdd(ItemOf("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11"));
             //lsbStandardFilter.ItemAdd(Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(ImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Database.Column.First] == null, Constants.FirstSortChar + "12"));
         }
 

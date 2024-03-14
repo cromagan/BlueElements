@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 #nullable enable
@@ -242,7 +242,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
         if (e.Control is ComboBox cbx) {
             var item2 = new List<AbstractListItem>();
-            item2.Add(Add("Keine weiteren Einträge vorhanden", "|~"));
+            item2.Add(ItemOf("Keine weiteren Einträge vorhanden", "|~"));
 
             //var c = Filter.Column.Contents(null);
             //foreach (var thiss in c)
@@ -331,12 +331,12 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         cbx.ItemClear();
         var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
         if (listFilterString.Count == 0) {
-            cbx.ItemAdd(Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
+            cbx.ItemAdd(ItemOf("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {
-            if (FilterSingleColumn != null) { cbx.ItemAddRange(AddRange(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText)); }
+            if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText)); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
-            cbx.ItemAdd(Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
+            cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }
     }
 

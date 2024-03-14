@@ -24,7 +24,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -114,7 +114,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             if (db.SortDefinition?.Columns != null) {
                 foreach (var thisColumn in db.SortDefinition.Columns) {
                     if (thisColumn != null && !thisColumn.IsDisposed) {
-                        lbxSortierSpalten.ItemAdd(Add(thisColumn));
+                        lbxSortierSpalten.ItemAdd(ItemOf(thisColumn));
                     }
                 }
             }
@@ -131,7 +131,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         DatenbankAdmin.ItemAddRange(Database.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(AddRange(db.Column, false));
+        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, false));
 
         variableEditor.WriteVariablesToTable(Database?.Variables);
 
@@ -326,9 +326,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
 
-        e.UserMenu.Add(Add("Sortierung", true));
-        e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Function.CanBeChangedByRules()));
-        e.UserMenu.Add(Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Function.CanBeChangedByRules()));
+        e.UserMenu.Add(ItemOf("Sortierung", true));
+        e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Function.CanBeChangedByRules()));
+        e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Function.CanBeChangedByRules()));
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

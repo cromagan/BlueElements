@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;

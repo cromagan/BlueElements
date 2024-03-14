@@ -18,62 +18,23 @@
 #nullable enable
 
 using BlueBasics;
-
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 using BlueDatabase;
 using BlueDatabase.Enums;
 
-using System.Collections.Generic;
-
 using System.ComponentModel;
 
-using System.Drawing;
-
 using static BlueBasics.Extensions;
-
-using BlueBasics;
-
-using BlueBasics.Enums;
-
-using BlueDatabase.EventArgs;
-
-using BlueScript.Variables;
-
-using System;
-
-using System.Collections.Specialized;
-
-using System.Diagnostics;
-
-using System.Drawing.Imaging;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static BlueBasics.Constants;
-using static BlueBasics.Develop;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueControls.FormManager;
 
 //using static BlueDatabase.Database;
-using static BlueBasics.Converter;
-
-using BlueControls.ItemCollectionList;
-using static BlueControls.ItemCollectionList.ItemCollectionList;
 
 #nullable enable
 
@@ -188,7 +149,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         foreach (var thisR in RowsInput) {
             if (cb[thisR.KeyName] == null) {
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                cb.ItemAdd(Add(tmpQuickInfo, thisR.KeyName));
+                cb.ItemAdd(ItemOf(tmpQuickInfo, thisR.KeyName));
             } else {
                 ex.Remove(thisR.KeyName);
             }
