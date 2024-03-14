@@ -547,7 +547,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             }
         }
 
-        l.Add(Constants.Everybody);
+        l.Add(Everybody);
         l.Add("#User: " + UserName);
 
         return l.SortedDistinctList();
@@ -731,8 +731,8 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             }
         }
 
-        l.Add(Constants.Administrator);
-        l.Add(Constants.Everybody);
+        l.Add(Administrator);
+        l.Add(Everybody);
         l.Add("#User: " + UserName);
 
         l.AddRange(Database.Permission_AllUsed(false));

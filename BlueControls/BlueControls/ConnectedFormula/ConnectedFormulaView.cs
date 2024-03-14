@@ -209,8 +209,8 @@ public partial class ConnectedFormulaView : BlueControls.Controls.GroupBox, IBac
 
                         if (o.Visible && o is FlexiControlForCell fo &&
                            thisit is EditFieldPadItem efpi && efpi.AutoX &&
-                           efpi.CaptionPosition is BlueDatabase.Enums.CaptionPosition.Links_neben_dem_Feld or
-                                                   BlueDatabase.Enums.CaptionPosition.Links_neben_dem_Feld_unsichtbar) { autoc.Add(fo); }
+                           efpi.CaptionPosition is CaptionPosition.Links_neben_dem_Feld or
+                                                   CaptionPosition.Links_neben_dem_Feld_unsichtbar) { autoc.Add(fo); }
                     }
                 }
             }

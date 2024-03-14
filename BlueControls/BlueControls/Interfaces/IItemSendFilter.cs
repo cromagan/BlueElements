@@ -139,7 +139,7 @@ public sealed class ItemSendSomething {
             new FlexiControl("Ausgang:", widthOfControl, true)
         };
 
-        var ld = Database.AllAvailableTables(string.Empty);
+        var ld = AllAvailableTables(string.Empty);
 
         var ld2 = new List<AbstractListItem>();
 

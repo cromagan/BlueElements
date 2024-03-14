@@ -305,7 +305,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnWeitere_Click(object sender, System.EventArgs e) {
-        var l = BlueBasics.Generic.GetInstaceOfType<IItemToControl>(string.Empty);
+        var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty);
 
         if (l == null || l.Count == 0) { return; }
 
@@ -315,7 +315,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             i.Add(ItemOf(thisl));
         }
 
-        var x = BlueControls.Forms.InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
+        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
 
         if (x == null || x.Count != 1) { return; }
 

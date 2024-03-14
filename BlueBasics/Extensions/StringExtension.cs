@@ -759,7 +759,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string StarkeVereinfachung(this string tXt, string additinalAllowed, bool removedupes) {
         tXt = tXt.ToLower().ReduceToChars(Char_Numerals + Char_Buchstaben + additinalAllowed);
-        foreach (var replacement in Constants.Replacements) {
+        foreach (var replacement in Replacements) {
             tXt = tXt.Replace(replacement.Key, replacement.Value);
         }
 

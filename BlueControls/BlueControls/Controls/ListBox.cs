@@ -68,18 +68,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private Design _itemDesign;
 
-    private ReadOnlyCollection<AbstractListItem>? _itemOrder;
-
     private SizeF _lastCheckedMaxSize = Size.Empty;
-
     private Size _maxNeededItemSize;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
     private AbstractListItem? _mouseOverItem;
 
     private bool _moveAllowed;
-
     private bool _removeAllowed;
+    private bool _sorted = false;
 
     #endregion
 
@@ -96,12 +93,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         _appearance = ListBoxAppearance.Listbox;
         _itemDesign = Design.Undefiniert;
         _controlDesign = Design.Undefiniert;
-        //_appearance = design;
-        //_autoSort = autosort;
+        InvalidateItemOrder();
         GetDesigns();
-
-        //RegisterEvents();
-        _appearance = ListBoxAppearance.Listbox;
     }
 
     #endregion
@@ -140,7 +133,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             if (value == _appearance && _itemDesign != Design.Undefiniert) { return; }
             _appearance = value;
             GetDesigns();
-            //DesignOrStyleChanged();
+            Invalidate();
         }
     }
 
@@ -150,8 +143,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         set {
             if (value == _autoSort) { return; }
             _autoSort = value;
-            _maxNeededItemSize = Size.Empty;
-            _itemOrder = null;
+            InvalidateItemOrder();
         }
     }
 
@@ -202,13 +194,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         get {
             if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(FehlerArt.Fehler, "ItemDesign undefiniert!"); }
             return _itemDesign;
-        }
-    }
-
-    public ReadOnlyCollection<AbstractListItem> ItemOrder {
-        get {
-            _itemOrder ??= CalculateItemOrder();
-            return _itemOrder;
         }
     }
 
@@ -340,7 +325,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
-        var it = BlueControls.ItemCollectionList.AbstractListItemExtension.Item(val);
+        var it = Item(val);
         ItemAdd(it);
     }
 
@@ -381,7 +366,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> l = [.. _checked, name];
 
         ValidateCheckStates(l, name);
-        Invalidate();
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -504,7 +488,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         (_item[index1], _item[index2]) = (_item[index2], _item[index1]);
 
         InvalidateItemOrder();
-        ValidateCheckStates(ItemOrder.ToListOfString(), string.Empty);
+        DoItemOrder();
+        ValidateCheckStates(_item.ToListOfString(), string.Empty);
     }
 
     public void UnCheck(AbstractListItem ali) => UnCheck(ali.KeyName);
@@ -521,7 +506,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         l.Remove(name);
 
         ValidateCheckStates(l, string.Empty);
-        Invalidate();
     }
 
     public void UncheckAll() => ValidateCheckStates([], string.Empty);
@@ -596,7 +580,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             var maxy = int.MinValue;
             var itenc = -1;
             AbstractListItem? previtem = null;
-            foreach (var thisItem in ItemOrder) {
+            DoItemOrder();
+            foreach (var thisItem in _item) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
                 if (thisItem != null) {
                     var cx = 0;
@@ -694,12 +679,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         foreach (var thisString in zuwenig) {
             if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
-                    _item.Add(BlueControls.ItemCollectionList.AbstractListItemExtension.ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix()));
+                    _item.Add(ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix()));
                 } else {
-                    _item.Add(BlueControls.ItemCollectionList.AbstractListItemExtension.ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48)));
+                    _item.Add(ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48)));
                 }
             } else {
-                _item.Add(BlueControls.ItemCollectionList.AbstractListItemExtension.Item(thisString));
+                _item.Add(Item(thisString));
             }
         }
     }
@@ -748,8 +733,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
-
-        Parallel.ForEach(ItemOrder, thisItem => {
+        DoItemOrder();
+        Parallel.ForEach(_item, thisItem => {
             var currentItem = thisItem;
             if (currentItem.Pos.IntersectsWith(visArea)) {
                 var itemState = tmpState;
@@ -772,11 +757,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //if (tmpButtonLeisteHeight > 0) {
         //    Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, tmpButtonLeisteHeight), this);
         //}
-    }
-
-    protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e) {
-        _maxNeededItemSize = Size.Empty;
-        _itemOrder = null;
     }
 
     protected override void OnDoubleClick(System.EventArgs e) {
@@ -847,7 +827,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void btnDown_Click(object sender, System.EventArgs e) {
         var ln = -1;
-        for (var z = _itemOrder.Count - 1; z >= 0; z--) {
+        DoItemOrder();
+        for (var z = _item.Count - 1; z >= 0; z--) {
             if (_item[z] == _mouseOverItem) {
                 if (ln < 0) { return; }// Befehl verwerfen...
                 Swap(ln, z);
@@ -897,7 +878,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void btnUp_Click(object sender, System.EventArgs e) {
         AbstractListItem? ln = null;
-        foreach (var thisItem in _itemOrder) {
+        DoItemOrder();
+        foreach (var thisItem in _item) {
             if (thisItem == _mouseOverItem) {
                 if (ln == null) { return; }// Befehl verwerfen...
                 Swap(_item.IndexOf(ln), _item.IndexOf(thisItem));
@@ -930,15 +912,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return -1;
     }
 
-    private ReadOnlyCollection<AbstractListItem> CalculateItemOrder() {
-        var l = new List<AbstractListItem>();
-        l.AddRange(_item);
-
-        if (_autoSort) { l.Sort(); }
-
-        return l.AsReadOnly();
-    }
-
     private void ChangeCheck(AbstractListItem ne) {
         if (IsChecked(ne)) {
             UnCheck(ne);
@@ -955,6 +928,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 : Design.CheckBox_TextStyle;
         }
         return checkboxDesign;
+    }
+
+    private void DoItemOrder() {
+        if (!_autoSort || _sorted) { return; }
+        _item.Sort();
     }
 
     private void DoMouseMovement() {
@@ -1052,31 +1030,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void InvalidateItemOrder() {
+        if (!_autoSort) { return; }
         _maxNeededItemSize = Size.Empty;
-        _itemOrder = null;
+        _sorted = false;
     }
 
     private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
 
     private bool IsChecked(string name) => _checked.Contains(name);
-
-    private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-        var last = string.Empty;
-        if (e.NewItems != null && e.NewItems.Count > 0) {
-            if (e.NewItems[0] is AbstractListItem ali) {
-                last = ali.KeyName;
-            }
-        }
-
-        var l = new List<string>();
-        foreach (var thisc in _checked) {
-            if (_item.Get(thisc) != null) { l.Add(thisc); }
-        }
-
-        ValidateCheckStates(l, last);
-
-        Invalidate();
-    }
 
     private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y));
 
@@ -1093,8 +1054,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    private void ValidateCheckStates(List<string> newCheckedItems, string lastaddeditem) {
-        newCheckedItems = newCheckedItems.SortedDistinctList();
+    private void ValidateCheckStates(List<string>? newCheckedItems, string lastaddeditem) {
+        newCheckedItems = newCheckedItems?.SortedDistinctList() ?? [];
 
         switch (_checkBehavior) {
             case CheckBehavior.AllSelected:
@@ -1138,7 +1099,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = _item.Get(thisit) ?? BlueControls.ItemCollectionList.AbstractListItemExtension.Item(thisit);
+            var it = _item.Get(thisit) ?? Item(thisit);
 
             if (it.IsClickable()) {
                 newList.Add(thisit);

@@ -1581,7 +1581,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
-            var db = Database.GetByFilename(thisFile, true, null, false, "Import");
+            var db = GetByFilename(thisFile, true, null, false, "Import");
             if (db == null) {
                 return thisFile + " konnte nicht geladen werden.";
             }

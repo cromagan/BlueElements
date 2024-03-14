@@ -86,7 +86,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
 
     public static List<ImageFilter> ImageFilters {
         get {
-            _imageFilter ??= BlueBasics.Generic.GetInstaceOfType<ImageFilter>();
+            _imageFilter ??= Generic.GetInstaceOfType<ImageFilter>();
             return _imageFilter;
         }
     }

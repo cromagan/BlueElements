@@ -71,7 +71,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 " ",
                 Database.EventScriptErrorMessage
             };
-            l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
+            l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
         }
 
         Database.EventScriptErrorMessage = string.Empty;
@@ -138,7 +138,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
                 lstPermissionExecute.ItemClear();
                 var l = Database.Permission_AllUsed(false).ToList();
-                l.AddIfNotExists(Constants.Administrator);
+                l.AddIfNotExists(Administrator);
                 lstPermissionExecute.ItemAddRange(l);
                 lstPermissionExecute.Check(value.UserGroups);
                 lstPermissionExecute.Suggestions.Clear();
@@ -269,9 +269,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 l.Add("############################################################################");
                 l.Add("############################################################################");
                 l.Add("############################################################################");
-                l.Add(thisUndo.DateTimeUtc.ToString(Constants.Format_Date7) + " " + thisUndo.User);
+                l.Add(thisUndo.DateTimeUtc.ToString(Format_Date7) + " " + thisUndo.User);
 
-                l.Add(thisUndo.DateTimeUtc.ToString(Constants.Format_Date7) + " " + thisUndo.User);
+                l.Add(thisUndo.DateTimeUtc.ToString(Format_Date7) + " " + thisUndo.User);
                 // Überprüfen, ob das Skript geändert wurde
                 List<string> ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
                 var found = false;

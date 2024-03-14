@@ -119,7 +119,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
             var vf = new List<AbstractListItem>();
-            vf.AddRange(ItemsOf(BlueControls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
+            vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
             l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
         }
 

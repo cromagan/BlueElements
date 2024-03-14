@@ -181,10 +181,10 @@ public class GenericControl : Control {
                 return PartentType.Slider;
             //Is = "FRMMSGBOX"
 
-            case BlueControls.Forms.FloatingForm:
+            case Forms.FloatingForm:
                 return PartentType.MsgBox;
 
-            case BlueControls.Forms.DialogWithOkAndCancel:
+            case Forms.DialogWithOkAndCancel:
                 return PartentType.MsgBox;
 
             case TextBox:
