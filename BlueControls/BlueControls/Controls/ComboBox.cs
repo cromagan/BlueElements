@@ -44,6 +44,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Fields
 
+    private bool _autoSort = true;
     private bool _btnDropDownIsIn;
     private ComboboxStyle _drawStyle = ComboboxStyle.TextBox;
     private ComboBoxStyle _dropDownStyle = ComboBoxStyle.DropDown;
@@ -87,6 +88,16 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Properties
 
+    [DefaultValue(true)]
+    public bool AutoSort {
+        get => _autoSort;
+        set {
+            if (value == _autoSort) { return; }
+            _autoSort = value;
+            Invalidate();
+        }
+    }
+
     [DefaultValue(ComboboxStyle.TextBox)]
     public ComboboxStyle DrawStyle {
         get => _drawStyle;
@@ -125,7 +136,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public int ItemCount { get; internal set; }
+    public int ItemCount => _item.Count;
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -189,7 +200,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         List<string> itc = [];
         if (_drawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, _autoSort);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;

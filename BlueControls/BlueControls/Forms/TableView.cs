@@ -1154,6 +1154,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void UpdateScripts(Database? db) {
+        Table.Invalidate();
         lstAufgaben.ItemClear();
 
         if (db == null || db.IsDisposed || !string.IsNullOrEmpty(db.FreezedReason)) {
@@ -1214,8 +1215,6 @@ public partial class TableView : FormWithStatusBar {
             var d = ItemOf("Skripte bearbeiten", "#editscript", ImageCode.Skript);
             lstAufgaben.ItemAdd(d);
             d.Enabled = db.IsAdministrator();
-            lstAufgaben.Enabled = true;
-            return;
         }
 
         lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;

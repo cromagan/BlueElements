@@ -427,16 +427,16 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
         _item.Add(item);
-
-        //item.PropertyChanged += Item_PropertyChanged;
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
         InvalidateItemOrder();
+        ValidateCheckStates(_checked, item.KeyName);
     }
 
     public void ItemAddRange(List<AbstractListItem>? items) {
         if (items == null || items.Count == 0) { return; }
 
         foreach (var thisIt in items) {
+            thisIt.CompareKeyChanged += Item_CompareKeyChangedChanged;
             _item.Add(thisIt);
         }
 
@@ -449,7 +449,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         foreach (var thisstring in list) {
             if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
-                _item.Add(ItemOf(thisstring, thisstring));
+                var it = ItemOf(thisstring, thisstring);
+                it.CompareKeyChanged += Item_CompareKeyChangedChanged;
+                _item.Add(it);
             }
         }
 
@@ -459,6 +461,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void ItemClear() {
         if (_item.Count == 0) { return; }
+
+        foreach (var thisIt in _item) {
+            thisIt.CompareKeyChanged -= Item_CompareKeyChangedChanged;
+        }
+
+        _checked.Clear();
+
         _item.Clear();
         InvalidateItemOrder();
         ValidateCheckStates(null, string.Empty);
@@ -471,14 +480,28 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public void Remove(string internalnam) {
         if (string.IsNullOrEmpty(internalnam)) { return; }
 
-        _item.Remove(internalnam);
-        _checked.Remove(internalnam);
+        var nl = new List<AbstractListItem>();
+        nl.AddRange(_item);
+        _item.Clear();
+
+        foreach (var thisItem in nl) {
+            if (thisItem.KeyName.Equals(internalnam, StringComparison.OrdinalIgnoreCase)) {
+                thisItem.CompareKeyChanged -= Item_CompareKeyChangedChanged;
+                _checked.Remove(internalnam);
+            } else {
+                _item.Add(thisItem); // Events noch vorhanden
+            }
+        }
+
         InvalidateItemOrder();
         ValidateCheckStates(_checked, string.Empty);
     }
 
     public void Remove(AbstractListItem? item) {
         if (item == null) { return; }
+        if (!_item.Contains(item)) { return; }
+
+        item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
 
         _item.Remove(item);
         _checked.Remove(item.KeyName);
@@ -676,25 +699,31 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         // Zu viele im Mains aus der Liste löschen
         foreach (var thisString in zuviel) {
             if (!values.Contains(thisString)) {
-                _item.Remove(thisString);
+                Remove(thisString);
             }
         }
 
         // und die Mains auffüllen
         foreach (var thisString in zuwenig) {
+            AbstractListItem? it = null;
             if (IO.FileExists(thisString)) {
                 if (thisString.FileType() == FileFormat.Image) {
-                    _item.Add(ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix()));
+                    it = ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix());
                 } else {
-                    _item.Add(ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48)));
+                    it = ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
                 }
             } else {
-                _item.Add(Item(thisString));
+                it = Item(thisString);
             }
+
+            if (it != null) {
+                it.CompareKeyChanged += Item_CompareKeyChangedChanged;
+                _item.Add(it);
+            }
+
         }
 
         InvalidateItemOrder();
-
     }
 
     protected override void Dispose(bool disposing) {
@@ -1012,7 +1041,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             var removeok = _removeAllowed;
 
             if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
-            if(CheckBehavior == CheckBehavior.MultiSelection) {  removeok = false; }
+            if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
 
             if (removeok) {
                 btnMinus.Width = 16;
@@ -1039,7 +1068,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void InvalidateItemOrder() {
-        if (!_autoSort) { return; }
         _maxNeededItemSize = Size.Empty;
         _sorted = false;
     }

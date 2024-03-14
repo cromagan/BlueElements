@@ -583,6 +583,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Database? database, string showingKey) {
         if (columnArrangementSelector == null || columnArrangementSelector.IsDisposed) { return; }
 
+        columnArrangementSelector.AutoSort = false;
+
         columnArrangementSelector.ItemClear();
         columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
@@ -2088,6 +2090,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
+            contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null);
+
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
     }
@@ -2942,6 +2946,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (!string.IsNullOrEmpty(db.FreezedReason)) {
                     BlueFont.DrawString(gr, db.FreezedReason, _columnFont, Brushes.Blue, 52, 12);
                 }
+            }
+
+            if (db.IsAdministrator() && !db.ReadOnly && !string.IsNullOrEmpty(db.EventScriptErrorMessage)) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, 8);
+                BlueFont.DrawString(gr, "Skripte müssen repariert werden", _columnFont, Brushes.Blue, 90, 12);
             }
 
             if (db.AmITemporaryMaster(false)) {
