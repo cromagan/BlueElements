@@ -38,9 +38,9 @@ internal class Method_LoadTextFile : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "loadtextfile";
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";

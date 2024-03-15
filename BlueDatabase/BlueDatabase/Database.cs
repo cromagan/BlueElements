@@ -1314,7 +1314,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region  Erlaubte Methoden ermitteln
 
-            var allowedMethods = MethodType.Standard | MethodType.Database;
+            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
             if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
@@ -2015,6 +2015,29 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         } catch (Exception ex) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Rechte-Check", ex);
+        }
+        return false;
+    }
+
+    //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    IsTableVisibleForUser?.Invoke(this, e);
+    //}
+    public bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
+        var tmpName = UserName.ToUpper();
+        var tmpGroup = UserGroup.ToUpper();
+        if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        }
+
+        if (Column.SysRowCreator is ColumnItem src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
+            if (row != null && Cell.GetString(src, row).ToUpper() == tmpName) { return true; }
+        } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {
+            return true;
+        } else if (string.Equals(allowed, tmpGroup, StringComparison.OrdinalIgnoreCase)) {
+            return true;
         }
         return false;
     }
@@ -3370,29 +3393,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //}
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { Freeze("Datenbankversions-Konflikt"); }
-    }
-
-    //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    IsTableVisibleForUser?.Invoke(this, e);
-    //}
-    private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
-        var tmpName = UserName.ToUpper();
-        var tmpGroup = UserGroup.ToUpper();
-        if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        }
-
-        if (Column.SysRowCreator is ColumnItem src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
-            if (row != null && Cell.GetString(src, row).ToUpper() == tmpName) { return true; }
-        } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        } else if (string.Equals(allowed, tmpGroup, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        }
-        return false;
     }
 
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {

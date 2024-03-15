@@ -60,7 +60,13 @@ public enum MethodType {
     /// </summary>
     ManipulatesUser = 64,
 
-    Break = 128,
+    /// <summary>
+    /// Dieser Befehl generiert abseits des normalen Weges neue Variablen. Oder, erstellt einen speziellen Rückgabewert, der nicht für Abfragen gedacht ist.
+    /// Z.B. kann dieser Befehl dann nicht in If-Abfragen benutzt werden.
+    /// </summary>
+    SpecialVariables = 128,
 
-    AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | NeedLongTime | ManipulatesUser
+    Break = 256,
+
+    AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | NeedLongTime | ManipulatesUser | SpecialVariables
 }

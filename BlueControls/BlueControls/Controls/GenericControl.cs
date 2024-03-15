@@ -121,6 +121,24 @@ public class GenericControl : Control {
 
     #region Methods
 
+    public static Form? ParentForm(Control? o) {
+        if (o == null || o.IsDisposed) { return null; }
+
+        do {
+            switch (o) {
+                case Form frm:
+                    return frm;
+
+                case null:
+                    return null;
+
+                default:
+                    o = o.Parent; //Manchmal ist o null. MultiThreading?
+                    break;
+            }
+        } while (true);
+    }
+
     public static PartentType Typ(Control control) {
         switch (control) {
             case null:
@@ -478,24 +496,6 @@ public class GenericControl : Control {
             if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
         } catch { }
-    }
-
-    private static Form? ParentForm(Control? o) {
-        if (o == null || o.IsDisposed) { return null; }
-
-        do {
-            switch (o) {
-                case Form frm:
-                    return frm;
-
-                case null:
-                    return null;
-
-                default:
-                    o = o.Parent; //Manchmal ist o null. MultiThreading?
-                    break;
-            }
-        } while (true);
     }
 
     private void DoDraw(Graphics gr) {

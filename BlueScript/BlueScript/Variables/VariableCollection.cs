@@ -87,7 +87,7 @@ public class VariableCollection : IEnumerable<Variable> {
 
     /// <summary>
     /// Erstellt eine neue VariableCollection, die alle Variablen aus ExistingVars enthält.
-    /// Überschreinbt die Werte in den existingVars mit den Werten aus newValues. Die Werte aus NewValues können dabei einen besonderen Prefix haben.
+    /// Überschreibt die Werte in den existingVars mit den Werten aus newValues. Die Werte aus NewValues können dabei einen besonderen Prefix haben.
     /// Beispiel: ExistingVars die Variable Test
     /// NewValues behinhaltet XX_Test.
     /// mit dem Prefix XX_ wird der Wert aus XX_Test nach Test geschrieben.

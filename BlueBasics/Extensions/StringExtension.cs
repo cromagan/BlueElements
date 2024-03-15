@@ -271,7 +271,7 @@ public static partial class Extensions {
                 tagval = value.Substring(gleichpos + 1, kommapos - gleichpos - 1).Trim();
 
                 var test = value.Substring(kommapos);
-                if (test is ",}" or ", }") { noarunde = false; }
+                if (test is ",}" or ", }" or ", , }" or ",,}" or ", ,}") { noarunde = false; }
             }
 
             if (tagval.Length > 1 && tagval.StartsWith("\"") && tagval.EndsWith("\"")) {

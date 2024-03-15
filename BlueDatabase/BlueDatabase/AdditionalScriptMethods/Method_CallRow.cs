@@ -50,7 +50,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime | MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 

@@ -468,9 +468,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         ValidateCheckStates(null, string.Empty);
     }
 
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+    public virtual void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+    public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void Remove(string internalnam) {
         if (string.IsNullOrEmpty(internalnam)) { return; }
@@ -871,10 +871,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         UnCheck(_mouseOverItem);
 
-        //if (_checkBehavior == CheckBehavior.AllSelected) {
-        //    Remove(_mouseOverItem);
-        //    //Check(string.Empty);
-        //}
+        if (_checkBehavior != CheckBehavior.AllSelected) {
+            // Z.B. die Sktipt-Liste.
+            // Items können gewähltz werden, aber auch gelöscht
+            Remove(_mouseOverItem);
+        }
     }
 
     private void btnPlus_Click(object sender, System.EventArgs e) {

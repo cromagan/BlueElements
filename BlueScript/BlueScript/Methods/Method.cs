@@ -345,7 +345,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
                 }
 
                 if (!scp.AllowedMethods.HasFlag(MethodType)) {
-                    return new CanDoFeedback(pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
+                    return new CanDoFeedback(pos, "Befehl '" + Syntax + "' kann in diesem Skript an der aktuellen Position nicht benutzt werden.", true, ld);
                 }
 
                 return new CanDoFeedback(cont, f.AttributeText, codebltxt, ld);

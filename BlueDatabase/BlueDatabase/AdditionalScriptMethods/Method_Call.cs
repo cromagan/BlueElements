@@ -52,7 +52,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.Database;
+    public override MethodType MethodType => MethodType.Database | MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 

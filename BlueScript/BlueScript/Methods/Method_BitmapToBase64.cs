@@ -36,9 +36,9 @@ internal class Method_BitmapToBase64 : Method {
     public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], StringVal];
     public override string Command => "bitmaptobase64";
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard | MethodType.NeedLongTime;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.Standard | MethodType.NeedLongTime | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";

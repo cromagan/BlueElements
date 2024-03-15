@@ -37,10 +37,9 @@ internal class Method_ReplaceList : Method {
     public override List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
     public override string Command => "replacelist";
     public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
-    public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.Standard | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
