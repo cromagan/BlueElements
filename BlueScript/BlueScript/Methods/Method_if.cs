@@ -84,7 +84,9 @@ public class Method_If : Method {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
+        var scpt = new ScriptProperties(scp, scp.AllowedMethods & ~MethodType.SpecialVariables);
+
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scpt);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, "Fehler innerhalb der runden Klammern des If-Befehls"); }
 
         if (attvar.ValueBoolGet(0)) {
