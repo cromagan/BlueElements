@@ -194,7 +194,7 @@ public static class Generic {
         return sb.ToString();
     }
 
-    public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {
+    public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
         List<T> l = [];
         foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
             try {

@@ -259,6 +259,9 @@ public static partial class Extensions {
             if (gleichpos < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
 
             var tag = value.Substring(start, gleichpos - start).Trim().ToLower();
+            tag = tag.Trim(" ");
+            tag = tag.Trim(",");
+            tag = tag.Trim(" ");
             if (string.IsNullOrEmpty(tag)) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
 
             var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
@@ -805,6 +808,7 @@ public static partial class Extensions {
     public static string ToNonCriticalWithQuote(this string txt) => "\"" + txt.ToNonCritical() + "\"";
 
     public static string ToTitleCase(this string text) {
+        // Suchwort: #Camelcase
         text = text.ToLower().Replace("_", " ");
         var info = CultureInfo.CurrentCulture.TextInfo;
         return info.ToTitleCase(text);

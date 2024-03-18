@@ -52,18 +52,14 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     #region Constructors
 
-    public DropDownSelectRowPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
+    public DropDownSelectRowPadItem(string keyName) : this(keyName, null, null) { }
 
-    public DropDownSelectRowPadItem(Database? db) : this(string.Empty, db) { }
-
-    public DropDownSelectRowPadItem(string intern, Database? db) : base(intern) {
+    public DropDownSelectRowPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
-
-    public DropDownSelectRowPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 

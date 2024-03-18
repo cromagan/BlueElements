@@ -32,7 +32,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Constructors
 
-    protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) => RemovePic();
+    protected FixedRectangleBitmapPadItem(string keyName) : base(keyName) => RemovePic();
 
     #endregion
 

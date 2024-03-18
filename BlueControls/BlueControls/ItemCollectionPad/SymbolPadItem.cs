@@ -38,7 +38,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     public SymbolPadItem() : this(string.Empty) { }
 
-    public SymbolPadItem(string internalname) : base(internalname) {
+    public SymbolPadItem(string keyName) : base(keyName) {
         Symbol = Symbol.Pfeil;
         Hintergrundfarbe = Color.White;
         Randfarbe = Color.Black;

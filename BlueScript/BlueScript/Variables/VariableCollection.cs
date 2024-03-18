@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -164,6 +165,28 @@ public class VariableCollection : IEnumerable<Variable> {
         var f = true;
         foreach (var thisv in vars._internal) {
             if (!Add(thisv)) { f = false; }
+        }
+
+        return f;
+    }
+
+    /// <summary>
+    /// Erstellt Clone
+    /// </summary>
+    /// <param name="v"></param>
+    /// <param name="varcom"></param>
+    /// <returns></returns>
+    public bool AddRange(VariableCollection vars, string newcomment) {
+        if (ReadOnly) { return false; }
+
+        var f = true;
+        foreach (var thisv in vars._internal) {
+            if (thisv is ICloneable c && c.Clone() is Variable nv) {
+                nv.Comment = newcomment;
+                if (!Add(nv)) { f = false; }
+            } else {
+                f = false;
+            }
         }
 
         return f;

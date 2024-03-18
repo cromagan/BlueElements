@@ -29,7 +29,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
 
     #region Constructors
 
-    protected AbstractPhysicPadItem(string internalname) : base(internalname) {
+    protected AbstractPhysicPadItem(string keyName) : base(keyName) {
         MovablePoint.Add(new PointM(5, 0));
         MovablePoint.Add(new PointM(10, 10));
         MovablePoint.Add(new PointM(0, 10));

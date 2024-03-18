@@ -421,9 +421,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public void ItemAdd(AbstractListItem? item) {
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
         if (_item.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
-        if (this[item.Internal] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
+        if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
 
-        if (string.IsNullOrEmpty(item.Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
+        if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
         AddAndRegister(item);
         InvalidateItemOrder();
         ValidateCheckStates(_checked, item.KeyName);
@@ -472,14 +472,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void Remove(string internalnam) {
-        if (string.IsNullOrEmpty(internalnam)) { return; }
+    public void Remove(string keyName) {
+        if (string.IsNullOrEmpty(keyName)) { return; }
 
         var nl = new List<AbstractListItem>();
         nl.AddRange(_item);
 
         foreach (var thisItem in nl) {
-            if (thisItem.KeyName.Equals(internalnam, StringComparison.OrdinalIgnoreCase)) {
+            if (thisItem.KeyName.Equals(keyName, StringComparison.OrdinalIgnoreCase)) {
                 RemoveAndUnRegister(thisItem);
             }
         }
@@ -959,6 +959,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void DoItemOrder() {
         if (!_autoSort || _sorted) { return; }
         _item.Sort();
+        _sorted = true;
     }
 
     private void DoMouseMovement() {
@@ -1091,7 +1092,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void ValidateCheckStates(List<string>? newCheckedItems, string lastaddeditem) {
-        newCheckedItems = newCheckedItems?.SortedDistinctList() ?? [];
+        newCheckedItems = newCheckedItems ?? [];
 
         switch (_checkBehavior) {
             case CheckBehavior.AllSelected:

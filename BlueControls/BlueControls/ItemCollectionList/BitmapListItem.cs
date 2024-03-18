@@ -45,7 +45,7 @@ public class BitmapListItem : AbstractListItem {
 
     #region Constructors
 
-    public BitmapListItem(Bitmap? bmp, string internalname, string caption) : base(internalname, true) {
+    public BitmapListItem(Bitmap? bmp, string keyName, string caption) : base(keyName, true) {
         _caption = caption;
         _captiontmp.Clear();
         _bitmap = bmp;
@@ -53,7 +53,7 @@ public class BitmapListItem : AbstractListItem {
         Overlays.Clear();
     }
 
-    public BitmapListItem(string filename, string internalname, string caption) : base(internalname, true) {
+    public BitmapListItem(string filename, string keyName, string caption) : base(keyName, true) {
         _caption = caption;
         _captiontmp.Clear();
         //_Bitmap = bmp;
@@ -222,7 +222,7 @@ public class BitmapListItem : AbstractListItem {
         }
     }
 
-    protected override string GetCompareKey() => Internal;
+    protected override string GetCompareKey() => KeyName;
 
     private void GetImage() {
         if (string.IsNullOrEmpty(_imageFilename)) { return; }

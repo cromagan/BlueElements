@@ -50,15 +50,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     #region Constructors
 
-    public BitmapPadItem(string internalname) : this(internalname, null, Size.Empty) { }
+    public BitmapPadItem(string keyName) : this(keyName, null, Size.Empty) { }
 
-    public BitmapPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
+    public BitmapPadItem(string keyName, Bitmap? bmp) : this(keyName, bmp, Size.Empty) { }
 
     public BitmapPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
 
     public BitmapPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
 
-    public BitmapPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
+    public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
         Bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
         Overlays = [];

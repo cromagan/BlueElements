@@ -49,7 +49,7 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Constructors
 
-    public CellLikeListItem(string internalAndReadableText, ColumnItem? columnStyle, ShortenStyle style, bool enabled, BildTextVerhalten bildTextverhalten) : base(internalAndReadableText, enabled) {
+    public CellLikeListItem(string keyNameAndReadableText, ColumnItem? columnStyle, ShortenStyle style, bool enabled, BildTextVerhalten bildTextverhalten) : base(keyNameAndReadableText, enabled) {
         _styleLikeThis = columnStyle;
         _style = style;
         _bildTextverhalten = bildTextverhalten;
@@ -59,7 +59,7 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Properties
 
-    public override string QuickInfo => Internal.CreateHtmlCodes(true);
+    public override string QuickInfo => KeyName.CreateHtmlCodes(true);
 
     #endregion
 
@@ -68,7 +68,7 @@ public class CellLikeListItem : AbstractListItem {
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
         if (_styleLikeThis == null) { return false; }
-        var txt = CellItem.ValueReadable(Internal, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = CellItem.ValueReadable(KeyName, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         return txt.ToUpper().Contains(filterText.ToUpper());
     }
 
@@ -79,14 +79,14 @@ public class CellLikeListItem : AbstractListItem {
             return new Size(16, 0);
         }
 
-        return CellItem.ContentSize(_styleLikeThis.KeyName, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
+        return CellItem.ContentSize(_styleLikeThis.KeyName, KeyName, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        Table.Draw_FormatedText(gr, Internal, _style, _styleLikeThis, positionModified, itemdesign, state, _bildTextverhalten, 1f);
+        Table.Draw_FormatedText(gr, KeyName, _style, _styleLikeThis, positionModified, itemdesign, state, _bildTextverhalten, 1f);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }
@@ -99,11 +99,11 @@ public class CellLikeListItem : AbstractListItem {
             return string.Empty;
         }
         // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
-        var txt = CellItem.ValueReadable(Internal, ShortenStyle.HTML, _bildTextverhalten, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = CellItem.ValueReadable(KeyName, ShortenStyle.HTML, _bildTextverhalten, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils
         var compareKey = txt.CompareKey(_styleLikeThis.SortType);
         // Rückgabe des Compare-Keys mit dem internen Wert
-        return $"{compareKey}|{Internal}";
+        return $"{compareKey}|{KeyName}";
     }
 
     #endregion

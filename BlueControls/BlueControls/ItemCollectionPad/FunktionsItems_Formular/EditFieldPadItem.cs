@@ -56,7 +56,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Constructors
 
-    public EditFieldPadItem(string internalname) : base(internalname) => _itemAccepts = new();
+    public EditFieldPadItem(string keyName) : this(keyName, null as ConnectedFormula.ConnectedFormula) { }
+
+    public EditFieldPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => _itemAccepts = new();
 
     #endregion
 

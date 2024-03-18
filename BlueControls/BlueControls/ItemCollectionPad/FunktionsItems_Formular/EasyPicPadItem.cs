@@ -44,7 +44,9 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     #region Constructors
 
-    public EasyPicPadItem(string internalname) : base(internalname) {
+    public EasyPicPadItem(string keyName) : this(keyName, null) { }
+
+    public EasyPicPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }

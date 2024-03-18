@@ -140,7 +140,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                 //case "scriptname":
                 //    _scriptName = pair.Value;
                 //    break;
-                case "keyname":
+                case "keyName":
                 case "id":
                     //if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
                     break;
@@ -341,7 +341,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     #region Indexers
 
-    public AbstractPadItem? this[string keyname] => this.Get(keyname);
+    public AbstractPadItem? this[string keyName] => this.Get(keyName);
 
     public List<AbstractPadItem> this[int x, int y] => this[new Point(x, y)];
 
@@ -553,7 +553,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return l.SortedDistinctList();
     }
 
-    public void Remove(string internalname) => Remove(this[internalname]);
+    public void Remove(string keyName) => Remove(this[keyName]);
 
     public new void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
@@ -1049,6 +1049,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                     foreach (var thisIt in x) {
                         switch (thisIt.Key) {
                             case "internalname":
+                            case "keyname":
                                 var it = this[thisIt.Value];
                                 it?.Parse(t);
                                 break;

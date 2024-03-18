@@ -1000,7 +1000,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (e.Item is TextListItem tli) {
-            var com = (tli.Internal + "|||").SplitBy("|");
+            var com = (tli.KeyName + "|||").SplitBy("|");
 
             switch (com[0].ToLower()) {
                 case "#repairscript":

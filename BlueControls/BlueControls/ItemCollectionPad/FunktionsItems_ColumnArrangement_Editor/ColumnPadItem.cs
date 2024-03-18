@@ -38,7 +38,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Constructors
 
-    public ColumnPadItem(string internalname) : base(internalname) { }
+    public ColumnPadItem(string keyName) : base(keyName) { }
 
     public ColumnPadItem(ColumnItem c, bool permanent) : base(c.Database?.TableName + "|" + c.KeyName) {
         Column = c;

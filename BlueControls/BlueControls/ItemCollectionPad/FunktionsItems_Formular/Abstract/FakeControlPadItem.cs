@@ -58,12 +58,16 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Constructors
 
-    protected FakeControlPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    protected FakeControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName) {
+        CFormula = cformula;
+        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    }
 
     #endregion
 
     #region Properties
 
+    public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
     public abstract bool MustBeInDrawingArea { get; }
     public ReadOnlyCollection<string> VisibleFor { get; set; } = new([]);
     protected override int SaveOrder => 3;

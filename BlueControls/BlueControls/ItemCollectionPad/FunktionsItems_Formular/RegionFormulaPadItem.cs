@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Unter-Element von ConnectedFormulaView
 /// </summary>
-public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptFilter, IAutosizable {
+public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -58,19 +58,15 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
 
     #region Constructors
 
-    public RegionFormulaPadItem() : this(Generic.UniqueInternal(), null) {
-    }
+    public RegionFormulaPadItem(string keyName) : this(keyName, null) { }
 
-    public RegionFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
+    public RegionFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
 
-        CFormula = cf;
         if (CFormula != null) {
             CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
         }
     }
-
-    public RegionFormulaPadItem(string intern) : this(intern, null) { }
 
     #endregion
 
@@ -79,11 +75,6 @@ public class RegionFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, II
     public static string ClassId => "FI-RegionFormula";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
-
-    /// <summary>
-    /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.
-    /// </summary>
-    public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
 
     public string Child {
         get => _child;

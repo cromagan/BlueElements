@@ -47,18 +47,18 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     #region Constructors
 
-    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
+    public RowEntryPadItem(string keyName, string toParse) : this(keyName, null, null) => this.Parse(toParse);
 
-    public RowEntryPadItem(Database? db) : this(string.Empty, db) { }
+    public RowEntryPadItem(Database? db) : this(string.Empty, db, null) { }
 
-    public RowEntryPadItem(string intern, Database? db) : base(intern) {
+    public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public RowEntryPadItem(string intern) : this(intern, null as Database) { }
+    public RowEntryPadItem(string keyName) : this(keyName, null, null) { }
 
     #endregion
 

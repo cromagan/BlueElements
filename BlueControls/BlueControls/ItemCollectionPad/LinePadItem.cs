@@ -48,11 +48,11 @@ public class LinePadItem : AbstractPadItem {
 
     #region Constructors
 
-    public LinePadItem(string internalname) : this(internalname, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+    public LinePadItem(string keyName) : this(keyName, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
 
     public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
-    public LinePadItem(string internalname, PadStyles format, Point point1, Point point2) : base(internalname) {
+    public LinePadItem(string keyName, PadStyles format, Point point1, Point point2) : base(keyName) {
         _point1 = new PointM(this, "Punkt 1", 0, 0);
         _point2 = new PointM(this, "Punkt 2", 0, 0);
         _point1.SetTo(point1);

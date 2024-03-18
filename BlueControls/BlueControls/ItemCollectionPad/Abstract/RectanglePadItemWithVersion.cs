@@ -28,7 +28,7 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem, IHasVersio
 
     #region Constructors
 
-    protected RectanglePadItemWithVersion(string internalname) : base(internalname) { }
+    protected RectanglePadItemWithVersion(string keyName) : base(keyName) { }
 
     #endregion
 

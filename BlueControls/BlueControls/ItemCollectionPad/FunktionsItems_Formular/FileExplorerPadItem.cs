@@ -48,7 +48,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
 
     #region Constructors
 
-    public FileExplorerPadItem(string internalname) : base(internalname) {
+    public FileExplorerPadItem(string keyName) : this(keyName, null) { }
+
+    public FileExplorerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }

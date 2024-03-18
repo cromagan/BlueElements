@@ -165,16 +165,16 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed)?.Column;
     }
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(internalName, caption, string.Empty, format, quickinfo);
+    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(keyName, caption, string.Empty, format, quickinfo);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, IColumnInputFormat format) => GenerateAndAdd(internalName, caption, string.Empty, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption, string.Empty, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string internalName) => GenerateAndAdd(internalName, string.Empty, string.Empty, null, string.Empty);
+    public ColumnItem? GenerateAndAdd(string keyName) => GenerateAndAdd(keyName, string.Empty, string.Empty, null, string.Empty);
 
     public ColumnItem? GenerateAndAdd() => GenerateAndAdd(Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string internalName, string caption, string suffix, IColumnInputFormat? format, string quickinfo) {
-        if (!ColumnItem.IsValidColumnName(internalName)) {
+    public ColumnItem? GenerateAndAdd(string keyName, string caption, string suffix, IColumnInputFormat? format, string quickinfo) {
+        if (!ColumnItem.IsValidColumnName(keyName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
             return null;
         }
@@ -186,14 +186,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
         //    return null;
         //}
-        _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, internalName, Generic.UserName, DateTime.UtcNow, string.Empty);
-        var item = this[internalName];
+        _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, keyName, Generic.UserName, DateTime.UtcNow, string.Empty);
+        var item = this[keyName];
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
             return null;
         }
 
-        item.KeyName = internalName;
+        item.KeyName = keyName;
         item.Caption = caption;
 
         item.GetStyleFrom(format);

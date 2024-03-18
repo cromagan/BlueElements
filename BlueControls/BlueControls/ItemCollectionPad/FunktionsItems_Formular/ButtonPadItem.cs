@@ -62,9 +62,9 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     #region Constructors
 
-    public ButtonPadItem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
+    public ButtonPadItem(string keyName) : this(keyName, null) { }
 
-    public ButtonPadItem(string intern) : base(intern) => _itemAccepts = new();
+    public ButtonPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => _itemAccepts = new();
 
     #endregion
 

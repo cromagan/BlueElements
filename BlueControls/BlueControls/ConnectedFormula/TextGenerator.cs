@@ -221,10 +221,10 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
             do {
                 again = false;
                 foreach (var thisit in lstAuswahl.Items) {
-                    if (thisit.Internal.CountString(";") >= stufe) {
+                    if (thisit.KeyName.CountString(";") >= stufe) {
                         var ok = false;
                         foreach (var thisall in allowed) {
-                            if (thisit.Internal.StartsWith(thisall)) { ok = true; }
+                            if (thisit.KeyName.StartsWith(thisall)) { ok = true; }
                         }
                         if (!ok) { lstAuswahl.Remove(thisit); again = true; break; }
                     }

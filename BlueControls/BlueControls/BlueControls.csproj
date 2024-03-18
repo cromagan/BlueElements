@@ -197,7 +197,6 @@
     <Compile Include="Interfaces\IItemAcceptFilter.cs" />
     <Compile Include="Interfaces\IControlSendFilter.cs" />
     <Compile Include="Interfaces\IItemSendFilter.cs" />
-    <Compile Include="Interfaces\IHasConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
       <SubType>Component</SubType>

@@ -59,18 +59,14 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     #region Constructors
 
-    public OutputFilterPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
+    public OutputFilterPadItem(string keyName) : this(keyName, null as Database, null as ConnectedFormula.ConnectedFormula) { }
 
-    public OutputFilterPadItem(Database? db) : this(string.Empty, db) { }
-
-    public OutputFilterPadItem(string intern, Database? db) : base(intern) {
+    public OutputFilterPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
-
-    public OutputFilterPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 

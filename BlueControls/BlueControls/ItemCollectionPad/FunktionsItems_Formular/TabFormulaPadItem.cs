@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptFilter, IAutosizable {
+public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -61,16 +61,15 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) {
     }
 
-    public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
+    public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
 
-        CFormula = cf;
         if (CFormula != null) {
             CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
         }
     }
 
-    public TabFormulaPadItem(string intern) : this(intern, null) { }
+    public TabFormulaPadItem(string keyName) : this(keyName, null) { }
 
     #endregion
 
@@ -79,12 +78,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public static string ClassId => "FI-ChildFormula";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
-
-    /// <summary>
-    /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.
-    /// </summary>
-    public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
-
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";

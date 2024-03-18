@@ -28,7 +28,7 @@ public class TextListItem : AbstractListItem {
 
     #region Constructors
 
-    public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname, enabled) {
+    public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
         IsCaption = isCaption;
         Text = readableText;
         Symbol = symbol;
@@ -66,7 +66,7 @@ public class TextListItem : AbstractListItem {
         }
     }
 
-    protected override string GetCompareKey() => Internal.CompareKey(SortierTyp.Sprachneutral_String);
+    protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
 
     private Design TempDesign(Design itemdesign) {
         if (IsCaption) {

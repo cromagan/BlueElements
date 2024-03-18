@@ -17,12 +17,15 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueControls;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 
@@ -115,45 +118,31 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         OnDoInvalidate();
     }
 
-    private void btnDrehenL_Click(object sender, System.EventArgs e) {
+    private void btnDrehenL_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.Rotate270FlipNone);
+
+    private void btnDrehenR_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.Rotate90FlipNone);
+
+    private void DoThis(RotateFlipType b) {
         _ausricht = false;
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic ==  null) { return; }
         CollectGarbage();
-        pic.RotateFlip(RotateFlipType.Rotate270FlipNone);
-        OnOverridePic(pic, true);
+        try {
+            Bitmap clonedBitmap = new Bitmap(pic);
+            clonedBitmap.RotateFlip(b);
+            OnOverridePic(clonedBitmap, true);
+        } catch (Exception ex) {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Warnung, "Spiegeln/Drehen fehlgeschlagen", ex);
+            Notification.Show("Befehl konnte nicht\r\nausgeführt werden.");
+        }
+
+
         OnZoomFit();
     }
 
-    private void btnDrehenR_Click(object sender, System.EventArgs e) {
-        _ausricht = false;
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        CollectGarbage();
-        pic.RotateFlip(RotateFlipType.Rotate90FlipNone);
-        OnOverridePic(pic, true);
-        OnZoomFit();
-    }
+    private void SpiegelnH_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.RotateNoneFlipY);
 
-    private void SpiegelnH_Click(object sender, System.EventArgs e) {
-        _ausricht = false;
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        CollectGarbage();
-        pic.RotateFlip(RotateFlipType.RotateNoneFlipY);
-        OnOverridePic(pic, true);
-        OnZoomFit();
-    }
-
-    private void SpiegelnV_Click(object sender, System.EventArgs e) {
-        _ausricht = false;
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        CollectGarbage();
-        pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
-        OnOverridePic(pic, true);
-        OnZoomFit();
-    }
+    private void SpiegelnV_Click(object sender, System.EventArgs e) => DoThis(RotateFlipType.RotateNoneFlipX);
 
     #endregion
 }

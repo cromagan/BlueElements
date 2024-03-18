@@ -304,7 +304,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnWeitere_Click(object sender, System.EventArgs e) {
-        var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty);
+        if (CFormula == null) { return; }
+
+        var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty, CFormula);
 
         if (l.Count == 0) { return; }
 

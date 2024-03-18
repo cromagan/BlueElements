@@ -64,7 +64,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     #region Constructors
 
-    protected AbstractPadItem(string internalname) : base(internalname) => MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
+    protected AbstractPadItem(string keyName) : base(keyName) => MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
 
     #endregion
 
@@ -200,7 +200,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return 0;
     }
 
-    //            case "internalname":
+    //            case "keyName":
     //                name = thisIt.Value;
     //                break;
     //        }

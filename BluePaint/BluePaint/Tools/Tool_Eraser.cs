@@ -45,7 +45,7 @@ public partial class Tool_Eraser : GenericTool {
         }
 
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic == null || e.Current == null) { return; }
 
         Point p1, p2;
         if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {

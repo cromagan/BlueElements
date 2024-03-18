@@ -53,18 +53,18 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Constructors
 
-    public TableViewPadItem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
+    public TableViewPadItem(string keyName, string toParse) : this(keyName) => this.Parse(toParse);
 
-    public TableViewPadItem(Database? db) : this(string.Empty, db) { }
+    public TableViewPadItem(Database? db) : this(string.Empty, db, null) { }
 
-    public TableViewPadItem(string intern, Database? db) : base(intern) {
+    public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public TableViewPadItem(string intern) : this(intern, null as Database) { }
+    public TableViewPadItem(string keyName) : this(keyName, null, null) { }
 
     #endregion
 

@@ -131,9 +131,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
-    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
-        //if (Script.Commands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
-
+    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection? varCol, LogData ld, ScriptProperties scp) {
         List<string> toSearch = [];
 
         #region Mögliche Methoden
@@ -148,8 +146,10 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         #region Mögliche Variablen
 
-        foreach (var thisv in varCol) {
-            toSearch.Add(thisv.KeyName + "=");
+        if (varCol != null) {
+            foreach (var thisv in varCol) {
+                toSearch.Add(thisv.KeyName + "=");
+            }
         }
 
         #endregion
@@ -180,7 +180,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     /// <param name="varCol"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection varCol, LogData ld) {
+    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection varCol, LogData? ld) {
         var posc = 0;
         var v = varCol.AllStringableNames();
 
@@ -228,12 +228,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
             if (mustBeVar) {
                 var varn = attributes[n];
-                //if (varn.StartsWith("~") && varn.EndsWith("~")) {
-                //    var tmp2 = Variable.GetVariableByParsing(varn.Substring(1, varn.Length - 2), s);
-                //    if (tmp2.Variable is not VariableString x) { return new SplittedAttributesFeedback(ScriptIssueType.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1), line); }
-                //    varn = x.ValueString;
-                //}
-
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
                 v = varcol?.Get(varn);

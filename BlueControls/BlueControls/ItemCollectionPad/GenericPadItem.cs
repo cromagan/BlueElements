@@ -39,12 +39,12 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
 
     #region Constructors
 
-    public GenericPadItem(string intern, string text, Size s) : base(intern) {
+    public GenericPadItem(string keyName, string text, Size s) : base(keyName) {
         _text = text;
         Size = s;
     }
 
-    public GenericPadItem(string intern) : this(intern, string.Empty, new Size(10, 10)) { }
+    public GenericPadItem(string keyName) : this(keyName, string.Empty, new Size(10, 10)) { }
 
     #endregion
 

@@ -47,7 +47,7 @@ public class ReadableListItem : TextListItem {
     private void Item_PropertyChanged(object sender, System.EventArgs e) {
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();
-        Internal = Item.KeyName;
+        KeyName = Item.KeyName;
         OnPropertyChanged(); // Um den Refresh zu bewirken
     }
 

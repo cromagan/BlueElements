@@ -52,7 +52,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     public ChildPadItem() : this(string.Empty) { }
 
-    public ChildPadItem(string internalname) : base(internalname) {
+    public ChildPadItem(string keyName) : base(keyName) {
         PadInternal = null; // new CreativePad();
         Seite = string.Empty;
         ZoomItems = null;

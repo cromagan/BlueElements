@@ -44,10 +44,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
     /// <remarks></remarks>
     private bool _enabled;
 
-    private string _internal = string.Empty;
-
     private bool _isCaption;
-
+    private string _keyName = string.Empty;
     private Size _sizeUntouchedForListBox = Size.Empty;
 
     private string _userDefCompareKey;
@@ -56,9 +54,9 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     #region Constructors
 
-    protected AbstractListItem(string internalname, bool enabled) {
-        Internal = string.IsNullOrEmpty(internalname) ? Generic.UniqueInternal() : internalname;
-        if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
+    protected AbstractListItem(string keyName, bool enabled) {
+        KeyName = string.IsNullOrEmpty(keyName) ? Generic.UniqueInternal() : keyName;
+        if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
         _enabled = enabled;
         Pos = Rectangle.Empty;
         _userDefCompareKey = string.Empty;
@@ -85,15 +83,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
-    public string Internal {
-        get => _internal;
-        set {
-            if (_internal == value) { return; }
-            _internal = value;
-            OnPropertyChanged();
-        }
-    }
-
     public bool IsCaption {
         get => _isCaption;
         protected set {
@@ -103,7 +92,14 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
-    public string KeyName => Internal;
+    public string KeyName {
+        get => _keyName;
+        set {
+            if (_keyName == value) { return; }
+            _keyName = value;
+            OnPropertyChanged();
+        }
+    }
 
     public abstract string QuickInfo { get; }
 
@@ -122,15 +118,15 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     #endregion
 
-    #region Methods
+    //public void CloneBasicStatesFrom(AbstractListItem sourceItem) {
+    //    Enabled = sourceItem.Enabled;
+    //    Tag = sourceItem.Tag;
+    //    UserDefCompareKey = sourceItem.UserDefCompareKey;
+    //    KeyName = sourceItem.KeyName;
+    //    IsCaption = sourceItem.IsCaption;
+    //}
 
-    public void CloneBasicStatesFrom(AbstractListItem sourceItem) {
-        Enabled = sourceItem.Enabled;
-        Tag = sourceItem.Tag;
-        UserDefCompareKey = sourceItem.UserDefCompareKey;
-        Internal = sourceItem.Internal;
-        IsCaption = sourceItem.IsCaption;
-    }
+    #region Methods
 
     ///// <summary>
     ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
@@ -184,7 +180,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
-    public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
+    public virtual bool FilterMatch(string filterText) => KeyName.ToUpper().Contains(filterText.ToUpper());
 
     public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign);
 

@@ -51,7 +51,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     #region Constructors
 
-    protected FixedRectanglePadItem(string internalname) : base(internalname) {
+    protected FixedRectanglePadItem(string keyName) : base(keyName) {
         _pLo = new PointM(this, "LO", 0, 0);
         _pRo = new PointM(this, "RO", 0, 0);
         _pRu = new PointM(this, "RU", 0, 0);

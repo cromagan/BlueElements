@@ -55,7 +55,9 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     #region Constructors
 
-    public TextGeneratorPadItem(string internalname) : base(internalname) {
+    public TextGeneratorPadItem(string keyName) : this(keyName, null as ConnectedFormula.ConnectedFormula) { }
+
+    public TextGeneratorPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }

@@ -52,18 +52,14 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     #region Constructors
 
-    public FilterConverterElementPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
+    public FilterConverterElementPadItem(string keyName) : this(keyName, null, null) { }
 
-    public FilterConverterElementPadItem(Database? db) : this(string.Empty, db) { }
-
-    public FilterConverterElementPadItem(string intern, Database? db) : base(intern) {
+    public FilterConverterElementPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
-
-    public FilterConverterElementPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 

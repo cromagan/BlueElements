@@ -29,7 +29,7 @@ public class LineListItem : AbstractListItem {
 
     #region Constructors
 
-    public LineListItem(string internalname, string userDefCompareKey) : base(internalname, true) => UserDefCompareKey = userDefCompareKey;
+    public LineListItem(string keyName, string userDefCompareKey) : base(keyName, true) => UserDefCompareKey = userDefCompareKey;
 
     #endregion
 

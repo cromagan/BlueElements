@@ -34,7 +34,7 @@ public static class AbstractListItemExtension {
 
     #region Methods
 
-    public static TextListItem Item(string internalAndReadableText) => ItemOf(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
+    public static TextListItem Item(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);
 
@@ -170,37 +170,37 @@ public static class AbstractListItemExtension {
     /// </summary>
     public static RowFormulaListItem ItemOf(RowItem row, string layoutId) => ItemOf(row, layoutId, string.Empty);
 
-    public static BitmapListItem ItemOf(string filename, string internalname, string caption) => new(filename, internalname, caption);
+    public static BitmapListItem ItemOf(string filename, string keyName, string caption) => new(filename, keyName, caption);
 
     public static BitmapListItem ItemOf(Bitmap? bmp, string caption) => new(bmp, string.Empty, caption);
 
-    public static TextListItem ItemOf(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) => new(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) => new(readableText, keyName, symbol, isCaption, enabled, userDefCompareKey);
 
-    public static TextListItem ItemOf(string readableText, string internalname, ImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => ItemOf(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
 
-    public static TextListItem ItemOf(string readableText, string internalname, QuickImage? symbol) => ItemOf(readableText, internalname, symbol, false, true, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol) => ItemOf(readableText, keyName, symbol, false, true, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string internalname, ImageCode symbol) => ItemOf(readableText, internalname, symbol, false, true, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol) => ItemOf(readableText, keyName, symbol, false, true, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string internalname) => ItemOf(readableText, internalname, null, false, true, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName) => ItemOf(readableText, keyName, null, false, true, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string internalname, QuickImage? symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, internalname, symbol, false, enabled, userDefCompareKey);
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, symbol, false, enabled, userDefCompareKey);
 
-    public static TextListItem ItemOf(string readableText, string internalname, QuickImage? symbol, bool enabled) => ItemOf(readableText, internalname, symbol, false, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string internalname, ImageCode symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, internalname, symbol, false, enabled, userDefCompareKey);
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, symbol, false, enabled, userDefCompareKey);
 
-    public static TextListItem ItemOf(string readableText, string internalname, ImageCode symbol, bool enabled) => ItemOf(readableText, internalname, symbol, false, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string internalname, bool enabled) => ItemOf(readableText, internalname, null, false, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, bool enabled) => ItemOf(readableText, keyName, null, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string internalAndReadableText, ImageCode symbol) => ItemOf(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
+    public static TextListItem ItemOf(string keyNameAndReadableText, ImageCode symbol) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, symbol, false, true, string.Empty);
 
-    public static TextListItem ItemOf(string internalAndReadableText, SortierTyp format) => ItemOf(internalAndReadableText, internalAndReadableText, null, false, true, internalAndReadableText.CompareKey(format));
+    public static TextListItem ItemOf(string keyNameAndReadableText, SortierTyp format) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, keyNameAndReadableText.CompareKey(format));
 
-    public static TextListItem ItemOf(string internalAndReadableText, bool isCaption) => ItemOf(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
+    public static TextListItem ItemOf(string keyNameAndReadableText, bool isCaption) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, isCaption, true, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string internalname, bool isCaption, string userDefCompareKey) => ItemOf(readableText, internalname, null, isCaption, true, userDefCompareKey);
+    public static TextListItem ItemOf(string readableText, string keyName, bool isCaption, string userDefCompareKey) => ItemOf(readableText, keyName, null, isCaption, true, userDefCompareKey);
 
     /// <summary>
     /// Fügt das übergebende Object den Tags hinzu.

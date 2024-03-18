@@ -489,7 +489,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
                 thisIt.Page = "Head";
             }
 
-            if (thisIt is IHasConnectedFormula itcf) {
+            if (thisIt is FakeControlPadItem itcf) {
                 itcf.CFormula = this;
             }
         }
@@ -547,7 +547,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         if (File.Exists(Filename)) {
             foreach (var thisf in Directory.GetFiles(Filename.FilePath(), "*.cfo")) {
                 if (!notAllowedChilds.Contains(thisf)) {
-                    list.Add(ItemOf(thisf, ImageCode.Diskette));
+                    list.Add(ItemOf(thisf.FileNameWithoutSuffix(), thisf, ImageCode.Diskette));
                 }
             }
         }
