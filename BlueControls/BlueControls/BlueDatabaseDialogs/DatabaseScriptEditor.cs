@@ -65,6 +65,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 "### ACHTUNG - EINMALIGE ANZEIGE ###",
                 "Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
                 "Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                "Datenbank: " + Database.Caption,
                 " ",
                 " ",
                 "Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",

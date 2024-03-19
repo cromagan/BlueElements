@@ -180,18 +180,18 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
 
     private void SetStandardValues() {
         var l = GenericControl.Typ(Parent);
-        if (_groupBoxStyle == GroupBoxStyle.RibbonBar) { l = PartentType.RibbonPage; }
+        if (_groupBoxStyle == GroupBoxStyle.RibbonBar) { l = ParentType.RibbonPage; }
         switch (l) {
-            case PartentType.RibbonPage:
+            case ParentType.RibbonPage:
                 GroupBoxStyle = GroupBoxStyle.RibbonBar;
                 base.BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
                 break;
 
-            case PartentType.TabPage:
+            case ParentType.TabPage:
                 base.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
                 break;
 
-            case PartentType.Form:
+            case ParentType.Form:
                 base.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
                 break;
         }

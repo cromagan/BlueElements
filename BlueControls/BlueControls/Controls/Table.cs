@@ -2540,6 +2540,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         box.Tag = new List<object?> { cellInThisDatabaseColumn, cellInThisDatabaseRow };
 
         if (box is ComboBox cbox) {
+            cbox.ItemClear();
             cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000));
             if (cbox.ItemCount == 0) {
                 return Cell_Edit_TextBox(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
@@ -3331,9 +3332,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         SliderX.Enabled = SliderX.Maximum > 0;
     }
 
-    private void SliderX_ValueChanged(object sender, System.EventArgs e) => Invalidate();
+    private void SliderX_ValueChanged(object sender, System.EventArgs e) {
+        CloseAllComponents();
+        Invalidate();
+    }
 
-    private void SliderY_ValueChanged(object sender, System.EventArgs e) => Invalidate();
+    private void SliderY_ValueChanged(object sender, System.EventArgs e) {
+        CloseAllComponents();
+        Invalidate();
+    }
 
     private RowSortDefinition? SortUsed() => _sortDefinitionTemporary?.Columns != null
         ? _sortDefinitionTemporary

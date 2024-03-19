@@ -147,7 +147,6 @@
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />
-    <Compile Include="EventArgs\RowScriptCancelEventArgs.cs" />
     <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
     <Compile Include="EventArgs\ProgressbarEventArgs.cs" />
     <Compile Include="EventArgs\RowEventArgs.cs" />

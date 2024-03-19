@@ -99,14 +99,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
                 _clickFirerer.Tick += ClickFirerer_Tick;
             }
 
-            if (DesignMode) { DisableOtherOptionButtons(); }
-
-            if (Parent is Slider) {
-                SetNotFocusable();
-            } else {
-                SetStyle(ControlStyles.Selectable, true);
-            }
-            CheckType();
+            DoButtonWorks();
 
             Invalidate();
         }
@@ -136,18 +129,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
         }
     }
 
-    //[Category("Darstellung")]
-    //[DefaultValue("")]
-    //[Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
-    //public string ImageCode_Checked {
-    //    get => _imageCodeChecked;
-    //    set {
-    //        if (_imageCodeChecked == value) { return; }
-    //        _imageCodeChecked = value;
-    //        Invalidate();
-    //    }
-    //}
-
     [DefaultValue("")]
     public new string Text {
         get => _text;
@@ -164,21 +145,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
     #endregion
 
     #region Methods
-
-    public void CheckType() {
-        if (_buttonStyle.HasFlag(ButtonStyle.Text)) { return; }
-
-        var par = ParentType();
-
-        if (par is PartentType.RibbonGroupBox or PartentType.RibbonPage) {
-            if (!_buttonStyle.HasFlag(ButtonStyle.Button_Big)) { _buttonStyle |= ButtonStyle.Button_Big; }
-            if (!_buttonStyle.HasFlag(ButtonStyle.Borderless)) { _buttonStyle |= ButtonStyle.Borderless; }
-        }
-
-        if (par is PartentType.ComboBox) { _buttonStyle = ButtonStyle.ComboBoxButton; }
-        if (par is PartentType.RibbonBarCombobox) { _buttonStyle = ButtonStyle.ComboBoxButton_Borderless; }
-        if (par is PartentType.Slider) { _buttonStyle = ButtonStyle.SliderButton; }
-    }
 
     internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? qi, Alignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
         var design = Skin.DesignOf(buttontype, state);
@@ -221,13 +187,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
             etxt.Draw(gr, 1);
         }
     }
-
-    //internal static Size StandardSize(string text, QuickImage? qi) {
-    //    var s = ((Font)Skin.GetBlueFont(Design.Button_CheckBox, States.Standard)).FormatedText_NeededSize(text, qi, 16);
-    //    s.Width += 10;
-    //    s.Height += 4;
-    //    return s;
-    //}
 
     protected override void DrawControl(Graphics gr, States state) {
         try {
@@ -309,6 +268,12 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
         } catch { }
     }
 
+    //internal static Size StandardSize(string text, QuickImage? qi) {
+    //    var s = ((Font)Skin.GetBlueFont(Design.Button_CheckBox, States.Standard)).FormatedText_NeededSize(text, qi, 16);
+    //    s.Width += 10;
+    //    s.Height += 4;
+    //    return s;
+    //}
     protected override void OnClick(System.EventArgs e) {
         // Click wird vor dem MouseUpEreigniss ausgelöst
         if (_isFireing || IsDisposed || !Enabled || _clickFired) { return; }
@@ -334,15 +299,13 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     protected override void OnCreateControl() {
         base.OnCreateControl();
-        CheckType();
+        DoButtonWorks();
     }
 
     protected override void OnLocationChanged(System.EventArgs e) {
         base.OnLocationChanged(e);
 
-        CheckType();
-
-        if (DesignMode) { DisableOtherOptionButtons(); }
+        DoButtonWorks();
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
@@ -383,6 +346,11 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
         Invalidate();
     }
 
+    protected override void OnParentChanged(System.EventArgs e) {
+        base.OnParentChanged(e);
+        DoButtonWorks();
+    }
+
     private void ClickFirerer_Tick(object? sender, System.EventArgs e) {
         if (_buttonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
             // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
@@ -407,6 +375,29 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
                 if (tmpButton.ButtonStyle.HasFlag(ButtonStyle.Optionbox) && tmpButton != this && tmpButton.Checked) { tmpButton.Checked = false; }
             }
         }
+    }
+
+    private void DoButtonWorks() {
+        if (DesignMode) { DisableOtherOptionButtons(); }
+
+        var par = GetParentType();
+
+        if (par == ParentType.Slider) {
+            SetNotFocusable();
+            _buttonStyle = ButtonStyle.SliderButton;
+        } else {
+            SetStyle(ControlStyles.Selectable, true);
+        }
+
+        if (_buttonStyle.HasFlag(ButtonStyle.Text)) { return; }
+
+        if (par is ParentType.RibbonGroupBox or ParentType.RibbonPage) {
+            if (!_buttonStyle.HasFlag(ButtonStyle.Button_Big)) { _buttonStyle |= ButtonStyle.Button_Big; }
+            if (!_buttonStyle.HasFlag(ButtonStyle.Borderless)) { _buttonStyle |= ButtonStyle.Borderless; }
+        }
+
+        if (par == ParentType.ComboBox) { _buttonStyle = ButtonStyle.ComboBoxButton; }
+        if (par == ParentType.RibbonBarCombobox) { _buttonStyle = ButtonStyle.ComboBoxButton_Borderless; }
     }
 
     private void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);

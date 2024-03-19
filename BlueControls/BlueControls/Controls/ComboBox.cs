@@ -244,7 +244,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         btnDropDown.Enabled = _item.Count > 0;
         var vType = Design.ComboBox_Textbox;
-        if (ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage) {
+        if (GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage) {
             vType = Design.Ribbon_ComboBox_Textbox;
         }
 
@@ -287,7 +287,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         btnDropDown.Invalidate();
     }
 
-    protected override Design GetDesign() => ParentType() is PartentType.RibbonGroupBox or PartentType.RibbonPage
+    protected override Design GetDesign() => GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage
         ? Design.Ribbon_ComboBox_Textbox
         : Design.ComboBox_Textbox;
 

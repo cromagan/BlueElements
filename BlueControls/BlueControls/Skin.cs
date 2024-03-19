@@ -1328,6 +1328,7 @@ public static class Skin {
         Design.Add(Enums.Design.Button_ComboBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_ComboBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, -3, -3, -3, -3, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_ComboBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, -3, -3, -3, -3, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
+
         Design.Add(Enums.Design.Button_Slider_Waagerecht, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CDCDCD", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_Slider_Waagerecht, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CECECE", string.Empty, RahmenArt.Solide_3px, "B7B7B7", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_Slider_Waagerecht, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
@@ -1336,13 +1337,15 @@ public static class Skin {
         Design.Add(Enums.Design.Button_Slider_Senkrecht, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CECECE", string.Empty, RahmenArt.Solide_3px, "B7B7B7", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_Slider_Senkrecht, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_Slider_Senkrecht, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CECECE", string.Empty, RahmenArt.Solide_3px, "B7B7B7", string.Empty, string.Empty, "");
+
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Button_SliderDesign, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, "");
-        Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, "");
+        //Design.Add(Enums.Design.Button_SliderDesign, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, "");
+        Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, "B6B6B6", string.Empty, string.Empty, "");
-        Design.Add(Enums.Design.Button_SliderDesign, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, "");
-        Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, "");
+        //Design.Add(Enums.Design.Button_SliderDesign, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, "");
+        //Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, "");
+
         Design.Add(Enums.Design.Button_EckpunktSchieber, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_EckpunktSchieber, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, string.Empty, "");
         Design.Add(Enums.Design.Button_EckpunktSchieber_Phantom, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, "");

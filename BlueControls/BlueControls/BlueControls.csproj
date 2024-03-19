@@ -241,7 +241,7 @@
     <Compile Include="Enums\Design.cs" />
     <Compile Include="Enums\FilterTypesToShow.cs" />
     <Compile Include="Enums\GroupBoxStyle.cs" />
-    <Compile Include="Enums\PartentType.cs" />
+    <Compile Include="Enums\ParentType.cs" />
     <Compile Include="Enums\Helpers.cs" />
     <Compile Include="Enums\Symbol.cs" />
     <Compile Include="Enums\TableDrawColumn.cs" />

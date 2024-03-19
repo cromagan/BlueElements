@@ -200,7 +200,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
 
-    public event EventHandler<RowScriptCancelEventArgs>? ScriptError;
+    public event EventHandler? ScriptMessageChanged;
 
     public event EventHandler? SortParameterChanged;
 
@@ -302,6 +302,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         set {
             if (_eventScriptErrorMessage == value) { return; }
             _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, UserName, DateTime.UtcNow, string.Empty);
+            OnScriptMessageChanged();
         }
     }
 
@@ -1941,9 +1942,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
-    public void OnScriptError(RowScriptCancelEventArgs e) {
+    public void OnScriptMessageChanged() {
         if (IsDisposed) { return; }
-        ScriptError?.Invoke(this, e);
+        ScriptMessageChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnViewChanged() {

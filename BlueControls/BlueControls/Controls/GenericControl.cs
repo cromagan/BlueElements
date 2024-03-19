@@ -50,7 +50,7 @@ public class GenericControl : Control {
 
     private bool _mousePressing;
 
-    private PartentType _myParentType = PartentType.Unbekannt;
+    private ParentType _myParentType = ParentType.Unbekannt;
 
     private Form? _pform;
 
@@ -139,92 +139,92 @@ public class GenericControl : Control {
         } while (true);
     }
 
-    public static PartentType Typ(Control control) {
+    public static ParentType Typ(Control control) {
         switch (control) {
             case null:
-                return PartentType.Nothing;
+                return ParentType.Nothing;
 
             case GroupBox: {
                     if (control.Parent is TabPage tp) {
-                        if (tp.Parent == null) { return PartentType.Unbekannt; }
-                        if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
+                        if (tp.Parent == null) { return ParentType.Unbekannt; }
+                        if (tp.Parent is RibbonBar) { return ParentType.RibbonGroupBox; }
                     }
-                    return PartentType.GroupBox;
+                    return ParentType.GroupBox;
                 }
 
             case LastFilesCombo:
-                return PartentType.LastFilesCombo;
+                return ParentType.LastFilesCombo;
             //Is = "BlueBasics.ComboBox"
 
-            case ComboBox box when box.ParentType() == PartentType.RibbonPage:
-                return PartentType.RibbonBarCombobox;
+            case ComboBox box when box.GetParentType() == ParentType.RibbonPage:
+                return ParentType.RibbonBarCombobox;
 
             case ComboBox:
-                return PartentType.ComboBox;
+                return ParentType.ComboBox;
             // Is = "BlueBasics.TabControl"
 
             case RibbonBar:
-                return PartentType.RibbonControl;
+                return ParentType.RibbonControl;
 
             case TabControl:
-                return PartentType.TabControl;
+                return ParentType.TabControl;
             // Is = "BlueBasics.TabPage"
 
             case TabPage when control.Parent is RibbonBar:
-                return PartentType.RibbonPage;
+                return ParentType.RibbonPage;
 
             case TabPage:
-                return PartentType.TabPage;
+                return ParentType.TabPage;
             //Is = "BlueBasics.Slider"
 
             case Slider:
-                return PartentType.Slider;
+                return ParentType.Slider;
             //Is = "FRMMSGBOX"
 
             case Forms.FloatingForm:
-                return PartentType.MsgBox;
+                return ParentType.MsgBox;
 
             case Forms.DialogWithOkAndCancel:
-                return PartentType.MsgBox;
+                return ParentType.MsgBox;
 
             case TextBox:
-                return PartentType.TextBox;
+                return ParentType.TextBox;
 
             case ListBox:
-                return PartentType.ListBox;
+                return ParentType.ListBox;
 
             case EasyPic:
-                return PartentType.EasyPic;
+                return ParentType.EasyPic;
 
             case Button:
-                return PartentType.Button;
+                return ParentType.Button;
 
             case Line:
-                return PartentType.Line;
+                return ParentType.Line;
 
             case Caption:
-                return PartentType.Caption;
+                return ParentType.Caption;
 
             //case Formula:
-            //    return PartentType.Formula;
+            //    return ParentType.Formula;
 
             case Forms.Form:
-                return PartentType.Form;
+                return ParentType.Form;
 
             case Table:
-                return PartentType.Table;
+                return ParentType.Table;
 
             case Panel:
-                return PartentType.Panel;
+                return ParentType.Panel;
 
             case FlexiControlForCell:
-                return PartentType.FlexiControlForCell;
+                return ParentType.FlexiControlForCell;
 
             case FlexiControl:
-                return PartentType.FlexiControl;
+                return ParentType.FlexiControl;
 
             default:
-                return PartentType.Nothing;
+                return ParentType.Nothing;
         }
     }
 
@@ -312,6 +312,13 @@ public class GenericControl : Control {
     }
 
     protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+    protected ParentType GetParentType() {
+        if (Parent == null) { return ParentType.Unbekannt; }
+        if (_myParentType != ParentType.Unbekannt) { return _myParentType; }
+        _myParentType = Typ(Parent);
+        return _myParentType;
+    }
 
     //MyBase.ScaleChildren
     protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
@@ -464,13 +471,6 @@ public class GenericControl : Control {
     }
 
     protected Form? ParentForm() => ParentForm(Parent);
-
-    protected PartentType ParentType() {
-        if (Parent == null) { return PartentType.Unbekannt; }
-        if (_myParentType != PartentType.Unbekannt) { return _myParentType; }
-        _myParentType = Typ(Parent);
-        return _myParentType;
-    }
 
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 

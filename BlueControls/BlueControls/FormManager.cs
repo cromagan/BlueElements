@@ -33,8 +33,8 @@ public class FormManager : ApplicationContext {
 
     #region Fields
 
+    public static readonly List<Form> Forms = [];
     public static DExecuteAtEnd? ExecuteAtEnd = null;
-    private static readonly List<Form> Forms = [];
 
     //public static dNewModeSelectionForm? NewModeSelectionForm = null;
     private static FormManager? _current;

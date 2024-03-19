@@ -19,7 +19,7 @@
 
 namespace BlueControls.Enums;
 
-public enum PartentType {
+public enum ParentType {
     Unbekannt = -1,
     Nothing = 1,
     GroupBox = 2,

@@ -272,19 +272,19 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             case Design.Form_AutoFilter:
                 return;
         }
-        switch (ParentType()) {
-            case PartentType.RibbonGroupBox:
-            case PartentType.RibbonPage:
+        switch (GetParentType()) {
+            case ParentType.RibbonGroupBox:
+            case ParentType.RibbonPage:
                 _design = Design.Ribbonbar_Caption;
                 break;
 
-            //case PartentType.GroupBox:
-            //case PartentType.TabPage:
-            //case PartentType.Form:
-            //case PartentType.FlexiControlForCell:
-            //case PartentType.Unbekannt: // UserForms und anderes
-            //case PartentType.Nothing: // UserForms und anderes
-            //case PartentType.ListBox:
+            //case ParentType.GroupBox:
+            //case ParentType.TabPage:
+            //case ParentType.Form:
+            //case ParentType.FlexiControlForCell:
+            //case ParentType.Unbekannt: // UserForms und anderes
+            //case ParentType.Nothing: // UserForms und anderes
+            //case ParentType.ListBox:
             //    _design = Design.Caption;
             //    return;
 
