@@ -548,6 +548,7 @@ internal sealed partial class ColumnEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(Database.UniqueKeyValue());
+            db.LogUndo = false;
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 

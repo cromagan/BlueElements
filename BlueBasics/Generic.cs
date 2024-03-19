@@ -275,18 +275,14 @@ public static class Generic {
         }
     }
 
-    public static void Pause(double sekunden, bool doEvents) {
-        if (sekunden <= 0) { return; }
-        //if (!doEvents) {
-        //    Thread.Sleep((int)(sekunden * 1000));
-        //    return;
-        //}
-        TimeSpan akTimer;
-        var firstTimer = DateTime.UtcNow;
-        do {
-            if (doEvents) { Develop.DoEvents(); }
-            akTimer = DateTime.UtcNow.Subtract(firstTimer);
-        } while (akTimer.TotalSeconds < sekunden);
+    public static void Pause(double seconds, bool allowEvents) {
+        if (seconds <= 0) { return; }
+
+        long endTicks = Environment.TickCount + (long)(seconds * 1000);
+
+        while (Environment.TickCount < endTicks) {
+            if (allowEvents) { Develop.DoEvents(); }
+        }
     }
 
     public static int PointOnScreenNr(Point pointToCheck) {

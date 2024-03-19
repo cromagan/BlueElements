@@ -22,7 +22,10 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Constants;
@@ -191,6 +194,68 @@ public static partial class Extensions {
         }
 
         return returnValue;
+    }
+
+    public static string? Decrypt(this string cipherText, string key) {
+
+
+        byte[] array;
+
+        key = (key + "!äQsWERadf§$%öü,");
+        var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
+
+         
+
+       try {
+            var iv = new byte[16];
+            var buffer = Convert.FromBase64String(cipherText);
+
+            key = (key + "!äQsWERadf§$%öü,").Substring(0, 16);
+
+            using var aes = Aes.Create();
+                aes.KeySize = 128;
+                aes.BlockSize = 128;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+                aes.Key = keyBytes.GetBytes(aes.KeySize / 8);
+                aes.IV = new byte[aes.BlockSize / 8];
+                var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+            using var memoryStream = new MemoryStream(buffer);
+            using var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);
+            using var streamReader = new StreamReader(cryptoStream);
+            return streamReader.ReadToEnd();
+        } catch { return null; }
+    }
+
+    public static string? Encrypt(this string plainText, string key) {
+        try {
+            byte[] array;
+
+            key = (key + "!äQsWERadf§$%öü,");
+            var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
+
+            using (var aes = Aes.Create()) {
+                aes.KeySize = 128;
+                aes.BlockSize = 128;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+                aes.Key = keyBytes.GetBytes(aes.KeySize / 8);
+                aes.IV = new byte[aes.BlockSize / 8];
+
+                var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                using var memoryStream = new MemoryStream();
+                using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
+                using (var streamWriter = new StreamWriter(cryptoStream)) {
+                    streamWriter.Write(plainText);
+                }
+
+                array = memoryStream.ToArray();
+            }
+
+            return Convert.ToBase64String(array);
+        } catch { return null; }
     }
 
     /// <summary>

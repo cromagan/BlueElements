@@ -117,16 +117,17 @@ public partial class VariableEditor : UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(Database.UniqueKeyValue());
-        x.DropMessages = false;
-        var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
-        _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
-        _ = x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
+        Database db = new(Database.UniqueKeyValue());
+        db.LogUndo = false;
+        db.DropMessages = false;
+        var na = db.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
+        _ = db.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
+        _ = db.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
         //_ = x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
-        var inh = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
-        var kom = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
+        var inh = db.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
+        var kom = db.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
-        foreach (var thisColumn in x.Column) {
+        foreach (var thisColumn in db.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
                 thisColumn.TextBearbeitungErlaubt = false;
@@ -134,7 +135,7 @@ public partial class VariableEditor : UserControl {
             }
         }
 
-        x.Column.GenerateAndAddSystem();
+        db.Column.GenerateAndAddSystem();
 
         if (Editabe) {
             var l = new List<ColumnItem?> { na, inh, kom };
@@ -151,11 +152,11 @@ public partial class VariableEditor : UserControl {
             if (inh != null) { inh.Caption = "Inhalt"; }
             if (kom != null) { kom.Caption = "Kommentar"; }
 
-            x.PermissionGroupsNewRow = new(new List<string> { Constants.Everybody });
+            db.PermissionGroupsNewRow = new(new List<string> { Constants.Everybody });
         }
 
-        x.RepairAfterParse();
-        var car = x.ColumnArrangements.CloneWithClones();
+        db.RepairAfterParse();
+        var car = db.ColumnArrangements.CloneWithClones();
 
         //if (car != null) {
         if (Editabe) {
@@ -164,17 +165,17 @@ public partial class VariableEditor : UserControl {
             car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         }
 
-        x.ColumnArrangements = new(car);
+        db.ColumnArrangements = new(car);
 
-        x.SortDefinition = new RowSortDefinition(x, "Name", true);
+        db.SortDefinition = new RowSortDefinition(db, "Name", true);
 
         //if (!Editabe) { x.Freeze("Nur Ansicht"); }
 
-        tableVariablen.DatabaseSet(x, string.Empty);
+        tableVariablen.DatabaseSet(db, string.Empty);
         //tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;
 
-        x.Cell.CellValueChanged += TableVariablen_CellValueChanged;
+        db.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
     private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {

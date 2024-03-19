@@ -355,7 +355,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
 
-    public bool LogUndo => true;
+    public bool LogUndo { get; set; } = true;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);
@@ -777,6 +777,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var d = GetEmmbedResource(assembly, name);
         if (d != null) {
             var db = new Database(name);
+            db.LogUndo = false;
             db.LoadFromStream(d);
             return db;
         }
@@ -2648,7 +2649,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static bool CriticalState() {
         foreach (var thisDb in AllFiles) {
             if (!thisDb.IsDisposed) {
-                if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
+                //if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
                 if (thisDb.IsInCache.Year < 2000 && !string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Datenbank wird aktuell geladen
             }
         }

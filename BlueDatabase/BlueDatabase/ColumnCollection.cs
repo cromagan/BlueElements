@@ -457,7 +457,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var f = Add(c);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            if (reason == Reason.SetCommand) {
+            if (reason == Reason.SetCommand && db.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
 
