@@ -197,29 +197,25 @@ public static partial class Extensions {
     }
 
     public static string? Decrypt(this string cipherText, string key) {
-
-
         byte[] array;
 
         key = (key + "!äQsWERadf§$%öü,");
         var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
-         
-
-       try {
+        try {
             var iv = new byte[16];
             var buffer = Convert.FromBase64String(cipherText);
 
             key = (key + "!äQsWERadf§$%öü,").Substring(0, 16);
 
             using var aes = Aes.Create();
-                aes.KeySize = 128;
-                aes.BlockSize = 128;
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.PKCS7;
-                aes.Key = keyBytes.GetBytes(aes.KeySize / 8);
-                aes.IV = new byte[aes.BlockSize / 8];
-                var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+            aes.KeySize = 128;
+            aes.BlockSize = 128;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.Key = keyBytes.GetBytes(aes.KeySize / 8);
+            aes.IV = new byte[aes.BlockSize / 8];
+            var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
             using var memoryStream = new MemoryStream(buffer);
             using var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);

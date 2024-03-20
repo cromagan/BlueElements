@@ -256,17 +256,24 @@ public static class AbstractListItemExtension {
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
         var l = new List<AbstractListItem>();
 
+        List<string> cl = [""];
+
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
                 var co = ItemOf(thisColumnItem);
 
                 if (doCaptionSort) {
-                    co.UserDefCompareKey = thisColumnItem.Ueberschriften + Constants.SecondSortChar + thisColumnItem.KeyName;
+                    var capt = thisColumnItem.Ueberschriften ?? string.Empty;
 
-                    var capt = thisColumnItem.Ueberschriften;
+                    co.UserDefCompareKey = capt + Constants.SecondSortChar + thisColumnItem.KeyName;
 
-                    l.Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
+                    if (!cl.Contains(capt)) {
+                        cl.Add(capt);
+                        l.Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
+                    }
                 }
+
+                l.Add(co);
             }
         }
 

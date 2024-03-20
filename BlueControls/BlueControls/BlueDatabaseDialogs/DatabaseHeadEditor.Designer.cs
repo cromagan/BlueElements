@@ -27,6 +27,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.grpBenutzergruppen = new BlueControls.Controls.GroupBox();
+            this.btnDummyAdmin = new BlueControls.Controls.Button();
             this.PermissionGroups_NewRow = new BlueControls.Controls.ListBox();
             this.capNeueZeilenInfo = new BlueControls.Controls.Caption();
             this.Caption22 = new BlueControls.Controls.Caption();
@@ -65,7 +66,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.btnDummyAdmin = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -103,6 +103,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpBenutzergruppen.TabIndex = 2;
             this.grpBenutzergruppen.TabStop = false;
             this.grpBenutzergruppen.Text = "Benutzergruppen:";
+            // 
+            // btnDummyAdmin
+            // 
+            this.btnDummyAdmin.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.btnDummyAdmin.Checked = true;
+            this.btnDummyAdmin.Enabled = false;
+            this.btnDummyAdmin.Location = new System.Drawing.Point(192, 48);
+            this.btnDummyAdmin.Name = "btnDummyAdmin";
+            this.btnDummyAdmin.Size = new System.Drawing.Size(176, 16);
+            this.btnDummyAdmin.TabIndex = 17;
+            this.btnDummyAdmin.Text = "#Administrator";
             // 
             // PermissionGroups_NewRow
             // 
@@ -193,7 +204,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // lbxSortierSpalten
             // 
             this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
-            this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.lbxSortierSpalten.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox;
+            this.lbxSortierSpalten.AutoSort = false;
+            this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
             this.lbxSortierSpalten.FilterText = null;
             this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
             this.lbxSortierSpalten.MoveAllowed = true;
@@ -527,17 +540,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.TabIndex = 3;
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
-            // 
-            // btnDummyAdmin
-            // 
-            this.btnDummyAdmin.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnDummyAdmin.Checked = true;
-            this.btnDummyAdmin.Enabled = false;
-            this.btnDummyAdmin.Location = new System.Drawing.Point(192, 48);
-            this.btnDummyAdmin.Name = "btnDummyAdmin";
-            this.btnDummyAdmin.Size = new System.Drawing.Size(176, 16);
-            this.btnDummyAdmin.TabIndex = 17;
-            this.btnDummyAdmin.Text = "#Administrator";
             // 
             // DatabaseHeadEditor
             // 

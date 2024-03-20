@@ -69,10 +69,10 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         //Höhe.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
         //   Format.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Width.ToString & ";" & _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
         // Zufuhr.Text = _PrintDocument1.
-        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
-        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
-        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
-        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
+        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
+        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
+        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
+        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
         DrawSampleAndCheckButton();
         // PrepareForShowing(Controls)
         _doing = false;

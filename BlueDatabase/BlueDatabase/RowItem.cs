@@ -309,9 +309,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem? column, string value, string comment) => Database?.Cell.Set(column, this, value, comment);
 
-    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture), comment);
+    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture), comment);
 
-    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture), comment);
+    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture), comment);
 
     public void CellSet(string columnName, int value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(), comment);
 

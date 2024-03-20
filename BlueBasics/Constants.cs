@@ -40,7 +40,7 @@ public static class Constants {
     public const string Char_Numerals = "0123456789";
     public const string Char_PfadSonderZeichen = "*?\"<>|\r\n";
     public const string Everybody = "#Everybody";
-    public const char FirstSortChar = '-';
+    public const char FirstSortChar = '+';
     public const string Format_Date = "yyyy/MM/dd HH:mm:ss.fff";
     public const string Format_Date10 = "yyyy_MM_dd";
     public const string Format_Date2 = "yyyy/MM/dd HH:mm:ss";
@@ -63,7 +63,7 @@ public static class Constants {
     public const string Format_Integer4 = "0000";
     public const string Format_Integer5 = "00000";
     public const string Format_Integer7 = "0000000";
-    public const char SecondSortChar = 'X';
+    public const char SecondSortChar = '-';
     public static readonly int AutoFilterSize = 22;
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));

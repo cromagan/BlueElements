@@ -122,7 +122,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbTags.Text = db.Tags.JoinWithCr();
 
         txbCaption.Text = db.Caption;
-        txbGlobalScale.Text = db.GlobalScale.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture);
+        txbGlobalScale.Text = db.GlobalScale.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
         txbAdditionalFiles.Text = db.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = db.StandardFormulaFile;
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
@@ -131,7 +131,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         DatenbankAdmin.ItemAddRange(Database.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, false));
+        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, true));
 
         variableEditor.WriteVariablesToTable(Database?.Variables);
 

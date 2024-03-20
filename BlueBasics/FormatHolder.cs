@@ -128,7 +128,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
         Regex = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
-        AllowedChars = Constants.Char_Numerals + ",-",
+        AllowedChars = Constants.Char_Numerals + ".,-",
         Suffix = string.Empty,
         Prefix = string.Empty,
         FormatierungErlaubt = false,
@@ -142,7 +142,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
         Regex = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
-        AllowedChars = Constants.Char_Numerals + ",-",
+        AllowedChars = Constants.Char_Numerals + ".,",
         Suffix = string.Empty,
         Prefix = string.Empty,
         FormatierungErlaubt = false,
@@ -168,7 +168,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder IntegerPositive = new("Integer only Positive") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^(([1-9]\d*)|0)$",
-        AllowedChars = Constants.Char_Numerals + "-",
+        AllowedChars = Constants.Char_Numerals,
         Suffix = string.Empty,
         Prefix = string.Empty,
         FormatierungErlaubt = false,
