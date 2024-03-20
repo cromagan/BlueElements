@@ -142,51 +142,17 @@ public class VariableCollection : IEnumerable<Variable> {
         return true;
     }
 
-    public void AddComment(string additionalComment) {
-        if (ReadOnly) { return; }
-
-        foreach (var thisvar in _internal) {
-            if (!string.IsNullOrEmpty(thisvar.Comment)) {
-                thisvar.Comment += "\r";
-            }
-
-            thisvar.Comment += additionalComment;
-        }
-    }
-
     /// <summary>
     /// True, wenn ALLE Variablen erfolgreich hinzugefügt wurden.
     /// </summary>
     /// <param name="vars"></param>
     /// <returns></returns>
-    public bool AddRange(VariableCollection vars) {
+    public bool AddRange(IEnumerable<Variable> vars) {
         if (ReadOnly) { return false; }
 
         var f = true;
-        foreach (var thisv in vars._internal) {
+        foreach (var thisv in vars) {
             if (!Add(thisv)) { f = false; }
-        }
-
-        return f;
-    }
-
-    /// <summary>
-    /// Erstellt Clone
-    /// </summary>
-    /// <param name="v"></param>
-    /// <param name="varcom"></param>
-    /// <returns></returns>
-    public bool AddRange(VariableCollection vars, string newcomment) {
-        if (ReadOnly) { return false; }
-
-        var f = true;
-        foreach (var thisv in vars._internal) {
-            if (thisv is ICloneable c && c.Clone() is Variable nv) {
-                nv.Comment = newcomment;
-                if (!Add(nv)) { f = false; }
-            } else {
-                f = false;
-            }
         }
 
         return f;

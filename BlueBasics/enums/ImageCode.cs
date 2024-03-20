@@ -77,6 +77,7 @@ public enum ImageCode {
     Kamera,
     Kamm,
     Karton,
+    Klee,
     Kontrast,
     Kopieren,
     Kreis,

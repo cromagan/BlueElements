@@ -411,7 +411,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Balken.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Ressourcen\Image\Icons\Klee.png" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Register.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Registersammlung.png" />
