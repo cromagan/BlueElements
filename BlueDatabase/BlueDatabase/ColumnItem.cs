@@ -649,10 +649,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 return;
             }
 
-            //if (Database?.Column[value) != null) {
-            //    Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
-            //    return;
-            //}
+            if (Database?.Column[value] != null) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
+                return;
+            }
 
             //if (!IsValidColumnName(value)) {
             //    Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
@@ -2124,20 +2124,15 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         switch (type) {
             case DatabaseDataType.ColumnName:
-                var nname = newvalue.ToUpper();
-
-                //if (reason == Reason.LoadReload && nname != _name) {
-                //    return "Namen Inkonsistent: " + nname + " " + _name;
-                //}
-
-                var ok = Database?.Column.ChangeName(_name, nname) ?? false;
+                var oldname = _name;
+                _name = newvalue.ToUpper();
+                var ok = Database?.Column.ChangeName(oldname, _name) ?? false;
 
                 if (!ok) {
                     Database?.Freeze("Schwerer Spalten Umbenennungsfehler!");
                     return "Schwerer Spalten Umbenennungsfehler!";
                 }
 
-                _name = nname;
                 break;
 
             case DatabaseDataType.ColumnCaption:

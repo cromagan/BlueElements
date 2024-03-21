@@ -404,7 +404,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ok = Database.Cell.ChangeColumnName(oldName, newName);
         if (!ok) { return false; }
         Database?.RepairColumnArrangements(Reason.SetCommand);
-        //Database?.RepairViews();
         return true;
     }
 
