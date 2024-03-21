@@ -93,7 +93,8 @@ public static class Converter {
                || DateTime.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date9, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+               || DateTime.TryParseExact(s, Constants.Format_Date9, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 
     /// <summary>

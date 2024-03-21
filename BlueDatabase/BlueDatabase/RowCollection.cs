@@ -259,7 +259,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return;
         }
 
-        if (db.AmITemporaryMaster(false) && age is < 0 or > 80) {
+        if (db.AmITemporaryMaster(5, 55) && age is < 0 or > 80) {
             _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
         }
     }

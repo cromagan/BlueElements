@@ -212,6 +212,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string DatabaseId => nameof(Database);
 
+    public static string MyMasterCode => UserName + "-" + Environment.MachineName;
+
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
     public string AdditionalFilesPfad {
         get => _additionalFilesPfad;
@@ -984,27 +986,32 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    //    var db = new Database(ci.TableName);
-    //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
-    //    return db;
-    //}
-    public bool AmITemporaryMaster(bool checkUpcomingTo) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
+    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
+    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
+    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
+    /// </param>
+    /// <returns></returns>
+    public bool AmITemporaryMaster(int ranges, int rangee) {
         if (ReadOnly) { return false; }
 
         if (!MultiUser) { return true; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
-        if (TemporaryDatabaseMasterUser != UserName + "-" + Environment.MachineName) { return false; }
+        if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
 
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
+        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
 
-        if (checkUpcomingTo) {
-            return DateTime.UtcNow.Subtract(d).TotalMinutes < 55;
-        }
+        ranges = Math.Max(ranges, 0);
+        //rangee = Math.Min(rangee, 55);
 
         // Info:
         // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
         // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
-        return DateTime.UtcNow.Subtract(d).TotalMinutes is > 5 and < 55;
+        return mins > ranges && mins < rangee;
     }
 
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
@@ -1578,6 +1585,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!IsRowScriptPossible(true)) { return false; }
 
         var e = EventScript.Get(ScriptEventTypes.value_changed);
+        if (e.Count == 1) { return true; }
+
+        e = EventScript.Get(ScriptEventTypes.keyvalue_changed);
         return e.Count == 1;
     }
 
@@ -1836,7 +1846,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return false; } // Nicht ReadOnly!
         if (checkMessageTo && !string.IsNullOrEmpty(_eventScriptErrorMessage)) { return false; }
         return true;
     }
@@ -2312,15 +2322,26 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    protected virtual bool IsThereNeedToMakeMeMaster() {
+    protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
+
+    protected virtual bool MasterPossible() {
+        if (ReadOnly) { return false; }
         if (!MultiUser) { return false; }
+        if (!IsAdministrator()) { return false; }
+        if (!IsRowScriptPossible(true)) { return false; }
 
         if (HasValueChangedScript()) { return false; }
 
+        var masters = 0;
+        foreach (var thisDb in Database.AllFiles) {
+            if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+                masters++;
+                if (masters > 3) { return false; }
+            }
+        }
+
         return true;
     }
-
-    protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
 
     protected void OnLoaded() {
         if (IsDisposed) { return; }
@@ -2610,22 +2631,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
     /// </summary>
     protected void TryToSetMeTemporaryMaster() {
-        if (ReadOnly) { return; }
-        if (!MultiUser) { return; }
-        if (!IsAdministrator()) { return; }
-        if (!IsRowScriptPossible(true)) { return; }
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
 
-        if (AmITemporaryMaster(true)) { return; }
+        if (AmITemporaryMaster(0, 60)) { return; }
 
-        if (!IsThereNeedToMakeMeMaster()) { return; }
+        if (!MasterPossible()) { return; }
 
-        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
-
-        if (DateTime.UtcNow.Subtract(d).TotalMinutes < 60 && !string.IsNullOrEmpty(TemporaryDatabaseMasterUser)) { return; }
-
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return; }
-
-        TemporaryDatabaseMasterUser = UserName + "-" + Environment.MachineName;
+        TemporaryDatabaseMasterUser = MyMasterCode;
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5, CultureInfo.InvariantCulture);
     }
 

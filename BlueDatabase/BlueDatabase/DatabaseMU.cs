@@ -29,6 +29,7 @@ using System.Linq;
 using System.Text;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -38,7 +39,11 @@ public class DatabaseMu : Database {
 
     #region Fields
 
-    private bool _mustMakeMaster;
+    /// <summary>
+    /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
+    /// </summary>
+    private bool _hasManyFragments;
+
     private string _myFragmentsFilename = string.Empty;
     private StreamWriter? _writer;
 
@@ -153,7 +158,7 @@ public class DatabaseMu : Database {
         if (ReadOnly) { return; }
         if (files == null || files.Count < 1) { return; }
 
-        _mustMakeMaster = files.Count > 8 || ChangesNotIncluded.Count > 40;
+        _hasManyFragments = files.Count > 8 || ChangesNotIncluded.Count > 40;
 
         if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { return; }
         //if (!Directory.Exists(OldFragmengtsPath())) { return; }
@@ -170,7 +175,7 @@ public class DatabaseMu : Database {
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
-        if (ChangesNotIncluded.Any() && AmITemporaryMaster(false)) {
+        if (ChangesNotIncluded.Any() && AmITemporaryMaster(5, 55)) {
             if (files.Count > 10 || ChangesNotIncluded.Count > 50) {
                 //var tmp = _fileStateUTCDate;
 
@@ -206,10 +211,23 @@ public class DatabaseMu : Database {
         files.Shuffle();
 
         foreach (var thisf in files) {
-            OnDropMessage(FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-            DeleteFile(thisf, 1, false);
-            //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
-            if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { break; }
+            var del = true;
+
+            var f = thisf.FileNameWithoutSuffix();
+            if (f.Length > 19) {
+                var da = f.Substring(f.Length - 19);
+
+                if (DateTimeTryParse(da, out var d2)) {
+                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 8) { del = false; }
+                }
+            }
+
+            if (del) {
+                OnDropMessage(FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
+                DeleteFile(thisf, 1, false);
+                //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
+                if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { break; }
+            }
         }
     }
 
@@ -293,8 +311,6 @@ public class DatabaseMu : Database {
         return (null, null);
     }
 
-    protected override bool IsThereNeedToMakeMeMaster() => _mustMakeMaster || base.IsThereNeedToMakeMeMaster();
-
     protected override List<Database> LoadedDatabasesWithSameServer() {
         var oo = new List<Database>();
 
@@ -312,6 +328,8 @@ public class DatabaseMu : Database {
 
         return oo;
     }
+
+    protected override bool MasterPossible() => _hasManyFragments && base.MasterPossible();
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);

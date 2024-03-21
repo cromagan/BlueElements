@@ -2954,9 +2954,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 BlueFont.DrawString(gr, "Skripte müssen repariert werden", _columnFont, Brushes.Blue, 90, 12);
             }
 
-            if (db.AmITemporaryMaster(false)) {
+            if (db.AmITemporaryMaster(5, 55)) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0);
-            } else if (db.AmITemporaryMaster(true)) {
+            } else if (db.AmITemporaryMaster(0, 55)) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, 0);
             }
         } catch {
