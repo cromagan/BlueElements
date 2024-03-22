@@ -50,7 +50,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private AddType _addAlloweds = AddType.Text;
 
-    private ListBoxAppearance _appearance;
+    private ListBoxAppearance _appearance = ListBoxAppearance.Listbox;
 
     private bool _autoSort = true;
 
@@ -125,6 +125,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
         get => _appearance;
         set {

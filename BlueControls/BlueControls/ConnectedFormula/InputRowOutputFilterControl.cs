@@ -56,6 +56,9 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
 
     [DefaultValue(null)]
@@ -102,9 +105,9 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
 
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void HandleChangesNow() {
         if (IsDisposed) { return; }

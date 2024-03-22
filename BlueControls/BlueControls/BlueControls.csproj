@@ -96,10 +96,12 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +173,12 @@
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
     <Compile Include="Designer Support\InputFormatConverter .cs" />
+    <Compile Include="Designer Support\QuickPicDesigner.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Designer Support\QuickPicDesigner.Designer.cs">
+      <DependentUpon>QuickPicDesigner.cs</DependentUpon>
+    </Compile>
     <Compile Include="Enums\AllowedInputFilter.cs" />
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="Enums\FlexiFilterDefaultFilter.cs" />
@@ -449,9 +457,6 @@
     <Compile Include="Designer Support\BasicDesigner.cs" />
     <Compile Include="Designer Support\ButtonActionList.cs" />
     <Compile Include="Designer Support\ButtonDesigner.cs" />
-    <Compile Include="Designer Support\frmQuickPic.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Designer Support\QuickPicSelector.cs" />
     <Compile Include="BlueDatabaseDialogs\AutoFilter.cs">
       <SubType>Form</SubType>
@@ -722,13 +727,12 @@
     <EmbeddedResource Include="ConnectedFormula\TextGenerator.resx">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Designer Support\frmQuickPic.resx">
-      <DependentUpon>frmQuickPic.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="ConnectedFormula\ConnectedFormulaEditor.resx">
       <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Designer Support\QuickPicDesigner.resx">
+      <DependentUpon>QuickPicDesigner.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogWithOkAndCancel.resx">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>

@@ -80,6 +80,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
 
     /// <summary>
@@ -112,6 +115,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterInputChangedHandled { get; set; }
 
     [DefaultValue(null)]
@@ -120,6 +126,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 02");
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ColumnItem? FilterSingleColumn { get; }
 
     [Browsable(false)]

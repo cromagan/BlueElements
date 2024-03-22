@@ -64,6 +64,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Action {
         get => _action;
         set {
@@ -74,6 +77,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg1 {
         get => _arg1;
         set {
@@ -84,6 +90,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg2 {
         get => _arg2;
         set {
@@ -94,6 +103,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg3 {
         get => _arg3;
         set {
@@ -104,6 +116,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg4 {
         get => _arg4;
         set {
@@ -138,6 +153,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]
@@ -145,10 +163,19 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<RowItem>? RowsInput { get; set; }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputChangedHandled { get; set; }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; } = false;
 
     #endregion

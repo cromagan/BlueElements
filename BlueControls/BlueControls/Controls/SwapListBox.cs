@@ -62,7 +62,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
             MoveItemBetweenList(Suggest, Main, thisCheck, true);
         }
 
-        var l = Main.Checked;
+        List<string> l = [..Main.Checked];
 
         foreach (var thisl in l) {
             if (!toCheck.Contains(thisl, false)) {

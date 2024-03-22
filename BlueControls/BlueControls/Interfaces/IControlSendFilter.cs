@@ -20,6 +20,7 @@
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BlueControls.Interfaces;
 
@@ -27,11 +28,17 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; }
 
     /// <summary>
     /// Sollte von DoOutputSettings befüllt werden.
     /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; }
 
     public string Name { get; set; }

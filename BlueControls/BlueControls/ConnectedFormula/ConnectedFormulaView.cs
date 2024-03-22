@@ -41,6 +41,7 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
     #region Fields
 
     private FilterCollection? _filterInput;
+
     private bool _generated;
 
     private string _modus = string.Empty;
@@ -70,6 +71,9 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
 
     public ConnectedFormula.ConnectedFormula? ConnectedFormula { get; private set; }
@@ -95,8 +99,14 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterInputChangedHandled { get; set; }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
 
     public string Mode {
@@ -115,11 +125,20 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<RowItem>? RowsInput { get; set; }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputChangedHandled { get; set; }
 
-    public bool RowsInputManualSeted { get; set; }
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RowsInputManualSeted { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -128,16 +147,15 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
 
     #endregion
 
+    #region Methods
+
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+
     //public void Dispose() {
     //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //    Dispose(disposing: true);
     //    GC.SuppressFinalize(this);
     //}
-
-    #region Methods
-
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();

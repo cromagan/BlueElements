@@ -841,6 +841,7 @@ namespace BlueControls.Forms {
             // 
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFO.FilterInputChangedHandled = true;
+            this.CFO.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFO.Location = new System.Drawing.Point(0, 0);
             this.CFO.Mode = null;
             this.CFO.Name = "CFO";

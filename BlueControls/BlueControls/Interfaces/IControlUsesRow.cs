@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BlueControls.Interfaces;
 
@@ -29,13 +30,23 @@ public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptF
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<RowItem>? RowsInput { get; set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputChangedHandled { get; set; }
 
     /// <summary>
     /// Bedeutet, dass kein Parent vorhanden ist - und der Filter anderweitig gesetzt wurde. Z.B. durch SetRow
     /// Wenn TRUE, sollte der Input Filter nicht mehr von den Parents verändert werden.
     /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; }
 
     #endregion
