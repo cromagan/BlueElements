@@ -42,7 +42,7 @@ public sealed class QuickPicSelector : UITypeEditor {
         _c = Convert.ToString(value);
         _fqp.StartAll(_c);
         //we add handler to the about form button1 in order to close the form when the button is clicked
-        _fqp.ButOK.Click += Click;
+        _fqp.btnOk.Click += Click;
         Develop.Debugprint_BackgroundThread();
         _edSvc.DropDownControl(_fqp);
         return _c;

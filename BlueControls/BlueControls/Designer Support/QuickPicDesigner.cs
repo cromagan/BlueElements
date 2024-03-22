@@ -19,22 +19,17 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Designer_Support;
 
-public partial class QuickPicDesigner : UserControl {
+public partial class QuickPicDesigner : Panel {
 
     #region Constructors
 
-    public QuickPicDesigner() {
-        InitializeComponent();
-    }
+    public QuickPicDesigner() => InitializeComponent();
 
     #endregion
 
@@ -42,50 +37,48 @@ public partial class QuickPicDesigner : UserControl {
 
     public void GeneratePreview() {
         try {
-            Preview.Image = QuickImage.Get(ImgCode());
+            picPreview.Image = QuickImage.Get(ImgCode());
         } catch {
-            Preview.Image = null;
+            picPreview.Image = null;
         }
     }
 
     public string ImgCode() {
         var e = (ImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsXPDisabled));
-        return QuickImage.GenerateCode(PicName.Text, IntParse(GrX.Text), IntParse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
+        return QuickImage.GenerateCode(txbName.Text, IntParse(txbWidth.Text), IntParse(txbHeight.Text), e, txbFaerbung.Text, txbChangeGreen.Text, sldSat.Value, satLum.Value, 0, satTransparenz.Value, txbZweitsymbol.Text);
     }
 
     public void StartAll(string code) {
-        LB.Items.Clear();
+        lstNames.ItemClear();
         var im = QuickImage.Images();
 
         foreach (var thisIm in im) {
-            _ = LB.Items.Add(thisIm);
+            lstNames.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
         QuickImage l = new(code);
-        PicName.Text = l.Name;
-        Färb.Text = l.Färbung;
-        grün.Text = l.ChangeGreenTo;
+        txbName.Text = l.Name;
+        txbFaerbung.Text = l.Färbung;
+        txbChangeGreen.Text = l.ChangeGreenTo;
         chkbGrauStufen.Checked = l.Effekt.HasFlag(ImageCodeEffect.Graustufen);
-        SAT.Value = l.Sättigung;
-        Hell.Value = l.Helligkeit;
-        Transp.Value = l.Transparenz;
+        sldSat.Value = l.Sättigung;
+        satLum.Value = l.Helligkeit;
+        satTransparenz.Value = l.Transparenz;
         //if (l.Effekt < 0) { l.Effekt =  ImageCodeEffect.Ohne; }
         chkbDurchgestrichen.Checked = l.Effekt.HasFlag(ImageCodeEffect.Durchgestrichen);
         chkbMEDisabled.Checked = l.Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled);
         chkbXPDisabled.Checked = l.Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled);
-        GrX.Text = l.Width.ToString();
-        GrY.Text = l.Height.ToString();
+        txbWidth.Text = l.Width.ToString();
+        txbHeight.Text = l.Height.ToString();
         txbZweitsymbol.Text = l.Zweitsymbol;
     }
 
-    private static void SomethingCheckedChanged(object sender, System.EventArgs e) { }
-
-    private void LB_DoubleClick(object sender, System.EventArgs e) => PicName.Text = Convert.ToString(LB.SelectedItem);
+    private void LstNames_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) => txbName.Text = e.Item.KeyName;
 
     private void SomethingChanged(object sender, System.EventArgs e) {
-        Helll.Text = Hell.Value + "%";
-        SATL.Text = SAT.Value + "%";
-        Transpl.Text = Transp.Value + "%";
+        Helll.Text = satLum.Value + "%";
+        SATL.Text = sldSat.Value + "%";
+        Transpl.Text = satTransparenz.Value + "%";
         GeneratePreview();
     }
 
