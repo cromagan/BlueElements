@@ -85,6 +85,8 @@
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
     <Compile Include="AdditionalScriptMethods\Method_EnsureDatabaseLoaded.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_LookupFilterAllValues.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Call.cs" />

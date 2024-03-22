@@ -1500,7 +1500,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblFilterliste.Arrangement = "";
-            this.tblFilterliste.FilterInputChangedHandled = false;
             this.tblFilterliste.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Gewähle_Zeile;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";

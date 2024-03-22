@@ -185,8 +185,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 break;
 
             case DatabaseDataType.EventScript:
-                alt = "[Skript alt]";
-                neu = "[Skript neu]";
+                alt = "[Skript alt (" + alt.Length + " Zeichen)]";
+                neu = "[Skript neu (" + neu.Length + " Zeichen)]";
                 symb = ImageCode.Skript;
                 break;
 

@@ -3275,8 +3275,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
         Undo.Clear();
-
-        {
+        try {
             ColumnItem? column = null;
             RowItem? row = null;
             do {
@@ -3378,6 +3377,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     }
                 }
             } while (true);
+        } catch {
+            Freeze("Parse Fehler!");
         }
 
         #region unbenutzte (gelöschte) Spalten entfernen

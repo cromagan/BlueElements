@@ -111,6 +111,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterInputChangedHandled { get; set; }
 
     [DefaultValue(false)]

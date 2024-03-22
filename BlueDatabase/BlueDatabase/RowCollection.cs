@@ -155,7 +155,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public static RowItem? GenerateAndAdd(FilterCollection fc, string comment) {
+    public static (RowItem? newrow, string message) GenerateAndAdd(FilterCollection fc, string comment) {
         IReadOnlyCollection<string>? first = null;
 
         Database? db2 = null;
@@ -163,29 +163,29 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisfi in fc) {
             if (thisfi.FilterType is not FilterType.Istgleich
                 and not FilterType.Istgleich_GroßKleinEgal
-                 and not FilterType.Istgleich_ODER_GroßKleinEgal) { return null; }
-            if (thisfi.Column == null) { return null; }
-            if (thisfi.Database is not Database db1 || db1.IsDisposed) { return null; }
+                 and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt"); }
+            if (thisfi.Column == null) { return (null, "Leere Spalte angekommen"); }
+            if (thisfi.Database is not Database db1 || db1.IsDisposed) { return (null, "Datenbanken unterschiedlich"); }
             db2 ??= db1;
 
             if (db1.Column.First() == thisfi.Column) {
-                if (first != null) { return null; }
+                if (first != null) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler"); }
                 first = thisfi.SearchValue;
             }
 
-            if (thisfi.Column.Database != db2) { return null; }
+            if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich"); }
         }
 
-        if (db2 == null || db2.IsDisposed) { return null; }
+        if (db2 == null || db2.IsDisposed) { return (null, "Datenbanken verworfen"); }
 
-        if (!db2.Row.IsNewRowPossible()) { return null; }
+        if (!db2.Row.IsNewRowPossible()) { return (null, "In der Datenbank sind keine neuen Zeilen möglich"); }
 
-        if (first == null) { return null; }
+        if (first == null) { return (null, "Der Wert für die erste Spalte fehlt"); }
 
         var s = db2.NextRowKey();
-        if (s == null || string.IsNullOrEmpty(s)) { return null; }
+        if (s == null || string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
 
-        return db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment);
+        return (db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment), string.Empty);
 
         //foreach (var thisfi in fc) {
         //    if (thisfi.Column is ColumnItem c) {

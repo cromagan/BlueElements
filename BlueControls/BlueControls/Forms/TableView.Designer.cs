@@ -777,7 +777,6 @@ namespace BlueControls.Forms {
             // 
             this.Table.Arrangement = "";
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.FilterInputChangedHandled = false;
             this.Table.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Im_Element_Gewählte_Filter;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
@@ -840,14 +839,10 @@ namespace BlueControls.Forms {
             // CFO
             // 
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CFO.FilterInputChangedHandled = true;
             this.CFO.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFO.Location = new System.Drawing.Point(0, 0);
             this.CFO.Mode = null;
             this.CFO.Name = "CFO";
-            this.CFO.RowsInput = null;
-            this.CFO.RowsInputChangedHandled = true;
-            this.CFO.RowsInputManualSeted = false;
             this.CFO.Size = new System.Drawing.Size(338, 566);
             this.CFO.TabIndex = 0;
             this.CFO.TabStop = false;

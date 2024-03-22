@@ -264,6 +264,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]

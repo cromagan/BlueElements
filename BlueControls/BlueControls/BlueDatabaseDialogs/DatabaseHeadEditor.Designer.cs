@@ -508,7 +508,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tblUndo.Arrangement = "";
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblUndo.FilterInputChangedHandled = false;
             this.tblUndo.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Gewähle_Zeile;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";

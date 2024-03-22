@@ -106,8 +106,8 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         if (r.Count == 0) {
             if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
             var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
-            if (nr == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden"); }
-            return Method_Row.RowToObjectFeedback(nr);
+            if (nr.newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
+            return Method_Row.RowToObjectFeedback(nr.newrow);
         }
 
         return Method_Row.RowToObjectFeedback(r[0]);
