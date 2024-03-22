@@ -418,7 +418,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (v == null || v.Count != 1) { return; }
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5), "Undo-Befehl");
-        row.Database?.Row.ExecuteValueChangedEvent(true);
+        //row.Database?.Row.ExecuteValueChangedEvent(true);
     }
 
     public static void Draw_FormatedText(Graphics gr, string text, ShortenStyle style, ColumnItem? column, Rectangle fitInRect, Design design, States state, BildTextVerhalten bildTextverhalten, float scale) {
@@ -2099,8 +2099,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
+            //contentHolderCellRow.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null);
             contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null);
-
+            RowCollection.AddBackgroundWorker(contentHolderCellRow);
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
     }
@@ -2730,9 +2731,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (!string.IsNullOrEmpty(txt)) {
                 var pos = new Rectangle(columnX1 + plus, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth - plus, _pix16);
                 Draw_CellTransparentDirect(gr, txt, ShortenStyle.Replaced, pos, _newRowFont, cellInThisDatabaseColumn, _pix16, cellInThisDatabaseColumn.BehaviorOfImageAndText, state, db.GlobalScale);
-                if (qi != null) {
-                    gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
-                }
+                gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
             }
         }
 
@@ -2750,7 +2749,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (isAdmin) {
                     if (cellInThisDatabaseRow.NeedsUpdate()) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
-                        db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);
+                        //db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);
                     }
                 }
 

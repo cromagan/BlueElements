@@ -2435,7 +2435,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
                 Database.Cell.DoSystemColumns(db, this, thisRow, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
-                thisRow.Database?.Row.AddRowWithChangedValue(thisRow);
             }
         }
     }

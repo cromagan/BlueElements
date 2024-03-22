@@ -1174,8 +1174,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     ok = false;
                 }
             } while (!ok);
-        } catch (Exception ex) {
-            Develop.DebugPrint("Rechtschreibprüfer-Fehler", ex);
+        } catch {
+            //Develop.DebugPrint("Rechtschreibprüfer-Fehler", ex);
         }
         SpellChecker.ReportProgress(100, "Done");
     }

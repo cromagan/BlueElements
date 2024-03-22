@@ -996,7 +996,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </param>
     /// <returns></returns>
     public bool AmITemporaryMaster(int ranges, int rangee) {
-        if (ReadOnly) { return false; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
 
         if (!MultiUser) { return true; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
@@ -2332,6 +2332,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (HasValueChangedScript()) { return false; }
 
+        if (RowCollection.WaitDelay > 90) { return true; }
+
         var masters = 0;
         foreach (var thisDb in Database.AllFiles) {
             if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
@@ -2989,20 +2991,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 6) { return; }
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 10) { return; }
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { return; }
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
         if (e.Cancel) { return; }
 
-        Row.AddRowsForValueChangedEvent();
-
-        Row.ExecuteValueChangedEvent(false);
+        RowCollection.ExecuteValueChangedEvent();
 
         if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
         if (!LogUndo) { return; }
-
-        Row.ExecuteExtraThread();
 
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }

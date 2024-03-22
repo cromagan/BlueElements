@@ -167,7 +167,7 @@ internal sealed partial class SearchAndReplace : Form {
         }
         p.Close();
 
-        db.Row.ExecuteValueChangedEvent(true);
+        //db.Row.ExecuteValueChangedEvent(true);
 
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;

@@ -173,6 +173,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
             if (!db.Column.HasKeyColumns()) { return "Routinen wird nie ausgelöst, da keine Schlüsselspalten definiert sind."; }
+            if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { return "Nach einer Schlüsselwert-Änderung wird sowieso 'Wert geändert' ausgelöst."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) {

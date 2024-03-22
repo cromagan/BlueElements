@@ -527,8 +527,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                     CellGetString(srs) != Database.EventScriptVersion &&
-                                     Database.HasValueChangedScript();
+                                 CellGetString(srs) != Database.EventScriptVersion;
 
     /// <summary>
     ///
@@ -608,24 +607,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    internal bool AmIChanger() {
-        if (IsDisposed) { return false; }
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
+    //internal bool AmIChanger() {
+    //    if (IsDisposed) { return false; }
+    //    if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
-        return db.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
-    }
+    //    return db.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
+    //}
 
-    internal double RowChangedXMinutesAgo() {
-        if (IsDisposed) { return -1; }
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return -1; }
+    //internal double RowChangedXMinutesAgo() {
+    //    if (IsDisposed) { return -1; }
+    //    if (IsDisposed || Database is not Database db || db.IsDisposed) { return -1; }
 
-        if (db.Column.SysRowChangeDate is not ColumnItem src) { return -1; }
+    //    if (db.Column.SysRowChangeDate is not ColumnItem src) { return -1; }
 
-        var v = CellGetDateTime(src);
-        if (v == DateTime.MinValue) { return -1; }
+    //    var v = CellGetDateTime(src);
+    //    if (v == DateTime.MinValue) { return -1; }
 
-        return DateTime.UtcNow.Subtract(v).TotalMinutes;
-    }
+    //    return DateTime.UtcNow.Subtract(v).TotalMinutes;
+    //}
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

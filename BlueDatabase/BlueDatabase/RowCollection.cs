@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -38,13 +39,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Fields
 
+    public static int WaitDelay = 0;
+    private static readonly List<BackgroundWorker> Pendingworker = [];
+    private static bool _executingchangedrows;
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
-    private readonly List<string> _pendingChangedBackgroundRow = [];
-    private readonly List<string> _pendingChangedRows = [];
-    private readonly List<BackgroundWorker> _pendingworker = [];
     private Database? _database;
-    private bool _executingbackgroundworks;
-    private bool _executingchangedrows;
 
     #endregion
 
@@ -146,6 +145,58 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Methods
 
+    public static void AddBackgroundWorker(RowItem row) {
+        if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { return; }
+        if (!db.IsRowScriptPossible(true)) { return; }
+
+        var l = new BackgroundWorker();
+        l.WorkerReportsProgress = true;
+        l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
+        l.DoWork += PendingWorker_DoWork;
+
+        Pendingworker.Add(l);
+        l.RunWorkerAsync(row);
+
+        db.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
+    }
+
+    public static void ExecuteValueChangedEvent() {
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3 + WaitDelay) { return; }
+
+        if (_executingchangedrows) { return; }
+        _executingchangedrows = true;
+
+        var start = new Stopwatch();
+        start.Start();
+
+        while (NextRowToCeck() is RowItem row) {
+            if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { break; }
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { break; }
+
+            WaitDelay = Pendingworker.Count * 3;
+            if (Pendingworker.Count > 5) { break; }
+
+            if (!db.IsRowScriptPossible(true)) { break; }
+
+            var e = new CancelReasonEventArgs();
+            db.OnCanDoScript(e);
+            if (e.Cancel) { break; }
+
+            try {
+                var ok = row.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null);
+                if (!ok.AllOk) { break; }
+                row.InvalidateCheckData();
+                row.CheckRowDataIfNeeded();
+                AddBackgroundWorker(row);
+                db.OnInvalidateView();
+            } catch { }
+
+            if (start.ElapsedMilliseconds > 10000) { break; }
+        }
+
+        _executingchangedrows = false;
+    }
+
     /// <summary>
     /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
     /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
@@ -183,7 +234,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (first == null) { return (null, "Der Wert für die erste Spalte fehlt"); }
 
         var s = db2.NextRowKey();
-        if (s == null || string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
+        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
 
         return (db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment), string.Empty);
 
@@ -243,26 +294,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } while (true);
     }
 
-    public void AddRowWithChangedValue(RowItem? row) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (row == null || row.IsDisposed) { return; }
-
-        if (!db.IsRowScriptPossible(true)) { return; }
-
-        if (!row.NeedsUpdate()) { return; }
-
-        var isMyRow = row.AmIChanger();
-        var age = row.RowChangedXMinutesAgo();
-
-        if (isMyRow && age >= 0 && age < 55) {
-            _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
-            return;
-        }
-
-        if (db.AmITemporaryMaster(5, 55) && age is < 0 or > 80) {
-            _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
-        }
-    }
+    public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
 
     ///// <summary>
     ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
@@ -277,65 +309,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    }
     //    return sortedRows;
     //}
-
-    public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
-
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
-
-    public void ExecuteExtraThread() {
-        if (_pendingChangedRows.Count > 0) { return; }
-        if (_pendingChangedBackgroundRow.Count == 0) { return; }
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (!Database.IsRowScriptPossible(true)) { return; }
-
-        if (_executingbackgroundworks) { return; }
-        _executingbackgroundworks = true;
-
-        var ev = Database.EventScript.Get(ScriptEventTypes.value_changed_extra_thread);
-        var ok = false;
-        if (ev.Count == 1) { ok = ev[0].IsOk(); }
-
-        if (!ok) {
-            _pendingChangedBackgroundRow.Clear();
-            _executingbackgroundworks = false;
-            return;
-        }
-
-        try {
-            while (_pendingworker.Count < 5) {
-                if (db.IsDisposed || IsDisposed) { break; }
-                if (!Database.IsRowScriptPossible(true)) { break; }
-                if (!Database.LogUndo) { break; }
-                if (_pendingChangedBackgroundRow.Count == 0) { break; }
-                if (_pendingChangedRows.Count > 0) { break; }
-                if (!Database.IsRowScriptPossible(true)) { break; }
-
-                var key = _pendingChangedBackgroundRow.First();
-                _ = _pendingChangedBackgroundRow.Remove(key);
-
-                var r = SearchByKey(key);
-
-                if (r != null && !r.IsDisposed) {
-                    var l = new BackgroundWorker();
-                    l.WorkerReportsProgress = true;
-                    l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
-                    l.DoWork += PendingWorker_DoWork;
-
-                    _pendingworker.Add(l);
-                    l.RunWorkerAsync(key);
-
-                    Database.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + r.CellFirstString());
-                }
-            }
-        } catch { }
-
-        _executingbackgroundworks = false;
     }
 
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
@@ -377,47 +354,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.Empty;
     }
 
-    public void ExecuteValueChangedEvent(bool ignoreUserAction) {
-        if (_pendingChangedRows.Count == 0) { return; }
-        if (!ignoreUserAction && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
-
-        if (_executingchangedrows) { return; }
-        _executingchangedrows = true;
-
-        while (_pendingChangedRows.Count > 0) {
-            if (IsDisposed) { break; }
-            if (IsDisposed || Database is not Database db || db.IsDisposed) { break; }
-
-            if (!Database.IsRowScriptPossible(true)) { break; }
-
-            var e = new CancelReasonEventArgs();
-            Database.OnCanDoScript(e);
-            if (e.Cancel) { break; }
-
-            try {
-                var key = _pendingChangedRows[0];
-
-                var r = SearchByKey(key);
-                if (r != null && !r.IsDisposed) {
-                    var ok = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null);
-
-                    if (!ok.AllOk) { break; }
-
-                    r.InvalidateCheckData();
-                    r.CheckRowDataIfNeeded();
-                    _pendingChangedBackgroundRow.Add(key);
-                }
-
-                _ = _pendingChangedRows.Remove(key);
-                Database?.OnInvalidateView();
-            } catch { }
-        }
-
-        _executingchangedrows = false;
-    }
-
-    //                    if (LongTryParse(s, out var v)) { key.Add(v); }
-    //                }
+    // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, FilterCollection? fc, string comment) {
@@ -517,7 +454,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
-    public bool HasPendingWorker() => _pendingworker.Count > 0;
+    public bool HasPendingWorker() => Pendingworker.Count > 0;
 
     //public string DoLinkedDatabase(List<RowItem> rowsToExpand) {
     //    if (rowsToExpand.Count == 0) { return string.Empty; }
@@ -608,22 +545,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
-    internal void AddRowsForValueChangedEvent() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (!db.IsRowScriptPossible(true)) { return; }
-
-        var x = DateTime.UtcNow;
-
-        try {
-            foreach (var thisRow in this) {
-                if (thisRow.IsInCache != null) {
-                    AddRowWithChangedValue(thisRow);
-                }
-                if (DateTime.UtcNow.Subtract(x).TotalSeconds > 5) { break; }
-            }
-        } catch { }
-    }
-
     internal void CloneFrom(Database sourceDatabase) {
         if (IsNewRowPossible()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht erlaubt");
@@ -682,6 +603,35 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
+    private static RowItem? NextRowToCeck() {
+        List<Database> l = [.. Database.AllFiles];
+        l.Shuffle();
+
+        foreach (var thisDb in l) {
+            if (thisDb is Database db && !db.IsDisposed) {
+                if (!db.IsRowScriptPossible(true)) { continue; }
+                if (!db.HasValueChangedScript()) { continue; }
+                if (!db.AmITemporaryMaster(5, 55)) { continue; }
+
+                var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUpdate());
+                if (rowToCheck != null) {
+                    return rowToCheck;
+                }
+            }
+        }
+
+        WaitDelay = Math.Min(WaitDelay + 1, 100);
+
+        return null;
+    }
+
+    private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
+        if (e.Argument is not RowItem r || r.IsDisposed) { return; }
+        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null);
+    }
+
+    private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);
+
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     /// <summary>
@@ -704,8 +654,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             _internal.Clear();
-            _pendingChangedBackgroundRow.Clear();
-            _pendingChangedRows.Clear();
 
             IsDisposed = true;
         }
@@ -742,15 +690,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);
     }
-
-    private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
-        var rk = (string)e.Argument;
-        var r = SearchByKey(rk);
-        if (r == null || r.IsDisposed) { return; }
-        var _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null);
-    }
-
-    private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
 
     #endregion
 }

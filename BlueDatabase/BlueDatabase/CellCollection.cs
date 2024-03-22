@@ -623,7 +623,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         row.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 2, null);
                     }
 
-                    Database?.Row.AddRowWithChangedValue(row);
+                    //Database?.Row.AddRowWithChangedValue(row);
                 }
             }
 
