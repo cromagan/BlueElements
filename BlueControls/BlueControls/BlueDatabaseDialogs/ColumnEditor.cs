@@ -377,7 +377,6 @@ internal sealed partial class ColumnEditor {
         btnLogUndo.Checked = _column.ShowUndo;
         btnFormatierungErlaubt.Checked = _column.FormatierungErlaubt;
         btnSpellChecking.Checked = _column.SpellCheckingEnabled;
-        btnEinzeiligDarstellen.Checked = _column.ShowMultiLineInOneLine;
         txbAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
         txbReplacer.Text = _column.OpticalReplace.JoinWithCr();
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
@@ -472,7 +471,6 @@ internal sealed partial class ColumnEditor {
 
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         _column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
-        _column.ShowMultiLineInOneLine = btnEinzeiligDarstellen.Checked;
         _column.ShowUndo = btnLogUndo.Checked;
         _column.FormatierungErlaubt = btnFormatierungErlaubt.Checked;
         _column.SpellCheckingEnabled = btnSpellChecking.Checked;

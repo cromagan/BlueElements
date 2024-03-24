@@ -145,8 +145,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
     private ScriptType _scriptType;
 
-    private bool _showMultiLineInOneLine;
-
     private bool _showUndo;
 
     private SortierTyp _sortType;
@@ -230,7 +228,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         //_CompactView = true;
         _showUndo = true;
         _doOpticalTranslation = TranslationType.Original_Anzeigen;
-        _showMultiLineInOneLine = false;
         _editAllowedDespiteLock = false;
         _suffix = string.Empty;
         _linkedDatabaseTableName = string.Empty;
@@ -882,26 +879,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
     }
 
-    //        _ = Database?.ChangeData(DatabaseDataType.SaveContent, this, null, _saveContent.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
-    //        OnPropertyChanged();
-    //    }
-    //}
-    public bool ShowMultiLineInOneLine {
-        get => _multiLine && _showMultiLineInOneLine;
-        set {
-            if (IsDisposed) { return; }
-            if (_showMultiLineInOneLine == value) { return; }
-
-            _ = Database?.ChangeData(DatabaseDataType.ShowMultiLineInOneLine, this, null, _showMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), Generic.UserName, DateTime.UtcNow, string.Empty);
-            Invalidate_ColumAndContent();
-            OnPropertyChanged();
-        }
-    }
-
-    //public bool SaveContent {
-    //    get => _saveContent;
-    //    set {
-    //        if (_saveContent == value) { return; }
     public bool ShowUndo {
         get => _showUndo;
         set {
@@ -1178,7 +1155,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         this.GetStyleFrom(source); // regex, Allowed Chars, etc.
         ScriptType = source.ScriptType;
         ShowUndo = source.ShowUndo;
-        ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
         CaptionGroup1 = source.CaptionGroup1;
         CaptionGroup2 = source.CaptionGroup2;
         CaptionGroup3 = source.CaptionGroup3;
@@ -1357,7 +1333,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             if (!_function.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
             if (_roundAfterEdit != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
         } else {
-            if (_showMultiLineInOneLine) { return "Wenn mehrzeilige Texte einzeilig dargestellt werden sollen, muss mehrzeilig angewählt sein."; }
             if (_afterEditQuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
         }
         if (_spellCheckingEnabled && !_function.SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
@@ -1651,7 +1626,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                     ForeColor = Color.FromArgb(0, 0, 0);
                     BackColor = Color.FromArgb(255, 255, 150);
                     LineLeft = ColumnLineStyle.Dick;
-                    ShowMultiLineInOneLine = true;
+                    BehaviorOfImageAndText = BildTextVerhalten.Mehrzeilig_einzeilig_darsellen;
                 }
                 break;
 
@@ -2230,10 +2205,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
             case DatabaseDataType.ShowUndo:
                 _showUndo = newvalue.FromPlusMinus();
-                break;
-
-            case DatabaseDataType.ShowMultiLineInOneLine:
-                _showMultiLineInOneLine = newvalue.FromPlusMinus();
                 break;
 
             case DatabaseDataType.EditableWithTextInput:

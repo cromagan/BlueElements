@@ -1927,14 +1927,29 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Draw_CellTransparentDirect_OneLine(gr, txt, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state, scale);
         } else {
             var mei = txt.SplitAndCutByCrAndBr();
-            if (contentHolderCellColumn.ShowMultiLineInOneLine) {
-                Draw_CellTransparentDirect_OneLine(gr, mei.JoinWith("; "), contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state, scale);
-            } else {
-                var y = 0;
-                for (var z = 0; z <= mei.GetUpperBound(0); z++) {
-                    Draw_CellTransparentDirect_OneLine(gr, mei[z], contentHolderCellColumn, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, bildTextverhalten, state, scale);
-                    y += CellItem.ContentSize(contentHolderCellColumn.KeyName, mei[z], font, style, pix16 - 1, bildTextverhalten, contentHolderCellColumn.Prefix, contentHolderCellColumn.Suffix, contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace, scale, contentHolderCellColumn.ConstantHeightOfImageCode).Height;
-                }
+
+            switch (contentHolderCellColumn.BehaviorOfImageAndText) {
+                case BildTextVerhalten.Nur_erste_Zeile_darstellen:
+                    if (mei.Length > 1) {
+                        Draw_CellTransparentDirect_OneLine(gr, mei[0] + "...", contentHolderCellColumn, drawarea, 0, false, font, pix16, style, BildTextVerhalten.Nur_Text, state, scale);
+                    } else if (mei.Length == 1) {
+                        Draw_CellTransparentDirect_OneLine(gr, mei[0], contentHolderCellColumn, drawarea, 0, false, font, pix16, style, BildTextVerhalten.Nur_Text, state, scale);
+                    }
+                    break;
+
+                case BildTextVerhalten.Mehrzeilig_einzeilig_darsellen:
+                    Draw_CellTransparentDirect_OneLine(gr, mei.JoinWith("; "), contentHolderCellColumn, drawarea, 0, false, font, pix16, style, BildTextVerhalten.Nur_Text, state, scale);
+                    break;
+
+                default: {
+                        var y = 0;
+                        for (var z = 0; z <= mei.GetUpperBound(0); z++) {
+                            Draw_CellTransparentDirect_OneLine(gr, mei[z], contentHolderCellColumn, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, bildTextverhalten, state, scale);
+                            y += CellItem.ContentSize(contentHolderCellColumn.KeyName, mei[z], font, style, pix16 - 1, bildTextverhalten, contentHolderCellColumn.Prefix, contentHolderCellColumn.Suffix, contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace, scale, contentHolderCellColumn.ConstantHeightOfImageCode).Height;
+                        }
+
+                        break;
+                    }
             }
         }
     }
@@ -2748,6 +2763,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 if (isAdmin) {
                     if (cellInThisDatabaseRow.NeedsUpdate()) {
+                        RowCollection.WaitDelay = 0;
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
                         //db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);
                     }

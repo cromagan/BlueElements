@@ -620,7 +620,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        WaitDelay = Math.Min(WaitDelay + 1, 100);
+        WaitDelay = Math.Min(WaitDelay + 5, 100);
 
         return null;
     }

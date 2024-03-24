@@ -382,7 +382,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), Reason.SystemSet); }
 
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-            if (db.Column.SysRowState is ColumnItem srs && srs != column) { SetValueInternal(srs, row, string.Empty, reason); }
+            if (db.Column.SysRowState is ColumnItem srs && srs != column) {
+                RowCollection.WaitDelay = 0;
+                SetValueInternal(srs, row, string.Empty, reason);
+            }
         }
     }
 

@@ -75,14 +75,29 @@ public class CellItem {
 
         if (column.MultiLine) {
             var tmp = db.Cell.GetString(column, row).SplitAndCutByCrAndBr();
-            if (column.ShowMultiLineInOneLine) {
-                contentSize = ContentSize(column.KeyName, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
-            } else {
-                foreach (var thisString in tmp) {
-                    var tmpSize = ContentSize(column.KeyName, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
-                    contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
-                    contentSize.Height += Math.Max(tmpSize.Height, pix16);
-                }
+            switch (column.BehaviorOfImageAndText) {
+                case BildTextVerhalten.Nur_erste_Zeile_darstellen:
+                    if (tmp.Length > 1) {
+                        contentSize = ContentSize(column.KeyName, tmp[0] + "...", cellFont, ShortenStyle.Replaced, pix16, BildTextVerhalten.Nur_Text, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+                    }
+                    if (tmp.Length == 1) {
+                        contentSize = ContentSize(column.KeyName, tmp[0], cellFont, ShortenStyle.Replaced, pix16, BildTextVerhalten.Nur_Text, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+                    }
+                    break;
+
+                case BildTextVerhalten.Mehrzeilig_einzeilig_darsellen:
+                    contentSize = ContentSize(column.KeyName, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+                    break;
+
+                default: {
+                        foreach (var thisString in tmp) {
+                            var tmpSize = ContentSize(column.KeyName, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+                            contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
+                            contentSize.Height += Math.Max(tmpSize.Height, pix16);
+                        }
+
+                        break;
+                    }
             }
         } else {
             var txt = db.Cell.GetString(column, row);

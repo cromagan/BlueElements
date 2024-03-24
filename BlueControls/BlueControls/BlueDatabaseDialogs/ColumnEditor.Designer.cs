@@ -58,7 +58,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift2 = new BlueControls.Controls.TextBox();
             this.txbUeberschift1 = new BlueControls.Controls.TextBox();
             this.capReplacer = new BlueControls.Controls.Caption();
-            this.btnEinzeiligDarstellen = new BlueControls.Controls.Button();
             this.capEinheit = new BlueControls.Controls.Caption();
             this.cbxEinheit = new BlueControls.Controls.ComboBox();
             this.capSpaltenbild = new BlueControls.Controls.Caption();
@@ -205,7 +204,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnzeige.Controls.Add(this.txbUeberschift2);
             this.tabAnzeige.Controls.Add(this.txbUeberschift1);
             this.tabAnzeige.Controls.Add(this.capReplacer);
-            this.tabAnzeige.Controls.Add(this.btnEinzeiligDarstellen);
             this.tabAnzeige.Controls.Add(this.capEinheit);
             this.tabAnzeige.Controls.Add(this.cbxEinheit);
             this.tabAnzeige.Controls.Add(this.capSpaltenbild);
@@ -447,15 +445,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capReplacer.Name = "capReplacer";
             this.capReplacer.Size = new System.Drawing.Size(144, 24);
             this.capReplacer.Text = "Optische Ersetzungen:";
-            // 
-            // btnEinzeiligDarstellen
-            // 
-            this.btnEinzeiligDarstellen.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnEinzeiligDarstellen.Location = new System.Drawing.Point(8, 88);
-            this.btnEinzeiligDarstellen.Name = "btnEinzeiligDarstellen";
-            this.btnEinzeiligDarstellen.Size = new System.Drawing.Size(216, 16);
-            this.btnEinzeiligDarstellen.TabIndex = 29;
-            this.btnEinzeiligDarstellen.Text = "Mehrzeilig einzeilig darstellen";
             // 
             // capEinheit
             // 
@@ -1641,7 +1630,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabFilter;
         private TabPage tabQuickInfo;
         private TabPage tabSonstiges;
-        private Button btnEinzeiligDarstellen;
         private Button btnIgnoreLock;
         private Button btnLogUndo;
         private Button btnSpellChecking;
