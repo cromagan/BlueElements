@@ -112,7 +112,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
         Caption = useThisKeyName;
         foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLower()) {
+            switch (pair.Key.ToLowerInvariant()) {
                 case "sheetsize":
                     _sheetSizeInMm = pair.Value.SizeFParse();
                     GenPoints();
@@ -623,7 +623,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public void SaveAsBitmap(string filename, string page) {
         var i = ToBitmap(1, page);
         if (i == null) { return; }
-        switch (filename.FileSuffix().ToUpper()) {
+        switch (filename.FileSuffix().ToUpperInvariant()) {
             case "JPG":
             case "JPEG":
                 i.Save(filename, ImageFormat.Jpeg);
@@ -638,7 +638,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                 break;
 
             default:
-                MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpper(), ImageCode.Warnung, "OK");
+                MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
                 return;
         }
     }
@@ -894,7 +894,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     private void CreateItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLower()) {
+            switch (pair.Key.ToLowerInvariant()) {
                 case "dpi":
                 case "sheetstylescale":
                 case "sheetstyle":
@@ -1021,7 +1021,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
         foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLower()) {
+            switch (pair.Key.ToLowerInvariant()) {
                 case "connection":
                     CreateConnection(pair.Value);
 
@@ -1036,7 +1036,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     private void ParseItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLower()) {
+            switch (pair.Key.ToLowerInvariant()) {
                 case "dpi":
                 case "sheetstyle":
                 case "sheetstylescale":

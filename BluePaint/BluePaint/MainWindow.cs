@@ -286,7 +286,7 @@ public partial class MainWindow {
             var c = bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
             InfoText.Text = "X: " + e.Current.TrimmedX +
                             "<br>Y: " + e.Current.TrimmedY +
-                            "<br>Farbe: " + c.ToHtmlCode().ToUpper();
+                            "<br>Farbe: " + c.ToHtmlCode().ToUpperInvariant();
         } else {
             InfoText.Text = string.Empty;
         }
@@ -327,7 +327,7 @@ public partial class MainWindow {
         if (P.Bmp is not Bitmap bmp || !bmp.IsValid()) { return; }
 
         try {
-            switch (_filename.FileSuffix().ToUpper()) {
+            switch (_filename.FileSuffix().ToUpperInvariant()) {
                 case "JPG":
                     bmp.Save(_filename, ImageFormat.Jpeg);
                     _isSaved = true;

@@ -42,7 +42,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     #region Constructors
 
-    protected Variable(string name, bool ronly, string comment) : base(name.ToLower()) {
+    protected Variable(string name, bool ronly, string comment) : base(name.ToLowerInvariant()) {
         ReadOnly = ronly;
         Comment = comment;
     }
@@ -66,7 +66,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
     }
 
-    public string CompareKey => CheckOrder.ToStringInt3() + "|" + KeyName.ToUpper();
+    public string CompareKey => CheckOrder.ToStringInt3() + "|" + KeyName.ToUpperInvariant();
     public abstract bool GetFromStringPossible { get; }
 
     public abstract bool IsNullOrEmpty { get; }
@@ -198,7 +198,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     }
 
     public static bool IsValidName(string v) {
-        v = v.ToLower();
+        v = v.ToLowerInvariant();
         var vo = v;
         v = v.ReduceToChars(AllowedCharsVariableName);
         return v == vo && !string.IsNullOrEmpty(v);
@@ -252,7 +252,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     }
 
     public string ReplaceInText(string txt) {
-        if (!txt.ToLower().Contains("~" + KeyName.ToLower() + "~")) { return txt; }
+        if (!txt.ToLowerInvariant().Contains("~" + KeyName.ToLowerInvariant() + "~")) { return txt; }
         return txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
     }
 

@@ -134,7 +134,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (_column == null || initialItem.Row == null || db.Column.First() is not ColumnItem cf) { return; }
 
         // Den Beziehungstext holen
-        var t = initialItem.Row.CellGetString(_column).ToUpper();
+        var t = initialItem.Row.CellGetString(_column).ToUpperInvariant();
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
         List<string> names = [.. cf.GetUcaseNamesSortedByLenght()];

@@ -70,7 +70,7 @@ internal class Method_SaveText : Method {
 
         //if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
-        switch (attvar.ValueStringGet(1).ToUpper()) {
+        switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "UTF8":
                 if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false)) {
                     return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei.");

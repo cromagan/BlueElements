@@ -94,7 +94,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             return;
         }
 
-        if (fileOrLayoutId.FileSuffix().ToUpper() == "BCR") {
+        if (fileOrLayoutId.FileSuffix().ToUpperInvariant() == "BCR") {
             LoadFile(fileOrLayoutId, fileOrLayoutId);
         } else {
             DisablePad();
@@ -161,7 +161,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             DisablePad();
         }
 
-        if (cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
+        if (cbxLayout.Text.FileSuffix().ToUpperInvariant() != "BCR" && FileExists(cbxLayout.Text)) {
             btnTextEditor.Enabled = true;
             btnLayoutOeffnen.Enabled = true;
             tabStart.Enabled = false;
@@ -188,7 +188,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (Pad.Item == null) { return; }
 
         var newl = Pad.Item.ToString();
-        if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {
+        if (Pad.Item.KeyName.FileSuffix().ToUpperInvariant() == "BCR") {
             WriteAllText(Pad.Item.KeyName, newl, Constants.Win1252, false);
         }
     }

@@ -904,7 +904,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             dataUncompressed = OnToListOfByte();
 
             if (dataUncompressed != null && dataUncompressed.Length > 0) {
-                tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
+                tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
                 try {
                     using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
                     x.Write(dataUncompressed, 0, dataUncompressed.Length);

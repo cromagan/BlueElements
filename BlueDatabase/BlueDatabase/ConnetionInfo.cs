@@ -51,11 +51,11 @@ public class ConnectionInfo : IReadableTextWithKey {
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
 
         if (uniqueId.IsFormat(FormatHolder.FilepathAndName) &&
-            uniqueId.FileSuffix().ToUpper() is "MDB" or "BDB" or "MBDB") {
+            uniqueId.FileSuffix().ToUpperInvariant() is "MDB" or "BDB" or "MBDB") {
             foreach (var thisDb in alf) {
                 var d = thisDb.ConnectionData;
 
-                if (d.UniqueId.ToUpper().EndsWith(uniqueId.ToUpper())) {
+                if (d.UniqueId.ToUpperInvariant().EndsWith(uniqueId.ToUpperInvariant())) {
                     TableName = d.TableName;
                     Provider = d.Provider;
                     DatabaseId = d.DatabaseId;
@@ -107,7 +107,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     }
 
     public ConnectionInfo(string tablename, Database? provider, string databaseId, string additionalInfo, string mustbefreezed) {
-        TableName = tablename.ToUpper();
+        TableName = tablename.ToUpperInvariant();
         Provider = provider;
         DatabaseId = databaseId;
         AdditionalData = additionalInfo;
@@ -170,9 +170,9 @@ public class ConnectionInfo : IReadableTextWithKey {
     public string ReadableText() => TableName;
 
     public QuickImage SymbolForReadableText() {
-        if (AdditionalData.ToLower().Contains(".bdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
-        if (AdditionalData.ToLower().Contains(".mdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
-        if (AdditionalData.ToLower().Contains(".mbdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
+        if (AdditionalData.ToLowerInvariant().Contains(".bdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
+        if (AdditionalData.ToLowerInvariant().Contains(".mdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
+        if (AdditionalData.ToLowerInvariant().Contains(".mbdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         return QuickImage.Get(ImageCode.Datenbank, 16);
     }
 

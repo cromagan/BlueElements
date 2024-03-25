@@ -150,13 +150,13 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var oldw = CFormula.PadData.SheetSizeInPix.Width / AutosizableExtension.GridSize;
 
-        var wi = InputBox.Show("Breite in Kästchen:", oldw.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture), FormatHolder.IntegerPositive);
+        var wi = InputBox.Show("Breite in Kästchen:", oldw.ToStringFloat1(), FormatHolder.IntegerPositive);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 
         var oldh = CFormula.PadData.SheetSizeInPix.Height / AutosizableExtension.GridSize;
 
-        var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString(Constants.Format_Float1, CultureInfo.InvariantCulture), FormatHolder.IntegerPositive);
+        var he = InputBox.Show("Höhe in Kästchen:", oldh.ToStringFloat1(), FormatHolder.IntegerPositive);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 

@@ -163,7 +163,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     public bool ReplaceVariable(Variable variable) {
         if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
-        if ("~" + variable.KeyName.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
+        if ("~" + variable.KeyName.ToLowerInvariant() + "~" != Platzhalter_Für_Layout.ToLowerInvariant()) { return false; }
         if (variable is not VariableBitmap vbmp) { return false; }
         var ot = vbmp.ValueBitmap;
         if (ot != null) {

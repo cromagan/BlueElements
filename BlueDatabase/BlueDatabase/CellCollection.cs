@@ -237,7 +237,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return column.IsInCache != null || row.IsInCache != null;
     }
 
-    public static string KeyOfCell(string colname, string rowKey) => colname.ToUpper() + "|" + rowKey;
+    public static string KeyOfCell(string colname, string rowKey) => colname.ToUpperInvariant() + "|" + rowKey;
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
@@ -643,8 +643,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style) ?? [];
 
     internal bool ChangeColumnName(string oldName, string newName) {
-        oldName = oldName.ToUpper() + "|";
-        newName = newName.ToUpper() + "|";
+        oldName = oldName.ToUpperInvariant() + "|";
+        newName = newName.ToUpperInvariant() + "|";
 
         if (oldName == newName) { return true; }
 
@@ -712,8 +712,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
         // if (Column.Format == DataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
         if (typ.HasFlag(FilterType.GroﬂKleinEgal)) {
-            istValue = istValue.ToUpper();
-            filterValue = filterValue.ToUpper();
+            istValue = istValue.ToUpperInvariant();
+            filterValue = filterValue.ToUpperInvariant();
             typ ^= FilterType.GroﬂKleinEgal;
         }
 
@@ -738,7 +738,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 if (ival > maxv) { return false; }
                 //if (DoubleParse)
                 //if (string.IsNullOrEmpty(IstValue)) { return false; }
-                //if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
+                //if (!FilterValue.ToUpperInvariant().Contains("VALUE")) { return false; }
                 //var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
                 //if (d == null) { return false; }
                 //return d == -1;
@@ -765,7 +765,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (row?.Database?.Column.First() == null || row.Database.IsDisposed) { return allRows; }
 
         var names = row.Database.Column.First()?.GetUcaseNamesSortedByLenght();
-        var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
+        var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
             List<RowItem?> r = [];
@@ -924,7 +924,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 didNew = true;
                 DoReplace(newValue, keyOfCHangedRow);
             }
-            if (completeRelationText.ToUpper().Contains(names[z])) {
+            if (completeRelationText.ToUpperInvariant().Contains(names[z])) {
                 var r = dbtmp.Row[names[z]];
                 if (r != null && !r.IsDisposed) { DoReplace(names[z], r.KeyName); }
             }
@@ -967,13 +967,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (thisRowItem != null) {
                 if (!thisRowItem.CellIsNullOrEmpty(columnToRepair)) {
                     var t = thisRowItem.CellGetString(columnToRepair);
-                    if (!string.IsNullOrEmpty(oldValue) && t.ToUpper().Contains(oldValue.ToUpper())) {
+                    if (!string.IsNullOrEmpty(oldValue) && t.ToUpperInvariant().Contains(oldValue.ToUpperInvariant())) {
                         t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                         t = ChangeTextFromRowId(t);
                         var t2 = t.SplitAndCutByCrToList().SortedDistinctList();
                         thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namens‰nderung: " + oldValue + " -> " + newValue);
                     }
-                    if (t.ToUpper().Contains(newValue.ToUpper())) {
+                    if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
                         MakeNewRelations(columnToRepair, thisRowItem, new List<string>(), t.SplitAndCutByCrToList());
                     }
                 }

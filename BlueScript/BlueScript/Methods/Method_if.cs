@@ -70,7 +70,7 @@ public class Method_If : Method {
         //                return;
         //            }
 
-        switch (txt.ToLower()) {
+        switch (txt.ToLowerInvariant()) {
             case "!false":
             case "true":
                 return true;

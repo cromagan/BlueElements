@@ -258,7 +258,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         }
 
         if (fi.DirectoryName != null) {
-            var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLower();
+            var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLowerInvariant();
 
             if (tmp.EndsWith("\\$getcurrent\\")) { return false; }
             if (tmp.EndsWith("\\$recycle.bin\\")) { return false; }
@@ -628,7 +628,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
                         break;
 
                     default:
-                        p.UserDefCompareKey = Constants.SecondSortChar + p.Caption.ToUpper();
+                        p.UserDefCompareKey = Constants.SecondSortChar + p.Caption.ToUpperInvariant();
                         break;
                 }
 
@@ -653,7 +653,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
                 var p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
                 tags.TagSet("Folder", bool.TrueString);
                 p.Padding = 10;
-                p.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpper();
+                p.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpperInvariant();
                 p.Tag = tags;
                 feedBack = ["Add", p];
                 ThumbGenerator.ReportProgress(1, feedBack);
@@ -680,7 +680,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
         var gb = (List<object>)e.UserState;
 
-        var com = ((string)gb[0]).ToLower();
+        var com = ((string)gb[0]).ToLowerInvariant();
 
         switch (com) {
             case "buttons&watcher":

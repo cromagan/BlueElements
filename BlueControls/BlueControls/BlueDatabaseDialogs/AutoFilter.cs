@@ -267,7 +267,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     private void OnFilterCommand(FilterCommandEventArgs e) => FilterCommand?.Invoke(this, e);
 
     private void sFilter_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        switch (e.Item.KeyName.ToLower()) {
+        switch (e.Item.KeyName.ToLowerInvariant()) {
             case "filterleere": {
                     CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, string.Empty));
                     break;
@@ -375,7 +375,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                         if (zd2 < zd1) {
                             Generic.Swap(ref zd1, ref zd2);
                         }
-                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToString(Constants.Format_Float9, CultureInfo.InvariantCulture) + "|" + zd2.ToString(Constants.Format_Float9, CultureInfo.InvariantCulture)));
+                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToStringFloat9() + "|" + zd2.ToStringFloat9()));
                         return;
                     }
                 }

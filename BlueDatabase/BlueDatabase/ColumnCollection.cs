@@ -130,7 +130,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (IsDisposed || Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
 
             try {
-                columnName = columnName.ToUpper();
+                columnName = columnName.ToUpperInvariant();
                 var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;
                 if (col != null && col.IsDisposed) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
@@ -285,7 +285,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null && thisColumnItem.IsSystemColumn()) {
-                switch (thisColumnItem.KeyName.ToUpper()) {
+                switch (thisColumnItem.KeyName.ToUpperInvariant()) {
                     case "SYS_LOCKED":
                         SysLocked = thisColumnItem;
                         break;
@@ -395,10 +395,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (oldName == newName) { return true; }
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
-        var ok = _internal.TryRemove(oldName.ToUpper(), out var vcol);
+        var ok = _internal.TryRemove(oldName.ToUpperInvariant(), out var vcol);
         if (!ok) { return false; }
 
-        ok = _internal.TryAdd(newName.ToUpper(), vcol);
+        ok = _internal.TryAdd(newName.ToUpperInvariant(), vcol);
         if (!ok) { return false; }
 
         ok = Database.Cell.ChangeColumnName(oldName, newName);
@@ -473,7 +473,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (c == null) { return "Spalte nicht gefunden!"; }
 
             OnColumnRemoving(new ColumnEventArgs(c));
-            if (!_internal.TryRemove(name.ToUpper(), out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
             if (reason is not Reason.InitialLoad and not Reason.UpdateChanges) {
@@ -527,7 +527,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void Column_DisposingEvent(object sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
             c.DisposingEvent -= Column_DisposingEvent;
-            _internal.TryRemove(c.KeyName.ToUpper(), out _);
+            _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
             OnColumnDisposed(new ColumnEventArgs(c));
             //Remove(c, "Disposing");
         }
@@ -602,7 +602,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return;
         }
 
-        c = GenerateAndAdd(sysname.ToUpper());
+        c = GenerateAndAdd(sysname.ToUpperInvariant());
         c?.ResetSystemToDefault(true);
     }
 

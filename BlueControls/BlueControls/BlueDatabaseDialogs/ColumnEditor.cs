@@ -570,8 +570,8 @@ internal sealed partial class ColumnEditor {
 
             foreach (var thisColumn in db2.Column) {
                 if (thisColumn.Function.CanBeCheckedByRules() && !thisColumn.MultiLine) {
-                    dd.Add("~" + thisColumn.KeyName.ToLower() + "~");
-                    or.Add("~" + thisColumn.KeyName.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
+                    dd.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~");
+                    or.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
             }
 

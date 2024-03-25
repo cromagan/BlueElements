@@ -122,7 +122,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbTags.Text = db.Tags.JoinWithCr();
 
         txbCaption.Text = db.Caption;
-        txbGlobalScale.Text = db.GlobalScale.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture);
+        txbGlobalScale.Text = db.GlobalScale.ToStringFloat2();
         txbAdditionalFiles.Text = db.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = db.StandardFormulaFile;
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");

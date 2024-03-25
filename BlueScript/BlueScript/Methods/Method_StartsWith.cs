@@ -55,7 +55,7 @@ internal class Method_StartsWith : Method {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (attvar.ValueStringGet(0).ToLower().StartsWith(attvar.ValueStringGet(z).ToLower())) {
+                if (attvar.ValueStringGet(0).ToLowerInvariant().StartsWith(attvar.ValueStringGet(z).ToLowerInvariant())) {
                     return DoItFeedback.Wahr();
                 }
             }

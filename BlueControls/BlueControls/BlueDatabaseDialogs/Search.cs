@@ -95,14 +95,14 @@ public sealed partial class Search : Form {
                 return;
             }
 
-            var ist1 = found.ReadableText().ToLower();
+            var ist1 = found.ReadableText().ToLowerInvariant();
             if (!string.IsNullOrEmpty(ist1)) {
                 // Allgemeine Prüfung
-                if (ist1.Contains(searchT.ToLower())) { break; }
+                if (ist1.Contains(searchT.ToLowerInvariant())) { break; }
                 if (btnAehnliches.Checked) {
                     var ist3 = ist1.StarkeVereinfachung(" ,", true);
                     var searchTxt3 = searchT.StarkeVereinfachung(" ,", true);
-                    if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
+                    if (!string.IsNullOrEmpty(ist3) && ist3.ToLowerInvariant().Contains(searchTxt3.ToLowerInvariant())) {
                         break;
                     }
                 }
@@ -133,7 +133,7 @@ public sealed partial class Search : Form {
             MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
             return string.Empty;
         }
-        return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
+        return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLowerInvariant();
     }
 
     private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);

@@ -66,7 +66,7 @@ internal class Method_LoadTextFile : Method {
 
         try {
             string importText;
-            switch (attvar.ValueStringGet(1).ToUpper()) {
+            switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "UTF8":
                     importText = File.ReadAllText(attvar.ValueStringGet(0), Encoding.UTF8);
                     break;

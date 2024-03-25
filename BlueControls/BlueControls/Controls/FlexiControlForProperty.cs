@@ -461,11 +461,11 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                 break;
 
             case double db:
-                ValueSet(db.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture), true);
+                ValueSet(db.ToStringFloat2(), true);
                 break;
 
             case float fl:
-                ValueSet(fl.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture), true);
+                ValueSet(fl.ToStringFloat2(), true);
                 break;
 
             case Color co:

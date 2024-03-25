@@ -269,7 +269,7 @@ public static class Develop {
         if (ServiceStarted) { return; }
         ServiceStarted = true;
 
-        OrigingLanguage = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName.ToUpper();
+        OrigingLanguage = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName.ToUpperInvariant();
 
         var info = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 

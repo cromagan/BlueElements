@@ -172,14 +172,14 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var ob = (IContextMenu)infos[2];
         Close(ListBoxAppearance.KontextMenu);
         Close(ob);
-        if (e.ClickedCommand.ToLower() == "weiterebefehle") {
+        if (e.ClickedCommand.ToLowerInvariant() == "weiterebefehle") {
             var par = ob.ParentControlWithCommands();
             if (par != null) {
                 ContextMenuShow(par, null);
             }
             return;
         }
-        if (e.ClickedCommand.ToLower() == "abbruch") { return; }
+        if (e.ClickedCommand.ToLowerInvariant() == "abbruch") { return; }
 
         ContextMenuItemClickedEventArgs ex = new(e.ClickedCommand, hotItem);
         bool done;

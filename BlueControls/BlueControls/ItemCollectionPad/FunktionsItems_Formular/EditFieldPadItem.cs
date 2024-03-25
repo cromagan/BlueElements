@@ -328,7 +328,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     //public bool ReplaceVariable(Variable variable) {
     //    if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
-    //    if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
+    //    if ("~" + variable.Name.ToLowerInvariant() + "~" != Platzhalter_Für_Layout.ToLowerInvariant()) { return false; }
     //    if (variable is not VariableBitmap vbmp) { return false; }
     //    var ot = vbmp.ValueBitmap;
     //    if (ot is Bitmap bmp) {

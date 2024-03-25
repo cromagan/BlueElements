@@ -55,7 +55,7 @@ internal class Method_EndsWith : Method {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (attvar.ValueStringGet(0).ToLower().EndsWith(attvar.ValueStringGet(z).ToLower())) {
+                if (attvar.ValueStringGet(0).ToLowerInvariant().EndsWith(attvar.ValueStringGet(z).ToLowerInvariant())) {
                     return DoItFeedback.Wahr();
                 }
             }

@@ -521,10 +521,10 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         string? attribut;
         if (istgleich < 0) {
             // <H4> wird durch autoprüfung zu <H4 >
-            cod = oricode.ToUpper().Trim();
+            cod = oricode.ToUpperInvariant().Trim();
             attribut = string.Empty;
         } else {
-            cod = oricode.Substring(0, istgleich).Replace(" ", string.Empty).ToUpper().Trim();
+            cod = oricode.Substring(0, istgleich).Replace(" ", string.Empty).ToUpperInvariant().Trim();
             attribut = oricode.Substring(istgleich + 1).Trim('\"');
         }
         switch (cod) {

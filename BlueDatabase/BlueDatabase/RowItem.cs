@@ -309,9 +309,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem? column, string value, string comment) => Database?.Cell.Set(column, this, value, comment);
 
-    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture), comment);
+    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToStringFloat10(), comment);
 
-    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture), comment);
+    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToStringFloat10(), comment);
 
     public void CellSet(string columnName, int value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(), comment);
 
@@ -545,7 +545,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!erg.Contains("~")) { return erg; }
 
             if (column != null) {
-                if (erg.ToUpper().Contains("~" + column.KeyName.ToUpper())) {
+                if (erg.ToUpperInvariant().Contains("~" + column.KeyName.ToUpperInvariant())) {
                     var replacewith = CellGetString(column);
                     if (replacedvalue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
                     if (removeLineBreaks && !replacedvalue) {
@@ -553,7 +553,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         replacewith = replacewith.Replace("\r", " ");
                     }
 
-                    erg = erg.Replace("~" + column.KeyName.ToUpper() + "~", replacewith, RegexOptions.IgnoreCase);
+                    erg = erg.Replace("~" + column.KeyName.ToUpperInvariant() + "~", replacewith, RegexOptions.IgnoreCase);
                 }
             }
         }
@@ -735,13 +735,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (string.IsNullOrEmpty(searchText)) { return true; }
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
-        searchText = searchText.ToUpper();
+        searchText = searchText.ToUpperInvariant();
         foreach (var thisColumnItem in db.Column) {
             {
                 if (!thisColumnItem.IgnoreAtRowFilter) {
                     var txt = CellGetString(thisColumnItem);
                     txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, thisColumnItem.Prefix, thisColumnItem.Suffix, thisColumnItem.DoOpticalTranslation, thisColumnItem.OpticalReplace);
-                    if (!string.IsNullOrEmpty(txt) && txt.ToUpper().Contains(searchText)) { return true; }
+                    if (!string.IsNullOrEmpty(txt) && txt.ToUpperInvariant().Contains(searchText)) { return true; }
                 }
             }
         }

@@ -1002,7 +1002,7 @@ public partial class TableView : FormWithStatusBar {
         if (e.Item is TextListItem tli) {
             var com = (tli.KeyName + "|||").SplitBy("|");
 
-            switch (com[0].ToLower()) {
+            switch (com[0].ToLowerInvariant()) {
                 case "#repairscript":
                 case "#editscript":
                     OpenScriptEditor(db);

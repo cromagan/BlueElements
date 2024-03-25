@@ -123,7 +123,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public static BlueFont Get(string toParse) {
         if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) { return DefaultFont; }
 
-        if (FontsAll.Get(toParse.Replace(" ", string.Empty).ToUpper()) is BlueFont found) { return found; }
+        if (FontsAll.Get(toParse.Replace(" ", string.Empty).ToUpperInvariant()) is BlueFont found) { return found; }
 
         var f = new BlueFont();
 
@@ -206,14 +206,14 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         var isCap = false;
 
-        if (Kapitälchen && text != text.ToUpper()) {
+        if (Kapitälchen && text != text.ToUpperInvariant()) {
             isCap = true;
             f = FontWithoutLinesForCapitals(zoom);
-            text = text.ToUpper();
+            text = text.ToUpperInvariant();
         } else if (OnlyUpper) {
-            text = text.ToUpper();
+            text = text.ToUpperInvariant();
         } else if (OnlyLower) {
-            text = text.ToLower();
+            text = text.ToLowerInvariant();
         }
 
         var si = SizeF.Empty;
@@ -288,7 +288,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) {
-        KeyName = parsed.Replace(" ", string.Empty).ToUpper();
+        KeyName = parsed.Replace(" ", string.Empty).ToUpperInvariant();
 
         _charSize = new SizeF[256];
         for (var z = 0; z <= _charSize.GetUpperBound(0); z++) {

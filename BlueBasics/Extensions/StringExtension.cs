@@ -95,7 +95,7 @@ public static partial class Extensions {
             case SortierTyp.ZahlenwertFloat:
                 if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                 if (DoubleTryParse(isValue, out var dw)) {
-                    var t = dw.ToString(Constants.Format_Float10_3, CultureInfo.InvariantCulture);
+                    var t = dw.ToStringFloat10_3();
                     if (!t.Contains(",")) { t += ",000"; }
 
                     if (dw >= 0) { t = "A" + t; }
@@ -285,7 +285,7 @@ public static partial class Extensions {
 
     public static bool FromPlusMinus(this string value) {
         if (string.IsNullOrEmpty(value)) { return false; }
-        switch (value.ToLower()) {
+        switch (value.ToLowerInvariant()) {
             case "+":
             case "wahr":
             case "true":
@@ -319,7 +319,7 @@ public static partial class Extensions {
             var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
             if (gleichpos < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
 
-            var tag = value.Substring(start, gleichpos - start).Trim().ToLower();
+            var tag = value.Substring(start, gleichpos - start).Trim().ToLowerInvariant();
             tag = tag.Trim(" ");
             tag = tag.Trim(",");
             tag = tag.Trim(" ");
@@ -382,8 +382,8 @@ public static partial class Extensions {
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
         if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
-        value = value.ToUpper();
-        input = " " + input.ToUpper() + " ";
+        value = value.ToUpperInvariant();
+        input = " " + input.ToUpperInvariant() + " ";
         startIndex++;
         while (true) {
             if (startIndex > input.Length - 1) { return -1; }
@@ -616,7 +616,7 @@ public static partial class Extensions {
         var oldPos = 0;
         while (true) {
             if (string.IsNullOrEmpty(txt)) { return txt; }
-            var posx = txt.ToUpper().IndexOf(alt.ToUpper(), oldPos, StringComparison.Ordinal);
+            var posx = txt.ToUpperInvariant().IndexOf(alt.ToUpperInvariant(), oldPos, StringComparison.Ordinal);
             if (posx >= 0) {
                 txt = txt.Substring(0, posx) + neu + txt.Substring(posx + alt.Length);
                 oldPos = posx + neu.Length;
@@ -726,7 +726,7 @@ public static partial class Extensions {
     }
 
     public static string Sprachneutral(this string isValue) {
-        isValue = isValue.ToLower();
+        isValue = isValue.ToLowerInvariant();
         isValue = isValue.Replace("ä", "a");
         isValue = isValue.Replace("ö", "o");
         isValue = isValue.Replace("ü", "u");
@@ -761,12 +761,12 @@ public static partial class Extensions {
     //        if (" ,{".Contains(tXT.Substring(BG, 1))) { break; }
     //        BG--;
     //    }
-    //    return tXT.Substring(BG + 1, IG - BG - 1).ToLower();
+    //    return tXT.Substring(BG + 1, IG - BG - 1).ToLowerInvariant();
     //}
     //public static string ParseValue(this string tXT, string offTag, int startIndex) {
     //    if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
     //    if (string.IsNullOrEmpty(offTag)) { return string.Empty; }
-    //    var FirstCharAfterEquals = tXT.ToLower().IndexOf(offTag.ToLower() + "=", startIndex);
+    //    var FirstCharAfterEquals = tXT.ToLowerInvariant().IndexOf(offTag.ToLowerInvariant() + "=", startIndex);
     //    if (FirstCharAfterEquals < 0) { return string.Empty; }
     //    FirstCharAfterEquals = FirstCharAfterEquals + offTag.Length + 1;
     //    // while (TXT.Substring(FirstCharAfterEquals, 1) == " ")
@@ -822,7 +822,7 @@ public static partial class Extensions {
     /// <param name="additinalAllowed"></param>
     /// <returns></returns>
     public static string StarkeVereinfachung(this string tXt, string additinalAllowed, bool removedupes) {
-        tXt = tXt.ToLower().ReduceToChars(Char_Numerals + Char_Buchstaben + additinalAllowed);
+        tXt = tXt.ToLowerInvariant().ReduceToChars(Char_Numerals + Char_Buchstaben + additinalAllowed);
         foreach (var replacement in Replacements) {
             tXt = tXt.Replace(replacement.Key, replacement.Value);
         }
@@ -870,7 +870,7 @@ public static partial class Extensions {
 
     public static string ToTitleCase(this string text) {
         // Suchwort: #Camelcase
-        text = text.ToLower().Replace("_", " ");
+        text = text.ToLowerInvariant().Replace("_", " ");
         var info = CultureInfo.CurrentCulture.TextInfo;
         return info.ToTitleCase(text);
     }
@@ -908,8 +908,8 @@ public static partial class Extensions {
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
-        was = was.ToUpper();
-        while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).ToUpper() == was) {
+        was = was.ToUpperInvariant();
+        while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).ToUpperInvariant() == was) {
             tXt = tXt.Remove(tXt.Length - was.Length);
         }
         return tXt;
@@ -918,8 +918,8 @@ public static partial class Extensions {
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
-        was = was.ToUpper();
-        while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).ToUpper() == was) {
+        was = was.ToUpperInvariant();
+        while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).ToUpperInvariant() == was) {
             tXt = tXt.Remove(0, was.Length);
         }
         return tXt;

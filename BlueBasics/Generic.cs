@@ -107,7 +107,7 @@ public static class Generic {
             title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
         } catch { }
 
-        title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
+        title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
         using StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + title + ".url"));
         writer.WriteLine("[InternetShortcut]");
         writer.WriteLine("URL=" + linkUrl);

@@ -134,7 +134,7 @@ public class CellItem {
                 x[2] = gr2[1];
                 var ntxt = x.JoinWith("|").TrimEnd("|");
 
-                tmpImageCode = QuickImage.Get(additionalname.ToLower() + "_" + ntxt);
+                tmpImageCode = QuickImage.Get(additionalname.ToLowerInvariant() + "_" + ntxt);
                 if (tmpImageCode.IsError) {
                     tmpImageCode = QuickImage.Get(ntxt);
                     if (tmpImageCode.IsError) {

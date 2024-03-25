@@ -70,7 +70,7 @@ internal class Method_AutoCorrect : Method_Database {
             var s = string.Empty;
             switch (columnVar) {
                 case VariableFloat vf:
-                    s = vf.ValueNum.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture);
+                    s = vf.ValueNum.ToStringFloat10();
                     break;
 
                 case VariableListString vl:

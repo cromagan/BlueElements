@@ -25,7 +25,6 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
@@ -126,7 +125,7 @@ public class DimensionPadItem : AbstractPadItem {
         get => _textOben;
         set {
             if (IsDisposed) { return; }
-            if (_textOben == Länge_In_Mm.ToString(CultureInfo.InvariantCulture)) { value = string.Empty; }
+            if (_textOben == Länge_In_Mm.ToStringFloat3()) { value = string.Empty; }
             _textOben = value;
             OnPropertyChanged();
         }
@@ -150,7 +149,7 @@ public class DimensionPadItem : AbstractPadItem {
 
     public string Angezeigter_Text_Oben() {
         if (!string.IsNullOrEmpty(Text_Oben)) { return Text_Oben; }
-        var s = Länge_In_Mm.ToString(Constants.Format_Float10, CultureInfo.InvariantCulture);
+        var s = Länge_In_Mm.ToStringFloat10();
         s = s.Replace(".", ",");
         if (s.Contains(",")) {
             s = s.TrimEnd("0");

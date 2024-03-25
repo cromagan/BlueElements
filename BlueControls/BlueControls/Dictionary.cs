@@ -59,11 +59,11 @@ internal static class Dictionary {
         if (word.IsNumeral()) { return true; }
         if (Constants.Char_Numerals.Contains(word.Substring(0, 1))) { return true; }// z.B. 00 oder 1b oder 2L
 
-        if (word != word.ToLower() &&
-            word != word.ToUpper() &&
+        if (word != word.ToLowerInvariant() &&
+            word != word.ToUpperInvariant() &&
             word != word.ToTitleCase()) { return false; }
 
-        if (word == word.ToLower()) {
+        if (word == word.ToLowerInvariant()) {
             // Wenn ein Wort klein geschrieben ist, muss auch das kleingeschriebene in der Datenbank sein!
             return _dictWords.Row[new FilterItem(fc, FilterType.Istgleich, word)] != null;
         }
@@ -79,7 +79,7 @@ internal static class Dictionary {
         foreach (var thisRowItem in _dictWords.Row) {
             if (thisRowItem != null) {
                 var w = thisRowItem.CellFirstString();
-                var di = Generic.LevenshteinDistance(word.ToLower(), w.ToLower());
+                var di = Generic.LevenshteinDistance(word.ToLowerInvariant(), w.ToLowerInvariant());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
                     l.Add(di.ToStringInt5() + w);
                 }
@@ -114,8 +114,8 @@ internal static class Dictionary {
                     woEnd = etxt.WordEnd(pos);
                     var wort = etxt.Word(pos);
                     if (!IsWordOk(wort)) {
-                        var butt = wort.ToLower() != wort
-                            ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLower() + "' aufnehmen", "Ignorieren", "Beenden")
+                        var butt = wort.ToLowerInvariant() != wort
+                            ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLowerInvariant() + "' aufnehmen", "Ignorieren", "Beenden")
                             : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
                         switch (butt) {
                             case 0:
@@ -123,7 +123,7 @@ internal static class Dictionary {
                                 break;
 
                             case 1:
-                                WordAdd(wort.ToLower());
+                                WordAdd(wort.ToLowerInvariant());
                                 break;
 
                             case 2:

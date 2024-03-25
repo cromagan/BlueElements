@@ -110,7 +110,7 @@ public class BitmapListItem : AbstractListItem {
 
     #region Methods
 
-    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || _imageFilename.ToUpper().Contains(filterText.ToUpper());
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpperInvariant().Contains(filterText.ToUpperInvariant()) || _imageFilename.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == ListBoxAppearance.FileSystem) {

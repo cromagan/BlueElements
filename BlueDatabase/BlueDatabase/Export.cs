@@ -131,10 +131,10 @@ public static class Export {
     //    if (platzhaltertxt.Length < variablename.Length + 4) { return platzhaltertxt; }
     //    ColumnItem Col = null;
     //    do {
-    //        var tmpKennungstart = platzhaltertxt.ToUpper().IndexOf("//TS/000" + variablename.ToUpper() + "/", kennungstart);
+    //        var tmpKennungstart = platzhaltertxt.ToUpperInvariant().IndexOf("//TS/000" + variablename.ToUpperInvariant() + "/", kennungstart);
     //        if (tmpKennungstart < 0) { return platzhaltertxt; }
     //        kennungstart = tmpKennungstart;
-    //        var kennungende = platzhaltertxt.ToUpper().IndexOf("/E", kennungstart + 1);
+    //        var kennungende = platzhaltertxt.ToUpperInvariant().IndexOf("/E", kennungstart + 1);
     //        if (kennungende < 0) { return platzhaltertxt; }
     //        var obj = value;
     //        var Ges = platzhaltertxt.Substring(kennungstart, kennungende - kennungstart + 2);
@@ -439,14 +439,14 @@ public static class Export {
     //    return t2.ToNonCritical();
     //}
     //public static string DoLayoutCode(string Welcher, string tmpBody, RowItem vRow, string EndCode, bool ToNonCriticalText) {
-    //    Welcher = Welcher.ToUpper();
-    //    EndCode = EndCode.ToUpper();
+    //    Welcher = Welcher.ToUpperInvariant();
+    //    EndCode = EndCode.ToUpperInvariant();
     //    do {
-    //        var stx = tmpBody.ToUpper().IndexOf("//" + Welcher.ToUpper() + "/");
+    //        var stx = tmpBody.ToUpperInvariant().IndexOf("//" + Welcher.ToUpperInvariant() + "/");
     //        if (stx < 0) {
     //            return tmpBody;
     //        }
-    //        var enx = tmpBody.ToUpper().IndexOf("/" + EndCode.ToUpper(), stx + 4);
+    //        var enx = tmpBody.ToUpperInvariant().IndexOf("/" + EndCode.ToUpperInvariant(), stx + 4);
     //        if (enx < 0) {
     //            return tmpBody;
     //        }
@@ -497,8 +497,8 @@ public static class Export {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;
-        var stx = fileLoaded.ToUpper().IndexOf("//AS/300/AE", StringComparison.Ordinal);
-        var enx = fileLoaded.ToUpper().IndexOf("//AS/301/AE", StringComparison.Ordinal);
+        var stx = fileLoaded.ToUpperInvariant().IndexOf("//AS/300/AE", StringComparison.Ordinal);
+        var enx = fileLoaded.ToUpperInvariant().IndexOf("//AS/301/AE", StringComparison.Ordinal);
         if (stx > -1 && enx > stx) {
             head = fileLoaded.Substring(0, stx);
             body = fileLoaded.Substring(stx + 11, enx - stx - 11);

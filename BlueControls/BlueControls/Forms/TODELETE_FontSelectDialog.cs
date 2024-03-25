@@ -100,9 +100,9 @@ public partial class FontSelectDialog {
             if (FName[value.FontName] == null) { FName.ItemAdd(ItemOf(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
             FName.UncheckAll();
             FName.Check(value.FontName);
-            if (FSize[value.Size.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture)] == null) { FSize.ItemAdd(Item(value.Size.ToString(Constants.Format_Float2))); }
+            if (FSize[value.Size.ToStringFloat2()] == null) { FSize.ItemAdd(Item(value.Size.ToStringFloat2())); }
             FSize.UncheckAll();
-            FSize.Check(value.Size.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture));
+            FSize.Check(value.Size.ToStringFloat2());
             fFett.Checked = value.Bold;
             fKursiv.Checked = value.Italic;
             fUnterstrichen.Checked = value.Underline;

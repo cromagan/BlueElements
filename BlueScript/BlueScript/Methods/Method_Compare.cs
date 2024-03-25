@@ -82,7 +82,7 @@ internal class Method_Compare : Method {
             }
 
             if (hasval) {
-                if (!cases) { val = val.ToUpper(); }
+                if (!cases) { val = val.ToUpperInvariant(); }
                 firstval ??= val;
 
                 if (val != firstval) { return DoItFeedback.Falsch(); }

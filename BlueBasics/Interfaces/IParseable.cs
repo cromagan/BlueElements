@@ -27,7 +27,7 @@ public static class ParseableExtension {
 
     public static void Parse(this IParseable parsable, string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
-            var i = parsable.ParseThis(pair.Key.ToLower(), pair.Value);
+            var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
 
             if (!i) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);

@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -35,6 +34,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.Database;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -635,11 +635,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
     public bool IsDisposed { get; private set; }
 
     public string KeyName {
-        get => _name.ToUpper();
+        get => _name.ToUpperInvariant();
         set {
             if (IsDisposed) { return; }
-            value = value.ToUpper();
-            if (value == _name.ToUpper()) { return; }
+            value = value.ToUpperInvariant();
+            if (value == _name.ToUpperInvariant()) { return; }
 
             if (!ColumNameAllowed(value)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt: " + _name);
@@ -965,20 +965,20 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         if (!name.ContainsOnlyChars(AllowedCharsVariableName)) { return false; }
 
-        if (!Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
+        if (!Char_AZ.Contains(name.Substring(0, 1).ToUpperInvariant())) { return false; }
         if (name.Length > 128) { return false; }
 
-        if (name.ToUpper() == "USER") { return false; } // SQL System-Name
-        if (name.ToUpper() == "COMMENT") { return false; } // SQL System-Name
-        if (name.ToUpper() == "TABLE_NAME") { return false; } // SQL System-Name
-        if (name.ToUpper() == "COLUMN_NAME") { return false; } // SQL System-Name
-        if (name.ToUpper() == "OWNER") { return false; } // SQL System-Name
-        if (name.ToUpper() == "DATA_TYPE") { return false; } // SQL System-Name
-        if (name.ToUpper() == "DATA_LENGTH") { return false; } // SQL System-Name
-        if (name.ToUpper() == "OFFLINE") { return false; } // SQL System-Name
-        if (name.ToUpper() == "ONLINE") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "USER") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "COMMENT") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "TABLE_NAME") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "COLUMN_NAME") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "OWNER") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "DATA_TYPE") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "DATA_LENGTH") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "OFFLINE") { return false; } // SQL System-Name
+        if (name.ToUpperInvariant() == "ONLINE") { return false; } // SQL System-Name
 
-        if (name.ToUpper() == TmpNewDummy) { return false; } // BlueDatabase name bei neuen Spalten
+        if (name.ToUpperInvariant() == TmpNewDummy) { return false; } // BlueDatabase name bei neuen Spalten
 
         return true;
     }
@@ -998,7 +998,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return value; }
         }
 
-        if (_afterEditDoUCase) { value = value.ToUpper(); }
+        if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
         if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
         if (_afterEditAutoReplace.Count > 0) {
             List<string> l = [.. value.SplitAndCutByCr()];
@@ -1008,12 +1008,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                     var r = string.Empty;
                     if (rep.Length > 1) { r = rep[1].Replace(";cr;", "\r"); }
                     var op = string.Empty;
-                    if (rep.Length > 2) { op = rep[2].ToLower(); }
+                    if (rep.Length > 2) { op = rep[2].ToLowerInvariant(); }
                     if (op == "casesensitive") {
                         if (l[z] == rep[0]) { l[z] = r; }
                     } else if (op == "instr") {
                         l[z] = l[z].Replace(rep[0], r, RegexOptions.IgnoreCase);
-                        //if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
+                        //if (l[z].ToLowerInvariant() == rep[0].ToLowerInvariant()) { l[z] = r; }
                     } else {
                         if (string.Equals(l[z], rep[0], StringComparison.OrdinalIgnoreCase)) { l[z] = r; }
                     }
@@ -1024,7 +1024,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (_afterEditAutoCorrect) { value = KleineFehlerCorrect(value); }
         if (_roundAfterEdit > -1 && DoubleTryParse(value, out var erg)) {
             erg = Math.Round(erg, _roundAfterEdit, MidpointRounding.AwayFromZero);
-            value = erg.ToString(CultureInfo.InvariantCulture);
+            value = erg.ToStringFloat();
         }
         if (_afterEditQuickSortRemoveDouble) {
             var l = new List<string>(value.SplitAndCutByCr()).SortedDistinctList();
@@ -1440,7 +1440,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
     public bool IsFirst() => Database?.Column.First() == this;
 
     public bool IsSystemColumn() =>
-        _name.ToUpper() is "SYS_CORRECT" or
+        _name.ToUpperInvariant() is "SYS_CORRECT" or
             "SYS_CHANGER" or
             "SYS_CREATOR" or
             "SYS_CHAPTER" or
@@ -1494,7 +1494,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         var i = ret.IndexOf("-\r", StringComparison.Ordinal);
         if (i > 0 && i < ret.Length - 3) {
             var tzei = ret.Substring(i + 2, 1);
-            if (tzei.ToLower() == tzei) {
+            if (tzei.ToLowerInvariant() == tzei) {
                 ret = ret.Substring(0, i) + ret.Substring(i + 2);
             }
         }
@@ -1545,7 +1545,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             #region Aus Dateinamen den Tablename extrahieren
 
             if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
-                _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB");
+                _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB");
                 LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
             }
 
@@ -1584,7 +1584,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             ForeColor = Color.FromArgb(0, 0, 0);
             //CaptionBitmapCode = null;
         }
-        switch (_name.ToUpper()) {
+        switch (_name.ToUpperInvariant()) {
             case "SYS_CREATOR":
                 _function = ColumnFunction.Normal;
                 _maxTextLenght = 20;
@@ -1937,8 +1937,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
         if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
         if (UsedInScript()) { t += " - Regeln-Skript<br>"; }
-        if (db.ZeilenQuickInfo.ToUpper().Contains(_name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (_tags.JoinWithCr().ToUpper().Contains(_name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
+        if (db.ZeilenQuickInfo.ToUpperInvariant().Contains(_name.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
+        if (_tags.JoinWithCr().ToUpperInvariant().Contains(_name.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
 
         if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { t += Am_A_Key_For_Other_Column; }
 
@@ -2034,7 +2034,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
     }
 
-    internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(AllowedCharsVariableName);
+    internal static string MakeValidColumnName(string columnname) => columnname.ToUpperInvariant().Replace(" ", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Die Datenbank wurde verworfen."; }
@@ -2100,7 +2100,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         switch (type) {
             case DatabaseDataType.ColumnName:
                 var oldname = _name;
-                _name = newvalue.ToUpper();
+                _name = newvalue.ToUpperInvariant();
                 var ok = Database?.Column.ChangeName(oldname, _name) ?? false;
 
                 if (!ok) {
@@ -2423,7 +2423,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 
-                    if (tmp[2].ToLower().Contains("~" + _name.ToLower() + "~")) {
+                    if (tmp[2].ToLowerInvariant().Contains("~" + _name.ToLowerInvariant() + "~")) {
                         Am_A_Key_For_Other_Column = "Spalte " + c.ReadableText() + " verweist auf diese Spalte";
                     }
                 }
@@ -2507,13 +2507,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         string oTxt;
         do {
             oTxt = txt;
-            if (oTxt.ToLower().Contains(".at")) { break; }
-            if (oTxt.ToLower().Contains(".de")) { break; }
-            if (oTxt.ToLower().Contains(".com")) { break; }
-            if (oTxt.ToLower().Contains("http")) { break; }
-            if (oTxt.ToLower().Contains("ftp")) { break; }
-            if (oTxt.ToLower().Contains(".xml")) { break; }
-            if (oTxt.ToLower().Contains(".doc")) { break; }
+            if (oTxt.ToLowerInvariant().Contains(".at")) { break; }
+            if (oTxt.ToLowerInvariant().Contains(".de")) { break; }
+            if (oTxt.ToLowerInvariant().Contains(".com")) { break; }
+            if (oTxt.ToLowerInvariant().Contains("http")) { break; }
+            if (oTxt.ToLowerInvariant().Contains("ftp")) { break; }
+            if (oTxt.ToLowerInvariant().Contains(".xml")) { break; }
+            if (oTxt.ToLowerInvariant().Contains(".doc")) { break; }
             if (oTxt.IsDateTime()) { break; }
             txt = txt.Replace("\r\n", "\r");
             // 1/2 l Milch

@@ -699,7 +699,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         if (string.IsNullOrEmpty(toParse)) { return; }
 
         foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLower()) {
+            switch (pair.Key.ToLowerInvariant()) {
                 case "type":
                     break;
 

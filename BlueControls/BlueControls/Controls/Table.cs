@@ -523,13 +523,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 ist1 = l.PlainText;
             }
             // Allgemeine Prüfung
-            if (!string.IsNullOrEmpty(ist1) && ist1.ToLower().Contains(searchTxt.ToLower())) {
+            if (!string.IsNullOrEmpty(ist1) && ist1.ToLowerInvariant().Contains(searchTxt.ToLowerInvariant())) {
                 foundColumn = column;
                 foundRow = row;
                 return;
             }
             // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-            if (!string.IsNullOrEmpty(ist2) && ist2.ToLower().Contains(searchTxt.ToLower())) {
+            if (!string.IsNullOrEmpty(ist2) && ist2.ToLowerInvariant().Contains(searchTxt.ToLowerInvariant())) {
                 foundColumn = column;
                 foundRow = row;
                 return;
@@ -537,7 +537,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (vereinfachteSuche) {
                 var ist3 = ist2.StarkeVereinfachung(" ,", true);
                 var searchTxt3 = searchTxt.StarkeVereinfachung(" ,", true);
-                if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
+                if (!string.IsNullOrEmpty(ist3) && ist3.ToLowerInvariant().Contains(searchTxt3.ToLowerInvariant())) {
                     foundColumn = column;
                     foundRow = row;
                     return;
@@ -2215,7 +2215,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        switch (e.Command.ToLower()) {
+        switch (e.Command.ToLowerInvariant()) {
             case "":
                 break;
 

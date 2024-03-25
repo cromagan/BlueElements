@@ -91,7 +91,7 @@ public class Method_Filter : Method_Database {
         #region Typ ermitteln
 
         FilterType filtertype;
-        switch (attvar.ValueStringGet(2).ToLower()) {
+        switch (attvar.ValueStringGet(2).ToLowerInvariant()) {
             case "is":
                 filtertype = FilterType.Istgleich_GroßKleinEgal;
                 break;

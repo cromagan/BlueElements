@@ -119,6 +119,7 @@
     <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
     <Compile Include="Extensions\DateExtensions.cs" />
+    <Compile Include="Extensions\FloatExtensions.cs" />
     <Compile Include="Extensions\IntExtensions.cs" />
     <Compile Include="Extensions\FontExtensions.cs" />
     <Compile Include="FormatHolder.cs" />

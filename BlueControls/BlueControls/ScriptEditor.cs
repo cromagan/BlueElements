@@ -76,7 +76,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
     #region Methods
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedCommand.ToLower()) {
+        switch (e.ClickedCommand.ToLowerInvariant()) {
             case "variableninhalt kopieren":
                 _ = Generic.CopytoClipboard(_lastVariableContent);
                 return true;

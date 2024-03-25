@@ -466,7 +466,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     //    if (e.HotItem is string txt) { c = Database?.Column[txt); }
 
-    //    switch (e.ClickedCommand.ToLower()) {
+    //    switch (e.ClickedCommand.ToLowerInvariant()) {
     //        case "spalteneigenschaftenbearbeiten":
     //            if (c != null && !c.IsDisposed) {
     //                TableView.OpenColumnEditor(c, null, null);

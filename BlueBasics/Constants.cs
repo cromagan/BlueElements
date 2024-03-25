@@ -41,12 +41,6 @@ public static class Constants {
     public const string Char_PfadSonderZeichen = "*?\"<>|\r\n";
     public const string Everybody = "#Everybody";
     public const char FirstSortChar = '+';
-    public const string Format_Float1 = "0.#";
-    public const string Format_Float10 = "0.##########";
-    public const string Format_Float10_3 = "0000000000.###";
-    public const string Format_Float2 = "0.##";
-    public const string Format_Float5 = "0.#####";
-    public const string Format_Float9 = "0.#########";
     public const char SecondSortChar = '-';
     public static readonly int AutoFilterSize = 22;
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));

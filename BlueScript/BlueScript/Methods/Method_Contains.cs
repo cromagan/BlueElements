@@ -78,7 +78,7 @@ internal class Method_Contains : Method {
                         return DoItFeedback.Wahr();
                     }
                 } else {
-                    if (vs2.ValueString.ToLower().Contains(thisW.ToLower())) {
+                    if (vs2.ValueString.ToLowerInvariant().Contains(thisW.ToLowerInvariant())) {
                         return DoItFeedback.Wahr();
                     }
                 }

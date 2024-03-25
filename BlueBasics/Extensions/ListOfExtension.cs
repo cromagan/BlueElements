@@ -185,7 +185,7 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString(CultureInfo.InvariantCulture).Replace(",", ".").ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToStringFloat10().ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value == null) { return; }
@@ -379,13 +379,13 @@ public static partial class Extensions {
 
     public static string TagGet(this ICollection<string>? list, string tagName) {
         if (list == null) { return string.Empty; }
-        var uTagName = tagName.ToUpper().Trim();
+        var uTagName = tagName.ToUpperInvariant().Trim();
         foreach (var thisString in list) {
-            if (thisString.ToUpper().StartsWith(uTagName)) {
-                if (thisString.ToUpper().StartsWith(uTagName + ": ")) { return thisString.Substring(uTagName.Length + 2); }
-                if (thisString.ToUpper().StartsWith(uTagName + ":")) { return thisString.Substring(uTagName.Length + 1); }
-                if (thisString.ToUpper().StartsWith(uTagName + " = ")) { return thisString.Substring(uTagName.Length + 3); }
-                if (thisString.ToUpper().StartsWith(uTagName + "=")) { return thisString.Substring(uTagName.Length + 1); }
+            if (thisString.ToUpperInvariant().StartsWith(uTagName)) {
+                if (thisString.ToUpperInvariant().StartsWith(uTagName + ": ")) { return thisString.Substring(uTagName.Length + 2); }
+                if (thisString.ToUpperInvariant().StartsWith(uTagName + ":")) { return thisString.Substring(uTagName.Length + 1); }
+                if (thisString.ToUpperInvariant().StartsWith(uTagName + " = ")) { return thisString.Substring(uTagName.Length + 3); }
+                if (thisString.ToUpperInvariant().StartsWith(uTagName + "=")) { return thisString.Substring(uTagName.Length + 1); }
             }
         }
         return string.Empty;
@@ -394,18 +394,18 @@ public static partial class Extensions {
     public static List<string> TagGetAll(this ICollection<string>? list, string tagName) {
         List<string> l = [];
         if (list == null) { return l; }
-        var uTagName = tagName.ToUpper();
+        var uTagName = tagName.ToUpperInvariant();
         foreach (var thisString in list) {
-            if (thisString.ToUpper().StartsWith(uTagName)) {
-                if (thisString.ToUpper().StartsWith(uTagName + ": ")) {
+            if (thisString.ToUpperInvariant().StartsWith(uTagName)) {
+                if (thisString.ToUpperInvariant().StartsWith(uTagName + ": ")) {
                     l.Add(thisString.Substring(uTagName.Length + 2));
                 } else {
-                    if (thisString.ToUpper().StartsWith(uTagName + ":")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
+                    if (thisString.ToUpperInvariant().StartsWith(uTagName + ":")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
                 }
-                if (thisString.ToUpper().StartsWith(uTagName + " = ")) {
+                if (thisString.ToUpperInvariant().StartsWith(uTagName + " = ")) {
                     l.Add(thisString.Substring(uTagName.Length + 3));
                 } else {
-                    if (thisString.ToUpper().StartsWith(uTagName + "=")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
+                    if (thisString.ToUpperInvariant().StartsWith(uTagName + "=")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
                 }
             }
         }
@@ -468,13 +468,13 @@ public static partial class Extensions {
     private static int TagGetPosition(this ICollection<string>? col, string tagname) {
         if (col == null) { return -1; }
 
-        var uTagName = tagname.ToUpper() + ":";
+        var uTagName = tagname.ToUpperInvariant() + ":";
 
         for (var z = 0; z < col.Count; z++) {
-            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpper() == uTagName + " ") {
+            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpperInvariant() == uTagName + " ") {
                 return z;
             }
-            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpper() == uTagName) {
+            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpperInvariant() == uTagName) {
                 return z;
             }
         }

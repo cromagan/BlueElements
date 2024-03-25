@@ -116,7 +116,7 @@ public partial class MessageBox : Form {
                     Text = names[z]
                 };
                 var w = 2;
-                switch (b.Text.ToLower()) {
+                switch (b.Text.ToLowerInvariant()) {
                     case "ja":
                     case "ok":
                         b.ImageCode = "Häkchen|16";

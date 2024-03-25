@@ -77,7 +77,7 @@ internal class Method_SaveImage : Method {
 
         //if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
-        switch (attvar.ValueStringGet(1).ToUpper()) {
+        switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "PNG":
                 img.Save(filn, ImageFormat.Png);
 

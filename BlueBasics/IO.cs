@@ -103,7 +103,7 @@ public static class IO {
     // }
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
-        var dirUpper = directory.ToUpper();
+        var dirUpper = directory.ToUpperInvariant();
         if (WriteAccess.Contains(dirUpper)) { return true; }
         if (NoWriteAccess.Contains(dirUpper)) { return false; }
         try {
@@ -278,7 +278,7 @@ public static class IO {
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
         ? FileFormat.Unknown
-        : filename.FileSuffix().ToUpper() switch {
+        : filename.FileSuffix().ToUpperInvariant() switch {
             "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
             "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
             "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
@@ -469,7 +469,7 @@ public static class IO {
         // http://www.vbarchiv.net/tipps/tipp_1281.html
         if (_canWriteLastResult) { _canWriteLastFile = string.Empty; }
         if (DateTime.UtcNow.Subtract(_canWriteLastCheck).TotalSeconds > CanWriteTryintervall) { _canWriteLastFile = string.Empty; }
-        if (_canWriteLastFile != file.ToUpper()) {
+        if (_canWriteLastFile != file.ToUpperInvariant()) {
             var startTime = DateTime.UtcNow;
             if (FileExists(file)) {
                 try {
@@ -485,7 +485,7 @@ public static class IO {
             }
             _canWriteLastCheck = DateTime.UtcNow;
         }
-        _canWriteLastFile = file.ToUpper();
+        _canWriteLastFile = file.ToUpperInvariant();
         return _canWriteLastResult;
     }
 

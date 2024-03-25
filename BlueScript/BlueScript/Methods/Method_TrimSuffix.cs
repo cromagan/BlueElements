@@ -55,12 +55,12 @@ internal class Method_TrimSuffix : Method {
         const string tmp = Constants.Char_Numerals + " ";
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            var suf = attvar.ValueStringGet(z).ToLower();
+            var suf = attvar.ValueStringGet(z).ToLowerInvariant();
             if (val.Length <= suf.Length) {
                 continue;
             }
 
-            if (val.ToLower().EndsWith(suf)) {
+            if (val.ToLowerInvariant().EndsWith(suf)) {
                 var c = val.Substring(val.Length - suf.Length - 1, 1);
                 if (tmp.Contains(c)) {
                     return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "));

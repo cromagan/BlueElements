@@ -59,7 +59,7 @@ internal class Method_FreeFileName : Method {
             return new DoItFeedback(infos.Data, "Verzeichnis existiert nicht");
         }
 
-        var zeichen = Constants.Char_AZ.ToLower() + Constants.Char_Numerals + Constants.Char_AZ.ToUpper();
+        var zeichen = Constants.Char_AZ.ToLowerInvariant() + Constants.Char_Numerals + Constants.Char_AZ.ToUpperInvariant();
         // Ja, lower und upper macht keinen sinn, sieht aber verrückter aus
 
         do {

@@ -180,7 +180,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
-    public virtual bool FilterMatch(string filterText) => KeyName.ToUpper().Contains(filterText.ToUpper());
+    public virtual bool FilterMatch(string filterText) => KeyName.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
     public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign);
 

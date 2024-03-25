@@ -54,7 +54,7 @@ internal class Method_BitmapToBase64 : Method {
 
         string x;
 
-        switch (attvar.ValueStringGet(1).ToUpper()) {
+        switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "JPG":
                 x = Converter.BitmapToBase64(attvar.ValueBitmapGet(0), ImageFormat.Jpeg);
                 break;

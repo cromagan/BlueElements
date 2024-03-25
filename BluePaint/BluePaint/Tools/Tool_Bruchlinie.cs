@@ -44,7 +44,7 @@ public partial class Tool_Bruchlinie {
         var modY = 0;
         OnForceUndoSaving();
         Point nach;
-        switch (((Button)sender).Name.ToLower()) {
+        switch (((Button)sender).Name.ToLowerInvariant()) {
             case "bruch_oben":
                 nach = new Point(0, 5);
                 yri = -5;

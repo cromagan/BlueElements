@@ -296,7 +296,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 return true;
 
             case "#SpellAddLower":
-                Dictionary.WordAdd(word.ToLower());
+                Dictionary.WordAdd(word.ToLowerInvariant());
                 _mustCheck = true;
                 Invalidate();
                 return true;
@@ -403,8 +403,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     items.Add(Separator());
                 }
                 items.Add(ItemOf("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable()));
-                if (tmpWord.ToLower() != tmpWord) {
-                    items.Add(ItemOf("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable()));
+                if (tmpWord.ToLowerInvariant() != tmpWord) {
+                    items.Add(ItemOf("'" + tmpWord.ToLowerInvariant() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable()));
                 }
                 items.Add(ItemOf("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable()));
                 items.Add(ItemOf("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable()));

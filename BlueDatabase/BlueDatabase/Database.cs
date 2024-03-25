@@ -337,7 +337,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _globalScale;
         set {
             if (Math.Abs(_globalScale - value) < DefaultTolerance) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), UserName, DateTime.UtcNow, string.Empty);
+            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToStringFloat2(), value.ToStringFloat2(), UserName, DateTime.UtcNow, string.Empty);
             Cell.InvalidateAllSizes();
         }
     }
@@ -626,9 +626,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-            if (d.AdditionalData.ToLower().EndsWith(".mdb") ||
-                d.AdditionalData.ToLower().EndsWith(".bdb") ||
-                d.AdditionalData.ToLower().EndsWith(".mbdb")) {
+            if (d.AdditionalData.ToLowerInvariant().EndsWith(".mdb") ||
+                d.AdditionalData.ToLowerInvariant().EndsWith(".bdb") ||
+                d.AdditionalData.ToLowerInvariant().EndsWith(".mbdb")) {
                 if (d.AdditionalData.Equals(ci.AdditionalData, StringComparison.OrdinalIgnoreCase)) {
                     return thisFile; // Multiuser - nicht multiuser konflikt
                 }
@@ -667,12 +667,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 
         if (FileExists(ci.AdditionalData)) {
-            if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
+            if (ci.AdditionalData.FileSuffix().ToLowerInvariant() is "mdb" or "bdb") {
                 var db = new Database(ci.TableName);
                 db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
                 return db;
             }
-            if (ci.AdditionalData.FileSuffix().ToLower() is "mbdb") {
+            if (ci.AdditionalData.FileSuffix().ToLowerInvariant() is "mbdb") {
                 var db = new DatabaseMu(ci.TableName);
                 db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
                 return db;
@@ -699,7 +699,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public static bool IsValidTableName(string tablename, bool allowSystemnames) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
 
-        var t = tablename.ToUpper();
+        var t = tablename.ToUpperInvariant();
 
         if (!allowSystemnames) {
             if (t.StartsWith("SYS_")) { return false; }
@@ -790,8 +790,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string MakeValidTableName(string tablename) {
         var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
-        tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
-        tmp = tmp.StarkeVereinfachung("_", false).ToUpper();
+        tmp = tmp.FileNameWithoutSuffix().ToLowerInvariant().Replace(" ", "_").Replace("-", "_");
+        tmp = tmp.StarkeVereinfachung("_", false).ToUpperInvariant();
 
         while (tmp.Contains("__")) {
             tmp = tmp.Replace("__", "_");
@@ -857,7 +857,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture));
+            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToStringFloat2());
             //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
             //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
             //SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
@@ -1015,7 +1015,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
+    //    if (ci.AdditionalData.FileSuffix().ToUpperInvariant() is not "BDB" or "MDB") { return null; }
     //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
@@ -1733,8 +1733,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         for (var rowNo = startZ; rowNo < zeil.Count; rowNo++) {
             if (zeileZuordnen) {
-                if (zeil[rowNo].GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpper())) {
-                    dictNeu.Add(zeil[rowNo][0].ToUpper(), zeil[rowNo]);
+                if (zeil[rowNo].GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpperInvariant())) {
+                    dictNeu.Add(zeil[rowNo][0].ToUpperInvariant(), zeil[rowNo]);
                 }
                 //else {
                 //    OnDropMessage(FehlerArt.Warnung, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
@@ -1753,7 +1753,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (zeileZuordnen) {
             foreach (var thisR in Row) {
-                var f = thisR.CellFirstString().ToUpper();
+                var f = thisR.CellFirstString().ToUpperInvariant();
                 if (!string.IsNullOrEmpty(f) && !dictVorhanden.ContainsKey(f)) {
                     dictVorhanden.Add(f, thisR);
                 } else {
@@ -2036,14 +2036,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    IsTableVisibleForUser?.Invoke(this, e);
     //}
     public bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
-        var tmpName = UserName.ToUpper();
-        var tmpGroup = UserGroup.ToUpper();
+        var tmpName = UserName.ToUpperInvariant();
+        var tmpGroup = UserGroup.ToUpperInvariant();
         if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
             return true;
         }
 
         if (Column.SysRowCreator is ColumnItem src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
-            if (row != null && Cell.GetString(src, row).ToUpper() == tmpName) { return true; }
+            if (row != null && Cell.GetString(src, row).ToUpperInvariant() == tmpName) { return true; }
         } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
             return true;
         } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {
@@ -3071,7 +3071,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (files != null) {
                 foreach (var thisf in files) {
-                    if (thisf.Contains("\\" + TableName.ToUpper() + "-")) {
+                    if (thisf.Contains("\\" + TableName.ToUpperInvariant() + "-")) {
                         myfiles.AddIfNotExists(thisf);
                     }
                 }
@@ -3442,7 +3442,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         var datacompressed = dataUncompressed.ZipIt() ?? dataUncompressed;
 
-        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
+        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
         x.Write(datacompressed, 0, datacompressed.Length);

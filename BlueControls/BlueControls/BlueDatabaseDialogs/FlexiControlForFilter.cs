@@ -183,7 +183,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     }
 
     //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-    //    switch (e.ClickedCommand.ToLower()) {
+    //    switch (e.ClickedCommand.ToLowerInvariant()) {
     //        case "#columnedit":
     //            if (e.HotItem is ColumnItem col) {
     //                Forms.TableView.OpenColumnEditor(col, null);

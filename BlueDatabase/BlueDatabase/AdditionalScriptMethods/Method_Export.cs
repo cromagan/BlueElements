@@ -121,7 +121,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
         try {
-            switch (attvar.ValueStringGet(1).ToUpper()) {
+            switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
                         var bytes = Database.ToListOfByte(db, 100, db.FileStateUTCDate);

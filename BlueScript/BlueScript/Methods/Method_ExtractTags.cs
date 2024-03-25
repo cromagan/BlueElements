@@ -67,7 +67,7 @@ internal class Method_ExtractTags : Method {
             var x = thisw.SplitBy(attvar.ValueStringGet(1));
 
             if (x.Length == 2) {
-                var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
+                var vn = x[0].ToLowerInvariant().ReduceToChars(Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
                     varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));

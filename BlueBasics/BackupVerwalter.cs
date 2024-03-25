@@ -63,7 +63,7 @@ public class BackupVerwalter {
     public void AddData(DateTime dateUtc, string file) {
         var d = dateUtc.ToString6();
         if (_data.ContainsKey(d)) { return; }
-        _data.Add(d, file.ToUpper());
+        _data.Add(d, file.ToUpperInvariant());
         _deletable = null;
     }
 

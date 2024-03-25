@@ -295,7 +295,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         if (attvar.Attributes[0] is Variable v) {
             if (generateVariable) {
-                v.KeyName = varnam.ToLower();
+                v.KeyName = varnam.ToLowerInvariant();
                 v.ReadOnly = false;
                 varCol.Add(v);
                 return new DoItFeedback(v);

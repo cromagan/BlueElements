@@ -97,7 +97,7 @@ public class DatabaseMu : Database {
     }
 
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
+    //    if (ci.AdditionalData.FileSuffix().ToUpperInvariant() is not "MBDB") { return null; }
     //    if (!FileExists(ci.AdditionalData)) { return null; }
     public override bool Save() {
         if (_writer == null) { return true; }
@@ -246,7 +246,7 @@ public class DatabaseMu : Database {
             var frgu = new List<string>();
             foreach (var thisdb in db) {
                 if (thisdb is DatabaseMu dbmu) {
-                    tbn.AddIfNotExists(dbmu.TableName.ToUpper());
+                    tbn.AddIfNotExists(dbmu.TableName.ToUpperInvariant());
                     if (!string.IsNullOrEmpty(dbmu._myFragmentsFilename)) {
                         frgu.Add(dbmu._myFragmentsFilename);
                     }
@@ -271,7 +271,7 @@ public class DatabaseMu : Database {
 
             foreach (var thisn in frgma) {
                 foreach (var thistbn in tbn) {
-                    if (thisn.ToUpper().Contains("\\" + thistbn + "-")) {
+                    if (thisn.ToUpperInvariant().Contains("\\" + thistbn + "-")) {
                         frgm.Add(thisn);
                         break;
                     }
@@ -295,7 +295,7 @@ public class DatabaseMu : Database {
                 foreach (var thist in fils) {
                     if (!thist.StartsWith("-")) {
                         var u = new UndoItem(thist);
-                        if (tbn.Contains(u.TableName.ToUpper())) {
+                        if (tbn.Contains(u.TableName.ToUpperInvariant())) {
                             if (u.DateTimeUtc.Subtract(IsInCache).TotalSeconds > 0 &&
                                u.DateTimeUtc.Subtract(toUtc).TotalSeconds < 0) {
                                 u.Container = thisf;

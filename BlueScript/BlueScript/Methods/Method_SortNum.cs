@@ -22,8 +22,8 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Globalization;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
@@ -35,9 +35,8 @@ internal class Method_SortNum : Method {
     public override List<List<string>> Args => [ListStringVar, FloatVal];
     public override string Command => "sortnum";
     public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
-    public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -66,7 +65,7 @@ internal class Method_SortNum : Method {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        vli.ValueList = nums.ConvertAll(i => i.ToString(Constants.Format_Float5, CultureInfo.InvariantCulture));
+        vli.ValueList = nums.ConvertAll(i => i.ToStringFloat5());
         return DoItFeedback.Null();
     }
 

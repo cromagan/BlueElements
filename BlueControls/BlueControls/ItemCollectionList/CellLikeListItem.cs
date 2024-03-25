@@ -69,7 +69,7 @@ public class CellLikeListItem : AbstractListItem {
         if (base.FilterMatch(filterText)) { return true; }
         if (_styleLikeThis == null) { return false; }
         var txt = CellItem.ValueReadable(KeyName, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
-        return txt.ToUpper().Contains(filterText.ToUpper());
+        return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
