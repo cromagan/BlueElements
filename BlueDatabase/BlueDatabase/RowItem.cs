@@ -297,9 +297,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public IEnumerable<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? [];
 
-    public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column[columnName], this) ?? default;
+    public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column[columnName], this) ?? true;
 
-    public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
+    public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? true;
 
     public void CellSet(string columnName, bool value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToPlusMinus(), comment);
 
@@ -309,9 +309,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem? column, string value, string comment) => Database?.Cell.Set(column, this, value, comment);
 
-    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToStringFloat10(), comment);
+    public void CellSet(string columnName, double value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToStringFloat5(), comment);
 
-    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToStringFloat10(), comment);
+    public void CellSet(ColumnItem column, double value, string comment) => Database?.Cell.Set(column, this, value.ToStringFloat5(), comment);
 
     public void CellSet(string columnName, int value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(), comment);
 
@@ -346,7 +346,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         //if (IsInCache == null) { Develop.DebugPrint(FehlerArt.Fehler, "Refresh-Fehler"); }
 
-        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null);
+        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null, true, true);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
@@ -449,13 +449,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="tryforsceonds"></param>
     /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds, List<string>? attributes) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
-            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues, attributes);
+            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues, attributes, wichtigerProzess, dbVariables);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -528,6 +528,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
                                  CellGetString(srs) != Database.EventScriptVersion;
+
+    public bool NeedsUrgentUpdate() => NeedsUpdate() &&
+                                       Database?.Column.SysRowChanger is ColumnItem srcr &&
+                                       Database?.Column.SysRowChangeDate is ColumnItem srcd &&
+                                       string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
+                                       DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 5 &&
+                                       DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 10;
 
     /// <summary>
     ///
@@ -652,7 +659,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, List<string>? attributes) {
+    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not Database db || db.IsDisposed) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
@@ -660,7 +667,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        var script = db.ExecuteScript(eventname, scriptname, changevalues, this, attributes);
+        var script = db.ExecuteScript(eventname, scriptname, changevalues, this, attributes, wichtigerProzess, dbVariables);
 
         if (!script.AllOk) {
             //db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));

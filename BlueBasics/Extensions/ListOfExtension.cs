@@ -185,7 +185,9 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToStringFloat10().ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToStringFloat5().ToNonCritical());
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add(tagname + "=" + value.ToStringFloat5().ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value == null) { return; }

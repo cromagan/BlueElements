@@ -515,7 +515,7 @@ public static class Export {
             if (thisRow != null && !thisRow.IsDisposed) {
                 var tmpBody = body;
 
-                var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null);
+                var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null, true, true);
 
                 if (!script.AllOk) {
                     f = f + thisRow.CellFirstString() + "\r\n";

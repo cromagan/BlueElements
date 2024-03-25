@@ -32,10 +32,6 @@ public static partial class Extensions {
 
     public static string ToStringFloat1(this double value) => Math.Round(value, 1, MidpointRounding.AwayFromZero).ToString("0.#", CultureInfo.InvariantCulture);
 
-    public static string ToStringFloat10(this float value) => Math.Round(value, 10, MidpointRounding.AwayFromZero).ToString("0.##########", CultureInfo.InvariantCulture);
-
-    public static string ToStringFloat10(this double value) => Math.Round(value, 10, MidpointRounding.AwayFromZero).ToString("0.##########", CultureInfo.InvariantCulture);
-
     public static string ToStringFloat10_3(this float value) => Math.Round(value, 3, MidpointRounding.AwayFromZero).ToString("0000000000.###", CultureInfo.InvariantCulture);
 
     public static string ToStringFloat10_3(this double value) => Math.Round(value, 3, MidpointRounding.AwayFromZero).ToString("0000000000.###", CultureInfo.InvariantCulture);
@@ -51,10 +47,6 @@ public static partial class Extensions {
     public static string ToStringFloat5(this float value) => Math.Round(value, 5, MidpointRounding.AwayFromZero).ToString("0.#####", CultureInfo.InvariantCulture);
 
     public static string ToStringFloat5(this double value) => Math.Round(value, 5, MidpointRounding.AwayFromZero).ToString("0.#####", CultureInfo.InvariantCulture);
-
-    public static string ToStringFloat9(this float value) => Math.Round(value, 9, MidpointRounding.AwayFromZero).ToString("0.#########", CultureInfo.InvariantCulture);
-
-    public static string ToStringFloat9(this double value) => Math.Round(value, 9, MidpointRounding.AwayFromZero).ToString("0.#########", CultureInfo.InvariantCulture);
 
     #endregion
 }

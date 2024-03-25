@@ -163,6 +163,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static void ExecuteValueChangedEvent() {
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3 + WaitDelay) { return; }
 
+        if (Database.ExecutingFirstLvlScript > 0) { return; }
+
         if (_executingchangedrows) { return; }
         _executingchangedrows = true;
 
@@ -172,6 +174,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (NextRowToCeck() is RowItem row) {
             if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { break; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { break; }
+            if (Database.ExecutingFirstLvlScript > 0) { break; }
 
             WaitDelay = Pendingworker.Count * 3;
             if (Pendingworker.Count > 5) { break; }
@@ -183,7 +186,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (e.Cancel) { break; }
 
             try {
-                var ok = row.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null);
+                var ok = row.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, false, true);
                 if (!ok.AllOk) { break; }
                 row.InvalidateCheckData();
                 row.CheckRowDataIfNeeded();
@@ -332,7 +335,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0, null);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0, null, true, true);
 
             if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
@@ -436,12 +439,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 
-        _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null);
-        if (db.Column.HasKeyColumns()) {
-            _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null);
-        }
-        _ = item.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null);
-        _ = item.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0.1f, null);
+        _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null, true, true);
+        //if (db.Column.HasKeyColumns()) {
+        //    _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null, true);
+        //}
+        //_ = item.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null, true);
+        //_ = item.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0.1f, null, true);
 
         return item;
     }
@@ -610,13 +613,19 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisDb in l) {
             if (thisDb is Database db && !db.IsDisposed) {
                 if (!db.IsRowScriptPossible(true)) { continue; }
-                if (!db.HasValueChangedScript()) { continue; }
+                var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUrgentUpdate());
+                if (rowToCheck != null) { return rowToCheck; }
+            }
+        }
+
+        foreach (var thisDb in l) {
+            if (thisDb is Database db && !db.IsDisposed) {
+                if (!db.IsRowScriptPossible(true)) { continue; }
+                //if (!db.HasValueChangedScript()) { continue; }
                 if (!db.AmITemporaryMaster(5, 55)) { continue; }
 
                 var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUpdate());
-                if (rowToCheck != null) {
-                    return rowToCheck;
-                }
+                if (rowToCheck != null) { return rowToCheck; }
             }
         }
 
@@ -627,7 +636,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem r || r.IsDisposed) { return; }
-        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null);
+        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null, true, true);
     }
 
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);

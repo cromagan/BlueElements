@@ -212,6 +212,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string DatabaseId => nameof(Database);
 
+    public static int ExecutingFirstLvlScript { get; private set; } = 0;
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
@@ -1165,7 +1166,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled, bool dbVariables) {
 
         #region Variablen für Skript erstellen
 
@@ -1178,9 +1179,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
-        foreach (var thisvar in Variables.ToListVariableString()) {
-            var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
-            vars.Add(v);
+        if (dbVariables) {
+            foreach (var thisvar in Variables.ToListVariableString()) {
+                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+                vars.Add(v);
+            }
         }
 
         vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
@@ -1303,13 +1306,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
         if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, s.KeyName); }
 
         var sce = CheckScriptError();
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
 
+        if (!wichtigerProzess && ExecutingFirstLvlScript > 0) {
+            return new ScriptEndedFeedback("Aktuell wird bereits ein Skript ausgeführt" + sce, false, false, "Allgemein");
+        }
+
+        if (wichtigerProzess) { ExecutingFirstLvlScript++; }
         try {
             var rowstamp = string.Empty;
 
@@ -1319,7 +1327,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            var vars = CreateVariableCollection(row, false, s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula));
+            var vars = CreateVariableCollection(row, false, s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), dbVariables);
 
             #region  Erlaubte Methoden ermitteln
 
@@ -1358,10 +1366,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (sc.Properties.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
                     if (Column.SysRowChangeDate is null) {
+                        if (wichtigerProzess) { ExecutingFirstLvlScript--; }
                         return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
                     }
 
                     if (row.RowStamp() != rowstamp) {
+                        if (wichtigerProzess) { ExecutingFirstLvlScript--; }
                         return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.KeyName);
                     }
 
@@ -1370,7 +1380,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     }
                 }
 
-                Variables = VariableCollection.Combine(Variables, vars, "DB_");
+                if (dbVariables) {
+                    Variables = VariableCollection.Combine(Variables, vars, "DB_");
+                }
             }
 
             if (!scf.AllOk) {
@@ -1379,14 +1391,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #endregion
 
+            if (wichtigerProzess) { ExecutingFirstLvlScript--; }
             return scf;
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(s, changevalues, row, attributes);
+            if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+            return ExecuteScript(s, changevalues, row, attributes, wichtigerProzess, dbVariables);
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
@@ -1430,10 +1444,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (!script.ChangeValues) { changevalues = false; }
 
-            return ExecuteScript(script, changevalues, row, attributes);
+            return ExecuteScript(script, changevalues, row, attributes, wichtigerProzess, dbVariables);
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(eventname, scriptname, changevalues, row, attributes);
+            return ExecuteScript(eventname, scriptname, changevalues, row, attributes, wichtigerProzess, dbVariables);
         }
     }
 
@@ -1824,6 +1838,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 OnDropMessage(FehlerArt.Info, "Import: Zeile " + no + " von " + zeil.Count);
                 d2 = DateTime.Now;
             }
+            Develop.SetUserDidSomething();
 
             #endregion
         }
@@ -1900,7 +1915,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, true);
 
         TryToSetMeTemporaryMaster();
     }
@@ -2330,15 +2345,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!IsAdministrator()) { return false; }
         if (!IsRowScriptPossible(true)) { return false; }
 
-        if (HasValueChangedScript()) { return false; }
+        //if (HasValueChangedScript()) { return false; }
 
         if (RowCollection.WaitDelay > 90) { return true; }
 
         var masters = 0;
         foreach (var thisDb in Database.AllFiles) {
-            if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+            if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45) && thisDb.MultiUser) {
                 masters++;
-                if (masters > 3) { return false; }
+                if (masters > 5) { return false; }
             }
         }
 
@@ -2362,14 +2377,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
+        Develop.SetUserDidSomething();
         var tmpFileName = WriteTempFileToDisk(setfileStateUtcDateTo);
-
+        Develop.SetUserDidSomething();
         if (string.IsNullOrEmpty(tmpFileName)) { return false; }
 
         if (FileExists(Backupdateiname())) {
             if (!DeleteFile(Backupdateiname(), false)) { return false; }
         }
-
+        Develop.SetUserDidSomething();
         // Haupt-Datei wird zum Backup umbenannt
         if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
 
@@ -2381,7 +2397,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         // --- TmpFile wird zum Haupt ---
         _ = MoveFile(tmpFileName, Filename, true);
-
+        Develop.SetUserDidSomething();
         HasPendingChanges = false;
         FileStateUTCDate = setfileStateUtcDateTo;
         return true;

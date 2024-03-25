@@ -623,7 +623,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (reason == Reason.SetCommand) {
                 if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                     if (column.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
-                        row.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 2, null);
+                        row.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 2, null, true, true);
                     }
 
                     //Database?.Row.AddRowWithChangedValue(row);
@@ -710,46 +710,43 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
-        // if (Column.Format == DataFormat.LinkedCell) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Fremdzellenzugriff"); }
-        if (typ.HasFlag(FilterType.GroßKleinEgal)) {
-            istValue = istValue.ToUpperInvariant();
-            filterValue = filterValue.ToUpperInvariant();
-            typ ^= FilterType.GroßKleinEgal;
-        }
+        StringComparison comparisonType = typ.HasFlag(FilterType.GroßKleinEgal) ? StringComparison.OrdinalIgnoreCase
+                                                                                : StringComparison.Ordinal;
+
+        // Entfernen des GroßKleinEgal-Flags, da es nicht mehr benötigt wird
+        typ &= ~FilterType.GroßKleinEgal;
 
         switch (typ) {
             case FilterType.Istgleich:
-                return istValue == filterValue;
+                return string.Equals(istValue, filterValue, comparisonType);
 
             case (FilterType)2: // Ungleich
-                return istValue != filterValue;
+                return !string.Equals(istValue, filterValue, comparisonType);
 
             case FilterType.Instr:
-                return istValue.Contains(filterValue);
+                return istValue.IndexOf(filterValue, comparisonType) >= 0;
 
             case FilterType.Between:
-                if (!istValue.IsNumeral()) { return false; }
-                _ = DoubleTryParse(istValue, out var ival);
-                var fval = filterValue.SplitAndCutBy("|");
+                var rangeParts = filterValue.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                if (rangeParts.Length != 2) return false;
 
-                _ = DoubleTryParse(fval[0], out var minv);
-                if (ival < minv) { return false; }
-                _ = DoubleTryParse(fval[1], out var maxv);
-                if (ival > maxv) { return false; }
-                //if (DoubleParse)
-                //if (string.IsNullOrEmpty(IstValue)) { return false; }
-                //if (!FilterValue.ToUpperInvariant().Contains("VALUE")) { return false; }
-                //var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
-                //if (d == null) { return false; }
-                //return d == -1;
-                return true;
+                // Wenn kein Datum, dann als numerischen Wert behandeln
+                if (DoubleTryParse(istValue, out var numericValue)) {
+                    if (!DoubleTryParse(rangeParts[0], out var minNumeric) || !DoubleTryParse(rangeParts[1], out var maxNumeric)) {
+                        return false; // Mindestens einer der Werte ist keine gültige Zahl
+                    }
+                    return numericValue >= minNumeric && numericValue <= maxNumeric;
+                } else if (DateTimeTryParse(istValue, out var dateValue)) {
+                    if (!DateTimeTryParse(rangeParts[0], out var minDate) || !DateTimeTryParse(rangeParts[1], out var maxDate)) {
+                        return false; // Mindestens einer der Bereichswerte ist kein gültiges Datum
+                    }
+                    return dateValue >= minDate && dateValue <= maxDate;
+                }
 
-            //case FilterType.KeinFilter:
-            //    Develop.DebugPrint("Kein Filter!");
-            //    return true;
+                return false; // Weder Datum noch numerischer Wert
 
             case FilterType.BeginntMit:
-                return istValue.StartsWith(filterValue);
+                return istValue.StartsWith(filterValue, comparisonType);
 
             case FilterType.AlwaysFalse:
                 return false;

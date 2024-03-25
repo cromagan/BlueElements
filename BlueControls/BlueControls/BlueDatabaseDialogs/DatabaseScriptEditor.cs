@@ -197,9 +197,22 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         lstEventScripts.ItemClear();
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
+        var cap = string.Empty;
+
         foreach (var thisSet in Database.EventScript) {
             if (thisSet != null) {
-                lstEventScripts.ItemAdd(ItemOf(thisSet));
+                cap = "Sonstige";
+
+                if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
+
+                var it = ItemOf(thisSet);
+                it.UserDefCompareKey = cap + Constants.SecondSortChar;
+
+                lstEventScripts.ItemAdd(it);
+
+                if (lstEventScripts[cap] == null) {
+                    lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));
+                }
 
                 if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
                     didMessage = true;
@@ -412,7 +425,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         }
 
         _allowTemporay = true;
-        e.Feedback = Database?.ExecuteScript(_item, !testmode, r, null);
+        e.Feedback = Database?.ExecuteScript(_item, !testmode, r, null, true, true);
         _allowTemporay = false;
     }
 
@@ -496,7 +509,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
         var t2 = new List<DatabaseScriptDescription>();
-        t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
+
+        foreach (var thisItem in lstEventScripts.Items) {
+            if (thisItem is ReadableListItem it && it.Item is DatabaseScriptDescription dbs) { t2.Add(dbs); }
+        }
+
+        //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
         Database.EventScriptErrorMessage = string.Empty;
 

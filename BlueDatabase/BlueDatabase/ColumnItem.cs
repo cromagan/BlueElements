@@ -1371,7 +1371,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (!string.IsNullOrEmpty(_suffix)) {
             if (_multiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
         }
-        if (_roundAfterEdit > 6) { return "Beim Runden maximal 6 Nachkommastellen möglich"; }
+        if (_roundAfterEdit > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
         }

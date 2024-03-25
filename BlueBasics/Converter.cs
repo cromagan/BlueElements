@@ -67,34 +67,15 @@ public static class Converter {
         return DateTime.UtcNow;
     }
 
-    public static bool DateTimeTryParse(string? s, out DateTime result) {
+    public static bool DateTimeTryParse(string s, out DateTime result) {
         // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
-        if (s == null || string.IsNullOrEmpty(s)) {
-            result = default;
-            return false;
-        }
+        result = default;
+        if (string.IsNullOrEmpty(s)) { return false; }
 
         s = s.TrimEnd(" Uhr");
 
-        return DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "d.M.yy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy/MM/dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy_MM_dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, "yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+        // Versuche, das Datum und die Uhrzeit mit den definierten Formaten zu parsen.
+        return DateTime.TryParseExact(s.Trim(), Constants.DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 
     /// <summary>
@@ -124,11 +105,6 @@ public static class Converter {
         return double.TryParse(s, out result)
                || double.TryParse(s.Replace(",", "."), out result)
                || double.TryParse(s.Replace(".", ","), out result);
-        //if (double.TryParse(s, out var result)) { return result; }
-        //if (double.TryParse(s.Replace(",", "."), out var result2)) { return result2; }
-        //if (double.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
-
-        //return 0;
     }
 
     public static T EnsureNotNull<T>(T? value) where T : class {

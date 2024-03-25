@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
+using System;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -77,7 +78,7 @@ public class VariableFloat : Variable {
         get => _double;
         set {
             if (ReadOnly) { return; }
-            _double = value;
+            _double = Math.Round(value, 5, MidpointRounding.AwayFromZero);
         }
     }
 

@@ -2115,7 +2115,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
             //contentHolderCellRow.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null);
-            contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null);
+            contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null, true, true);
             RowCollection.AddBackgroundWorker(contentHolderCellRow);
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }

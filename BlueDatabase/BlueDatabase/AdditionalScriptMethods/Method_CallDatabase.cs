@@ -43,8 +43,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override string Description => "Führt das Skript in der angegebenen Datenabank aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszühenden Skript zur Verfügung.\r\n" +
-        "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-        "Kein Zugriff auf auf Datenbank-Variablen!";
+        "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
@@ -66,6 +65,8 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
+        if (db == MyDatabase(scp)) { return new DoItFeedback(infos.Data, "Befehl Call benutzen!"); }
+
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
@@ -83,7 +84,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         #endregion
 
-        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, a);
+        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, a, true, true);
 
         if (!f.AllOk) {
             return new DoItFeedback(infos.Data, f.ProtocolText);

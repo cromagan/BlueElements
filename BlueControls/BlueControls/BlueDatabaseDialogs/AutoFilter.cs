@@ -375,7 +375,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                         if (zd2 < zd1) {
                             Generic.Swap(ref zd1, ref zd2);
                         }
-                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToStringFloat9() + "|" + zd2.ToStringFloat9()));
+                        CloseAndDispose("Filter", new FilterItem(_column, FilterType.Between | FilterType.UND, zd1.ToStringFloat5() + "|" + zd2.ToStringFloat5()));
                         return;
                     }
                 }

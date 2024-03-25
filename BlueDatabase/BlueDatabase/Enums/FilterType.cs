@@ -25,25 +25,19 @@ namespace BlueDatabase.Enums;
 public enum FilterType {
 
     // Filterarten allgemein -------------------------------------------------------
-    Istgleich = 1,
-
-    //  ZUR INFO:  Ungleich = 2
-    Instr = 4,
-
-    AlwaysFalse = 8,
-
-    //  Tendiert_Zu = 8
-    //  EigenschaftTendenz = 8,
-    Between = 16,
-
-    BeginntMit = 32,
+    Istgleich = 1 << 0,
+    //  ZUR INFO:  Ungleich = 1 << 1
+    Instr = 1 << 2,
+    AlwaysFalse = 1 << 3,
+    Between = 1 << 4,
+    BeginntMit = 1 << 5,
 
     // Filter - Bits -----------------------------------------------------------------
-    GroßKleinEgal = 128,
+    GroßKleinEgal = 1 << 7,
 
-    ODER = 256,
-    UND = 512,
-    MultiRowIgnorieren = 1024,
+    ODER = 1 << 8,
+    UND = 1 << 9,
+    MultiRowIgnorieren = 1 << 10,
 
     // FormatStandardisieren = 2048
     // Std-Filter - Kombinationen ----------------------------------------------------
@@ -55,7 +49,7 @@ public enum FilterType {
     Istgleich_UND_GroßKleinEgal = Istgleich_GroßKleinEgal | UND,
     Istgleich_GroßKleinEgal_MultiRowIgnorieren = Istgleich | GroßKleinEgal | MultiRowIgnorieren,
     Istgleich_MultiRowIgnorieren = Istgleich | MultiRowIgnorieren,
-    Ungleich_MultiRowIgnorieren = 2 | MultiRowIgnorieren,
+    Ungleich_MultiRowIgnorieren = (1 << 1) | MultiRowIgnorieren,
     Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal = Ungleich_MultiRowIgnorieren | UND | GroßKleinEgal,
     Ungleich_MultiRowIgnorieren_GroßKleinEgal = Ungleich_MultiRowIgnorieren | GroßKleinEgal,
     Instr_GroßKleinEgal = Instr | GroßKleinEgal,
