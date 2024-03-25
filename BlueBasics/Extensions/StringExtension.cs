@@ -77,8 +77,8 @@ public static partial class Extensions {
                 if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
                 if (IntTryParse(isValue, out var w)) {
                     return w >= 0
-                        ? compareKeySOk + "A" + w.ToString(Format_Integer10)
-                        : compareKeySOk + w.ToString(Format_Integer10);
+                        ? compareKeySOk + "A" + w.ToStringInt10()
+                        : compareKeySOk + w.ToStringInt10();
                 }
 
                 return compareKeySNok + isValue;
@@ -95,7 +95,7 @@ public static partial class Extensions {
             case SortierTyp.ZahlenwertFloat:
                 if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                 if (DoubleTryParse(isValue, out var dw)) {
-                    var t = dw.ToString(Format_Float10_3, CultureInfo.InvariantCulture);
+                    var t = dw.ToString(Constants.Format_Float10_3, CultureInfo.InvariantCulture);
                     if (!t.Contains(",")) { t += ",000"; }
 
                     if (dw >= 0) { t = "A" + t; }
@@ -106,7 +106,7 @@ public static partial class Extensions {
                 return compareKeySNok + isValue;
 
             case SortierTyp.Datum_Uhrzeit:
-                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Format_Date, CultureInfo.InvariantCulture) : compareKeySNok + isValue;
+                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString1() : compareKeySNok + isValue;
 
             default:
                 Develop.DebugPrint(format);
@@ -258,7 +258,7 @@ public static partial class Extensions {
     /// Entfernt Leerzeichen und angebebene Textpaare am Anfang/Ende - mit genau einem Zeichen. Z.B. perfekt im Klammern zu entfernen
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="klammern">z.B. BlueBasics.Constants.KlammernRund</param>
+    /// <param name="klammern">z.B. Constants.KlammernRund</param>
 
     public static string FromNonCritical(this string txt) {
         // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html

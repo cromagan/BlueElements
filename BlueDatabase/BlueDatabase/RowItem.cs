@@ -325,9 +325,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem column, List<string>? value, string comment) => Database?.Cell.Set(column, this, value.JoinWithCr(), comment);
 
-    public void CellSet(string columnName, DateTime value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), comment);
+    public void CellSet(string columnName, DateTime value, string comment) => Database?.Cell.Set(Database?.Column[columnName], this, value.ToString5(), comment);
 
-    public void CellSet(ColumnItem column, DateTime value, string comment) => Database?.Cell.Set(column, this, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), comment);
+    public void CellSet(ColumnItem column, DateTime value, string comment) => Database?.Cell.Set(column, this, value.ToString5(), comment);
 
     public void CheckRowDataIfNeeded() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) {
@@ -668,7 +668,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 db.EventScriptErrorMessage = "Zeile: " + CellFirstString() + "\r\n\r\n" + script.ProtocolText;
             }
 
-            return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+            return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\nZeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
         if (changevalues && db.Column.SysRowState is ColumnItem srs) {

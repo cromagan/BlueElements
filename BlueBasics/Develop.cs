@@ -174,7 +174,7 @@ public static class Develop {
                         _deleteTraceLog = false;
                         break;
                 }
-                Trace.WriteLine("<br>" + DateTime.UtcNow.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) + " UTC<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
+                Trace.WriteLine("<br>" + DateTime.UtcNow.ToString1() + " UTC<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                 Trace.WriteLine("<th ALIGN=LEFT>");
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
                     if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint")) {

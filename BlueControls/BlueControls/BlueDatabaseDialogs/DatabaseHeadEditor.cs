@@ -243,7 +243,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         var t = "<b>Tabelle:</b> <tab>" + Database.TableName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
         t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser + "<br>";
-        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUTCDate.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture) + "<br>";
+        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUTCDate.ToString7() + "<br>";
         t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueId + "<br>";
         capInfo.Text = t.TrimEnd("<br>");
     }

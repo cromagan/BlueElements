@@ -379,7 +379,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         // Die unterschiedlichen Reasons in der Routine beachten!
         if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.SystemSet); }
-        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), Reason.SystemSet); }
+        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString5(), Reason.SystemSet); }
 
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
             if (db.Column.SysRowState is ColumnItem srs && srs != column) {

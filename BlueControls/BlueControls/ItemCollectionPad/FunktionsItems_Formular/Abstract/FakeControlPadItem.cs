@@ -80,10 +80,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public void Breite_berechnen() {
         var li = new List<AbstractListItem>();
         for (var br = 1; br <= 20; br++) {
-            li.Add(ItemOf(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar));
+            li.Add(ItemOf(br + " Spalte(n)", br.ToString(), true, br.ToStringInt3() + Constants.FirstSortChar));
 
             for (var pos = 1; pos <= br; pos++) {
-                li.Add(ItemOf(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToString(Constants.Format_Integer3) + Constants.SecondSortChar + pos.ToString(Constants.Format_Integer3)));
+                li.Add(ItemOf(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToStringInt3() + Constants.SecondSortChar + pos.ToStringInt3()));
             }
         }
 

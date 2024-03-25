@@ -90,7 +90,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
         _muf.Saving += _muf_Saving;
-        _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture);
+        _createDate = DateTime.UtcNow.ToString5();
         _creator = UserName;
         PadData = [];
 

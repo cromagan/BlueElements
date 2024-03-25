@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -124,7 +125,7 @@ public class CellItem {
             }
 
             if (!string.IsNullOrEmpty(imgtxt)) {
-                var gr = Math.Truncate(16 * scale).ToString(Constants.Format_Integer1);
+                var gr = ((int)Math.Truncate(16 * scale)).ToStringInt1();
                 if (!string.IsNullOrEmpty(constantHeightOfImageCode)) { gr = constantHeightOfImageCode; }
 
                 var x = (imgtxt + "||").SplitBy("|");

@@ -36,9 +36,9 @@ internal class Method_DateTimeNowUTC : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "datetimeutcnow";
-    public override string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. " + Constants.Format_Date7 + ") zurück. ";
-    public override int LastArgMinCount => -1;
+    public override string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. dd.MM.yyyy HH:mm:ss.fff) zurück. ";
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;

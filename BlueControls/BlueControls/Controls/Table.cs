@@ -572,7 +572,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     } else {
                         las = new TextListItem(
                             "ab " + db.Undo[z].DateTimeUtc + " UTC, geändert von " + db.Undo[z].User,
-                            co.ToString(Format_Integer5) + db.Undo[z].ChangedTo, null, false, true,
+                            co.ToStringInt5() + db.Undo[z].ChangedTo, null, false, true,
                             string.Empty);
                     }
                     isfirst = false;
@@ -582,7 +582,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (las != null) {
                 co++;
-                i.Add(ItemOf("vor " + db.Undo[lasNr].DateTimeUtc + " UTC", co.ToString(Format_Integer5) + db.Undo[lasNr].PreviousValue));
+                i.Add(ItemOf("vor " + db.Undo[lasNr].DateTimeUtc + " UTC", co.ToStringInt5() + db.Undo[lasNr].PreviousValue));
             }
         }
 

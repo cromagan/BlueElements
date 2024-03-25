@@ -152,7 +152,7 @@ public class UndoItem : IParseable {
 
         result.ParseableAdd("T", TableName);
         result.ParseableAdd("CO", Command);
-        result.ParseableAdd("D", DateTimeUtc, Constants.Format_Date9);
+        result.ParseableAdd("D", DateTimeUtc, "yyyy-MM-dd HH:mm:ss.fff");
         result.ParseableAdd("U", User);
         result.ParseableAdd("CN", ColName);
         result.ParseableAdd("RK", RowKey);

@@ -147,7 +147,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //_datenbankAdmin.Clear();
         //_globalShowPass = string.Empty;
         _creator = UserName;
-        _createDate = DateTime.UtcNow.ToString(Format_Date9, CultureInfo.InvariantCulture);
+        _createDate = DateTime.UtcNow.ToString9();
         FileStateUTCDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
         //_caption = string.Empty;
         LoadedVersion = DatabaseVersion;
@@ -846,7 +846,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
-            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString(Format_Date7, CultureInfo.InvariantCulture));
+            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
 
             SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
@@ -857,7 +857,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Format_Float2, CultureInfo.InvariantCulture));
+            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Constants.Format_Float2, CultureInfo.InvariantCulture));
             //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
             //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
             //SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
@@ -945,7 +945,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             x += 1;
             if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
 
-            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Format_Integer5)).RemoveChars(Char_DateiSonderZeichen + " _.");
+            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Char_DateiSonderZeichen + " _.");
             var ok = true;
 
             if (IsValidTableName(unique, false)) {
@@ -2641,7 +2641,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         RowCollection.WaitDelay = 0;
         TemporaryDatabaseMasterUser = MyMasterCode;
-        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5, CultureInfo.InvariantCulture);
+        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
     }
 
     protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {

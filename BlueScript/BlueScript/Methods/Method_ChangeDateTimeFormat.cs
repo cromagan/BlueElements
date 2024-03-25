@@ -35,7 +35,7 @@ internal class Method_ChangeDateTimeFormat : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "changedatetimeformat";
-    public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
+    public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;

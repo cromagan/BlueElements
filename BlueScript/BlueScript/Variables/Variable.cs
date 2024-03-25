@@ -66,7 +66,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
     }
 
-    public string CompareKey => CheckOrder.ToString(Format_Integer3) + "|" + KeyName.ToUpper();
+    public string CompareKey => CheckOrder.ToStringInt3() + "|" + KeyName.ToUpper();
     public abstract bool GetFromStringPossible { get; }
 
     public abstract bool IsNullOrEmpty { get; }

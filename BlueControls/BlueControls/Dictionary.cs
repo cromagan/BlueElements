@@ -81,7 +81,7 @@ internal static class Dictionary {
                 var w = thisRowItem.CellFirstString();
                 var di = Generic.LevenshteinDistance(word.ToLower(), w.ToLower());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
-                    l.Add(di.ToString(Constants.Format_Integer5) + w);
+                    l.Add(di.ToStringInt5() + w);
                 }
             }
         }

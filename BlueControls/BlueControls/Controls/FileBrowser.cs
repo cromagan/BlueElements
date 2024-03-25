@@ -280,7 +280,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
         var i = ScreenShot.GrabArea(ParentForm());
 
-        var dateiPng = TempFile(_directory.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), "PNG");
+        var dateiPng = TempFile(_directory.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString4(), "PNG");
         i.Save(dateiPng, ImageFormat.Png);
         i.Dispose();
         CollectGarbage();
@@ -620,7 +620,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
                 switch (_sort) {
                     case "Größe":
-                        p.UserDefCompareKey = fi.Length.ToString(Constants.Format_Integer10);
+                        p.UserDefCompareKey = ((int)fi.Length).ToStringInt10();
                         break;
 
                     case "Erstelldatum":

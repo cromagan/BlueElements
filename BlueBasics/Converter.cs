@@ -76,24 +76,24 @@ public static class Converter {
 
         s = s.TrimEnd(" Uhr");
 
-        return DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+        return DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date2, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "d.M.yy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date7, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date9, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date10, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy/MM/dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy_MM_dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date9, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, "yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 

@@ -270,9 +270,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 l.Add("############################################################################");
                 l.Add("############################################################################");
                 l.Add("############################################################################");
-                l.Add(thisUndo.DateTimeUtc.ToString(Format_Date7) + " " + thisUndo.User);
+                l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
 
-                l.Add(thisUndo.DateTimeUtc.ToString(Format_Date7) + " " + thisUndo.User);
+                l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
                 // Überprüfen, ob das Skript geändert wurde
                 List<string> ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
                 var found = false;

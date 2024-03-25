@@ -375,14 +375,14 @@ public class DatabaseMu : Database {
 
     private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {
-            Freeze("Fragmentpfad nicht gesetzt. Stand: " + IsInCache.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
+            Freeze("Fragmentpfad nicht gesetzt. Stand: " + IsInCache.ToString5());
             return;
         }
         CheckPath();
 
         //CheckSysUndoNow();
 
-        _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), SuffixOfFragments());
+        _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
 
         _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
 

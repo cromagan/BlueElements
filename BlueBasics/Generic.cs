@@ -313,14 +313,14 @@ public static class Generic {
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
 
     public static string UniqueInternal() {
-        var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture).ReduceToChars(Constants.Char_Numerals);
+        var neueZeit = DateTime.UtcNow.ToString7().ReduceToChars(Constants.Char_Numerals);
         if (neueZeit == _uniqueInternalLastTime) {
             _uniqueInternalCount++;
         } else {
             _uniqueInternalCount = 0;
             _uniqueInternalLastTime = neueZeit;
         }
-        return "ID_" + neueZeit + "_" + _uniqueInternalCount.ToString(Constants.Format_Integer3);
+        return "ID_" + neueZeit + "_" + _uniqueInternalCount.ToStringInt3();
     }
 
     private static IEnumerable<byte> GetHash(this string inputString) {

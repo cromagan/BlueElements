@@ -342,7 +342,7 @@ public static class IO {
     public static string GetFileInfo(string filename, bool mustDo) {
         try {
             FileInfo f = new(filename);
-            return f.LastWriteTimeUtc.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) + "-" + f.Length;
+            return f.LastWriteTimeUtc.ToString1() + "-" + f.Length;
         } catch {
             if (!mustDo) { return string.Empty; }
             Develop.CheckStackForOverflow();
@@ -427,7 +427,7 @@ public static class IO {
     public static string TempFile(string pfad, string wunschname, string suffix) {
         if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }
         if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
-        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString(Constants.Format_Date6, CultureInfo.InvariantCulture); }
+        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString6(); }
         var z = -1;
         pfad = pfad.CheckPath();
         if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }
@@ -435,7 +435,7 @@ public static class IO {
         string? filename;
         do {
             z++;
-            filename = z > 0 ? pfad + wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + suffix : pfad + wunschname + "." + suffix;
+            filename = z > 0 ? pfad + wunschname + "_" + z.ToStringInt5() + "." + suffix : pfad + wunschname + "." + suffix;
         } while (FileExists(filename));
         return filename;
     }

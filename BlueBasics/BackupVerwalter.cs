@@ -61,7 +61,7 @@ public class BackupVerwalter {
     #region Methods
 
     public void AddData(DateTime dateUtc, string file) {
-        var d = dateUtc.ToString(Constants.Format_Date6, CultureInfo.InvariantCulture);
+        var d = dateUtc.ToString6();
         if (_data.ContainsKey(d)) { return; }
         _data.Add(d, file.ToUpper());
         _deletable = null;
@@ -128,7 +128,7 @@ public class BackupVerwalter {
     }
 
     private string? FileOf(DateTime date) {
-        var dts = date.ToString(Constants.Format_Date6, CultureInfo.InvariantCulture);
+        var dts = date.ToString6();
         if (!_data.ContainsKey(dts)) { return null; }
         if (!_data.TryGetValue(dts, out var file)) { return null; }
         return file;

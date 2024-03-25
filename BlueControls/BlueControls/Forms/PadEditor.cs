@@ -77,7 +77,7 @@ public partial class PadEditor : PadEditorReadOnly {
 
         if (Pad?.Item?.SheetStyle != null) {
             PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
-            cbxSchriftGröße.Text = ((int)(Pad.Item.SheetStyleScale * 100)).ToString(Constants.Format_Integer3);
+            cbxSchriftGröße.Text = ((int)(Pad.Item.SheetStyleScale * 100)).ToStringInt3();
         }
     }
 

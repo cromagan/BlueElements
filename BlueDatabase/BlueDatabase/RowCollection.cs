@@ -282,7 +282,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             x += 1;
             if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
 
-            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
 
             foreach (var thisfile in Database.AllFiles) {
@@ -413,7 +413,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (fullprocessing) {
             if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src, u, "Initialwert neuer Zeile"); }
-            if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), "Initialwert neuer Zeile"); }
+            if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString5(), "Initialwert neuer Zeile"); }
 
             // Dann die Inital-Werte reinschreiben
             if (fc != null) {

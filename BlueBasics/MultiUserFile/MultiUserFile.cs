@@ -537,7 +537,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     }
 
     private bool CreateBlockDatei() {
-        var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture) + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+        var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
         try {
             var bInhalt = tmpInhalt.UTF8_ToByte();
