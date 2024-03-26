@@ -80,6 +80,12 @@ public static class AbstractListItemExtension {
                 symbol = QuickImage.Get(ImageCode.Blitz);
                 break;
 
+            case ContextMenuCommands.SpaltenSortierungDefault:
+                readableText = "Sortierung zurückstetzen";
+                symbol = QuickImage.Get("AZ|16|8|1");
+                break;
+
+
             case ContextMenuCommands.SpaltenSortierungAZ:
                 readableText = "Nach dieser Spalte aufsteigend sortieren";
                 symbol = QuickImage.Get("AZ|16|8");

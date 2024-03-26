@@ -59,6 +59,7 @@ public static class Constants {
                                                        "dd.MM.yyyy HH:mm:ss.fff",
                                                        "yyyy-MM-dd HH:mm:ss.fff",
                                                        "yyyy_MM_dd",
+                                                       "yyyy-MM-dd",
                                                        "yyyy-MM-dd HH:mm",
                                                        "yyyy-MM-dd HH:mm:ss",
                                                        "yyyy-MM-dd HH:mm:ss.fff",

@@ -114,6 +114,8 @@ public partial class TableView : FormWithStatusBar {
 
         if (column != null) {
             e.UserMenu.Add(ItemOf("Sortierung", true));
+            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungDefault, column.Function.CanBeCheckedByRules()));
+
             e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
             e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
             //_ = e.UserMenu.Add(AddSeparator());
@@ -175,6 +177,11 @@ public partial class TableView : FormWithStatusBar {
 
             case "anpinnen":
                 tbl?.PinAdd(row);
+                break;
+
+
+            case "SpaltenSortierungDefault":
+                tbl.SortDefinitionTemporary = null;
                 break;
 
             case "SpaltenSortierungAZ":

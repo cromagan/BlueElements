@@ -114,7 +114,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             if (db.SortDefinition?.Columns != null) {
                 foreach (var thisColumn in db.SortDefinition.Columns) {
                     if (thisColumn != null && !thisColumn.IsDisposed) {
-                        lbxSortierSpalten.ItemAdd(ItemOf(thisColumn));
+                        lbxSortierSpalten.AddAndCheck(ItemOf(thisColumn));
                     }
                 }
             }
