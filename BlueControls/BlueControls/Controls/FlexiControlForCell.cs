@@ -25,7 +25,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -37,6 +36,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.IO;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -59,7 +59,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     /// </summary>
     public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiControlForCell(string column, CaptionPosition captionPosition, EditTypeFormula editType) : base() {
+    public FlexiControlForCell(string columnName, CaptionPosition captionPosition, EditTypeFormula editType) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -67,10 +67,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         ShowInfoWhenDisabled = true;
         CaptionPosition = captionPosition;
         EditType = editType;
-        ColumnName = column;
+        ColumnName = columnName;
         //((IControlSendFilter)this).RegisterEvents();
         this.RegisterEvents();
-        CheckEnabledState();
+        var (column, row) = GetTmpVariables();
+        StyleControls(column, row);
+        CheckEnabledState(column, row);
     }
 
     #endregion
@@ -85,15 +87,16 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     #region Properties
 
-    [Description("Dieses Feld kann für den Forms-Editor verwendet werden.")]
     [DefaultValue("")]
     public string ColumnName {
         get => _columnName;
         set {
             if (_columnName == value) { return; }
             _columnName = value;
-            UpdateColumnData();
-            SetValueFromCell();
+
+            var (column, row) = GetTmpVariables();
+            StyleControls(column, row);
+            SetValueFromCell(column, row);
         }
     }
 
@@ -211,6 +214,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         RowsInputChangedHandled = true;
         this.DoRows();
 
+        var (column, row) = GetTmpVariables();
+
         if (this.Database() is Database db2 && _lastDb != db2 && !db2.IsDisposed) {
             _lastDb = db2;
             db2.Cell.CellValueChanged += Database_CellValueChanged;
@@ -220,17 +225,15 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             db2.Disposed += _Database_Disposed;
         }
 
-        UpdateColumnData();
-        SetValueFromCell();
-        CheckEnabledState();
+        StyleControls(column, row);
+        SetValueFromCell(column, row);
+        CheckEnabledState(column, row);
 
-        var (_, row) = GetTmpVariables();
         row?.CheckRowDataIfNeeded();
 
         if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
             Database_RowChecked(this, rce);
         }
-        SetValueFromCell();
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
@@ -241,9 +244,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     public void RowsInput_Changed() { }
 
-    internal void CheckEnabledState() {
-        var (column, row) = GetTmpVariables();
-
+    internal void CheckEnabledState(ColumnItem? column, RowItem? row) {
         if (Parent == null) {
             DisabledReason = "Kein Bezug zu einem Formular.";
             return;
@@ -288,61 +289,21 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
-        if (e.Control is Caption) { return; } // z.B. Info Caption
-
-        var (column, _) = GetTmpVariables();
-
-        var column1 = GetRealColumn(column, null);
-
-        if (column1 != null) {
-            Suffix = column1.Suffix;
-            Regex = column1.Regex;
-            AllowedChars = column1.AllowedChars;
-            MaxTextLenght = column1.MaxTextLenght;
-        }
 
         switch (e.Control) {
-            case ComboBox comboBox:
-                var item2 = new List<AbstractListItem>();
-
-                if (column1 != null) {
-                    item2.AddRange(ItemsOf(column1, null, ShortenStyle.Replaced, 10000));
-                }
-
-                if (column1 != null && column1.TextBearbeitungErlaubt) {
-                    StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
-                } else {
-                    StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
-                }
-                //comboBox.GotFocus += GotFocus_ComboBox;
-                break;
-
-            //case EasyPic easyPic:
-            //    easyPic.ConnectedDatabase += EasyPicConnectedDatabase;
-            //    easyPic.ImageChanged += EasyPicImageChanged;
-            //    break;
-
             case TextBox textBox:
-                if (column1 == null) {
-                    StyleTextBox(textBox);
-                } else {
-                    StyleTextBox(textBox);
-                }
                 textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                 //textBox.GotFocus += GotFocus_TextBox;
                 textBox.TextChanged += TextBox_TextChanged;
                 break;
 
             case ListBox listBox:
-                StyleListBox(listBox, column1);
                 listBox.ContextMenuInit += ListBox_ContextMenuInit;
                 listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                 break;
 
-            case SwapListBox swapListBox:
-                StyleSwapListBox(swapListBox, column1);
-                break;
-
+            case BlueControls.Controls.Caption:
+            case SwapListBox:
             case Button:
             case Line:
                 break;
@@ -351,14 +312,14 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 Develop.DebugPrint("Control unbekannt");
                 break;
         }
+
+        var (column, row) = GetTmpVariables();
+        StyleControls(column, row);
     }
 
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
         switch (e.Control) {
-            case ComboBox:
-                break;
-
             case TextBox textBox:
                 textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
                 textBox.TextChanged -= TextBox_TextChanged;
@@ -370,14 +331,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 break;
 
             case SwapListBox:
-                break;
-
-            case Caption _:
-                break;
-
+            case BlueControls.Controls.Caption:
             case Button:
-                break;
-
             case Line:
                 break;
 
@@ -389,17 +344,17 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     protected override void OnValueChanged() {
         base.OnValueChanged();
-        FillCellNow();
+        ValueToCell();
     }
 
     protected override void RemoveAll() {
-        FillCellNow();
+        ValueToCell();
         base.RemoveAll();
     }
 
     protected void StyleListBox(ListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
-        control.ItemClear();
+        //control.ItemClear();
         control.CheckBehavior = CheckBehavior.MultiSelection;
         if (column == null || column.IsDisposed) { return; }
 
@@ -452,7 +407,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     protected void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
-        control.UnCheck();
+        //control.UnCheck();
         control.SuggestionsClear();
         if (column == null || column.IsDisposed) { return; }
         var item = new List<AbstractListItem>();
@@ -501,16 +456,17 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             }
         }
 
-        UpdateColumnData();
-        SetValueFromCell();
+        var (column, row) = GetTmpVariables();
+        StyleControls(column, row);
+        SetValueFromCell(column, row);
     }
 
     private void Column_ItemInternalChanged(object sender, ColumnEventArgs e) {
-        var (column, _) = GetTmpVariables();
+        var (column, row) = GetTmpVariables();
 
         if (e.Column == column) {
-            UpdateColumnData();
-            CheckEnabledState();
+            StyleControls(column, row);
+            CheckEnabledState(column, row);
             //OnNeedRefresh();
         }
     }
@@ -526,9 +482,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
             if (e.Row != row) { return; }
 
-            if (e.Column == column) { SetValueFromCell(); }
+            if (e.Column == column) { SetValueFromCell(column, row); }
 
-            if (e.Column == column || e.Column == e.Column.Database?.Column.SysLocked) { CheckEnabledState(); }
+            if (e.Column == column || e.Column == e.Column.Database?.Column.SysLocked) { CheckEnabledState(column, row); }
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {
@@ -556,25 +512,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             }
         }
         InfoText = newT;
-    }
-
-    private void FillCellNow() {
-        if (IsFilling) { return; }
-        if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
-        var (column, row) = GetTmpVariables();
-        if (column == null || row == null) { return; }
-        if (column.IsDisposed || row.IsDisposed) { return; }
-
-        var oldVal = row.CellGetString(column);
-        var newValue = Value;
-
-        if (oldVal == newValue) { return; }
-
-        row.CellSet(column, newValue, "Über Formular bearbeitet (FlexiControl)");
-        //if (oldVal != row.CellGetString(column)) {
-        //    _ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, false, false, true, 1);
-        //    row.Database?.AddBackgroundWork(row);
-        //}
     }
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
@@ -726,10 +663,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
-    private void SetValueFromCell() {
+    private void SetValueFromCell(ColumnItem? column, RowItem? row) {
         if (IsDisposed) { return; }
-
-        var (column, row) = GetTmpVariables();
 
         if (column == null || row == null) {
             ValueSet(string.Empty, true);
@@ -749,12 +684,73 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
+    private void StyleControls(ColumnItem? column, RowItem? row) {
+        var realColumn = GetRealColumn(column, row);
+
+        if (realColumn != null) {
+            Caption = realColumn.ReadableText() + ":";
+            QuickInfo = realColumn.QuickInfoText(string.Empty);
+            this.GetStyleFrom(realColumn);
+            //Suffix = realColumn.Suffix;
+            //Regex = realColumn.Regex;
+            //AllowedChars = realColumn.AllowedChars;
+            //MaxTextLenght = realColumn.MaxTextLenght;
+        } else {
+            QuickInfo = string.Empty;
+
+            if (string.IsNullOrEmpty(_columnName)) {
+                Caption = "[?]";
+            } else {
+                Caption = _columnName + ":";
+            }
+        }
+
+        foreach (var thisControl in Controls) {
+            switch (thisControl) {
+                case ComboBox comboBox:
+                    var item2 = new List<AbstractListItem>();
+                    if (realColumn != null) {
+                        item2.AddRange(ItemsOf(realColumn, null, ShortenStyle.Replaced, 10000));
+                    }
+
+                    if (realColumn != null && realColumn.TextBearbeitungErlaubt) {
+                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
+                    } else {
+                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
+                    }
+
+                    break;
+
+                case TextBox textBox:
+                    StyleTextBox(textBox);
+                    break;
+
+                case ListBox listBox:
+                    StyleListBox(listBox, realColumn);
+                    break;
+
+                case SwapListBox swapListBox:
+                    StyleSwapListBox(swapListBox, realColumn);
+                    break;
+
+                case BlueControls.Controls.Caption:
+                case Button:
+                case Line:
+                    break;
+
+                default:
+                    Develop.DebugPrint("Control unbekannt");
+                    break;
+            }
+        }
+    }
+
     private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = this.Database();
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) {
         while (Marker.IsBusy) {
             if (!Marker.CancellationPending) { Marker.CancelAsync(); }
-            Develop.DoEvents();
+            //Develop.DoEvents();
         }
 
         var (column, _) = GetTmpVariables();
@@ -764,24 +760,23 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         Marker.RunWorkerAsync();
     }
 
-    private void UpdateColumnData() {
-        var (column, _) = GetTmpVariables();
+    private void ValueToCell() {
+        if (IsFilling) { return; }
+        if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
+        var (column, row) = GetTmpVariables();
+        if (column == null || row == null) { return; }
+        if (column.IsDisposed || row.IsDisposed) { return; }
 
-        if (column == null || column.IsDisposed) {
-            if (string.IsNullOrEmpty(_columnName)) {
-                Caption = "[?]";
-                //EditType = EditTypeFormula.None;
-                QuickInfo = string.Empty;
-            } else {
-                Caption = _columnName + ":";
-            }
-        } else {
-            Caption = column.ReadableText() + ":";
+        var oldVal = row.CellGetString(column);
+        var newValue = Value;
 
-            if (string.IsNullOrEmpty(_columnName)) {
-                QuickInfo = column.QuickInfoText(string.Empty);
-            }
-        }
+        if (oldVal == newValue) { return; }
+
+        row.CellSet(column, newValue, "Über Formular bearbeitet (FlexiControl)");
+        //if (oldVal != row.CellGetString(column)) {
+        //    _ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, false, false, true, 1);
+        //    row.Database?.AddBackgroundWork(row);
+        //}
     }
 
     #endregion

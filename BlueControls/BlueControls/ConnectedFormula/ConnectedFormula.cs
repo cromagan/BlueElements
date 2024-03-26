@@ -560,13 +560,13 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             }
         }
 
-        //if (PadData != null) {
-        //    foreach (var thisf in PadData.AllPages()) {
-        //        if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-        //            _ = list.Add(thisf, ImageCode.Register);
-        //        }
-        //    }
-        //}
+        if (PadData != null) {
+            foreach (var thisf in PadData.AllPages()) {
+                if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
+                   list.Add(ItemOf(thisf, ImageCode.Register));
+                }
+            }
+        }
     }
 
     /// <summary>

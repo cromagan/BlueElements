@@ -1097,8 +1097,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         switch (_checkBehavior) {
             case CheckBehavior.AllSelected:
-                SetValuesTo(newCheckedItems);
-                newCheckedItems = _item.ToListOfString();
+                //SetValuesTo(newCheckedItems);
+                //newCheckedItems = _item.ToListOfString();
                 break;
 
             case CheckBehavior.NoSelection:
@@ -1116,19 +1116,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
                 break;
 
-            //case CheckBehavior.AlwaysSingleSelection:
-            //    if (newCheckedItems.Count > 1) {
-            //        if (string.IsNullOrEmpty(lastaddeditem)) { lastaddeditem = newCheckedItems[0]; }
-            //        newCheckedItems.Clear();
-            //        newCheckedItems.Add(lastaddeditem);
-            //    }
-
-            //if (newCheckedItems.Count == 0) {
-            //    var it = Item.FirstOrDefault(thisp => thisp != null && thisp.IsClickable());
-            //    if (it != null) { newCheckedItems.Add(it.KeyName); }
-            //}
-            //break;
-
             default:
                 Develop.DebugPrint(_checkBehavior);
                 break;
@@ -1145,6 +1132,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         if (newList.IsDifferentTo(_checked)) {
+
+            if(_checkBehavior == CheckBehavior.AllSelected) {
+                SetValuesTo(newCheckedItems);
+            }
+
+
             _checked = newList;
             OnItemCheckedChanged();
         }

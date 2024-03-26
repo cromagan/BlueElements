@@ -292,7 +292,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IdColor(InputColorId));
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
+            //return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
