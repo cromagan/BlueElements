@@ -2353,7 +2353,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thisDb in Database.AllFiles) {
             if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45) && thisDb.MultiUser) {
                 masters++;
-                if (masters > 5) { return false; }
+                if (masters > 8) { return false; }
             }
         }
 

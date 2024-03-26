@@ -42,18 +42,17 @@ namespace BlueControls.Forms {
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
-            this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
             this.btnFormular = new BlueControls.Controls.Button();
             this.btnSpaltenanordnung = new BlueControls.Controls.Button();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
             this.btnLayouts = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
+            this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
-            this.tabAllgemein.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminAllgemein.SuspendLayout();
             this.grpAdminBearbeiten.SuspendLayout();
@@ -210,16 +209,6 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
             // 
-            // btnSkripteBearbeiten
-            // 
-            this.btnSkripteBearbeiten.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
-            this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
-            this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
-            this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
-            this.btnSkripteBearbeiten.TabIndex = 45;
-            this.btnSkripteBearbeiten.Text = "Skripte";
-            // 
             // btnFormular
             // 
             this.btnFormular.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
@@ -273,12 +262,25 @@ namespace BlueControls.Forms {
             // CFormula
             // 
             this.CFormula.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CFormula.GroupBoxStyle = Enums.GroupBoxStyle.Nothing;
+            this.CFormula.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFormula.Location = new System.Drawing.Point(0, 110);
+            this.CFormula.Mode = "";
             this.CFormula.Name = "CFormula";
             this.CFormula.Size = new System.Drawing.Size(1202, 316);
             this.CFormula.TabIndex = 98;
+            this.CFormula.TabStop = false;
             this.CFormula.Text = "CFO";
+            // 
+            // btnSkripteBearbeiten
+            // 
+            this.btnSkripteBearbeiten.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnSkripteBearbeiten.Enabled = false;
+            this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
+            this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
+            this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
+            this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
+            this.btnSkripteBearbeiten.TabIndex = 45;
+            this.btnSkripteBearbeiten.Text = "Skripte";
             // 
             // FormulaView
             // 
@@ -297,7 +299,6 @@ namespace BlueControls.Forms {
             this.ribMain.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
-            this.tabAllgemein.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminAllgemein.ResumeLayout(false);
             this.grpAdminBearbeiten.ResumeLayout(false);
@@ -318,12 +319,12 @@ namespace BlueControls.Forms {
         private Button btnSaveLoad;
         private Button btnPowerBearbeitung;
         private GroupBox grpAdminBearbeiten;
-        private Button btnSkripteBearbeiten;
         private Button btnFormular;
         private Button btnSpaltenanordnung;
         private Button btnDatenbankKopf;
         private Button btnLayouts;
         private OpenFileDialog LoadTab;
         protected ConnectedFormulaView CFormula;
+        private Button btnSkripteBearbeiten;
     }
 }
