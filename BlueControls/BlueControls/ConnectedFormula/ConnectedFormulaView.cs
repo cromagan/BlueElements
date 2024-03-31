@@ -344,18 +344,23 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
 
-        foreach (var thisC in base.Controls) {
-            if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
-        }
+        try {
+            foreach (var thisC in base.Controls) {
+                if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
+            }
 
-        var c = thisit.CreateControl(this);
-        if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
-            Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
+            var c = thisit.CreateControl(this);
+            if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
+                Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
+                return null;
+            }
+
+            base.Controls.Add(c);
+            return c;
+        } catch {
+            // Beim Beenden- Fehler beim Fenster-Handle erstellen
             return null;
         }
-
-        base.Controls.Add(c);
-        return c;
     }
 
     /// <summary>
