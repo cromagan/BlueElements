@@ -75,6 +75,8 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         _column?.RefreshColumnsData();
     }
 
+    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToStringFloat5() + "|" + to.ToStringFloat5()) { }
+
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Database' vorkommen!
     /// </summary>

@@ -69,26 +69,36 @@ public partial class Voting : System.Windows.Forms.Form {
 
     private void btn1_Click(object? sender, System.EventArgs e) {
         if (_fr1 == null || _fr2 == null) { return; }
-        var v1 = _fr1.CellGetDouble(_column) - 7;
-        var v2 = _fr2.CellGetDouble(_column) + 10;
+        var v1 = _fr1.CellGetDouble(_column);
+        var v2 = _fr2.CellGetDouble(_column);
 
         Add(_fr1, _fr2, false);
 
-        _fr1.CellSet(_column, v1, "Downvote");
-        _fr2.CellSet(_column, v2, "Upvote");
+        _fr1.CellSet(_column, v1 - 7, "Downvote");
+        _fr2.CellSet(_column, v2 + 10, "Upvote");
+
+        Change(v2, 3, [_fr1, _fr2]);
+        Change(v1, -2, [_fr1, _fr2]);
+
         Generate();
+        Database.ForceSaveAll();
     }
 
     private void btn2_Click(object? sender, System.EventArgs e) {
         if (_fr1 == null || _fr2 == null) { return; }
-        var v1 = _fr1.CellGetDouble(_column) + 10;
-        var v2 = _fr2.CellGetDouble(_column) - 7;
+        var v1 = _fr1.CellGetDouble(_column);
+        var v2 = _fr2.CellGetDouble(_column);
 
         Add(_fr1, _fr2, true);
 
-        _fr1.CellSet(_column, v1, "Upvote");
-        _fr2.CellSet(_column, v2, "DownVote");
+        _fr1.CellSet(_column, v1 + 10, "Upvote");
+        _fr2.CellSet(_column, v2 - 7, "DownVote");
+
+        Change(v1, 3, [_fr1, _fr2]);
+        Change(v2, -2, [_fr1, _fr2]);
+
         Generate();
+        Database.ForceSaveAll();
     }
 
     private void cbxStil_TextChanged(object sender, System.EventArgs e) {
@@ -100,11 +110,26 @@ public partial class Voting : System.Windows.Forms.Form {
         Generate();
     }
 
+    private void Change(double v, int value, List<RowItem> notallowed) {
+        using var f = new FilterCollection(_column.Database, "ChangeFilter") {
+            new FilterItem(_column, v - 3, v + 3)
+        };
+
+        var r = f.Rows;
+
+        foreach (var thisRow in r) {
+            if (!notallowed.Contains(thisRow)) {
+                var v1 = thisRow.CellGetDouble(_column);
+                thisRow.CellSet(_column, v1 + value, "VoteChange");
+            }
+        }
+    }
+
     private void Generate() {
         _fr1 = null;
         _fr2 = null;
 
-        double minab = 6;
+        double minab = 11;
 
         for (var row1 = 0; row1 < _rows.Count - 1; row1++) {
             var sc1 = _rows[row1].CellGetDouble(_column);
@@ -122,11 +147,6 @@ public partial class Voting : System.Windows.Forms.Form {
             }
         }
 
-
-
-
-
-
         if (_fr1 == null || _fr2 == null || string.IsNullOrWhiteSpace(_filename)) {
             Pad1.Item?.Clear();
             btn1.Enabled = false;
@@ -134,8 +154,6 @@ public partial class Voting : System.Windows.Forms.Form {
             btn2.Enabled = false;
             return;
         }
-
-
 
         string key;
         if (_fr1.KeyName.CompareTo(_fr2.KeyName) > 0) {
@@ -156,7 +174,6 @@ public partial class Voting : System.Windows.Forms.Form {
             return;
         }
 
-
         var p1 = new ItemCollectionPad.ItemCollectionPad(_filename);
         p1.ResetVariables();
         p1.ReplaceVariables(_fr1);
@@ -172,10 +189,6 @@ public partial class Voting : System.Windows.Forms.Form {
         Pad2.Item = p2;
         Pad2.ShowInPrintMode = true;
         Pad2.ZoomFit();
-
- 
-
-
 
         btn1.Enabled = true;
         btn2.Enabled = true;
