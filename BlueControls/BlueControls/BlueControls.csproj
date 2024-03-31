@@ -186,6 +186,12 @@
     <Compile Include="EventArgs\EditingEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="FormManager.cs" />
+    <Compile Include="Forms\Voting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Voting.Designer.cs">
+      <DependentUpon>Voting.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormulaView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -482,12 +488,6 @@
     <Compile Include="BlueDatabaseDialogs\ImportCsv.designer.cs">
       <DependentUpon>ImportCsv.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\LayoutPadEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\LayoutPadEditor.Designer.cs">
-      <DependentUpon>LayoutPadEditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="BlueDatabaseDialogs\SearchAndReplace.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -689,10 +689,6 @@
       <DependentUpon>ImportCsv.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\LayoutPadEditor.resx">
-      <DependentUpon>LayoutPadEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\SearchAndReplace.resx">
       <DependentUpon>SearchAndReplace.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -740,6 +736,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditBoxRow.resx">
       <DependentUpon>EditBoxRow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Voting.resx">
+      <DependentUpon>Voting.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormulaView.resx">

@@ -108,7 +108,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     public static void AddLayoutsOff(Controls.ComboBox addHere, Database? db) {
         if (db is null || db.IsDisposed) { return; }
-        var r = db.GetAllLayouts();
+        var r = db.GetAllLayoutsFileNames();
 
         foreach (var thisFile in r) {
             if (addHere[thisFile] == null) { addHere.ItemAdd(ItemOf(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
@@ -255,7 +255,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Database == null || string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text)) || _rowsForExport == null || !_rowsForExport.Any()) {
+        if (Database == null || string.IsNullOrEmpty(cbxLayoutWahl.Text) || _rowsForExport == null || !_rowsForExport.Any()) {
             padVorschau.Item?.Clear();
         } else {
             padVorschau.ShowInPrintMode = true;
@@ -371,7 +371,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             tabStart.Enabled = false; // Geht ja gleich los
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
-            var (files, error) = !string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text))
+            var (files, error) = !string.IsNullOrEmpty(cbxLayoutWahl.Text)
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
                 : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
             lstExported.ItemAddRange(files);

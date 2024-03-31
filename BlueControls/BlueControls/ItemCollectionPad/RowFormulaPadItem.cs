@@ -128,8 +128,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
         if (Row?.Database is Database db && !db.IsDisposed) {
             var layouts = new List<AbstractListItem>();
-            foreach (var thisLayouts in db.GetAllLayouts()) {
-                ItemCollectionPad p = new(thisLayouts, string.Empty);
+            foreach (var thisLayouts in db.GetAllLayoutsFileNames()) {
+                ItemCollectionPad p = new(thisLayouts);
                 layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }
             l.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
@@ -193,9 +193,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             return;
         }
 
-        var lf = db.GetLayout(_layoutFileName);
-
-        CreativePad pad = new(new ItemCollectionPad(lf));
+        CreativePad pad = new(new ItemCollectionPad(_layoutFileName));
         if (pad.Item is ItemCollectionPad icp) {
             icp.ResetVariables();
             icp.ReplaceVariables(db, _rowKey);

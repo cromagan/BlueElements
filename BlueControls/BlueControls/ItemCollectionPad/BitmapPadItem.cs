@@ -27,6 +27,7 @@ using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -164,8 +165,21 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
         if ("~" + variable.KeyName.ToLowerInvariant() + "~" != Platzhalter_Für_Layout.ToLowerInvariant()) { return false; }
-        if (variable is not VariableBitmap vbmp) { return false; }
-        var ot = vbmp.ValueBitmap;
+
+        Bitmap? ot;
+
+        if (variable is VariableBitmap vbmp) {
+            ot = vbmp.ValueBitmap;
+        } else if (variable is VariableString filn) {
+            if (BlueBasics.IO.FileExists(filn.ValueString)) {
+                ot = (Bitmap)Image_FromFile(filn.ValueString);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
         if (ot != null) {
             Bitmap = ot;
             OnPropertyChanged();

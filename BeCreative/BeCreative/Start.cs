@@ -94,7 +94,7 @@ namespace BeCreative {
         }
 
         private void btnLayout_Click(object sender, EventArgs e) {
-            DoForm(new LayoutPadEditor(null));
+            DoForm(new PadEditorWithFileAccess());
         }
 
         private void DoForm(System.Windows.Forms.Form frm) {

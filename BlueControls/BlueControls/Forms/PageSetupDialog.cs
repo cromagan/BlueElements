@@ -126,7 +126,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
     }
 
     private void DrawSampleAndCheckButton() {
-        var makeP = !Breite.Text.IsNumeral();
+        var makeP = Breite.Text.IsNumeral();
         if (!Höhe.Text.IsNumeral()) { makeP = false; }
         if (!Oben.Text.IsNumeral()) { makeP = false; }
         if (!Unten.Text.IsNumeral()) { makeP = false; }

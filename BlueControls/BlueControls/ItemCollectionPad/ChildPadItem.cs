@@ -219,7 +219,10 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 return true;
 
             case "data":
-                PadInternal = new CreativePad(new ItemCollectionPad(value, string.Empty));
+                PadInternal = new CreativePad();
+                var it = new ItemCollectionPad();
+                it.Parse(value);
+                PadInternal.Item = it;
                 return true;
 
             case "checked":

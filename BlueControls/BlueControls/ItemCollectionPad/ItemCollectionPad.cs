@@ -59,7 +59,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public static List<AbstractPadItem>? PadItemTypes;
 
-    internal readonly string Caption;
+    internal string Caption;
 
     /// <summary>
     /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
@@ -100,113 +100,11 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutFileName) : this(File.ReadAllText(layoutFileName, Win1252), string.Empty) => Connections.CollectionChanged += ConnectsTo_CollectionChanged;
+    public ItemCollectionPad(string layoutFileName) : this() {
+        Parse(File.ReadAllText(layoutFileName, Win1252));
+        IsSaved = true;
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="toParse"></param>
-    /// <param name="useThisKeyName">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-    public ItemCollectionPad(string? toParse, string useThisKeyName) : this() {
-        if (toParse == null || string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
-        if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
-        Caption = useThisKeyName;
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLowerInvariant()) {
-                case "sheetsize":
-                    _sheetSizeInMm = pair.Value.SizeFParse();
-                    GenPoints();
-                    break;
-
-                case "printarea":
-                    _randinMm = pair.Value.PaddingParse();
-                    GenPoints();
-                    break;
-                //case "items":
-                //    Parse(pvalue);
-                //    break;
-                case "relation": // TODO: Entfernt, 24.05.2021
-                    //AllRelations.Add(new clsPointRelation(this, null, pair.Value));
-                    break;
-
-                case "caption":
-                    if (string.IsNullOrEmpty(Caption)) { Caption = pair.Value.FromNonCritical(); }
-                    break;
-
-                case "backcolor":
-                    BackColor = Color.FromArgb(IntParse(pair.Value));
-                    break;
-
-                //case "scriptname":
-                //    _scriptName = pair.Value;
-                //    break;
-                case "keyName":
-                case "id":
-                    //if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
-                    break;
-
-                case "style":
-                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
-                    _sheetStyle ??= Skin.StyleDb?.Row.First();// Einfach die Erste nehmen
-                    break;
-
-                case "fontscale":
-                    _sheetStyleScale = FloatParse(pair.Value);
-                    break;
-
-                case "snapmode":
-                    _snapMode = (SnapMode)IntParse(pair.Value);
-                    break;
-
-                case "grid":
-                    //_Grid = pair.Value.FromPlusMinus();
-                    break;
-
-                case "gridshow":
-                    _gridShow = FloatParse(pair.Value);
-                    break;
-
-                case "gridsnap":
-                    _gridsnap = FloatParse(pair.Value);
-                    break;
-
-                case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), DataFormat)
-                    break;
-
-                case "items":
-                    CreateItems(pair.Value); // im ersten Step nur die items erzeugen....
-                    ParseItems(pair.Value);// ...im zweiten können nun auch Beziehungen erstellt werden!
-
-                    break;
-
-                case "connection":
-                    CreateConnection(pair.Value);
-                    break;
-
-                case "connections": // TODO: Obsolet ab 07.02.2023
-                    ParseConnections(pair.Value);
-                    break;
-
-                case "dpi":
-                    if (IntParse(pair.Value) != Dpi) {
-                        Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
-                    }
-                    break;
-
-                case "sheetstyle":
-                    if (Skin.StyleDb == null) { Skin.InitStyles(); }
-                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
-                    break;
-
-                case "sheetstylescale":
-                    _sheetStyleScale = FloatParse(pair.Value);
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
-        }
+        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
     #endregion
@@ -227,7 +125,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public event EventHandler<ListEventArgs>? ItemRemoving;
 
-    public event EventHandler? PropertyChanged;
+    public new EventHandler? PropertyChanged;
 
     #endregion
 
@@ -365,7 +263,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     }
 
     public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) => new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
-        (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
+            (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
 
     public static float ZoomFitValue(RectangleF maxBounds, Size sizeOfPaintArea) {
         if (maxBounds.IsEmpty) { return 1f; }
@@ -536,6 +434,112 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public void OnPropertyChanged() {
         IsSaved = false;
         PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toParse"></param>
+    public void Parse(string? toParse) {
+        if (toParse == null || string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
+        if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
+        //Caption = useThisKeyName;
+        foreach (var pair in toParse.GetAllTags()) {
+            switch (pair.Key.ToLowerInvariant()) {
+                case "sheetsize":
+                    _sheetSizeInMm = pair.Value.SizeFParse();
+                    GenPoints();
+                    break;
+
+                case "printarea":
+                    _randinMm = pair.Value.PaddingParse();
+                    GenPoints();
+                    break;
+                //case "items":
+                //    Parse(pvalue);
+                //    break;
+                case "relation": // TODO: Entfernt, 24.05.2021
+                    //AllRelations.Add(new clsPointRelation(this, null, pair.Value));
+                    break;
+
+                case "caption":
+                    if (string.IsNullOrEmpty(Caption)) { Caption = pair.Value.FromNonCritical(); }
+                    break;
+
+                case "backcolor":
+                    BackColor = Color.FromArgb(IntParse(pair.Value));
+                    break;
+
+                //case "scriptname":
+                //    _scriptName = pair.Value;
+                //    break;
+                case "keyName":
+                case "id":
+                    //if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
+                    break;
+
+                case "style":
+                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
+                    _sheetStyle ??= Skin.StyleDb?.Row.First();// Einfach die Erste nehmen
+                    break;
+
+                case "fontscale":
+                    _sheetStyleScale = FloatParse(pair.Value);
+                    break;
+
+                case "snapmode":
+                    _snapMode = (SnapMode)IntParse(pair.Value);
+                    break;
+
+                case "grid":
+                    //_Grid = pair.Value.FromPlusMinus();
+                    break;
+
+                case "gridshow":
+                    _gridShow = FloatParse(pair.Value);
+                    break;
+
+                case "gridsnap":
+                    _gridsnap = FloatParse(pair.Value);
+                    break;
+
+                case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), DataFormat)
+                    break;
+
+                case "items":
+                    CreateItems(pair.Value); // im ersten Step nur die items erzeugen....
+                    ParseItems(pair.Value);// ...im zweiten können nun auch Beziehungen erstellt werden!
+
+                    break;
+
+                case "connection":
+                    CreateConnection(pair.Value);
+                    break;
+
+                case "connections": // TODO: Obsolet ab 07.02.2023
+                    ParseConnections(pair.Value);
+                    break;
+
+                case "dpi":
+                    if (IntParse(pair.Value) != Dpi) {
+                        Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
+                    }
+                    break;
+
+                case "sheetstyle":
+                    if (Skin.StyleDb == null) { Skin.InitStyles(); }
+                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
+                    break;
+
+                case "sheetstylescale":
+                    _sheetStyleScale = FloatParse(pair.Value);
+                    break;
+
+                default:
+                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                    break;
+            }
+        }
     }
 
     public IEnumerable<string> Permission_AllUsed() {
@@ -796,7 +800,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount++;
-            if (IsSaved || itemCount >= Count) { return null; }
+            if (itemCount >= Count) { return null; }
             if (this[itemCount] != null) { return this[itemCount]; }
         } while (true);
     }
@@ -806,7 +810,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount--;
-            if (IsSaved || itemCount < 0) { return null; }
+            if (itemCount < 0) { return null; }
             if (this[itemCount] != null) { return this[itemCount]; }
         } while (true);
     }

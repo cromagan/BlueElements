@@ -1426,6 +1426,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (l.Count == 1) { scriptname = l[0].KeyName; }
                 if (string.IsNullOrEmpty(scriptname)) {
                     // Script nicht definiert. Macht nix. ist eben keines gewünscht
+
+                    if (eventname == ScriptEventTypes.export) {
+                        var vars = CreateVariableCollection(row, false, false, dbVariables);
+                        return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true);
+                    }
+
                     return new ScriptEndedFeedback();
                 }
             }
@@ -1542,7 +1548,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         FreezedReason = reason;
     }
 
-    public List<string> GetAllLayouts() {
+    public List<string> GetAllLayoutsFileNames() {
         List<string> path = [];
         var r = new List<string>();
         if (!IsDisposed) {
@@ -1561,17 +1567,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
         return r;
-    }
-
-    public string GetLayout(string ca) {
-        if (FileExists(ca)) { return ca; }
-
-        var f = GetAllLayouts();
-
-        foreach (var thisF in f) {
-            if (thisF.FileNameWithoutSuffix().Equals(ca, StringComparison.OrdinalIgnoreCase)) { return thisF; }
-        }
-        return string.Empty;
     }
 
     public Database? GetOtherTable(string tablename, bool readOnly) {

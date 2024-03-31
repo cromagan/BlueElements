@@ -44,18 +44,27 @@ namespace BlueControls.Forms {
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.pnlStatusBar.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.SuspendLayout();
             // 
+            // tabRightSide
+            // 
+            this.tabRightSide.Size = new System.Drawing.Size(372, 201);
+            // 
+            // Pad
+            // 
+            this.Pad.Location = new System.Drawing.Point(0, 136);
+            this.Pad.Size = new System.Drawing.Size(512, 201);
+            // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
-            this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.TabDefault = this.tabDatei;
             this.Ribbon.TabDefaultOrder = new string[] {
+        "Datei",
         "Start",
-        "Bearbeiten",
         "Hintergrund",
         "Export"};
             this.Ribbon.TabIndex = 3;
@@ -63,10 +72,6 @@ namespace BlueControls.Forms {
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabStart, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabDatei, 0);
-            // 
-            // tabSeiten
-            // 
-            this.tabSeiten.Location = new System.Drawing.Point(0, 110);
             // 
             // tabDatei
             // 
@@ -99,7 +104,7 @@ namespace BlueControls.Forms {
             // 
             // btnImport
             // 
-            this.btnImport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnImport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnImport.ImageCode = "Textdatei||||||||||Pfeil_Links";
             this.btnImport.Location = new System.Drawing.Point(240, 2);
             this.btnImport.Name = "btnImport";
@@ -126,7 +131,7 @@ namespace BlueControls.Forms {
             // 
             // btnNeu
             // 
-            this.btnNeu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeu.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnNeu.ImageCode = "Datei";
             this.btnNeu.Location = new System.Drawing.Point(8, 2);
             this.btnNeu.Name = "btnNeu";
@@ -138,7 +143,7 @@ namespace BlueControls.Forms {
             // 
             // btnOeffnen
             // 
-            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnOeffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
@@ -150,7 +155,7 @@ namespace BlueControls.Forms {
             // 
             // btnSpeichern
             // 
-            this.btnSpeichern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpeichern.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSpeichern.ImageCode = "Diskette";
             this.btnSpeichern.Location = new System.Drawing.Point(304, 2);
             this.btnSpeichern.Name = "btnSpeichern";
@@ -187,11 +192,13 @@ namespace BlueControls.Forms {
             this.ClientSize = new System.Drawing.Size(884, 361);
             this.Name = "PadEditorWithFileAccess";
             this.Text = "PadEditorWithFileAccess";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.grpDesign.ResumeLayout(false);
             this.tabHintergrund.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.pnlStatusBar.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -203,12 +210,12 @@ namespace BlueControls.Forms {
         protected TabPage tabDatei;
         protected GroupBox grpDateiSystem;
         private Button btnDruckerDialog;
-        private Button btnImport;
         protected LastFilesCombo btnLastFiles;
         private Button btnNeu;
         protected Button btnOeffnen;
-        private Button btnSpeichern;
         private OpenFileDialog LoadTab;
         private SaveFileDialog SaveTab;
+        protected Button btnImport;
+        protected Button btnSpeichern;
     }
 }

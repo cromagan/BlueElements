@@ -135,6 +135,9 @@ public partial class TableView : FormWithStatusBar {
 
             e.UserMenu.Add(ItemOf("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
             e.UserMenu.Add(ItemOf("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
+
+            e.UserMenu.Add(ItemOf("Voting", "Voting", ImageCode.Herz, db.IsAdministrator() && editable && column.Function.CanBeChangedByRules()));
+
             //_ = e.UserMenu.Add(AddSeparator());
         }
 
@@ -178,7 +181,6 @@ public partial class TableView : FormWithStatusBar {
             case "anpinnen":
                 tbl?.PinAdd(row);
                 break;
-
 
             case "SpaltenSortierungDefault":
                 tbl.SortDefinitionTemporary = null;
@@ -247,6 +249,13 @@ public partial class TableView : FormWithStatusBar {
                     MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
                 }
 
+                break;
+
+            case "Voting":
+                if (!db.IsAdministrator() || tbl == null || column == null) { return; }
+
+                var v = new Voting(column, [.. tbl.Filter.Rows]);
+                v.ShowDialog();
                 break;
 
             case "Statistik":
@@ -377,9 +386,10 @@ public partial class TableView : FormWithStatusBar {
             return;
         }
 
-        LayoutPadEditor w = new(db);
-        if (!string.IsNullOrEmpty(layoutToOpen)) {
-            w.LoadLayout(layoutToOpen);
+        var w = new BlueControls.Forms.PadEditorWithFileAccess();
+
+        if (!string.IsNullOrWhiteSpace(layoutToOpen)) {
+            w.LoadFile(layoutToOpen);
         }
 
         _ = w.ShowDialog();

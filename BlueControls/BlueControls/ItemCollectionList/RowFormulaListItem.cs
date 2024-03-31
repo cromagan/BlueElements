@@ -30,7 +30,7 @@ public class RowFormulaListItem : AbstractListItem {
 
     #region Fields
 
-    private readonly string _layoutId;
+    private readonly string _layoutFileName;
 
     private RowItem? _row;
 
@@ -48,7 +48,7 @@ public class RowFormulaListItem : AbstractListItem {
     /// <param name="userDefCompareKey"></param>
     public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.KeyName, true) {
         _row = row;
-        _layoutId = layoutId;
+        _layoutFileName = layoutId;
         UserDefCompareKey = userDefCompareKey;
     }
 
@@ -135,11 +135,11 @@ public class RowFormulaListItem : AbstractListItem {
     protected override string GetCompareKey() => _row?.CompareKey() ?? string.Empty;
 
     private void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#") || Row?.Database is not Database db || db.IsDisposed) {
+        if (string.IsNullOrEmpty(_layoutFileName) || !_layoutFileName.StartsWith("#") || Row?.Database is not Database db || db.IsDisposed) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
-        ItemCollectionPad.ItemCollectionPad pad = new(_layoutId);
+        ItemCollectionPad.ItemCollectionPad pad = new(_layoutFileName);
         pad.ResetVariables();
         var l = pad.ReplaceVariables(Row);
         if (!l.AllOk) {

@@ -563,7 +563,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         if (PadData != null) {
             foreach (var thisf in PadData.AllPages()) {
                 if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-                   list.Add(ItemOf(thisf, ImageCode.Register));
+                    list.Add(ItemOf(thisf, ImageCode.Register));
                 }
             }
         }
@@ -732,7 +732,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
                     break;
 
                 case "paditemdata":
-                    PadData = new ItemCollectionPad.ItemCollectionPad(pair.Value.FromNonCritical(), string.Empty);
+                    PadData = new ItemCollectionPad.ItemCollectionPad();
+                    PadData.Parse(pair.Value.FromNonCritical());
                     break;
 
                 case "lastusedid":

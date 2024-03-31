@@ -19,13 +19,22 @@
 
 using BlueBasics;
 using BlueControls.EventArgs;
+using System;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Forms;
+using BlueBasics.Enums;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
 public partial class PadEditorWithFileAccess : PadEditor {
+
+    #region Fields
+
+    private string _lastFileName = string.Empty;
+
+    #endregion
 
     #region Constructors
 
@@ -40,6 +49,8 @@ public partial class PadEditorWithFileAccess : PadEditor {
     #region Methods
 
     public void DisablePad() {
+        CheckSave();
+        _lastFileName = string.Empty;
         Pad.Item = [];
         Pad.Enabled = false;
     }
@@ -48,28 +59,24 @@ public partial class PadEditorWithFileAccess : PadEditor {
     ///
     /// </summary>
     /// <param name="fileName"></param>
-    /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-
-    public void LoadFile(string fileName, string useThisID) {
-        var t = File.ReadAllText(fileName, Constants.Win1252);
-        LoadFromString(t, useThisID);
-        btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-    public void LoadFromString(string data, string useThisID) {
+    public void LoadFile(string fileName) {
+        CheckSave();
         Pad.Enabled = true;
-        Pad.Item = new ItemCollectionPad.ItemCollectionPad(data, useThisID);
-        ItemChanged();
+        Pad.Item = new ItemCollectionPad.ItemCollectionPad(fileName);
+        btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
+        _lastFileName = fileName;
     }
 
-    private void btnLastFiles_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadFile(e.Item.KeyName, string.Empty);
+    protected override void OnFormClosing(FormClosingEventArgs e) {
+        CheckSave();
+        base.OnFormClosing(e);
+    }
+
+    private void btnLastFiles_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadFile(e.Item.KeyName);
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
+        CheckSave();
+        _lastFileName = string.Empty;
         Pad?.Item?.Clear();
         Pad?.ZoomFit();
     }
@@ -81,14 +88,28 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName, string.Empty);
+    private void CheckSave() {
+        if (string.IsNullOrWhiteSpace(_lastFileName)) { return; }
+        if (Pad?.Item == null) { return; }
+        if (Pad.Item.IsSaved) { return; }
+
+        Pad.Item.IsSaved = true;
+
+        if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
+
+        var t = Pad.Item.ToString();
+        WriteAllText(_lastFileName, t, Constants.Win1252, false);
+    }
+
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName);
 
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {
         if (Pad?.Item == null) { return; }
 
-        var t = Pad.Item.ToString(false);
+        var t = Pad.Item.ToString();
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
+        _lastFileName = SaveTab.FileName;
     }
 
     #endregion

@@ -59,9 +59,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #region  Layout index ermitteln (ind)
 
-        var ca = attvar.ValueStringGet(0);
-
-        var ind = r.Database.GetLayout(ca);
+        var ind = attvar.ValueStringGet(0);
 
         if (string.IsNullOrEmpty(ind)) { return new DoItFeedback(infos.Data, "Layout nicht gefunden."); }
 
