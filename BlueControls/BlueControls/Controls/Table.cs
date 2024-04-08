@@ -645,7 +645,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (db.Column.SysChapter is ColumnItem csc) { _ = colsToRefresh.AddIfNotExists(csc); }
         if (db.Column.First() is ColumnItem cf) { _ = colsToRefresh.AddIfNotExists(cf); }
 
-        db.RefreshColumnsData(colsToRefresh);
+        db.RefreshColumnsData(colsToRefresh.ToArray());
 
         #endregion
 

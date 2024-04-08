@@ -124,7 +124,7 @@ internal sealed partial class SearchAndReplace : Form {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
-            if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToList())) {
+            if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray())) {
                 if (db.Column.SysLocked is ColumnItem sl) {
                     if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
                 }

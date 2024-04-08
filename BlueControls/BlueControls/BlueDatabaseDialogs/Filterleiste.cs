@@ -423,7 +423,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
             if (thisCo != null && thisCo.IsInCache == null && !thisCo.IgnoreAtRowFilter) { l.Add(thisCo); }
         }
 
-        db.RefreshColumnsData(l);
+        db.RefreshColumnsData(l.ToArray());
 
         _table.Filter.RowFilterText = newF;
         DoÄhnlich();

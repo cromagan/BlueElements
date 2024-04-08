@@ -27,9 +27,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using System.Text.RegularExpressions;
-using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 
 namespace BlueDatabase;
@@ -446,95 +444,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.IsNullOrEmpty(GetStringCore(column, row));
     }
 
-    public bool MatchesTo(ColumnItem? column, RowItem? row, FilterItem fi) {
-        //Grundlegendes zu UND und ODER:
-        //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
-        //Bei UND müssen alle Werte des Filters im Multiline vorkommen.
-        //Bei ODER muss ein Wert des Filters im Multiline vorkommen.
-        //Beispiel: UND-Filter mit C & D
-        //Wenn die Zelle       A B C D hat, trifft der UND-Filter zwar nicht bei den ersten beiden zu, aber bei den letzten.
-        //Um genau zu sein C:  - - + -
-        //                 D:  - - - +
-        //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen.
-        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(enFehlerArt.Fehler, "Kein Filter angegeben: " + ToString()); }
-        try {
-            var typ = fi.FilterType;
-            // Oder-Flag ermitteln --------------------------------------------
-            var oder = typ.HasFlag(FilterType.ODER);
-            if (oder) { typ ^= FilterType.ODER; }
-            // Und-Flag Ermitteln --------------------------------------------
-            var und = typ.HasFlag(FilterType.UND);
-            if (und) { typ ^= FilterType.UND; }
-            if (fi.SearchValue.Count < 2) {
-                oder = true;
-                und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
-            }
-            //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
-            // Tatsächlichen String ermitteln --------------------------------------------
-            var txt = string.Empty;
-            var fColumn = column;
-            if (column?.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-                var (columnItem, rowItem, _, _) = LinkedCellData(column, row, false, false);
-                if (columnItem != null && rowItem != null) {
-                    txt = rowItem.CellGetString(columnItem);
-                    fColumn = columnItem;
-                }
-            } else {
-                txt = GetStringCore(column, row);
-            }
-
-            if (typ.HasFlag(FilterType.Instr) && fColumn != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, fColumn.Prefix, fColumn.Suffix, fColumn.DoOpticalTranslation, fColumn.OpticalReplace); }
-            // Multiline-Typ ermitteln  --------------------------------------------
-            var tmpMultiLine = false;
-            if (column != null && !column.IsDisposed) { tmpMultiLine = column.MultiLine; }
-            if (typ.HasFlag(FilterType.MultiRowIgnorieren)) {
-                tmpMultiLine = false;
-                typ ^= FilterType.MultiRowIgnorieren;
-            }
-            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandelt werden.
-                                                                               //if (Typ == enFilterType.KeinFilter)
-                                                                               //{
-                                                                               //    Develop.DebugPrint(enFehlerArt.Fehler, "'Kein Filter' wurde übergeben: " + ToString());
-                                                                               //}
-            if (!tmpMultiLine) {
-                var bedingungErfüllt = false;
-                foreach (var t in fi.SearchValue) {
-                    bedingungErfüllt = CompareValues(txt, t, typ);
-                    if (oder && bedingungErfüllt) { return true; }
-                    if (und && bedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
-                }
-                return bedingungErfüllt;
-            }
-            List<string> vorhandenWerte = [.. txt.SplitAndCutByCr()];
-            if (vorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
-            {
-                vorhandenWerte.Add("");
-            }
-            // Diese Reihenfolge der For Next ist unglaublich wichtig:
-            // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,
-            // bevor sie bei einem UND ein False zurückgibt
-            foreach (var t1 in fi.SearchValue) {
-                var bedingungErfüllt = false;
-                foreach (var t in vorhandenWerte) {
-                    bedingungErfüllt = CompareValues(t, t1, typ);
-                    if (oder && bedingungErfüllt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
-                    if (und && bedingungErfüllt) { break; }// Irgend ein vorhandener Value trifft zu, restliche Prüfung uninteresant
-                }
-                if (und && !bedingungErfüllt) // Einzelne UND konnte nicht erfüllt werden...
-                {
-                    return false;
-                }
-            }
-            if (und) { return true; } // alle "Und" stimmen!
-            return false; // Gar kein "Oder" trifft zu...
-        } catch (Exception ex) {
-            Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
-            Pause(1, true);
-            Develop.CheckStackForOverflow();
-            return MatchesTo(column, row, fi);
-        }
-    }
-
     public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank ungültig!"; }
 
@@ -667,7 +576,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal string CompareKey(ColumnItem column, RowItem row) => GetString(column, row).CompareKey(column.SortType);
 
-    internal string GetStringCore(ColumnItem column, RowItem row) => this[column, row]?.Value ?? string.Empty;
+    internal string GetStringCore(ColumnItem? column, RowItem? row) => this[column, row]?.Value ?? string.Empty;
 
     internal void InvalidateAllSizes() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
@@ -706,54 +615,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         } catch {
             Develop.CheckStackForOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
-        }
-    }
-
-    private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
-        StringComparison comparisonType = typ.HasFlag(FilterType.GroßKleinEgal) ? StringComparison.OrdinalIgnoreCase
-                                                                                : StringComparison.Ordinal;
-
-        // Entfernen des GroßKleinEgal-Flags, da es nicht mehr benötigt wird
-        typ &= ~FilterType.GroßKleinEgal;
-
-        switch (typ) {
-            case FilterType.Istgleich:
-                return string.Equals(istValue, filterValue, comparisonType);
-
-            case (FilterType)2: // Ungleich
-                return !string.Equals(istValue, filterValue, comparisonType);
-
-            case FilterType.Instr:
-                return istValue.IndexOf(filterValue, comparisonType) >= 0;
-
-            case FilterType.Between:
-                var rangeParts = filterValue.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-                if (rangeParts.Length != 2) return false;
-
-                // Wenn kein Datum, dann als numerischen Wert behandeln
-                if (DoubleTryParse(istValue, out var numericValue)) {
-                    if (!DoubleTryParse(rangeParts[0], out var minNumeric) || !DoubleTryParse(rangeParts[1], out var maxNumeric)) {
-                        return false; // Mindestens einer der Werte ist keine gültige Zahl
-                    }
-                    return numericValue >= minNumeric && numericValue <= maxNumeric;
-                } else if (DateTimeTryParse(istValue, out var dateValue)) {
-                    if (!DateTimeTryParse(rangeParts[0], out var minDate) || !DateTimeTryParse(rangeParts[1], out var maxDate)) {
-                        return false; // Mindestens einer der Bereichswerte ist kein gültiges Datum
-                    }
-                    return dateValue >= minDate && dateValue <= maxDate;
-                }
-
-                return false; // Weder Datum noch numerischer Wert
-
-            case FilterType.BeginntMit:
-                return istValue.StartsWith(filterValue, comparisonType);
-
-            case FilterType.AlwaysFalse:
-                return false;
-
-            default:
-                Develop.DebugPrint(typ);
-                return false;
         }
     }
 

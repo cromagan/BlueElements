@@ -504,7 +504,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (_rows == null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
-        if (e.Row.MatchesTo(_internal) != _rows.Contains(e.Row)) {
+        if (e.Row.MatchesTo(_internal.ToArray()) != _rows.Contains(e.Row)) {
             Invalidate_FilteredRows();
         }
 
@@ -547,14 +547,17 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private List<RowItem> CalculateFilteredRows() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
-        db.RefreshColumnsData(_internal);
+
+        var fi2 = _internal.ToArray();
+
+        db.RefreshColumnsData(fi2);
 
         List<RowItem> tmpVisibleRows = [];
         var lockMe = new object();
         try {
             _ = Parallel.ForEach(Database.Row, thisRowItem => {
                 if (thisRowItem != null) {
-                    if (thisRowItem.MatchesTo(_internal)) {
+                    if (thisRowItem.MatchesTo(fi2)) {
                         lock (lockMe) {
                             tmpVisibleRows.Add(thisRowItem);
                         }
@@ -633,7 +636,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void Row_Added(object sender, RowChangedEventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
-        if (e.Row.MatchesTo(_internal)) { Invalidate_FilteredRows(); }
+        if (e.Row.MatchesTo(_internal.ToArray())) { Invalidate_FilteredRows(); }
     }
 
     private void Row_RowRemoved(object sender, RowEventArgs e) {

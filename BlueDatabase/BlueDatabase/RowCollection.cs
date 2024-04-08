@@ -30,7 +30,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 
 namespace BlueDatabase;
@@ -113,9 +112,30 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? this[string primärSchlüssel] {
         get {
             if (Database?.Column.First() is ColumnItem c) {
-                return this[new FilterItem(c,
-                    FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren,
-                    primärSchlüssel)];
+                //foreach(var thisRow in _internal.Values) {
+                //    if(thisRow != null && !thisRow.IsDisposed) {
+                //       var  txt = _database?.Cell.GetStringCore(c, thisRow) ?? string.Empty;
+                //        if (RowItem.CompareValues(txt, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal)) {  return thisRow}
+
+                //    }
+
+                //}
+
+                //var result = _internal.Values.AsParallel()
+                //    .Where(thisRow => thisRow != null && !thisRow.IsDisposed)
+                //    .Select(thisRow => new {
+                //        Row = thisRow,
+                //        Text = _database?.Cell.GetStringCore(c, thisRow) ?? string.Empty
+                //    })
+                //    .FirstOrDefault(x => RowItem.CompareValues(x.Text, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal)).Row;
+
+                //return result;
+
+                var parallelQuery = _internal.Values.AsParallel()
+                                    .Where(thisRow => thisRow != null)
+                                    .FirstOrDefault(thisRow => thisRow.CompareValues(c, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal));
+
+                return parallelQuery;
             }
             return null;
         }
@@ -128,16 +148,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowItem? this[params FilterItem[] filter] {
         get {
-            //if (filter == null || filter.Length == 0) {
-            //    Develop.DebugPrint("Kein Filter angekommen!");
-            //    return null;
-            //}
+            var parallelQuery = _internal.Values.AsParallel()
+                                                .Where(thisRow => thisRow != null)
+                                                .FirstOrDefault(thisRow => thisRow.MatchesTo(filter));
 
-            return _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter.ToList()));
-
-            //FilterCollection d = new(filter[0].database);
-            //d.AddRange(filter);
-            //return this[d];
+            return parallelQuery;
         }
     }
 
@@ -486,7 +501,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
-        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc.ToList()) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
+        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc.ToArray()) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
         var did = false;
 
         foreach (var thisKey in keys) {

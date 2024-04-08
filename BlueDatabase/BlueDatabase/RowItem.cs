@@ -27,8 +27,8 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -418,7 +418,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysChapter is ColumnItem csc) { _ = ColsToRefresh.AddIfNotExists(csc); }
         if (db.Column.First() is ColumnItem cf) { _ = ColsToRefresh.AddIfNotExists(cf); }
 
-        db.RefreshColumnsData(ColsToRefresh);
+        db.RefreshColumnsData(ColsToRefresh.ToArray());
 
         return CompareKey(ColsToRefresh);
     }
@@ -498,20 +498,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return fi.SearchValue.All(RowFilterMatch);
         }
 
-        if (!Database.Cell.MatchesTo(fi.Column, this, fi)) { return false; }
+        if (!MatchesTo(fi.Column, fi.FilterType, fi.SearchValue)) { return false; }
 
         return true;
     }
 
-    public bool MatchesTo(List<FilterItem>? fi) {
+    public bool MatchesTo(params FilterItem[]? filter) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
-        if (fi == null || fi.Count == 0) { return true; }
+        if (filter == null || filter.Length == 0) { return true; }
 
-        Database.RefreshColumnsData(fi);
+        Database.RefreshColumnsData(filter);
 
         var ok = true;
 
-        _ = Parallel.ForEach(fi, (thisFilter, state) => {
+        _ = Parallel.ForEach(filter, (thisFilter, state) => {
             if (!MatchesTo(thisFilter)) {
                 ok = false;
                 state.Break();
@@ -519,11 +519,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         });
 
         return ok;
-
-        //foreach (var thisFilter in filter) {
-        //    if (!MatchesTo(thisFilter)) { return false; }
-        //}
-        //return true;
     }
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
@@ -614,24 +609,55 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    //internal bool AmIChanger() {
-    //    if (IsDisposed) { return false; }
-    //    if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
+    internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
+        StringComparison comparisonType = typ.HasFlag(FilterType.GroßKleinEgal) ? StringComparison.OrdinalIgnoreCase
+                                                                                : StringComparison.Ordinal;
 
-    //    return db.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
-    //}
+        // Entfernen des GroßKleinEgal-Flags, da es nicht mehr benötigt wird
+        typ &= ~FilterType.GroßKleinEgal;
 
-    //internal double RowChangedXMinutesAgo() {
-    //    if (IsDisposed) { return -1; }
-    //    if (IsDisposed || Database is not Database db || db.IsDisposed) { return -1; }
+        switch (typ) {
+            case FilterType.Istgleich:
+                return string.Equals(istValue, filterValue, comparisonType);
 
-    //    if (db.Column.SysRowChangeDate is not ColumnItem src) { return -1; }
+            case (FilterType)2: // Ungleich
+                return !string.Equals(istValue, filterValue, comparisonType);
 
-    //    var v = CellGetDateTime(src);
-    //    if (v == DateTime.MinValue) { return -1; }
+            case FilterType.Instr:
+                return istValue.IndexOf(filterValue, comparisonType) >= 0;
 
-    //    return DateTime.UtcNow.Subtract(v).TotalMinutes;
-    //}
+            case FilterType.Between:
+                var rangeParts = filterValue.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                if (rangeParts.Length != 2) return false;
+
+                // Wenn kein Datum, dann als numerischen Wert behandeln
+                if (DoubleTryParse(istValue, out var numericValue)) {
+                    if (!DoubleTryParse(rangeParts[0], out var minNumeric) || !DoubleTryParse(rangeParts[1], out var maxNumeric)) {
+                        return false; // Mindestens einer der Werte ist keine gültige Zahl
+                    }
+                    return numericValue >= minNumeric && numericValue <= maxNumeric;
+                } else if (DateTimeTryParse(istValue, out var dateValue)) {
+                    if (!DateTimeTryParse(rangeParts[0], out var minDate) || !DateTimeTryParse(rangeParts[1], out var maxDate)) {
+                        return false; // Mindestens einer der Bereichswerte ist kein gültiges Datum
+                    }
+                    return dateValue >= minDate && dateValue <= maxDate;
+                }
+
+                return false; // Weder Datum noch numerischer Wert
+
+            case FilterType.BeginntMit:
+                return istValue.StartsWith(filterValue, comparisonType);
+
+            case FilterType.AlwaysFalse:
+                return false;
+
+            default:
+                Develop.DebugPrint(typ);
+                return false;
+        }
+    }
+
+    internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(_database?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
@@ -732,6 +758,93 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false);
     }
 
+    private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {
+        //Grundlegendes zu UND und ODER:
+        //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
+        //Bei UND müssen alle Werte des Filters im Multiline vorkommen.
+        //Bei ODER muss ein Wert des Filters im Multiline vorkommen.
+        //Beispiel: UND-Filter mit C & D
+        //Wenn die Zelle       A B C D hat, trifft der UND-Filter zwar nicht bei den ersten beiden zu, aber bei den letzten.
+        //Um genau zu sein C:  - - + -
+        //                 D:  - - - +
+        //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen.
+        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(enFehlerArt.Fehler, "Kein Filter angegeben: " + ToString()); }
+
+        try {
+            var typ = filtertyp;
+            // Oder-Flag ermitteln --------------------------------------------
+            var oder = typ.HasFlag(FilterType.ODER);
+            if (oder) { typ ^= FilterType.ODER; }
+            // Und-Flag Ermitteln --------------------------------------------
+            var und = typ.HasFlag(FilterType.UND);
+            if (und) { typ ^= FilterType.UND; }
+            if (searchvalue.Count < 2) {
+                oder = true;
+                und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
+            }
+            //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
+            // Tatsächlichen String ermitteln --------------------------------------------
+            var txt = string.Empty;
+            var fColumn = column;
+            if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+                var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
+                if (columnItem != null && rowItem != null) {
+                    txt = rowItem.CellGetString(columnItem);
+                    fColumn = columnItem;
+                }
+            } else {
+                txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
+            }
+
+            if (typ.HasFlag(FilterType.Instr) && fColumn != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, fColumn.Prefix, fColumn.Suffix, fColumn.DoOpticalTranslation, fColumn.OpticalReplace); }
+            // Multiline-Typ ermitteln  --------------------------------------------
+            var tmpMultiLine = column.MultiLine;
+            if (typ.HasFlag(FilterType.MultiRowIgnorieren)) {
+                tmpMultiLine = false;
+                typ ^= FilterType.MultiRowIgnorieren;
+            }
+            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandelt werden.
+
+            if (!tmpMultiLine) {
+                var bedingungErfüllt = false;
+                foreach (var t in searchvalue) {
+                    bedingungErfüllt = CompareValues(txt, t, typ);
+                    if (oder && bedingungErfüllt) { return true; }
+                    if (und && bedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
+                }
+                return bedingungErfüllt;
+            }
+            List<string> vorhandenWerte = [.. txt.SplitAndCutByCr()];
+            if (vorhandenWerte.Count == 0) { vorhandenWerte.Add(""); }// Um den Filter, der nach 'Leere' Sucht, zu befriediegen
+
+            // Diese Reihenfolge der For Next ist unglaublich wichtig:
+            // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,
+            // bevor sie bei einem UND ein False zurückgibt
+            foreach (var t1 in searchvalue) {
+                var bedingungErfüllt = false;
+                foreach (var t in vorhandenWerte) {
+                    bedingungErfüllt = CompareValues(t, t1, typ);
+                    if (oder && bedingungErfüllt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
+                    if (und && bedingungErfüllt) { break; }// Irgend ein vorhandener Value trifft zu, restliche Prüfung uninteresant
+                }
+                if (und && !bedingungErfüllt) // Einzelne UND konnte nicht erfüllt werden...
+                {
+                    return false;
+                }
+            }
+            if (und) { return true; } // alle "Und" stimmen!
+            return false; // Gar kein "Oder" trifft zu...
+        } catch (Exception ex) {
+            Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
+            Generic.Pause(0.1, true);
+            Develop.CheckStackForOverflow();
+            return MatchesTo(column, filtertyp, searchvalue);
+        }
+    }
+
+    //internal bool AmIChanger() {
+    //    if (IsDisposed) { return false; }
+    //    if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
     private void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     private void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);

@@ -2064,13 +2064,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return false;
     }
 
-    public void RefreshColumnsData(ColumnItem column) {
-        if (column.IsInCache != null) { return; }
-        RefreshColumnsData([column]);
-    }
-
-    public virtual void RefreshColumnsData(List<ColumnItem> columns) {
-        if (columns.Count == 0) { return; }
+    public virtual void RefreshColumnsData(params ColumnItem[] columns) {
+        if (columns.Length == 0) { return; }
 
         foreach (var thiscol in columns) {
             if (thiscol != null) {
@@ -2084,16 +2079,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public void RefreshColumnsData(IEnumerable<FilterItem>? fi) {
-        if (fi != null) {
+    public void RefreshColumnsData(params FilterItem[] filter) {
+        if (filter != null) {
             var c = new List<ColumnItem>();
 
-            foreach (var thisF in fi) {
+            foreach (var thisF in filter) {
                 if (thisF.Column is ColumnItem ci && ci.IsInCache == null) {
                     _ = c.AddIfNotExists(ci);
                 }
             }
-            RefreshColumnsData(c);
+            RefreshColumnsData(c.ToArray());
         }
     }
 

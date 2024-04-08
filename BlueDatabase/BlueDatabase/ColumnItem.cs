@@ -1506,8 +1506,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
-        var x = new List<ColumnItem> { this };
-        Database?.RefreshColumnsData(x);
+        Database?.RefreshColumnsData(this);
     }
 
     public void Repair() {
@@ -1828,7 +1827,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         double summ = 0;
         foreach (var thisrow in db.Row) {
-            if (thisrow != null && thisrow.MatchesTo(fc.ToList())) {
+            if (thisrow != null && thisrow.MatchesTo(fc.ToArray())) {
                 if (!thisrow.CellIsNullOrEmpty(this)) {
                     if (!thisrow.CellGetString(this).IsDouble()) { return null; }
                     summ += thisrow.CellGetDouble(this);
