@@ -507,7 +507,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
         if (filter == null || filter.Length == 0) { return true; }
 
-        Database.RefreshColumnsData(filter);
+        //Database.RefreshColumnsData(filter);
+        if (filter.Length == 1) { return MatchesTo(filter[0]); }
 
         var ok = true;
 
