@@ -1979,8 +1979,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             thisColumn.Optimize();
 
             if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
-                                     not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
-                                     not ColumnFunction.Button) {
+                                      not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 and
+                                      not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
+                                      not ColumnFunction.Button) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
                     Column.Remove(thisColumn, "Automatische Optimierung");

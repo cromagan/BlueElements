@@ -517,7 +517,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
         ColumnItem? gbColumn;
 
-        if (column?.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (column?.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
             (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
         } else {
             gbColumn = column;
@@ -673,6 +673,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
 
         switch (column.Function) {
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                 _ = GetRealColumn(column, row);
                 ValueSet(row.CellGetString(column), true);

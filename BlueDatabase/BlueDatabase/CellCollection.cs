@@ -138,7 +138,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
             if (ignoreLinked) { return string.Empty; }
             //repairallowed = repairallowed && mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently;
 
@@ -261,7 +261,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? column, RowItem? row, bool repairLinkedValue, bool addRowIfNotExists) {
         if (column?.Database is not Database db || db.IsDisposed) { return (null, null, "Interner Spaltenfehler.", false); }
 
-        if (column.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { return (null, null, "Format ist nicht LinkedCell.", false); }
+        if (column.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, null, "Format ist nicht LinkedCell.", false); }
 
         var linkedDatabase = column.LinkedDatabase;
         if (linkedDatabase == null || linkedDatabase.IsDisposed) { return (null, null, "Verlinkte Datenbank nicht gefunden.", false); }
@@ -272,6 +272,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (string.IsNullOrEmpty(key)) {
             return (linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase], null, "Keine Verlinkung vorhanden.", false);
         }
+
+        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, null, "Format ist nicht LinkedCell.", false); }
 
         if (key.Contains("|")) { return (null, null, "Falsches Format", false); }
 
@@ -333,6 +335,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
                 break;
 
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                 if (doAlways) {
                     _ = LinkedCellData(column, row, true, false); // Repariert auch Cellbezüge
@@ -341,16 +344,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (!doAlways && currentValue == previewsValue) { return; }
-        //column.CheckIfIAmAKeyColumn();
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
             foreach (var thisC in db.Column) {
-                if (thisC.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+                if (thisC.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
                     _ = LinkedCellData(thisC, row, true, false);
                 }
             }
-
-            //SetSameValueOfKey(column, row, currentValue);
         }
 
         if (column.IsFirst()) {
@@ -453,7 +453,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
 
-        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
 
             //return db.ChangeData(DatabaseDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
@@ -711,8 +712,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
             if (db != null && column != null && row != null) {
                 var oldvalue = db.Cell.GetStringCore(column, row);
-                var newvalue = targetRow?.KeyName ?? string.Empty;
-                if (targetColumn == null || !string.IsNullOrEmpty(fehler)) { newvalue = string.Empty; }
+
+                var newvalue = string.Empty;
+
+                if (targetRow != null && targetColumn != null && string.IsNullOrEmpty(fehler)) {
+                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { newvalue = targetRow.KeyName; }
+
+                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { newvalue = targetRow.CellGetString(targetColumn); }
+                }
+
                 //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
                 //row.CellSet(column, targetRow.KeyName);
                 //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);

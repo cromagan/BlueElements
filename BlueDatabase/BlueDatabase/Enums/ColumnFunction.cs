@@ -70,7 +70,9 @@ public enum ColumnFunction {
 
     Verknüpfung_zu_anderer_Datenbank = 80,
 
-    Schlüsselspalte_NurDatenprüfung = 81
+    Schlüsselspalte_NurDatenprüfung = 81,
+
+    Verknüpfung_zu_anderer_Datenbank2 = 82
 
     // bis 999 wird geprüft
 }
@@ -81,6 +83,7 @@ public static class ColumnFunctionExtensions {
 
     public static bool Autofilter_möglich(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                     or ColumnFunction.RelationText
                                                                                     or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
@@ -91,6 +94,7 @@ public static class ColumnFunctionExtensions {
     public static bool CanBeCheckedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
 
@@ -100,32 +104,39 @@ public static class ColumnFunctionExtensions {
 
     public static bool DropdownItemsOfOtherCellsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                                  or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                                   or ColumnFunction.RelationText;
 
     public static bool DropdownUnselectAllAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                             or ColumnFunction.RelationText
-                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
+                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2;
 
     public static bool ExportableForLayout(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
 
     public static bool MultilinePossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                    or ColumnFunction.RelationText
-                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
+                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2;
 
     public static bool NeedTargetDatabase(this ColumnFunction function) => function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems;
 
     public static bool SpellCheckingPossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                        or ColumnFunction.RelationText
                                                                                        or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                       or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                        or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
 
     public static bool TextboxEditPossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                      or ColumnFunction.RelationText;
 
     #endregion

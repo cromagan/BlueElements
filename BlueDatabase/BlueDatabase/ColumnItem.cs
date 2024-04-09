@@ -994,8 +994,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (IsSystemColumn()) { return value; }
 
         if (exitifLinkedFormat) {
-            if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or
-                ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return value; }
+            if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
+                or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return value; }
         }
 
         if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
@@ -1539,7 +1540,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             ScriptType = ScriptType.String;
         }
 
-        if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or
+                         ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
 
             #region Aus Dateinamen den Tablename extrahieren
 
@@ -1892,6 +1894,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         //if (_function == ColumnFunction.FarbeInteger) { return QuickImage.Get(ImageCode.Pinsel, 16); }
         if (_function == ColumnFunction.Button) { return QuickImage.Get(ImageCode.Kugel, 16); }
         if (_function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { return QuickImage.Get(ImageCode.Fernglas, 16); }
+        if (_function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return QuickImage.Get(ImageCode.Fernglas, 16); }
 
         foreach (var thisFormat in FormatHolder.AllFormats) {
             if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.Image; }
@@ -1966,19 +1969,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf && _behaviorOfImageAndText is BildTextVerhalten.Interpretiere_Bool or BildTextVerhalten.Interpretiere_Bool_CorrectState) { return true; }
                 return false;
 
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                 if (editTypeToCheck == EditTypeFormula.None) { return true; }
-                //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
-                //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
-                //if (Database.IsLoading) { return true; }
-
-                //var skriptgesteuert = LinkedCell_RowKeyIsInColumn == -9999;
-                //if (skriptgesteuert) {
-                //    return editTypeToCheck is enEditTypeFormula.Textfeld or enEditTypeFormula.nur_als_Text_anzeigen;
-                //}
-
-                //if (LinkedDatabase is not Database db) { return false; }
-                //if (string.IsNullOrEmpty_linkedCell_ColumnKeyOfLinkedDatabase < 0) { return false; }
                 var col = LinkedDatabase?.Column[_linkedCell_ColumnNameOfLinkedDatabase];
                 if (col == null) { return false; }
                 return col.UserEditDialogTypeInFormula(editTypeToCheck);
@@ -2418,7 +2411,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
             //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-            if (c.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+            if (c.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 

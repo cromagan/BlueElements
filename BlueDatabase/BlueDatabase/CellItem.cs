@@ -187,10 +187,6 @@ public class CellItem {
     public static List<string>? ValuesReadable(ColumnItem? column, RowItem? row, ShortenStyle style) {
         if (column == null || row == null) { return null; }
 
-        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-            Develop.DebugPrint(FehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
-        }
-
         List<string> ret = [];
         if (!column.MultiLine) {
             ret.Add(ValueReadable(row.CellGetString(column), style, column.BehaviorOfImageAndText, true, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace));

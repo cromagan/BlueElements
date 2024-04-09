@@ -629,7 +629,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case FilterType.Between:
                 var rangeParts = filterValue.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-                if (rangeParts.Length != 2) return false;
+                if (rangeParts.Length != 2)
+                    return false;
 
                 // Wenn kein Datum, dann als numerischen Wert behandeln
                 if (DoubleTryParse(istValue, out var numericValue)) {
@@ -730,7 +731,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (fullCheck) {
                     var x = CellGetString(thisColum);
                     var x2 = thisColum.AutoCorrect(x, true);
-                    if (thisColum.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                    if (thisColum.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 && x != x2) {
                         db.Cell.Set(thisColum, this, x2, "Nach Skript-Korrekturen");
                     } else {
                         if (!thisColum.IsFirst()) {
@@ -786,20 +787,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
             var txt = string.Empty;
-            var fColumn = column;
+
             if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                 var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
                 if (columnItem != null && rowItem != null) {
                     txt = rowItem.CellGetString(columnItem);
-                    fColumn = columnItem;
                 }
             } else {
                 txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
             }
 
-            if (typ.HasFlag(FilterType.Instr) && fColumn != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, fColumn.Prefix, fColumn.Suffix, fColumn.DoOpticalTranslation, fColumn.OpticalReplace); }
+            if (typ.HasFlag(FilterType.Instr) && column != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
             // Multiline-Typ ermitteln  --------------------------------------------
-            var tmpMultiLine = column.MultiLine;
+            var tmpMultiLine = column?.MultiLine ?? false;
             if (typ.HasFlag(FilterType.MultiRowIgnorieren)) {
                 tmpMultiLine = false;
                 typ ^= FilterType.MultiRowIgnorieren;
