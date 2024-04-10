@@ -2392,12 +2392,28 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
 
-        foreach (var thisRow in Database.Row) {
-            if (Database.Cell.GetStringCore(this, thisRow) == e.Row.KeyName) {
-                thisRow.InvalidateCheckData();
-                Invalidate_ContentWidth();
-                Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
-                Database.Cell.DoSystemColumns(db, this, thisRow, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
+        if (Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+            foreach (var thisRow in Database.Row) {
+                if (Database.Cell.GetStringCore(this, thisRow) == e.Row.KeyName) {
+                    thisRow.InvalidateCheckData();
+                    Invalidate_ContentWidth();
+                    Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
+                    Database.Cell.DoSystemColumns(db, this, thisRow, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
+                }
+            }
+        }
+
+        if (Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 && LinkedDatabase != null) {
+            var (fc, info) = CellCollection.GetFilterReverse(this, e.Column, e.Row);
+            var val = e.Row.CellGetString(e.Column);
+
+            if (fc != null && string.IsNullOrWhiteSpace(info)) {
+                foreach (var thisRow in fc.Rows) {
+                    if (thisRow.CellGetString(this) != val) {
+                        CellCollection.RepairLinkedCellValue(LinkedDatabase, this, thisRow, false);
+                    }
+                }
+                fc.Dispose();
             }
         }
     }

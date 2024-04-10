@@ -41,6 +41,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static int WaitDelay = 0;
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static bool _executingchangedrows;
+    private static object _executingchangedrowsx = new();
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
     private Database? _database;
 
@@ -183,8 +184,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (Pendingworker.Count > 2) { return; }
 
-        if (_executingchangedrows) { return; }
-        _executingchangedrows = true;
+        lock (_executingchangedrowsx) {
+            if (_executingchangedrows) { return; }
+            _executingchangedrows = true;
+        }
 
         var start = new Stopwatch();
         start.Start();
@@ -216,7 +219,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (start.ElapsedMilliseconds > 10000) { break; }
         }
 
-        _executingchangedrows = false;
+        lock (_executingchangedrowsx) {
+            _executingchangedrows = false;
+        }
     }
 
     /// <summary>

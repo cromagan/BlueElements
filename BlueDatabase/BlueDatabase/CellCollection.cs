@@ -228,6 +228,83 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return (fc, string.Empty);
     }
 
+    /// <summary>
+    /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
+    /// Es versucht rauszufinden, welche Zeile in der Datenbank von mycolumn von der Zeile linkedrow befüllt werden.
+    /// </summary>
+    /// <param name="mycolumn"></param>
+    /// <param name="linkedcolumn"></param>
+    /// <param name="linkedrow"></param>
+    /// <returns></returns>
+
+    public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
+        if (linkedcolumn.Database is not Database ldb || ldb.IsDisposed || linkedcolumn.IsDisposed) { return (null, "Datenbank verworfen."); }
+
+        if (mycolumn.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, "Falsches Format."); }
+
+        if (mycolumn.Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen."); }
+
+        var fi = new List<FilterItem>();
+
+        foreach (var thisFi in mycolumn.LinkedCellFilter) {
+            if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
+
+            var x = thisFi.SplitBy("|");
+            var c = ldb.Column[x[0]];
+            if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
+
+            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
+
+            var value = x[2].FromNonCritical().ToUpperInvariant();
+            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
+
+            foreach (var thisColumn in db.Column) {
+                if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
+                    fi.Add(new FilterItem(thisColumn, FilterType.Istgleich_MultiRowIgnorieren, linkedrow.CellGetString(c)));
+                }
+            }
+        }
+
+        //if (fi.Count == 0 && column.Function != ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
+
+        var fc = new FilterCollection(db, "cell get reverse filter");
+        fc.AddIfNotExists(fi);
+
+        if (fc.Count == 0) {
+            fc.Add(new FilterItem(db, "Reverse Filter"));
+        }
+
+        return (fc, string.Empty);
+
+        //var columns = new List<ColumnItem>();
+
+        //foreach (var thisFi in column.LinkedCellFilter) {
+        //    if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
+
+        //    var x = thisFi.SplitBy("|");
+        //    var value = x[2].FromNonCritical().ToUpperInvariant();
+
+        //    foreach (var thisColumn in db.Column) {
+        //        if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
+        //            columns.AddIfNotExists(thisColumn);
+        //        }
+        //    }
+        //}
+
+        //var fc = new FilterCollection(db, "cell reverse get filter");
+
+        //foreach (var thisColumn in columns) {
+        //    var fi = new FilterItem(row, thisColumn);
+        //    fc.AddIfNotExists(fi);
+        //}
+
+        //if (fc.Count == 0) {
+        //    fc.Add(new FilterItem(db, "Reverse Filter"));
+        //}
+
+        //return (fc, string.Empty);
+    }
+
     public static bool IsInCache(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return false; }
         if (row == null || row.IsDisposed) { return false; }
@@ -286,6 +363,79 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var linkedRow = linkedDatabase.Row.SearchByKey(key);
 
         return (linkedColumn, linkedRow, string.Empty, false);
+    }
+
+    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
+        RowItem? targetRow = null;
+        ColumnItem? targetColumn = null;
+        var cr = false;
+
+        // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
+        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
+
+        var db = column.Database;
+        if (db == null || db.IsDisposed) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
+
+        if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
+
+        if (row == null || row.IsDisposed) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
+
+        targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
+        if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
+
+        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
+        if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
+        if (fc == null || fc.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden: " + info); }
+
+        var r = fc.Rows;
+        switch (r.Count) {
+            case > 1:
+                return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");
+
+            case 1:
+                targetRow = r[0];
+                break;
+
+            default: {
+                    if (addRowIfNotExists) {
+                        targetRow = RowCollection.GenerateAndAdd(fc, "LinkedCell aus " + db.TableName).newrow;
+                    } else {
+                        cr = true;
+                    }
+                    break;
+                }
+        }
+
+        return targetRow == null ? Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden.") : Ergebnis(string.Empty);
+
+        #region Subroutine Ergebnis
+
+        (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
+            if (db != null && column != null && row != null) {
+                var oldvalue = db.Cell.GetStringCore(column, row);
+
+                var newvalue = string.Empty;
+
+                if (targetRow != null && targetColumn != null && string.IsNullOrEmpty(fehler)) {
+                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { newvalue = targetRow.KeyName; }
+
+                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { newvalue = targetRow.CellGetString(targetColumn); }
+                }
+
+                //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
+                //row.CellSet(column, targetRow.KeyName);
+                //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
+
+                if (oldvalue != newvalue) {
+                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
+                }
+            } else {
+                if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
+            }
+            return (targetColumn, targetRow, fehler, cr);
+        }
+
+        #endregion
     }
 
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
@@ -662,79 +812,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
             }
         }
-    }
-
-    private static (ColumnItem? column, RowItem? row, string info, bool canrepair) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
-        RowItem? targetRow = null;
-        ColumnItem? targetColumn = null;
-        var cr = false;
-
-        // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
-        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
-
-        var db = column.Database;
-        if (db == null || db.IsDisposed) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
-
-        if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
-
-        if (row == null || row.IsDisposed) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
-
-        targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
-        if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
-
-        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
-        if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
-        if (fc == null || fc.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden: " + info); }
-
-        var r = fc.Rows;
-        switch (r.Count) {
-            case > 1:
-                return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");
-
-            case 1:
-                targetRow = r[0];
-                break;
-
-            default: {
-                    if (addRowIfNotExists) {
-                        targetRow = RowCollection.GenerateAndAdd(fc, "LinkedCell aus " + db.TableName).newrow;
-                    } else {
-                        cr = true;
-                    }
-                    break;
-                }
-        }
-
-        return targetRow == null ? Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden.") : Ergebnis(string.Empty);
-
-        #region Subroutine Ergebnis
-
-        (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
-            if (db != null && column != null && row != null) {
-                var oldvalue = db.Cell.GetStringCore(column, row);
-
-                var newvalue = string.Empty;
-
-                if (targetRow != null && targetColumn != null && string.IsNullOrEmpty(fehler)) {
-                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { newvalue = targetRow.KeyName; }
-
-                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { newvalue = targetRow.CellGetString(targetColumn); }
-                }
-
-                //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
-                //row.CellSet(column, targetRow.KeyName);
-                //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
-
-                if (oldvalue != newvalue) {
-                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
-                }
-            } else {
-                if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
-            }
-            return (targetColumn, targetRow, fehler, cr);
-        }
-
-        #endregion
     }
 
     //    var ownRow = _database.Row.SearchByKey(rowKey);
