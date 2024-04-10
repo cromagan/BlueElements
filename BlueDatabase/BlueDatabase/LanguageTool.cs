@@ -91,12 +91,14 @@ public static class LanguageTool {
     /// <param name="opticalReplace"></param>
     /// <returns></returns>
     public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
-        if (Translation != null) {
-            if (!string.IsNullOrEmpty(txt)) {
-                if (doOpticalTranslation == TranslationType.Übersetzen) { txt = DoTranslate(prefix, true); }
-                if (!string.IsNullOrEmpty(prefix)) { txt = DoTranslate(prefix, true) + " " + txt; }
-                if (!string.IsNullOrEmpty(suffix)) { txt = txt + " " + DoTranslate(suffix, true); }
+        if (!string.IsNullOrEmpty(txt)) {
+            if (Translation != null && doOpticalTranslation == TranslationType.Übersetzen) {
+                txt = DoTranslate(prefix, true);
+                if (!string.IsNullOrEmpty(prefix)) { prefix = DoTranslate(prefix, true); }
+                if (!string.IsNullOrEmpty(suffix)) { suffix = DoTranslate(suffix, true); }
             }
+            if (!string.IsNullOrEmpty(prefix)) { txt = $"{prefix} {txt}"; }
+            if (!string.IsNullOrEmpty(suffix)) { txt = $"{txt} {suffix}"; }
         }
 
         if (style == ShortenStyle.Unreplaced || opticalReplace.Count == 0) { return txt; }
@@ -114,9 +116,9 @@ public static class LanguageTool {
             }
         }
 
-        if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) { return txt; }
+        if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot.Equals(txt)) { return txt; }
 
-        return ot + " (" + txt + ")";
+        return $"{ot} ({txt})";
     }
 
     #endregion
