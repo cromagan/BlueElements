@@ -42,20 +42,16 @@ public class GenericControl : Control {
 
     protected bool MouseHighlight = true;
 
-    private readonly bool _useBackBitmap;
-
     private Bitmap? _bitmapOfControl;
-
     private bool _generatingBitmapOfControl;
-
     private bool _mousePressing;
-
     private ParentType _myParentType = ParentType.Unbekannt;
-
     private Form? _pform;
 
     // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
     private string _quickInfo = string.Empty;
+
+    private bool _useBackBitmap;
 
     #endregion
 
@@ -75,6 +71,7 @@ public class GenericControl : Control {
         //The next 3 styles are allefor double buffering
         SetStyle(ControlStyles.UserPaint, true);
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+        UpdateStyles();
         if (doubleBuffer) {
             SetDoubleBuffering();
         }
@@ -116,6 +113,15 @@ public class GenericControl : Control {
     protected virtual string QuickInfoText => _quickInfo;
 
     protected override bool ScaleChildren => false;
+
+    protected bool UseBackgroundBitmap {
+        get => _useBackBitmap;
+        set {
+            if (_useBackBitmap == value) { return; }
+            _useBackBitmap = value;
+            _bitmapOfControl = null;
+        }
+    }
 
     #endregion
 
@@ -229,7 +235,8 @@ public class GenericControl : Control {
     }
 
     public Bitmap? BitmapOfControl() {
-        if (!_useBackBitmap || _generatingBitmapOfControl) { return null; }
+        UseBackgroundBitmap = true;
+        if (_generatingBitmapOfControl) { return null; }
         _generatingBitmapOfControl = true;
         if (_bitmapOfControl == null) { Refresh(); }
         _generatingBitmapOfControl = false;
@@ -475,7 +482,11 @@ public class GenericControl : Control {
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
     protected void SetDoubleBuffering() {
-        SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
+        DoubleBuffered = true;
+        SetStyle(ControlStyles.DoubleBuffer, true);
+        SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+        SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+        SetStyle(ControlStyles.UserPaint, true);
         UpdateStyles();
     }
 
@@ -485,6 +496,7 @@ public class GenericControl : Control {
         TabIndex = 0;
         CausesValidation = false;
         SetStyle(ControlStyles.Selectable, false);
+        UpdateStyles();
         //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
         //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
     }

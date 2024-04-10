@@ -54,9 +54,12 @@ public partial class FloatingForm : Form {
         SetStyle(ControlStyles.Opaque, false);
         //The next 3 styles are allefor double buffering
         // Bei FloatingForms muss immer der Hinetergunrd gezeichnet haben. wir wollen ja einen schönen Rahmen haben.
+        DoubleBuffered = true;
         SetStyle(ControlStyles.DoubleBuffer, true);
+        SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         SetStyle(ControlStyles.UserPaint, true);
+        UpdateStyles();
         //BackColor = Color.FromArgb(255, 0, 255);
         //TransparencyKey = Color.FromArgb(255, 0, 255);
         AllBoxes.Add(this);

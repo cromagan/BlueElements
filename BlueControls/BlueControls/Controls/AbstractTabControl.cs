@@ -47,9 +47,12 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         SetStyle(ControlStyles.Opaque, true);
 
         //The next 3 styles are all for double buffering
+        DoubleBuffered = true;
         SetStyle(ControlStyles.DoubleBuffer, true);
+        SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         SetStyle(ControlStyles.UserPaint, true);
+        UpdateStyles();
 
         TabDefaultOrder = Array.Empty<string>();
     }
@@ -133,7 +136,9 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     protected override void OnSelectedIndexChanged(System.EventArgs e) {
         if (_indexChanged) { return; }
         _indexChanged = true;
+        Develop.SetUserDidSomething();
         base.OnSelectedIndexChanged(e);
+        Develop.SetUserDidSomething();
         _indexChanged = false;
     }
 

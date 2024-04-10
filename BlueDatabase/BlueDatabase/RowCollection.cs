@@ -162,6 +162,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public static void AddBackgroundWorker(RowItem row) {
         if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { return; }
+        if (db.EventScript.Get(ScriptEventTypes.value_changed_extra_thread).Count != 1) { return; }
         if (!db.IsRowScriptPossible(true)) { return; }
 
         var l = new BackgroundWorker();
@@ -180,6 +181,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (Database.ExecutingFirstLvlScript > 0) { return; }
 
+        if (Pendingworker.Count > 2) { return; }
+
         if (_executingchangedrows) { return; }
         _executingchangedrows = true;
 
@@ -191,8 +194,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { break; }
             if (Database.ExecutingFirstLvlScript > 0) { break; }
 
-            WaitDelay = Pendingworker.Count * 3;
-            if (Pendingworker.Count > 5) { break; }
+            WaitDelay = Pendingworker.Count * 5;
+            if (Pendingworker.Count > 2) { break; }
 
             if (!db.IsRowScriptPossible(true)) { break; }
 
@@ -201,6 +204,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (e.Cancel) { break; }
 
             try {
+                db.OnDropMessage(FehlerArt.Info, "Aktualisiere Zeile: " + row.CellFirstString());
                 var ok = row.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, false, true);
                 if (!ok.AllOk) { break; }
                 row.InvalidateCheckData();

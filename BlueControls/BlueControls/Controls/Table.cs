@@ -1587,6 +1587,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (_isinKeyDown) { return; }
             _isinKeyDown = true;
 
+            Develop.SetUserDidSomething();
+
             //_database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             switch (e.KeyCode) {
@@ -1759,6 +1761,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             _ = EnsureVisible(ca, _mouseOverColumn, _mouseOverRow);
             CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
+            Develop.SetUserDidSomething();
             _isinMouseDown = false;
         }
     }
@@ -1799,6 +1802,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (e.Button != MouseButtons.None) {
                 //_database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             } else {
+                Develop.SetUserDidSomething();
                 if (_mouseOverColumn != null && e.Y < ca.HeadSize(_columnFont)) {
                     _mouseOverText = _mouseOverColumn.QuickInfoText(string.Empty);
                 } else if (_mouseOverColumn != null && _mouseOverRow != null) {

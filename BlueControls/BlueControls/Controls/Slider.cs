@@ -327,6 +327,7 @@ public partial class Slider : IBackgroundNone {
             testVal = testVal > _value ? _value + LargeChange : _value - LargeChange;
         }
         if (Math.Abs(testVal - _value) < 0.00001) { return; }
+        BlueBasics.Develop.SetUserDidSomething();
         Value = testVal;
     }
 

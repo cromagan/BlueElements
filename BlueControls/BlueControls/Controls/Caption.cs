@@ -59,7 +59,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
-        SetDoubleBuffering();
         MouseHighlight = false;
     }
 
@@ -215,6 +214,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                     Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
                 }
+
+                UseBackgroundBitmap = true;
 
                 _eText ??= new ExtText(_design, state) {
                     HtmlText = LanguageTool.DoTranslate(_text, Translate),

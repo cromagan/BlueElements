@@ -75,7 +75,7 @@ public partial class FormWithStatusBar : Form {
         var did = false;
         try {
             foreach (var thisf in _formsWithStatusBar) {
-                if (thisf != null && thisf.Visible && !thisf.InvokeRequired) {
+                if (thisf != null && thisf.Visible) {
                     var x = thisf.UpdateStatus(type, text, did);
                     if (x) { did = true; }
                 }
