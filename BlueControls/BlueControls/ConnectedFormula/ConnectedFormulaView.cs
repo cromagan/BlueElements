@@ -205,7 +205,7 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
                         _ = unused.Remove(o);
 
                         if (thisit is FakeControlPadItem cspi) {
-                            o.Visible = cspi.IsVisibleForMe(Mode);
+                            o.Visible = cspi.IsVisibleForMe(Mode, true);
                         } else {
                             o.Visible = true;
                         }

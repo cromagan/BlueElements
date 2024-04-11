@@ -32,7 +32,7 @@ public interface IAutosizable {
 
     #region Methods
 
-    public bool IsVisibleForMe(string mode);
+    public bool IsVisibleForMe(string mode, bool nowDrawing);
 
     public void SetCoordinates(RectangleF r, bool overrideFixedSize);
 

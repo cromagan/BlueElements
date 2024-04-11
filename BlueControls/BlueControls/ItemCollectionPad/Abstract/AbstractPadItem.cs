@@ -443,7 +443,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
         }
 
-        result.ParseableAdd("Tags", Tags);
+        result.ParseableAdd("Tags", Tags, false);
 
         return result.Parseable(base.ToString());
     }

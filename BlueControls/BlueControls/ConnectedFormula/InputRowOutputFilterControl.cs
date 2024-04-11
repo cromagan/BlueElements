@@ -107,7 +107,11 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+        this.FilterOutput_PropertyChanged();
+
+        Text = FilterOutput.ReadableText();
+    }
 
     public void HandleChangesNow() {
         if (IsDisposed) { return; }

@@ -281,7 +281,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         result.ParseableAdd("Name", _name);
 
         if (Textlage != (Alignment)(-1)) { result.ParseableAdd("Pos", Textlage); }
-        result.ParseableAdd("Embedded", Eingebettete_Ansichten);
+        result.ParseableAdd("Embedded", Eingebettete_Ansichten, false);
         result.ParseableAdd("Color", Randfarbe.ToArgb());
         result.ParseableAdd("Data", "Item", PadInternal?.Item);
 

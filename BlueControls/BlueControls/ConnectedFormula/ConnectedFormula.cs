@@ -412,7 +412,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         List<IAutosizable> its = [];
 
         foreach (var thisc in padData) {
-            if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode) && thisc.IsVisibleOnPage(page)) {
+            if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) && thisc.IsVisibleOnPage(page)) {
                 its.Add(aas);
             }
         }
@@ -583,7 +583,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
                 if (thisItem is FakeControlPadItem cspi) {
-                    if (cspi.MustBeInDrawingArea && cspi.IsVisibleForMe(mode)) { return true; }
+                    if (cspi.MustBeInDrawingArea && cspi.IsVisibleForMe(mode, false)) { return true; }
                 }
             }
         }
@@ -779,8 +779,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         t.ParseableAdd("CreateDate", _createDate);
         t.ParseableAdd("CreateName", _creator);
         t.ParseableAdd("LastUsedID", _id);
-        t.ParseableAdd("DatabaseFiles", _databaseFiles);
-        t.ParseableAdd("NotAllowedChilds", _notAllowedChilds);
+        t.ParseableAdd("DatabaseFiles", _databaseFiles, false);
+        t.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
 
         if (PadData != null) {
             t.ParseableAdd("PadItemData", PadData.ToString());

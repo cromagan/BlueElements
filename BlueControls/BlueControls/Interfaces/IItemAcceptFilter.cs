@@ -274,7 +274,7 @@ public sealed class ItemAcceptFilter {
 
     public List<string> ParsableTags() {
         List<string> result = [];
-        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
+        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
 
         return result;

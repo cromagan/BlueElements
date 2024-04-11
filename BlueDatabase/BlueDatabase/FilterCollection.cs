@@ -27,6 +27,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,7 +35,7 @@ namespace BlueDatabase;
 
 #nullable enable
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText {
 
     #region Fields
 
@@ -382,6 +383,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return false;
     }
 
+    public string ReadableText() {
+        switch (Count) {
+            case 0:
+                return "Kein Filter";
+
+            case 1:
+                return _internal[0].ReadableText();
+
+            default:
+                return $"{Count} Filter";
+        }
+    }
+
     public void Remove(ColumnItem? column) {
         var toDel = _internal.Where(thisFilter => thisFilter.Column == column).ToList();
         if (toDel.Count == 0) { return; }
@@ -483,6 +497,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (did) {
             Invalidate_FilteredRows();
             OnPropertyChanged();
+        }
+    }
+
+    public QuickImage? SymbolForReadableText() {
+        switch (Count) {
+            case 0:
+                return QuickImage.Get(ImageCode.Kreuz, 16);
+
+            case 1:
+                return QuickImage.Get(ImageCode.Trichter, 16);
+
+            default:
+                return QuickImage.Get(ImageCode.Trichter, 16, Color.Red, Color.Transparent);
         }
     }
 

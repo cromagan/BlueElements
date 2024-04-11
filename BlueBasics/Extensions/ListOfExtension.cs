@@ -206,9 +206,9 @@ public static partial class Extensions {
     /// <param name="col"></param>
     /// <param name="tagname"></param>
     /// <param name="value"></param>
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value) {
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
         if (value == null || !value.Any()) { return; }
-        ParseableAdd(col, tagname, value.ToListOfString());
+        ParseableAdd(col, tagname, value.ToListOfString(), ignoreEmpty);
     }
 
     /// <summary>
@@ -217,8 +217,12 @@ public static partial class Extensions {
     /// <param name="col"></param>
     /// <param name="tagname"></param>
     /// <param name="value"></param>
-    public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value) {
-        if (value == null || value.Count == 0) { return; }
+    public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value, bool ignoreEmpty) {
+        if (value == null || value.Count == 0) {
+            if (ignoreEmpty) { return; }
+            col.Add(tagname + "=");
+            return;
+        }
 
         var l = new StringBuilder();
 

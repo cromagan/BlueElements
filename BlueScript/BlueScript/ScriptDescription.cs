@@ -256,7 +256,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             result.ParseableAdd("QuickInfo", _quickinfo);
             result.ParseableAdd("AdminInfo", _admininfo);
             result.ParseableAdd("Image", _image);
-            result.ParseableAdd("UserGroups", _usergroups);
+            result.ParseableAdd("UserGroups", _usergroups, false);
 
             return result.Parseable();
         } catch {

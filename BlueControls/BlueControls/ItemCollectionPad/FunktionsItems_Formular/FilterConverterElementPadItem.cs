@@ -37,7 +37,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IAutosizable {
 
     #region Fields
 
@@ -68,6 +68,8 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public static string ClassId => "FI-FilterConverterElement";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
 
+    public bool AutoSizeableHeight => false;
+
     public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
@@ -81,7 +83,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Kann aus dem empfangenen Filtern einen komplett anderen Filter erstellen und ausgeben.";
+    public override string Description => "Kann aus dem empfangenen Filtern einen komplett anderen Filter erstellen und ausgeben.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
     [Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
     [DefaultValue("")]

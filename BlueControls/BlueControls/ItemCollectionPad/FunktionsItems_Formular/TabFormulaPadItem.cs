@@ -312,7 +312,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
         result.ParseableAdd("Parent", CFormula);
-        result.ParseableAdd("Childs", _childs);
+        result.ParseableAdd("Childs", _childs, false);
         return result.Parseable(base.ToString());
     }
 

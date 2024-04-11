@@ -85,6 +85,8 @@ public sealed class ItemSendSomething {
     private Database? _databaseOutput;
     private int _outputColorId = -1;
 
+    private string tempDatabaseNametoLoad = string.Empty;
+
     #endregion
 
     #region Methods
@@ -111,7 +113,13 @@ public sealed class ItemSendSomething {
         item.OnPropertyChanged();
     }
 
-    public Database? DatabaseOutputGet() => _databaseOutput;
+    public Database? DatabaseOutputGet() {
+        if (string.IsNullOrEmpty(tempDatabaseNametoLoad)) { return _databaseOutput; }
+        _databaseOutput = GetById(new ConnectionInfo(tempDatabaseNametoLoad, null, string.Empty), false, null, true);
+
+        tempDatabaseNametoLoad = string.Empty;
+        return _databaseOutput;
+    }
 
     public void DatabaseOutputSet(Database? value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
@@ -167,7 +175,7 @@ public sealed class ItemSendSomething {
 
         result.ParseableAdd("OutputDatabase", _databaseOutput);
 
-        result.ParseableAdd("SentToChildIds", _childIds);
+        result.ParseableAdd("SentToChildIds", _childIds, false);
 
         return result;
     }
@@ -178,13 +186,12 @@ public sealed class ItemSendSomething {
         switch (tag) {
             case "database":
             case "outputdatabase":
-                var na = value.FromNonCritical();
+                tempDatabaseNametoLoad = value.FromNonCritical();
 
-                if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
+                if (tempDatabaseNametoLoad.IsFormat(FormatHolder.FilepathAndName)) {
+                    tempDatabaseNametoLoad = tempDatabaseNametoLoad.FilePath() + MakeValidTableName(tempDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempDatabaseNametoLoad.FileSuffix();
                 }
 
-                _databaseOutput = GetById(new ConnectionInfo(na, null, string.Empty), false, null, true);
                 return true;
 
             case "senttochildids":

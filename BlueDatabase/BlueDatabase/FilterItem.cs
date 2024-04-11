@@ -430,7 +430,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             result.ParseableAdd("Type", _filterType);
             result.ParseableAdd("Database", Database);
             result.ParseableAdd("ColumnName", _column);
-            result.ParseableAdd("Values", _searchValue);
+            result.ParseableAdd("Values", _searchValue, false);
             result.ParseableAdd("Origin", _origin);
             return result.Parseable();
         } catch {

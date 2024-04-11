@@ -122,9 +122,11 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
-            var vf = new List<AbstractListItem>();
-            vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
-            l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
+            if (MustBeInDrawingArea) {
+                var vf = new List<AbstractListItem>();
+                vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
+                l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
+            }
         }
 
         //l.Add(new FlexiControl());
@@ -132,9 +134,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return l;
     }
 
-    public bool IsVisibleForMe(string mode) {
+    public bool IsVisibleForMe(string mode, bool nowDrawing) {
         //if(!Bei_Export_sichtbar ) { return false; }
-        if (VisibleFor.Count == 0) { return true; }
+        if (!MustBeInDrawingArea && !nowDrawing) { return false; } // Unwichtiges Element
+        if (VisibleFor.Count == 0) { return false; }
         if (string.IsNullOrEmpty(mode)) { return true; }
 
         if (VisibleFor.Contains(Constants.Everybody, false)) { return true; }
@@ -211,7 +214,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         //if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
 
-        result.ParseableAdd("VisibleFor", VisibleFor);
+        if (MustBeInDrawingArea) {
+            result.ParseableAdd("VisibleFor", VisibleFor, false);
+        }
 
         return result.Parseable(base.ToString());
     }

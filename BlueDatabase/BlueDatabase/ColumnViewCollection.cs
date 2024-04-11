@@ -395,7 +395,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
         tmp.RemoveString(Administrator, false);
-        result.ParseableAdd("Permissiongroups", tmp);
+        result.ParseableAdd("Permissiongroups", tmp, true);
 
         return result.Parseable();
     }

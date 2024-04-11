@@ -128,7 +128,7 @@ public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("Reverse", Reverse);
-        result.ParseableAdd("Columns", Columns);
+        result.ParseableAdd("Columns", Columns, true);
         return result.Parseable();
     }
 

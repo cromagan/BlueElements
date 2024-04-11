@@ -1384,9 +1384,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         result.ParseableAdd("Filters", (IStringable?)Filter);
         result.ParseableAdd("SliderX", SliderX.Value);
         result.ParseableAdd("SliderY", SliderY.Value);
-        result.ParseableAdd("Pin", PinnedRows);
-        result.ParseableAdd("Collapsed", _collapsed);
-        result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns());
+        result.ParseableAdd("Pin", PinnedRows, false);
+        result.ParseableAdd("Collapsed", _collapsed, false);
+        result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns(), false);
         result.ParseableAdd("TempSort", _sortDefinitionTemporary);
         result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn, CursorPosRow?.Row));
         return result.Parseable();
