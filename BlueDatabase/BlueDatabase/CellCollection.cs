@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using BlueScript.Variables;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -193,7 +194,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Database? linkedDatabase, ColumnItem column, RowItem? row) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="varcol">Wird eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
+    /// <returns></returns>
+    public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Database? linkedDatabase, ColumnItem column, RowItem? row, VariableCollection? varcol) {
         if (linkedDatabase == null || linkedDatabase.IsDisposed) { return (null, "Verlinkte Datenbank verworfen."); }
         if (column.Database is not Database db || db.IsDisposed || column.IsDisposed) { return (null, "Datenbank verworfen."); }
 
@@ -214,7 +220,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (row != null && !row.IsDisposed) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
                 // und auch diese abgefragt werden
-                value = row.ReplaceVariables(value, false, true);
+                value = row.ReplaceVariables(value, false, true, varcol);
             }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
@@ -383,17 +389,17 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
-        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
+        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row, null);
         if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
-        if (fc == null || fc.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden: " + info); }
+        if (fc == null || fc.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden"); }
 
-        var r = fc.Rows;
-        switch (r.Count) {
+        var rows = fc.Rows;
+        switch (rows.Count) {
             case > 1:
                 return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");
 
             case 1:
-                targetRow = r[0];
+                targetRow = rows[0];
                 break;
 
             default: {

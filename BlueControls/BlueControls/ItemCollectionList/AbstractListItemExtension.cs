@@ -85,7 +85,6 @@ public static class AbstractListItemExtension {
                 symbol = QuickImage.Get("AZ|16|8|1");
                 break;
 
-
             case ContextMenuCommands.SpaltenSortierungAZ:
                 readableText = "Nach dieser Spalte aufsteigend sortieren";
                 symbol = QuickImage.Get("AZ|16|8");
@@ -231,7 +230,7 @@ public static class AbstractListItemExtension {
                 var targetColumn = db2.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
                 if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return []; }
 
-                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
+                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow, null);
                 if (!string.IsNullOrEmpty(info)) {
                     Notification.Show(info, ImageCode.Information);
                     return [];

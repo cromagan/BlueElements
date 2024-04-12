@@ -37,7 +37,7 @@ public class Method_Filter : Method_Database {
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell werden nur die FilterTypen 'is', 'isnot' und 'instr' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string StartSequence => "(";
@@ -103,7 +103,6 @@ public class Method_Filter : Method_Database {
             case "instr":
                 filtertype = FilterType.Instr_GroßKleinEgal;
                 break;
-
 
             default:
                 return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + attvar.ValueStringGet(2));

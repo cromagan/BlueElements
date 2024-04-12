@@ -164,7 +164,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         foreach (var thisR in RowsInput) {
             if (cb[thisR.KeyName] == null) {
-                var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
+                var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true, null);
                 cb.ItemAdd(ItemOf(tmpQuickInfo, thisR.KeyName));
             } else {
                 ex.Remove(thisR.KeyName);

@@ -1305,7 +1305,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             case ColumnFunction.RelationText:
                 if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewählt werden."; }
                 //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-                if (IsFirst()) { return "Diese Funktion ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
+                if (IsFirst()) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt. (Ansicht: Alle Spalten)"; }
                 //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
                 //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
@@ -1316,9 +1316,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 }
                 break;
 
-            //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-            //    if (MaxTextLenght < 35) { return "Maximallänge bei diesem Format mindestens 35!"; }
-            //    break;
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+                if (_scriptType is not ScriptType.Nicht_vorhanden) {
+                    return "Verknüpfung_zu_anderer_Datenbank kann im Skript nicht verwendet werden. ImportLinked im Skript benutzen.";
+                }
+                break;
 
             case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
@@ -1565,7 +1568,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             if (c != null && !c.IsDisposed) {
                 this.GetStyleFrom((IInputFormat)c);
                 BehaviorOfImageAndText = c.BehaviorOfImageAndText;
-                ScriptType = c.ScriptType; // 29.06.2022 Wieder aktivert. Grund: Plananalyse waren zwei vershieden Typen bei den Zeitn. So erschien immer automatisch eine 0 bei den Stnden, und es war nicht ersichtlich warum.
+                ScriptType = ScriptType.Nicht_vorhanden;
                 DoOpticalTranslation = c.DoOpticalTranslation;
             }
         }

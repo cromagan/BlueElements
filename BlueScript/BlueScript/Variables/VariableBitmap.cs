@@ -53,6 +53,7 @@ public class VariableBitmap : Variable {
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp == null;
     public override string MyClassId => ClassId;
+    public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
     public Bitmap? ValueBitmap {

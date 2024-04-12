@@ -71,7 +71,7 @@ public class VariableFilterItem : Variable {
     public override string MyClassId => ClassId;
 
     public override string ReadableText => _lastText;
-
+    public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
     #endregion

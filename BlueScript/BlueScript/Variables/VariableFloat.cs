@@ -65,6 +65,7 @@ public class VariableFloat : Variable {
     /// </summary>
     public override string ReadableText => _double.ToStringFloat5();
 
+    public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
 
     /// <summary>

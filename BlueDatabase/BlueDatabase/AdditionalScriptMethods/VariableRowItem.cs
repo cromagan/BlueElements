@@ -49,17 +49,11 @@ public class VariableRowItem : Variable {
     #region Properties
 
     public static string ClassId => "row";
-
     public static string ShortName_Variable => "*row";
-
     public override int CheckOrder => 99;
-
     public override bool GetFromStringPossible => false;
-
     public override bool IsNullOrEmpty => _row == null;
-
     public override string MyClassId => ClassId;
-
     public override string ReadableText => _lastText;
 
     public RowItem? RowItem {
@@ -72,14 +66,7 @@ public class VariableRowItem : Variable {
         }
     }
 
-    private void GetText() {
-        if (_row == null) {
-            _lastText = "Row: [NULL]";
-        } else {
-            _lastText = "Row: " + _row.CellFirstString();
-        }
-    }
-
+    public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
     #endregion
@@ -106,6 +93,14 @@ public class VariableRowItem : Variable {
     protected override void SetValue(object? x) { }
 
     protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => null;
+
+    private void GetText() {
+        if (_row == null) {
+            _lastText = "Row: [NULL]";
+        } else {
+            _lastText = "Row: " + _row.CellFirstString();
+        }
+    }
 
     #endregion
 }

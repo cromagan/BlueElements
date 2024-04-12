@@ -21,11 +21,12 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_CellGetRow : Method_Database {
+public class Method_CellGetRow : BlueScript.Methods.Method {
 
     #region Properties
 
@@ -34,7 +35,7 @@ public class Method_CellGetRow : Method_Database {
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
@@ -56,15 +57,15 @@ public class Method_CellGetRow : Method_Database {
         if (db.Column[attvar.ValueStringGet(0)] is not ColumnItem c) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var v = RowItem.CellToVariable(c, row, true);
-        if (v == null || v.Count != 1) {
+        if (v == null) {
             return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
         }
 
         var l = new List<string>();
 
-        if (v[0] is VariableListString vl) {
+        if (v is VariableListString vl) {
             l.AddRange(vl.ValueList);
-        } else if (v[0] is VariableString vs) {
+        } else if (v is VariableString vs) {
             var w = vs.ValueString;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {

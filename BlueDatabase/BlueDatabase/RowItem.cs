@@ -123,8 +123,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static VariableCollection? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly) {
-        if (column == null || row == null) { return null; }
+    public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly) {
+        if (column == null) { return null; }
         if (column.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { return null; }
 
         if (!column.Function.CanBeCheckedByRules()) { return null; }
@@ -139,79 +139,34 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         #endregion
 
-        var wert = row.CellGetString(column);
+        var wert = row?.CellGetString(column) ?? string.Empty;
+
         var qi = "Spalte: " + column.ReadableText();
-
-        var vars = new VariableCollection();
-
-        //switch (column.Format) {
-        //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-        //    //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
-        //    //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
-        //    //    //vars.GenerateAndAdd(new Variable(Column.KeyName + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
-        //    //    //} else {
-        //    //    //    qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
-        //    //    //    ro = true;
-        //    //    //}
-        //    //    break;
-
-        //    //case DataFormat.Link_To_Filesystem:
-        //    //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + Column.KeyName + "_FileName";
-        //    //    var f = column.Database.Cell.BestFile(column, row);
-        //    //    if (f.FileType() == FileFormat.Image && IO.FileExists(f)) {
-        //    //        vars.GenerateAndAdd(new VariableString(Column.KeyName + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
-        //    //    }
-        //    //    break;
-
-        //    //case DataFormat.Columns_für_LinkedCellDropdown:
-        //    //    if (IntTryParse(wert, out var colKey)) {
-        //    //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
-        //    //        if (c != null && !c.IsDisposed) { wert = c.Name; }
-        //    //    }
-        //    //    break;
-        //}
 
         switch (column.ScriptType) {
             case ScriptType.Bool:
-                vars.Add(new VariableBool(column.KeyName, wert == "+", ro, qi));
-                break;
+                return new VariableBool(column.KeyName, wert == "+", ro, qi);
 
             case ScriptType.List:
-                vars.Add(new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, qi));
-                break;
+                return new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, qi);
 
             case ScriptType.Numeral:
                 _ = FloatTryParse(wert, out var f);
-                vars.Add(new VariableFloat(column.KeyName, f, ro, qi));
-                break;
+                return new VariableFloat(column.KeyName, f, ro, qi);
 
             case ScriptType.String:
-                vars.Add(new VariableString(column.KeyName, wert, ro, qi));
-                break;
-
-            //case ScriptType.DateTime:
-            //    qi += "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
-            //    if (DateTimeTryParse(wert, out var d)) {
-            //        vars.Add(new VariableDateTime(column.KeyName, d, ro, false, qi));
-            //    } else {
-            //        vars.Add(new VariableDateTime(column.KeyName, new DateTime(1, 1, 1), ro, false, qi));
-            //    }
-            //    break;
+                return new VariableString(column.KeyName, wert, ro, qi);
 
             case ScriptType.String_Readonly:
-                vars.Add(new VariableString(column.KeyName, wert, true, qi));
-                break;
+                return new VariableString(column.KeyName, wert, true, qi);
 
             case ScriptType.Bool_Readonly:
-                vars.Add(new VariableBool(column.KeyName, wert == "+", true, qi));
-                break;
+                return new VariableBool(column.KeyName, wert == "+", true, qi);
 
             default:
                 Develop.DebugPrint(column.ScriptType);
-                break;
+                return null;
         }
-
-        return vars;
     }
 
     public string CellFirstString() => Database?.Column.First() is not ColumnItem fc ? string.Empty : CellGetString(fc);
@@ -536,10 +491,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     ///
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="replacedvalue">Wenn true, wird der Wert durch den leserlichen Zelleninhalt ersetzt. Bei False durch den Origial Zelleninhalt</param>
+    /// <param name="readableValue">Wenn true, wird der Wert durch den leserlichen Zelleninhalt ersetzt. Bei False durch den origial Zelleninhalt</param>
     /// <param name="removeLineBreaks"></param>
+    /// <param name="varcol">Wir eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
     /// <returns></returns>
-    public string ReplaceVariables(string txt, bool replacedvalue, bool removeLineBreaks) {
+    public string ReplaceVariables(string txt, bool readableValue, bool removeLineBreaks, VariableCollection? varcol) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return txt; }
 
         var erg = txt;
@@ -550,8 +506,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (column != null) {
                 if (erg.ToUpperInvariant().Contains("~" + column.KeyName.ToUpperInvariant())) {
                     var replacewith = CellGetString(column);
-                    if (replacedvalue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
-                    if (removeLineBreaks && !replacedvalue) {
+                    if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
+
+                    if (varcol != null) {
+                        if (varcol.Get(column.KeyName) is Variable v) { replacewith = v.SearchValue; }
+                    }
+
+                    if (removeLineBreaks && !readableValue) {
                         replacewith = replacewith.Replace("\r\n", " ");
                         replacewith = replacewith.Replace("\r", " ");
                     }
@@ -757,7 +718,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false);
+        _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false, null);
     }
 
     private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {

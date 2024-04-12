@@ -84,6 +84,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
     }
 
+    public abstract string SearchValue { get; }
     public abstract bool ToStringPossible { get; }
 
     public virtual string ValueForReplace {

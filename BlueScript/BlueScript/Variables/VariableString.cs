@@ -57,19 +57,24 @@ public class VariableString : Variable {
     public override string MyClassId => ClassId;
 
     /// <summary>
-    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ValueString
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText, ValueString, SearchValue
     /// </summary>
     public override string ReadableText => _valueString;
+
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText, ValueString, SearchValue
+    /// </summary>
+    public override string SearchValue => _valueString;
 
     public override bool ToStringPossible => true;
 
     /// <summary>
-    /// Der Wert mit " Aanfang/Ende un entfernten Kritischen Zeichen.
+    /// Der Wert mit " Anfang/Ende und entfernten kritischen Zeichen.
     /// </summary>
     public override string ValueForReplace => "\"" + _valueString.RemoveCriticalVariableChars() + "\"";
 
     /// <summary>
-    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText, ValueString, SearchValue
     /// </summary>
     public string ValueString {
         get => _valueString;

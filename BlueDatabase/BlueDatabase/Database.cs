@@ -1175,7 +1175,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (row != null && !row.IsDisposed) {
             foreach (var thisCol in Column) {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly);
-                if (v != null) { vars.AddRange(v); }
+                if (v != null) { vars.Add(v); }
             }
         }
 

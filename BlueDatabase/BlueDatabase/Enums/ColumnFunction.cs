@@ -93,8 +93,6 @@ public static class ColumnFunctionExtensions {
 
     public static bool CanBeCheckedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
 

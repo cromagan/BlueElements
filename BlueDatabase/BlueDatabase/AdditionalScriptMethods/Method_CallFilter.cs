@@ -23,11 +23,12 @@ using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallFilter : Method_Database, IUseableForButton {
+public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
 
     #region Properties
 
