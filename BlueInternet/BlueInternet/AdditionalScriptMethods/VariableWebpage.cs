@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-//using CefSharp.WinForms;
+#nullable enable
 
 using BlueScript.Structures;
 using CefSharp.OffScreen;
@@ -53,6 +53,7 @@ public class VariableWebpage : Variable {
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _browser == null;
     public override string MyClassId => ClassId;
+    public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
     public ChromiumWebBrowser? ValueWebpage {
