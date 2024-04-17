@@ -1521,8 +1521,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
-    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
-
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
         if (FileExists(AdditionalFilesPfadWhole() + _standardFormulaFile)) { return AdditionalFilesPfadWhole() + _standardFormulaFile; }
@@ -3118,95 +3116,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
-    }
-
-    private bool Export_HTML(string filename, List<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows, bool execute) {
-        try {
-            if (columnList == null || columnList.Count == 0) {
-                columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
-            }
-
-            //sortedRows ??= Row.AllRows();
-
-            if (string.IsNullOrEmpty(filename)) {
-                filename = TempFile(string.Empty, "Export", "html");
-            }
-
-            Html da = new(TableName.FileNameWithoutSuffix());
-            da.AddCaption(_caption);
-            da.TableBeginn();
-
-            #region Spaltenköpfe
-
-            da.RowBeginn();
-            foreach (var thisColumn in columnList) {
-                if (thisColumn != null) {
-                    da.CellAdd(thisColumn.ReadableText().Replace(";", "<br>"), thisColumn.BackColor);
-                }
-            }
-
-            da.RowEnd();
-
-            #endregion
-
-            var (_, errormessage) = RefreshRowData(sortedRows);
-            if (!string.IsNullOrEmpty(errormessage)) {
-                OnDropMessage(FehlerArt.Fehler, errormessage);
-                return false;
-            }
-
-            #region Zeilen
-
-            foreach (var thisRow in sortedRows) {
-                if (thisRow != null && !thisRow.IsDisposed) {
-                    da.RowBeginn();
-                    foreach (var thisColumn in columnList) {
-                        if (thisColumn != null) {
-                            var lcColumn = thisColumn;
-                            var lCrow = thisRow;
-                            if (thisColumn.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-                                (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn, thisRow, false, false);
-                            }
-
-                            if (lCrow != null && lcColumn != null) {
-                                da.CellAdd(lCrow.CellGetValuesReadable(lcColumn, ShortenStyle.HTML).JoinWith("<br>"), thisColumn.BackColor);
-                            } else {
-                                da.CellAdd(" ", thisColumn.BackColor);
-                            }
-                        }
-                    }
-
-                    da.RowEnd();
-                }
-            }
-
-            #endregion
-
-            #region Summe
-
-            da.RowBeginn();
-            foreach (var thisColumn in columnList) {
-                if (thisColumn != null) {
-                    var s = thisColumn.Summe(sortedRows);
-                    if (s == null) {
-                        da.CellAdd("-", thisColumn.BackColor);
-                        //da.GenerateAndAdd("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
-                    } else {
-                        da.CellAdd("~sum~ " + s, thisColumn.BackColor);
-                        //da.GenerateAndAdd("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
-                    }
-                }
-            }
-            da.RowEnd();
-
-            #endregion
-
-            da.TableEnd();
-            da.AddFoot();
-            return da.Save(filename, execute);
-        } catch {
-            return false;
-        }
     }
 
     private void GenerateTimer() {

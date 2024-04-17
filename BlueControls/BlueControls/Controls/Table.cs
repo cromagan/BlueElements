@@ -1060,8 +1060,96 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void Export_HTML(string filename = "", bool execute = true) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (CurrentArrangement is not ColumnViewCollection ca) { return; }
+
         if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
-        Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
+        //Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUniquex(), execute);
+
+        //try {
+        //    if (columnList == null || columnList.Count == 0) {
+        //        columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
+        //    }
+
+        //sortedRows ??= Row.AllRows();
+
+        if (string.IsNullOrEmpty(filename)) {
+            filename = TempFile(string.Empty, "Export", "html");
+        }
+
+        Html da = new(db.TableName.FileNameWithoutSuffix());
+        da.AddCaption(db.Caption);
+        da.TableBeginn();
+
+        #region Spaltenköpfe
+
+        da.RowBeginn();
+        foreach (var thisColumn in ca) {
+            if (thisColumn.Column != null) {
+                da.CellAdd(thisColumn.Column.ReadableText().Replace(";", "<br>"), thisColumn.Column.BackColor);
+            }
+        }
+
+        da.RowEnd();
+
+        #endregion
+
+        //var (_, errormessage) = RefreshRowData(sortedRows);
+        //if (!string.IsNullOrEmpty(errormessage)) {
+        //    OnDropMessage(FehlerArt.Fehler, errormessage);
+        //    return false;
+        //}
+
+        #region Zeilen
+
+        if (RowsFilteredAndPinned() is List<RowData> rw) {
+            foreach (var thisRow in rw) {
+                if (thisRow != null && !thisRow.IsDisposed) {
+                    da.RowBeginn();
+                    foreach (var thisColumn in ca) {
+                        if (thisColumn.Column != null) {
+                            var lcColumn = thisColumn.Column;
+                            var lCrow = thisRow.Row;
+                            if (thisColumn.Column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+                                (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn.Column, thisRow.Row, false, false);
+                            }
+
+                            if (lCrow != null && lcColumn != null) {
+                                da.CellAdd(lCrow.CellGetValuesReadable(lcColumn, ShortenStyle.HTML).JoinWith("<br>"), thisColumn.Column.BackColor);
+                            } else {
+                                da.CellAdd(" ", thisColumn.Column.BackColor);
+                            }
+                        }
+                    }
+
+                    da.RowEnd();
+                }
+            }
+        }
+
+        #endregion
+
+        //#region Summe
+
+        //da.RowBeginn();
+        //foreach (var thisColumn in ca) {
+        //    if (thisColumn.Column != null) {
+        //        var s = thisColumn.Column.Summe(sortedRows);
+        //        if (s == null) {
+        //            da.CellAdd("-", thisColumn.Column.BackColor);
+        //            //da.GenerateAndAdd("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
+        //        } else {
+        //            da.CellAdd("~sum~ " + s, thisColumn.Column.BackColor);
+        //            //da.GenerateAndAdd("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
+        //        }
+        //    }
+        //}
+        //da.RowEnd();
+
+        //#endregion
+
+        da.TableEnd();
+        da.AddFoot();
+        da.Save(filename, execute);
     }
 
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();

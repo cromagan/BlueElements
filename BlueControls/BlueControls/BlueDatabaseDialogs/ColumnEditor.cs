@@ -559,7 +559,7 @@ internal sealed partial class ColumnEditor {
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             if (b == null || b.IsDisposed) { return; }
-            b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
+            b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
             b.DropdownAllesAbwählenErlaubt = true;
@@ -612,7 +612,7 @@ internal sealed partial class ColumnEditor {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
                 r.CellSet("SpalteName", col.KeyName, string.Empty);
 
-                if (col.Function.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Function.NeedTargetDatabase() && !col.IsSystemColumn()) {
+                if (col.Function.Autofilter_möglich() && col != spalteauDb && !col.Function.NeedTargetDatabase() && !col.IsSystemColumn()) {
                     r.CellSet("visible", true, string.Empty);
                 } else {
                     r.CellSet("visible", false, string.Empty);

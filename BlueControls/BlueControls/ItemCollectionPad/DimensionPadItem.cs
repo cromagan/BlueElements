@@ -149,7 +149,7 @@ public class DimensionPadItem : AbstractPadItem {
 
     public string Angezeigter_Text_Oben() {
         if (!string.IsNullOrEmpty(Text_Oben)) { return Text_Oben; }
-        var s = Länge_In_Mm.ToStringFloat5();
+        var s = Länge_In_Mm.ToStringFloat3(); // nur 3, wegen umrechnungsfehlern Inch zu mm
         s = s.Replace(".", ",");
         if (s.Contains(",")) {
             s = s.TrimEnd("0");

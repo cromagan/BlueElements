@@ -60,7 +60,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "Export(Filename, HTML/CSV/BDB, AnsichtName, Filter, ...);";
+    public override string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
 
     #endregion
 
@@ -141,10 +141,10 @@ internal class Method_Export : Method_Database, IUseableForButton {
                     if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
                     break;
 
-                case "HTML":
-                case "HTM":
-                    if (!db.Export_HTML(filn, cu, r, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
-                    break;
+                //case "HTML":
+                //case "HTM":
+                //    if (!db.Export_HTML(filn, cu, r, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
+                //    break;
 
                 default:
                     return new DoItFeedback(infos.Data, "Export-Format unbekannt.");
