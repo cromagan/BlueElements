@@ -59,6 +59,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public static List<AbstractPadItem>? PadItemTypes;
 
+    public new EventHandler? PropertyChanged;
     internal string Caption;
 
     /// <summary>
@@ -124,8 +125,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public event EventHandler? ItemRemoved;
 
     public event EventHandler<ListEventArgs>? ItemRemoving;
-
-    public new EventHandler? PropertyChanged;
 
     #endregion
 
@@ -542,7 +541,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
-    public IEnumerable<string> Permission_AllUsed() {
+    public List<string> Permission_AllUsed() {
         var l = new List<string>();
 
         foreach (var thisIt in this) {
@@ -726,7 +725,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return result.Parseable(tmp);
     }
 
-    public IEnumerable<string> VisibleFor_AllUsed() {
+    public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
         foreach (var thisIt in this) {
@@ -986,7 +985,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
-    private RectangleF MaximumBounds(ICollection<AbstractPadItem>? zoomItems) {
+    private RectangleF MaximumBounds(IEnumerable<AbstractPadItem>? zoomItems) {
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;

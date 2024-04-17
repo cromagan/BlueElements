@@ -383,7 +383,7 @@ public static partial class Extensions {
         list.AddRange(l);
     }
 
-    public static string TagGet(this ICollection<string>? list, string tagName) {
+    public static string TagGet(this IEnumerable<string>? list, string tagName) {
         if (list == null) { return string.Empty; }
         var uTagName = tagName.ToUpperInvariant().Trim();
         foreach (var thisString in list) {
@@ -397,7 +397,7 @@ public static partial class Extensions {
         return string.Empty;
     }
 
-    public static List<string> TagGetAll(this ICollection<string>? list, string tagName) {
+    public static List<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
         List<string> l = [];
         if (list == null) { return l; }
         var uTagName = tagName.ToUpperInvariant();
@@ -425,8 +425,7 @@ public static partial class Extensions {
         }
     }
 
-    //public static int TagGetInt(this ICollection<string>? col, string tagname) => IntParse(TagGet(col, tagname));
-    public static void TagSet(this List<string> col, string tagname, string value) {
+    public static void TagSet(this ICollection<string> col, string tagname, string value) {
         var found = col.TagGetPosition(tagname);
         var n = tagname + ": " + value;
 
@@ -445,7 +444,7 @@ public static partial class Extensions {
     /// <param name="l"></param>
     /// <param name="removeEmpty"></param>
     /// <returns></returns>
-    public static string ToString<T>(this ICollection<T> l, bool removeEmpty) where T : IStringable? {
+    public static string ToString<T>(this IEnumerable<T> l, bool removeEmpty) where T : IStringable? {
         // Remove Empty sollte eigentlich selbstverständlich sein. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
         var tmp = string.Empty;
         foreach (var item in l) {
@@ -459,7 +458,7 @@ public static partial class Extensions {
         return tmp.TrimCr();
     }
 
-    public static bool WriteAllText(this ICollection<string> l, string filename, Encoding endcoding, bool executeAfter) {
+    public static bool WriteAllText(this IEnumerable<string> l, string filename, Encoding endcoding, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
         if (!DirectoryExists(filename.FilePath())) {
             _ = Directory.CreateDirectory(filename.FilePath());

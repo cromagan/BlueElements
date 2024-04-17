@@ -32,6 +32,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -206,8 +207,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         _btnDropDownIsIn = false;
     }
 
-    internal void ItemAddRange(ICollection<AbstractListItem>? items) {
-        if (items == null || items.Count == 0) { return; }
+    internal void ItemAddRange(IEnumerable<AbstractListItem>? items) {
+        if (items == null || !items.Any()) { return; }
 
         foreach (var thisIt in items) {
             _item.Remove(thisIt.KeyName);

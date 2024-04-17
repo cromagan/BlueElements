@@ -343,7 +343,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public IEnumerable<ColumnItem> ReducedColumns() {
+    public List<ColumnItem> ReducedColumns() {
         var x = new List<ColumnItem>();
         foreach (var thiscol in _internal) {
             if (thiscol?.Column != null && thiscol.TmpReduced) { x.Add(thiscol.Column); }

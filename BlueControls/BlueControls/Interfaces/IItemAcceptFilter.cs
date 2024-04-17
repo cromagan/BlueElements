@@ -176,7 +176,7 @@ public sealed class ItemAcceptFilter {
 
     public ReadOnlyCollection<string> GetFilterFromKeysGet() => new(_getFilterFromKeys);
 
-    public void GetFilterFromKeysSet(ICollection<string>? value, IItemAcceptFilter item) {
+    public void GetFilterFromKeysSet(IEnumerable<string>? value, IItemAcceptFilter item) {
         if (!_getFilterFromKeys.IsDifferentTo(value)) { return; }
 
         var g = GetFilterFromGet(item);

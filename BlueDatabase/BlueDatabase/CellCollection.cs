@@ -797,7 +797,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return allRows;
     }
 
-    private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, List<string> newBz) {
+    private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, IEnumerable<string> newBz) {
         if (row == null || row.IsDisposed) { return; }
         if (column == null || column.IsDisposed) { return; }
 

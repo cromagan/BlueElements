@@ -290,20 +290,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
 
-        //List<AbstractListItem> ic = [];
-        //foreach (var thisColumnItem in db.Column) {
-        //    if (thisColumnItem != null && ca[thisColumnItem] == null) {
-
-        //        ic.Add(ItemOf(thisColumnItem));
-
-
-        //    }
-        //}
-        //if (ic.Count == 0) {
-        //    MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
-        //    return;
-        //}
-
         var ic = ItemsOf(db.Column, true);
 
         foreach (var thisColumnItem in db.Column) {
@@ -311,7 +297,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                 ic.Get(thisColumnItem.KeyName).Enabled = false;
             }
         }
-
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
         if (r == null || r.Count == 0) { return; }
@@ -477,7 +462,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
 
-    private ColumnPadItem? LeftestItem(ICollection<AbstractPadItem> ignore) {
+    private ColumnPadItem? LeftestItem(IEnumerable<AbstractPadItem> ignore) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (Pad?.Item == null) { return null; }
 

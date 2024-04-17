@@ -432,7 +432,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         return erg;
     }
 
-    public static IEnumerable<string> VisibleFor_AllUsed() {
+    public static List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
         foreach (var thisCf in AllFiles) {

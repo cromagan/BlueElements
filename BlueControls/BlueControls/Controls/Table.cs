@@ -626,14 +626,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         columnArrangementSelector.Text = showingKey;
     }
 
-    public List<RowData> CalculateSortedRows(ICollection<RowItem> filteredRows, List<RowItem>? pinnedRows) {
+    public List<RowData> CalculateSortedRows(IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
 
         VisibleRowCount = 0;
 
         #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
-        var capName = pinnedRows != null && pinnedRows.Count > 0;
+        var capName = pinnedRows != null && pinnedRows.Any();
         if (!capName && db.Column.SysChapter is ColumnItem cap) {
             foreach (var thisRow in filteredRows) {
                 if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(cap)) {

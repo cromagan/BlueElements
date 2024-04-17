@@ -1223,8 +1223,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         return Contents(r2);
     }
 
-    public List<string> Contents(ICollection<RowItem>? rows) {
-        if (rows == null || rows.Count == 0) { return []; }
+    public List<string> Contents(IEnumerable<RowItem>? rows) {
+        if (rows == null || !rows.Any()) { return []; }
 
         RefreshColumnsData();
 

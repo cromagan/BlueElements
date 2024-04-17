@@ -1457,16 +1457,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
-
-    public string Export_CSV(FirstRow firstRow, ColumnItem column, IEnumerable<RowItem> sortedRows) =>
-                        //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-                        Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
-
     public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         var columnListtmp = columnList?.ToList();
         columnListtmp ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
-        //sortedRows ??= Row.AllRows();
 
         StringBuilder sb = new();
         switch (firstRow) {
@@ -1526,9 +1519,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return sb.ToString().TrimEnd("\r\n");
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, ICollection<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
+    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
-    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, ICollection<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
+    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -2001,7 +1994,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public IEnumerable<string> Permission_AllUsedInThisDB(bool cellLevel) {
+    public List<string> Permission_AllUsedInThisDB(bool cellLevel) {
         List<string> e = [];
         foreach (var thisColumnItem in Column) {
             if (thisColumnItem != null) {
@@ -2312,7 +2305,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
     }
 
-    protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<Database> db, DateTime fromUtc, DateTime toUtc) => ([], null);
+    protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime fromUtc, DateTime toUtc) => ([], null);
 
     protected bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
@@ -3127,7 +3120,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
     }
 
-    private bool Export_HTML(string filename, List<ColumnItem>? columnList, ICollection<RowItem> sortedRows, bool execute) {
+    private bool Export_HTML(string filename, List<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows, bool execute) {
         try {
             if (columnList == null || columnList.Count == 0) {
                 columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();

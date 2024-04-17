@@ -95,7 +95,7 @@ public sealed partial class Search : Form {
                 return;
             }
 
-            var ist1 = found.ReadableText().ToLowerInvariant();
+            var ist1 = found.ReadableText().ToLowerInvariant() + " (" + found.KeyName.ToLowerInvariant() + ")";
             if (!string.IsNullOrEmpty(ist1)) {
                 // Allgemeine Prüfung
                 if (ist1.Contains(searchT.ToLowerInvariant())) { break; }

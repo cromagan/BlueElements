@@ -687,14 +687,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Allinitialized = false;
     }
 
-    protected void StyleComboBox(ComboBox control, ICollection<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-        //if (control == null) {
-        //    if (removevalueIfNotExists) {
-        //        ValueSet(string.Empty, true, true);
-        //    }
-        //    return;
-        //}
-
+    protected void StyleComboBox(ComboBox control, IEnumerable<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
         control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.DropDownStyle = style;
@@ -702,7 +695,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (list != null) {
             control.ItemAddRange(list);
         }
-        //control.Item.Sort();
 
         if (removevalueIfNotExists) {
             if (control[Value] == null) {

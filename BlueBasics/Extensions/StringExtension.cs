@@ -43,7 +43,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public static ICollection<string> AllWords(this string input) {
+    public static List<string> AllWords(this string input) {
         input = " " + input + " ";
         var position = 0;
         var lastSeperator = 0;
@@ -718,7 +718,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="textToSplit"></param>
     /// <returns></returns>
-    public static ICollection<string> SplitByCrToList(this string textToSplit) {
+    public static List<string> SplitByCrToList(this string textToSplit) {
         List<string> w = [];
         if (string.IsNullOrEmpty(textToSplit)) { return w; }
         w.AddRange(textToSplit.SplitByCr());

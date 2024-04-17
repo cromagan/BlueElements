@@ -231,7 +231,7 @@ public class DatabaseMu : Database {
         }
     }
 
-    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<Database> db, DateTime fromUtc, DateTime toUtc) {
+    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime fromUtc, DateTime toUtc) {
         if (string.IsNullOrEmpty(FragmengtsPath())) { return new(); }
 
         if (!db.Any()) { return new(); }
