@@ -268,7 +268,7 @@ internal sealed partial class ColumnEditor {
             //    //}
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
-                if (!thisLinkedColumn.IsFirst() && thisLinkedColumn.Function.CanBeCheckedByRules() && !thisLinkedColumn.Function.NeedTargetDatabase()) {
+                if (thisLinkedColumn.Function.CanBeCheckedByRules() && !thisLinkedColumn.Function.NeedTargetDatabase()) {
                     cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
                 }
             }
