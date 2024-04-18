@@ -437,6 +437,11 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         result.ParseableAdd("Caption", _anzeige);
         result.ParseableAdd("Image", _image);
 
+        result.ParseableAdd("Arg1", _arg1);
+        result.ParseableAdd("Arg2", _arg2);
+        result.ParseableAdd("Arg3", _arg3);
+        result.ParseableAdd("Arg4", _arg4);
+
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
         result.ParseableAdd("Action", _action);
         return result.Parseable(base.ToString());

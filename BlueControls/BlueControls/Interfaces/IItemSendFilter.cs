@@ -123,9 +123,10 @@ public sealed class ItemSendSomething {
 
     public void DatabaseOutputSet(Database? value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
-        if (value == _databaseOutput) { return; }
+        if (value == DatabaseOutputGet()) { return; }
 
         _databaseOutput = value;
+        tempDatabaseNametoLoad = string.Empty;
         item.RaiseVersion();
         item.DoChilds();
         item.OnPropertyChanged();
@@ -173,7 +174,9 @@ public sealed class ItemSendSomething {
     public List<string> ParsableTags() {
         List<string> result = [];
 
-        result.ParseableAdd("OutputDatabase", _databaseOutput);
+
+
+        result.ParseableAdd("OutputDatabase", DatabaseOutputGet()); // Nicht _databaseOutput, weil sie evtl. noch nicht geladen ist
 
         result.ParseableAdd("SentToChildIds", _childIds, false);
 
