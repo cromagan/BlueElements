@@ -32,7 +32,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -53,6 +52,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     #region Fields
 
     public const string DatabaseVersion = "4.02";
+
     public static readonly ObservableCollection<Database> AllFiles = [];
 
     /// <summary>
@@ -66,7 +66,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
     private static List<Type>? _databaseTypes;
+
     private static bool _isInTimer;
+
     private static DateTime _lastTableCheck = new(1900, 1, 1);
 
     /// <summary>
@@ -80,29 +82,55 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
     private readonly List<ColumnViewCollection> _columnArrangements = [];
+
     private readonly List<string> _datenbankAdmin = [];
+
     private readonly List<DatabaseScriptDescription> _eventScript = [];
+
     private readonly List<string> _permissionGroupsNewRow = [];
+
     private readonly List<string> _tags = [];
+
     private readonly List<Variable> _variables = [];
+
     private string _additionalFilesPfad;
+
     private string _cachePfad = string.Empty;
+
     private string _canWriteError = string.Empty;
+
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+
     private string _caption = string.Empty;
+
     private Timer? _checker;
+
     private int _checkerTickCount = -5;
+
     private string _createDate;
+
     private string _creator;
+
+    private int _doingChanges = 0;
+
     private string _editNormalyError = string.Empty;
+
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+
     private string _eventScriptErrorMessage = string.Empty;
+
     private string _eventScriptTmp = string.Empty;
+
     private string _eventScriptVersion = string.Empty;
+
     private double _globalScale = 1f;
+
     private string _globalShowPass = string.Empty;
+
     private bool _isInSave;
+
     private bool _readOnly;
+
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -111,8 +139,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryDatabaseMasterTimeUtc = string.Empty;
+
     private string _temporaryDatabaseMasterUser = string.Empty;
+
     private string _variableTmp;
+
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
@@ -213,6 +244,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public static string DatabaseId => nameof(Database);
 
     public static int ExecutingFirstLvlScript { get; private set; } = 0;
+
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
@@ -282,6 +314,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty);
         }
     }
+
+    /// <summary>
+    /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemachte werden.
+    /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
+    /// </summary>
+    public int DoingChanges => _doingChanges;
 
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
@@ -3075,6 +3113,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
+            _doingChanges++;
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                     Undo.Add(thisWork);
@@ -3087,6 +3126,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Datenbank-Fehler: " + error + " " + thisWork.ToString());
                         //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
+                        _doingChanges--;
                         return;
                     }
 
@@ -3095,7 +3135,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (rowchanged != null && columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
-
+            _doingChanges--;
             IsInCache = toUtc;
             DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc);
             OnInvalidateView();

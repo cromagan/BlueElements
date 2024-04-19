@@ -1526,7 +1526,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             state ^= States.Standard_HasFocus;
         }
 
-        if (Database is not Database db || db.IsDisposed || DesignMode || ShowWaitScreen || _drawing) {
+        if (Database is not Database db || db.IsDisposed || DesignMode || ShowWaitScreen || _drawing || db.DoingChanges > 0) {
             DrawWaitScreen(gr);
             return;
         }
