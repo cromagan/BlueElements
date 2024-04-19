@@ -100,7 +100,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         var r = allFi.Rows;
 
         if (r.Count > 1) {
-            return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount.");
+            return new DoItFeedback(infos.Data, "RowUnique gescheiter, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
         }
 
         if (r.Count == 0) {

@@ -61,72 +61,72 @@ internal sealed partial class SearchAndReplace : Form {
         _table.SelectedCellChanged -= SelectedCellChanged;
     }
 
-    private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
+    private void AltNeu_TextChanged(object sender, System.EventArgs e) => Checkbuttons();
 
     private void Checkbuttons() {
         var canDo = true;
         if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
         if (!db.IsAdministrator()) { canDo = false; }
-        if (SucheNach.Checked) {
-            if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }
-            Alt.Enabled = true;
-            ErsetzeMit.Enabled = true;
-            NurinAktuellerSpalte.Enabled = true;
-        } else if (SucheExact.Checked) {
-            Alt.Enabled = true;
-            ErsetzeMit.Enabled = false;
-            if (ErsetzeMit.Checked) { canDo = false; }
-            NurinAktuellerSpalte.Enabled = true;
-        } else if (InhaltEgal.Checked) {
-            Alt.Enabled = false;
-            ErsetzeMit.Enabled = false;
-            NurinAktuellerSpalte.Enabled = false; // Zu Riskant
-            if (!NurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
-            if (ErsetzeMit.Checked) { canDo = false; }
+        if (optSucheNach.Checked) {
+            if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
+            txbAlt.Enabled = true;
+            optErsetzeMit.Enabled = true;
+            chkNurinAktuellerSpalte.Enabled = true;
+        } else if (optSucheExact.Checked) {
+            txbAlt.Enabled = true;
+            optErsetzeMit.Enabled = false;
+            if (optErsetzeMit.Checked) { canDo = false; }
+            chkNurinAktuellerSpalte.Enabled = true;
+        } else if (optInhaltEgal.Checked) {
+            txbAlt.Enabled = false;
+            optErsetzeMit.Enabled = false;
+            chkNurinAktuellerSpalte.Enabled = false; // Zu Riskant
+            if (!chkNurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
+            if (optErsetzeMit.Checked) { canDo = false; }
         } else {
             canDo = false;
         }
-        if (ErsetzeMit.Checked) { } else if (ErsetzeKomplett.Checked) {
-            NurinAktuellerSpalte.Enabled = false; // Zu Riskant
-            if (!NurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
-        } else if (FügeHinzu.Checked) {
-            if (string.IsNullOrEmpty(Neu.Text)) { canDo = false; }
+        if (optErsetzeMit.Checked) { } else if (optErsetzeKomplett.Checked) {
+            chkNurinAktuellerSpalte.Enabled = false; // Zu Riskant
+            if (!chkNurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
+        } else if (optFügeHinzu.Checked) {
+            if (string.IsNullOrEmpty(txbNeu.Text)) { canDo = false; }
         } else {
             canDo = true;
         }
-        if (NurinAktuellerSpalte.Checked) {
+        if (chkNurinAktuellerSpalte.Checked) {
             if (_table.CursorPosColumn == null) {
                 canDo = false;
             } else {
                 if (!_table.CursorPosColumn.Function.CanBeCheckedByRules()) { canDo = false; }
             }
         }
-        if (Alt.Text == Neu.Text) {
-            if (!InhaltEgal.Checked) { canDo = false; }
-            if (!ErsetzeKomplett.Checked) { canDo = false; }
+        if (txbAlt.Text == txbNeu.Text) {
+            if (!optInhaltEgal.Checked) { canDo = false; }
+            if (!optErsetzeKomplett.Checked) { canDo = false; }
         }
-        ers.Enabled = canDo;
+        btnAusfuehren.Enabled = canDo;
     }
 
     private void ers_Click(object sender, System.EventArgs e) {
         if (_isWorking) { return; }
-        var suchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
-        var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
+        var suchText = txbAlt.Text.Replace("\\r", "\r").Replace("\\t", "\t");
+        var ersetzText = txbNeu.Text.Replace("\\r", "\r").Replace("\\t", "\t");
         //db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
         if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
 
         List<ColumnItem> sp = [];
         List<RowItem> ro = [];
-        if (NurinAktuellerSpalte.Checked) {
+        if (chkNurinAktuellerSpalte.Checked) {
             if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
         } else {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
-            if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray())) {
+            if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray()) || _table.PinnedRows.Contains(thisRow)) {
                 if (db.Column.SysLocked is ColumnItem sl) {
-                    if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
+                    if (!chkAbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
                 }
             }
         }
@@ -141,20 +141,20 @@ internal sealed partial class SearchAndReplace : Form {
                 var trifft = false;
                 var originalText = thisRow.CellGetString(thiscolumn);
 
-                if (SucheNach.Checked) {
+                if (optSucheNach.Checked) {
                     trifft = originalText.Contains(suchText);
-                } else if (SucheExact.Checked) {
+                } else if (optSucheExact.Checked) {
                     trifft = originalText == suchText;
-                } else if (InhaltEgal.Checked) {
+                } else if (optInhaltEgal.Checked) {
                     trifft = true;
                 }
 
                 if (trifft) {
-                    if (ErsetzeMit.Checked) {
+                    if (optErsetzeMit.Checked) {
                         geändeterText = originalText.Replace(suchText, ersetzText);
-                    } else if (ErsetzeKomplett.Checked) {
+                    } else if (optErsetzeKomplett.Checked) {
                         geändeterText = ersetzText;
-                    } else if (FügeHinzu.Checked) {
+                    } else if (optFügeHinzu.Checked) {
                         List<string> tmp = [.. originalText.SplitAndCutByCr(), ersetzText];
                         geändeterText = tmp.SortedDistinctList().JoinWithCr();
                     }
@@ -174,7 +174,7 @@ internal sealed partial class SearchAndReplace : Form {
     }
 
     private void SelectedCellChanged(object sender, CellExtEventArgs e) {
-        NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
+        chkNurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
             : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
         Checkbuttons();
     }
