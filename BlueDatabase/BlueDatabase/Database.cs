@@ -2010,7 +2010,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
                                       not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 and
                                       not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
-                                      not ColumnFunction.Button) {
+                                      not ColumnFunction.Button and
+                                      not ColumnFunction.Virtelle_Spalte) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
                     Column.Remove(thisColumn, "Automatische Optimierung");
@@ -2962,8 +2963,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
 
-        foreach (var thisR in db.Row) {
-            SaveToByteList(l, c, thisR);
+        if (c.Function != ColumnFunction.Virtelle_Spalte) {
+            foreach (var thisR in db.Row) {
+                SaveToByteList(l, c, thisR);
+            }
         }
     }
 

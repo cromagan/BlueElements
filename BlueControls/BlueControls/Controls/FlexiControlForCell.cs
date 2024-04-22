@@ -673,6 +673,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
 
         switch (column.Function) {
+            case ColumnFunction.Virtelle_Spalte:
+                break;
+
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                 _ = GetRealColumn(column, row);

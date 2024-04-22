@@ -176,7 +176,7 @@ public class DatabaseMu : Database {
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
         if (ChangesNotIncluded.Any() && AmITemporaryMaster(5, 55)) {
-            if (files.Count > 10 || ChangesNotIncluded.Count > 50) {
+            if (files.Count > 10 || ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUTCDate).TotalHours > 12) {
                 //var tmp = _fileStateUTCDate;
 
                 //_fileStateUTCDate = IsInCache;

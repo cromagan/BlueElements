@@ -403,6 +403,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
+        if (column.Function == ColumnFunction.Virtelle_Spalte) { return; }
+
         if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, true, false);
             if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
@@ -2152,6 +2154,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
         if (cellInThisDatabaseColumn == null) { return; } // Dummy prüfung
+        if (cellInThisDatabaseColumn.Function == ColumnFunction.Virtelle_Spalte) { return; }
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 

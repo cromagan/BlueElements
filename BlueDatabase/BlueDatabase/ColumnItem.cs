@@ -992,6 +992,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return value; }
 
         if (IsSystemColumn()) { return value; }
+        if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
 
         if (exitifLinkedFormat) {
             if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
@@ -1292,7 +1293,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             if (!string.IsNullOrEmpty(_linkedCell_ColumnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }
 
-        if (!_function.Autofilter_möglich() && _filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
+        if (!_function.Autofilter_möglich()) {
+            if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
+            if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
+        }
         if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
@@ -1302,6 +1306,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             }
         }
         switch (_function) {
+            case ColumnFunction.Virtelle_Spalte:
+                if (_showUndo) { return "Virtuelle Spalten unterstützen kein Undo."; }
+                if (_scriptType is not ScriptType.Nicht_vorhanden) {
+                    return "Virtuelle Spalten können im Skript nicht verwendet werden.";
+                }
+
+                break;
+
             case ColumnFunction.RelationText:
                 if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewählt werden."; }
                 //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
@@ -1899,6 +1911,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (_function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { return QuickImage.Get(ImageCode.Fernglas, 16); }
         if (_function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return QuickImage.Get(ImageCode.Fernglas, 16); }
 
+        if (_function == ColumnFunction.Virtelle_Spalte) { return QuickImage.Get(ImageCode.Tabelle, 16); }
+
         foreach (var thisFormat in FormatHolder.AllFormats) {
             if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.Image; }
         }
@@ -1960,6 +1974,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
     //            break;
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
         switch (_function) {
+            case ColumnFunction.Virtelle_Spalte:
+                if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
+                return false;
+
             case ColumnFunction.Normal:
             case ColumnFunction.RelationText:
                 if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
@@ -2362,6 +2380,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 return EditTypeTable.None;
 
             case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
+                return EditTypeTable.None;
+
+            case ColumnFunction.Virtelle_Spalte:
                 return EditTypeTable.None;
 
             default:

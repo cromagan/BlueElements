@@ -136,6 +136,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row != null && row.IsDisposed) { return "Die Zeile wurde verworfen."; }
 
+        if (column.Function == ColumnFunction.Virtelle_Spalte) { return "Virtuelle Spalten können nicht bearbeitet werden."; }
+
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -607,6 +609,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row == null || row.IsDisposed) { return "Zeile ungültig!"; }
 
+        if (column.Function == ColumnFunction.Virtelle_Spalte) { return "Virtuelle Spalte!"; }
+
         if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
 
         if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
@@ -659,6 +663,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="reason"></param>
     public string SetValueInternal(ColumnItem column, RowItem row, string value, Reason reason) {
         var tries = 0;
+
+        if (column.Function == ColumnFunction.Virtelle_Spalte) { return string.Empty; }
 
         while (true) {
             if (IsDisposed || column.Database is not Database db || db.IsDisposed) { return "Datenbank ungültig"; }
