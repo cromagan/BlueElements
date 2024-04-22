@@ -2452,8 +2452,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (type.IsCellValue()) {
             if (column?.Database is not Database db || db.IsDisposed) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
-                return ("Wert nicht gesetzt!", null, null);
+                //Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
+                return (string.Empty, column, row);
             }
 
             if (row == null) {
