@@ -2359,9 +2359,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
 
-    protected virtual bool MasterPossible() {
+    protected virtual bool NewMasterPossible() {
         if (ReadOnly) { return false; }
         if (!MultiUser) { return false; }
+
+        if (DateTimeTryParse(TemporaryDatabaseMasterTimeUtc, out var c)) {
+            if (DateTime.UtcNow.Subtract(c).TotalMinutes < 60) { return false; }
+        }
+
         if (!IsAdministrator()) { return false; }
         if (!IsRowScriptPossible(true)) { return false; }
 
@@ -2673,7 +2678,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (AmITemporaryMaster(0, 60)) { return; }
 
-        if (!MasterPossible()) { return; }
+        if (!NewMasterPossible()) { return; }
 
         RowCollection.WaitDelay = 0;
         TemporaryDatabaseMasterUser = MyMasterCode;

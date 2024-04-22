@@ -57,6 +57,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     private ButtonArgs _enabledwhenrows;
     private ExtText? _eTxt;
     private string _image = string.Empty;
+    private string _quickinfo = string.Empty;
 
     #endregion
 
@@ -150,6 +151,17 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_image == value) { return; }
             _image = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [Description("Eine Information, die dem Benutzer angezeigt wird,\r\nwenn er mit der Maus über den Knopf fährt..")]
+    public string ButtonQuickInfo {
+        get => _quickinfo;
+        set {
+            if (IsDisposed) { return; }
+            if (_quickinfo == value) { return; }
+            _quickinfo = value;
             OnPropertyChanged();
         }
     }
@@ -270,7 +282,8 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             Arg2 = _arg2,
             Arg3 = _arg3,
             Arg4 = _arg4,
-            Action = _action
+            Action = _action,
+            QuickInfo = ButtonQuickInfo
         };
 
         con.DoInputSettings(parent, this);
@@ -353,6 +366,8 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
         }
 
+        l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
+
         l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
@@ -392,6 +407,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
             case "arg4":
                 _arg4 = value.FromNonCritical();
+                return true;
+
+            case "quickinfo":
+                _quickinfo = value.FromNonCritical();
                 return true;
 
             case "enablewhenrows":
@@ -442,6 +461,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         result.ParseableAdd("Arg3", _arg3);
         result.ParseableAdd("Arg4", _arg4);
 
+        result.ParseableAdd("QuickInfo", _quickinfo);
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
         result.ParseableAdd("Action", _action);
         return result.Parseable(base.ToString());

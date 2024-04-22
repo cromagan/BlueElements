@@ -329,7 +329,20 @@ public class DatabaseMu : Database {
         return oo;
     }
 
-    protected override bool MasterPossible() => _hasManyFragments && base.MasterPossible();
+    protected override bool NewMasterPossible() {
+        if (!base.NewMasterPossible()) { return false; }
+
+        if (_hasManyFragments) { return true; }
+        if (DateTime.UtcNow.Subtract(FileStateUTCDate).TotalDays > 3) { return true; } // Letze Komplettierung
+
+        if (DateTimeTryParse(TemporaryDatabaseMasterTimeUtc, out var c)) {
+            if (DateTime.UtcNow.Subtract(c).TotalDays > 1) { return true; }
+        } else {
+            return true;
+        }
+
+        return false;
+    }
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);

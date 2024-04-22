@@ -85,9 +85,9 @@ public partial class MessageBox : Form {
 
     public static void Show(string txt) => Show(txt, null, true, "OK");
 
-    public static void Show(string txt, ImageCode pic, string buttons) => Show(txt, pic, true, buttons);
+    public static void Show(string txt, ImageCode? pic, string buttons) => Show(txt, pic, true, buttons);
 
-    public static int Show(string txt, ImageCode pic, params string[] buttons) => Show(txt, pic, true, buttons);
+    public static int Show(string txt, ImageCode? pic, params string[] buttons) => Show(txt, pic, true, buttons);
 
     public static int Show(string txt, ImageCode? pic, bool dialog, params string[] buttons) {
         MessageBox mb = new(txt, pic, buttons);
