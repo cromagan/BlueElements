@@ -67,7 +67,7 @@ public class Method_LookupFilterFirstValue : Method {
             return new DoItFeedback(l);
         }
 
-        var v = RowItem.CellToVariable(returncolumn, r[0], true);
+        var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
         if (v == null) { return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden"); }
 
         if (v is VariableListString vl) {

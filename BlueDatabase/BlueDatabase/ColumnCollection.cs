@@ -460,7 +460,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
 
-            if (reason is not Reason.InitialLoad and not Reason.UpdateChanges) {
+            if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
                 // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
                 Database.RepairColumnArrangements(reason);
             }
@@ -476,7 +476,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
-            if (reason is not Reason.InitialLoad and not Reason.UpdateChanges) {
+            if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
                 // Wichtig! Nicht bei LoadReload, da werden evtl. noch weitere Spalten modifiziert
 
                 Database.RepairColumnArrangements(reason);

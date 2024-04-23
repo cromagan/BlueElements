@@ -73,7 +73,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf"); }
 
-        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
 
         #region Attributliste erzeugen
 
@@ -84,7 +84,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         #endregion
 
-        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, a, true, true);
+        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
 
         if (!f.AllOk) {
             return new DoItFeedback(infos.Data, f.ProtocolText);

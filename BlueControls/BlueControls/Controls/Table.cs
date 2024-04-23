@@ -403,7 +403,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
-        if (column.Function == ColumnFunction.Virtelle_Spalte) { return; }
+        if (column.Function == ColumnFunction.Virtuelle_Spalte) { return; }
 
         if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, true, false);
@@ -2154,7 +2154,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
         if (cellInThisDatabaseColumn == null) { return; } // Dummy prüfung
-        if (cellInThisDatabaseColumn.Function == ColumnFunction.Virtelle_Spalte) { return; }
+        if (cellInThisDatabaseColumn.Function == ColumnFunction.Virtuelle_Spalte) { return; }
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
@@ -2919,6 +2919,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                             }
                         }
                         break;
+
+                    case ColumnFunction.Virtuelle_Spalte:
+                        cellInThisDatabaseRow.CheckRowDataIfNeeded();
+                        var toDrawd2 = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
+                        Draw_CellTransparentDirect(gr, toDrawd2, ShortenStyle.Replaced, cellrectangle, _cellFont, cellInThisDatabaseColumn, _pix16, cellInThisDatabaseColumn.BehaviorOfImageAndText, state, db.GlobalScale);
+                        break;
+
 
                     default:
                         var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);

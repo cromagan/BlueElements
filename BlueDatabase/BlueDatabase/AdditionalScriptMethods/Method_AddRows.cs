@@ -72,7 +72,7 @@ public class Method_AddRows : Method_Database {
             return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf");
         }
 
-        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
         foreach (var thisKey in keys) {
             if (db.Row[thisKey] is null) {

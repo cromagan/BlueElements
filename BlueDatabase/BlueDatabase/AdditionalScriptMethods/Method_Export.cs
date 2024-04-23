@@ -118,7 +118,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         #endregion
 
-        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
         try {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {

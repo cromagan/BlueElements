@@ -123,9 +123,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly) {
+    public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly, bool virtualcolumns) {
         if (column == null) { return null; }
         if (column.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { return null; }
+
+        if (column.Function == ColumnFunction.Virtuelle_Spalte) {
+            if (!virtualcolumns) { return null; }
+            mustbeReadOnly = false;
+        }
 
         if (!column.Function.CanBeCheckedByRules()) { return null; }
         //if (!column.SaveContent) { return null; }
@@ -400,17 +405,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="scriptname"></param>
     /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
-    /// <param name="changevalues"></param>
+    /// <param name="produktivphase"></param>
     /// <param name="tryforsceonds"></param>
     /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, float tryforsceonds, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
-            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues, attributes, wichtigerProzess, dbVariables);
+            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, produktivphase, attributes, wichtigerProzess, dbVariables);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -648,7 +653,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
+    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not Database db || db.IsDisposed) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
@@ -656,7 +661,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        var script = db.ExecuteScript(eventname, scriptname, changevalues, this, attributes, wichtigerProzess, dbVariables);
+        var script = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, wichtigerProzess, dbVariables);
 
         if (!script.AllOk) {
             //db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));
@@ -667,7 +672,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\nZeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
-        if (changevalues && db.Column.SysRowState is ColumnItem srs) {
+        // Nicht ganz optimal, da ein Script ebenfalls den Flag changevalues hat. Aber hier wird nur auf den Flag eingenangen, ob es eine Testroutine ist oder nicht
+        if (eventname is ScriptEventTypes.prepare_formula or ScriptEventTypes.value_changed_extra_thread or ScriptEventTypes.export) { return new ScriptEndedFeedback(string.Empty, false, false, "Allgemein"); }
+
+        if (!produktivphase) { return new ScriptEndedFeedback(string.Empty, false, false, "Allgemein"); }
+
+        if (db.Column.SysRowState is ColumnItem srs) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             DoRowAutomaticEventArgs e = new(this);
             OnDoSpecialRules(e);
@@ -681,8 +691,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
         }
-
-        if (!changevalues) { return new ScriptEndedFeedback(string.Empty, false, false, "Allgemein"); }
 
         // checkPerformed geht von Dateisystemfehlern aus
 
@@ -749,13 +757,22 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             // Tatsächlichen String ermitteln --------------------------------------------
             var txt = string.Empty;
 
-            if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-                var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
-                if (columnItem != null && rowItem != null) {
-                    txt = rowItem.CellGetString(columnItem);
-                }
-            } else {
-                txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
+            switch (column.Function) {
+                case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+                    var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
+                    if (columnItem != null && rowItem != null) {
+                        txt = rowItem.CellGetString(columnItem);
+                    }
+                    break;
+
+                case ColumnFunction.Virtuelle_Spalte:
+                    CheckRowDataIfNeeded();
+                    txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
+                    break;
+
+                default:
+                    txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
+                    break;
             }
 
             if (typ.HasFlag(FilterType.Instr) && column != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }

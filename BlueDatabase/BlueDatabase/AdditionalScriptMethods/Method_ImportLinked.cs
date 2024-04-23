@@ -78,15 +78,15 @@ public class Method_ImportLinked : Method_Database {
             var rows = fc.Rows;
             if (rows.Count > 1) { return new DoItFeedback(infos.Data, "Suchergebnis liefert mehrere Ergebnisse."); }
 
-             var v = RowItem.CellToVariable(targetColumn,null, true);
+            var v = RowItem.CellToVariable(targetColumn, null, true, false);
 
             if (rows.Count == 1) {
-                 v = RowItem.CellToVariable(targetColumn, rows[0], true);
+                v = RowItem.CellToVariable(targetColumn, rows[0], true, false);
             }
-  if (v == null) { v = new VariableUnknown("xxx"); }
+            if (v == null) { v = new VariableUnknown("xxx"); }
             v.KeyName = "Linked_" + thisColumn.KeyName;
-                v.Comment = t;
-                varCol.Add(v);
+            v.Comment = t;
+            varCol.Add(v);
         }
 
         return DoItFeedback.Null();

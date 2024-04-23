@@ -1204,7 +1204,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled, bool dbVariables) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled, bool dbVariables, bool virtualcolumns) {
 
         #region Variablen für Skript erstellen
 
@@ -1212,7 +1212,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (row != null && !row.IsDisposed) {
             foreach (var thisCol in Column) {
-                var v = RowItem.CellToVariable(thisCol, row, allReadOnly);
+                var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
                 if (v != null) { vars.Add(v); }
             }
         }
@@ -1344,7 +1344,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool produktivphase, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
         if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, s.KeyName); }
 
@@ -1365,32 +1365,36 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            var vars = CreateVariableCollection(row, false, s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), dbVariables);
+            var prepf = true;
 
             #region  Erlaubte Methoden ermitteln
 
             var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
+
             if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
                 allowedMethods |= MethodType.IO;
                 allowedMethods |= MethodType.NeedLongTime;
+                prepf = false;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
+                !prepf &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
 
-            if (changevalues) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }
+            if (s.ChangeValues && produktivphase) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }
 
             #endregion
 
+            var vars = CreateVariableCollection(row, prepf, prepf, dbVariables, prepf);
+
             #region Script ausführen
 
-            var scp = new ScriptProperties(s.KeyName, allowedMethods, changevalues, s.Attributes(), addinfo);
+            var scp = new ScriptProperties(s.KeyName, allowedMethods, produktivphase, s.Attributes(), addinfo);
 
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
@@ -1399,32 +1403,50 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #endregion
 
-            #region Variablen zurückschreiben und Special Rules ausführen
+            #region Fehlerprüfungen
 
-            if (sc.Properties.ChangeValues && changevalues && scf.AllOk) {
+            if (!scf.AllOk) {
+                if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+                return new ScriptEndedFeedback("Skript Fehler", false, false, s.KeyName);
+            }
+
+            if (row != null) {
+                if (row.IsDisposed) {
+                    if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+                    return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, s.KeyName);
+                }
+
+                if (Column.SysRowChangeDate is null) {
+                    if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
+                }
+
+                if (row.RowStamp() != rowstamp) {
+                    if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.KeyName);
+                }
+            }
+
+            if (!produktivphase) {
+                if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+                return scf;
+            }
+
+            #endregion
+
+            #region Variablen zurückschreiben
+
+            if (prepf || s.ChangeValues) {
                 if (row != null && !row.IsDisposed) {
-                    if (Column.SysRowChangeDate is null) {
-                        if (wichtigerProzess) { ExecutingFirstLvlScript--; }
-                        return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
-                    }
-
-                    if (row.RowStamp() != rowstamp) {
-                        if (wichtigerProzess) { ExecutingFirstLvlScript--; }
-                        return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.KeyName);
-                    }
-
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars, s.KeyName);
                     }
                 }
-
-                if (dbVariables) {
-                    Variables = VariableCollection.Combine(Variables, vars, "DB_");
-                }
             }
 
-            if (!scf.AllOk) {
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+            if (dbVariables && s.ChangeValues) {
+                Variables = VariableCollection.Combine(Variables, vars, "DB_");
             }
 
             #endregion
@@ -1434,11 +1456,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         } catch {
             Develop.CheckStackForOverflow();
             if (wichtigerProzess) { ExecutingFirstLvlScript--; }
-            return ExecuteScript(s, changevalues, row, attributes, wichtigerProzess, dbVariables);
+            return ExecuteScript(s, produktivphase, row, attributes, wichtigerProzess, dbVariables);
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
@@ -1457,7 +1479,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, false, "Allgemein"); }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
@@ -1466,7 +1488,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     // Script nicht definiert. Macht nix. ist eben keines gewünscht
 
                     if (eventname == ScriptEventTypes.export) {
-                        var vars = CreateVariableCollection(row, false, false, dbVariables);
+                        var vars = CreateVariableCollection(row, false, false, dbVariables, true);
                         return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true);
                     }
 
@@ -1486,12 +1508,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #endregion
 
-            if (!script.ChangeValues) { changevalues = false; }
-
-            return ExecuteScript(script, changevalues, row, attributes, wichtigerProzess, dbVariables);
+            return ExecuteScript(script, produktivphase, row, attributes, wichtigerProzess, dbVariables);
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(eventname, scriptname, changevalues, row, attributes, wichtigerProzess, dbVariables);
+            return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, wichtigerProzess, dbVariables);
         }
     }
 
@@ -2011,7 +2031,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                       not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 and
                                       not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
                                       not ColumnFunction.Button and
-                                      not ColumnFunction.Virtelle_Spalte) {
+                                      not ColumnFunction.Virtuelle_Spalte) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
                     Column.Remove(thisColumn, "Automatische Optimierung");
@@ -2224,7 +2244,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    if (!isLoading) { Variables = new VariableCollection(_variables); }
     //}
     internal void RefreshCellData(ColumnItem column, RowItem row, Reason reason) {
-        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) { return; }
+        if (reason is Reason.NoUndo_NoInvalidate or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) { return; }
 
         if (column.IsInCache != null || row.IsInCache != null) { return; }
 
@@ -2248,7 +2268,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ColumnViewCollection.Repair(x[z], z);
         }
 
-        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) {
+        if (reason is Reason.NoUndo_NoInvalidate or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) {
+            if (_columnArrangements.ToString(false) == x.ToString(false)) { return; }
             SetValueInternal(DatabaseDataType.ColumnArrangement, null, null, x.ToString(false), UserName, DateTime.UtcNow, reason);
         } else {
             ColumnArrangements = x.AsReadOnly();
@@ -2445,7 +2466,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected (string Error, ColumnItem? Columnchanged, RowItem? Rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return ("Datenbank verworfen!", null, null); }
-        if ((reason is not Reason.InitialLoad and not Reason.UpdateChanges) && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
+        if ((reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
         if (type.IsObsolete()) { return (string.Empty, null, null); }
 
         LastChange = DateTime.UtcNow;
@@ -2963,7 +2984,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
 
-        if (c.Function != ColumnFunction.Virtelle_Spalte) {
+        if (c.Function != ColumnFunction.Virtuelle_Spalte) {
             foreach (var thisR in db.Row) {
                 SaveToByteList(l, c, thisR);
             }
@@ -3248,7 +3269,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.SearchByKey(rowKey);
                         if (row == null || row.IsDisposed) {
-                            _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.InitialLoad);
+                            _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate);
                             row = Row.SearchByKey(rowKey);
                         }
 
@@ -3288,7 +3309,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                 Develop.DebugPrint(command + " an erster Stelle!");
                             }
 
-                            _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
+                            _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
                             column = Column[columname];
                         }
 
@@ -3325,7 +3346,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         break;
                     }
 
-                    var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.InitialLoad);
+                    var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
                     if (!string.IsNullOrEmpty(fehler.Error)) {
                         Freeze("Datenbank-Ladefehler");
                         Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
@@ -3345,7 +3366,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, Reason.InitialLoad);
+                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, Reason.NoUndo_NoInvalidate);
                 //_ = SetValueInternal(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
             }
         }

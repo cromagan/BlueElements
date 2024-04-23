@@ -515,6 +515,7 @@ public static class Export {
             if (thisRow != null && !thisRow.IsDisposed) {
                 var tmpBody = body;
 
+                thisRow.CheckRowDataIfNeeded(); // Virtuelle Spalten
                 var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null, true, true);
 
                 if (!script.AllOk) {

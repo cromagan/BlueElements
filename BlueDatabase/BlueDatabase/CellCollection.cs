@@ -136,7 +136,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row != null && row.IsDisposed) { return "Die Zeile wurde verworfen."; }
 
-        if (column.Function == ColumnFunction.Virtelle_Spalte) { return "Virtuelle Spalten können nicht bearbeitet werden."; }
+        if (column.Function == ColumnFunction.Virtuelle_Spalte) { return "Virtuelle Spalten können nicht bearbeitet werden."; }
 
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -531,11 +531,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public void DoSystemColumns(Database db, ColumnItem column, RowItem row, string user, DateTime datetimeutc, Reason reason) {
-        if (reason == Reason.InitialLoad) { return; }
+        if (reason == Reason.NoUndo_NoInvalidate) { return; }
 
         // Die unterschiedlichen Reasons in der Routine beachten!
-        if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.SystemSet); }
-        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString5(), Reason.SystemSet); }
+        if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.NoUndo_NoInvalidate); }
+        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
             if (db.Column.SysRowState is ColumnItem srs && srs != column) {
@@ -609,7 +609,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row == null || row.IsDisposed) { return "Zeile ungültig!"; }
 
-        if (column.Function == ColumnFunction.Virtelle_Spalte) { return "Virtuelle Spalte!"; }
+        if (column.Function == ColumnFunction.Virtuelle_Spalte) {
+            return SetValueInternal(column, row, value, Reason.NoUndo_NoInvalidate);
+        }
 
         if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
 
@@ -664,8 +666,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public string SetValueInternal(ColumnItem column, RowItem row, string value, Reason reason) {
         var tries = 0;
 
-        if (column.Function == ColumnFunction.Virtelle_Spalte) { return string.Empty; }
-
         while (true) {
             if (IsDisposed || column.Database is not Database db || db.IsDisposed) { return "Datenbank ungültig"; }
             if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
@@ -697,8 +697,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     if (column.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
                         row.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 2, null, true, true);
                     }
-
-                    //Database?.Row.AddRowWithChangedValue(row);
                 }
             }
 

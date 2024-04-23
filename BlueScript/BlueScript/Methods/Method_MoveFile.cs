@@ -81,7 +81,7 @@ internal class Method_MoveFile : Method, IUseableForButton {
             return new DoItFeedback(infos.Data, "Zieldatei existiert bereits.");
         }
 
-        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveFile(sop, dep, false)) {
             return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");

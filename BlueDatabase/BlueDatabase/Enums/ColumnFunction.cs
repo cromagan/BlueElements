@@ -74,7 +74,7 @@ public enum ColumnFunction {
 
     Verknüpfung_zu_anderer_Datenbank2 = 82,
 
-    Virtelle_Spalte = 83
+    Virtuelle_Spalte = 83
 
     // bis 999 wird geprüft
 }
@@ -88,15 +88,17 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                     or ColumnFunction.RelationText
-                                                                                    or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
+                                                                                    or ColumnFunction.Schlüsselspalte_NurDatenprüfung or ColumnFunction.Virtuelle_Spalte;
 
     public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                     or ColumnFunction.RelationText;
+                                                                                     or ColumnFunction.RelationText
+                                                                                     or ColumnFunction.Virtuelle_Spalte;
 
     public static bool CanBeCheckedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                     or ColumnFunction.Schlüsselspalte_NurDatenprüfung;
+                                                                                     or ColumnFunction.Schlüsselspalte_NurDatenprüfung
+                                                                                     or ColumnFunction.Virtuelle_Spalte;
 
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                       or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
@@ -118,13 +120,13 @@ public static class ColumnFunctionExtensions {
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte_NurDatenprüfung
-                                                                                     or ColumnFunction.Virtelle_Spalte;
+                                                                                     or ColumnFunction.Virtuelle_Spalte;
 
     public static bool MultilinePossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                    or ColumnFunction.RelationText
                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
-                                                                                   or ColumnFunction.Virtelle_Spalte;
+                                                                                   or ColumnFunction.Virtuelle_Spalte;
 
     public static bool NeedTargetDatabase(this ColumnFunction function) => function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2

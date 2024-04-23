@@ -992,7 +992,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return value; }
 
         if (IsSystemColumn()) { return value; }
-        if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
+        //if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
 
         if (exitifLinkedFormat) {
             if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
@@ -1001,7 +1001,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
 
         if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
+
         if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
+
         if (_afterEditAutoReplace.Count > 0) {
             List<string> l = [.. value.SplitAndCutByCr()];
             foreach (var thisar in _afterEditAutoReplace) {
@@ -1023,11 +1025,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             }
             value = l.JoinWithCr();
         }
+
         if (_afterEditAutoCorrect) { value = KleineFehlerCorrect(value); }
+
         if (_roundAfterEdit > -1 && DoubleTryParse(value, out var erg)) {
             erg = Math.Round(erg, _roundAfterEdit, MidpointRounding.AwayFromZero);
             value = erg.ToStringFloat();
         }
+
         if (_afterEditQuickSortRemoveDouble) {
             var l = new List<string>(value.SplitAndCutByCr()).SortedDistinctList();
             value = l.JoinWithCr();
@@ -1232,6 +1237,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
             if (thisRowItem != null) {
+                if (_function == ColumnFunction.Virtuelle_Spalte) { thisRowItem.CheckRowDataIfNeeded(); }
+
                 if (_multiLine) {
                     list.AddRange(thisRowItem.CellGetList(this));
                 } else {
@@ -1306,11 +1313,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             }
         }
         switch (_function) {
-            case ColumnFunction.Virtelle_Spalte:
+            case ColumnFunction.Virtuelle_Spalte:
                 if (_showUndo) { return "Virtuelle Spalten unterstützen kein Undo."; }
-                if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                    return "Virtuelle Spalten können im Skript nicht verwendet werden.";
+                if (_fixedColumnWidth < 16) { return "Virtuelle Spalten brauchen eine feste Spaltenbreite."; }
+                if (_scriptType is not ScriptType.Bool and not ScriptType.String and not ScriptType.Numeral and not ScriptType.List) {
+                    return "Virtuelle Spalten müssen im Skript gesetzt werden und deswegen vorhanden sein.";
                 }
+                if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
+                if (!db.HasPrepareFormulaCheckScript()) { return "Für virtuelle Spalten zuerst das Skript 'Formular Vorbereiten' erstellen."; }
 
                 break;
 
@@ -1911,7 +1921,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (_function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { return QuickImage.Get(ImageCode.Fernglas, 16); }
         if (_function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return QuickImage.Get(ImageCode.Fernglas, 16); }
 
-        if (_function == ColumnFunction.Virtelle_Spalte) { return QuickImage.Get(ImageCode.Tabelle, 16); }
+        if (_function == ColumnFunction.Virtuelle_Spalte) { return QuickImage.Get(ImageCode.Tabelle, 16); }
 
         foreach (var thisFormat in FormatHolder.AllFormats) {
             if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.Image; }
@@ -1974,7 +1984,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
     //            break;
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
         switch (_function) {
-            case ColumnFunction.Virtelle_Spalte:
+            case ColumnFunction.Virtuelle_Spalte:
                 if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
                 return false;
 
@@ -2382,7 +2392,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
                 return EditTypeTable.None;
 
-            case ColumnFunction.Virtelle_Spalte:
+            case ColumnFunction.Virtuelle_Spalte:
                 return EditTypeTable.None;
 
             default:

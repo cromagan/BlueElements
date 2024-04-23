@@ -25,7 +25,12 @@ namespace BlueBasics.Enums;
 public enum ScriptEventTypes {
     new_row = 1,
     value_changed = 2,
+
+    /// <summary>
+    /// Berechnet die Fehler, Variablen für das Formular und Virtuelle Spalten
+    /// </summary>
     prepare_formula = 4,
+
     value_changed_extra_thread = 8,
     loaded = 16,
     export = 32,

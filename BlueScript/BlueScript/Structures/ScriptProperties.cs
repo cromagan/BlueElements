@@ -19,6 +19,7 @@
 
 using BlueScript.Enums;
 using System.Collections.Generic;
+using System.Runtime;
 
 namespace BlueScript.Structures;
 
@@ -28,22 +29,22 @@ public class ScriptProperties {
 
     public ScriptProperties() : this(string.Empty, MethodType.Standard, false, [], null) { }
 
-    public ScriptProperties(string scriptname, MethodType allowedMethods, bool changeValues, List<string> scriptAttributes, object? additionalInfo) {
+    public ScriptProperties(string scriptname, MethodType allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
-        ChangeValues = changeValues;
+        ProduktivPhase = produktivphase;
         ScriptAttributes = scriptAttributes;
         AdditionalInfo = additionalInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ChangeValues, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo) { }
+    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo) { }
 
     #endregion
 
     #region Properties
 
     public object? AdditionalInfo { get; }
-    public bool ChangeValues { get; }
+    public bool ProduktivPhase { get; }
 
     /// <summary>
     /// Diese Attriute muss das nachfolgende Script mindestens erfüllen

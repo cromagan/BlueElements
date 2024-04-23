@@ -21,8 +21,14 @@ namespace BlueDatabase.Enums;
 
 public enum Reason {
     SetCommand = 0,
-    InitialLoad = 1,
-    SystemSet = 1, // Ebenfalls ein, soll sehr sanft behandelt werden.
+
+    /// <summary>
+    /// Es werden keine Werte invalidiert. Kein undo geloggt. und auch keine Repairs oder Skripte ausgeführt.
+    /// Allerdings wird der Freeze-State umgangen. Z.B. um eine Datenbank laden zu können
+    /// Wird benutzt beim Laden einer Datenbank, beim Systemspalten befüllen, oder virtuelle Spalten zu befüllen
+    /// </summary>
+    NoUndo_NoInvalidate = 1,
+
     UpdateChanges = 2,
     AdditionalWorkAfterCommand = 3
 }

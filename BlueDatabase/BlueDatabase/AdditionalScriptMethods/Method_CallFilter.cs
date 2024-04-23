@@ -87,7 +87,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
         foreach (var thisR in r) {
             if (thisR != null && !thisR.IsDisposed) {
                 //s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ChangeValues, 0, a, true, false);
+                var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ProduktivPhase, 0, a, true, false);
                 if (!s2.AllOk) {
                     infos.Data.Protocol.AddRange(s2.Protocol);
                     return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");

@@ -77,7 +77,7 @@ public class Method_AddRow : Method_Database {
             }
         }
 
-        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
         var r = db.Row.GenerateAndAdd(db.NextRowKey(), attvar.ValueStringGet(1), null, true, "Script-Befehl: 'AddRow' von " + mydb.Caption);
 

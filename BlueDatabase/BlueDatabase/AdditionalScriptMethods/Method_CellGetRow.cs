@@ -56,7 +56,7 @@ public class Method_CellGetRow : BlueScript.Methods.Method {
 
         if (db.Column[attvar.ValueStringGet(0)] is not ColumnItem c) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
-        var v = RowItem.CellToVariable(c, row, true);
+        var v = RowItem.CellToVariable(c, row, true, false);
         if (v == null) {
             return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
         }
