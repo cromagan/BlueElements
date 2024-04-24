@@ -1408,7 +1408,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (!scf.AllOk) {
                 if (wichtigerProzess) { ExecutingFirstLvlScript--; }
                 OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
-                return new ScriptEndedFeedback("Skript Fehler", false, false, s.KeyName);
+                return scf;
             }
 
             if (row != null) {

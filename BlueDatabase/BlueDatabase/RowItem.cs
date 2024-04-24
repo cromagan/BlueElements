@@ -673,9 +673,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         // Nicht ganz optimal, da ein Script ebenfalls den Flag changevalues hat. Aber hier wird nur auf den Flag eingenangen, ob es eine Testroutine ist oder nicht
-        if (eventname is ScriptEventTypes.prepare_formula or ScriptEventTypes.value_changed_extra_thread or ScriptEventTypes.export) { return new ScriptEndedFeedback(string.Empty, false, false, "Allgemein"); }
+        if (eventname is ScriptEventTypes.prepare_formula or ScriptEventTypes.value_changed_extra_thread or ScriptEventTypes.export) { return script; }
 
-        if (!produktivphase) { return new ScriptEndedFeedback(string.Empty, false, false, "Allgemein"); }
+        if (!produktivphase) { return script; }
 
         if (db.Column.SysRowState is ColumnItem srs) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe

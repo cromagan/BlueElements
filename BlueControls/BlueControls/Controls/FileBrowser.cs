@@ -205,10 +205,18 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
         var ct = string.Empty;
 
-        if (this.RowSingleOrNull()?.LastCheckedEventArgs?.Variables is VariableCollection list) {
-            ct = list.ReplaceInText(OriginalText);
-        }
 
+        var r = this.RowSingleOrNull();
+
+        if (r != null) {
+
+            r.CheckRowDataIfNeeded();
+
+            if (r.LastCheckedEventArgs?.Variables is VariableCollection list) {
+                ct = list.ReplaceInText(OriginalText);
+            }
+
+        }
         Directory = ct;
 
         CreateWatcher();
