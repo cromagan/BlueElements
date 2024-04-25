@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.EventArgs;
@@ -28,11 +29,11 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_RowUnique : Method_Database, IUseableForButton {
+public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [FilterVar];
+    public override List<List<string>> Args => [StringVal, FilterVar];
 
     public List<List<string>> ArgsForButton => [];
 
@@ -40,13 +41,13 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
 
-    public override string Command => "rowunique";
+    public override string Command => "rowuniqueandupdate";
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
-                                          "Werden mehrere Zeilen gefunden, wird das Skript abgebrochen.\r\n" +
+                                          "Werden mehrere Zeilen gefunden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
-                                          "Bessere Alternative: RowUniqueAndUpdate";
+                                          "Zusätzlich wird die Zeile komplett neu durchgerechnet:\r\nNeueZeile, AngegebenesSkript, KeyValueScript, ValueChangesScript und FormularVorbereitenSkript";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -56,13 +57,13 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
-    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen";
+    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen und durchrechnen";
 
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "RowUnique( Filter, ...)";
+    public override string Syntax => "RowUniqueAndUpdate(ZusätzlichesSkript, Filter, ...)";
 
     #endregion
 
@@ -72,10 +73,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
-
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
         if (allFi is null || allFi.Count == 0) {
             return new DoItFeedback(infos.Data, "Fehler im Filter");
         }
@@ -100,16 +98,50 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
         var r = allFi.Rows;
 
-        if (r.Count > 1) {
-            return new DoItFeedback(infos.Data, "RowUnique gescheitert, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
+        if (r.Count > 5) {
+            return new DoItFeedback(infos.Data, "RowUniqueAndUpdate gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
         }
 
-        if (r.Count == 0) {
+        if (r.Count > 1) {
             if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
-            var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
-            if (nr.newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
-            return Method_Row.RowToObjectFeedback(nr.newrow);
+
+            r[0].Database?.Row.Combine(r);
+            r[0].Database?.Row.RemoveYoungest(r, true);
+            r = allFi.Rows;
+            if (r.Count > 1) {
+                return new DoItFeedback(infos.Data, "RowUniqueAndUpdate gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
+            }
         }
+
+        RowItem? myRow = null;
+
+        if (r.Count == 0) {
+            var mydb = MyDatabase(scp);
+            if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+            if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+            var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUniqueAndUpdate' von " + mydb.Caption);
+            if (nr.newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
+            myRow = nr.newrow;
+        } else {
+            myRow = r[0];
+
+            var ok1 = myRow.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 2, null, true, true);
+
+            if (!ok1.AllOk) { { return new DoItFeedback(infos.Data, "RowUniqueAndUpdate fehlgeschlagen bei Skript: NewRow."); } }
+        }
+
+        var scriptn = attvar.ValueStringGet(0);
+        if (!string.IsNullOrEmpty(scriptn)) {
+            var ok1 = myRow.ExecuteScript(null, scriptn, true, true, true, 2, null, true, true);
+            if (!ok1.AllOk) { { return new DoItFeedback(infos.Data, $"RowUniqueAndUpdate fehlgeschlagen bei Skript: {scriptn}."); } }
+        }
+
+        var ok = myRow.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 2, null, true, true);
+        if (!ok.AllOk) { { return new DoItFeedback(infos.Data, "RowUniqueAndUpdate fehlgeschlagen bei Skript: keyvalue_changed."); } }
+        myRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null, true, true);
+        if (!ok.AllOk) { { return new DoItFeedback(infos.Data, "RowUniqueAndUpdate fehlgeschlagen bei Skript: value_changed."); } }
+        myRow.InvalidateCheckData();
+        myRow.CheckRowDataIfNeeded();
 
         return Method_Row.RowToObjectFeedback(r[0]);
     }

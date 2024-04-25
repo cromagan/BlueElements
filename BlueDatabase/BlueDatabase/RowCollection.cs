@@ -323,6 +323,42 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
 
+    /// <summary>
+    /// Alle Angegebenen Zeilen werden die gleichen Werte erhalten.
+    /// </summary>
+    /// <param name="rows"></param>
+    public void Combine(ICollection<RowItem> rows) {
+        if (rows.Count < 2) { return; }
+
+        if (Database is not Database db || db.IsDisposed) { return; }
+
+        #region Leere Werte befüllen
+
+        foreach (var thisC in db.Column) {
+
+            #region neuen Wert zum Reinschreiben ermitteln (Wert)
+
+            var wert = string.Empty;
+            foreach (var thisR2 in rows) {
+                if (thisR2.Database != db) { return; }
+
+                if (string.IsNullOrEmpty(wert)) { wert = thisR2.CellGetString(thisC); }
+            }
+
+            #endregion
+
+            #region Wert in leere Zellen reinscheiben
+
+            foreach (var thisR2 in rows) {
+                if (string.IsNullOrEmpty(thisR2.CellGetString(thisC))) { thisR2.CellSet(thisC, wert, "Zeilenbereinigungs-Dialog"); }
+            }
+
+            #endregion
+        }
+
+        #endregion
+    }
+
     ///// <summary>
     ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
     ///// </summary>
@@ -547,6 +583,35 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return true;
     }
 
+    public void RemoveYoungest(ICollection<RowItem> rows, bool reduceToOne) {
+        if (Database is not Database db || db.IsDisposed) { return; }
+
+        var l = new List<RowItem>();
+        l = rows.Distinct().ToList();
+
+
+        if (l.Count < 2) { return; }
+
+        #region Jüngste löschen
+
+        var ToDel = l.First();
+
+        foreach (var thisR2 in l) {
+            if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(ToDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {
+                ToDel = thisR2;
+            }
+        }
+
+        db.Row.Remove(ToDel, "RowCleanUp");
+
+        if (reduceToOne) {
+            l.Remove(ToDel);
+            if (l.Count > 1) { RemoveYoungest(l, true); }
+        }
+
+        #endregion
+    }
+
     public RowItem? SearchByKey(string? key) {
         if (Database is not Database db || db.IsDisposed || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
         try {
@@ -725,4 +790,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     #endregion
+
+    /// <summary>
+    /// Löscht die Jüngste Zeile
+    /// </summary>
+    /// <param name="rows"></param>
+    /// <param name="reduceToOne"></param>
 }

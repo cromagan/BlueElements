@@ -198,45 +198,9 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
 
                 if (rows.Count > 1) {
                     if (optFülle.Checked) {
-
-                        #region Leere Werte befüllen
-
-                        foreach (var thisC in db.Column) {
-
-                            #region neuen Wert zum Reinschreiben ermitteln (Wert)
-
-                            var wert = string.Empty;
-                            foreach (var thisR2 in rows) {
-                                if (string.IsNullOrEmpty(wert)) { wert = thisR2.CellGetString(thisC); }
-                            }
-
-                            #endregion
-
-                            #region Wert in leere Zellen reinscheiben
-
-                            foreach (var thisR2 in rows) {
-                                if (string.IsNullOrEmpty(thisR2.CellGetString(thisC))) { thisR2.CellSet(thisC, wert, "Zeilenbereinigungs-Dialog"); }
-                            }
-
-                            #endregion
-                        }
-
-                        #endregion
+                        db.Row.Combine(rows);
                     } else if (optLöschen.Checked) {
-
-                        #region Jüngste löschen
-
-                        var ToDel = rows[0];
-
-                        foreach (var thisR2 in rows) {
-                            if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(ToDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {
-                                ToDel = thisR2;
-                            }
-                        }
-
-                        db.Row.Remove(ToDel, "RowCleanUp");
-
-                        #endregion
+                        db.Row.RemoveYoungest(rows, false);
                     } else {
                         MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
                         return;

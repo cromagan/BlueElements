@@ -700,7 +700,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
             }
 
-            if (reason is Reason.SetCommand or Reason.UpdateChanges) {
+            if (reason is Reason.SetCommand) {
                 column.Invalidate_ContentWidth();
                 row.InvalidateCheckData();
                 OnCellValueChanged(new CellChangedEventArgs(column, row, reason));
