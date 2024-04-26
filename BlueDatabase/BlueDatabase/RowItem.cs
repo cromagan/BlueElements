@@ -482,6 +482,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return ok;
     }
 
+    public bool NeedsRowUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
+                                     string.IsNullOrEmpty(CellGetString(srs));
+
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
                                  CellGetString(srs) != Database.EventScriptVersion;
 
@@ -682,10 +685,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             DoRowAutomaticEventArgs e = new(this);
             OnDoSpecialRules(e);
 
-            if (eventname is ScriptEventTypes.value_changed) {
+            if (eventname is ScriptEventTypes.value_changed_large or ScriptEventTypes.value_changed_quick) {
                 CellSet(srs, db.EventScriptVersion, "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
             } else {
-                var l = db.EventScript.Get(ScriptEventTypes.value_changed);
+                var l = db.EventScript.Get(ScriptEventTypes.value_changed_large);
+                if (l.Count != 1 || l[0].KeyName != scriptname) { l = db.EventScript.Get(ScriptEventTypes.value_changed_quick); }
                 if (l.Count == 1 && l[0].KeyName == scriptname) {
                     CellSet(srs, db.EventScriptVersion, "NACH Skript 'value_changed' (" + scriptname + ")"); // Nicht System set, diese Änderung muss geloggt werden
                 }

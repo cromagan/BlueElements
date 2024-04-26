@@ -127,9 +127,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
-                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.new_row);
-                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
-                chkAuslöser_keyvaluechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.keyvalue_changed);
+                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
+                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_quick);
+                chkAuslöser_keyvaluechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_large);
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
@@ -338,9 +338,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (Item == null) { return; }
 
         ScriptEventTypes tmp = 0;
-        if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.new_row; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
-        if (chkAuslöser_keyvaluechanged.Checked) { tmp |= ScriptEventTypes.keyvalue_changed; }
+        if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed_quick; }
+        if (chkAuslöser_keyvaluechanged.Checked) { tmp |= ScriptEventTypes.value_changed_large; }
         if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
         if (chkAuslöser_databaseloaded.Checked) { tmp |= ScriptEventTypes.loaded; }

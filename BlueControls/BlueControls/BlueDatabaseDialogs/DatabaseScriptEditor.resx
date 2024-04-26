@@ -117,4 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="chkAuslöser_keyvaluechanged.QuickInfo" xml:space="preserve">
+    <value>Das Skript wird nach dem Ändern eines
+Wertes einer Zelle ausgeführt, wenn die Spalte
+als Schlüsselspalte definiert ist. Oder nachdem eine neue Zeile erstellt wurde.
+Achtung: Die einfache Prüfdung wird danach nicht ausgeführt!</value>
+  </data>
 </root>

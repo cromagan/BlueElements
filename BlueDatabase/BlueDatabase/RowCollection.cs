@@ -24,6 +24,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using BlueScript.Structures;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -208,15 +209,24 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             try {
                 db.OnDropMessage(FehlerArt.Info, "Aktualisiere Zeile: " + row.CellFirstString());
-                var ok = row.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, false, true);
-                if (!ok.AllOk) { break; }
+
+                ScriptEndedFeedback? ok = null;
+                if (db.Column.SysRowState is ColumnItem srs) {
+                    if (string.IsNullOrEmpty(row.CellGetString(srs))) {
+                        ok = row.ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, false, true);
+                    } else {
+                        ok = row.ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 2, null, false, true);
+                    }
+                }
+
+                if (ok is null || !ok.AllOk) { break; }
                 row.InvalidateCheckData();
                 row.CheckRowDataIfNeeded();
                 AddBackgroundWorker(row);
                 db.OnInvalidateView();
             } catch { }
 
-            if (start.ElapsedMilliseconds > 10000) { break; }
+            if (start.ElapsedMilliseconds > 30000) { break; }
         }
 
         lock (_executingchangedrowsx) {
@@ -499,7 +509,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 
-        _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f, null, true, true);
+        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, true, true, 0.1f, null, true, true);
         //if (db.Column.HasKeyColumns()) {
         //    _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null, true);
         //}
@@ -588,7 +598,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var l = new List<RowItem>();
         l = rows.Distinct().ToList();
-
 
         if (l.Count < 2) { return; }
 
@@ -698,6 +707,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private static RowItem? NextRowToCeck() {
         List<Database> l = [.. Database.AllFiles];
         l.Shuffle();
+
+        foreach (var thisDb in l) {
+            if (thisDb is Database db && !db.IsDisposed) {
+                if (!db.IsRowScriptPossible(true)) { continue; }
+                var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
+                if (rowToCheck != null) { return rowToCheck; }
+            }
+        }
 
         foreach (var thisDb in l) {
             if (thisDb is Database db && !db.IsDisposed) {

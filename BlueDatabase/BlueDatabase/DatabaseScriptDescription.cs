@@ -152,11 +152,14 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (ChangeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, die das Formular vorbereiten, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes != ScriptEventTypes.prepare_formula) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) {
             if (ChangeValues) { return "Routinen für Export können keine Werte ändern."; }
             if (!_needRow) { return "Routinen für Export müssen sich auf Zeilen beziehen."; }
+            if (UserGroups.Count > 0) { return "Routinen, die den Export vorbereiten, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes != ScriptEventTypes.export) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) {
@@ -164,24 +167,32 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
         }
 
-        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
+
+            if (!_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
+                if (UserGroups.Count > 0) { return "Routinen, für schnelle Wertänderungen, können nicht von außerhalb benutzt werden."; }
+            }
+
+
+            if (_eventTypes is not ScriptEventTypes.value_changed_quick and
+                not (ScriptEventTypes.value_changed_large | ScriptEventTypes.value_changed_quick)) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
         }
 
-        if (_eventTypes.HasFlag(ScriptEventTypes.keyvalue_changed)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
-            if (!db.Column.HasKeyColumns()) { return "Routinen wird nie ausgelöst, da keine Schlüsselspalten definiert sind."; }
-            if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { return "Nach einer Schlüsselwert-Änderung wird sowieso 'Wert geändert' ausgelöst."; }
+            //if (!db.Column.HasKeyColumns()) { return "Routinen wird nie ausgelöst, da keine Schlüsselspalten definiert sind."; }
+            if (_eventTypes is not ScriptEventTypes.value_changed_large and
+                not (ScriptEventTypes.value_changed_large | ScriptEventTypes.value_changed_quick)) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
         }
 
-        if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
             if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
-
-            if (_eventTypes.HasFlag(ScriptEventTypes.keyvalue_changed)) { return "Nach einer neuen Zeile wird sowieso 'Schlüsselwert geändert' ausgelöst."; }
-            if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { return "Nach einer neuen Zeile wird sowieso 'Wert geändert' ausgelöst."; }
+            if (UserGroups.Count > 0) { return "Routinen, die die Zeilen initialsieren, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes != ScriptEventTypes.InitialValues) { return "Routinen zum Initialisieren müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) {
@@ -231,9 +242,9 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) { symb = ImageCode.Layout; }
         if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
-        if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) { symb = ImageCode.Zeile; }
-        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { symb = ImageCode.Stift; }
-        if (_eventTypes.HasFlag(ScriptEventTypes.keyvalue_changed)) { symb = ImageCode.Schlüssel; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.InitialValues)) { symb = ImageCode.Zeile; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) { symb = ImageCode.Stift; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) { symb = ImageCode.Schlüssel; }
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 

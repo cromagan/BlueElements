@@ -2218,8 +2218,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
-            //contentHolderCellRow.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null);
-            contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null, true, true);
+            if (table.Database?.Column.SysRowState is ColumnItem srs && !string.IsNullOrEmpty(contentHolderCellRow.CellGetString(srs))) {
+                contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 0.1f, null, true, true);
+            }
+
             RowCollection.AddBackgroundWorker(contentHolderCellRow);
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
@@ -2925,7 +2927,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         var toDrawd2 = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
                         Draw_CellTransparentDirect(gr, toDrawd2, ShortenStyle.Replaced, cellrectangle, _cellFont, cellInThisDatabaseColumn, _pix16, cellInThisDatabaseColumn.BehaviorOfImageAndText, state, db.GlobalScale);
                         break;
-
 
                     default:
                         var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);

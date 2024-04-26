@@ -1122,16 +1122,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Skript 'Wert ge‰ndert Extra Thread' mehrfach vorhanden";
         }
 
-        if (l.Get(ScriptEventTypes.new_row).Count > 1) {
-            return "Skript 'Neue Zeile' mehrfach vorhanden";
+        if (l.Get(ScriptEventTypes.InitialValues).Count > 1) {
+            return "Skript 'InitialValues' mehrfach vorhanden";
         }
 
-        if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
-            return "Skript 'Wert ge‰ndert' mehrfach vorhanden";
+        if (l.Get(ScriptEventTypes.value_changed_quick).Count > 1) {
+            return "Skript 'Wert ge‰ndert (schnell)' mehrfach vorhanden";
         }
 
-        if (l.Get(ScriptEventTypes.keyvalue_changed).Count > 1) {
-            return "Skript 'Schl¸sselwert ge‰ndert' mehrfach vorhanden";
+        if (l.Get(ScriptEventTypes.value_changed_large).Count > 1) {
+            return "Skript 'Wert ge‰ndert (groﬂ)' mehrfach vorhanden";
         }
 
         return string.Empty;
@@ -1334,7 +1334,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         foreach (var thisCom in Script.Commands) {
             if (thisCom.Verwendung.Count < 3) {
-                if (ev.ScriptText.ContainsWord(thisCom.Command, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
+                if (ev.ScriptText.ContainsWord(thisCom.Command + thisCom.StartSequence, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
                     thisCom.Verwendung.AddIfNotExists($"Datenbank: {Caption} / {ev.KeyName}");
                     if (thisCom.LastArgMinCount == 3) {
                         thisCom.Verwendung.Add("[WEITERE VERWENDUNGEN VORHANDEN]");
@@ -1365,30 +1365,30 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            var prepf = true;
-
             #region  Erlaubte Methoden ermitteln
 
             var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
 
-            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
-                allowedMethods |= MethodType.IO;
+            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
                 allowedMethods |= MethodType.NeedLongTime;
-                prepf = false;
+                allowedMethods |= MethodType.IO;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
-                !prepf &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
 
             if (s.ChangeValues && produktivphase) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }
 
             #endregion
+
+            var prepf = s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
 
             var vars = CreateVariableCollection(row, prepf, prepf, dbVariables, prepf);
 
@@ -1642,10 +1642,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public bool HasValueChangedScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
-        var e = EventScript.Get(ScriptEventTypes.value_changed);
+        var e = EventScript.Get(ScriptEventTypes.value_changed_quick);
         if (e.Count == 1) { return true; }
 
-        e = EventScript.Get(ScriptEventTypes.keyvalue_changed);
+        e = EventScript.Get(ScriptEventTypes.value_changed_large);
         return e.Count == 1;
     }
 
@@ -2169,6 +2169,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         SortDefinition?.Repair();
+
+        if (string.IsNullOrEmpty(EventScriptVersion)) { EventScriptVersion = "1"; }
+        if (LongTryParse(EventScriptVersion, out var version) && version < 1) { EventScriptVersion = "1"; }
     }
 
     public virtual bool Save() {
