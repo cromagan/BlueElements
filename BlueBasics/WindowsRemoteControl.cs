@@ -146,7 +146,7 @@ public static class WindowsRemoteControl {
         input_Move.mi.dwFlags = Mouseeventf.MOVE | Mouseeventf.ABSOLUTE;
         input_Move.mi.time = 0;
         input_Move.mi.dwExtraInfo = GetMessageExtraInfo();
-        Input[] input = { input_Move };
+        Input[] input = [input_Move];
         return SendInput(1, input, Marshal.SizeOf(input_Move));
     }
 

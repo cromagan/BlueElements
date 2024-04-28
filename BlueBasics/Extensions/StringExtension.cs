@@ -24,7 +24,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -197,16 +196,13 @@ public static partial class Extensions {
     }
 
     public static string? Decrypt(this string cipherText, string key) {
-        byte[] array;
-
         key = (key + "!äQsWERadf§$%öü,");
         var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
         try {
-            var iv = new byte[16];
             var buffer = Convert.FromBase64String(cipherText);
 
-            key = (key + "!äQsWERadf§$%öü,").Substring(0, 16);
+            //key = (key + "!äQsWERadf§$%öü,").Substring(0, 16);
 
             using var aes = Aes.Create();
             aes.KeySize = 128;
@@ -419,7 +415,7 @@ public static partial class Extensions {
         return tXt;
     }
 
-    public static bool IsDateTime(this string? txt) => DateTimeTryParse(txt, out _);
+    public static bool IsDateTime(this string? txt) => txt != null && DateTimeTryParse(txt, out _);
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
@@ -664,7 +660,7 @@ public static partial class Extensions {
 
         if (string.IsNullOrEmpty(textToSplit)) { return w; }
 
-        w = textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
+        w = textToSplit.Split([trennzeichen], StringSplitOptions.None);
         //if (w.Length == 1 && string.IsNullOrEmpty(w[0])) { w = new string[0]; }
         return w;
     }
@@ -704,7 +700,7 @@ public static partial class Extensions {
     /// <param name="textToSplit"></param>
     /// <param name="trennzeichen"></param>
     /// <returns></returns>
-    public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? Array.Empty<string>() : textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
+    public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? Array.Empty<string>() : textToSplit.Split([trennzeichen], StringSplitOptions.None);
 
     /// <summary>
     /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.

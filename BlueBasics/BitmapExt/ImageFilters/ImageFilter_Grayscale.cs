@@ -33,7 +33,6 @@ internal class ImageFilter_Grayscale : ImageFilter {
         // Schleife über alle Pixel im Bild
         for (var i = 0; i < bits.Length; i += 4) {
             // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
-            var a = bits[i + 3];
             var r = bits[i + 2];
             var g = bits[i + 1];
             var b = bits[i];

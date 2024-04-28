@@ -110,9 +110,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _createDate;
 
     private string _creator;
-
-    private int _doingChanges = 0;
-
     private string _editNormalyError = string.Empty;
 
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
@@ -121,7 +118,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private string _eventScriptTmp = string.Empty;
 
-    private string _eventScriptVersion = string.Empty;
+    private long _eventScriptVersion = 1;
 
     private double _globalScale = 1f;
 
@@ -319,7 +316,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemachte werden.
     /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
     /// </summary>
-    public int DoingChanges => _doingChanges;
+    public int DoingChanges { get; private set; } = 0;
 
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
@@ -347,11 +344,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public string EventScriptVersion {
+    public long EventScriptVersion {
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion, value, UserName, DateTime.UtcNow, string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString(), value.ToString(), UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -917,7 +914,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
 
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
-            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion);
+            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString());
             SaveToByteList(l, DatabaseDataType.EventScriptErrorMessage, db.EventScriptErrorMessage);
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
@@ -1051,6 +1048,23 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
         // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
         return mins > ranges && mins < rangee;
+    }
+
+    public bool CanDoPrepareFormulaCheckScript() {
+        if (!IsRowScriptPossible(true)) { return false; }
+
+        var e = EventScript.Get(ScriptEventTypes.prepare_formula);
+        return e.Count == 1;
+    }
+
+    public bool CanDoValueChangedScript() {
+        if (!IsRowScriptPossible(true)) { return false; }
+
+        var e = EventScript.Get(ScriptEventTypes.value_changed_quick);
+        if (e.Count == 1) { return true; }
+
+        e = EventScript.Get(ScriptEventTypes.value_changed_large);
+        return e.Count == 1;
     }
 
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
@@ -1632,23 +1646,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    public bool HasPrepareFormulaCheckScript() {
-        if (!IsRowScriptPossible(true)) { return false; }
-
-        var e = EventScript.Get(ScriptEventTypes.prepare_formula);
-        return e.Count == 1;
-    }
-
-    public bool HasValueChangedScript() {
-        if (!IsRowScriptPossible(true)) { return false; }
-
-        var e = EventScript.Get(ScriptEventTypes.value_changed_quick);
-        if (e.Count == 1) { return true; }
-
-        e = EventScript.Get(ScriptEventTypes.value_changed_large);
-        return e.Count == 1;
-    }
-
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
             var db = GetByFilename(thisFile, true, null, false, "Import");
@@ -2170,8 +2167,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         SortDefinition?.Repair();
 
-        if (string.IsNullOrEmpty(EventScriptVersion)) { EventScriptVersion = "1"; }
-        if (LongTryParse(EventScriptVersion, out var version) && version < 1) { EventScriptVersion = "1"; }
+        if (EventScriptVersion < 1) { EventScriptVersion = 1; }
     }
 
     public virtual bool Save() {
@@ -2393,7 +2389,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (!IsAdministrator()) { return false; }
-        if (!IsRowScriptPossible(true)) { return false; }
+        if (!CanDoValueChangedScript()) { return false; }
 
         //if (HasValueChangedScript()) { return false; }
 
@@ -2662,7 +2658,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //    break;
 
             case DatabaseDataType.EventScriptVersion:
-                _eventScriptVersion = value;
+                _eventScriptVersion = LongParse(value);
                 break;
 
             case DatabaseDataType.EventScriptErrorMessage:
@@ -3145,7 +3141,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-            _doingChanges++;
+            DoingChanges++;
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                     Undo.Add(thisWork);
@@ -3158,7 +3154,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Datenbank-Fehler: " + error + " " + thisWork.ToString());
                         //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
-                        _doingChanges--;
+                        DoingChanges--;
                         return;
                     }
 
@@ -3167,7 +3163,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (rowchanged != null && columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
-            _doingChanges--;
+            DoingChanges--;
             IsInCache = toUtc;
             DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc);
             OnInvalidateView();

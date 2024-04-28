@@ -203,7 +203,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GenerateAndAddSystem() {
-        string[] w = {
+        string[] w = [
             "SYS_ROWSTATE",
             "SYS_CHAPTER",
             "SYS_DATECHANGED",
@@ -212,7 +212,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             "SYS_CREATOR",
             "SYS_CORRECT",
             "SYS_LOCKED"
-        };
+        ];
         GenerateAndAddSystem(w);
     }
 

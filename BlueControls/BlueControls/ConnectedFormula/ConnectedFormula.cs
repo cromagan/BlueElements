@@ -33,7 +33,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Converter;

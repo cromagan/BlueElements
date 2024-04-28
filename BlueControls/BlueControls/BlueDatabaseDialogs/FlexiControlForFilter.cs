@@ -58,7 +58,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? column, CaptionPosition _defaultCaptionPosition) {
+    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -72,7 +72,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         _fromInputFilter = false;
         ((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
-        DefaultCaptionPosition = _defaultCaptionPosition;
+        DefaultCaptionPosition = defaultCaptionPosition;
         OnValueChanged();
     }
 

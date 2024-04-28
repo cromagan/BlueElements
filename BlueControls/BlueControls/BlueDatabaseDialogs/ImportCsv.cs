@@ -86,26 +86,26 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasDatabase {
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
     private void Fertig_Click(object sender, System.EventArgs e) {
-        var TR = string.Empty;
+        var tr = string.Empty;
         if (optTabStopp.Checked) {
-            TR = "\t";
+            tr = "\t";
         } else if (optSemikolon.Checked) {
-            TR = ";";
+            tr = ";";
         } else if (optKomma.Checked) {
-            TR = ",";
+            tr = ",";
         } else if (optLeerzeichen.Checked) {
-            TR = " ";
+            tr = " ";
         } else if (optAndere.Checked) {
-            TR = txtAndere.Text;
+            tr = txtAndere.Text;
         }
-        if (string.IsNullOrEmpty(TR)) {
+        if (string.IsNullOrEmpty(tr)) {
             MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
             return;
         }
         var m = "Datenbank-Fehler";
 
         if (Database != null && !Database.IsDisposed) {
-            m = Database.ImportCsv(_originalImportText, optSpalteZuordnen.Checked, optZeilenZuorden.Checked, TR, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
+            m = Database.ImportCsv(_originalImportText, optSpalteZuordnen.Checked, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

@@ -154,7 +154,7 @@ internal sealed partial class ColumnEditor {
 
     private void btnSchnellGanzzahl_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
-        _column.GetStyleFrom(ColumnFormatHolder.Integer);
+        _column.GetStyleFrom(ColumnFormatHolder.Long);
         Column_DatenAuslesen();
     }
 

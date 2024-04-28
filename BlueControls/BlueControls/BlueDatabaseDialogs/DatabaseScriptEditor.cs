@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,7 +32,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
-using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
@@ -47,7 +47,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private Database? _database;
     private DatabaseScriptDescription? _item;
 
-    private bool testmode = true;
+    private bool _testmode = true;
 
     #endregion
 
@@ -197,11 +197,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         lstEventScripts.ItemClear();
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        var cap = string.Empty;
-
         foreach (var thisSet in Database.EventScript) {
             if (thisSet != null) {
-                cap = "Sonstige";
+                var cap = "Sonstige";
 
                 if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
 
@@ -228,7 +226,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) {
-        testmode = false;
+        _testmode = false;
         eventScriptEditor.TesteScript(txbName.Text);
     }
 
@@ -259,7 +257,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void btnTest_Click(object sender, System.EventArgs e) {
-        testmode = true;
+        _testmode = true;
         eventScriptEditor.TesteScript(txbName.Text);
     }
 
@@ -273,7 +271,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             return;
         }
         // Das ausgewählte Skript aus der Liste abrufen
-        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts[lstEventScripts.Checked[0]]).Item;
+        var selectedlstEventScripts = lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem item ? (DatabaseScriptDescription)item.Item : null;
         var l = new List<string>();
         // Durchlaufen aller Undo-Operationen in der Datenbank
         foreach (var thisUndo in db.Undo) {
@@ -291,7 +289,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 var found = false;
                 foreach (var t in ai) {
                     var s = new DatabaseScriptDescription(db, t);
-                    if (s.KeyName == selectedlstEventScripts.KeyName && selectedlstEventScripts.ScriptText != s.ScriptText) {
+                    if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.ScriptText != s.ScriptText) {
                         l.Add(s.ScriptText);
                         found = true;
                         break;
@@ -311,11 +309,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         btnVersionErhöhen.Enabled = false;
 
-        _ = IntTryParse(Database.EventScriptVersion, out var tmp);
-        tmp++;
-        if (tmp == int.MaxValue) { tmp = 0; }
-
-        Database.EventScriptVersion = tmp.ToString();
+        Database.EventScriptVersion = RowItem.TimeCodeUTCNow();
     }
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
@@ -420,12 +414,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
         }
 
-        if (!testmode) {
+        if (!_testmode) {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
         _allowTemporay = true;
-        e.Feedback = Database?.ExecuteScript(_item, !testmode, r, null, true, true);
+        e.Feedback = Database?.ExecuteScript(_item, !_testmode, r, null, true, true);
         _allowTemporay = false;
     }
 
@@ -456,7 +450,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void lstPermissionExecute_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         var tmp = lstPermissionExecute.Checked.ToList();
         //_ = tmp.Remove(Constants.Administrator);
-        Item.UserGroups = new(tmp);
+        if (Item != null) { Item.UserGroups = [.. tmp]; }
     }
 
     private void ScriptEditor_PropertyChanged(object sender, System.EventArgs e) {

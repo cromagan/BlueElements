@@ -18,7 +18,6 @@
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Forms;
 using BlueDatabase;
 using BluePaint;

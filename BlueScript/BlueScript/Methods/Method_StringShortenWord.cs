@@ -36,9 +36,8 @@ internal class Method_StringShortenWord : Method {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "stringshortenword";
     public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-    public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
@@ -104,7 +103,7 @@ internal class Method_StringShortenWord : Method {
         txt = txt.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
         txt = txt.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
         txt = txt.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
-        string[] a = { "es", "er", "em", "en", "e", "" };
+        string[] a = ["es", "er", "em", "en", "e", ""];
         for (var t = 0; t <= a.GetUpperBound(0); t++) {
             txt = txt.Replace("gerieben" + a[t], "ger.");
             //tx = tx.Replace("groß" + A[t], "gr.");

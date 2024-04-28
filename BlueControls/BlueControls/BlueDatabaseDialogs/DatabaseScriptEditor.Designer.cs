@@ -113,6 +113,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften.TabDefault = null;
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 0;
+            this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
             // 
             // tabSkriptEditor
             // 

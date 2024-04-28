@@ -332,7 +332,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                             var tmpG = Graphics.FromImage(_tmpBmp);
                             Pen p = new(pad.Randfarbe, (float)(8.7d * zoom));
                             Pen p2 = new(Color.White, (float)(8.7d * zoom) + 2f);
-                            p.DashPattern = new float[] { 5, 1, 1, 1 };
+                            p.DashPattern = [5, 1, 1, 1];
                             var dc2 = mb2.ZoomAndMoveRect(zoomv, slidervalues.X, slidervalues.Y, false);
                             tmpG.DrawRectangle(p2, dc2);
                             tmpG.DrawRectangle(p, dc2);
@@ -353,7 +353,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
             }
             if (Textlage != (Alignment)(-1)) {
                 Pen p = new(Randfarbe, (float)(8.7d * zoom)) {
-                    DashPattern = new float[] { 10, 2, 1, 2 }
+                    DashPattern = [10, 2, 1, 2]
                 };
                 gr.DrawRectangle(p, positionModified);
                 var s = gr.MeasureString(Name, font);

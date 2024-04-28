@@ -26,7 +26,6 @@ using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -94,9 +93,9 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
 
         if (r.Count == 0) {
             if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
-            var nr = RowCollection.GenerateAndAdd(allFi, coment);
-            if (nr.newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
-            myRow = nr.newrow;
+            var (newrow, message) = RowCollection.GenerateAndAdd(allFi, coment);
+            if (newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + message); }
+            myRow = newrow;
         } else {
             myRow = r[0];
 

@@ -25,7 +25,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Windows.Interop;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 
@@ -87,8 +86,10 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         Matrix rotateAtOrigin = new();
         rotateAtOrigin.Rotate(wink);
         // Rotate the image's corners to see how big it will be after rotation.
-        PointF[] p = {new(0, 0), new(pic.Width, 0), new(pic.Width, pic.Height),
-            new(0, pic.Height) };
+        PointF[] p = [
+            new(0, 0), new(pic.Width, 0), new(pic.Width, pic.Height),
+            new(0, pic.Height)
+        ];
         rotateAtOrigin.TransformPoints(p);
         var minX = Math.Min(Math.Min(p[0].X, p[1].X), Math.Min(p[2].X, p[3].X));
         var minY = Math.Min(Math.Min(p[0].Y, p[1].Y), Math.Min(p[2].Y, p[3].Y));
@@ -125,7 +126,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
     private void DoThis(RotateFlipType b) {
         _ausricht = false;
         var pic = OnNeedCurrentPic();
-        if (pic ==  null) { return; }
+        if (pic == null) { return; }
         CollectGarbage();
         try {
             Bitmap clonedBitmap = new Bitmap(pic);
@@ -135,7 +136,6 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Warnung, "Spiegeln/Drehen fehlgeschlagen", ex);
             Notification.Show("Befehl konnte nicht\r\nausgeführt werden.");
         }
-
 
         OnZoomFit();
     }

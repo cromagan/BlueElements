@@ -152,7 +152,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 255
     };
 
-    public static readonly FormatHolder Integer = new("Integer") {
+    public static readonly FormatHolder Long = new("Long") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^((-?[1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals + "-",
@@ -165,7 +165,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = long.MinValue.ToString().Length
     };
 
-    public static readonly FormatHolder IntegerPositive = new("Integer only Positive") {
+    public static readonly FormatHolder LongPositive = new("Long only Positive") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^(([1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals,

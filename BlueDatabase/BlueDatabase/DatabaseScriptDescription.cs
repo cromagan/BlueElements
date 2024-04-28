@@ -175,7 +175,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
                 if (UserGroups.Count > 0) { return "Routinen, für schnelle Wertänderungen, können nicht von außerhalb benutzt werden."; }
             }
 
-
             if (_eventTypes is not ScriptEventTypes.value_changed_quick and
                 not (ScriptEventTypes.value_changed_large | ScriptEventTypes.value_changed_quick)) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
         }

@@ -23,7 +23,6 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 

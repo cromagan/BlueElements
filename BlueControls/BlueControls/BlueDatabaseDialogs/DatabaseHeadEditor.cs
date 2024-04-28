@@ -32,7 +32,6 @@ using BlueDatabase.Interfaces;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -43,7 +42,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     #region Fields
 
-    public bool undoDone;
+    public bool UndoDone;
     private Database? _database;
     private bool _frmHeadEditorFormClosingIsin;
 
@@ -255,7 +254,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         //_ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
+        _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
         _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
         _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
@@ -313,8 +312,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     //}
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) {
-        if (GlobalTab.SelectedTab == tabUndo && !undoDone) {
-            undoDone = true;
+        if (GlobalTab.SelectedTab == tabUndo && !UndoDone) {
+            UndoDone = true;
             GenerateUndoTabelle();
         }
     }

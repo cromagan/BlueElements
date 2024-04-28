@@ -34,7 +34,6 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.Database;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -1320,7 +1319,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                     return "Virtuelle Spalten müssen im Skript gesetzt werden und deswegen vorhanden sein.";
                 }
                 if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
-                if (!db.HasPrepareFormulaCheckScript()) { return "Für virtuelle Spalten zuerst das Skript 'Formular Vorbereiten' erstellen."; }
+                if (!db.CanDoPrepareFormulaCheckScript()) { return "Für virtuelle Spalten zuerst das Skript 'Formular Vorbereiten' erstellen."; }
 
                 break;
 
@@ -1675,7 +1674,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
-                this.GetStyleFrom(FormatHolder.IntegerPositive); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolder.LongPositive); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLenght = MaxTextLenght;
                 if (setOpticalToo) {
                     Caption = "Zeilen-Status";
@@ -2340,7 +2339,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
             case DatabaseDataType.ColumnNameOfLinkedDatabase:
 
-                if (newvalue.IsFormat(FormatHolder.Integer)) {
+                if (newvalue.IsFormat(FormatHolder.Long)) {
                     _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
                 } else {
                     _linkedCell_ColumnNameOfLinkedDatabase = newvalue;

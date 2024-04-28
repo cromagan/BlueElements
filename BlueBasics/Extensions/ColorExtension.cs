@@ -42,8 +42,8 @@ public static partial class Extensions {
         } else {
             var temp2 = brightness <= 0.5F ? brightness * (1.0 + satuation) : brightness + satuation - (brightness * satuation);
             var temp1 = (2.0 * brightness) - temp2;
-            double[] t3 = { hue + (1.0 / 3.0), hue, hue - (1.0 / 3.0) };
-            double[] clr = { 0, 0, 0 };
+            double[] t3 = [hue + (1.0 / 3.0), hue, hue - (1.0 / 3.0)];
+            double[] clr = [0, 0, 0];
             for (var i = 0; i <= 2; i++) {
                 if (t3[i] < 0) { t3[i] += 1.0; }
                 if (t3[i] > 1) { t3[i] -= 1.0; }

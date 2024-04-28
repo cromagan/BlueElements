@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Windows.Forms;
 using BlueControls.ItemCollectionList;
@@ -153,8 +152,9 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                                     this.GetStyleFrom(FormatHolder.Text);
                                     break;
 
+                                case Accessor<long>:
                                 case Accessor<int>:
-                                    this.GetStyleFrom(FormatHolder.Integer);
+                                    this.GetStyleFrom(FormatHolder.Long);
                                     break;
 
                                 case Accessor<float>:

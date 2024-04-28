@@ -138,7 +138,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownWerteAndererZellenAnzeigen = false
     };
 
-    public new static readonly ColumnFormatHolder Integer = new(FormatHolder.Integer) {
+    public new static readonly ColumnFormatHolder Long = new(FormatHolder.Long) {
         Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
@@ -153,7 +153,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownWerteAndererZellenAnzeigen = false
     };
 
-    public new static readonly ColumnFormatHolder IntegerPositive = new(FormatHolder.IntegerPositive) {
+    public new static readonly ColumnFormatHolder LongPositive = new(FormatHolder.LongPositive) {
         Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,

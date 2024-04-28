@@ -2835,6 +2835,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var columnX1 = viewItem.OrderTmpSpalteX1 ?? 0;
         var drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 2;
         var errorImg = QuickImage.Get("Warnung|10||||||120||60");
+        var rowScript = db.CanDoValueChangedScript();
 
         if (SliderY.Value < _pix16 && UserEdit_NewRowAllowed()) {
             string txt;
@@ -2868,7 +2869,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
 
                 if (isAdmin) {
-                    if (cellInThisDatabaseRow.NeedsUpdate()) {
+                    if (rowScript && cellInThisDatabaseRow.NeedsUpdate()) {
                         RowCollection.WaitDelay = 0;
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
                         //db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);

@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;

@@ -48,7 +48,8 @@ public static class Constants {
     public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
     public static readonly int ColumnCaptionSizeY = 22;
 
-    public static readonly string[] DateTimeFormats = {"dd.MM.yyyy HH:mm:ss",
+    public static readonly string[] DateTimeFormats = [
+        "dd.MM.yyyy HH:mm:ss",
                                                        "dd.MM.yyyy",
                                                        "dd.MM.yyyy HH:mm",
                                                        "MM/dd/yyyy HH:mm:ss",
@@ -66,7 +67,8 @@ public static class Constants {
                                                        "yyyy-MM-dd_HH-mm-ss",
                                                        "dd.MM.yyyy H:mm",
                                                        "d.M.yy",
-                                                       "d.M.yy HH:mm:ss"};
+                                                       "d.M.yy HH:mm:ss"
+    ];
 
     public static readonly List<string> Gleich = ["="];
 

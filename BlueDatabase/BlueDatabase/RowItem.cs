@@ -174,6 +174,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    public static long TimeCodeUTCNow() {
+        var t = DateTime.UtcNow.Ticks - new DateTime(2024, 1, 1).Ticks;
+        return t / 5000;
+    }
+
     public string CellFirstString() => Database?.Column.First() is not ColumnItem fc ? string.Empty : CellGetString(fc);
 
     public bool CellGetBoolean(string columnName) => CellGetBoolean(Database?.Column[columnName]);
@@ -205,6 +210,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>DateTime.MinValue bei Fehlern</returns>
     public DateTime CellGetDateTime(ColumnItem? column) {
         var value = Database?.Cell.GetString(column, this);
+        if (value == null) { return DateTime.MinValue; }
         return string.IsNullOrEmpty(value) ? default : DateTimeTryParse(value, out var d) ? d : DateTime.MinValue;
     }
 
@@ -236,9 +242,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>0 bei Fehlern</returns>
     public int CellGetInteger(ColumnItem? column) => IntParse(Database?.Cell.GetString(column, this));
 
-    public List<string> CellGetList(ColumnItem? column) => Database?.Cell.GetString(column, this).SplitAndCutByCrToList() ?? [];// Main Method
+    public List<string> CellGetList(ColumnItem? column) => Database?.Cell.GetString(column, this).SplitAndCutByCrToList() ?? [];
 
     public List<string> CellGetList(string columnName) => CellGetList(Database?.Column[columnName]);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns>0 bei Fehlern</returns>
+    public long CellGetLong(ColumnItem? column) => LongParse(Database?.Cell.GetString(column, this));
 
     public Point CellGetPoint(ColumnItem? column) // Main Method
 {
@@ -295,7 +308,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        if (!db.IsRowScriptPossible(true)) {
+        if (!db.CanDoValueChangedScript()) {
             LastCheckedMessage = "Zeilenprüfung deaktiviert";
             return;
         }
@@ -373,14 +386,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public string CompareKey() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
 
-        var ColsToRefresh = new List<ColumnItem>();
-        if (db.SortDefinition?.Columns is List<ColumnItem> lc) { ColsToRefresh.AddRange(lc); }
-        if (db.Column.SysChapter is ColumnItem csc) { _ = ColsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First() is ColumnItem cf) { _ = ColsToRefresh.AddIfNotExists(cf); }
+        var colsToRefresh = new List<ColumnItem>();
+        if (db.SortDefinition?.Columns is List<ColumnItem> lc) { colsToRefresh.AddRange(lc); }
+        if (db.Column.SysChapter is ColumnItem csc) { _ = colsToRefresh.AddIfNotExists(csc); }
+        if (db.Column.First() is ColumnItem cf) { _ = colsToRefresh.AddIfNotExists(cf); }
 
-        db.RefreshColumnsData(ColsToRefresh.ToArray());
+        db.RefreshColumnsData(colsToRefresh.ToArray());
 
-        return CompareKey(ColsToRefresh);
+        return CompareKey(colsToRefresh);
     }
 
     public int CompareTo(object obj) {
@@ -486,7 +499,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                                      string.IsNullOrEmpty(CellGetString(srs));
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                 CellGetString(srs) != Database.EventScriptVersion;
+                                 CellGetLong(srs) < Database.EventScriptVersion;
 
     public bool NeedsUrgentUpdate() => NeedsUpdate() &&
                                        Database?.Column.SysRowChanger is ColumnItem srcr &&
@@ -597,7 +610,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return istValue.IndexOf(filterValue, comparisonType) >= 0;
 
             case FilterType.Between:
-                var rangeParts = filterValue.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                var rangeParts = filterValue.Split(['|'], StringSplitOptions.RemoveEmptyEntries);
                 if (rangeParts.Length != 2)
                     return false;
 
@@ -686,12 +699,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             OnDoSpecialRules(e);
 
             if (eventname is ScriptEventTypes.value_changed_large or ScriptEventTypes.value_changed_quick) {
-                CellSet(srs, db.EventScriptVersion, "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
+                CellSet(srs, TimeCodeUTCNow(), "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
             } else {
                 var l = db.EventScript.Get(ScriptEventTypes.value_changed_large);
                 if (l.Count != 1 || l[0].KeyName != scriptname) { l = db.EventScript.Get(ScriptEventTypes.value_changed_quick); }
                 if (l.Count == 1 && l[0].KeyName == scriptname) {
-                    CellSet(srs, db.EventScriptVersion, "NACH Skript 'value_changed' (" + scriptname + ")"); // Nicht System set, diese Änderung muss geloggt werden
+                    CellSet(srs, TimeCodeUTCNow(), "NACH Skript 'value_changed' (" + scriptname + ")"); // Nicht System set, diese Änderung muss geloggt werden
                 }
             }
         }
@@ -779,9 +792,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     break;
             }
 
-            if (typ.HasFlag(FilterType.Instr) && column != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
+            if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
             // Multiline-Typ ermitteln  --------------------------------------------
-            var tmpMultiLine = column?.MultiLine ?? false;
+            var tmpMultiLine = column.MultiLine;
             if (typ.HasFlag(FilterType.MultiRowIgnorieren)) {
                 tmpMultiLine = false;
                 typ ^= FilterType.MultiRowIgnorieren;
