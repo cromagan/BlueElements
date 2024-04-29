@@ -212,7 +212,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 ScriptEndedFeedback? ok = null;
                 if (db.Column.SysRowState is ColumnItem srs) {
-                    if (string.IsNullOrEmpty(row.CellGetString(srs))) {
+                    if (string.IsNullOrEmpty(row.CellGetString(srs)) && db.EventScript.Get(ScriptEventTypes.value_changed_large).Count == 1) {
                         ok = row.ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, false, true);
                     } else {
                         ok = row.ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 2, null, false, true);
@@ -543,6 +543,43 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return Database.IsNewRowPossible();
     }
 
+    /// <summary>
+    /// Gibt Zeilen Zurück, die ein Update benötigen.
+    /// wenn oldestTo=True ist, wird nach den dringenen Updates die älteste Zeile zurückgegeben.
+    /// </summary>
+    /// <param name="oldestTo"></param>
+    /// <returns></returns>
+    public RowItem? NextRowToCheck(bool oldestTo) {
+        if (Database is not Database db || db.IsDisposed) { return null; }
+
+        if (!db.CanDoValueChangedScript()) { return null; }
+
+        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
+        if (rowToCheck != null) { return rowToCheck; }
+
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUrgentUpdate());
+        if (rowToCheck != null) { return rowToCheck; }
+
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUpdate());
+        if (rowToCheck != null) { return rowToCheck; }
+
+        if (!oldestTo) { return null; }
+
+        if (db.Column.SysRowState is not ColumnItem srs) { return null; }
+        var l = long.MaxValue;
+        RowItem? r = null;
+
+        foreach (var thisRow in db.Row) {
+            var t = thisRow.CellGetLong(srs);
+            if (t < l) {
+                l = t;
+                r = thisRow;
+            }
+        }
+
+        return r;
+    }
+
     public bool Remove(string key, string comment) {
         var r = SearchByKey(key);
 
@@ -704,6 +741,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
+    /// <summary>
+    /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
+    /// </summary>
+    /// <returns></returns>
     private static RowItem? NextRowToCeck() {
         List<Database> l = [.. Database.AllFiles];
         l.Shuffle();

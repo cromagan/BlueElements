@@ -26,6 +26,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften = new BlueControls.Controls.TabControl();
             this.tabSkriptEditor = new System.Windows.Forms.TabPage();
             this.tabKopfdaten = new System.Windows.Forms.TabPage();
+            this.capFehler = new BlueControls.Controls.Caption();
             this.txbQuickInfo = new BlueControls.Controls.TextBox();
             this.cbxPic = new BlueControls.Controls.ComboBox();
             this.capQuickInfo = new BlueControls.Controls.Caption();
@@ -129,6 +130,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabKopfdaten
             // 
             this.tabKopfdaten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabKopfdaten.Controls.Add(this.capFehler);
             this.tabKopfdaten.Controls.Add(this.txbQuickInfo);
             this.tabKopfdaten.Controls.Add(this.cbxPic);
             this.tabKopfdaten.Controls.Add(this.capQuickInfo);
@@ -145,6 +147,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabKopfdaten.Size = new System.Drawing.Size(1052, 514);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
+            // 
+            // capFehler
+            // 
+            this.capFehler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capFehler.CausesValidation = false;
+            this.capFehler.Location = new System.Drawing.Point(712, 80);
+            this.capFehler.Name = "capFehler";
+            this.capFehler.Size = new System.Drawing.Size(336, 192);
+            this.capFehler.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbQuickInfo
             // 
@@ -666,5 +678,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capImage;
         private TextBox txbQuickInfo;
         private Button chkAuslöser_keyvaluechanged;
+        private Caption capFehler;
     }
 }

@@ -240,7 +240,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string DatabaseId => nameof(Database);
 
-    public static int ExecutingFirstLvlScript { get; private set; } = 0;
+    public static int ExecutingFirstLvlScript { get; set; } = 0;
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
@@ -1393,9 +1393,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
                 allowedMethods |= MethodType.ManipulatesUser;
+            }
+            if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
+                allowedMethods |= MethodType.ManipulatesUser;
+                allowedMethods |= MethodType.ChangeAnyDatabaseOrRow;
             }
 
             if (s.ChangeValues && produktivphase) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }

@@ -114,6 +114,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
             WriteInfosBack();
+            UnRegisterEvent();
 
             _item = null; // Um keine werte zurück zu Schreiben werden des anzeigen
 
@@ -145,6 +146,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 lstPermissionExecute.Suggestions.Clear();
 
                 _item = value;
+                RegisterEvent();
+
+                btnVerlauf.Enabled = _item != null;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 eventScriptEditor.Enabled = false;
@@ -161,7 +165,10 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_valuechangedThread.Checked = false;
                 chkAuslöser_databaseloaded.Checked = false;
                 chkAuslöser_export.Checked = false;
+                btnVerlauf.Enabled = false;
             }
+
+            _item_PropertyChanged(null, System.EventArgs.Empty);
         }
     }
 
@@ -223,6 +230,20 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         Close();
+    }
+
+    private void _item_PropertyChanged(object? sender, System.EventArgs e) {
+        if (_item == null) {
+            capFehler.Text = string.Empty;
+            return;
+        }
+
+        if (_item.IsOk()) {
+            capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
+            return;
+        }
+
+        capFehler.Text = "<imagecode=Warnung|16> " + _item.ErrorReason();
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) {
@@ -443,8 +464,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 newItem = selectedlstEventScripts.Item as DatabaseScriptDescription;
             }
         }
+
         Item = newItem;
-        btnVerlauf.Enabled = Item != null;
     }
 
     private void lstPermissionExecute_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
@@ -453,9 +474,33 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (Item != null) { Item.UserGroups = [.. tmp]; }
     }
 
+    private void RegisterEvent() {
+        if (_item == null) { return; }
+        _item.PropertyChanged += _item_PropertyChanged;
+    }
+
     private void ScriptEditor_PropertyChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.ScriptText = eventScriptEditor.ScriptText;
+    }
+
+    private void txbName_TextChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.KeyName = txbName.Text;
+    }
+
+    //            break;
+    //    }
+    //}
+    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.QuickInfo = txbQuickInfo.Text;
+    }
+
+    private void UnRegisterEvent() {
+        if (_item == null) { return; }
+
+        _item.PropertyChanged -= _item_PropertyChanged;
     }
 
     //private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -478,21 +523,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     //            if (c != null && !c.IsDisposed) {
     //                TableView.OpenColumnEditor(c, null, null);
     //            }
-
-    //            break;
-    //    }
-    //}
-
-    private void txbName_TextChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.KeyName = txbName.Text;
-    }
-
-    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.QuickInfo = txbQuickInfo.Text;
-    }
-
     private void WriteInfosBack() {
         if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
 
