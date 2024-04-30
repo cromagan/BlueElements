@@ -2392,8 +2392,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (!IsAdministrator()) { return false; }
-        if (!CanDoValueChangedScript()) { return false; }
 
+        // Skripte nicht abfragen! Sonst wird nie ein Master gewählt
+        // und Änderungen verweilen für immer in den Fragmenten
+        //if (!CanDoValueChangedScript()) { return false; }
         //if (HasValueChangedScript()) { return false; }
 
         if (RowCollection.WaitDelay > 90) { return true; }
