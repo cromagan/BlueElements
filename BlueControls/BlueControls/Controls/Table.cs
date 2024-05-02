@@ -2218,11 +2218,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
-            if (table.Database?.Column.SysRowState is ColumnItem srs && !string.IsNullOrEmpty(contentHolderCellRow.CellGetString(srs))) {
-                contentHolderCellRow.ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 0.1f, null, true, true);
-            }
+            contentHolderCellRow.UpdateRow(true);
 
-            RowCollection.AddBackgroundWorker(contentHolderCellRow);
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
     }

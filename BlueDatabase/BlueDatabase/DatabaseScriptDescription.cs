@@ -170,21 +170,16 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
-
-            if (!_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
-                if (UserGroups.Count > 0) { return "Routinen, für schnelle Wertänderungen, können nicht von außerhalb benutzt werden."; }
-            }
-
-            if (_eventTypes is not ScriptEventTypes.value_changed_quick and
-                not (ScriptEventTypes.value_changed_large | ScriptEventTypes.value_changed_quick)) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
+            if (UserGroups.Count > 0) { return "Routinen, für Werteänderungen, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes is not ScriptEventTypes.value_changed_quick) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
             //if (!db.Column.HasKeyColumns()) { return "Routinen wird nie ausgelöst, da keine Schlüsselspalten definiert sind."; }
-            if (_eventTypes is not ScriptEventTypes.value_changed_large and
-                not (ScriptEventTypes.value_changed_large | ScriptEventTypes.value_changed_quick)) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
+            if (UserGroups.Count > 0) { return "Routinen, für Werteänderungen, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes is not ScriptEventTypes.value_changed_large) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.InitialValues)) {

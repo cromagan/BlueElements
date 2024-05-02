@@ -70,8 +70,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Events
 
-    public event EventHandler<DoRowAutomaticEventArgs>? DoSpecialRules;
-
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
     public event EventHandler<RowEventArgs>? RowGotData;
@@ -183,11 +181,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool CellGetBoolean(string columnName) => CellGetBoolean(Database?.Column[columnName]);
 
-    public bool CellGetBoolean(ColumnItem? column) => Database?.Cell.GetString(column, this).FromPlusMinus() ?? default;// Main Method
+    public bool CellGetBoolean(ColumnItem? column) => Database?.Cell.GetString(column, this).FromPlusMinus() ?? default;
 
     public Color CellGetColor(string columnName) => CellGetColor(Database?.Column[columnName]);
 
-    public Color CellGetColor(ColumnItem? column) => Color.FromArgb(CellGetInteger(column)); // Main Method
+    public Color CellGetColor(ColumnItem? column) => Color.FromArgb(CellGetInteger(column));
 
     public int CellGetColorBgr(ColumnItem? column) {
         var c = CellGetColor(column);
@@ -254,7 +252,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public long CellGetLong(ColumnItem? column) => LongParse(Database?.Cell.GetString(column, this));
 
     public Point CellGetPoint(ColumnItem? column) // Main Method
-{
+    {
         var value = Database?.Cell.GetString(column, this);
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
@@ -496,17 +494,34 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool NeedsRowUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                     string.IsNullOrEmpty(CellGetString(srs));
+                                         string.IsNullOrEmpty(CellGetString(srs));
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                 CellGetLong(srs) < Database.EventScriptVersion;
+                                     CellGetLong(srs) < Database.EventScriptVersion;
 
     public bool NeedsUrgentUpdate() => NeedsUpdate() &&
-                                       Database?.Column.SysRowChanger is ColumnItem srcr &&
-                                       Database?.Column.SysRowChangeDate is ColumnItem srcd &&
-                                       string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
-                                       DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 5 &&
-                                       DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 10;
+                                           Database?.Column.SysRowChanger is ColumnItem srcr &&
+                                           Database?.Column.SysRowChangeDate is ColumnItem srcd &&
+                                           string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
+                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 5 &&
+                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 10;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns>True wenn alles in Ordnung ist</returns>
+    public bool RepairAllLinks() {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
+
+        foreach (var thisColumn in db.Column) {
+            if (thisColumn.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+                _ = CellCollection.LinkedCellData(thisColumn, this, true, false);
+
+                //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }
+            }
+        }
+        return true;
+    }
 
     /// <summary>
     ///
@@ -557,6 +572,47 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
         return erg;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="onlyIfQuick"></param>
+    /// <returns>Wenn alles in Ordung ist</returns>
+    public bool UpdateRow(bool onlyIfQuick) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
+        if (db.Column.SysRowState is not ColumnItem srs) { return RepairAllLinks(); }
+
+        var large = db.EventScript.Get(ScriptEventTypes.value_changed_large).Count;
+        if (large > 1) { return false; }
+
+        bool mustDoFullCheck = large == 1 && !string.IsNullOrEmpty(CellGetString(srs));
+
+        if (onlyIfQuick && mustDoFullCheck) { return false; }
+
+        try {
+            db.OnDropMessage(FehlerArt.Info, "Aktualisiere Zeile: " + CellFirstString());
+
+            if (mustDoFullCheck) {
+                var ok = ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, false, true);
+                if (!ok.AllOk) { return false; }
+            }
+
+            var ok2 = ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 2, null, false, true);
+            if (!ok2.AllOk) { return false; }
+
+            if (!RepairAllLinks()) { return false; }
+
+            CellSet(srs, TimeCodeUTCNow(), "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
+
+            InvalidateCheckData();
+            CheckRowDataIfNeeded();
+            RowCollection.AddBackgroundWorker(this);
+            db.OnInvalidateView();
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
@@ -693,24 +749,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!produktivphase) { return script; }
 
-        if (db.Column.SysRowState is ColumnItem srs) {
-            // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-            DoRowAutomaticEventArgs e = new(this);
-            OnDoSpecialRules(e);
-
-            if (eventname is ScriptEventTypes.value_changed_large or ScriptEventTypes.value_changed_quick) {
-                CellSet(srs, TimeCodeUTCNow(), "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
-            } else {
-                var l = db.EventScript.Get(ScriptEventTypes.value_changed_large);
-                if (l.Count != 1 || l[0].KeyName != scriptname) { l = db.EventScript.Get(ScriptEventTypes.value_changed_quick); }
-                if (l.Count == 1 && l[0].KeyName == scriptname) {
-                    CellSet(srs, TimeCodeUTCNow(), "NACH Skript 'value_changed' (" + scriptname + ")"); // Nicht System set, diese Änderung muss geloggt werden
-                }
-            }
-        }
-
-        // checkPerformed geht von Dateisystemfehlern aus
-
         // Dann die abschließenden Korrekturen vornehmen
         foreach (var thisColum in db.Column) {
             if (thisColum != null) {
@@ -837,11 +875,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return MatchesTo(column, filtertyp, searchvalue);
         }
     }
-
-    //internal bool AmIChanger() {
-    //    if (IsDisposed) { return false; }
-    //    if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
-    private void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     private void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
 

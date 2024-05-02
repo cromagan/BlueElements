@@ -24,12 +24,12 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using BlueScript.Structures;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 
@@ -65,8 +65,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #endregion
 
     #region Events
-
-    public event EventHandler<DoRowAutomaticEventArgs>? DoSpecialRules;
 
     public event EventHandler<RowChangedEventArgs>? RowAdded;
 
@@ -207,29 +205,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             db.OnCanDoScript(e);
             if (e.Cancel) { break; }
 
-            try {
-                db.OnDropMessage(FehlerArt.Info, "Aktualisiere Zeile: " + row.CellFirstString());
-
-                ScriptEndedFeedback? ok = null;
-                if (db.Column.SysRowState is ColumnItem srs) {
-                    if (string.IsNullOrEmpty(row.CellGetString(srs)) && db.EventScript.Get(ScriptEventTypes.value_changed_large).Count == 1) {
-                        ok = row.ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, false, true);
-                    } else {
-                        ok = row.ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 2, null, false, true);
-                    }
-                }
-
-                if (ok is null || !ok.AllOk) { break; }
-                row.InvalidateCheckData();
-                row.CheckRowDataIfNeeded();
-                AddBackgroundWorker(row);
-                db.OnInvalidateView();
-            } catch { }
+            row.UpdateRow(false);
 
             if (start.ElapsedMilliseconds > 30000) { break; }
         }
 
         lock (_executingchangedrowsx) {
+            Develop.SetUserDidSomething();
             _executingchangedrows = false;
         }
     }
@@ -815,20 +797,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
-
-    //internal void Repair() {
-    //    foreach (var ThisRowItem in _Internal.Values) {
-    //        if (ThisRowItem != null) {
-    //            //ThisRowItem.Repair();
-    //            _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.KeyName); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
-    //        }
-    //    }
-    //}
-    //private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
     private void OnRowAdded(RowChangedEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
-        e.Row.DoSpecialRules += OnDoSpecialRules;
         e.Row.RowGotData += OnRowGotData;
 
         RowAdded?.Invoke(this, e);
@@ -842,7 +812,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnRowRemoving(RowChangedEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
-        e.Row.DoSpecialRules -= OnDoSpecialRules;
         e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);
     }

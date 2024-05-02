@@ -150,7 +150,6 @@
     <Compile Include="Enums\DatabaseDataType.cs" />
     <Compile Include="Enums\ViewType.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
-    <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />
     <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
     <Compile Include="EventArgs\ProgressbarEventArgs.cs" />

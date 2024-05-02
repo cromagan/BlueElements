@@ -144,12 +144,12 @@ public partial class TableView : FormWithStatusBar {
         if (row != null) {
             e.UserMenu.Add(ItemOf("Zeile", true));
             e.UserMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator()));
-            e.UserMenu.Add(ItemOf("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.CanDoPrepareFormulaCheckScript()));
+            e.UserMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), true));
 
             var didmenu = false;
 
             foreach (var thiss in db.EventScript) {
-                if (thiss != null && thiss.UserGroups.Count > 0 && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow) {
+                if (thiss != null && thiss.UserGroups.Count > 0 && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
                     if (!didmenu) {
                         e.UserMenu.Add(ItemOf("Skripte", true));
                         didmenu = true;
@@ -275,10 +275,10 @@ public partial class TableView : FormWithStatusBar {
                 Table.DoUndo(column, row);
                 break;
 
-            case "Datenüberprüfung":
+            case "#datenüberprüfung":
                 if (row != null && !row.IsDisposed) {
-                    row.InvalidateCheckData();
-                    row.CheckRowDataIfNeeded();
+                    row.UpdateRow(false);
+                    //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
                 }
                 break;
@@ -1046,8 +1046,8 @@ public partial class TableView : FormWithStatusBar {
                     }
 
                     foreach (var thisR in rows) {
-                        thisR.InvalidateCheckData();
-                        thisR.CheckRowDataIfNeeded();
+                        thisR.UpdateRow(false);
+                        //thisR.CheckRowDataIfNeeded();
                     }
 
                     MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
@@ -1225,9 +1225,9 @@ public partial class TableView : FormWithStatusBar {
             }
         }
 
-        if (db.CanDoPrepareFormulaCheckScript()) {
-            lstAufgaben.ItemAdd(ItemOf("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
-        }
+        //if (db.CanDoPrepareFormulaCheckScript()) {
+            lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
+        //}
 
         if (db.IsAdministrator()) {
             var d = ItemOf("Skripte bearbeiten", "#editscript", ImageCode.Skript);

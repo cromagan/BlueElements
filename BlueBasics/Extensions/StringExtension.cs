@@ -377,9 +377,13 @@ public static partial class Extensions {
     }
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
-        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
-        value = value.ToUpperInvariant();
-        input = " " + input.ToUpperInvariant() + " ";
+        if (options == RegexOptions.IgnoreCase) {
+            value = value.ToUpperInvariant();
+            input = " " + input.ToUpperInvariant() + " ";
+        } else {
+            input = " " + input + " ";
+        }
+
         startIndex++;
         while (true) {
             if (startIndex > input.Length - 1) { return -1; }

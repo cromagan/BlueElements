@@ -2063,6 +2063,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thisArrangement in _columnArrangements) {
             e.AddRange(thisArrangement.PermissionGroups_Show);
         }
+
+        foreach(var thisEv in EventScript) {
+            e.AddRange(thisEv.UserGroups);
+        }
+
         //foreach (var thisArrangement in OldFormulaViews) {
         //    e.AddRange(thisArrangement.PermissionGroups_Show);
         //}
