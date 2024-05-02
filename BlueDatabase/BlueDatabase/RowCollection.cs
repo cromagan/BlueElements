@@ -205,7 +205,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             db.OnCanDoScript(e);
             if (e.Cancel) { break; }
 
-            row.UpdateRow(false);
+            row.UpdateRow(false, false, false);
 
             if (start.ElapsedMilliseconds > 30000) { break; }
         }

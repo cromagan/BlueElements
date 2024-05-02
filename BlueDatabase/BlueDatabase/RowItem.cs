@@ -579,14 +579,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
-    public bool UpdateRow(bool onlyIfQuick) {
+    public bool UpdateRow(bool onlyIfQuick, bool mustDoFullCheck, bool wichtig) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
         if (db.Column.SysRowState is not ColumnItem srs) { return RepairAllLinks(); }
 
         var large = db.EventScript.Get(ScriptEventTypes.value_changed_large).Count;
         if (large > 1) { return false; }
 
-        bool mustDoFullCheck = large == 1 && string.IsNullOrEmpty(CellGetString(srs));
+        mustDoFullCheck = mustDoFullCheck || (large == 1 && string.IsNullOrEmpty(CellGetString(srs)));
 
         if (onlyIfQuick && mustDoFullCheck) { return false; }
 
@@ -594,11 +594,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption}");
 
             if (mustDoFullCheck) {
-                var ok = ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, false, true);
+                var ok = ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, wichtig, true);
                 if (!ok.AllOk) { return false; }
             }
 
-            var ok2 = ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 2, null, false, true);
+            var ok2 = ExecuteScript(ScriptEventTypes.value_changed_quick, string.Empty, true, true, true, 2, null, wichtig, true);
             if (!ok2.AllOk) { return false; }
 
             if (!RepairAllLinks()) { return false; }

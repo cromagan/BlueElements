@@ -277,7 +277,7 @@ public partial class TableView : FormWithStatusBar {
 
             case "#datenüberprüfung":
                 if (row != null && !row.IsDisposed) {
-                    row.UpdateRow(false);
+                    row.UpdateRow(false, true, true);
                     //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
                 }
@@ -1046,7 +1046,7 @@ public partial class TableView : FormWithStatusBar {
                     }
 
                     foreach (var thisR in rows) {
-                        thisR.UpdateRow(false);
+                        thisR.UpdateRow(false, true, true);
                         //thisR.CheckRowDataIfNeeded();
                     }
 
@@ -1140,12 +1140,12 @@ public partial class TableView : FormWithStatusBar {
         var s = (List<object>)e.TabPage.Tag;
 
         var ci = (ConnectionInfo)s[0];
-        if(ci == null) {
+        if (ci == null) {
             e.TabPage.Text = "FEHLER";
             UpdateScripts(null);
             DatabaseSet(null, string.Empty);
-            return; }
-
+            return;
+        }
 
         #region Status-Meldung updaten?
 
@@ -1232,7 +1232,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         //if (db.CanDoPrepareFormulaCheckScript()) {
-            lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
         //}
 
         if (db.IsAdministrator()) {

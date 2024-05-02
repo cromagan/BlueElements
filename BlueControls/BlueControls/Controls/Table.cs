@@ -2218,7 +2218,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
-            contentHolderCellRow.UpdateRow(true);
+            contentHolderCellRow.UpdateRow(true, false, true);
 
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
