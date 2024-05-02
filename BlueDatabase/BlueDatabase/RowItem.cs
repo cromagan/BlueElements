@@ -586,7 +586,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var large = db.EventScript.Get(ScriptEventTypes.value_changed_large).Count;
         if (large > 1) { return false; }
 
-        bool mustDoFullCheck = large == 1 && !string.IsNullOrEmpty(CellGetString(srs));
+        bool mustDoFullCheck = large == 1 && string.IsNullOrEmpty(CellGetString(srs));
 
         if (onlyIfQuick && mustDoFullCheck) { return false; }
 

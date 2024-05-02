@@ -1140,6 +1140,12 @@ public partial class TableView : FormWithStatusBar {
         var s = (List<object>)e.TabPage.Tag;
 
         var ci = (ConnectionInfo)s[0];
+        if(ci == null) {
+            e.TabPage.Text = "FEHLER";
+            UpdateScripts(null);
+            DatabaseSet(null, string.Empty);
+            return; }
+
 
         #region Status-Meldung updaten?
 

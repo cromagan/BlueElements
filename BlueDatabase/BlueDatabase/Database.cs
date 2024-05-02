@@ -1386,14 +1386,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
                 allowedMethods |= MethodType.NeedLongTime;
+            }
+
+            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
                 allowedMethods |= MethodType.IO;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
             if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
