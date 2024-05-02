@@ -591,7 +591,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (onlyIfQuick && mustDoFullCheck) { return false; }
 
         try {
-            db.OnDropMessage(FehlerArt.Info, "Aktualisiere Zeile: " + CellFirstString());
+            db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption}");
 
             if (mustDoFullCheck) {
                 var ok = ExecuteScript(ScriptEventTypes.value_changed_large, string.Empty, true, true, true, 2, null, false, true);

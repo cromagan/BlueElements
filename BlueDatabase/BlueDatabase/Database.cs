@@ -1949,9 +1949,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
         IsInCache = FileStateUTCDate;
 
+        CheckSysUndoNow(new List<Database> { this }, true);
+
         RepairAfterParse();
 
-        CheckSysUndoNow(new List<Database> { this }, true);
         if (ronly) { SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded();
@@ -2064,7 +2065,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             e.AddRange(thisArrangement.PermissionGroups_Show);
         }
 
-        foreach(var thisEv in EventScript) {
+        foreach (var thisEv in EventScript) {
             e.AddRange(thisEv.UserGroups);
         }
 
