@@ -751,7 +751,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private void TextBox_TextChanged(object sender, System.EventArgs e) {
         while (Marker.IsBusy) {
             if (!Marker.CancellationPending) { Marker.CancelAsync(); }
-            //Develop.DoEvents();
+            Develop.DoEvents();
         }
 
         var (column, _) = GetTmpVariables();
