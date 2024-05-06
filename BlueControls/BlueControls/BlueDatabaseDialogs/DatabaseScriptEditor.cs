@@ -135,6 +135,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
+                chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.ScriptText;
 
@@ -360,6 +361,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
         if (chkAuslöser_databaseloaded.Checked) { tmp |= ScriptEventTypes.loaded; }
         if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
+        if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
         Item.EventTypes = tmp;
     }
 

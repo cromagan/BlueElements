@@ -707,6 +707,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (row == null) { return "Zeile nicht gefunden!"; }
 
             OnRowRemoving(new RowChangedEventArgs(row, reason));
+
+            if (reason == Reason.SetCommand) {
+                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, false, false, true, 3, null, true, true);
+            }
+
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
                     db.Cell.SetValueInternal(thisColumn, row, string.Empty, Reason.AdditionalWorkAfterCommand);

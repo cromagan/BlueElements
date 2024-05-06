@@ -121,6 +121,6 @@
     <value>Das Skript wird nach dem Ändern eines
 Wertes einer Zelle ausgeführt, wenn die Spalte
 als Schlüsselspalte definiert ist. Oder nachdem eine neue Zeile erstellt wurde.
-Achtung: Die einfache Prüfdung wird danach nicht ausgeführt!</value>
+Achtung: Die einfache Prüffung wird danach ebenfalls ausgeführt!</value>
   </data>
 </root>

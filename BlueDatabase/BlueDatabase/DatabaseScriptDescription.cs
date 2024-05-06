@@ -162,6 +162,13 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (_eventTypes != ScriptEventTypes.export) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
+        if (_eventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
+            if (ChangeValues) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
+            if (!_needRow) { return "Routinen für das Löschen einer Zeile müssen sich auf Zeilen beziehen."; }
+            if (UserGroups.Count > 0) { return "Routinen, für das Löschen einer Zeile, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes != ScriptEventTypes.row_deleting) { return "Routinen für für das Löschen einer Zeile müssen für sich alleine stehen."; }
+        }
+
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) {
             if (ChangeValues) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }

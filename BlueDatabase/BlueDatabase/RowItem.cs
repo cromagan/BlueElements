@@ -751,7 +751,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         // Nicht ganz optimal, da ein Script ebenfalls den Flag changevalues hat. Aber hier wird nur auf den Flag eingenangen, ob es eine Testroutine ist oder nicht
-        if (eventname is ScriptEventTypes.prepare_formula or ScriptEventTypes.value_changed_extra_thread or ScriptEventTypes.export) { return script; }
+        if (eventname is ScriptEventTypes.prepare_formula
+            or ScriptEventTypes.value_changed_extra_thread
+            or ScriptEventTypes.export
+            or ScriptEventTypes.row_deleting) { return script; }
 
         if (!produktivphase) { return script; }
 

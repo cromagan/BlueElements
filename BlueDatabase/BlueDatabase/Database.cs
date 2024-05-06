@@ -1124,6 +1124,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Skript 'Export' mehrfach vorhanden";
         }
 
+        if (l.Get(ScriptEventTypes.row_deleting).Count > 1) {
+            return "Skript 'Zeile löschen' mehrfach vorhanden";
+        }
+
         if (l.Get(ScriptEventTypes.loaded).Count > 1) {
             return "Skript 'Datenank geladen' mehrfach vorhanden";
         }
@@ -1133,19 +1137,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (l.Get(ScriptEventTypes.value_changed_extra_thread).Count > 1) {
-            return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
+            return "Skript 'Wert geändert (Extra Thread)' mehrfach vorhanden";
         }
 
         if (l.Get(ScriptEventTypes.InitialValues).Count > 1) {
-            return "Skript 'InitialValues' mehrfach vorhanden";
+            return "Skript 'Zeile Initialisieren' mehrfach vorhanden";
         }
 
         if (l.Get(ScriptEventTypes.value_changed_quick).Count > 1) {
-            return "Skript 'Wert geändert (schnell)' mehrfach vorhanden";
+            return "Skript 'Wert geändert (einfach)' mehrfach vorhanden";
         }
 
         if (l.Get(ScriptEventTypes.value_changed_large).Count > 1) {
-            return "Skript 'Wert geändert (groß)' mehrfach vorhanden";
+            return "Skript 'Wert geändert (erweitert)' mehrfach vorhanden";
         }
 
         return string.Empty;

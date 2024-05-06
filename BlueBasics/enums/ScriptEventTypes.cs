@@ -35,5 +35,6 @@ public enum ScriptEventTypes {
     loaded = 16,
     export = 32,
     clipboard_changed = 64,
-    value_changed_large = 128
+    value_changed_large = 128,
+    row_deleting = 256
 }
