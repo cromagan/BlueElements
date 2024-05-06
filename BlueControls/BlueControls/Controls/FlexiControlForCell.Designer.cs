@@ -24,6 +24,7 @@ namespace BlueControls.Controls {
             this.Marker.WorkerSupportsCancellation = true;
             this.Marker.DoWork += new DoWorkEventHandler(this.Marker_DoWork);
             this.Marker.ProgressChanged += new ProgressChangedEventHandler(this.Marker_ProgressChanged);
+            this.Marker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.Marker_RunWorkerCompleted);
             this.ResumeLayout(false);
         }
         #endregion

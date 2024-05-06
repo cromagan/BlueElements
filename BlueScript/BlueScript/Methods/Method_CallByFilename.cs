@@ -114,7 +114,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
         if (!scx.AllOk) {
             infos.Data.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
+            return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen");
         }
 
         return new DoItFeedback(scx.BreakFired, scx.EndScript);

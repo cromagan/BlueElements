@@ -276,6 +276,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         if (disposing) {
             this.DoDispose();
             components?.Dispose();
+            RestartMarker(); // Restart beendet den Marker und starten ihn bei Bedarf
         }
 
         base.Dispose(disposing);
@@ -342,9 +343,19 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        RestartMarker();
+    }
+
     protected override void OnValueChanged() {
         base.OnValueChanged();
         ValueToCell();
+    }
+
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+        RestartMarker();
     }
 
     protected override void RemoveAll() {
@@ -459,6 +470,15 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         var (column, row) = GetTmpVariables();
         StyleControls(column, row);
         SetValueFromCell(column, row);
+    }
+
+    private void ActivateMarker() {
+        if (IsDisposed || !Visible || !Enabled) { return; }
+        var (column, _) = GetTmpVariables();
+
+        if (column == null || column.IsDisposed) { return; }
+        if (column.Function != ColumnFunction.RelationText) { return; }
+        Marker.RunWorkerAsync();
     }
 
     private void Column_ItemInternalChanged(object sender, ColumnEventArgs e) {
@@ -663,6 +683,18 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
+    private void Marker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+        ActivateMarker();
+    }
+
+    private void RestartMarker() {
+        if (Marker.IsBusy && !Marker.CancellationPending) {
+            Marker.CancelAsync();
+        } else {
+            ActivateMarker();
+        }
+    }
+
     private void SetValueFromCell(ColumnItem? column, RowItem? row) {
         if (IsDisposed) { return; }
 
@@ -749,16 +781,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = this.Database();
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) {
-        while (Marker.IsBusy) {
-            if (!Marker.CancellationPending) { Marker.CancelAsync(); }
-            Develop.DoEvents();
-        }
-
-        var (column, _) = GetTmpVariables();
-
-        if (column == null || column.IsDisposed) { return; }
-        if (column.Function != ColumnFunction.RelationText) { return; }
-        Marker.RunWorkerAsync();
+        RestartMarker();
     }
 
     private void ValueToCell() {

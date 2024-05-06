@@ -614,7 +614,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Controls.Add(this.ribMain);
             this.MinimizeBox = false;
             this.Name = "DatabaseScriptEditor";
-            this.ShowInTaskbar = false;
             this.Text = "Datenbank-Eigenschaften";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.ribMain, 0);

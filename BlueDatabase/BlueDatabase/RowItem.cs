@@ -493,8 +493,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return ok;
     }
 
-    public bool NeedsRowUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                         string.IsNullOrEmpty(CellGetString(srs));
+    public bool NeedsRowUpdate() {
+        if (Database is not Database db || db.IsDisposed) { return false; }
+        if (db.Column.SysRowState is not ColumnItem srs) { return false; }
+        if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
+        if (db.Column.SysRowChanger is not ColumnItem src) { return false; }
+        return string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase);
+        //return db.IsAdministrator();
+    }
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
                                      CellGetLong(srs) < Database.EventScriptVersion;
