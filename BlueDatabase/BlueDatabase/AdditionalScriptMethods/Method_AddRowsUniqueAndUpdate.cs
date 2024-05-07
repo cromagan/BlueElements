@@ -86,7 +86,7 @@ public class Method_AddRowsUniqueAndUpdate : Method_Database {
                 new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, thisKey)
             };
 
-            var fb = Method_RowUniqueAndUpdade.UniqueRow(infos, allFi, scp, "Script-Befehl: 'AddRows' von " + mydb.Caption);
+            var fb = Method_RowUniqueAndUpdade.UniqueRow(infos, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndUpdate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }

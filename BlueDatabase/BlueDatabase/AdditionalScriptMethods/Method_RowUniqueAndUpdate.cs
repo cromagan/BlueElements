@@ -18,13 +18,13 @@
 #nullable enable
 
 using BlueBasics;
-using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
@@ -98,29 +98,25 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
             myRow = newrow;
         } else {
             myRow = r[0];
-
-            //var ok1 = myRow.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 2, null, true, true);
-
-            //if (!ok1.AllOk) { { return new DoItFeedback(infos.Data, "RowUniqueAndUpdate fehlgeschlagen bei Skript: NewRow."); } }
         }
-
-        //if (!string.IsNullOrEmpty(scriptn)) {
-        //    var ok1 = myRow.ExecuteScript(null, scriptn, true, true, true, 2, null, true, true);
-        //    if (!ok1.AllOk) { { return new DoItFeedback(infos.Data, $"RowUniqueAndUpdate fehlgeschlagen bei Skript: {scriptn}."); } }
-        //}
 
         if (myRow.Database is not Database db) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
 
         if (db.Column.SysRowState is ColumnItem srs) {
-            db.Cell.SetValueInternal(srs, myRow, string.Empty, Reason.SetCommand);
-        }
+            var v = myRow.CellGetLong(srs);
 
-        //var ok = myRow.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 2, null, true, true);
-        //if (!ok.AllOk) { { return new DoItFeedback(infos.Data, "RowUniqueAndUpdate fehlgeschlagen bei Skript: keyvalue_changed."); } }
-        //myRow.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null, true, true);
-        //if (!ok.AllOk) { { return new DoItFeedback(infos.Data, "RowUniqueAndUpdate fehlgeschlagen bei Skript: value_changed."); } }
-        //myRow.InvalidateCheckData();
-        //myRow.CheckRowDataIfNeeded();
+            if (v > 0) {
+                var lastchange = RowItem.TimeCodeToUTCDateTime(v);
+
+                if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes < 15) {
+                    return new DoItFeedback(infos.Data, "Fehlgeschlagen, da eine Zeile erst durchgerechet wurde und der Intervall zu kurz ist (15 Minuten)");
+                }
+            }
+
+            myRow.CellSet(srs, string.Empty, coment);
+        } else {
+            return new DoItFeedback(infos.Data, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
+        }
 
         return Method_Row.RowToObjectFeedback(myRow);
     }
@@ -154,7 +150,7 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
 
-        return UniqueRow(infos, allFi, scp, "Script-Befehl: 'RowUniqueAndUpdate' von " + mydb.Caption);
+        return UniqueRow(infos, allFi, scp, $"Script-Befehl: 'UniqueRow' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
     }
 
     public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => filterarg;

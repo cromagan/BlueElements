@@ -660,62 +660,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         _ = Sizes.TryAdd(key, contentSize);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="value"></param>
-    /// <param name="reason"></param>
-    public string SetValueInternal(ColumnItem column, RowItem row, string value, Reason reason) {
-        var tries = 0;
-
-        while (true) {
-            if (IsDisposed || column.Database is not Database db || db.IsDisposed) { return "Datenbank ungültig"; }
-            if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
-
-            db.RefreshCellData(column, row, reason);
-
-            var cellKey = KeyOfCell(column, row);
-
-            if (ContainsKey(cellKey)) {
-                var c = this[cellKey];
-                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-                if (string.IsNullOrEmpty(value)) {
-                    if (!TryRemove(cellKey, out _)) {
-                        tries++;
-                        continue;
-                    }
-                }
-            } else {
-                if (!string.IsNullOrEmpty(value)) {
-                    if (!TryAdd(cellKey, new CellItem(value))) {
-                        tries++;
-                        continue;
-                    }
-                }
-            }
-
-            if (reason == Reason.SetCommand) {
-                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (column.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
-                        if (db.Column.SysRowState is ColumnItem srs) {
-                            SetValueInternal(srs, row, string.Empty, reason);
-                        }
-                    }
-                }
-            }
-
-            if (reason is Reason.SetCommand) {
-                column.Invalidate_ContentWidth();
-                row.InvalidateCheckData();
-                OnCellValueChanged(new CellChangedEventArgs(column, row, reason));
-            }
-
-            return string.Empty;
-        }
-    }
-
     public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style) ?? [];
 
     internal bool ChangeColumnName(string oldName, string newName) {
@@ -782,6 +726,62 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         } catch {
             Develop.CheckStackForOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
+        }
+    }
+
+    /// <summary>
+    /// Setzt den Wert ohne Undo Logging
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="value"></param>
+    /// <param name="reason"></param>
+    internal string SetValueInternal(ColumnItem column, RowItem row, string value, Reason reason) {
+        var tries = 0;
+
+        while (true) {
+            if (IsDisposed || column.Database is not Database db || db.IsDisposed) { return "Datenbank ungültig"; }
+            if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
+
+            db.RefreshCellData(column, row, reason);
+
+            var cellKey = KeyOfCell(column, row);
+
+            if (ContainsKey(cellKey)) {
+                var c = this[cellKey];
+                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+                if (string.IsNullOrEmpty(value)) {
+                    if (!TryRemove(cellKey, out _)) {
+                        tries++;
+                        continue;
+                    }
+                }
+            } else {
+                if (!string.IsNullOrEmpty(value)) {
+                    if (!TryAdd(cellKey, new CellItem(value))) {
+                        tries++;
+                        continue;
+                    }
+                }
+            }
+
+            if (reason == Reason.SetCommand) {
+                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+                    if (column.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
+                        if (db.Column.SysRowState is ColumnItem srs) {
+                            SetValueInternal(srs, row, string.Empty, reason);
+                        }
+                    }
+                }
+            }
+
+            if (reason is Reason.SetCommand) {
+                column.Invalidate_ContentWidth();
+                row.InvalidateCheckData();
+                OnCellValueChanged(new CellChangedEventArgs(column, row, reason));
+            }
+
+            return string.Empty;
         }
     }
 

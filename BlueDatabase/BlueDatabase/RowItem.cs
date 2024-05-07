@@ -172,6 +172,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    public static DateTime TimeCodeToUTCDateTime(long timeCode) {
+        long originalTicks = (timeCode * 5000) + new DateTime(2024, 1, 1).Ticks;
+        return new DateTime(originalTicks, DateTimeKind.Utc);
+    }
+
     public static long TimeCodeUTCNow() {
         var t = DateTime.UtcNow.Ticks - new DateTime(2024, 1, 1).Ticks;
         return t / 5000;
@@ -609,7 +614,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!RepairAllLinks()) { return false; }
 
-            CellSet(srs, TimeCodeUTCNow(), "NACH Skript 'value_changed'"); // Nicht System set, diese Änderung muss geloggt werden
+            CellSet(srs, TimeCodeUTCNow(), "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
 
             InvalidateCheckData();
             CheckRowDataIfNeeded();
