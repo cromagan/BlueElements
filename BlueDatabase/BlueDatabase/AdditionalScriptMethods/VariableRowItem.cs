@@ -54,6 +54,10 @@ public class VariableRowItem : Variable {
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _row == null;
     public override string MyClassId => ClassId;
+
+    /// <summary>
+    /// Gibt den Text "Row: CellFirstString" zurück.
+    /// </summary>
     public override string ReadableText => _lastText;
 
     public RowItem? RowItem {

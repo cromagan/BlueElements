@@ -28,12 +28,12 @@ using System.Diagnostics;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_AddRowsUniqueAndUpdate : Method_Database {
+public class Method_AddRowsUniqueAndInvalidate : Method_Database {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, ListStringVar];
-    public override string Command => "addrowsuniqueandupdate";
+    public override string Command => "addrowsuniqueandinvalidate";
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
@@ -48,7 +48,7 @@ public class Method_AddRowsUniqueAndUpdate : Method_Database {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRowsUniqueAndUpdate(database, ZusätzlichesSkript, keyvalues);";
+    public override string Syntax => "AddRowsUniqueAndInvalidate(database, ZusätzlichesSkript, keyvalues);";
 
     #endregion
 
@@ -82,11 +82,11 @@ public class Method_AddRowsUniqueAndUpdate : Method_Database {
         if (c == null) { return new DoItFeedback(infos.Data, "Erste Spalte nicht vorhanden"); }
 
         foreach (var thisKey in keys) {
-            var allFi = new FilterCollection(db, "Method_AddRowsUniqueAndUpdate") {
+            var allFi = new FilterCollection(db, "Method_AddRowsUniqueAndInvalidate") {
                 new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, thisKey)
             };
 
-            var fb = Method_RowUniqueAndUpdade.UniqueRow(infos, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndUpdate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+            var fb = Method_RowUniqueAndUpdade.UniqueRow(infos, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }

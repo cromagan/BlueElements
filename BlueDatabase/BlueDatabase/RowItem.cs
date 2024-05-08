@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
@@ -33,6 +34,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -165,6 +167,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case ScriptType.Bool_Readonly:
                 return new VariableBool(column.KeyName, wert == "+", true, qi);
+
+            case ScriptType.Row:
+                return new VariableRowItem(column.KeyName, row?.Database?.Row.SearchByKey(wert), ro, qi);
 
             default:
                 Develop.DebugPrint(column.ScriptType);
@@ -651,6 +656,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case VariableString vs:
                 CellSet(column, vs.ValueString, comment);
+                break;
+
+            case VariableRowItem vr:
+                var r = string.Empty;
+                if (vr.RowItem is RowItem ro) { r = ro.KeyName; }
+                CellSet(column, r, comment);
                 break;
 
             default:

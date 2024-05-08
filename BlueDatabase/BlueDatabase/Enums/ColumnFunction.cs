@@ -74,7 +74,9 @@ public enum ColumnFunction {
 
     Verknüpfung_zu_anderer_Datenbank2 = 82,
 
-    Virtuelle_Spalte = 83
+    Virtuelle_Spalte = 83,
+
+    Zeile = 84
 
     // bis 999 wird geprüft
 }
@@ -88,17 +90,21 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                     or ColumnFunction.RelationText
-                                                                                    or ColumnFunction.Schlüsselspalte_NurDatenprüfung or ColumnFunction.Virtuelle_Spalte;
+                                                                                    or ColumnFunction.Schlüsselspalte_NurDatenprüfung
+                                                                                    or ColumnFunction.Virtuelle_Spalte
+                                                                                    or ColumnFunction.Zeile;
 
     public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Virtuelle_Spalte;
+                                                                                     or ColumnFunction.Virtuelle_Spalte
+                                                                                     or ColumnFunction.Zeile;
 
     public static bool CanBeCheckedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte_NurDatenprüfung
-                                                                                     or ColumnFunction.Virtuelle_Spalte;
+                                                                                     or ColumnFunction.Virtuelle_Spalte
+                                                                                     or ColumnFunction.Zeile;
 
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                       or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems

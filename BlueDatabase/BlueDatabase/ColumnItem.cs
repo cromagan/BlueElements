@@ -1259,19 +1259,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
     public string ErrorReason() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
-        //if (_name < 0) { return "Interner Fehler: ID nicht definiert"; }
         if (string.IsNullOrEmpty(_name)) { return "Der Spaltenname ist nicht definiert."; }
 
         if (!IsValidColumnName(_name)) { return "Der Spaltenname ist ungültig."; }
 
-        //if (!IsSystemColumn()) {
-        //if (_maxTextLenght == 4000) {
-        //    _maxTextLenght = CalculatePreveredMaxTextLenght(1.2);
-        //}
-
         if (_maxCellLenght < _maxTextLenght) { return "Zellengröße zu klein!"; }
-        //}
-
         if (_maxCellLenght < 1) { return "Zellengröße zu klein!"; }
         if (_maxCellLenght > 4000) { return "Zellengröße zu groß!"; }
         if (_maxTextLenght > 4000) { return "Maximallänge zu groß!"; }
@@ -1281,15 +1273,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
 
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
-        //if (!_saveContent && !IsSystemColumn()) { return "Inhalt der Spalte muss gespeichert werden."; }
-        //if (!_saveContent && _showUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
+
         if (((int)_function).ToString() == _function.ToString()) { return "Format fehlerhaft."; }
+
         if (_function.NeedTargetDatabase()) {
             if (LinkedDatabase is not Database db2 || db2.IsDisposed) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
             if (db == db2) { return "Zirkelbezug mit verknüpfter Datenbank."; }
             var c = db2.Column[_linkedCell_ColumnNameOfLinkedDatabase];
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-            //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
             if (_linkedCellFilter.Count == 0) {
                 if (Function != ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                     return "Keine Filter für verknüpfte Datenbank definiert.";
@@ -1312,6 +1303,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             }
         }
         switch (_function) {
+            case ColumnFunction.Zeile:
+                if (_scriptType is not ScriptType.Row) { return "Zeilenspalten müssen im Skript als Zeile vorhanden sein."; }
+                if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
+                break;
+
             case ColumnFunction.Virtuelle_Spalte:
                 if (_showUndo) { return "Virtuelle Spalten unterstützen kein Undo."; }
                 if (_fixedColumnWidth < 16) { return "Virtuelle Spalten brauchen eine feste Spaltenbreite."; }
@@ -1360,6 +1356,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         } else {
             if (_afterEditQuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
         }
+
         if (_spellCheckingEnabled && !_function.SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
         if (_editAllowedDespiteLock && !_textBearbeitungErlaubt && !_dropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
         var tmpEditDialog = UserEditDialogTypeInTable(_function, false, true, _multiLine);
@@ -1393,8 +1390,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (_dropdownAllesAbwählenErlaubt && !_function.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
         if (_dropDownItems.Count > 0 && !_function.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
-        if (!string.IsNullOrEmpty(_suffix)) {
-            if (_multiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
+        if (!string.IsNullOrEmpty(_suffix) || !string.IsNullOrEmpty(_prefix)) {
+            if (_multiLine) { return "Präfix/Suffix und Mehrzeilig darf nicht kombiniert werden."; }
         }
         if (_roundAfterEdit > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
@@ -1405,6 +1402,20 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                              not ColumnFunction.RelationText) { return "Format unterstützt keine Ersetzungen."; }
             if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
+        }
+
+        if (_function != ColumnFunction.Zeile && _scriptType == ScriptType.Row) {
+            return "Der Skripttyp 'Zeile' kann nur bei der Spaltenfuntion 'Zeile' gewählt werden.";
+        }
+
+        if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 or ColumnFunction.Zeile or ColumnFunction.Button or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+            if (_roundAfterEdit != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
+                return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben oder Sortierung.";
+            }
+
+            if (!string.IsNullOrEmpty(_suffix) || !string.IsNullOrEmpty(_prefix)) {
+                return "Dieses Format unterstützt kein Präfix/Suffix.";
+            }
         }
 
         return string.Empty;
@@ -1541,6 +1552,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (IsDisposed) { return; }
 
         if (_function == ColumnFunction.Button) { ScriptType = ScriptType.Nicht_vorhanden; }
+        if (_function == ColumnFunction.Zeile) { ScriptType = ScriptType.Row; }
 
         if (_function.ToString() == ((int)_function).ToString()) {
             this.GetStyleFrom(ColumnFormatHolder.Text);
@@ -1922,6 +1934,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         if (_function == ColumnFunction.Virtuelle_Spalte) { return QuickImage.Get(ImageCode.Tabelle, 16); }
 
+        if (_function == ColumnFunction.Zeile) { return QuickImage.Get(ImageCode.Zeile, 16); }
+
         foreach (var thisFormat in FormatHolder.AllFormats) {
             if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.Image; }
         }
@@ -2042,6 +2056,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             //case ColumnFunction.Schrift:
             //    return editTypeToCheck == EditTypeFormula.Font_AuswahlDialog;
 
+            case ColumnFunction.Zeile:
             case ColumnFunction.Button:
                 //if (EditType_To_Check == enEditTypeFormula.Button) { return true; }
                 return false;
@@ -2385,12 +2400,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             //    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
             //    return EditTypeTable.Font_AuswahlDialog;
 
+            case ColumnFunction.Zeile:
             case ColumnFunction.Button:
-                return EditTypeTable.None;
-
             case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
-                return EditTypeTable.None;
-
             case ColumnFunction.Virtuelle_Spalte:
                 return EditTypeTable.None;
 

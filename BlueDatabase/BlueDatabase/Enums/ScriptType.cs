@@ -30,5 +30,7 @@ public enum ScriptType {
     //DateTime = 6,
     Bool_Readonly = 7,
 
+    Row = 8,
+
     undefiniert = 999
 }

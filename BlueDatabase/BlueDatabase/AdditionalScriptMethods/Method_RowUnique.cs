@@ -46,7 +46,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
                                           "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
                                           "Werden mehrere Zeilen gefunden, wird das Skript abgebrochen.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
-                                          "Bessere Alternative: RowUniqueAndUpdate";
+                                          "Bessere Alternative: RowUniqueAndInvalidate";
 
     public override bool GetCodeBlockAfter => false;
 

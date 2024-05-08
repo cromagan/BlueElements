@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
+public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton {
 
     #region Properties
 
@@ -42,7 +42,7 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
 
     public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
 
-    public override string Command => "rowuniqueandupdate";
+    public override string Command => "rowuniqueandinvalidate";
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
@@ -64,7 +64,7 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "RowUniqueAndUpdate(Filter, ...)";
+    public override string Syntax => "RowUniqueAndInvalidate(Filter, ...)";
 
     #endregion
 
@@ -75,7 +75,7 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
         var r = allFi.Rows;
 
         if (r.Count > 5) {
-            return new DoItFeedback(infos.Data, "RowUniqueAndUpdate gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
+            return new DoItFeedback(infos.Data, "RowUniqueAndInvalidate gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
         }
 
         if (r.Count > 1) {
@@ -85,7 +85,7 @@ public class Method_RowUniqueAndUpdade : Method_Database, IUseableForButton {
             r[0].Database?.Row.RemoveYoungest(r, true);
             r = allFi.Rows;
             if (r.Count > 1) {
-                return new DoItFeedback(infos.Data, "RowUniqueAndUpdate gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
+                return new DoItFeedback(infos.Data, "RowUniqueAndInvalidate gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
             }
         }
 
