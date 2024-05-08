@@ -590,7 +590,7 @@ internal sealed partial class ColumnEditor {
 
             db.ColumnArrangements = car.AsReadOnly();
 
-            db.SortDefinition = new RowSortDefinition(db, "Spalte", false);
+            db.SortDefinition = new RowSortDefinition(db, sp, false);
             tblFilterliste.DatabaseSet(db, string.Empty);
             //tblFilterliste.Arrangement = 1;
 

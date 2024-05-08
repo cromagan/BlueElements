@@ -167,7 +167,7 @@ public partial class VariableEditor : UserControl {
 
         db.ColumnArrangements = new(car);
 
-        db.SortDefinition = new RowSortDefinition(db, "Name", true);
+        db.SortDefinition = new RowSortDefinition(db, na, true);
 
         //if (!Editabe) { x.Freeze("Nur Ansicht"); }
 

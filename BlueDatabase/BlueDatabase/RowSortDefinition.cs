@@ -28,7 +28,7 @@ using System.Linq;
 
 namespace BlueDatabase;
 
-public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
+public sealed class RowSortDefinition : IParseable {
 
     #region Fields
 
@@ -45,25 +45,27 @@ public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
         this.Parse(toParse);
     }
 
-    public RowSortDefinition(Database database, string columnName, bool reverse) {
-        Database = database;
-        Initialize();
-        Reverse = reverse;
-        SetColumn(new List<string> { columnName });
-    }
-
-    public RowSortDefinition(Database database, List<string> columnNames, bool reverse) {
-        Initialize();
+    public RowSortDefinition(Database database, ColumnItem? colum, bool reverse) {
         Database = database;
         Reverse = reverse;
-        SetColumn(columnNames);
+
+        Columns.Clear();
+
+        if (colum != null && !colum.IsDisposed) { Columns.Add(colum); }
     }
 
-    #endregion
+    public RowSortDefinition(Database database, List<ColumnItem?>? column, bool reverse) {
+        Database = database;
+        Reverse = reverse;
 
-    #region Events
+        Columns.Clear();
 
-    public event EventHandler? PropertyChanged;
+        if (column != null) {
+            foreach (var thisColumn in column) {
+                if (thisColumn is ColumnItem c && !c.IsDisposed) { Columns.Add(c); }
+            }
+        }
+    }
 
     #endregion
 
@@ -74,8 +76,6 @@ public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
     #endregion
 
     #region Methods
-
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 
@@ -119,8 +119,9 @@ public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
         for (var i = 0; i < Columns.Count; i++) {
             if (Columns[i] is not ColumnItem c || c.IsDisposed) {
                 Columns.RemoveAt(i);
-                OnPropertyChanged();
+                //OnPropertyChanged();
                 Repair();
+                return;
             }
         }
     }
@@ -138,18 +139,10 @@ public sealed class RowSortDefinition : IParseable, IPropertyChangedFeedback {
         return Columns.Any(thisColumn => thisColumn == vcolumn);
     }
 
-    private void Initialize() {
-        Reverse = false;
-        Columns.Clear();
-    }
-
-    private void SetColumn(List<string> names) {
-        Columns.Clear();
-        foreach (var t in names) {
-            var c = Database.Column[t];
-            if (c != null && !c.IsDisposed) { Columns.Add(c); }
-        }
-    }
-
     #endregion
+
+    //private void Initialize() {
+    //    Reverse = false;
+    //    Columns.Clear();
+    //}
 }

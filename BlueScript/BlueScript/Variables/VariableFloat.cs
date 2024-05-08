@@ -102,7 +102,7 @@ public class VariableFloat : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x) {
+    protected override Variable NewWithThisValue(object? x) {
         var v = new VariableFloat(string.Empty);
         v.SetValue(x);
         return v;
@@ -118,19 +118,19 @@ public class VariableFloat : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernAlle);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
-            if (erg == null) { return null; }
+            if (erg == null) { return (false, null); }
             txt = erg.ToString();
         }
 
         if (DoubleTryParse(txt, out var zahl)) {
-            return zahl;
+            return (true, zahl);
         }
 
-        return null;
+        return (false, null);
     }
 
     #endregion

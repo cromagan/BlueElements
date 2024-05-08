@@ -86,7 +86,7 @@ public class Method_AddRowsUniqueAndInvalidate : Method_Database {
                 new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, thisKey)
             };
 
-            var fb = Method_RowUniqueAndUpdade.UniqueRow(infos, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+            var fb = Method_RowUniqueAndInvalidate.UniqueRow(infos, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }

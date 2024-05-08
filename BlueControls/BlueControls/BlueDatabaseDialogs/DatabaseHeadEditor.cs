@@ -256,7 +256,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
         _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
+        var az = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
         _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
@@ -282,7 +282,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         x.ColumnArrangements = new(car);
 
-        x.SortDefinition = new RowSortDefinition(x, "Index", true);
+        //x.SortDefinition = new RowSortDefinition(x, "Index", true);
 
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = string.Empty;
@@ -300,7 +300,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             }
         }
 
-        tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, "Aenderzeit", true);
+        tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, az, true);
 
         x.Freeze("Nur Ansicht");
     }
@@ -343,11 +343,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         switch (e.ClickedCommand) {
             case "SpaltenSortierungAZ":
-                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, false);
+                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column, false);
                 break;
 
             case "SpaltenSortierungZA":
-                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, true);
+                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column, true);
                 break;
         }
     }
@@ -377,7 +377,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         #region Sortierung
 
-        var colnam = lbxSortierSpalten.Items.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).KeyName).ToList();
+        var colnam = lbxSortierSpalten.Items.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item)).ToList();
         Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
 
         #endregion

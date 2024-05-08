@@ -183,15 +183,15 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "SpaltenSortierungDefault":
-                tbl.SortDefinitionTemporary = null;
+                if (tbl != null) { tbl.SortDefinitionTemporary = null; }
                 break;
 
             case "SpaltenSortierungAZ":
-                if (column != null && !column.IsDisposed && tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column.KeyName, false); }
+                if (tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column, false); }
                 break;
 
             case "SpaltenSortierungZA":
-                if (column != null && !column.IsDisposed && tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column.KeyName, true); }
+                if (tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column, true); }
                 break;
 
             case "Skript":

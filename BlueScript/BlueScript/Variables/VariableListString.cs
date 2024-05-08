@@ -124,7 +124,7 @@ public class VariableListString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x) {
+    protected override Variable NewWithThisValue(object? x) {
         var v = new VariableListString(string.Empty);
         v.SetValue(x);
         return v;
@@ -138,21 +138,19 @@ public class VariableListString : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (txt.Length > 1 && txt.StartsWith("[") && txt.EndsWith("]")) {
             var t = txt.Trim(KlammernEckig);
 
-            if (string.IsNullOrEmpty(t)) { return new List<string>(); } // Leere Liste
-
-            //var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null);
+            if (string.IsNullOrEmpty(t)) { return (true, new List<string>()); } // Leere Liste
 
             var l = Method.SplitAttributeToVars(vs, t, [[VariableString.ShortName_Plain]], 1, null, scp);
-            if (!string.IsNullOrEmpty(l.ErrorMessage)) { return null; }
+            if (!string.IsNullOrEmpty(l.ErrorMessage)) { return (false, null); }
 
-            return l.Attributes.AllStringValues();
+            return (true, l.Attributes.AllStringValues());
         }
 
-        return null;
+        return (false, null);
     }
 
     #endregion

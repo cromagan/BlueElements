@@ -85,8 +85,15 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     }
 
     public abstract string SearchValue { get; }
+
+    /// <summary>
+    /// Wichtig für Boolsche Vergleiche
+    /// </summary>
     public abstract bool ToStringPossible { get; }
 
+    /// <summary>
+    /// Wichtig für Boolsche Vergleiche
+    /// </summary>
     public virtual string ValueForReplace {
         get {
             if (ToStringPossible) { Develop.DebugPrint(FehlerArt.Fehler, "Routine muss überschrieben werden!"); }
@@ -95,10 +102,10 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
         set {
             var x = TryParse(value, null, null);
-            if (x == null) {
+            if (!x.cando) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler");
             }
-            SetValue(x);
+            SetValue(x.result);
         }
     }
 
@@ -202,7 +209,15 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         v = v.ToLowerInvariant();
         var vo = v;
         v = v.ReduceToChars(AllowedCharsVariableName);
-        return v == vo && !string.IsNullOrEmpty(v);
+        if( v != vo || string.IsNullOrEmpty(v)) {  return false; }
+
+        foreach (var thisc in Script.Commands) {
+            if(thisc.Command.Equals(v)) { return false; }
+
+        }
+        return true;
+
+
     }
 
     public abstract object Clone();
@@ -267,20 +282,20 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return result.Parseable(base.ToString());
     }
 
-    protected abstract Variable? NewWithThisValue(object x);
+    protected abstract Variable? NewWithThisValue(object? x);
 
     protected abstract void SetValue(object? x);
 
-    protected abstract object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
+    protected abstract (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
 
     protected bool TryParse(string txt, out Variable? succesVar, VariableCollection varCol, ScriptProperties scp) {
         var x = TryParse(txt, varCol, scp);
-        if (x == null) {
+        if (!x.cando) {
             succesVar = null;
             return false;
         }
 
-        succesVar = NewWithThisValue(x);
+        succesVar = NewWithThisValue(x.result);
         return succesVar != null;
     }
 

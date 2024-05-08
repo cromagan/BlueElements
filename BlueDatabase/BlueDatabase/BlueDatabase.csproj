@@ -86,9 +86,11 @@
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
     <Compile Include="AdditionalScriptMethods\Method_EnsureDatabaseLoaded.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_FilterinMyDB.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterAllValues.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowUniqueAndInvalidate.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
@@ -159,6 +161,7 @@
     <Compile Include="FilterItem.cs" />
     <Compile Include="LanguageTool.cs" />
     <Compile Include="RowCollection.cs" />
+    <Compile Include="RowData.cs" />
     <Compile Include="RowItem.cs" />
     <Compile Include="RowSortDefinition.cs" />
     <Compile Include="UndoItem.cs" />

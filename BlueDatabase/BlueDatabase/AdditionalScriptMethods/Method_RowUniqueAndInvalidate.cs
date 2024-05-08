@@ -109,7 +109,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
                 var lastchange = RowItem.TimeCodeToUTCDateTime(v);
 
                 if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes < 15) {
-                    return new DoItFeedback(infos.Data, "Fehlgeschlagen, da eine Zeile erst durchgerechet wurde und der Intervall zu kurz ist (15 Minuten)");
+                    return new DoItFeedback(infos.Data, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
                 }
             }
 

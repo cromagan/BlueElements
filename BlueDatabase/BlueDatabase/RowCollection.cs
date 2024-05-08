@@ -24,6 +24,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using BlueScript.Structures;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -32,6 +33,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BlueDatabase;
 
@@ -311,6 +313,109 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (ok) { return unique; }
         } while (true);
+    }
+
+    public (List<RowData> rows, long visiblerowcount) CalculateSortedRows(IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return ([], 0); }
+
+        var vrc = 0;
+
+        #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
+
+        var capName = pinnedRows != null && pinnedRows.Any();
+        if (!capName && db.Column.SysChapter is ColumnItem cap) {
+            foreach (var thisRow in filteredRows) {
+                if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(cap)) {
+                    capName = true;
+                    break;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Refresh
+
+        var colsToRefresh = new List<ColumnItem>();
+        var reverse = false;
+        if (sortused is RowSortDefinition rsd) { colsToRefresh.AddRange(rsd.Columns); reverse = rsd.Reverse; }
+        if (db.Column.SysChapter is ColumnItem csc) { _ = colsToRefresh.AddIfNotExists(csc); }
+        if (db.Column.First() is ColumnItem cf) { _ = colsToRefresh.AddIfNotExists(cf); }
+
+        db.RefreshColumnsData(colsToRefresh.ToArray());
+
+        #endregion
+
+        var lockMe = new object();
+
+        #region _Angepinnten Zeilen erstellen (_pinnedData)
+
+        List<RowData> pinnedData = [];
+
+        if (pinnedRows != null) {
+            _ = Parallel.ForEach(pinnedRows, thisRow => {
+                var rd = new RowData(thisRow, "Angepinnt");
+                rd.PinStateSortAddition = "1";
+                rd.MarkYellow = true;
+                rd.AdditionalSort = thisRow.CompareKey(colsToRefresh);
+
+                lock (lockMe) {
+                    vrc++;
+                    pinnedData.Add(rd);
+                }
+            });
+        }
+
+        #endregion
+
+        #region Gefiltere Zeilen erstellen (_rowData)
+
+        List<RowData> rowData = [];
+        _ = Parallel.ForEach(filteredRows, thisRow => {
+            var adk = thisRow.CompareKey(colsToRefresh);
+
+            var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
+            var added = markYellow;
+
+            List<string> caps;
+            if (db.Column.SysChapter is ColumnItem sc) {
+                caps = thisRow.CellGetList(sc);
+            } else {
+                caps = [];
+            }
+
+            if (caps.Count > 0) {
+                if (caps.Contains(string.Empty)) {
+                    _ = caps.Remove(string.Empty);
+                    caps.Add("-?-");
+                }
+            }
+
+            if (caps.Count == 0 && capName) { caps.Add("Weitere Zeilen"); }
+            if (caps.Count == 0) { caps.Add(string.Empty); }
+
+            foreach (var thisCap in caps) {
+                var rd = new RowData(thisRow, thisCap);
+
+                rd.PinStateSortAddition = "2";
+                rd.MarkYellow = markYellow;
+                rd.AdditionalSort = adk;
+                lock (lockMe) {
+                    rowData.Add(rd);
+                    if (!added) { vrc++; added = true; }
+                }
+            }
+        });
+
+        #endregion
+
+        pinnedData.Sort();
+        rowData.Sort();
+
+        if (reverse) { rowData.Reverse(); }
+
+        rowData.InsertRange(0, pinnedData);
+        return (rowData, vrc);
     }
 
     public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
@@ -612,6 +717,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return true;
     }
 
+    /// <summary>
+    /// Löscht die Jüngste Zeile
+    /// </summary>
+    /// <param name="rows"></param>
+    /// <param name="reduceToOne"></param>
     public void RemoveYoungest(ICollection<RowItem> rows, bool reduceToOne) {
         if (Database is not Database db || db.IsDisposed) { return; }
 
@@ -822,10 +932,4 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     #endregion
-
-    /// <summary>
-    /// Löscht die Jüngste Zeile
-    /// </summary>
-    /// <param name="rows"></param>
-    /// <param name="reduceToOne"></param>
 }

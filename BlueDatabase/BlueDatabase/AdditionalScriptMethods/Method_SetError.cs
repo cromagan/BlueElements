@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -29,7 +30,7 @@ public class Method_SetError : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, [VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable]];
+    public override List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
     public override string Command => "seterror";
 
     public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +

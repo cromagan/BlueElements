@@ -28,75 +28,40 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_Filter : Method_Database {
+public class Method_FilterInMyDB : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal, StringVal];
-    public override string Command => "filter";
+    public override List<List<string>> Args => [[Variable.Any_Variable], StringVal, StringVal];
+    public override string Command => "filterinmydb";
 
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                         "Aktuell werden nur die FilterTypen 'is', 'isnot' und 'instr' unterstützt.\r\n" +
-                                         "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
-                                         "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Datanbank und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
+                                            "Aktuell werden nur die FilterTypen 'is', 'isnot' und 'instr' unterstützt.\r\n" +
+                                            "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Database;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "Filter(Datenbank, Spalte, Filtertyp, Wert)";
+    public override string Syntax => "FilterInMyDB(Spalte, Filtertyp, Wert)";
 
     #endregion
 
     #region Methods
 
-    public static FilterCollection? ObjectToFilter(VariableCollection attributes, int ab) {
-        var allFi = new List<FilterItem>();
-
-        for (var z = ab; z < attributes.Count; z++) {
-            if (attributes[z] is not VariableFilterItem fi) { return null; } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
-
-            //var fi = new FilterItem(attributes[z].ObjectData());
-
-            if (!fi.FilterItem.IsOk()) { return null; }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
-
-            if (z > ab) {
-                if (fi.FilterItem.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
-            }
-
-            if (fi.FilterItem.Clone() is FilterItem fin) {
-                // Müssen Clone sein. Die  Routine kann mehrfach ausgelöst werden und dann gehört der Filter bereits einer Collection an
-                allFi.Add(fin);
-            }
-        }
-
-        if (allFi.Count < 1) { return null; }
-
-        var f = new FilterCollection(allFi[0].Database, "method_filter");
-        f.AddIfNotExists(allFi);
-        return f;
-    }
-
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = DatabaseOf(scp, attvar.ValueStringGet(0));
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
-
-        #region Spalte ermitteln
-
-        var filterColumn = db.Column[attvar.ValueStringGet(1)];
-        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Datenbank nicht gefunden"); }
-
-        #endregion
+        var column = Column(scp, attvar, 0);
+        if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         #region Typ ermitteln
 
         FilterType filtertype;
-        switch (attvar.ValueStringGet(2).ToLowerInvariant()) {
+        switch (attvar.ValueStringGet(1).ToLowerInvariant()) {
             case "is":
                 filtertype = FilterType.Istgleich_GroßKleinEgal;
                 break;
@@ -115,7 +80,7 @@ public class Method_Filter : Method_Database {
 
         #endregion
 
-        var fii = new FilterItem(filterColumn, filtertype, attvar.ValueStringGet(3));
+        var fii = new FilterItem(column, filtertype, attvar.ValueStringGet(2));
 
         if (!fii.IsOk()) {
             return new DoItFeedback(infos.Data, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");

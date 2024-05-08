@@ -96,11 +96,11 @@ public class VariableFilterItem : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x) => null;
+    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => null;
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
 
     private void GetText() {
         if (_filter == null || !_filter.IsOk()) {

@@ -43,7 +43,7 @@ public class Method_Row : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";

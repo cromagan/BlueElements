@@ -423,7 +423,6 @@
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="RowData.cs" />
     <Compile Include="SkinDesign.cs" />
     <Compile Include="ScriptEditor.cs">
       <SubType>Component</SubType>

@@ -17,10 +17,16 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics;
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Interfaces.ParseableExtension;
+using BlueDatabase.AdditionalScriptMethods;
+using BlueScript.Methods;
+using System.Collections.Generic;
+using System.Data.Common;
 
 namespace BlueScript;
 
@@ -51,7 +57,7 @@ public class VariableRowItem : Variable {
     public static string ClassId => "row";
     public static string ShortName_Variable => "*row";
     public override int CheckOrder => 99;
-    public override bool GetFromStringPossible => false;
+    public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => _row == null;
     public override string MyClassId => ClassId;
 
@@ -71,7 +77,18 @@ public class VariableRowItem : Variable {
     }
 
     public override string SearchValue => ReadableText;
-    public override bool ToStringPossible => false;
+
+    public override bool ToStringPossible => true;
+
+    public override string ValueForReplace {
+        get {
+            if (_row is null || _row.Database is not Database db) {
+                return "{ROW:?}";
+            }
+
+            return "{ROW:" + db.TableName + ";" + _row.KeyName + "}";
+        }
+    }
 
     #endregion
 
@@ -92,11 +109,45 @@ public class VariableRowItem : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x) => null;
+    protected override Variable? NewWithThisValue(object? x) {
+        var v = new VariableRowItem(string.Empty);
+        v.SetValue(x);
+        return v;
+    }
 
-    protected override void SetValue(object? x) { }
+    protected override void SetValue(object? x) {
+        if (x is null) {
+            _row = null;
+        } else if (x is RowItem r) {
+            _row = r;
+        } else {
+            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
+        }
+    }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => null;
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+        if (txt.Length > 6 && txt.StartsWith("{ROW:") && txt.EndsWith("}")) {
+            var t = txt.Substring(5, txt.Length - 6);
+
+            if (t == "?") { return (true, null); }
+
+            var tx = t.SplitBy(";");
+
+            if (tx.Length != 2) { return (false, null); }
+
+            var db = Database.GetByFilename(tx[0], false, null, true, string.Empty);
+
+            if (db is null || db.IsDisposed) { return (false, null); }
+
+            var row = db.Row.SearchByKey(tx[1]);
+
+            if (row is null || row.IsDisposed) { return (false, null); }
+
+            return (true, row);
+        }
+
+        return (false, null);
+    }
 
     private void GetText() {
         if (_row == null) {

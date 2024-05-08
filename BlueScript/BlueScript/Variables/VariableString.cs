@@ -106,7 +106,7 @@ public class VariableString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x) {
+    protected override Variable NewWithThisValue(object? x) {
         var v = new VariableString(string.Empty);
         v.SetValue(x);
         return v;
@@ -120,15 +120,15 @@ public class VariableString : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
             var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
             tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-            if (tmp.Contains("\"")) { return null; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+            if (tmp.Contains("\"")) { return (false, null); } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
 
-            return tmp;
+            return (true, tmp);
         }
-        return null;
+        return (false, null);
     }
 
     #endregion
