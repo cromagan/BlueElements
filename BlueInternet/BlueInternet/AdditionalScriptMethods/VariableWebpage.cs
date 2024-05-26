@@ -87,7 +87,7 @@ public class VariableWebpage : Variable {
 
     protected override void SetValue(object? x) { }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => null;
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
 
     #endregion
 }

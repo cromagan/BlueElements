@@ -37,6 +37,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAendertWerte = new BlueControls.Controls.Button();
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
+            this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
             this.chkAuslöser_keyvaluechanged = new BlueControls.Controls.Button();
             this.chkAuslöser_databaseloaded = new BlueControls.Controls.Button();
             this.chkAuslöser_export = new BlueControls.Controls.Button();
@@ -64,7 +65,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusführen = new BlueControls.Controls.GroupBox();
             this.btnAusführen = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
-            this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
             this.tabSkriptEditor.SuspendLayout();
@@ -84,6 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1060, 24);
             this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -279,6 +280,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAuslöser.TabIndex = 23;
             this.grpAuslöser.TabStop = false;
             this.grpAuslöser.Text = "Auslöser";
+            // 
+            // chkAuslöser_deletingRow
+            // 
+            this.chkAuslöser_deletingRow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslöser_deletingRow.Location = new System.Drawing.Point(8, 128);
+            this.chkAuslöser_deletingRow.Name = "chkAuslöser_deletingRow";
+            this.chkAuslöser_deletingRow.QuickInfo = "Das Skript wird ausgeführt, bevor eine Zeile gelöscht wird.";
+            this.chkAuslöser_deletingRow.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslöser_deletingRow.TabIndex = 24;
+            this.chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
+            this.chkAuslöser_deletingRow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_keyvaluechanged
             // 
@@ -608,16 +620,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnTest.TabIndex = 3;
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
-            // 
-            // chkAuslöser_deletingRow
-            // 
-            this.chkAuslöser_deletingRow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_deletingRow.Location = new System.Drawing.Point(8, 128);
-            this.chkAuslöser_deletingRow.Name = "chkAuslöser_deletingRow";
-            this.chkAuslöser_deletingRow.QuickInfo = "Das Skript wird ausgeführt, bevor eine Zeile gelöscht wird.";
-            this.chkAuslöser_deletingRow.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_deletingRow.TabIndex = 24;
-            this.chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
             // 
             // DatabaseScriptEditor
             // 

@@ -226,14 +226,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             AbortSpellChecking();
 
-            lock (Dictionary.LockSpellChecking) {
-                GenerateEtxt(true);
+            GenerateEtxt(true);
 
-                if (_formatierungErlaubt) {
-                    _eTxt.HtmlText = value;
-                } else {
-                    _eTxt.PlainText = value;
-                }
+            if (_formatierungErlaubt) {
+                _eTxt.HtmlText = value;
+            } else {
+                _eTxt.PlainText = value;
             }
 
             Invalidate();

@@ -684,7 +684,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     }
 
     private void Marker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-        ActivateMarker();
+        //ActivateMarker();
     }
 
     private void RestartMarker() {

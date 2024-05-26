@@ -97,48 +97,49 @@ internal static class Dictionary {
 
     public static void SpellCheckingAll(ExtText etxt, bool allOk) {
         var can = Monitor.TryEnter(LockSpellChecking);
-        if (can) { Monitor.Exit(LockSpellChecking); }
+
         if (!can || IsSpellChecking) {
+            if (can) { Monitor.Exit(LockSpellChecking); }
             MessageBox.Show("Die Rechtschreibprüfung steht<br>nicht zur Verfügung.", ImageCode.Information, "OK");
             return;
         }
-        lock (LockSpellChecking) {
-            var pos = 0;
-            var woEnd = -1;
-            IsSpellChecking = true;
-            do {
-                pos = Math.Max(woEnd + 1, pos + 1);
-                if (pos >= etxt.Count) { break; }
-                var woStart = etxt.WordStart(pos);
-                if (woStart > -1) {
-                    woEnd = etxt.WordEnd(pos);
-                    var wort = etxt.Word(pos);
-                    if (!IsWordOk(wort)) {
-                        var butt = wort.ToLowerInvariant() != wort
-                            ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLowerInvariant() + "' aufnehmen", "Ignorieren", "Beenden")
-                            : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
-                        switch (butt) {
-                            case 0:
-                                WordAdd(wort);
-                                break;
 
-                            case 1:
-                                WordAdd(wort.ToLowerInvariant());
-                                break;
+        var pos = 0;
+        var woEnd = -1;
+        IsSpellChecking = true;
+        do {
+            pos = Math.Max(woEnd + 1, pos + 1);
+            if (pos >= etxt.Count) { break; }
+            var woStart = etxt.WordStart(pos);
+            if (woStart > -1) {
+                woEnd = etxt.WordEnd(pos);
+                var wort = etxt.Word(pos);
+                if (!IsWordOk(wort)) {
+                    var butt = wort.ToLowerInvariant() != wort
+                        ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLowerInvariant() + "' aufnehmen", "Ignorieren", "Beenden")
+                        : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
+                    switch (butt) {
+                        case 0:
+                            WordAdd(wort);
+                            break;
 
-                            case 2:
-                                //  woEnd = woStart - 1
-                                break;
+                        case 1:
+                            WordAdd(wort.ToLowerInvariant());
+                            break;
 
-                            case 3:
-                                IsSpellChecking = false;
-                                return;
-                        }
+                        case 2:
+                            //  woEnd = woStart - 1
+                            break;
+
+                        case 3:
+                            IsSpellChecking = false;
+                            return;
                     }
                 }
-            } while (true);
-            IsSpellChecking = false;
-        }
+            }
+        } while (true);
+        IsSpellChecking = false;
+        Monitor.Exit(LockSpellChecking);
     }
 
     public static void WordAdd(string wort) {

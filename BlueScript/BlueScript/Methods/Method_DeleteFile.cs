@@ -77,7 +77,7 @@ internal class Method_DeleteFile : Method, IUseableForButton {
             return DoItFeedback.Wahr();
         }
 
-        //if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
 
         try {
             return new DoItFeedback(IO.DeleteFile(filn, false));
