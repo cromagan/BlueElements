@@ -1402,7 +1402,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.export) ||
-                s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
+                (s.EventTypes.HasFlag(ScriptEventTypes.value_changed) && !extended)) {
                 maxtime = 2;
             }
 
@@ -1453,7 +1453,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (st.ElapsedMilliseconds > maxtime * 1000) {
                 if (wichtigerProzess) { ExecutingFirstLvlScript--; }
-                return new ScriptEndedFeedback("Das Script hat eine zu lange Laufzeit.", false, false, s.KeyName);
+                return new ScriptEndedFeedback("Das Skript hat eine zu lange Laufzeit.", false, false, s.KeyName);
             }
 
             if (!scf.AllOk) {
