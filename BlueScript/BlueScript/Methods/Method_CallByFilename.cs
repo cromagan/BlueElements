@@ -53,7 +53,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
 
     public override bool MustUseReturnValue => false;
 

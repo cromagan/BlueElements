@@ -38,7 +38,7 @@ internal class Method_FreeDirectoryName : Method {
     public override string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";

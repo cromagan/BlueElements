@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -1060,11 +1061,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public bool CanDoValueChangedScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
-        var e = EventScript.Get(ScriptEventTypes.value_changed_quick);
-        if (e.Count == 1) { return true; }
-
-        e = EventScript.Get(ScriptEventTypes.value_changed_large);
-        return e.Count == 1;
+        return EventScript.Get(ScriptEventTypes.value_changed).Count == 1;
     }
 
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
@@ -1144,12 +1141,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Skript 'Zeile Initialisieren' mehrfach vorhanden";
         }
 
-        if (l.Get(ScriptEventTypes.value_changed_quick).Count > 1) {
-            return "Skript 'Wert geändert (einfach)' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.value_changed_large).Count > 1) {
-            return "Skript 'Wert geändert (erweitert)' mehrfach vorhanden";
+        if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
+            return "Skript 'Wert geändert' mehrfach vorhanden";
         }
 
         return string.Empty;
@@ -1222,7 +1215,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled, bool dbVariables, bool virtualcolumns) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled, bool dbVariables, bool virtualcolumns, bool? extendedVariable) {
 
         #region Variablen für Skript erstellen
 
@@ -1250,6 +1243,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
         vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
         vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+
+        if (extendedVariable is bool e) {
+            vars.Add(new VariableBool("Extended", e, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
+        }
 
         #endregion
 
@@ -1362,7 +1359,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool produktivphase, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="s"></param>
+    /// <param name="produktivphase"></param>
+    /// <param name="row"></param>
+    /// <param name="attributes"></param>
+    /// <param name="wichtigerProzess"></param>
+    /// <param name="dbVariables"></param>
+    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// <returns></returns>
+
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool produktivphase, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables, bool extended) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
         if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, s.KeyName); }
 
@@ -1383,30 +1392,31 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            #region  Erlaubte Methoden ermitteln
+            #region  Erlaubte Methoden ermitteln und maxtime
 
-            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
+            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.IO;
+            float maxtime = 60 * 60;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
 
-            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
-                allowedMethods |= MethodType.NeedLongTime;
+            if (s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) ||
+                s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) ||
+                s.EventTypes.HasFlag(ScriptEventTypes.export)) {
+                maxtime = 1;
             }
 
-            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
-                allowedMethods |= MethodType.IO;
+            if (s.EventTypes.HasFlag(ScriptEventTypes.loaded) ||
+                !s.EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
+                maxtime = 10;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
-            if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
+
+            if (extended) {
                 allowedMethods |= MethodType.ManipulatesUser;
                 allowedMethods |= MethodType.ChangeAnyDatabaseOrRow;
             }
@@ -1417,7 +1427,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             var prepf = s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
 
-            var vars = CreateVariableCollection(row, prepf, prepf, dbVariables, prepf);
+            bool? extv = null;
+            if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) { extv = extended; }
+
+            var vars = CreateVariableCollection(row, prepf, prepf, dbVariables, prepf, extv);
 
             #region Script ausführen
 
@@ -1426,11 +1439,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
             };
+
+            var st = new Stopwatch();
+            st.Start();
+
             var scf = sc.Parse(0, s.KeyName, attributes);
 
             #endregion
 
             #region Fehlerprüfungen
+
+            if (st.ElapsedMilliseconds > maxtime * 1000) {
+                if (wichtigerProzess) { ExecutingFirstLvlScript--; }
+                return new ScriptEndedFeedback("Das Script hat eine zu lange Laufzeit.", false, false, s.KeyName);
+            }
 
             if (!scf.AllOk) {
                 if (wichtigerProzess) { ExecutingFirstLvlScript--; }
@@ -1483,11 +1505,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         } catch {
             Develop.CheckStackForOverflow();
             if (wichtigerProzess) { ExecutingFirstLvlScript--; }
-            return ExecuteScript(s, produktivphase, row, attributes, wichtigerProzess, dbVariables);
+            return ExecuteScript(s, produktivphase, row, attributes, wichtigerProzess, dbVariables, extended);
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="eventname"></param>
+    /// <param name="scriptname"></param>
+    /// <param name="produktivphase"></param>
+    /// <param name="row"></param>
+    /// <param name="attributes"></param>
+    /// <param name="wichtigerProzess"></param>
+    /// <param name="dbVariables"></param>
+    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// <returns></returns>
+
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool wichtigerProzess, bool dbVariables, bool extended) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
@@ -1515,7 +1550,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     // Script nicht definiert. Macht nix. ist eben keines gewünscht
 
                     if (eventname == ScriptEventTypes.export) {
-                        var vars = CreateVariableCollection(row, false, false, dbVariables, true);
+                        var vars = CreateVariableCollection(row, false, false, dbVariables, true, false);
                         return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true);
                     }
 
@@ -1535,10 +1570,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #endregion
 
-            return ExecuteScript(script, produktivphase, row, attributes, wichtigerProzess, dbVariables);
+            return ExecuteScript(script, produktivphase, row, attributes, wichtigerProzess, dbVariables, extended);
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, wichtigerProzess, dbVariables);
+            return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, wichtigerProzess, dbVariables, extended);
         }
     }
 
@@ -1970,7 +2005,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, true);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, true, false);
 
         TryToSetMeTemporaryMaster();
     }

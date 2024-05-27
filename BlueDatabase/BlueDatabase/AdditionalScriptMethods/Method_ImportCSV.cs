@@ -35,7 +35,7 @@ internal class Method_ImportCsv : Method_Database {
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO ;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

@@ -516,7 +516,7 @@ public static class Export {
                 var tmpBody = body;
 
                 thisRow.CheckRowDataIfNeeded(); // Virtuelle Spalten
-                var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null, true, true);
+                var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null, true, true, false);
 
                 if (!script.AllOk) {
                     f = f + thisRow.CellFirstString() + "\r\n";

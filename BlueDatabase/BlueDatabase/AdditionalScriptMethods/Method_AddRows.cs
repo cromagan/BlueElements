@@ -41,7 +41,7 @@ public class Method_AddRows : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow ;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

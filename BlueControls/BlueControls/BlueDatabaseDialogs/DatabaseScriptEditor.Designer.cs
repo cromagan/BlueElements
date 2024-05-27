@@ -38,7 +38,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
             this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
-            this.chkAuslöser_keyvaluechanged = new BlueControls.Controls.Button();
             this.chkAuslöser_databaseloaded = new BlueControls.Controls.Button();
             this.chkAuslöser_export = new BlueControls.Controls.Button();
             this.chkAuslöser_newrow = new BlueControls.Controls.Button();
@@ -63,6 +62,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnBefehlsUebersicht = new BlueControls.Controls.Button();
             this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.grpAusführen = new BlueControls.Controls.GroupBox();
+            this.chkExtendend = new BlueControls.Controls.Button();
             this.btnAusführen = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
@@ -84,7 +84,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1060, 24);
             this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -267,7 +266,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpAuslöser.Controls.Add(this.chkAuslöser_deletingRow);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_keyvaluechanged);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_databaseloaded);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
@@ -284,24 +282,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_deletingRow
             // 
             this.chkAuslöser_deletingRow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_deletingRow.Location = new System.Drawing.Point(8, 128);
+            this.chkAuslöser_deletingRow.Location = new System.Drawing.Point(8, 120);
             this.chkAuslöser_deletingRow.Name = "chkAuslöser_deletingRow";
             this.chkAuslöser_deletingRow.QuickInfo = "Das Skript wird ausgeführt, bevor eine Zeile gelöscht wird.";
             this.chkAuslöser_deletingRow.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_deletingRow.TabIndex = 24;
             this.chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
             this.chkAuslöser_deletingRow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
-            // 
-            // chkAuslöser_keyvaluechanged
-            // 
-            this.chkAuslöser_keyvaluechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_keyvaluechanged.Location = new System.Drawing.Point(8, 72);
-            this.chkAuslöser_keyvaluechanged.Name = "chkAuslöser_keyvaluechanged";
-            this.chkAuslöser_keyvaluechanged.QuickInfo = resources.GetString("chkAuslöser_keyvaluechanged.QuickInfo");
-            this.chkAuslöser_keyvaluechanged.Size = new System.Drawing.Size(224, 16);
-            this.chkAuslöser_keyvaluechanged.TabIndex = 23;
-            this.chkAuslöser_keyvaluechanged.Text = "Wert geändert - erweiterte Prüfung";
-            this.chkAuslöser_keyvaluechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_databaseloaded
             // 
@@ -318,7 +305,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_export
             // 
             this.chkAuslöser_export.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 168);
+            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 160);
             this.chkAuslöser_export.Name = "chkAuslöser_export";
             this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
     " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
@@ -342,7 +329,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_valuechangedThread
             // 
             this.chkAuslöser_valuechangedThread.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_valuechangedThread.Location = new System.Drawing.Point(8, 104);
+            this.chkAuslöser_valuechangedThread.Location = new System.Drawing.Point(8, 96);
             this.chkAuslöser_valuechangedThread.Name = "chkAuslöser_valuechangedThread";
             this.chkAuslöser_valuechangedThread.QuickInfo = "Das Skript wird irgendwann im Hintergrund nach einer Zelländerung ausgeführt und " +
     "ist nicht sehr zuverlässig.\r\nKann dazu benutzt werden, um Exporte auszuführen.";
@@ -354,19 +341,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_valuechanged
             // 
             this.chkAuslöser_valuechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(8, 88);
+            this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(8, 80);
             this.chkAuslöser_valuechanged.Name = "chkAuslöser_valuechanged";
-            this.chkAuslöser_valuechanged.QuickInfo = "Das Skript wird nach dem Ändern eines\r\nWertes einer Zelle ausgeführt und kann nur" +
-    "\r\neinfache Rechenoperationen ausführen.";
-            this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(208, 16);
+            this.chkAuslöser_valuechanged.QuickInfo = resources.GetString("chkAuslöser_valuechanged.QuickInfo");
+            this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_valuechanged.TabIndex = 18;
-            this.chkAuslöser_valuechanged.Text = "Wert geändert - einfache Prüfung";
+            this.chkAuslöser_valuechanged.Text = "Wert geändert";
             this.chkAuslöser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_prepaireformula
             // 
             this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 152);
+            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 144);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
             this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird zur Datenkonsitenzprüfung,\r\nfür Variablen für Formulare und virtu" +
     "elle Spalten verwendet.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen " +
@@ -584,6 +570,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpAusführen
             // 
             this.grpAusführen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAusführen.Controls.Add(this.chkExtendend);
             this.grpAusführen.Controls.Add(this.btnAusführen);
             this.grpAusführen.Controls.Add(this.btnTest);
             this.grpAusführen.Controls.Add(this.txbTestZeile);
@@ -596,6 +583,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusführen.TabIndex = 0;
             this.grpAusführen.TabStop = false;
             this.grpAusführen.Text = "Ausführen";
+            // 
+            // chkExtendend
+            // 
+            this.chkExtendend.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkExtendend.Location = new System.Drawing.Point(128, 46);
+            this.chkExtendend.Name = "chkExtendend";
+            this.chkExtendend.QuickInfo = resources.GetString("chkExtendend.QuickInfo");
+            this.chkExtendend.Size = new System.Drawing.Size(184, 22);
+            this.chkExtendend.TabIndex = 8;
+            this.chkExtendend.Tag = "";
+            this.chkExtendend.Text = "Erweiterte Ausführung";
             // 
             // btnAusführen
             // 
@@ -691,8 +689,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capQuickInfo;
         private Caption capImage;
         private TextBox txbQuickInfo;
-        private Button chkAuslöser_keyvaluechanged;
         private Caption capFehler;
         private Button chkAuslöser_deletingRow;
+        private Button chkExtendend;
     }
 }

@@ -38,7 +38,7 @@ internal class Method_DirectoryExists : Method {
     public override string Description => "Prüft, ob ein Verzeichnis existiert";
     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";

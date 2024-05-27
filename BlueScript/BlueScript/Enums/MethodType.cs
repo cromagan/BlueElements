@@ -50,10 +50,10 @@ public enum MethodType {
     /// </summary>
     ChangeAnyDatabaseOrRow = 16,
 
-    /// <summary>
-    /// Methoden, die an sich harmlos sind, aber eine lange Zeit zum Ausführen benötigen. Unpassend für z.B. RowCheck
-    /// </summary>
-    NeedLongTime = 32,
+    ///// <summary>
+    ///// Methoden, die an sich harmlos sind, aber eine lange Zeit zum Ausführen benötigen. Unpassend für z.B. RowCheck
+    ///// </summary>
+    //NeedLongTime = 32,
 
     /// <summary>
     /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipbard verändert der ein Programm gestartet.
@@ -69,5 +69,5 @@ public enum MethodType {
 
     Break = 256,
 
-    AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | NeedLongTime | ManipulatesUser | SpecialVariables
+    AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | ManipulatesUser | SpecialVariables
 }

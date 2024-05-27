@@ -36,10 +36,9 @@ internal class Method_BackupControl : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "backupcontrol";
     public override string Description => "Durchsucht das Verzeichnis nach Dateien mit dem angegebenen Filter. Löscht Dateien nach bestimmten Datumsangaben.";
-    public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.IO;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

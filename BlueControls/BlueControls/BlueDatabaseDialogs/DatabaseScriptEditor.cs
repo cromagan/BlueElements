@@ -129,8 +129,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
-                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_quick);
-                chkAuslöser_keyvaluechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_large);
+                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
+                chkExtendend.Visible = chkAuslöser_valuechanged.Checked;
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
@@ -355,8 +355,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         ScriptEventTypes tmp = 0;
         if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed_quick; }
-        if (chkAuslöser_keyvaluechanged.Checked) { tmp |= ScriptEventTypes.value_changed_large; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
         if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
         if (chkAuslöser_databaseloaded.Checked) { tmp |= ScriptEventTypes.loaded; }
@@ -441,8 +440,10 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
+        var ext = chkExtendend.Checked && chkExtendend.Visible;
+
         _allowTemporay = true;
-        e.Feedback = Database?.ExecuteScript(_item, !_testmode, r, null, true, true);
+        e.Feedback = Database?.ExecuteScript(_item, !_testmode, r, null, true, true, ext);
         _allowTemporay = false;
     }
 

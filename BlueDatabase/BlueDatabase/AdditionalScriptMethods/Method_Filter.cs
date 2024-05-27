@@ -42,7 +42,7 @@ public class Method_Filter : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Database | MethodType.IO ;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string StartSequence => "(";

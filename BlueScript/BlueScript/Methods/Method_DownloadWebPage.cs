@@ -43,7 +43,7 @@ internal class Method_DownloadWebPage : Method {
     public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";

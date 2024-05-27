@@ -272,7 +272,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         var row = this.RowSingleOrNull();
 
         if (row?.Database is Database db && !db.IsDisposed) {
-            vars = db.CreateVariableCollection(row, true, false, false, false); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            vars = db.CreateVariableCollection(row, true, false, false, false, false); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = new VariableCollection();
         }

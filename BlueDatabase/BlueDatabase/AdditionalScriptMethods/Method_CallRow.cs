@@ -50,7 +50,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow  | MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 
@@ -89,7 +89,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
         var vs = attvar.ValueStringGet(0);
 
-        var s2 = row.ExecuteScript(null, vs, false, false, scp.ProduktivPhase, 0, a, true, false);
+        var s2 = row.ExecuteScript(null, vs, false, false, scp.ProduktivPhase, 0, a, true, false, false);
         if (!s2.AllOk) {
             infos.Data.Protocol.AddRange(s2.Protocol);
             return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");

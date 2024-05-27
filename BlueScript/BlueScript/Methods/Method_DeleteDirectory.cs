@@ -45,7 +45,7 @@ internal class Method_DeleteDirectory : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
 
     public override bool MustUseReturnValue => false;
 

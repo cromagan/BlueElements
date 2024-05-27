@@ -36,7 +36,7 @@ public class Method_ContentsFilter : Method {
     public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.MyDatabaseRow ;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
 

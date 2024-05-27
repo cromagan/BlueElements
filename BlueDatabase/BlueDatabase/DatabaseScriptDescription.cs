@@ -174,19 +174,9 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
         }
 
-        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
-            if (UserGroups.Count > 0) { return "Routinen, für Werteänderungen, können nicht von außerhalb benutzt werden."; }
-            if (_eventTypes is not ScriptEventTypes.value_changed_quick) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
-        }
-
-        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) {
-            if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
-            if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
-            //if (!db.Column.HasKeyColumns()) { return "Routinen wird nie ausgelöst, da keine Schlüsselspalten definiert sind."; }
-            if (UserGroups.Count > 0) { return "Routinen, für Werteänderungen, können nicht von außerhalb benutzt werden."; }
-            if (_eventTypes is not ScriptEventTypes.value_changed_large) { return "Routinen für Werteänderungen müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
@@ -201,6 +191,8 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         }
 
         if (_needRow && !Database.IsRowScriptPossible(false)) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
+
+        if (_eventTypes.ToString() == ((int)_eventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
 
         return string.Empty;
     }
@@ -244,8 +236,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) { symb = ImageCode.Layout; }
         if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
         if (_eventTypes.HasFlag(ScriptEventTypes.InitialValues)) { symb = ImageCode.Zeile; }
-        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_quick)) { symb = ImageCode.Stift; }
-        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_large)) { symb = ImageCode.Schlüssel; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { symb = ImageCode.Stift; }
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 

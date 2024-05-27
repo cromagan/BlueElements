@@ -39,7 +39,7 @@ internal class Method_EnsureDatabaseLoaded : Method {
     public override string Description => "Versucht die Datenbank in den Speicher zu holen.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";

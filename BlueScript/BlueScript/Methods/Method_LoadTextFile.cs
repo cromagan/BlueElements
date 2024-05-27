@@ -40,7 +40,7 @@ internal class Method_LoadTextFile : Method {
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.IO  | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
