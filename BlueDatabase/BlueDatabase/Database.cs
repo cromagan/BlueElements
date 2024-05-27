@@ -1401,18 +1401,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) ||
-                s.EventTypes.HasFlag(ScriptEventTypes.export)) {
-                maxtime = 1;
+                s.EventTypes.HasFlag(ScriptEventTypes.export) ||
+                s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
+                maxtime = 2;
             }
 
             if (s.EventTypes.HasFlag(ScriptEventTypes.loaded) ||
-                !s.EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
+                s.EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
                 maxtime = 10;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
+                 !s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
 
