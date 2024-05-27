@@ -384,16 +384,15 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public string ReadableText() {
-        switch (Count) {
-            case 0:
-                return "Kein Filter";
+        if (Count <= 0) { return "Kein Filter"; }
 
-            case 1:
-                return _internal[0].ReadableText();
+        var f = string.Empty;
 
-            default:
-                return $"{Count} Filter";
+        foreach (var thisf in _internal) {
+            f += thisf.ReadableText() + "\r\n";
         }
+
+        return f.TrimEnd("\r\n");
     }
 
     public void Remove(ColumnItem? column) {
