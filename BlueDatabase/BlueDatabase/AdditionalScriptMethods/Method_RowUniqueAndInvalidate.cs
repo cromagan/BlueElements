@@ -108,12 +108,13 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
             if (v > 0) {
                 var lastchange = RowItem.TimeCodeToUTCDateTime(v);
 
-                if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes < 15) {
-                    return new DoItFeedback(infos.Data, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
+                if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes > 15) {
+                    //return new DoItFeedback(infos.Data, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
+                    myRow.CellSet(srs, string.Empty, coment);
                 }
             }
 
-            myRow.CellSet(srs, string.Empty, coment);
+      
         } else {
             return new DoItFeedback(infos.Data, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
         }
