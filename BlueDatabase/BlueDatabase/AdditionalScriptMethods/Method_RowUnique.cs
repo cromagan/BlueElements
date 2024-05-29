@@ -56,7 +56,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
-    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen";
+    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen, wenn diese noch nicht vorhanden ist.";
 
     public override string Returns => VariableRowItem.ShortName_Variable;
 

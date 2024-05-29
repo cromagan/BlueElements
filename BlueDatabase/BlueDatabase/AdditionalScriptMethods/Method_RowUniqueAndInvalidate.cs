@@ -58,7 +58,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
-    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen und durchrechnen";
+    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen, wenn diese noch nicht vorhanden ist. Aber immer invalidieren.";
 
     public override string Returns => VariableRowItem.ShortName_Variable;
 

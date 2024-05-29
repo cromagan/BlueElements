@@ -1408,9 +1408,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             return "Der Skripttyp 'Zeile' kann nur bei der Spaltenfuntion 'Zeile' gewählt werden.";
         }
 
-        if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 or ColumnFunction.Zeile or ColumnFunction.Button or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+        if (_function is ColumnFunction.Zeile or ColumnFunction.Button or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
             if (_roundAfterEdit != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
-                return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben oder Sortierung.";
+                return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }
 
             if (!string.IsNullOrEmpty(_suffix) || !string.IsNullOrEmpty(_prefix)) {
@@ -1603,6 +1603,21 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 BehaviorOfImageAndText = c.BehaviorOfImageAndText;
                 ScriptType = ScriptType.Nicht_vorhanden;
                 DoOpticalTranslation = c.DoOpticalTranslation;
+
+                //AfterEditQuickSortRemoveDouble = c.AfterEditQuickSortRemoveDouble;
+                //Align = c.Align;
+
+                //DropdownAllesAbwählenErlaubt = c.DropdownAllesAbwählenErlaubt;
+                //DropdownBearbeitungErlaubt = c.DropdownBearbeitungErlaubt;
+                //DropDownItems = c.DropDownItems;
+                //DropdownWerteAndererZellenAnzeigen = c.DropdownWerteAndererZellenAnzeigen;
+                //Function = c.Function;
+                //SortType = c.SortType;
+                //TextBearbeitungErlaubt = c.TextBearbeitungErlaubt;
+                if (Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+                    MaxTextLenght = c.MaxTextLenght;
+                    MaxCellLenght = c.MaxCellLenght;
+                }
             }
         }
 
