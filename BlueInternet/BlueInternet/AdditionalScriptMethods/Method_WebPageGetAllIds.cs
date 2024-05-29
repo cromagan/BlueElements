@@ -36,7 +36,7 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
     public override string Description => "Gibt eine Liste aller IDS zurück, mit denen interagiert werden kann.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO ;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
