@@ -91,6 +91,17 @@ public sealed class ItemSendSomething {
 
     #region Methods
 
+    public static List<AbstractListItem> AllAvailableTables() {
+        var ld = Database.AllAvailableTables(string.Empty);
+
+        var ld2 = new List<AbstractListItem>();
+
+        foreach (var thisd in ld) {
+            ld2.Add(ItemOf(thisd));
+        }
+        return ld2;
+    }
+
     public void AddChild(IItemSendFilter item, IHasKeyName add) {
         var l = new List<string>();
         l.AddRange(item.ChildIds);
@@ -145,18 +156,9 @@ public sealed class ItemSendSomething {
 
     public List<GenericControl> GetStyleOptions(IItemSendFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
-            new FlexiControl("Ausgang:", widthOfControl, true)
+            new FlexiControl("Ausgang:", widthOfControl, true),
+            new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables())
         };
-
-        var ld = AllAvailableTables(string.Empty);
-
-        var ld2 = new List<AbstractListItem>();
-
-        foreach (var thisd in ld) {
-            ld2.Add(ItemOf(thisd));
-        }
-
-        l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, ld2));
 
         return l;
     }
@@ -173,8 +175,6 @@ public sealed class ItemSendSomething {
 
     public List<string> ParsableTags() {
         List<string> result = [];
-
-
 
         result.ParseableAdd("OutputDatabase", DatabaseOutputGet()); // Nicht _databaseOutput, weil sie evtl. noch nicht geladen ist
 

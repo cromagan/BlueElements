@@ -84,7 +84,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         #endregion
 
-        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true, false);
+        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true, true);
 
         if (!f.AllOk) {
             return new DoItFeedback(infos.Data, f.ProtocolText);
