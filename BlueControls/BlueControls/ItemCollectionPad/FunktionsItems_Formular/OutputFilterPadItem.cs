@@ -210,7 +210,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
             var lst = new List<AbstractListItem>();
-            lst.AddRange(ItemsOf(db.Column, false));
+            lst.AddRange(ItemsOf(db.Column, true));
 
             l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }

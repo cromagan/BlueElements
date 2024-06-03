@@ -215,7 +215,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
         var lst = new List<AbstractListItem>();
-        lst.AddRange(ItemsOf(db.Column, false));
+        lst.AddRange(ItemsOf(db.Column, true));
 
         l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 

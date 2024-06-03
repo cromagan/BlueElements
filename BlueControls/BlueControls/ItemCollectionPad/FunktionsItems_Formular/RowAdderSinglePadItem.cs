@@ -27,6 +27,8 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+
+using static BlueDatabase.Database;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
@@ -40,96 +42,133 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
-public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IHasVersion, IAutosizable {
+public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable {
 
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
+    private readonly ItemSendSomething _itemSends;
 
     /// <summary>
-    /// Überschrift des Steuerelementes
+    /// Wo der Zusätzliche Text in die Zieldatenbank geschrieben werden soll
     /// </summary>
-    private string _caption = string.Empty;
+    private string _additinalTextColumnName = string.Empty;
 
     /// <summary>
-    /// Zusätzlicher Text der in eine Spalte geschrieben wird. Wird mit Variablen erzeugt
+    /// Wo die normale ID in die Zieldatenbank geschrieben werden soll.
     /// </summary>
-    private string _individualText = string.Empty;
+    private string _iDColumnName = string.Empty;
 
     /// <summary>
     /// Zusätzliche Erkennung für individuelle Items. Wird mit Variablen erzeugt
     /// </summary>
-    private string _inputDatabase_AdditionalID = string.Empty;
+    private string _inputDatabase_UniqueSaveID = string.Empty;
 
     /// <summary>
-    /// Id des klickbaren elements (InputDatabase)
+    /// Wo Zeilen-Id in die Zieldatenbank geschrieben werden soll
     /// </summary>
-    private string _inputDatabase_IDColumn = string.Empty;
+    private string _uniqueRowIDColumnName = string.Empty;
 
     /// <summary>
-    /// Diese Datenbank wird bei einen Klick beschrieben
+    /// Wo die Vorfilterungs-ID in die Zieldatenbank geschrieben werden soll
     /// </summary>
-    private Database? _targetDatabase = null;
-
-    /// <summary>
-    /// wo die zusätzliche ID hingeschrieben wird
-    /// </summary>
-    private string _targetDatabase_AdditionalIDColumn = string.Empty;
-
-    /// <summary>
-    /// Id des klickbaren elements, wo es hingeschrieben wird
-    /// </summary>
-    private string _targetDatabase_IDColumn = string.Empty;
-
-    /// <summary>
-    /// wo der zusätzliche Text hingeschrieben wird
-    /// </summary>
-    private string _targetDatabase_individualTextColumn = string.Empty;
-
-    /// <summary>
-    /// Wo die Vorfilterung in die Zieldatenbank geschrieben werden soll
-    /// </summary>
-    private string _targetDatabase_PreFilterColumn = string.Empty;
+    private string _uniqueSaveIDColumnName = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public RowAdderSingle(string keyName) : this(keyName, null as ConnectedFormula.ConnectedFormula) { }
+    public RowAdder(string keyName) : this(keyName, null, null) { }
 
-    public RowAdderSingle(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => _itemAccepts = new();
+    public RowAdder(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+
+    public RowAdder(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
+        _itemAccepts = new();
+        _itemSends = new();
+
+        DatabaseOutput = db;
+    }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "FI-RowAdderSingle";
+    public static string ClassId => "FI-RowAdder";
+
+    public ColumnItem? AdditinalTextColumn {
+        get {
+            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+
+            var c = dbout?.Column[_additinalTextColumnName];
+            return c == null || c.IsDisposed ? null : c;
+        }
+    }
+
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der Eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
+    public string AdditinalTextColumnName {
+        get => _additinalTextColumnName;
+        set {
+            if (IsDisposed) { return; }
+            if (_additinalTextColumnName == value) { return; }
+            _additinalTextColumnName = value;
+            OnPropertyChanged();
+            //UpdateSideOptionMenu();
+        }
+    }
 
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
     public bool AutoSizeableHeight => true;
 
-    public string Caption {
-        get => _caption;
-        set {
-            if (IsDisposed) { return; }
-            if (_caption == value) { return; }
-            _caption = value;
-            OnPropertyChanged();
-        }
+    public ReadOnlyCollection<string> ChildIds {
+        get => _itemSends.ChildIdsGet();
+        set => _itemSends.ChildIdsSet(value, this);
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
 
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
-    public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann. Es werden alle Zellen des eingehenden Filters als drückbare Knöpfe angezeigt";
+    public Database? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
+    }
+
+    public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
+                                          "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
+                                            "Diese ID wird auch aus Ausgangefilter weitergegeben.";
+
+    public ColumnItem? IDColumn {
+        get {
+            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+
+            var c = dbout?.Column[_iDColumnName];
+            return c == null || c.IsDisposed ? null : c;
+        }
+    }
+
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die ID der Zeile gespeichert.")]
+    public string IDColumnName {
+        get => _iDColumnName;
+        set {
+            if (IsDisposed) { return; }
+            if (_iDColumnName == value) { return; }
+            _iDColumnName = value;
+            OnPropertyChanged();
+            //UpdateSideOptionMenu();
+        }
+    }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
     public override bool MustBeInDrawingArea => true;
 
-    public bool MustBeOneRow => false;
+    public bool MustBeOneRow => true;
+
+    public int OutputColorId {
+        get => _itemSends.OutputColorIdGet();
+        set => _itemSends.OutputColorIdSet(value, this);
+    }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -140,32 +179,54 @@ public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl,
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    [Description("Die Ziel-Datenbank. In diese Datenbank wird das Ergebniss des Benutzers gespeichert")]
-    public Database? Target_Database {
-        get => _targetDatabase; set {
-            if (IsDisposed) { return; }
-            if (_targetDatabase == value) { return; }
-            _targetDatabase = value;
-            OnPropertyChanged();
-
-            UpdateSideOptionMenu();
-        }
-    }
-
-    public ColumnItem? TargetDatabase_PreFilterColumn {
+    public ColumnItem? UniqueRowIDColumn {
         get {
-            var c = Target_Database?.Column[_targetDatabase_PreFilterColumn];
+            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+
+            var c = dbout?.Column[_uniqueRowIDColumnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank. In diese wird die eingehende Vorfilterung gespeichert. Dadurch können verschiedene Datensätze gespeichert werden. ")]
-    public string TargetDatabase_PreFilterColumnName {
-        get => _targetDatabase_PreFilterColumn;
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des Klickbaren Elements gespeichert.")]
+    public string UniqueRowIDColumnName {
+        get => _uniqueRowIDColumnName;
         set {
             if (IsDisposed) { return; }
-            if (_targetDatabase_PreFilterColumn == value) { return; }
-            _targetDatabase_PreFilterColumn = value;
+            if (_uniqueRowIDColumnName == value) { return; }
+            _uniqueRowIDColumnName = value;
+            OnPropertyChanged();
+            //UpdateSideOptionMenu();
+        }
+    }
+
+    [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
+    public string UniqueSaveID {
+        get => _inputDatabase_UniqueSaveID;
+        set {
+            if (IsDisposed) { return; }
+            if (_inputDatabase_UniqueSaveID == value) { return; }
+            _inputDatabase_UniqueSaveID = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ColumnItem? UniqueSaveIDColumn {
+        get {
+            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+
+            var c = dbout?.Column[_uniqueSaveIDColumnName];
+            return c == null || c.IsDisposed ? null : c;
+        }
+    }
+
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der Eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
+    public string UniqueSaveIDColumnName {
+        get => _uniqueSaveIDColumnName;
+        set {
+            if (IsDisposed) { return; }
+            if (_uniqueSaveIDColumnName == value) { return; }
+            _uniqueSaveIDColumnName = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -174,6 +235,8 @@ public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl,
     #endregion
 
     #region Methods
+
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public override void AddedToCollection() {
         base.AddedToCollection();
@@ -205,29 +268,57 @@ public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl,
         b = _itemAccepts.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        //b = _itemSends.ErrorReason(this);
-        //if (!string.IsNullOrEmpty(b)) { return b; }
+        b = _itemSends.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (_targetDatabase == null || _targetDatabase.IsDisposed) {
-            return "Ziel-Datenbank fehlt";
+        if (string.IsNullOrEmpty(_inputDatabase_UniqueSaveID)) { return "Id-Generierung fehlt"; }
+        if (!_inputDatabase_UniqueSaveID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
+
+        if (UniqueSaveIDColumn == null || UniqueSaveIDColumn.IsDisposed) {
+            return "Spalte, in der die SaveID geschrieben werden soll, fehlt";
+        }
+
+        if (UniqueRowIDColumn == null || UniqueRowIDColumn.IsDisposed) {
+            return "Spalte, in der die einzigartige Zeilen-ID geschrieben werden soll, fehlt";
+        }
+
+        if (IDColumn == null || IDColumn.IsDisposed) {
+            return "Spalte, in der die Zeilen-ID geschrieben werden soll, fehlt";
+        }
+
+        if (AdditinalTextColumn == null || AdditinalTextColumn.IsDisposed) {
+            return "Spalte, in der der Zusätzliche Text geschrieben werden soll, fehlt";
         }
 
         return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
+        var l = new List<GenericControl>();
 
-        if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
-        l.Add(new FlexiControlForProperty<Database?>(() => Target_Database, ItemSendSomething.AllAvailableTables()));
+        var inr = _itemAccepts.GetFilterFromGet(this);
+        if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
+            l.Add(new FlexiControlForProperty<string>(() => UniqueSaveID));
+        }
 
-        if (Target_Database == null) { return l; }
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
-        var lst = new List<AbstractListItem>();
-        lst.AddRange(ItemsOf(db.Column, false));
+        if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
+            var lst = new List<AbstractListItem>();
+            lst.AddRange(ItemsOf(dbout.Column, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => TargetDatabase_PreFilterColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => UniqueSaveIDColumnName, lst));
+
+            l.Add(new FlexiControlForProperty<string>(() => IDColumnName, lst));
+
+            l.Add(new FlexiControlForProperty<string>(() => AdditinalTextColumnName, lst));
+        }
+
+        //l.Add(new FlexiControlForProperty<Database?>(() => Target_Database, ItemSendSomething.AllAvailableTables()));
+
+        //if (Target_Database == null) { return l; }
 
         //if (Column == null || Column.IsDisposed) { return l; }
 
@@ -251,31 +342,56 @@ public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl,
         if (_itemAccepts.ParseThis(tag, value)) { return true; }
 
         switch (tag) {
+            //case "targetdatabase":
+            //    tempTargetDatabaseNametoLoad = value.FromNonCritical();
+
+            //    if (tempTargetDatabaseNametoLoad.IsFormat(FormatHolder.FilepathAndName)) {
+            //        tempTargetDatabaseNametoLoad = tempTargetDatabaseNametoLoad.FilePath() + MakeValidTableName(tempTargetDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempTargetDatabaseNametoLoad.FileSuffix();
+            //    }
+
+            //    return true;
+
             //case "column":
             //    //Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
             //    return true;
 
-            //case "columnname":
-            //    _columnName = value;
-            //    return true;
+            case "uniquesaveid":
+                _inputDatabase_UniqueSaveID = value.FromNonCritical();
+                return true;
 
-            //case "edittype":
-            //    _bearbeitung = (EditTypeFormula)IntParse(value);
-            //    return true;
+            case "uniquesaveidcolumnname":
+                _uniqueSaveIDColumnName = value;
+                return true;
 
-            //case "caption":
-            //    _überschriftanordung = (CaptionPosition)IntParse(value);
-            //    return true;
+            case "idcolumnname":
+                _iDColumnName = value;
+                return true;
 
-            //case "autodistance":
-            //    _autoX = value.FromPlusMinus();
-            //    return true;
+            case "uniquerowidcolumnname":
+                _uniqueRowIDColumnName = value;
+                return true;
+
+            case "additinalTextColumnName":
+                _additinalTextColumnName = value;
+                return true;
+
+                //case "edittype":
+                //    _bearbeitung = (EditTypeFormula)IntParse(value);
+                //    return true;
+
+                //case "caption":
+                //    _überschriftanordung = (CaptionPosition)IntParse(value);
+                //    return true;
+
+                //case "autodistance":
+                //    _autoX = value.FromPlusMinus();
+                //    return true;
         }
         return false;
     }
 
     public override string ReadableText() {
-        const string txt = "Wert aus: ";
+        const string txt = "Zeilengenerator ";
 
         //if (this.IsOk() && Column != null) {
         //    return txt + Column.Caption;
@@ -283,6 +399,8 @@ public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl,
 
         return txt + ErrorReason();
     }
+
+    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage? SymbolForReadableText() {
         //if (this.IsOk() && Column != null) {
@@ -296,9 +414,16 @@ public class RowAdderSingle : FakeControlPadItem, IReadableText, IItemToControl,
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
 
-        //result.ParseableAdd("ColumnName", _columnName);
+        //result.ParseableAdd("TargetDatabase", _targetDatabase); // Nicht _database, weil sie evtl. noch nicht geladen ist
+
+        result.ParseableAdd("UniqueSaveID", _inputDatabase_UniqueSaveID);
+        result.ParseableAdd("UniqueSaveIDColumnName", _uniqueSaveIDColumnName);
+        result.ParseableAdd("UniqueRowIDColumnName", _uniqueRowIDColumnName);
+        result.ParseableAdd("IDColumnName", _iDColumnName);
+        result.ParseableAdd("AdditinalTextColumnName", _additinalTextColumnName);
+
         //result.ParseableAdd("EditType", _bearbeitung);
         //result.ParseableAdd("Caption", _überschriftanordung);
         //result.ParseableAdd("AutoDistance", _autoX);
