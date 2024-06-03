@@ -46,7 +46,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendSomething _itemSends;
+    private readonly ItemSendFilter _itemSends;
     private string _columnName = string.Empty;
     private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
@@ -241,12 +241,12 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemSends.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemSends.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
+        switch (key) {
             case "id":
                 //Id = IntParse(value);
                 return true;

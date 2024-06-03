@@ -168,9 +168,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         this.RaiseVersion();
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        switch (tag) {
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        switch (key) {
             case "visiblefor":
                 value = value.Replace("\r", "|");
                 var tmp = value.FromNonCritical().SplitBy("|").ToList();

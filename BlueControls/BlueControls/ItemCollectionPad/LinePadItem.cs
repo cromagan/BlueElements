@@ -127,9 +127,9 @@ public class LinePadItem : AbstractPadItem {
         _point2.SetTo(x + width, y + (height / 2));
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        switch (tag) {
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        switch (key) {
             case "connection":
                 Linien_Verhalten = (ConectorStyle)IntParse(value);
                 return true;

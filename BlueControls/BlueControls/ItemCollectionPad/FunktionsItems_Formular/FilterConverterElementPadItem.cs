@@ -42,7 +42,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendSomething _itemSends;
+    private readonly ItemSendFilter _itemSends;
     private string _eingangsWertSpalte = string.Empty;
     private string _filterSpalte = string.Empty;
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
@@ -240,11 +240,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemSends.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
-        switch (tag) {
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemSends.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
+        switch (key) {
             case "id":
                 //ColorId = IntParse(value);
                 return true;

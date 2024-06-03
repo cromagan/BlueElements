@@ -79,9 +79,9 @@ public class SymbolPadItem : RectanglePadItem {
         return l;
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        switch (tag) {
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        switch (key) {
             case "symbol":
                 Symbol = (Symbol)IntParse(value);
                 return true;

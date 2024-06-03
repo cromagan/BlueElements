@@ -66,7 +66,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         // Database?, weil always False keine Datenbank braucht
         Database = db;
 
-        KeyName = Generic.UniqueInternal();
+        KeyName = Generic.GetUniqueKey();
 
         SearchValue = new List<string>().AsReadOnly();
 
@@ -87,7 +87,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string origin) {
-        KeyName = Generic.UniqueInternal();
+        KeyName = Generic.GetUniqueKey();
         Database = column.Database;
         _column = column;
         _filterType = filterType;
@@ -113,7 +113,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     private FilterItem(Database? db, FilterType filterType, IList<string>? searchValue) {
         //Database?, weil AlwaysFalse keine Angaben braucht
         Database = db;
-        KeyName = Generic.UniqueInternal();
+        KeyName = Generic.GetUniqueKey();
 
         _filterType = filterType;
         if (searchValue != null && searchValue.Count > 0) {

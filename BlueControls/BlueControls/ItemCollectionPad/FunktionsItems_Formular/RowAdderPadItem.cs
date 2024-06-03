@@ -47,7 +47,9 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendSomething _itemSends;
+    private readonly ItemSendFilter _itemSends;
+
+    private List<RowAdderSingle> _addersingle = new();
 
     /// <summary>
     /// Wo der Zusätzliche Text in die Zieldatenbank geschrieben werden soll
@@ -290,6 +292,11 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
             return "Spalte, in der der Zusätzliche Text geschrieben werden soll, fehlt";
         }
 
+        foreach (var thisAdder in _addersingle) {
+            b = thisAdder.ErrorReason();
+            if (!string.IsNullOrEmpty(b)) { return "Ein Eintrag der Ergänzer ist falsch:" + b; }
+        }
+
         return string.Empty;
     }
 
@@ -316,7 +323,7 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
             l.Add(new FlexiControlForProperty<string>(() => AdditinalTextColumnName, lst));
         }
 
-        //l.Add(new FlexiControlForProperty<Database?>(() => Target_Database, ItemSendSomething.AllAvailableTables()));
+        //l.Add(new FlexiControlForProperty<Database?>(() => Target_Database, ItemSendFilter.AllAvailableTables()));
 
         //if (Target_Database == null) { return l; }
 
@@ -337,24 +344,11 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
-            //case "targetdatabase":
-            //    tempTargetDatabaseNametoLoad = value.FromNonCritical();
-
-            //    if (tempTargetDatabaseNametoLoad.IsFormat(FormatHolder.FilepathAndName)) {
-            //        tempTargetDatabaseNametoLoad = tempTargetDatabaseNametoLoad.FilePath() + MakeValidTableName(tempTargetDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempTargetDatabaseNametoLoad.FileSuffix();
-            //    }
-
-            //    return true;
-
-            //case "column":
-            //    //Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
-            //    return true;
-
+        switch (key) {
             case "uniquesaveid":
                 _inputDatabase_UniqueSaveID = value.FromNonCritical();
                 return true;

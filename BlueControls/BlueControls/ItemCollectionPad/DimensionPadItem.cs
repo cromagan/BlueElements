@@ -193,9 +193,9 @@ public class DimensionPadItem : AbstractPadItem {
         CalculateOtherPoints();
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        switch (tag) {
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        switch (key) {
             case "text": // TODO: Alt 06.09.2019
 
             case "text1":

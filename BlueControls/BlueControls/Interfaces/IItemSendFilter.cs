@@ -55,7 +55,7 @@ public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPr
     //public void RemoveAllConnections();
 }
 
-public static class ItemSendSomethingExtension {
+public static class ItemSendFilterExtension {
 
     #region Methods
 
@@ -76,7 +76,7 @@ public static class ItemSendSomethingExtension {
     #endregion
 }
 
-public sealed class ItemSendSomething {
+public sealed class ItemSendFilter {
 
     #region Fields
 
@@ -176,7 +176,7 @@ public sealed class ItemSendSomething {
     public List<string> ParsableTags() {
         List<string> result = [];
 
-        result.ParseableAdd("OutputDatabase", DatabaseOutputGet()); // Nicht _databaseOutput, weil sie evtl. noch nicht geladen ist
+        result.ParseableAdd("OutputDatabase", DatabaseOutputGet()); // Nicht _database, weil sie evtl. noch nicht geladen ist
 
         result.ParseableAdd("SentToChildIds", _childIds, false);
 
@@ -185,8 +185,8 @@ public sealed class ItemSendSomething {
 
     public void ParseFinished(IItemSendFilter item) { }
 
-    public bool ParseThis(string tag, string value) {
-        switch (tag) {
+    public bool ParseThis(string key, string value) {
+        switch (key) {
             case "database":
             case "outputdatabase":
                 tempDatabaseNametoLoad = value.FromNonCritical();

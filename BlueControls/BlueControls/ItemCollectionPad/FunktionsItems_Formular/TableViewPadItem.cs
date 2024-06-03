@@ -45,7 +45,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendSomething _itemSends;
+    private readonly ItemSendFilter _itemSends;
     private string _defaultArrangement = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
 
@@ -195,11 +195,11 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemSends.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
-        switch (tag) {
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemSends.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
+        switch (key) {
             case "id":
                 return true;
 

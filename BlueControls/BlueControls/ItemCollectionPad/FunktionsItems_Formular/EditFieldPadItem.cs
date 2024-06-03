@@ -245,11 +245,11 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
+        switch (key) {
             case "column":
                 //Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
                 return true;

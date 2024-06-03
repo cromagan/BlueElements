@@ -41,7 +41,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendSomething _itemSends;
+    private readonly ItemSendFilter _itemSends;
 
     #endregion
 
@@ -164,12 +164,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
-        if (_itemSends.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
+        if (_itemSends.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
+        switch (key) {
             case "id": // TODO: 29.03.2023
                 //Id = IntParse(value);
                 return true;

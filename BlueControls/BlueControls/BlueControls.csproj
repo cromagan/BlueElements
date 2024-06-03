@@ -396,8 +396,9 @@
     <Compile Include="ItemCollectionList\ReadableListItem.cs" />
     <Compile Include="ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
     <Compile Include="ItemCollectionPad\Abstract\AbstractPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowAdderSinglePadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowAdderPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RegionFormulaPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowAdderSingle.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TextGeneratorPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\ButtonPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />

@@ -282,8 +282,8 @@ public sealed class ItemAcceptFilter {
 
     public void ParseFinished(IItemAcceptFilter item) { }
 
-    public bool ParseThis(string tag, string value) {
-        switch (tag) {
+    public bool ParseThis(string key, string value) {
+        switch (key) {
             case "getvaluefrom":
             case "getvaluefromkey":
             case "getfilterfromkeys":

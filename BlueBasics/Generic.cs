@@ -44,11 +44,9 @@ public static class Generic {
 
     public static string UserGroup = Constants.Everybody;
 
+    private static int _GetUniqueKeyCount;
+    private static string _GetUniqueKeyLastTime = "InitialDummy";
     private static string _gotUserName = string.Empty;
-
-    private static int _uniqueInternalCount;
-
-    private static string _uniqueInternalLastTime = "InitialDummy";
 
     #endregion
 
@@ -216,6 +214,18 @@ public static class Generic {
         return key < 0 ? (key * -1).ToString() : key.ToString();
     }
 
+    public static string GetUniqueKey() {
+        // Hashtag: UniqueInternal
+        var neueZeit = DateTime.UtcNow.ToString7().ReduceToChars(Constants.Char_Numerals);
+        if (neueZeit == _GetUniqueKeyLastTime) {
+            _GetUniqueKeyCount++;
+        } else {
+            _GetUniqueKeyCount = 0;
+            _GetUniqueKeyLastTime = neueZeit;
+        }
+        return "ID_" + neueZeit + "_" + _GetUniqueKeyCount.ToStringInt3();
+    }
+
     public static void LaunchBrowser(string url) {
         var browserName = "iexplore.exe";
         var adds = string.Empty;
@@ -310,17 +320,6 @@ public static class Generic {
     }
 
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
-
-    public static string UniqueInternal() {
-        var neueZeit = DateTime.UtcNow.ToString7().ReduceToChars(Constants.Char_Numerals);
-        if (neueZeit == _uniqueInternalLastTime) {
-            _uniqueInternalCount++;
-        } else {
-            _uniqueInternalCount = 0;
-            _uniqueInternalLastTime = neueZeit;
-        }
-        return "ID_" + neueZeit + "_" + _uniqueInternalCount.ToStringInt3();
-    }
 
     private static IEnumerable<byte> GetHash(this string inputString) {
         using HashAlgorithm algorithm = SHA256.Create();

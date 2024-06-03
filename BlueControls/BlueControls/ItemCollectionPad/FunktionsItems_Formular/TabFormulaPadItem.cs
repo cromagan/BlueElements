@@ -58,7 +58,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
 
     #region Constructors
 
-    public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) {
+    public TabFormulaPadItem() : this(Generic.GetUniqueKey(), null) {
     }
 
     public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
@@ -260,11 +260,11 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
+        switch (key) {
             case "parent":
                 CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
                 if (CFormula != null) {

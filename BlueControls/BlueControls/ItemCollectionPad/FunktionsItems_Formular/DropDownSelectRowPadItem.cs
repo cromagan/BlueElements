@@ -42,7 +42,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendSomething _itemSends;
+    private readonly ItemSendFilter _itemSends;
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
     private string _überschrift = string.Empty;
@@ -198,12 +198,12 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
-        if (_itemSends.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
+        if (_itemSends.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
+        switch (key) {
             case "id":
                 //ColorId = IntParse(value);
                 return true;

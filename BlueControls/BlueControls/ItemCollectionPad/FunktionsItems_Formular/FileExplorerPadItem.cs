@@ -176,11 +176,11 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
         _itemAccepts.ParseFinished(this);
     }
 
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
+        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
-        switch (tag) {
+        switch (key) {
             case "pfad":
                 _pfad = value.FromNonCritical();
                 return true;
