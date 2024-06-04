@@ -114,6 +114,18 @@
     <Compile Include="Editoren\DatabaseScriptEditor.Designer.cs">
       <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editoren\EditorAbstract.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editoren\EditorAbstract.Designer.cs">
+      <DependentUpon>EditorAbstract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editoren\FilterEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editoren\FilterEditor.Designer.cs">
+      <DependentUpon>FilterEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms_Database\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -642,6 +654,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Editoren\EditorAbstract.resx">
+      <DependentUpon>EditorAbstract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editoren\FilterEditor.resx">
+      <DependentUpon>FilterEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms_Database\AutoFilter.resx">
       <DependentUpon>AutoFilter.cs</DependentUpon>
     </EmbeddedResource>

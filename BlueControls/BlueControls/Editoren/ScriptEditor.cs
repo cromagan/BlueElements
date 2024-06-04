@@ -116,7 +116,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
             ex.Feedback = s.Parse(0, "Main", null);
         }
 
-        grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);
+        grpVariablen.ToEdit = ex.Feedback.Variables;
         WriteCommandsToList();
 
         Message(ex.Feedback.AllOk ? "Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden." : ex.Feedback.ProtocolText);

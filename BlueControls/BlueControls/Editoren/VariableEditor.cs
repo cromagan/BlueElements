@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueControls.Editoren;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
@@ -26,27 +27,17 @@ using System.Windows.Forms;
 
 namespace BlueControls;
 
-public partial class VariableEditor : UserControl {
-
-    #region Fields
-
-    private bool _inited;
-
-    #endregion
+public partial class VariableEditor : EditorAbstract {
 
     #region Constructors
 
-    public VariableEditor() => InitializeComponent();
-
-    #endregion
-
-    #region Properties
-
-    public bool Editabe { get; set; }
+    public VariableEditor() : base() => InitializeComponent();
 
     #endregion
 
     #region Methods
+
+    public override void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
     public VariableCollection GetVariables() {
         if (!Editabe || IsDisposed) {
@@ -75,24 +66,16 @@ public partial class VariableEditor : UserControl {
         return db.Row[variable.KeyName];
     }
 
-    public void WriteVariablesToTable(VariableCollection? variables) {
-        if (!_inited) {
-            _inited = true;
-            GenerateVariableTable();
-        }
+    protected override bool Init(object? variables) {
+        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return false; }
+        if (variables is not VariableCollection vc) { return false; }
 
-        //tableVariablen.Database?.Row.Clear("Neue Variablen");
-
-        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return; }
-        if (variables == null) { return; }
-
-        foreach (var thisv in variables) {
+        foreach (var thisv in vc) {
             var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, null, "Neue Variable");
 
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId, string.Empty);
                 ro.CellSet("RO", thisv.ReadOnly, string.Empty);
-                //ro.CellSet("System", thisv.SystemVariable);
 
                 var tmpi = thisv.ReadableText;
                 if (!Editabe && tmpi.Length > 3990) {
@@ -103,27 +86,17 @@ public partial class VariableEditor : UserControl {
                 ro.CellSet("Kommentar", thisv.Comment, string.Empty);
             }
         }
+
+        return true;
     }
 
-    internal void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
-
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
-
-        if (Visible && !_inited && !Disposing) {
-            _inited = true;
-            GenerateVariableTable();
-        }
-    }
-
-    private void GenerateVariableTable() {
+    protected override void InitializeComponentDefaultValues() {
         Database db = new(Database.UniqueKeyValue());
         db.LogUndo = false;
         db.DropMessages = false;
         var na = db.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = db.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
         _ = db.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
-        //_ = x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
         var inh = db.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
         var kom = db.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
@@ -169,10 +142,7 @@ public partial class VariableEditor : UserControl {
 
         db.SortDefinition = new RowSortDefinition(db, na, true);
 
-        //if (!Editabe) { x.Freeze("Nur Ansicht"); }
-
         tableVariablen.DatabaseSet(db, string.Empty);
-        //tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;
 
         db.Cell.CellValueChanged += TableVariablen_CellValueChanged;

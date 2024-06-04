@@ -132,7 +132,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, true));
 
-        variableEditor.WriteVariablesToTable(Database?.Variables);
+        variableEditor.ToEdit = Database?.Variables;
 
         //GenerateUndoTabelle();
 

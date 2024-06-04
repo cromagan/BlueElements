@@ -174,7 +174,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
         ////}
 
         //Skin.Draw_Border(gr, Design.EasyPic, vState, DisplayRectangle);
-        base.DrawControl(gr, state);
+        //base.DrawControl(gr, state);
     }
 
     private void GenerateColumns() {
