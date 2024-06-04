@@ -108,69 +108,69 @@
     <Compile Include="AdditionalScriptMethods\Method_MsgBox.cs" />
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="Allgemein.cs" />
-    <Compile Include="BlueDatabaseDialogs\DatabaseScriptEditor.cs">
+    <Compile Include="Editoren\DatabaseScriptEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\DatabaseScriptEditor.Designer.cs">
+    <Compile Include="Editoren\DatabaseScriptEditor.Designer.cs">
       <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\FlexiControlForFilter.cs">
+    <Compile Include="Forms_Database\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\FlexiControlForFilter.Designer.cs">
+    <Compile Include="Forms_Database\FlexiControlForFilter.Designer.cs">
       <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ColumnArrangementPadEditor.cs">
+    <Compile Include="Editoren\ColumnArrangementPadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ColumnArrangementPadEditor.Designer.cs">
+    <Compile Include="Editoren\ColumnArrangementPadEditor.Designer.cs">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\RowCleanUp.cs">
+    <Compile Include="Forms_Database\RowCleanUp.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\RowCleanUp.designer.cs">
+    <Compile Include="Forms_Database\RowCleanUp.designer.cs">
       <DependentUpon>RowCleanUp.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ImportBdb.cs">
+    <Compile Include="Forms_Database\ImportBdb.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ImportBdb.designer.cs">
+    <Compile Include="Forms_Database\ImportBdb.designer.cs">
       <DependentUpon>ImportBdb.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Search.cs">
+    <Compile Include="Forms_Database\Search.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Search.designer.cs">
+    <Compile Include="Forms_Database\Search.designer.cs">
       <DependentUpon>Search.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Filterleiste.cs">
+    <Compile Include="Forms_Database\Filterleiste.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Filterleiste.Designer.cs">
+    <Compile Include="Forms_Database\Filterleiste.Designer.cs">
       <DependentUpon>Filterleiste.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueFont.cs" />
+    <Compile Include="Classes\BlueFont.cs" />
     <Compile Include="CommonDialogs.cs" />
-    <Compile Include="ConnectedFormula\InputRowOutputFilterControl.cs">
+    <Compile Include="Controls\ConnectedFormula\InputRowOutputFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\RowEntryControl.cs">
+    <Compile Include="Controls\ConnectedFormula\RowEntryControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
+    <Compile Include="Controls\ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\FlexiControlForDelegate.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\ConnectedFormulaButton.cs">
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\TextGenerator.cs">
+    <Compile Include="Controls\ConnectedFormula\TextGenerator.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\TextGenerator.Designer.cs">
+    <Compile Include="Controls\ConnectedFormula\TextGenerator.Designer.cs">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
     <Compile Include="Designer Support\InputFormatConverter .cs" />
@@ -186,7 +186,7 @@
     <Compile Include="Enums\FlexiFilterDefaultOutput.cs" />
     <Compile Include="EventArgs\EditingEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
-    <Compile Include="FormManager.cs" />
+    <Compile Include="Classes\FormManager.cs" />
     <Compile Include="Forms\Voting.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -212,11 +212,11 @@
     <Compile Include="Interfaces\IItemAcceptFilter.cs" />
     <Compile Include="Interfaces\IControlSendFilter.cs" />
     <Compile Include="Interfaces\IItemSendFilter.cs" />
-    <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
-    <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormula.cs" />
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\ConnectedFormulaView.Designer.cs">
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaView.Designer.cs">
       <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\FileBrowser.cs">
@@ -281,16 +281,16 @@
     <Compile Include="EventArgs\MoveEventArgs.cs" />
     <Compile Include="EventArgs\PositionEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1.cs" />
-    <Compile Include="Extended Text\ExtChar.cs" />
-    <Compile Include="Extended Text\ExtCharCRLFCode.cs" />
-    <Compile Include="Extended Text\ExtCharTabCode.cs" />
-    <Compile Include="Extended Text\ExtCharStoreXCode.cs" />
-    <Compile Include="Extended Text\ExtCharImageCode.cs" />
-    <Compile Include="Extended Text\ExtCharTopCode.cs" />
-    <Compile Include="ConnectedFormula\ConnectedFormulaEditor.cs">
+    <Compile Include="Classes\Extended Text\ExtChar.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharCRLFCode.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharTabCode.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharStoreXCode.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharImageCode.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharTopCode.cs" />
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\ConnectedFormulaEditor.Designer.cs">
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaEditor.Designer.cs">
       <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\DialogWithOkAndCancel.cs">
@@ -360,16 +360,16 @@
     <Compile Include="Forms\FloatingForm.Designer.cs">
       <DependentUpon>FloatingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\PadEditorReadOnly.cs">
+    <Compile Include="Editoren\PadEditorReadOnly.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PadEditorReadOnly.designer.cs">
+    <Compile Include="Editoren\PadEditorReadOnly.designer.cs">
       <DependentUpon>PadEditorReadOnly.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\PadEditorWithFileAccess.cs">
+    <Compile Include="Editoren\PadEditorWithFileAccess.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PadEditorWithFileAccess.Designer.cs">
+    <Compile Include="Editoren\PadEditorWithFileAccess.Designer.cs">
       <DependentUpon>PadEditorWithFileAccess.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\PictureView.cs">
@@ -393,46 +393,46 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemCollectionList\ReadableListItem.cs" />
-    <Compile Include="ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
-    <Compile Include="ItemCollectionPad\Abstract\AbstractPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowAdderPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RegionFormulaPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowAdderSingle.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TextGeneratorPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\ButtonPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TableViewPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FilterConverterElementPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\OutputFilterPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
-    <Compile Include="ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
-    <Compile Include="ItemConnection.cs" />
-    <Compile Include="ItemCollectionPad\Temporär\PhysicPadItem.cs" />
-    <Compile Include="ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
-    <Compile Include="ItemCollectionPad\GenericPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_ColumnArrangement_Editor\ColumnPadItem.cs" />
-    <Compile Include="ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
-    <Compile Include="ItemCollectionPad\Abstract\RectanglePadItem.cs" />
-    <Compile Include="ItemCollectionPad\SymbolPadItem.cs" />
-    <Compile Include="ItemCollectionPad\Temporär\clsKraft.cs" />
-    <Compile Include="ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />
+    <Compile Include="Classes\ItemCollectionList\ReadableListItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Abstract\AbstractPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RegionFormulaPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderSingle.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\TextGeneratorPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\ButtonPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\TableViewPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\FilterConverterElementPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\OutputFilterPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
+    <Compile Include="Classes\ItemConnection.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\GenericPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_ColumnArrangement_Editor\ColumnPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Abstract\RectanglePadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\SymbolPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Temporär\clsKraft.cs" />
+    <Compile Include="Classes\ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SkinDesign.cs" />
-    <Compile Include="ScriptEditor.cs">
+    <Compile Include="Classes\SkinDesign.cs" />
+    <Compile Include="Editoren\ScriptEditor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ScriptEditor.Designer.cs">
+    <Compile Include="Editoren\ScriptEditor.Designer.cs">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="SystemInputHook.cs" />
+    <Compile Include="Classes\SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -447,9 +447,9 @@
     <Compile Include="Enums\CheckBehavior.cs" />
     <Compile Include="Enums\HintergrundArt.cs" />
     <Compile Include="Enums\SteuerelementVerhalten.cs" />
-    <Compile Include="Extended Text\ExtCharASCII.cs" />
-    <Compile Include="Extended Text\ExtText.cs" />
-    <Compile Include="Skin.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharASCII.cs" />
+    <Compile Include="Classes\Extended Text\ExtText.cs" />
+    <Compile Include="Classes\Skin.cs" />
     <Compile Include="Controls\ComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -466,37 +466,37 @@
     <Compile Include="Designer Support\ButtonActionList.cs" />
     <Compile Include="Designer Support\ButtonDesigner.cs" />
     <Compile Include="Designer Support\QuickPicSelector.cs" />
-    <Compile Include="BlueDatabaseDialogs\AutoFilter.cs">
+    <Compile Include="Forms_Database\AutoFilter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\AutoFilter.Designer.cs">
+    <Compile Include="Forms_Database\AutoFilter.Designer.cs">
       <DependentUpon>AutoFilter.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ColumnEditor.cs">
+    <Compile Include="Editoren\ColumnEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ColumnEditor.Designer.cs">
+    <Compile Include="Editoren\ColumnEditor.Designer.cs">
       <DependentUpon>ColumnEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\DatabaseHeadEditor.cs">
+    <Compile Include="Editoren\DatabaseHeadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\DatabaseHeadEditor.Designer.cs">
+    <Compile Include="Editoren\DatabaseHeadEditor.Designer.cs">
       <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ImportCsv.cs">
+    <Compile Include="Forms_Database\ImportCsv.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\ImportCsv.designer.cs">
+    <Compile Include="Forms_Database\ImportCsv.designer.cs">
       <DependentUpon>ImportCsv.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\SearchAndReplace.cs">
+    <Compile Include="Forms_Database\SearchAndReplace.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\SearchAndReplace.designer.cs">
+    <Compile Include="Forms_Database\SearchAndReplace.designer.cs">
       <DependentUpon>SearchAndReplace.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dictionary.cs" />
+    <Compile Include="Classes\Dictionary.cs" />
     <Compile Include="Controls\EasyPic.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -524,11 +524,11 @@
     <Compile Include="Forms\ExportDialog.Designer.cs">
       <DependentUpon>ExportDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TODELETE_FontSelectDialog.cs">
+    <Compile Include="Editoren\FontSelectDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\TODELETE_FontSelectDialog.Designer.cs">
-      <DependentUpon>TODELETE_FontSelectDialog.cs</DependentUpon>
+    <Compile Include="Editoren\FontSelectDialog.Designer.cs">
+      <DependentUpon>FontSelectDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Form.cs">
       <SubType>Form</SubType>
@@ -542,22 +542,22 @@
     <Compile Include="Forms\ItemSelect.Designer.cs">
       <DependentUpon>ItemSelect.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\PageSetupDialog.cs">
+    <Compile Include="Editoren\PageSetupDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PageSetupDialog.Designer.cs">
+    <Compile Include="Editoren\PageSetupDialog.Designer.cs">
       <DependentUpon>PageSetupDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\PadEditor.cs">
+    <Compile Include="Editoren\PadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PadEditor.designer.cs">
+    <Compile Include="Editoren\PadEditor.designer.cs">
       <DependentUpon>PadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\RelationDiagram.cs">
+    <Compile Include="Editoren\RelationDiagram.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\RelationDiagram.Designer.cs">
+    <Compile Include="Editoren\RelationDiagram.Designer.cs">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\GenericControl.cs">
@@ -572,20 +572,20 @@
     <Compile Include="Interfaces\ICanHaveVariables.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
-    <Compile Include="ItemCollectionList\AbstractListItem.cs" />
-    <Compile Include="ItemCollectionList\BitmapListItem.cs" />
-    <Compile Include="ItemCollectionList\CellLikeListItem.cs" />
-    <Compile Include="ItemCollectionList\AbstractListItemExtension.cs" />
-    <Compile Include="ItemCollectionList\LineListItem.cs" />
-    <Compile Include="ItemCollectionList\RowFormulaListItem.cs" />
-    <Compile Include="ItemCollectionList\TextListItem.cs" />
-    <Compile Include="ItemCollectionPad\BitmapPadItem.cs" />
-    <Compile Include="ItemCollectionPad\ChildPadItem.cs" />
-    <Compile Include="ItemCollectionPad\DimensionPadItem.cs" />
-    <Compile Include="ItemCollectionPad\ItemCollectionPad.cs" />
-    <Compile Include="ItemCollectionPad\LinePadItem.cs" />
-    <Compile Include="ItemCollectionPad\RowFormulaPadItem.cs" />
-    <Compile Include="ItemCollectionPad\TextPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\AbstractListItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\BitmapListItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\CellLikeListItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\AbstractListItemExtension.cs" />
+    <Compile Include="Classes\ItemCollectionList\LineListItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\RowFormulaListItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\TextListItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\BitmapPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\ChildPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\DimensionPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\ItemCollectionPad.cs" />
+    <Compile Include="Classes\ItemCollectionPad\LinePadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\RowFormulaPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\TextPadItem.cs" />
     <Compile Include="Controls\LastFilesCombo.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -598,7 +598,7 @@
     <Compile Include="Controls\ListBox.Designer.cs">
       <DependentUpon>ListBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="PointM.cs" />
+    <Compile Include="Classes\PointM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenShot.cs">
       <SubType>Form</SubType>
@@ -627,51 +627,51 @@
     <Compile Include="Controls\TextBox.Designer.cs">
       <DependentUpon>TextBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="ScreenData.cs" />
+    <Compile Include="Classes\ScreenData.cs" />
     <Compile Include="Controls\ZoomPad.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ZoomPad.Designer.cs">
       <DependentUpon>ZoomPad.cs</DependentUpon>
     </Compile>
-    <Compile Include="VariableEditor.cs">
+    <Compile Include="Editoren\VariableEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="VariableEditor.Designer.cs">
+    <Compile Include="Editoren\VariableEditor.Designer.cs">
       <DependentUpon>VariableEditor.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BlueDatabaseDialogs\AutoFilter.resx">
+    <EmbeddedResource Include="Forms_Database\AutoFilter.resx">
       <DependentUpon>AutoFilter.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseHeadEditor.resx">
+    <EmbeddedResource Include="Editoren\DatabaseHeadEditor.resx">
       <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseScriptEditor.resx">
+    <EmbeddedResource Include="Editoren\DatabaseScriptEditor.resx">
       <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\FlexiControlForFilter.resx">
+    <EmbeddedResource Include="Forms_Database\FlexiControlForFilter.resx">
       <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\ColumnArrangementPadEditor.resx">
+    <EmbeddedResource Include="Editoren\ColumnArrangementPadEditor.resx">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\RowCleanUp.resx">
+    <EmbeddedResource Include="Forms_Database\RowCleanUp.resx">
       <DependentUpon>RowCleanUp.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\ImportBdb.resx">
+    <EmbeddedResource Include="Forms_Database\ImportBdb.resx">
       <DependentUpon>ImportBdb.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Search.resx">
+    <EmbeddedResource Include="Forms_Database\Search.resx">
       <DependentUpon>Search.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Filterleiste.resx">
+    <EmbeddedResource Include="Forms_Database\Filterleiste.resx">
       <DependentUpon>Filterleiste.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -683,15 +683,15 @@
       <DependentUpon>ComboBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\ColumnEditor.resx">
+    <EmbeddedResource Include="Editoren\ColumnEditor.resx">
       <DependentUpon>ColumnEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\ImportCsv.resx">
+    <EmbeddedResource Include="Forms_Database\ImportCsv.resx">
       <DependentUpon>ImportCsv.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\SearchAndReplace.resx">
+    <EmbeddedResource Include="Forms_Database\SearchAndReplace.resx">
       <DependentUpon>SearchAndReplace.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -722,10 +722,10 @@
       <DependentUpon>SwapListBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConnectedFormula\TextGenerator.resx">
+    <EmbeddedResource Include="Controls\ConnectedFormula\TextGenerator.resx">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConnectedFormula\ConnectedFormulaEditor.resx">
+    <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaEditor.resx">
       <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -786,8 +786,8 @@
       <DependentUpon>FloatingForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TODELETE_FontSelectDialog.resx">
-      <DependentUpon>TODELETE_FontSelectDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Editoren\FontSelectDialog.resx">
+      <DependentUpon>FontSelectDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form.resx">
@@ -798,25 +798,25 @@
       <DependentUpon>ItemSelect.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PageSetupDialog.resx">
+    <EmbeddedResource Include="Editoren\PageSetupDialog.resx">
       <DependentUpon>PageSetupDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PadEditorReadOnly.resx">
+    <EmbeddedResource Include="Editoren\PadEditorReadOnly.resx">
       <DependentUpon>PadEditorReadOnly.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PadEditor.resx">
+    <EmbeddedResource Include="Editoren\PadEditor.resx">
       <DependentUpon>PadEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PadEditorWithFileAccess.resx">
+    <EmbeddedResource Include="Editoren\PadEditorWithFileAccess.resx">
       <DependentUpon>PadEditorWithFileAccess.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PictureView.resx">
       <DependentUpon>PictureView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\RelationDiagram.resx">
+    <EmbeddedResource Include="Editoren\RelationDiagram.resx">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -846,11 +846,11 @@
     <EmbeddedResource Include="Befehlsreferenz.resx">
       <DependentUpon>Befehlsreferenz.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ScriptEditor.resx">
+    <EmbeddedResource Include="Editoren\ScriptEditor.resx">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="VariableEditor.resx">
+    <EmbeddedResource Include="Editoren\VariableEditor.resx">
       <DependentUpon>VariableEditor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -869,10 +869,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Dictionary\Deutsch.BDB" />
+    <EmbeddedResource Include="Ressources\Dictionary\Deutsch.BDB" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Styles\Styles.BDB" />
+    <EmbeddedResource Include="Ressources\Styles\Styles.BDB" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
