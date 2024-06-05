@@ -31,7 +31,6 @@ using System.Windows.Data;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
-using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueBasics;
 
@@ -122,13 +121,13 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
     public string ChangeGreenTo { get; } = string.Empty;
     public string Code { get; } = string.Empty;
     public int DrehWinkel { get; }
+    public Type? Editor { get; set; }
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
     public string Färbung { get; } = string.Empty;
     public int Height { get; private set; }
     public int Helligkeit { get; }
     public bool IsError { get; }
     public string Name { get; } = string.Empty;
-    public dOpenEditor? OpenEditor { get; set; }
     public int Sättigung { get; }
 
     public int Transparenz { get; }

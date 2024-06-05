@@ -84,17 +84,32 @@ public partial class EditorAbstract : UserControl {
 
     #region Methods
 
-    public static void Edit(IEditable toEdit, EditorAbstract editor) {
-        //if (toEdit is not VariableCollection v) { return; }
+    public static void Edit(IEditable toEdit) {
+        if (toEdit.Editor == null) { return; }
 
-        editor.ToEdit = toEdit;
+        try {
+            object myObject = Activator.CreateInstance(toEdit.Editor);
 
-        var l = new DialogWithOkAndCancel(true, true);
+            if (myObject is EditorAbstract ea) {
+                ea.ToEdit = toEdit;
 
-        l.Controls.Add(editor);
+                var l = new DialogWithOkAndCancel(true, true);
 
-        l.Setup(string.Empty, editor, editor.Width);
-        l.ShowDialog();
+                l.Controls.Add(ea);
+
+                l.Setup(string.Empty, ea, ea.Width);
+                l.ShowDialog();
+            }
+        } catch { }
+
+        //public static void Edit(IEditable toEdit) {
+        //    Edit(toEdit, new VariableEditor());
+        //}
+
+        //public static void Edit(IEditable toEdit, EditorAbstract editor) {
+        //    //if (toEdit is not VariableCollection v) { return; }
+
+        //}
     }
 
     /// <summary>

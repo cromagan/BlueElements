@@ -27,7 +27,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static BlueBasics.Converter;
-using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueDatabase;
 
@@ -174,6 +173,8 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         }
     }
 
+    public Type? Editor { get; set; }
+
     public FilterType FilterType {
         get => _filterType;
         set {
@@ -187,7 +188,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public bool IsDisposed { get; private set; }
     public string KeyName { get; private set; }
-    public dOpenEditor? OpenEditor { get; set; }
 
     public string Origin {
         get => _origin;

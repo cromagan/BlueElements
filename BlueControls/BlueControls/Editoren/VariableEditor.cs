@@ -41,10 +41,6 @@ public partial class VariableEditor : EditorAbstract {
 
     #region Methods
 
-    public static void Edit(IEditable toEdit) {
-        Edit(toEdit, new VariableEditor());
-    }
-
     public override void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
     public VariableCollection GetVariables() {

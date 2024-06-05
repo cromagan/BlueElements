@@ -40,6 +40,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
 using BlueControls.ItemCollectionList;
 using BlueBasics.Interfaces;
+using BlueControls.Editoren;
 
 namespace BlueControls.Controls;
 
@@ -894,8 +895,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.OpenEditor != null) {
-            ie.Edit();
+        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
+            EditorAbstract.Edit(ie);
         }
     }
 
@@ -944,8 +945,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             AddAndCheck(ali);
         }
 
-        if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie && ie.OpenEditor != null) {
-            ie.Edit();
+        if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
+            EditorAbstract.Edit(ie);
         }
 
         DoMouseMovement();
@@ -1100,7 +1101,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             var editok = false;
 
-            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.OpenEditor != null) { editok = false; }
+            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) { editok = false; }
 
             if (editok) {
                 btnEdit.Width = 16;

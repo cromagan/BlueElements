@@ -20,9 +20,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueScript.Variables;
 
@@ -71,7 +71,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
     public string CaptionForEditor => "Variablen";
     public int Count => _internal.Count;
 
-    public dOpenEditor? OpenEditor { get; set; }
+    public Type? Editor { get; set; }
     public bool ReadOnly { get; }
 
     #endregion

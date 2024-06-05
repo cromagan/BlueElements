@@ -36,6 +36,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
+using BlueControls.Editoren;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -344,6 +345,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public AbstractListItem? NewChild() {
         var l = new RowAdderSingle();
+        l.Editor = typeof(RowAdderSingleEditor);
         return ItemOf(l);
     }
 

@@ -61,7 +61,6 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
     #region Fields
 
     private string _additionalText = string.Empty;
-
     private Database? _database;
 
     /// <summary>
@@ -98,8 +97,7 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
     public Database? Database { get; set; }
 
     public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
-    public EditableExtension.dOpenEditor? OpenEditor { get; set; }
-
+    public Type? Editor { get; set; }
     public string QuickInfo => ReadableText();
 
     [Description("Eine Id, die mit Variablen der erzeugt wird.\r\nDiese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.\r\nDie Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl")]

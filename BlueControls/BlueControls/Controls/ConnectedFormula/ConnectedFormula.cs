@@ -47,27 +47,20 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
     #region Fields
 
     public const float StandardHöhe = 1.75f;
-    public const string Version = "0.50"; // 0.50 seit 08.03.2024
-
+    public const string Version = "0.50";
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
+
+    // 0.50 seit 08.03.2024
     private readonly List<string> _databaseFiles = [];
 
     private readonly List<string> _notAllowedChilds = [];
-
     private string _createDate;
-
     private string _creator;
-
     private int _id = -1;
-
     private string _loadedVersion = "0.00";
-
     private MultiUserFile? _muf;
-
     private ItemCollectionPad.ItemCollectionPad? _padData;
-
     private bool _saved;
-
     private bool _saving;
 
     #endregion
@@ -139,6 +132,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
     [DefaultValue(true)]
     public bool DropMessages => true;
 
+    public Type? Editor { get; set; }
     public string Filename => _muf?.Filename ?? string.Empty;
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
@@ -162,8 +156,6 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             OnNotAllowedChildsChanged();
         }
     }
-
-    public EditableExtension.dOpenEditor? OpenEditor { get; set; }
 
     public ItemCollectionPad.ItemCollectionPad? PadData {
         get => _padData;

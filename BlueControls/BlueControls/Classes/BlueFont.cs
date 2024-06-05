@@ -27,7 +27,6 @@ using System.Drawing.Drawing2D;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
-using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueControls;
 
@@ -74,8 +73,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     #region Properties
 
     public string CaptionForEditor => "Schriftart";
+    public Type? Editor { get; set; }
     public string KeyName { get; private set; } = string.Empty;
-    public dOpenEditor? OpenEditor { get; set; }
     internal bool Bold { get; private set; }
 
     internal Color ColorMain { get; private set; } = Color.Black;

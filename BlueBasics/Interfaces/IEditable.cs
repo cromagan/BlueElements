@@ -17,7 +17,7 @@
 
 #nullable enable
 
-using static BlueBasics.Interfaces.EditableExtension;
+using System;
 
 namespace BlueBasics.Interfaces;
 
@@ -26,26 +26,8 @@ public interface IEditable {
     #region Properties
 
     string CaptionForEditor { get; }
-    dOpenEditor? OpenEditor { get; }
 
-    #endregion
-}
-
-public static class EditableExtension {
-
-    #region Delegates
-
-    public delegate void dOpenEditor(IEditable toEdit);
-
-    #endregion
-
-    #region Methods
-
-    public static void Edit(this IEditable toEdit) {
-        if (toEdit == null) { return; }
-
-        toEdit.OpenEditor?.Invoke(toEdit);
-    }
+    Type? Editor { get; }
 
     #endregion
 }

@@ -32,7 +32,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
-using static BlueBasics.Interfaces.EditableExtension;
 using static BlueBasics.IO;
 using static BlueDatabase.Database;
 
@@ -528,6 +527,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
     }
 
+    public Type? Editor { get; set; }
+
     public FilterOptions FilterOptions {
         get => _filterOptions;
         set {
@@ -763,8 +764,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             OnPropertyChanged();
         }
     }
-
-    public dOpenEditor? OpenEditor { get; set; }
 
     public ReadOnlyCollection<string> OpticalReplace {
         get => new(_opticalReplace);

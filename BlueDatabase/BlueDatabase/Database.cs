@@ -42,7 +42,6 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
-using static BlueBasics.Interfaces.EditableExtension;
 using static BlueBasics.IO;
 using Timer = System.Threading.Timer;
 
@@ -292,6 +291,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
+    public Type? Editor { get; set; }
+
     public ReadOnlyCollection<DatabaseScriptDescription> EventScript {
         get => new(_eventScript);
         set {
@@ -362,7 +363,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public string KeyName => IsDisposed ? string.Empty : ConnectionData.UniqueId;
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
     public bool LogUndo { get; set; } = true;
-    public dOpenEditor? OpenEditor { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);

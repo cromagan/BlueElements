@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
-using static BlueBasics.Interfaces.EditableExtension;
 using static System.Windows.Forms.Control;
 
 namespace BlueBasics.Interfaces;

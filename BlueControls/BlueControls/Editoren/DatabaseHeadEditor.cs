@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
+using BlueControls.Editoren;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -235,8 +236,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void button1_Click(object sender, System.EventArgs e) {
         var v = Database.Variables;
-        v.OpenEditor = VariableEditor.Edit;
-        v.Edit();
+        v.Editor = typeof(VariableEditor);
+        EditorAbstract.Edit(v);
     }
 
     private void GenerateInfoText() {
