@@ -17,39 +17,55 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
+using BlueControls.Editoren;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
 
 namespace BlueControls.Forms;
 
-public partial class EditBoxRow : DialogWithOkAndCancel {
+public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private EditBoxRow() : this(string.Empty, null, null) { }
+    private InputBoxEditor() : this(null, null) { }
 
-    private EditBoxRow(string txt, ConnectedFormula.ConnectedFormula? cf, RowItem? row) : base(false, true) {
+    private InputBoxEditor(IEditable? toEdit) : this(toEdit, toEdit?.Editor) { }
+
+    private InputBoxEditor(IEditable? toEdit, Type? type) : base(false, true) {
         InitializeComponent();
 
-        formToEdit.InitFormula(cf, row?.Database);
+        if (toEdit == null) { return; }
+        if (type == null) { return; }
 
-        if (row != null && !row.IsDisposed) {
-            if (cf == null) {
-                formToEdit.GetConnectedFormulaFromDatabase(row.Database);
+        toEdit.Editor = type;
+
+        try {
+            object myObject = Activator.CreateInstance(toEdit.Editor);
+
+            if (myObject is EditorAbstract ea) {
+                ea.ToEdit = toEdit;
+
+         
+
+                Controls.Add(ea);
+
+                Setup(string.Empty, ea, ea.Width + Skin.Padding * 2);
             }
-
-            formToEdit.SetToRow(row);
-        }
-
-        Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
+        } catch { }
     }
 
     #endregion
 
     #region Methods
 
-    public static void Show(string txt, RowItem? row, bool isDialog) {
-        EditBoxRow mb = new(txt, null, row);
+    public static void Show(IEditable? toEdit, bool isDialog) => Show(toEdit, toEdit?.Editor, isDialog);
+
+    public static void Show(IEditable? toEdit, Type? type) => Show(toEdit, type, true);
+
+    public static void Show(IEditable? toEdit, Type? type, bool isDialog) {
+        InputBoxEditor mb = new(toEdit, type);
         if (isDialog) {
             _ = mb.ShowDialog();
             mb.Dispose();

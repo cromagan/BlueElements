@@ -66,7 +66,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.button1 = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -318,7 +317,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabAllgemein.Controls.Add(this.button1);
             this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.butSystemspaltenErstellen);
             this.tabAllgemein.Controls.Add(this.btnOptimize);
@@ -543,17 +541,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.ImageCode = "Spalte|16";
-            this.button1.Location = new System.Drawing.Point(272, 552);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(200, 32);
-            this.button1.TabIndex = 50;
-            this.button1.Text = "Spaltenübersicht";
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1244, 756);
@@ -619,6 +606,5 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabVariablen;
         private VariableEditor variableEditor;
         private Button btnDummyAdmin;
-        private Button button1;
     }
 }

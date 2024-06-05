@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using System;
@@ -76,31 +77,20 @@ public partial class EditorAbstract : UserControl {
 
     #region Methods
 
-    public static void Edit(IEditable toEdit) {
-        if (toEdit.Editor == null) { return; }
-
-        try {
-            object myObject = Activator.CreateInstance(toEdit.Editor);
-
-            if (myObject is EditorAbstract ea) {
-                ea.ToEdit = toEdit;
-
-                var l = new DialogWithOkAndCancel(true, true);
-
-                l.Controls.Add(ea);
-
-                l.Setup(string.Empty, ea, ea.Width);
-                l.ShowDialog();
-            }
-        } catch { }
-    }
-
     /// <summary>
     /// Reseted Formulare. Löscht z.B. Texte, Tabellen-Einträge, etc
     /// </summary>
     public virtual void Clear() {
         if (_toEdit is ISimpleEditor) { return; }
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    }
+
+    public virtual IEditable? GetCloneOfCurrent() {
+        if (ToEdit is null or ISimpleEditor) { return null; }
+        if (!string.IsNullOrEmpty(Error)) { return null; }
+
+        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+        return null;
     }
 
     /// <summary>

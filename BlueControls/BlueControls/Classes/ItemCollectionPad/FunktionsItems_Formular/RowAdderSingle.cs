@@ -97,6 +97,7 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
     public Database? Database { get; set; }
 
     public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
+
     public Type? Editor { get; set; }
     public string QuickInfo => ReadableText();
 

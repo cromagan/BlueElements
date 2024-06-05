@@ -120,6 +120,12 @@
     <Compile Include="Editoren\EditorAbstract.Designer.cs">
       <DependentUpon>EditorAbstract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editoren\RowEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editoren\RowEditor.Designer.cs">
+      <DependentUpon>RowEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editoren\FilterEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -317,11 +323,11 @@
     <Compile Include="Forms\DialogWithOkAndCancel.Designer.cs">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EditBoxRow.cs">
+    <Compile Include="Forms\InputBoxEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\EditBoxRow.Designer.cs">
-      <DependentUpon>EditBoxRow.cs</DependentUpon>
+    <Compile Include="Forms\InputBoxEditor.Designer.cs">
+      <DependentUpon>InputBoxEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TableView.cs">
       <SubType>Form</SubType>
@@ -664,6 +670,9 @@
     <EmbeddedResource Include="Editoren\EditorAbstract.resx">
       <DependentUpon>EditorAbstract.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editoren\RowEditor.resx">
+      <DependentUpon>RowEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editoren\FilterEditor.resx">
       <DependentUpon>FilterEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -764,8 +773,8 @@
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EditBoxRow.resx">
-      <DependentUpon>EditBoxRow.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\InputBoxEditor.resx">
+      <DependentUpon>InputBoxEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Voting.resx">

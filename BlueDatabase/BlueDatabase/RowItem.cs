@@ -38,7 +38,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable {
 
     #region Fields
 
@@ -79,6 +79,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Properties
 
+    public string CaptionForEditor => "Zeile";
+
     public Database? Database {
         get => _database;
         private set {
@@ -98,6 +100,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    public Type? Editor { get; set; }
     public bool IsDisposed { get; private set; }
 
     public DateTime? IsInCache {

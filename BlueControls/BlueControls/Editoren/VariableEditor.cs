@@ -43,7 +43,10 @@ public partial class VariableEditor : EditorAbstract {
 
     public override void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
-    public VariableCollection GetVariables() {
+    public override IEditable? GetCloneOfCurrent() {
+        if (ToEdit is null or ISimpleEditor) { return null; }
+        if (!string.IsNullOrEmpty(Error)) { return null; }
+
         if (!Editabe || IsDisposed) {
             Develop.DebugPrint_NichtImplementiert(true);
             // Bei Editable TRUE sind es nur string variablen

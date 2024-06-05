@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using System;
 
 namespace BlueBasics.Interfaces;
@@ -27,7 +28,7 @@ public interface IEditable {
 
     string CaptionForEditor { get; }
 
-    Type? Editor { get; }
+    Type? Editor { get; set; }
 
     #endregion
 }

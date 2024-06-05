@@ -896,7 +896,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
-            EditorAbstract.Edit(ie);
+            InputBoxEditor.Show(ie, true);
         }
     }
 
@@ -946,7 +946,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
-            EditorAbstract.Edit(ie);
+            InputBoxEditor.Show(ie, true);
         }
 
         DoMouseMovement();

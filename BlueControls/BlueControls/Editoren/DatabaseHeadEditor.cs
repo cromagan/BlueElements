@@ -234,12 +234,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         db.Column.GenerateAndAddSystem();
     }
 
-    private void button1_Click(object sender, System.EventArgs e) {
-        var v = Database.Variables;
-        v.Editor = typeof(VariableEditor);
-        EditorAbstract.Edit(v);
-    }
-
     private void GenerateInfoText() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) {
             capInfo.Text = "Datenbank-Fehler";
@@ -392,14 +386,17 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         #region Variablen
 
         // Identisch in DatabaseHeadEditor und DatabaseScriptEditor
-        var l = variableEditor.GetVariables();
-        var l2 = new List<VariableString>();
-        foreach (var thisv in l) {
-            if (thisv is VariableString vs) {
-                l2.Add(vs);
+        var l = variableEditor.GetCloneOfCurrent();
+
+        if (l is VariableCollection vl) {
+            var l2 = new List<VariableString>();
+            foreach (var thisv in vl) {
+                if (thisv is VariableString vs) {
+                    l2.Add(vs);
+                }
             }
+            Database.Variables = new VariableCollection(l2);
         }
-        Database.Variables = new VariableCollection(l2);
 
         #endregion
     }
