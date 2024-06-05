@@ -42,18 +42,18 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
+using static BlueBasics.Interfaces.EditableExtension;
 using static BlueBasics.IO;
 using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessages {
+public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessages, IEditable {
 
     #region Fields
 
     public const string DatabaseVersion = "4.02";
-
     public static readonly ObservableCollection<Database> AllFiles = [];
 
     /// <summary>
@@ -67,9 +67,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
     private static List<Type>? _databaseTypes;
-
     private static bool _isInTimer;
-
     private static DateTime _lastTableCheck = new(1900, 1, 1);
 
     /// <summary>
@@ -83,52 +81,29 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
     private readonly List<ColumnViewCollection> _columnArrangements = [];
-
     private readonly List<string> _datenbankAdmin = [];
-
     private readonly List<DatabaseScriptDescription> _eventScript = [];
-
     private readonly List<string> _permissionGroupsNewRow = [];
-
     private readonly List<string> _tags = [];
-
     private readonly List<Variable> _variables = [];
-
     private string _additionalFilesPfad;
-
     private string _cachePfad = string.Empty;
-
     private string _canWriteError = string.Empty;
-
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-
     private string _caption = string.Empty;
-
     private Timer? _checker;
-
     private int _checkerTickCount = -5;
-
     private string _createDate;
-
     private string _creator;
     private string _editNormalyError = string.Empty;
-
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-
     private string _eventScriptErrorMessage = string.Empty;
-
     private string _eventScriptTmp = string.Empty;
-
     private long _eventScriptVersion = 1;
-
     private double _globalScale = 1f;
-
     private string _globalShowPass = string.Empty;
-
     private bool _isInSave;
-
     private bool _readOnly;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -137,11 +112,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryDatabaseMasterTimeUtc = string.Empty;
-
     private string _temporaryDatabaseMasterUser = string.Empty;
-
     private string _variableTmp;
-
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
@@ -240,9 +212,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     #region Properties
 
     public static string DatabaseId => nameof(Database);
-
     public static int ExecutingFirstLvlScript { get; set; } = 0;
-
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
@@ -274,8 +244,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
+    public string CaptionForEditor => "Datenbank";
     public CellCollection Cell { get; }
-
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -388,14 +358,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public bool HasPendingChanges { get; protected set; }
-
     public bool IsDisposed { get; private set; }
-
     public string KeyName => IsDisposed ? string.Empty : ConnectionData.UniqueId;
-
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
-
     public bool LogUndo { get; set; } = true;
+    public dOpenEditor? OpenEditor { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);

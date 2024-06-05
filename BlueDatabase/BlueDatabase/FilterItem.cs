@@ -27,21 +27,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, IReadableTextWithPropertyChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IPropertyChangedFeedback, ICloneable {
+public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, IReadableTextWithPropertyChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IPropertyChangedFeedback, ICloneable, IEditable {
 
     #region Fields
 
     private ColumnItem? _column;
-
     private Database? _database;
-
     private FilterType _filterType = FilterType.AlwaysFalse;
-
     private string _origin = string.Empty;
-
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
@@ -143,6 +140,8 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     #region Properties
 
+    public string CaptionForEditor => "Filter";
+
     public ColumnItem? Column {
         get => _column;
         set {
@@ -187,8 +186,8 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     }
 
     public bool IsDisposed { get; private set; }
-
     public string KeyName { get; private set; }
+    public dOpenEditor? OpenEditor { get; set; }
 
     public string Origin {
         get => _origin;

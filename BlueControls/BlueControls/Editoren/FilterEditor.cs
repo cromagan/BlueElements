@@ -18,9 +18,11 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System.Windows.Controls;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
@@ -54,7 +56,7 @@ public partial class FilterEditor : EditorAbstract, IHasDatabase {
         txbFilterText.Text = string.Empty;
     }
 
-    protected override bool Init(object toEdit) {
+    protected override bool Init(IEditable? toEdit) {
         if (toEdit is not FilterItem fi || fi.IsDisposed) { return false; }
 
         cbxFilterType.Text = ((int)fi.FilterType).ToString();

@@ -31,63 +31,44 @@ namespace BlueControls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.grpVariablen = new GroupBox();
-            this.tableVariablen = new Table();
-            this.filterVariablen = new Filterleiste();
-            this.grpVariablen.SuspendLayout();
+            this.tableVariablen = new BlueControls.Controls.Table();
+            this.filterVariablen = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.SuspendLayout();
-            // 
-            // grpVariablen
-            // 
-            this.grpVariablen.Controls.Add(this.tableVariablen);
-            this.grpVariablen.Controls.Add(this.filterVariablen);
-            this.grpVariablen.Dock = DockStyle.Fill;
-            this.grpVariablen.GroupBoxStyle = GroupBoxStyle.NormalBold;
-            this.grpVariablen.Location = new Point(0, 0);
-            this.grpVariablen.Name = "grpVariablen";
-            this.grpVariablen.Size = new Size(502, 375);
-            this.grpVariablen.TabIndex = 5;
-            this.grpVariablen.TabStop = false;
-            this.grpVariablen.Text = "Variablen";
             // 
             // tableVariablen
             // 
-            this.tableVariablen.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                           | AnchorStyles.Left) 
-                                                          | AnchorStyles.Right)));
-            this.tableVariablen.Location = new Point(8, 64);
+            this.tableVariablen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableVariablen.Arrangement = "";
+            this.tableVariablen.Location = new System.Drawing.Point(8, 64);
             this.tableVariablen.Name = "tableVariablen";
-            this.tableVariablen.ShowWaitScreen = true;
-            this.tableVariablen.Size = new Size(483, 303);
+            this.tableVariablen.Size = new System.Drawing.Size(483, 303);
             this.tableVariablen.TabIndex = 2;
             this.tableVariablen.Text = "tabVariablen";
             // 
             // filterVariablen
             // 
-            this.filterVariablen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
-                                                           | AnchorStyles.Right)));
-            this.filterVariablen.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.filterVariablen.Location = new Point(8, 24);
+            this.filterVariablen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.filterVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.filterVariablen.Location = new System.Drawing.Point(8, 16);
             this.filterVariablen.Name = "filterVariablen";
-            this.filterVariablen.Size = new Size(483, 40);
+            this.filterVariablen.Size = new System.Drawing.Size(483, 40);
             this.filterVariablen.TabIndex = 1;
             this.filterVariablen.TabStop = false;
             // 
             // VariableEditor
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
-            this.AutoScaleMode = AutoScaleMode.Font;
-            this.Controls.Add(this.grpVariablen);
+            this.Controls.Add(this.tableVariablen);
+            this.Controls.Add(this.filterVariablen);
             this.Name = "VariableEditor";
-            this.Size = new Size(502, 375);
-            this.grpVariablen.ResumeLayout(false);
+            this.Size = new System.Drawing.Size(502, 375);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private GroupBox grpVariablen;
         private Table tableVariablen;
         private Filterleiste filterVariablen;
     }

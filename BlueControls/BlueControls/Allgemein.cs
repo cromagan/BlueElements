@@ -100,7 +100,7 @@ public static class Allgemein {
         }
 
         if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert();
+            Develop.DebugPrint_NichtImplementiert(true);
         }
     }
 

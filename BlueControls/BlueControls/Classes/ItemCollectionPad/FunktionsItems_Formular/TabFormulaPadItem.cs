@@ -242,14 +242,14 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             .. _itemAccepts.GetStyleOptions(this, widthOfControl),
             new FlexiControl("Eigenschaften:", widthOfControl, true),
             new FlexiControl("Formulare:", -1, false),
             Childs(),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
         return l;
     }
@@ -369,6 +369,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
             RemoveAllowed = true,
             MoveAllowed = true,
             AutoSort = false,
+            ItemEditAllowed = true,
             CheckBehavior = CheckBehavior.AllSelected
         };
 

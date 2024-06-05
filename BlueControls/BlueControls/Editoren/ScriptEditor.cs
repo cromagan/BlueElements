@@ -32,10 +32,17 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
+using System.ComponentModel;
+using System.Windows.Forms.Design;
 
 namespace BlueControls;
 
-public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
+#if DEBUG
+
+public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
+#else
+   public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
+#endif
 {
     #region Fields
 

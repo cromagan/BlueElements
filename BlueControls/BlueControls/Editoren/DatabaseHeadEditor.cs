@@ -233,6 +233,12 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         db.Column.GenerateAndAddSystem();
     }
 
+    private void button1_Click(object sender, System.EventArgs e) {
+        var v = Database.Variables;
+        v.OpenEditor = VariableEditor.Edit;
+        v.Edit();
+    }
+
     private void GenerateInfoText() {
         if (IsDisposed || Database is not Database db || db.IsDisposed) {
             capInfo.Text = "Datenbank-Fehler";

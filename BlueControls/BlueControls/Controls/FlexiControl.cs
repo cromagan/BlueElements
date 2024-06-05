@@ -586,7 +586,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                         break;
 
                     default:
-                        Develop.DebugPrint_NichtImplementiert();
+                        Develop.DebugPrint_NichtImplementiert(true);
                         break;
                 }
                 break;
@@ -640,7 +640,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                         break;
 
                     default:
-                        Develop.DebugPrint_NichtImplementiert();
+                        Develop.DebugPrint_NichtImplementiert(true);
                         break;
                 }
                 break;
@@ -721,7 +721,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert();
+    private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(false);
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
@@ -1037,7 +1037,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             default:
-                Develop.DebugPrint_NichtImplementiert();
+                Develop.DebugPrint_NichtImplementiert(true);
                 break;
         }
     }

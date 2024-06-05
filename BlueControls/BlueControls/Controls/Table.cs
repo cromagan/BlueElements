@@ -2434,7 +2434,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 break;
 
             case EditTypeTable.Font_AuswahlDialog:
-                Develop.DebugPrint_NichtImplementiert();
+                Develop.DebugPrint_NichtImplementiert(false);
                 //if (cellInThisDatabaseColumn != ContentHolderCellColumn || cellInThisDatabaseRow != ContentHolderCellRow)
                 //{
                 //    NotEditableInfo("Ziel-Spalte ist kein Textformat");

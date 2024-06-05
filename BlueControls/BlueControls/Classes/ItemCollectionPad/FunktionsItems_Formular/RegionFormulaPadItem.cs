@@ -173,7 +173,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         var cl = new List<AbstractListItem>();
 
         CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
@@ -187,7 +187,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
                 new FlexiControlForProperty<string>(() => Child, cl),
 
                 new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u),
-                .. base.GetStyleOptions(widthOfControl),
+                .. base.GetProperties(widthOfControl),
             ];
 
         return l;

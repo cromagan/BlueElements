@@ -17,6 +17,7 @@ namespace BlueControls.Controls
         {
             this.SliderY = new BlueControls.Controls.Slider();
             this.btnDown = new BlueControls.Controls.Button();
+            this.btnEdit = new BlueControls.Controls.Button();
             this.btnUp = new BlueControls.Controls.Button();
             this.btnPlus = new BlueControls.Controls.Button();
             this.btnMinus = new BlueControls.Controls.Button();
@@ -44,6 +45,18 @@ namespace BlueControls.Controls
             this.btnDown.TabIndex = 51;
             this.btnDown.Visible = false;
             this.btnDown.Click += new System.EventHandler(this.btnDown_Click);
+            // 
+            // btnEdit
+            // 
+            this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnEdit.ImageCode = "Stift|8";
+            this.btnEdit.Location = new System.Drawing.Point(24, 144);
+            this.btnEdit.Name = "btnEdit";
+            this.btnEdit.Size = new System.Drawing.Size(24, 24);
+            this.btnEdit.TabIndex = 51;
+            this.btnEdit.Visible = false;
+            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
+
             // 
             // btnUp
             // 
@@ -84,6 +97,7 @@ namespace BlueControls.Controls
             // 
             this.Controls.Add(this.btnPlus);
             this.Controls.Add(this.btnMinus);
+            this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.btnUp);
             this.Controls.Add(this.SliderY);
@@ -91,6 +105,8 @@ namespace BlueControls.Controls
             this.ResumeLayout(false);
 
         }
+
+        private Button btnEdit;
         private Button btnDown;
         private Button btnUp;
         private Button btnPlus;

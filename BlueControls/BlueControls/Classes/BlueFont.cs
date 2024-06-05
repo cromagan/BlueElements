@@ -27,21 +27,18 @@ using System.Drawing.Drawing2D;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
+using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueControls;
 
-public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IParseable {
+public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IParseable, IEditable {
 
     #region Fields
 
     public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false);
-
     internal Brush BrushColorMain = Brushes.Red;
-
     internal Brush BrushColorOutline = Brushes.Red;
-
     private static readonly List<BlueFont> FontsAll = [];
-
     private SizeF[] _charSize = new SizeF[256];
 
     /// <summary>
@@ -76,8 +73,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     #region Properties
 
+    public string CaptionForEditor => "Schriftart";
     public string KeyName { get; private set; } = string.Empty;
-
+    public dOpenEditor? OpenEditor { get; set; }
     internal bool Bold { get; private set; }
 
     internal Color ColorMain { get; private set; } = Color.Black;

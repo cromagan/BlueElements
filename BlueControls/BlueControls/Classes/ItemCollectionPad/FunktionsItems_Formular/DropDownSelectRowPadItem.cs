@@ -171,7 +171,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             .. _itemAccepts.GetStyleOptions(this, widthOfControl),
@@ -188,7 +188,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

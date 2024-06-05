@@ -1,6 +1,6 @@
 ﻿namespace BlueControls.Editoren;
 
-partial class EditorAbstract {
+partial class RowAdderSingleEditor {
     /// <summary> 
     /// Erforderliche Designervariable.
     /// </summary>
@@ -26,10 +26,12 @@ partial class EditorAbstract {
     private void InitializeComponent() {
             this.SuspendLayout();
             // 
-            // EditorAbstract
+            // RowAdderSingleEditor
             // 
-            this.Name = "EditorAbstract";
-            this.Size = new System.Drawing.Size(421, 380);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Name = "RowAdderSingleEditor";
+            this.Size = new System.Drawing.Size(429, 331);
             this.ResumeLayout(false);
 
     }

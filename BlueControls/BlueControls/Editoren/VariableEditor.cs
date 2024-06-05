@@ -18,12 +18,16 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.Editoren;
+using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls;
 
@@ -37,11 +41,15 @@ public partial class VariableEditor : EditorAbstract {
 
     #region Methods
 
+    public static void Edit(IEditable toEdit) {
+        Edit(toEdit, new VariableEditor());
+    }
+
     public override void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
     public VariableCollection GetVariables() {
         if (!Editabe || IsDisposed) {
-            Develop.DebugPrint_NichtImplementiert();
+            Develop.DebugPrint_NichtImplementiert(true);
             // Bei Editable TRUE sind es nur string variablen
         }
         var list = new VariableCollection();
@@ -66,7 +74,7 @@ public partial class VariableEditor : EditorAbstract {
         return db.Row[variable.KeyName];
     }
 
-    protected override bool Init(object? variables) {
+    protected override bool Init(IEditable? variables) {
         if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return false; }
         if (variables is not VariableCollection vc) { return false; }
 

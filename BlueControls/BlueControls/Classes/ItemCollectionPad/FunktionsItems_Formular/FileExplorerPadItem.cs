@@ -157,7 +157,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             .. _itemAccepts.GetStyleOptions(this, widthOfControl),
@@ -165,7 +165,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
             new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
             new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
             new FlexiControl(),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
         return l;
     }

@@ -38,7 +38,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IPropertyChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
+public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IPropertyChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName, ISimpleEditor {
 
     #region Fields
 
@@ -287,7 +287,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// und werden bei nicht gebrauchen automatisch disposed
     /// </summary>
     /// <returns></returns>
-    public virtual List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public virtual List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             new FlexiControl(),
@@ -542,7 +542,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         }
 
         if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert();
+            Develop.DebugPrint_NichtImplementiert(true);
         }
     }
 

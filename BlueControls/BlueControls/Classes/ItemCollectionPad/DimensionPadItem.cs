@@ -167,7 +167,7 @@ public class DimensionPadItem : AbstractPadItem {
                || Länge(new PointM(value), _textPoint) < ne * 10;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             new FlexiControlForProperty<float>(() => Länge_In_Mm),
@@ -178,7 +178,7 @@ public class DimensionPadItem : AbstractPadItem {
         ];
         AddStyleOption(l);
         l.Add(new FlexiControlForProperty<float>(() => Skalierung));
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

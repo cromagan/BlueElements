@@ -196,7 +196,7 @@ public partial class ZoomPad : GenericControl {
             (int)Math.Round(((e.Y + _shiftY) / Zoom) - 0.5d, 0, MidpointRounding.AwayFromZero));
 
     protected virtual RectangleF MaxBounds() {
-        Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
         return default;
     }
 

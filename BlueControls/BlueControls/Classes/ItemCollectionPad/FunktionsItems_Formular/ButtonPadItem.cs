@@ -305,7 +305,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
@@ -368,7 +368,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
 
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
 
         return l;
     }

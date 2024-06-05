@@ -27,41 +27,76 @@ partial class FilterEditor {
             this.cbxFilterType = new BlueControls.Controls.ComboBox();
             this.cbxColumn = new BlueControls.Controls.ComboBox();
             this.txbFilterText = new BlueControls.Controls.TextBox();
+            this.capFilterType = new BlueControls.Controls.Caption();
+            this.capSpalte = new BlueControls.Controls.Caption();
+            this.capSuch = new BlueControls.Controls.Caption();
             this.SuspendLayout();
             // 
             // cbxFilterType
             // 
+            this.cbxFilterType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxFilterType.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxFilterType.Location = new System.Drawing.Point(8, 8);
+            this.cbxFilterType.Location = new System.Drawing.Point(96, 24);
             this.cbxFilterType.Name = "cbxFilterType";
-            this.cbxFilterType.Size = new System.Drawing.Size(304, 32);
+            this.cbxFilterType.Size = new System.Drawing.Size(216, 32);
             this.cbxFilterType.TabIndex = 0;
             // 
             // cbxColumn
             // 
+            this.cbxColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxColumn.Location = new System.Drawing.Point(8, 48);
+            this.cbxColumn.Location = new System.Drawing.Point(96, 64);
             this.cbxColumn.Name = "cbxColumn";
-            this.cbxColumn.Size = new System.Drawing.Size(304, 32);
+            this.cbxColumn.Size = new System.Drawing.Size(216, 32);
             this.cbxColumn.TabIndex = 1;
             // 
             // txbFilterText
             // 
+            this.txbFilterText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbFilterText.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFilterText.Location = new System.Drawing.Point(8, 88);
+            this.txbFilterText.Location = new System.Drawing.Point(96, 104);
             this.txbFilterText.Name = "txbFilterText";
-            this.txbFilterText.Size = new System.Drawing.Size(304, 32);
+            this.txbFilterText.Size = new System.Drawing.Size(216, 32);
             this.txbFilterText.TabIndex = 2;
+            // 
+            // capFilterType
+            // 
+            this.capFilterType.CausesValidation = false;
+            this.capFilterType.Location = new System.Drawing.Point(8, 24);
+            this.capFilterType.Name = "capFilterType";
+            this.capFilterType.Size = new System.Drawing.Size(64, 24);
+            this.capFilterType.Text = "Filter:";
+            // 
+            // capSpalte
+            // 
+            this.capSpalte.CausesValidation = false;
+            this.capSpalte.Location = new System.Drawing.Point(8, 64);
+            this.capSpalte.Name = "capSpalte";
+            this.capSpalte.Size = new System.Drawing.Size(64, 24);
+            this.capSpalte.Text = "Spalte:";
+            // 
+            // capSuch
+            // 
+            this.capSuch.CausesValidation = false;
+            this.capSuch.Location = new System.Drawing.Point(8, 104);
+            this.capSuch.Name = "capSuch";
+            this.capSuch.Size = new System.Drawing.Size(80, 24);
+            this.capSuch.Text = "Filter-Wert:";
             // 
             // FilterEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.capSuch);
+            this.Controls.Add(this.capSpalte);
+            this.Controls.Add(this.capFilterType);
             this.Controls.Add(this.txbFilterText);
             this.Controls.Add(this.cbxColumn);
             this.Controls.Add(this.cbxFilterType);
             this.Name = "FilterEditor";
-            this.Size = new System.Drawing.Size(323, 136);
+            this.Size = new System.Drawing.Size(323, 144);
             this.ResumeLayout(false);
 
     }
@@ -71,4 +106,7 @@ partial class FilterEditor {
     private Controls.ComboBox cbxFilterType;
     private Controls.ComboBox cbxColumn;
     private Controls.TextBox txbFilterText;
+    private Controls.Caption capFilterType;
+    private Controls.Caption capSpalte;
+    private Controls.Caption capSuch;
 }

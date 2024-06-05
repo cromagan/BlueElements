@@ -31,15 +31,15 @@ using System.Windows.Data;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
+using static BlueBasics.Interfaces.EditableExtension;
 
 namespace BlueBasics;
 
-public sealed class QuickImage : IReadableText, IStringable {
+public sealed class QuickImage : IReadableText, IStringable, IEditable {
 
     #region Fields
 
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = [];
-
     private readonly Bitmap _bitmap;
 
     #endregion
@@ -118,24 +118,17 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     #region Properties
 
+    public string CaptionForEditor => "Bild";
     public string ChangeGreenTo { get; } = string.Empty;
-
     public string Code { get; } = string.Empty;
-
     public int DrehWinkel { get; }
-
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
-
     public string Färbung { get; } = string.Empty;
-
     public int Height { get; private set; }
-
     public int Helligkeit { get; }
-
     public bool IsError { get; }
-
     public string Name { get; } = string.Empty;
-
+    public dOpenEditor? OpenEditor { get; set; }
     public int Sättigung { get; }
 
     public int Transparenz { get; }

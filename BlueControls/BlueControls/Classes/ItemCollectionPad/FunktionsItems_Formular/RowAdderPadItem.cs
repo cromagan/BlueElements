@@ -42,7 +42,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
-public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable {
+public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable, ISimpleEditor {
 
     #region Fields
 
@@ -80,11 +80,11 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
 
     #region Constructors
 
-    public RowAdder(string keyName) : this(keyName, null, null) { }
+    public RowAdderPadItem(string keyName) : this(keyName, null, null) { }
 
-    public RowAdder(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+    public RowAdderPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public RowAdder(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
+    public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
 
@@ -106,7 +106,7 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der Eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
     public string AdditinalTextColumnName {
         get => _additinalTextColumnName;
         set {
@@ -138,7 +138,7 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
 
     public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
                                           "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
-                                            "Diese ID wird auch aus Ausgangefilter weitergegeben.";
+                                            "Diese ID wird auch aus Ausgangsfilter weitergegeben.";
 
     public ColumnItem? IDColumn {
         get {
@@ -242,7 +242,7 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
 
     public override void AddedToCollection() {
         base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemSends.DoCreativePadAddedToCollection(this);
         _itemAccepts.DoCreativePadAddedToCollection(this);
         //RepairConnections();
     }
@@ -300,17 +300,18 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+
+        l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
             l.Add(new FlexiControlForProperty<string>(() => UniqueSaveID));
         }
-
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
             var lst = new List<AbstractListItem>();
@@ -323,6 +324,9 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
             l.Add(new FlexiControlForProperty<string>(() => AdditinalTextColumnName, lst));
         }
 
+        l.Add(new FlexiControl("Bausteine:", widthOfControl, true));
+        l.Add(Childs());
+
         //l.Add(new FlexiControlForProperty<Database?>(() => Target_Database, ItemSendFilter.AllAvailableTables()));
 
         //if (Target_Database == null) { return l; }
@@ -334,18 +338,24 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
         //l.Add(new FlexiControlForProperty<string>(() => Caption));
 
         //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions(widthOfControl));
+        //l.AddRange(base.GetProperties(widthOfControl));
         return l;
+    }
+
+    public AbstractListItem? NewChild() {
+        var l = new RowAdderSingle();
+        return ItemOf(l);
     }
 
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
+        _itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
+        if (_itemSends.ParseThis(key, value)) { return true; }
         if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
@@ -442,6 +452,54 @@ public class RowAdder : FakeControlPadItem, IReadableText, IItemToControl, IItem
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
+    }
+
+    private ListBox Childs() {
+        var childs = new ListBox {
+            AddAllowed = AddType.UserDef,
+            RemoveAllowed = true,
+            MoveAllowed = true,
+            AutoSort = false,
+            ItemEditAllowed = true,
+            CheckBehavior = CheckBehavior.AllSelected,
+            AddMethod = NewChild
+        };
+
+        CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);
+
+        foreach (var thisf in _addersingle) {
+            //if (File.Exists(thisf)) {
+            //    childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
+            //} else {
+            childs.AddAndCheck(ItemOf(thisf));
+            //}
+        }
+
+        childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
+        childs.Disposed += Childs_Disposed;
+
+        return childs;
+    }
+
+    private void Childs_Disposed(object sender, System.EventArgs e) {
+        if (sender is ListBox childs) {
+            childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
+            childs.Disposed -= Childs_Disposed;
+        }
+    }
+
+    private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        _addersingle.Clear();
+
+        foreach (var item in ((ListBox)sender).CheckedItems()) {
+            if (item is ReadableListItem rli && rli.Item is RowAdderSingle ras) {
+                _addersingle.Add(ras);
+            }
+        }
+        OnPropertyChanged();
+        this.RaiseVersion();
+        UpdateSideOptionMenu();
     }
 
     #endregion

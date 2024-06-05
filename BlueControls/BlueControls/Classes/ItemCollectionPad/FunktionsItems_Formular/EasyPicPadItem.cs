@@ -126,13 +126,13 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             .. _itemAccepts.GetStyleOptions(this, widthOfControl),
             new FlexiControlForProperty<string>(() => Bild_Dateiname),
             new FlexiControl(),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
         return l;
     }

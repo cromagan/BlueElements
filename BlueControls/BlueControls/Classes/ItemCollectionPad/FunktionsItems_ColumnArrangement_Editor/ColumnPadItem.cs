@@ -85,7 +85,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     #region Methods
 
     //        if (value == Permanent) { return; }
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [];
         if (Column == null || Column.IsDisposed) { return l; }
 
@@ -113,7 +113,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         //    layouts.GenerateAndAdd(p.Caption, p.Id, ImageCode.Stern);
         //}
         //l.GenerateAndAdd(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
-        //l.AddRange(base.GetStyleOptions(widthOfControl));
+        //l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

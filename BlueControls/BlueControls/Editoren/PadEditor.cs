@@ -153,49 +153,7 @@ public partial class PadEditor : PadEditorReadOnly {
     }
 
     private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) {
-
-        #region  SideMenu leeren
-
-        foreach (var thisControl in tabElementEigenschaften.Controls) {
-            if (thisControl is IDisposable d) { d.Dispose(); }
-        }
-        tabElementEigenschaften.Controls.Clear();
-
-        #endregion
-
-        if (Pad.LastClickedItem is not AbstractPadItem bpi) { return; }
-
-        var stdWidth = tabElementEigenschaften.Width - (Skin.Padding * 4);
-
-        var flexis = bpi.GetStyleOptions(stdWidth);
-        if (flexis.Count == 0) { return; }
-
-        //Rückwärts inserten
-
-        //flexis.Insert(0, new FlexiControl()); // Trennlinie
-        if (bpi is IErrorCheckable iec && !iec.IsOk()) {
-            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
-            flexis.Insert(0, new FlexiControl("Achtung!", stdWidth, true));
-        }
-
-        flexis.Insert(0, new FlexiControl(bpi.Description, stdWidth, false)); // Beschreibung
-        flexis.Insert(0, new FlexiControl("Beschreibung:", stdWidth, true));
-
-        #region  SideMenu erstellen
-
-        var top = Skin.Padding;
-        foreach (var thisFlexi in flexis) {
-            if (thisFlexi != null && !thisFlexi.IsDisposed) {
-                tabElementEigenschaften.Controls.Add(thisFlexi);
-                thisFlexi.Left = Skin.Padding;
-                thisFlexi.Top = top;
-                thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-                top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = stdWidth;
-            }
-        }
-
-        #endregion
+        SimpleEditorExtension.DoForm(Pad.LastClickedItem, tabElementEigenschaften.Controls, tabElementEigenschaften.Width);
     }
 
     private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {

@@ -104,7 +104,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             new FlexiControlForProperty<string>(() => Name),
@@ -115,7 +115,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         lage.Add(ItemOf("Links oben", ((int)Alignment.Top_Left).ToString()));
         l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
         l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

@@ -143,7 +143,7 @@ public partial class DialogWithOkAndCancel : Form {
     /// <summary>
     /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
     /// </summary>
-    protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden();
+    protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
 

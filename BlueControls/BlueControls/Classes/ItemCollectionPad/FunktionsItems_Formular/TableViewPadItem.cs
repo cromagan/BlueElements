@@ -165,7 +165,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [];
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
@@ -184,7 +184,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
 
         return l;
     }

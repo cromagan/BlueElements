@@ -88,7 +88,7 @@ public static class Export {
 
     public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
         List<string> l = [];
-        Develop.DebugPrint_NichtImplementiert();
+        Develop.DebugPrint_NichtImplementiert(true);
         //foreach (var thisRow in row) {
         //    var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
         //    thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));

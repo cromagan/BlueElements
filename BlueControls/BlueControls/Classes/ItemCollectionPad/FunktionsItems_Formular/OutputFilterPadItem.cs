@@ -203,7 +203,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
@@ -230,7 +230,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
 
         return l;
     }

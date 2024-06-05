@@ -120,7 +120,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             new FlexiControlForProperty<string>(() => Text, 5)
@@ -133,7 +133,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
         l.Add(new FlexiControlForProperty<float>(() => Skalierung));
         AddStyleOption(l);
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

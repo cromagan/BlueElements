@@ -61,7 +61,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         var comms = new List<AbstractListItem>();
         comms.Add(ItemOf("Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32")));
         comms.Add(ItemOf("Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32")));
@@ -74,7 +74,7 @@ public class SymbolPadItem : RectanglePadItem {
             new FlexiControlForProperty<float>(() => Randdicke),
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
         return l;
     }

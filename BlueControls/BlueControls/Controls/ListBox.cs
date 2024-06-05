@@ -39,6 +39,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
 using BlueControls.ItemCollectionList;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.Controls;
 
@@ -66,6 +67,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private Design _itemDesign;
 
+    private bool _itemEditAllowed;
     private SizeF _lastCheckedMaxSize = Size.Empty;
     private Size _maxNeededItemSize;
 
@@ -97,6 +99,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #endregion
 
+    #region Delegates
+
+    public delegate AbstractListItem? dAddMethod();
+
+    #endregion
+
     #region Events
 
     public event EventHandler? AddClicked;
@@ -111,8 +119,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #endregion
 
-    //public event EventHandler<AbstractListItemEventArgs>? ItemDoubleClick;
-
     #region Properties
 
     [DefaultValue(true)]
@@ -124,6 +130,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             DoMouseMovement();
         }
     }
+
+    public dAddMethod? AddMethod { get; set; }
 
     [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
@@ -193,6 +201,16 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         get {
             if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(FehlerArt.Fehler, "ItemDesign undefiniert!"); }
             return _itemDesign;
+        }
+    }
+
+    [DefaultValue(false)]
+    public bool ItemEditAllowed {
+        get => _itemEditAllowed;
+        set {
+            if (_itemEditAllowed == value) { return; }
+            _itemEditAllowed = value;
+            DoMouseMovement();
         }
     }
 
@@ -322,26 +340,25 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    public void Add_Text() {
+    public AbstractListItem? Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
-        var it = Item(val);
-        AddAndCheck(it);
+
+        if (string.IsNullOrEmpty(val)) { return null; }
+
+        return Item(val);
     }
 
-    public void Add_TextBySuggestion() {
+    public AbstractListItem? Add_TextBySuggestion() {
         if (Suggestions.Count == 0) {
             MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
-            return;
+            return null;
         }
 
         var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None);
 
-        if (rück == null || rück.Count == 0) { return; }
+        if (rück == null || rück.Count == 0) { return null; }
 
-        var sg = Suggestions.Get(rück[0]);
-        if (sg == null) { return; }
-
-        AddAndCheck(sg);
+        return Suggestions.Get(rück[0]);
     }
 
     public Size CalculateColumnAndSize() {
@@ -367,6 +384,17 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         ValidateCheckStates(l, name);
     }
 
+    public ReadOnlyCollection<AbstractListItem> CheckedItems() {
+        var l = new List<AbstractListItem>();
+
+        foreach (var thisItem in _item) {
+            if (thisItem != null && IsChecked(thisItem)) {
+                l.Add(thisItem);
+            }
+        }
+        return l.AsReadOnly();
+    }
+
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
     public new void Focus() {
@@ -374,7 +402,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         _ = base.Focus();
     }
 
-    public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || SliderY.Focused();
+    public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused();
 
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
@@ -713,6 +741,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
+                AddMethod = null;
             }
             _item.Clear();
         } finally {
@@ -864,6 +893,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    private void btnEdit_Click(object sender, System.EventArgs e) {
+        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.OpenEditor != null) {
+            ie.Edit();
+        }
+    }
+
     private void btnMinus_Click(object sender, System.EventArgs e) {
         if (_mouseOverItem == null) { return; }
 
@@ -881,16 +916,20 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void btnPlus_Click(object sender, System.EventArgs e) {
         OnAddClicked();
+
+        AbstractListItem? toAdd = null;
+
         switch (_addAlloweds) {
             case AddType.UserDef:
+                toAdd = AddMethod?.Invoke();
                 break;
 
             case AddType.Text:
-                Add_Text();
+                toAdd = Add_Text();
                 break;
 
             case AddType.OnlySuggests:
-                Add_TextBySuggestion();
+                toAdd = Add_TextBySuggestion();
                 break;
 
             case AddType.None:
@@ -900,6 +939,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 Develop.DebugPrint(_addAlloweds);
                 break;
         }
+
+        if (toAdd is AbstractListItem ali) {
+            AddAndCheck(ali);
+        }
+
+        if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie && ie.OpenEditor != null) {
+            ie.Edit();
+        }
+
         DoMouseMovement();
     }
 
@@ -1047,10 +1095,31 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             }
 
             #endregion
+
+            #region Edit-Button
+
+            var editok = false;
+
+            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.OpenEditor != null) { editok = false; }
+
+            if (editok) {
+                btnEdit.Width = 16;
+                btnEdit.Height = 16;
+                pos -= btnEdit.Width;
+                btnEdit.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnEdit.Left = pos;
+                btnEdit.Visible = true;
+                btnEdit.Enabled = true;
+            } else {
+                btnEdit.Visible = false;
+            }
+
+            #endregion
         } else {
             btnMinus.Visible = false;
             btnUp.Visible = false;
             btnDown.Visible = false;
+            btnEdit.Visible = false;
         }
 
         Invalidate();
@@ -1132,11 +1201,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         if (newList.IsDifferentTo(_checked)) {
-
-            if(_checkBehavior == CheckBehavior.AllSelected) {
+            if (_checkBehavior == CheckBehavior.AllSelected) {
                 SetValuesTo(newCheckedItems);
             }
-
 
             _checked = newList;
             OnItemCheckedChanged();

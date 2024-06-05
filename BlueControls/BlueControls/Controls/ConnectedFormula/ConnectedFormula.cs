@@ -42,7 +42,7 @@ using BlueControls.ItemCollectionList;
 
 namespace BlueControls.ConnectedFormula;
 
-public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages {
+public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages, IEditable {
 
     #region Fields
 
@@ -134,6 +134,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
     #region Properties
 
+    public string CaptionForEditor => "Formular";
+
     [DefaultValue(true)]
     public bool DropMessages => true;
 
@@ -160,6 +162,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             OnNotAllowedChildsChanged();
         }
     }
+
+    public EditableExtension.dOpenEditor? OpenEditor { get; set; }
 
     public ItemCollectionPad.ItemCollectionPad? PadData {
         get => _padData;

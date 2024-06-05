@@ -85,12 +85,12 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             new FlexiControl(),
             new FlexiControlForProperty<int>(() => Drehwinkel),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
         return l;
     }

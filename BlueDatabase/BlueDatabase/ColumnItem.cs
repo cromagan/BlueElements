@@ -32,61 +32,39 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.EditableExtension;
 using static BlueBasics.IO;
 using static BlueDatabase.Database;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtendedWithEvent {
+public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtendedWithEvent, IEditable {
 
     #region Fields
 
     public int? Contentwidth;
-
     public DateTime? IsInCache = null;
-
     public QuickImage? TmpCaptionBitmapCode;
-
     public SizeF TmpCaptionTextSize = new(-1, -1);
-
     public int? TmpIfFilterRemoved = null;
-
     internal List<string>? UcaseNamesSortedByLenght;
-
     private const string TmpNewDummy = "TMPNEWDUMMY";
-
     private readonly List<string> _afterEditAutoReplace = [];
-
     private readonly List<string> _dropDownItems = [];
-
     private readonly List<string> _linkedCellFilter = [];
-
     private readonly List<string> _opticalReplace = [];
-
     private readonly List<string> _permissionGroupsChangeCell = [];
-
     private readonly List<string> _tags = [];
-
     private AdditionalCheck _additionalFormatCheck;
-
     private string _adminInfo;
-
     private bool _afterEditAutoCorrect;
-
     private bool _afterEditDoUCase;
-
     private bool _afterEditQuickSortRemoveDouble;
-
     private AlignmentHorizontal _align;
-
     private string _allowedChars;
-
     private string _autoFilterJoker;
-
     private string _autoRemove;
-
     private Color _backColor;
-
     private BildTextVerhalten _behaviorOfImageAndText;
     private string _caption;
     private string _captionBitmapCode;
@@ -109,9 +87,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
     private bool _formatierungErlaubt;
     private ColumnFunction _function;
     private bool _ignoreAtRowFilter;
-
     private ColumnLineStyle _lineLeft;
-
     private ColumnLineStyle _lineRight;
 
     /// <summary>
@@ -125,33 +101,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
     private Database? _linkedDatabase;
 
     private string _linkedDatabaseTableName;
-
     private int _maxCellLenght;
-
     private int _maxTextLenght;
-
     private bool _multiLine;
-
     private string _name;
-
     private string _prefix;
-
     private string _quickInfo;
-
     private string _regex = string.Empty;
-
     private int _roundAfterEdit;
-
     private ScriptType _scriptType;
-
     private bool _showUndo;
-
     private SortierTyp _sortType;
-
     private bool _spellCheckingEnabled;
-
     private string _suffix;
-
     private bool _textBearbeitungErlaubt;
 
     #endregion
@@ -431,6 +393,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             OnPropertyChanged();
         }
     }
+
+    public string CaptionForEditor => "Spalte";
 
     public string CaptionGroup1 {
         get => _captionGroup1;
@@ -799,6 +763,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             OnPropertyChanged();
         }
     }
+
+    public dOpenEditor? OpenEditor { get; set; }
 
     public ReadOnlyCollection<string> OpticalReplace {
         get => new(_opticalReplace);

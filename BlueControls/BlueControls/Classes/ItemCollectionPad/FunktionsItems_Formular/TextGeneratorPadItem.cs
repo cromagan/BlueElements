@@ -135,7 +135,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             .. _itemAccepts.GetStyleOptions(this, widthOfControl),
@@ -145,7 +145,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             new FlexiControlForDelegate(Auswahl_Spalte_2_wählen, "Auswahl-Spalte 2 wählen", ImageCode.Pfeil_Rechts),
             new FlexiControlForDelegate(Auswahl_Spalte_3_wählen, "Auswahl-Spalte 3 wählen", ImageCode.Pfeil_Rechts),
             new FlexiControl(),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
         return l;
     }

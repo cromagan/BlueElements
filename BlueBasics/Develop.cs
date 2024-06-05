@@ -232,14 +232,20 @@ public static class Develop {
 
     public static void DebugPrint_MissingCommand(string command) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
-    public static void DebugPrint_NichtImplementiert() {
-        if (IsHostRunning()) { Debugger.Break(); }
-        DebugPrint(FehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
+    public static void DebugPrint_NichtImplementiert(bool doend) {
+        if (doend) {
+            DebugPrint(FehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
+        } else {
+            DebugPrint(FehlerArt.Warnung, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
+        }
     }
 
-    public static void DebugPrint_RoutineMussUeberschriebenWerden() {
-        if (IsHostRunning()) { Debugger.Break(); }
-        DebugPrint(FehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
+    public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) {
+        if (doend) {
+            DebugPrint(FehlerArt.Fehler, "Diese Routine muss überschrieben werden.");
+        } else {
+            DebugPrint(FehlerArt.Warnung, "Diese Routine muss überschrieben werden.");
+        }
     }
 
     public static void DoEvents() => Application.DoEvents();

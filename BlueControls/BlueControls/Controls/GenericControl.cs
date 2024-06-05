@@ -253,6 +253,7 @@ public class GenericControl : Control {
 
     public bool DoDrawings() {
         if (IsDisposed || Disposing) { return false; }
+        if (DesignMode) { return true; }
         if (_pform == null || _pform.IsDisposed || !_pform.Visible) { return false; }
         if (_pform is BlueControls.Forms.Form bf && bf.isClosing) { return false; }
         return Visible;
@@ -322,7 +323,7 @@ public class GenericControl : Control {
         }
     }
 
-    protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+    protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     protected ParentType GetParentType() {
         if (Parent == null) { return ParentType.Unbekannt; }

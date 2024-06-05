@@ -56,7 +56,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-internal class RowAdderSingle : ParsebleItem, IErrorCheckable, IHasKeyName, IReadableText {
+internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
 
     #region Fields
 
@@ -81,7 +81,7 @@ internal class RowAdderSingle : ParsebleItem, IErrorCheckable, IHasKeyName, IRea
 
     #region Properties
 
-    [Description("Ein zusätzlicher Text, der erzeugt wird.")]
+    [Description("Ein zusätzlicher Text, der mit Variablen erzeugt wird.\r\nKann jede Art von Informationen enthalten")]
     public string AdditionalText {
         get => _additionalText;
         set {
@@ -92,9 +92,17 @@ internal class RowAdderSingle : ParsebleItem, IErrorCheckable, IHasKeyName, IRea
         }
     }
 
+    public string CaptionForEditor => "Import Element";
+
+    [Description("Aus dieser Datenbank werden die Zeilen konvertiert und importiert.")]
     public Database? Database { get; set; }
 
-    [Description("Eine Id, die mit Variablen der erzeugt wird.")]
+    public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
+    public EditableExtension.dOpenEditor? OpenEditor { get; set; }
+
+    public string QuickInfo => ReadableText();
+
+    [Description("Eine Id, die mit Variablen der erzeugt wird.\r\nDiese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.\r\nDie Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl")]
     public string RowID {
         get => _rowID;
         set {
@@ -126,14 +134,27 @@ internal class RowAdderSingle : ParsebleItem, IErrorCheckable, IHasKeyName, IRea
         return string.Empty;
     }
 
+    public List<GenericControl> GetProperties(int widthOfControl) {
+        var l = new List<GenericControl>();
+        //new FlexiControl("Ausgang:", widthOfControl, true),
+        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
+
+        if (Database != null && Database.IsDisposed) {
+            l.Add(new FlexiControlForProperty<string>(() => RowID, 5));
+            l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
+        }
+
+        return l;
+    }
+
     public List<GenericControl> GetStyleOptions() {
         var l = new List<GenericControl>();
         //new FlexiControl("Ausgang:", widthOfControl, true),
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => RowID));
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalText));
+            l.Add(new FlexiControlForProperty<string>(() => RowID, 5));
+            l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
 
         return l;

@@ -839,7 +839,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
 
         if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert();
+            Develop.DebugPrint_NichtImplementiert(true);
         }
 
         if (IsDisposed) { return; }

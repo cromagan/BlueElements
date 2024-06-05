@@ -114,7 +114,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [];
 
         if (Bei_Export_sichtbar) {
@@ -130,7 +130,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
 
         //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions(widthOfControl));
+        //l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

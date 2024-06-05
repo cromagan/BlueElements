@@ -66,6 +66,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
+            this.button1 = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -118,6 +119,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // PermissionGroups_NewRow
             // 
             this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.PermissionGroups_NewRow.AddMethod = null;
             this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PermissionGroups_NewRow.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
@@ -151,6 +153,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // DatenbankAdmin
             // 
             this.DatenbankAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.DatenbankAdmin.AddMethod = null;
             this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.DatenbankAdmin.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
@@ -204,7 +207,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // lbxSortierSpalten
             // 
             this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
-            this.lbxSortierSpalten.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox;
+            this.lbxSortierSpalten.AddMethod = null;
             this.lbxSortierSpalten.AutoSort = false;
             this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
             this.lbxSortierSpalten.FilterText = null;
@@ -315,6 +318,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.button1);
             this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.butSystemspaltenErstellen);
             this.tabAllgemein.Controls.Add(this.btnOptimize);
@@ -508,7 +512,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tblUndo.Arrangement = "";
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblUndo.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Gewähle_Zeile;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.Size = new System.Drawing.Size(1233, 608);
@@ -539,6 +542,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.TabIndex = 3;
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button1.ImageCode = "Spalte|16";
+            this.button1.Location = new System.Drawing.Point(272, 552);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(200, 32);
+            this.button1.TabIndex = 50;
+            this.button1.Text = "Spaltenübersicht";
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // DatabaseHeadEditor
             // 
@@ -605,5 +619,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabVariablen;
         private VariableEditor variableEditor;
         private Button btnDummyAdmin;
+        private Button button1;
     }
 }

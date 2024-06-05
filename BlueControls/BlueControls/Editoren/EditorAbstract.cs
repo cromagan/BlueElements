@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
+using BlueControls.Forms;
+using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,11 +36,11 @@ namespace BlueControls.Editoren;
 
 #nullable enable
 
-public abstract partial class EditorAbstract : UserControl {
+public partial class EditorAbstract : UserControl {
 
     #region Fields
 
-    private object? _toEdit = null;
+    private IEditable? _toEdit = null;
 
     #endregion
 
@@ -50,9 +55,10 @@ public abstract partial class EditorAbstract : UserControl {
     #region Properties
 
     public bool Editabe { get; set; }
+
     public string Error { get; private set; } = "Nicht Initialisiert.";
 
-    public object? ToEdit {
+    public IEditable? ToEdit {
         protected get => _toEdit;
 
         set {
@@ -78,22 +84,38 @@ public abstract partial class EditorAbstract : UserControl {
 
     #region Methods
 
+    public static void Edit(IEditable toEdit, EditorAbstract editor) {
+        //if (toEdit is not VariableCollection v) { return; }
+
+        editor.ToEdit = toEdit;
+
+        var l = new DialogWithOkAndCancel(true, true);
+
+        l.Controls.Add(editor);
+
+        l.Setup(string.Empty, editor, editor.Width);
+        l.ShowDialog();
+    }
+
     /// <summary>
     /// Reseted Formulare. Löscht z.B. Texte, Tabellen-Einträge, etc
     /// </summary>
-    public abstract void Clear();
+    public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     /// <summary>
     /// Schreibt die Werte des Objekts in die Steuerelemente
     /// </summary>
     /// <param name="toEdit"></param>
     /// <returns></returns>
-    protected abstract bool Init(object? toEdit);
+    protected virtual bool Init(IEditable? toEdit) {
+        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+        return false;
+    }
 
     /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
-    protected abstract void InitializeComponentDefaultValues();
+    protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);

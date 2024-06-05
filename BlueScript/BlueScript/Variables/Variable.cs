@@ -96,7 +96,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     /// </summary>
     public virtual string ValueForReplace {
         get {
-            if (ToStringPossible) { Develop.DebugPrint(FehlerArt.Fehler, "Routine muss überschrieben werden!"); }
+            if (ToStringPossible) { Develop.DebugPrint_RoutineMussUeberschriebenWerden(true); }
 
             return "\"" + MyClassId + ";" + KeyName + "\"";
         }
@@ -209,15 +209,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         v = v.ToLowerInvariant();
         var vo = v;
         v = v.ReduceToChars(AllowedCharsVariableName);
-        if( v != vo || string.IsNullOrEmpty(v)) {  return false; }
+        if (v != vo || string.IsNullOrEmpty(v)) { return false; }
 
         foreach (var thisc in Script.Commands) {
-            if(thisc.Command.Equals(v)) { return false; }
-
+            if (thisc.Command.Equals(v)) { return false; }
         }
         return true;
-
-
     }
 
     public abstract object Clone();

@@ -209,7 +209,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
@@ -235,7 +235,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         //l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 

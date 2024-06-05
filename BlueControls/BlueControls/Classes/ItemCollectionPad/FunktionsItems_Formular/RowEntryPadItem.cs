@@ -147,12 +147,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             .. _itemSends.GetStyleOptions(this, widthOfControl),
             //new FlexiControl(),
-            .. base.GetStyleOptions(widthOfControl),
+            .. base.GetProperties(widthOfControl),
         ];
 
         return l;
