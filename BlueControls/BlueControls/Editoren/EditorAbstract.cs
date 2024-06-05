@@ -19,18 +19,10 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueScript.Variables;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using static BlueBasics.Interfaces.SimpleEditorExtension;
 
 namespace BlueControls.Editoren;
 
@@ -101,21 +93,15 @@ public partial class EditorAbstract : UserControl {
                 l.ShowDialog();
             }
         } catch { }
-
-        //public static void Edit(IEditable toEdit) {
-        //    Edit(toEdit, new VariableEditor());
-        //}
-
-        //public static void Edit(IEditable toEdit, EditorAbstract editor) {
-        //    //if (toEdit is not VariableCollection v) { return; }
-
-        //}
     }
 
     /// <summary>
     /// Reseted Formulare. Löscht z.B. Texte, Tabellen-Einträge, etc
     /// </summary>
-    public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    public virtual void Clear() {
+        if (_toEdit is ISimpleEditor) { return; }
+        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    }
 
     /// <summary>
     /// Schreibt die Werte des Objekts in die Steuerelemente
@@ -123,6 +109,11 @@ public partial class EditorAbstract : UserControl {
     /// <param name="toEdit"></param>
     /// <returns></returns>
     protected virtual bool Init(IEditable? toEdit) {
+        if (_toEdit is ISimpleEditor ise) {
+            DoForm(ise, this.Controls, this.Width);
+            return true;
+        }
+
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
         return false;
     }
@@ -130,7 +121,11 @@ public partial class EditorAbstract : UserControl {
     /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
-    protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    protected virtual void InitializeComponentDefaultValues() {
+        if (_toEdit is ISimpleEditor ise) { return; }
+
+        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
