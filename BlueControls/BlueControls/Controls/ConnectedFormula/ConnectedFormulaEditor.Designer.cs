@@ -24,7 +24,6 @@ namespace BlueControls.Forms {
             this.groupBox2 = new BlueControls.Controls.GroupBox();
             this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
             this.grpVorschau = new BlueControls.Controls.GroupBox();
-            this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
             this.btnRegionAdd = new BlueControls.Controls.Button();
@@ -174,7 +173,6 @@ namespace BlueControls.Forms {
             // grpVorschau
             // 
             this.grpVorschau.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpVorschau.Controls.Add(this.btnVorschauÖffnen);
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
@@ -184,17 +182,6 @@ namespace BlueControls.Forms {
             this.grpVorschau.TabIndex = 1;
             this.grpVorschau.TabStop = false;
             this.grpVorschau.Text = "Vorschau";
-            // 
-            // btnVorschauÖffnen
-            // 
-            this.btnVorschauÖffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnVorschauÖffnen.ImageCode = "Anwendung|16";
-            this.btnVorschauÖffnen.Location = new System.Drawing.Point(80, 2);
-            this.btnVorschauÖffnen.Name = "btnVorschauÖffnen";
-            this.btnVorschauÖffnen.Size = new System.Drawing.Size(72, 66);
-            this.btnVorschauÖffnen.TabIndex = 1;
-            this.btnVorschauÖffnen.Text = "Vorschau öffnen";
-            this.btnVorschauÖffnen.Click += new System.EventHandler(this.btnVorschauÖffnen_Click);
             // 
             // btnPfeileAusblenden
             // 
@@ -555,7 +542,6 @@ namespace BlueControls.Forms {
         private Button btnFeldHinzu;
         private GroupBox grpVorschau;
         private Button btnPfeileAusblenden;
-        private Button btnVorschauÖffnen;
         private Button btnTabControlAdd;
         private TabPage tabFile;
         private GroupBox grpDatei;

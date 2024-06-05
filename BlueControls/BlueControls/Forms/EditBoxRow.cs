@@ -58,26 +58,6 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
         }
     }
 
-    public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, RowItem? row, bool isDialog) {
-        EditBoxRow mb = new(txt, cf, row);
-        if (isDialog) {
-            _ = mb.ShowDialog();
-            mb.Dispose();
-        } else {
-            mb.Show();
-        }
-    }
-
-    public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, bool isDialog) {
-        EditBoxRow mb = new(txt, cf, null);
-        if (isDialog) {
-            _ = mb.ShowDialog();
-            mb.Dispose();
-        } else {
-            mb.Show();
-        }
-    }
-
     protected override void SetValue(bool canceled) { }
 
     #endregion

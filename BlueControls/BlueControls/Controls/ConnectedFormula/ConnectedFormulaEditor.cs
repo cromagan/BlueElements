@@ -279,29 +279,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
-    private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(false);
-
-        Database? db = null;
-
-        if (CFormula?.PadData != null) {
-            foreach (var thisItem in CFormula.PadData) {
-                if (thisItem is RowEntryPadItem iri) {
-                    db = iri.DatabaseOutput;
-                }
-            }
-        }
-        RowItem? r = null;
-        if (db != null) {
-            r = db.Row.First();
-        }
-
-        var c = CFormula;
-        CFormula = null;
-        EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", c, r, true);
-        CFormula = c;
-    }
-
     private void btnWeitere_Click(object sender, System.EventArgs e) {
         if (CFormula == null) { return; }
 
