@@ -36,10 +36,11 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using BlueControls.Editoren;
+using BlueControls.Interfaces;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase {
+public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase, IIsEditor {
 
     #region Fields
 
@@ -51,10 +52,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     #region Constructors
 
-    public DatabaseHeadEditor(Database database) {
+    public DatabaseHeadEditor() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        Database = database;
+        Database = null;
     }
 
     #endregion
@@ -75,6 +76,14 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             if (_database != null) {
                 _database.DisposingEvent += _database_Disposing;
             }
+        }
+    }
+
+    public IEditable? ToEdit {
+        set {
+            if (value is Database db) {
+                Database = db;
+            } else { Database = null; }
         }
     }
 

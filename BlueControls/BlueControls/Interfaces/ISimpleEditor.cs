@@ -19,10 +19,8 @@
 
 using BlueControls;
 using BlueControls.Controls;
-using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using static System.Windows.Forms.Control;
 

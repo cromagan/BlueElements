@@ -370,47 +370,33 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
             MoveAllowed = true,
             AutoSort = false,
             ItemEditAllowed = true,
-            CheckBehavior = CheckBehavior.AllSelected
+            CheckBehavior = CheckBehavior.AllSelected,
         };
 
         CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);
 
         foreach (var thisf in _childs) {
             if (File.Exists(thisf)) {
-                childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
+                var c = ConnectedFormula.ConnectedFormula.GetByFilename(thisf);
+
+                if (c != null) {
+                    c.Editor = typeof(ConnectedFormulaEditor);
+                    childs.AddAndCheck(ItemOf(c));
+                }
             } else {
                 childs.AddAndCheck(new TextListItem(thisf, thisf, QuickImage.Get(ImageCode.Register, 16), false, true, string.Empty));
             }
         }
 
         childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
-        childs.ContextMenuInit += Childs_ContextMenuInit;
-        childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
         childs.Disposed += Childs_Disposed;
 
         return childs;
     }
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
-
-    private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not AbstractListItem it) { return; }
-
-        if (e.ClickedCommand.ToLowerInvariant() == "bearbeiten") {
-            MultiUserFile.SaveAll(false);
-
-            var x = new ConnectedFormulaEditor(it.KeyName, CFormula?.NotAllowedChilds);
-            _ = x.ShowDialog();
-            MultiUserFile.SaveAll(false);
-            x.Dispose();
-        }
-    }
-
     private void Childs_Disposed(object sender, System.EventArgs e) {
         if (sender is ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
-            childs.ContextMenuInit -= Childs_ContextMenuInit;
-            childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
             childs.Disposed -= Childs_Disposed;
         }
     }

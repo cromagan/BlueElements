@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using System;
 using System.Windows.Forms;
 using static BlueBasics.Interfaces.SimpleEditorExtension;
@@ -29,7 +30,7 @@ namespace BlueControls.Editoren;
 
 #nullable enable
 
-public partial class EditorAbstract : UserControl {
+public partial class EditorEasy : UserControl, IIsEditor {
 
     #region Fields
 
@@ -39,7 +40,7 @@ public partial class EditorAbstract : UserControl {
 
     #region Constructors
 
-    public EditorAbstract() {
+    public EditorEasy() {
         InitializeComponent();
     }
 

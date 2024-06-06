@@ -42,7 +42,7 @@ using BlueControls.ItemCollectionList;
 
 namespace BlueControls.ConnectedFormula;
 
-public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages, IEditable {
+public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages, IEditable, IReadableTextWithKey {
 
     #region Fields
 
@@ -175,6 +175,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             _saved = false;
         }
     }
+
+    public string QuickInfo => string.Empty;
 
     #endregion
 
@@ -468,6 +470,12 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
+    public string ReadableText() {
+        if (!string.IsNullOrWhiteSpace(Filename)) { return Filename.FileNameWithoutSuffix(); }
+
+        return string.Empty;
+    }
+
     public void Repair() {
         // Reparatur-Routine
 
@@ -530,6 +538,12 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
     //    if (!isLoading) { Variables_Changed(); }
     //}
+
+    public QuickImage? SymbolForReadableText() {
+        if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
 
     /// <summary>
     /// Leert die eingehende List und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds

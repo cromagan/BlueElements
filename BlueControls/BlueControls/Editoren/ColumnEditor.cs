@@ -19,8 +19,10 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -36,23 +38,45 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-internal sealed partial class ColumnEditor {
+internal sealed partial class ColumnEditor : IIsEditor {
 
     #region Fields
 
     private readonly Table? _table;
+
     private ColumnItem? _column;
 
     #endregion
 
     #region Constructors
 
-    public ColumnEditor(ColumnItem column, Table? table) : base() {
+    public ColumnEditor() : this(null, null) { }
+
+    public ColumnEditor(ColumnItem? column, Table? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         _table = table;
         _column = column;
         Column_DatenAuslesen();
+    }
+
+    #endregion
+
+    #region Properties
+
+    public IEditable? ToEdit {
+        set {
+            if (value == _column) { return; }
+            if (IsDisposed) { return; }
+
+            AllOk();
+            if (value is ColumnItem c) {
+                _column = c;
+            } else {
+                _column = null;
+            }
+            Column_DatenAuslesen();
+        }
     }
 
     #endregion

@@ -132,6 +132,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public dAddMethod? AddMethod { get; set; }
 
     [DefaultValue(ListBoxAppearance.Listbox)]
@@ -896,7 +900,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
-            InputBoxEditor.Show(ie, true);
+            ie.Edit();
         }
     }
 
@@ -946,7 +950,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
-            InputBoxEditor.Show(ie, true);
+            ie.Edit();
         }
 
         DoMouseMovement();
@@ -1101,7 +1105,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             var editok = false;
 
-            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) { editok = false; }
+            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) { editok = true; }
 
             if (editok) {
                 btnEdit.Width = 16;

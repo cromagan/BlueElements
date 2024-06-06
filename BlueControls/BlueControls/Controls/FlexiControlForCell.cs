@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -307,6 +308,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             case SwapListBox:
             case Button:
             case Line:
+            case GroupBox:
                 break;
 
             default:
@@ -335,6 +337,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             case BlueControls.Controls.Caption:
             case Button:
             case Line:
+            case GroupBox:
                 break;
 
             default:
@@ -769,6 +772,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
                 case BlueControls.Controls.Caption:
                 case Button:
                 case Line:
+                case GroupBox:
                     break;
 
                 default:

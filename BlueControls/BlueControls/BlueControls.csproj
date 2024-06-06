@@ -114,11 +114,11 @@
     <Compile Include="Editoren\DatabaseScriptEditor.Designer.cs">
       <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\EditorAbstract.cs">
+    <Compile Include="Editoren\EditorEasy.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Editoren\EditorAbstract.Designer.cs">
-      <DependentUpon>EditorAbstract.cs</DependentUpon>
+    <Compile Include="Editoren\EditorEasy.Designer.cs">
+      <DependentUpon>EditorEasy.cs</DependentUpon>
     </Compile>
     <Compile Include="Editoren\RowEditor.cs">
       <SubType>UserControl</SubType>
@@ -229,6 +229,7 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IIsEditor.cs" />
     <Compile Include="Interfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\IControlUsesRow.cs" />
     <Compile Include="Interfaces\IControlAcceptFilter.cs" />
@@ -667,8 +668,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Editoren\EditorAbstract.resx">
-      <DependentUpon>EditorAbstract.cs</DependentUpon>
+    <EmbeddedResource Include="Editoren\EditorEasy.resx">
+      <DependentUpon>EditorEasy.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\RowEditor.resx">
       <DependentUpon>RowEditor.cs</DependentUpon>

@@ -31,7 +31,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls;
 
-public partial class VariableEditor : EditorAbstract {
+public partial class VariableEditor : EditorEasy {
 
     #region Constructors
 

@@ -182,26 +182,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         UpdateFilterData(filterSingle, _doFilterDeleteButton);
     }
 
-    //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-    //    switch (e.ClickedCommand.ToLowerInvariant()) {
-    //        case "#columnedit":
-    //            if (e.HotItem is ColumnItem col) {
-    //                Forms.TableView.OpenColumnEditor(col, null);
-    //            }
-    //            return true;
-    //    }
-    //    return false;
-    //}
-
     public void ParentFilterOutput_Changed() => HandleChangesNow();
-
-    //public void GetContextMenuItems(MouseEventArgs? e,  List<AbstractListItem> items, out object? hotItem) {
-    //    hotItem = null;
-    //    if (FilterSingleColumn?.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) { return; }
-
-    //    hotItem = FilterSingleColumn;
-    //   items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
-    //}
 
     protected override void CommandButton_Click(object sender, System.EventArgs e) {
         //base.CommandButton_Click(); // Nope, keine Ereignisse und auch nicht auf + setzen

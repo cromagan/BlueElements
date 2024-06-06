@@ -364,19 +364,9 @@ public partial class TableView : FormWithStatusBar {
 
     public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
         if (column == null || column.IsDisposed) { return; }
+        column.Editor = typeof(ColumnEditor);
 
         using ColumnEditor w = new(column, tableview);
-        _ = w.ShowDialog();
-    }
-
-    /// <summary>
-    /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
-    /// </summary>
-    /// <param name="db"></param>
-    public static void OpenDatabaseHeadEditor(Database? db) {
-        if (db == null || db.IsDisposed) { return; }
-
-        using DatabaseHeadEditor w = new(db);
         _ = w.ShowDialog();
     }
 
@@ -767,7 +757,7 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
+    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Database, typeof(DatabaseHeadEditor));
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);

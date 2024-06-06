@@ -31,29 +31,15 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     private InputBoxEditor() : this(null, null) { }
 
-    private InputBoxEditor(IEditable? toEdit) : this(toEdit, toEdit?.Editor) { }
-
-    private InputBoxEditor(IEditable? toEdit, Type? type) : base(false, true) {
+    private InputBoxEditor(IEditable? toEdit, EditorEasy? ea) : base(false, true) {
         InitializeComponent();
 
         if (toEdit == null) { return; }
-        if (type == null) { return; }
+        if (ea == null) { return; }
 
-        toEdit.Editor = type;
+        Controls.Add(ea);
 
-        try {
-            object myObject = Activator.CreateInstance(toEdit.Editor);
-
-            if (myObject is EditorAbstract ea) {
-                ea.ToEdit = toEdit;
-
-         
-
-                Controls.Add(ea);
-
-                Setup(string.Empty, ea, ea.Width + Skin.Padding * 2);
-            }
-        } catch { }
+        Setup(string.Empty, ea, ea.Width + Skin.Padding * 2);
     }
 
     #endregion
@@ -65,7 +51,29 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     public static void Show(IEditable? toEdit, Type? type) => Show(toEdit, type, true);
 
     public static void Show(IEditable? toEdit, Type? type, bool isDialog) {
-        InputBoxEditor mb = new(toEdit, type);
+        if (toEdit == null || type == null) { return; }
+
+        if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
+
+        toEdit.Editor = type;
+
+        Form? mb = null;
+
+        try {
+            object myObject = Activator.CreateInstance(toEdit.Editor);
+
+            if (myObject is IIsEditor ie) {
+                ie.ToEdit = toEdit;
+                if (ie is EditorEasy ea) {
+                    mb = new InputBoxEditor(toEdit, ea);
+                } else if (ie is Form frm) {
+                    mb = frm;
+                }
+            }
+        } catch { }
+
+        if (mb == null) { return; }
+
         if (isDialog) {
             _ = mb.ShowDialog();
             mb.Dispose();
@@ -79,4 +87,43 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     #endregion
 
     // Nix zu tun
+}
+
+public static class InputBoxEditorExtension {
+
+    #region Methods
+
+    /// <summary>
+    /// Routine für allgemeine Elemente, wenn nicht bekannt ist, welcher Form zuständig ist
+    /// </summary>
+    /// <param name="toEdit"></param>
+    public static void Edit(this IEditable? toEdit) {
+        if (toEdit == null) { return; }
+
+        InputBoxEditor.Show(toEdit, true);
+    }
+
+    /// <summary>
+    /// Erweitert, setzt auch gleich den Bearbeitungs-Modus.
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <param name="type"></param>
+    public static void Edit(this IEditable? toEdit, Type? type) {
+        if (toEdit == null || type == null) { return; }
+
+        InputBoxEditor.Show(toEdit, type, true);
+    }
+
+    /// <summary>
+    /// Erweitert, setzt auch gleich den Bearbeitungs-Modus.
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <param name="type"></param>
+    public static void Edit(this IEditable? toEdit, Type? type, bool isDialog) {
+        if (toEdit == null || type == null) { return; }
+
+        InputBoxEditor.Show(toEdit, type, isDialog);
+    }
+
+    #endregion
 }

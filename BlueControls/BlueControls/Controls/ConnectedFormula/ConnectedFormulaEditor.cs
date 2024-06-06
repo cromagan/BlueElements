@@ -33,12 +33,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
+using BlueBasics.Interfaces;
 
 #nullable enable
 
 namespace BlueControls.Forms;
 
-public partial class ConnectedFormulaEditor : PadEditor {
+public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
 
@@ -80,19 +81,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Properties
 
-    public ConnectedFormula.ConnectedFormula? CFormula {
-        get => _cFormula;
-        private set {
-            if (_cFormula == value) { return; }
+    public ConnectedFormula.ConnectedFormula? CFormula => _cFormula;
 
-            if (_cFormula != null) {
-                _cFormula.Editing -= _cFormula_Editing;
-            }
-
-            _cFormula = value;
-
-            if (_cFormula != null) {
-                _cFormula.Editing += _cFormula_Editing;
+    public IEditable? ToEdit {
+        set {
+            if (value is ConnectedFormula.ConnectedFormula cf) {
+                FormulaSet(cf, null);
+            } else {
+                FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
             }
         }
     }
@@ -107,7 +103,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            CFormula = null;
+            FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
             components?.Dispose();
         }
         base.Dispose(disposing);
@@ -327,7 +323,17 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
-        CFormula = formular;
+        if (_cFormula == formular) { return; }
+
+        if (_cFormula != null) {
+            _cFormula.Editing -= _cFormula_Editing;
+        }
+
+        _cFormula = formular;
+
+        if (_cFormula != null) {
+            _cFormula.Editing += _cFormula_Editing;
+        }
 
         if (notAllowedchilds != null && CFormula != null) {
             var l = new List<string>();

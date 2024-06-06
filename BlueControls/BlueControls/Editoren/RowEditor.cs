@@ -28,7 +28,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
 
-public partial class RowEditor : EditorAbstract, IHasDatabase {
+public partial class RowEditor : EditorEasy, IHasDatabase {
 
     #region Constructors
 

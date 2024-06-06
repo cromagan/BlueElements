@@ -49,7 +49,7 @@ namespace BlueControls.Controls
             // btnEdit
             // 
             this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnEdit.ImageCode = "Stift|8";
+            this.btnEdit.ImageCode = "Stift|12";
             this.btnEdit.Location = new System.Drawing.Point(24, 144);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(24, 24);

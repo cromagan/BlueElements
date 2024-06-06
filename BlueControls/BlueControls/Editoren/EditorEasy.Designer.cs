@@ -1,6 +1,6 @@
 ﻿namespace BlueControls.Editoren;
 
-partial class EditorAbstract {
+partial class EditorEasy {
     /// <summary> 
     /// Erforderliche Designervariable.
     /// </summary>

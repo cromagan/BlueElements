@@ -22,12 +22,11 @@ using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System.Windows.Controls;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
 
-public partial class FilterEditor : EditorAbstract, IHasDatabase {
+public partial class FilterEditor : EditorEasy, IHasDatabase {
 
     #region Constructors
 

@@ -30,7 +30,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
 
-public partial class RowAdderSingleEditor : EditorAbstract, IHasDatabase {
+public partial class RowAdderSingleEditor : EditorEasy, IHasDatabase {
 
     #region Fields
 
