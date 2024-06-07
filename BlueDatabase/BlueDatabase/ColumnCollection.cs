@@ -493,7 +493,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     internal bool HasKeyColumns() {
         foreach (var thisColumn in _internal) {
-            if (thisColumn.Value.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
+            if (thisColumn.Value.Function == ColumnFunction.Schlüsselspalte) {
                 return true;
             }
         }

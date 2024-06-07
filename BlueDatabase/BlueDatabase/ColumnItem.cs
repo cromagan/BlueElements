@@ -1292,7 +1292,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
 
-            case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
+            case ColumnFunction.Schlüsselspalte:
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly) {
                     return "Schlüsselspalten müssen im Skript als ReadOnly vorhanden sein.";
                 }
@@ -1588,6 +1588,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
 
+        PermissionGroupsChangeCell = RepairUserGroups(PermissionGroupsChangeCell).AsReadOnly();
+
         ResetSystemToDefault(false);
         CheckIfIAmAKeyColumn();
     }
@@ -1635,9 +1637,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 break;
 
             case "SYS_CHAPTER":
-                _function = ColumnFunction.Normal;
-                _afterEditAutoCorrect = true; // Verhindert \r am Ende und somit anzeigefehler
+
+                if (_function is not ColumnFunction.Normal and not ColumnFunction.Schlüsselspalte) {
+                    _function = ColumnFunction.Normal;
+                }
+
+                if (_function == ColumnFunction.Normal) {
+                    _afterEditAutoCorrect = true; // Verhindert \r am Ende und somit anzeigefehler
+                } else {
+                    _afterEditAutoCorrect = false;
+                }
+
                 _multiLine = true;
+
                 if (setOpticalToo) {
                     Caption = "Kapitel";
                     ForeColor = Color.FromArgb(0, 0, 0);
@@ -2041,7 +2053,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 //if (EditType_To_Check == enEditTypeFormula.Button) { return true; }
                 return false;
 
-            case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
+            case ColumnFunction.Schlüsselspalte:
                 if (editTypeToCheck == EditTypeFormula.als_Überschrift_anzeigen) { return true; }
                 return false;
 
@@ -2382,7 +2394,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
             case ColumnFunction.Zeile:
             case ColumnFunction.Button:
-            case ColumnFunction.Schlüsselspalte_NurDatenprüfung:
+            case ColumnFunction.Schlüsselspalte:
             case ColumnFunction.Virtuelle_Spalte:
                 return EditTypeTable.None;
 

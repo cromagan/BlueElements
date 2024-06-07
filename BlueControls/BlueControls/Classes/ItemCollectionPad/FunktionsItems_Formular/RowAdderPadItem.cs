@@ -27,15 +27,10 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-
-using static BlueDatabase.Database;
-using BlueDatabase.Enums;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueBasics.Converter;
 using BlueControls.Editoren;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -52,30 +47,15 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     private List<RowAdderSingle> _addersingle = new();
 
-    /// <summary>
-    /// Wo der Zusätzliche Text in die Zieldatenbank geschrieben werden soll
-    /// </summary>
-    private string _additinalTextColumnName = string.Empty;
+    private string _additionalTextColumnName = string.Empty;
 
-    /// <summary>
-    /// Wo die normale ID in die Zieldatenbank geschrieben werden soll.
-    /// </summary>
-    private string _iDColumnName = string.Empty;
+    private string _entityIDColumnName = string.Empty;
 
-    /// <summary>
-    /// Zusätzliche Erkennung für individuelle Items. Wird mit Variablen erzeugt
-    /// </summary>
-    private string _inputDatabase_UniqueSaveID = string.Empty;
+    private string _inputDatabase_EntityID = string.Empty;
 
-    /// <summary>
-    /// Wo Zeilen-Id in die Zieldatenbank geschrieben werden soll
-    /// </summary>
-    private string _uniqueRowIDColumnName = string.Empty;
+    private string _originIDColumnName = string.Empty;
 
-    /// <summary>
-    /// Wo die Vorfilterungs-ID in die Zieldatenbank geschrieben werden soll
-    /// </summary>
-    private string _uniqueSaveIDColumnName = string.Empty;
+    private string _textKeyColumnName = string.Empty;
 
     #endregion
 
@@ -102,18 +82,18 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         get {
             if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
 
-            var c = dbout?.Column[_additinalTextColumnName];
+            var c = dbout?.Column[_additionalTextColumnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
-    public string AdditinalTextColumnName {
-        get => _additinalTextColumnName;
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird der Zusatztext gespeichert.\r\nBeispiele: Anzahl oder Objekt-Beschreibungen")]
+    public string AdditionalTextColumnName {
+        get => _additionalTextColumnName;
         set {
             if (IsDisposed) { return; }
-            if (_additinalTextColumnName == value) { return; }
-            _additinalTextColumnName = value;
+            if (_additionalTextColumnName == value) { return; }
+            _additionalTextColumnName = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -141,22 +121,33 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
                                           "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
                                             "Diese ID wird auch aus Ausgangsfilter weitergegeben.";
 
-    public ColumnItem? IDColumn {
+    [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.\r\nBeispiele: Rezepetname, Personenname, Beleg-Nummer")]
+    public string EntityID {
+        get => _inputDatabase_EntityID;
+        set {
+            if (IsDisposed) { return; }
+            if (_inputDatabase_EntityID == value) { return; }
+            _inputDatabase_EntityID = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ColumnItem? EntityIDColumn {
         get {
             if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
 
-            var c = dbout?.Column[_iDColumnName];
+            var c = dbout?.Column[_entityIDColumnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die ID der Zeile gespeichert.")]
-    public string IDColumnName {
-        get => _iDColumnName;
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
+    public string EntityIDColumnName {
+        get => _entityIDColumnName;
         set {
             if (IsDisposed) { return; }
-            if (_iDColumnName == value) { return; }
-            _iDColumnName = value;
+            if (_entityIDColumnName == value) { return; }
+            _entityIDColumnName = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -167,6 +158,27 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override bool MustBeInDrawingArea => true;
 
     public bool MustBeOneRow => true;
+
+    public ColumnItem? OriginIDColumn {
+        get {
+            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+
+            var c = dbout?.Column[_originIDColumnName];
+            return c == null || c.IsDisposed ? null : c;
+        }
+    }
+
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
+    public string OriginIDColumnName {
+        get => _originIDColumnName;
+        set {
+            if (IsDisposed) { return; }
+            if (_originIDColumnName == value) { return; }
+            _originIDColumnName = value;
+            OnPropertyChanged();
+            //UpdateSideOptionMenu();
+        }
+    }
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -182,54 +194,22 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public ColumnItem? UniqueRowIDColumn {
+    public ColumnItem? TextKeyColumn {
         get {
             if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
 
-            var c = dbout?.Column[_uniqueRowIDColumnName];
+            var c = dbout?.Column[_textKeyColumnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des Klickbaren Elements gespeichert.")]
-    public string UniqueRowIDColumnName {
-        get => _uniqueRowIDColumnName;
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird ein Textschlüssel gespeichert. Mit diesem kann dann die Ziel-Datenbank weiter Aktionen ausführen..")]
+    public string TextKeyColumnName {
+        get => _textKeyColumnName;
         set {
             if (IsDisposed) { return; }
-            if (_uniqueRowIDColumnName == value) { return; }
-            _uniqueRowIDColumnName = value;
-            OnPropertyChanged();
-            //UpdateSideOptionMenu();
-        }
-    }
-
-    [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
-    public string UniqueSaveID {
-        get => _inputDatabase_UniqueSaveID;
-        set {
-            if (IsDisposed) { return; }
-            if (_inputDatabase_UniqueSaveID == value) { return; }
-            _inputDatabase_UniqueSaveID = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public ColumnItem? UniqueSaveIDColumn {
-        get {
-            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
-
-            var c = dbout?.Column[_uniqueSaveIDColumnName];
-            return c == null || c.IsDisposed ? null : c;
-        }
-    }
-
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der Eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
-    public string UniqueSaveIDColumnName {
-        get => _uniqueSaveIDColumnName;
-        set {
-            if (IsDisposed) { return; }
-            if (_uniqueSaveIDColumnName == value) { return; }
-            _uniqueSaveIDColumnName = value;
+            if (_textKeyColumnName == value) { return; }
+            _textKeyColumnName = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -274,19 +254,27 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (string.IsNullOrEmpty(_inputDatabase_UniqueSaveID)) { return "Id-Generierung fehlt"; }
-        if (!_inputDatabase_UniqueSaveID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
+        if (string.IsNullOrEmpty(_inputDatabase_EntityID)) { return "Id-Generierung fehlt"; }
+        if (!_inputDatabase_EntityID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
-        if (UniqueSaveIDColumn == null || UniqueSaveIDColumn.IsDisposed) {
-            return "Spalte, in der die SaveID geschrieben werden soll, fehlt";
+        if (EntityIDColumn is not ColumnItem eic || eic.IsDisposed) {
+            return "Spalte, in der die Entitäten-ID geschrieben werden soll, fehlt";
         }
 
-        if (UniqueRowIDColumn == null || UniqueRowIDColumn.IsDisposed) {
-            return "Spalte, in der die einzigartige Zeilen-ID geschrieben werden soll, fehlt";
+        if (eic.Function != BlueDatabase.Enums.ColumnFunction.Schlüsselspalte) {
+            return "Die Entitäten-ID-Spalte muss eine Schlüsselspalte sein.";
         }
 
-        if (IDColumn == null || IDColumn.IsDisposed) {
-            return "Spalte, in der die Zeilen-ID geschrieben werden soll, fehlt";
+        if (OriginIDColumn is not ColumnItem oic || oic.IsDisposed) {
+            return "Spalte, in der die  Herkunft-ID geschrieben werden soll, fehlt";
+        }
+
+        if (oic.Function != BlueDatabase.Enums.ColumnFunction.Schlüsselspalte) {
+            return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
+        }
+
+        if (TextKeyColumn == null || TextKeyColumn.IsDisposed) {
+            return "Spalte, in der die Entitäten-ID geschrieben werden soll, fehlt";
         }
 
         if (AdditinalTextColumn == null || AdditinalTextColumn.IsDisposed) {
@@ -311,40 +299,30 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => UniqueSaveID));
+            l.Add(new FlexiControlForProperty<string>(() => EntityID));
         }
 
         if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
-            l.Add(new FlexiControlForProperty<string>(() => UniqueSaveIDColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => EntityIDColumnName, lst));
 
-            l.Add(new FlexiControlForProperty<string>(() => IDColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
 
-            l.Add(new FlexiControlForProperty<string>(() => AdditinalTextColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => TextKeyColumnName, lst));
+
+            l.Add(new FlexiControlForProperty<string>(() => AdditionalTextColumnName, lst));
         }
 
         l.Add(new FlexiControl("Bausteine:", widthOfControl, true));
         l.Add(Childs());
 
-        //l.Add(new FlexiControlForProperty<Database?>(() => Target_Database, ItemSendFilter.AllAvailableTables()));
-
-        //if (Target_Database == null) { return l; }
-
-        //if (Column == null || Column.IsDisposed) { return l; }
-
-        //var u = new List<AbstractListItem>();
-        //u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        //l.Add(new FlexiControlForProperty<string>(() => Caption));
-
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
 
     public AbstractListItem? NewChild() {
-        var l = new RowAdderSingle();
+        var l = new RowAdderSingle(this);
         l.Editor = typeof(RowAdderSingleEditor);
         return ItemOf(l);
     }
@@ -361,25 +339,32 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
-            case "uniquesaveid":
-                _inputDatabase_UniqueSaveID = value.FromNonCritical();
+            case "entityid":
+                _inputDatabase_EntityID = value.FromNonCritical();
                 return true;
 
-            case "uniquesaveidcolumnname":
-                _uniqueSaveIDColumnName = value;
+            case "entityidcolumnname":
+                _entityIDColumnName = value;
                 return true;
 
-            case "idcolumnname":
-                _iDColumnName = value;
+            case "textkeycolumnname":
+                _textKeyColumnName = value;
                 return true;
 
-            case "uniquerowidcolumnname":
-                _uniqueRowIDColumnName = value;
+            case "originidcolumnname":
+                _originIDColumnName = value;
                 return true;
 
-            case "additinalTextColumnName":
-                _additinalTextColumnName = value;
+            case "additionaltextcolumnname":
+                _additionalTextColumnName = value;
                 return true;
+
+            case "adders":
+                foreach (var pair2 in value.GetAllTags()) {
+                    _addersingle.Add(new RowAdderSingle(this, pair2.Value.FromNonCritical()));
+                }
+
+                break;
 
                 //case "edittype":
                 //    _bearbeitung = (EditTypeFormula)IntParse(value);
@@ -409,11 +394,11 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage? SymbolForReadableText() {
-        //if (this.IsOk() && Column != null) {
-        //    return Column.SymbolForReadableText();
+        if (this.IsOk()) {
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-        //    //return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        //}
+            //return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
+        }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
@@ -424,19 +409,19 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         //result.ParseableAdd("TargetDatabase", _targetDatabase); // Nicht _database, weil sie evtl. noch nicht geladen ist
 
-        result.ParseableAdd("UniqueSaveID", _inputDatabase_UniqueSaveID);
-        result.ParseableAdd("UniqueSaveIDColumnName", _uniqueSaveIDColumnName);
-        result.ParseableAdd("UniqueRowIDColumnName", _uniqueRowIDColumnName);
-        result.ParseableAdd("IDColumnName", _iDColumnName);
-        result.ParseableAdd("AdditinalTextColumnName", _additinalTextColumnName);
+        result.ParseableAdd("EntityID", _inputDatabase_EntityID);
+        result.ParseableAdd("EntityIDColumnName", _entityIDColumnName);
+        result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
+        result.ParseableAdd("TextKeyColumnName", _textKeyColumnName);
+        result.ParseableAdd("AdditionalTextColumnName", _additionalTextColumnName);
+        result.ParseableAdd("Adders", "Item", _addersingle);
 
-        //result.ParseableAdd("EditType", _bearbeitung);
-        //result.ParseableAdd("Caption", _überschriftanordung);
-        //result.ParseableAdd("AutoDistance", _autoX);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, OutputColorId);
+
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }

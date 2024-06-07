@@ -540,7 +540,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
             if (db.Column.SysRowState is ColumnItem srs && srs != column) {
                 RowCollection.WaitDelay = 0;
-                if (column.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
+                if (column.Function == ColumnFunction.Schlüsselspalte) {
                     SetValueInternal(srs, row, string.Empty, reason);
                 } else {
                     SetValueInternal(srs, row, "0", reason);
@@ -767,7 +767,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (reason == Reason.SetCommand) {
                 if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (column.Function == ColumnFunction.Schlüsselspalte_NurDatenprüfung) {
+                    if (column.Function == ColumnFunction.Schlüsselspalte) {
                         if (db.Column.SysRowState is ColumnItem srs) {
                             SetValueInternal(srs, row, string.Empty, reason);
                         }

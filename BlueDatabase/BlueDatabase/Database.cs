@@ -813,6 +813,28 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
+        return RepairUserGroups(l);
+    }
+
+    public static List<string> RepairUserGroups(IEnumerable<string> e) {
+        var l = new List<string>();
+
+        foreach (var thisUser in e) {
+            if (string.Equals(thisUser, Everybody, StringComparison.OrdinalIgnoreCase)) {
+                l.Add(Everybody);
+            } else if (string.Equals(thisUser, Administrator, StringComparison.OrdinalIgnoreCase)) {
+                l.Add(Administrator);
+            } else if (string.Equals(thisUser, "#RowCreator", StringComparison.OrdinalIgnoreCase)) {
+                l.Add("#RowCreator");
+            } else if (thisUser.StartsWith("#USER:", StringComparison.OrdinalIgnoreCase)) {
+                var th = thisUser.Substring(6).Trim(" ");
+
+                l.Add("#User: " + th.ToUpper());
+            } else {
+                l.Add(thisUser.ToUpper());
+            }
+        }
+
         return l.SortedDistinctList();
     }
 
@@ -1399,7 +1421,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             bool? extv = null;
             if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) { extv = extended; }
 
-            var vars = CreateVariableCollection(row, prepf, prepf, dbVariables, prepf, extv);
+            var vars = CreateVariableCollection(row, !s.ChangeValues, prepf, dbVariables, prepf, extv);
 
             #region Script ausführen
 
@@ -1455,16 +1477,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Variablen zurückschreiben
 
-            if (prepf || s.ChangeValues) {
+            if (s.ChangeValues) {
                 if (row != null && !row.IsDisposed) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars, s.KeyName);
                     }
                 }
-            }
-
-            if (dbVariables && s.ChangeValues) {
-                Variables = VariableCollection.Combine(Variables, vars, "DB_");
+                if (dbVariables) {
+                    Variables = VariableCollection.Combine(Variables, vars, "DB_");
+                }
             }
 
             #endregion
@@ -2095,6 +2116,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
         e.RemoveString(Administrator, false);
         if (!IsAdministrator()) { e.Add(UserGroup); }
+
+        e = RepairUserGroups(e);
         return e.SortedDistinctList();
     }
 
@@ -2189,6 +2212,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         SortDefinition?.Repair();
+
+        PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
+        DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
         if (EventScriptVersion < 1) { EventScriptVersion = 1; }
     }

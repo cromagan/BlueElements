@@ -18,63 +18,45 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-
-//using BlueDatabase;
-
 using static BlueDatabase.Database;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
-using static BlueBasics.Converter;
-
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
 
 using BlueDatabase;
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using static BlueDatabase.Database;
-using BlueControls.ItemCollectionList;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
-using System.Windows.Input;
-using BlueControls.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
+internal class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
 
     #region Fields
 
+    private static RowAdderPadItem? _parent = null;
     private string _additionalText = string.Empty;
     private Database? _database;
 
     /// <summary>
     /// Erkennung, welche ID die Zeile hat
     /// </summary>
-    private string _rowID = string.Empty;
+    private string _originID = string.Empty;
 
     private string tempDatabaseNametoLoad = string.Empty;
 
     #endregion
 
+    //public RowAdderSingle() : base(Generic.GetUniqueKey()) { }
+
     #region Constructors
 
-    public RowAdderSingle() : base(Generic.GetUniqueKey()) { }
+    public RowAdderSingle(RowAdderPadItem parent, string toParse) : this(parent) => this.Parse(toParse);
+
+    public RowAdderSingle(RowAdderPadItem parent) : base() {
+        KeyName = Generic.GetUniqueKey();
+        _parent = parent;
+    }
 
     #endregion
 
@@ -87,7 +69,7 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
             //if (IsDisposed) { return; }
             if (_additionalText == value) { return; }
             _additionalText = value;
-            OnPropertyChanged();
+            //OnPropertyChanged();
         }
     }
 
@@ -99,18 +81,21 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
     public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
 
     public Type? Editor { get; set; }
-    public string QuickInfo => ReadableText();
 
-    [Description("Eine Id, die mit Variablen der erzeugt wird.\r\nDiese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.\r\nDie Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl")]
-    public string RowID {
-        get => _rowID;
+    public string KeyName { get; private set; } = string.Empty;
+
+    [Description("Die Herkunft-Id, die mit Variablen der erzeugt wird.\r\nDiese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.\r\nDie Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl")]
+    public string OriginID {
+        get => _originID;
         set {
             //if (IsDisposed) { return; }
-            if (_rowID == value) { return; }
-            _rowID = value;
-            OnPropertyChanged();
+            if (_originID == value) { return; }
+            _originID = value;
+            //OnPropertyChanged();
         }
     }
+
+    public string QuickInfo => ReadableText();
 
     #endregion
 
@@ -127,8 +112,8 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
     public string ErrorReason() {
         if (Database == null || Database.IsDisposed) { return "Datenbank fehlt."; }
 
-        if (string.IsNullOrEmpty(_rowID)) { return "Id-Generierung fehlt"; }
-        if (!_rowID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
+        if (string.IsNullOrEmpty(_originID)) { return "Herkunft-Id-Generierung fehlt"; }
+        if (!_originID.Contains("~")) { return "Herkunft-ID-Generierung muss mit Variablen definiert werden."; }
 
         return string.Empty;
     }
@@ -138,8 +123,8 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
         //new FlexiControl("Ausgang:", widthOfControl, true),
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
-        if (Database != null && Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => RowID, 5));
+        if (Database != null && !Database.IsDisposed) {
+            l.Add(new FlexiControlForProperty<string>(() => OriginID, 5));
             l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
 
@@ -152,14 +137,16 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => RowID, 5));
+            l.Add(new FlexiControlForProperty<string>(() => OriginID, 5));
             l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
 
         return l;
     }
 
-    public override bool ParseThis(string key, string value) {
+    public void ParseFinished(string parsed) { }
+
+    public bool ParseThis(string key, string value) {
         switch (key) {
             case "database":
                 tempDatabaseNametoLoad = value.FromNonCritical();
@@ -170,8 +157,8 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
 
                 return true;
 
-            case "rowid":
-                _rowID = value.FromNonCritical();
+            case "originid":
+                _originID = value.FromNonCritical();
                 return true;
 
             case "additionaltext":
@@ -190,27 +177,13 @@ internal class RowAdderSingle : ParsebleItem, IReadableTextWithKey, IErrorChecka
     public QuickImage? SymbolForReadableText() => null;
 
     public override string ToString() {
-        //if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
         result.ParseableAdd("Database", DatabaseGet()); // Nicht _database, weil sie evtl. noch nicht geladen ist
-        result.ParseableAdd("RowId", _rowID);
+        result.ParseableAdd("OriginId", _originID);
         result.ParseableAdd("AdditionalText", _additionalText);
-        //result.ParseableAdd("Page", _page);
-        //result.ParseableAdd("Print", _beiExportSichtbar);
-        //result.ParseableAdd("QuickInfo", QuickInfo);
-        //result.ParseableAdd("ZoomPadding", _zoomPadding);
 
-        //foreach (var thisPoint in MovablePoint) {
-        //    result.ParseableAdd("Point", thisPoint as IStringable);
-        //}
-        //if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
-        //    result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
-        //}
-
-        //result.ParseableAdd("Tags", Tags, false);
-
-        return result.Parseable(base.ToString());
+        return result.Parseable();
     }
 
     #endregion

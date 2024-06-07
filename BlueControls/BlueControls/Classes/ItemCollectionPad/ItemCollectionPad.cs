@@ -540,20 +540,22 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
-    public List<string> Permission_AllUsed() {
-        var l = new List<string>();
+    //public List<string> Permission_AllUsed() {
+    //    var l = new List<string>();
 
-        foreach (var thisIt in this) {
-            if (thisIt is FakeControlPadItem csi) {
-                l.AddRange(csi.VisibleFor);
-            }
-        }
+    //    foreach (var thisIt in this) {
+    //        if (thisIt is FakeControlPadItem csi) {
+    //            l.AddRange(csi.VisibleFor);
+    //        }
+    //    }
 
-        l.Add(Everybody);
-        l.Add("#User: " + UserName);
+    //    l.Add(Everybody);
+    //    l.Add("#User: " + UserName);
 
-        return l.SortedDistinctList();
-    }
+    //    l = RepairUserGroups(l);
+
+    //    return l.SortedDistinctList();
+    //}
 
     public void Remove(string keyName) => Remove(this[keyName]);
 
@@ -739,7 +741,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         l.AddRange(Database.Permission_AllUsed(false));
 
-        return l.SortedDistinctList();
+        return Database.RepairUserGroups(l);
     }
 
     internal Rectangle DruckbereichRect() =>
