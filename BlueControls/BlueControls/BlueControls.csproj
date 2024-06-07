@@ -108,6 +108,12 @@
     <Compile Include="AdditionalScriptMethods\Method_MsgBox.cs" />
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\RowAdder.Designer.cs">
+      <DependentUpon>RowAdder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editoren\DatabaseScriptEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -312,10 +318,10 @@
     <Compile Include="Classes\Extended Text\ExtCharStoreXCode.cs" />
     <Compile Include="Classes\Extended Text\ExtCharImageCode.cs" />
     <Compile Include="Classes\Extended Text\ExtCharTopCode.cs" />
-    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaEditor.cs">
+    <Compile Include="Editoren\ConnectedFormulaEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaEditor.Designer.cs">
+    <Compile Include="Editoren\ConnectedFormulaEditor.Designer.cs">
       <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\DialogWithOkAndCancel.cs">
@@ -668,6 +674,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\ConnectedFormula\RowAdder.resx">
+      <DependentUpon>RowAdder.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editoren\EditorEasy.resx">
       <DependentUpon>EditorEasy.cs</DependentUpon>
     </EmbeddedResource>
@@ -763,7 +772,7 @@
     <EmbeddedResource Include="Controls\ConnectedFormula\TextGenerator.resx">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaEditor.resx">
+    <EmbeddedResource Include="Editoren\ConnectedFormulaEditor.resx">
       <DependentUpon>ConnectedFormulaEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>

@@ -30,11 +30,17 @@ public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptF
 
     #region Properties
 
+    /// <summary>
+    /// Einfaches Property, muss nur zur Verfügung gestellt werden.
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<RowItem>? RowsInput { get; set; }
 
+    /// <summary>
+    /// Einfaches Property, muss nur zur Verfügung gestellt werden.
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]

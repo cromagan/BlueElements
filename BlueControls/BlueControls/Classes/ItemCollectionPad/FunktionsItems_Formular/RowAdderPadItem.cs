@@ -32,6 +32,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using BlueControls.Editoren;
+using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -231,16 +232,25 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        //var ff = parent.SearchOrGenerate(rfw2);
+        //var i = _itemAccepts.DatabaseInput(this)?.Column[_eingangsWertSpalte];
+        //var o = DatabaseOutput?.Column[_filterSpalte];
+        //var con = new InputRowOutputFilterControl(i, o, _filtertype) {
+        //    Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe
+        //};
+        //con.DoOutputSettings(this);
+        //con.DoInputSettings(parent, this);
 
-        var con = new FlexiControlForCell {
+        //return con;
+
+        var con = new RowAdder {
             //ColumnName = _columnName
             //EditType = EditType,
             //CaptionPosition = CaptionPosition
         };
 
+        con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(this);
+
         return con;
     }
 

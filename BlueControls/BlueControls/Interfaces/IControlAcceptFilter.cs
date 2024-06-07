@@ -33,14 +33,20 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
     /// <summary>
     /// Ein Wert, der bei ParentFilterOutput_Changed zumindest neu berechnet oder invalidiert werden muss.
     /// Zum Berechnen sollte die Routine DoInputFilter benutzt werden.
-    /// Enthält die DatabaseInput und auch den berechnete Zeile.
+    /// Enthält die DatabaseInput und auch die berechnete Zeile.
     /// </summary>
     public FilterCollection? FilterInput { get; set; }
 
+    /// <summary>
+    /// Einfaches Property, muss einfach nur zur Verfügung gestellt werden.
+    /// </summary>
     public bool FilterInputChangedHandled { get; set; }
 
     public string Name { get; set; }
 
+    /// <summary>
+    /// Einfaches Property, muss einfach nur zur Verfügung gestellt werden.
+    /// </summary>
     public List<IControlSendFilter> Parents { get; }
 
     #endregion
@@ -55,7 +61,8 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e);
 
     /// <summary>
-    /// Weiterleitung nach:  this.FilterInput_RowsChanged();
+    /// Weiterleitung nach:  this.FilterInput_RowsChanged(); (nur  möglich wenn IControlUsesRow vorhanden ist)
+    ///
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>

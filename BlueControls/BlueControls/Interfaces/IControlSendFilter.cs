@@ -28,6 +28,9 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
 
     #region Properties
 
+    /// <summary>
+    /// Einfaches Property, muss einfach nur zur Verfügung gestellt werden.
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -35,6 +38,7 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
 
     /// <summary>
     /// Sollte von DoOutputSettings befüllt werden.
+    /// Wird im Steuerlement nur Initialsisiert, wie z.B.   public FilterCollection FilterOutput { get; } = new("FilterOutput 08");
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -47,6 +51,11 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
 
     #region Methods
 
+    /// <summary>
+    /// Weiterleitung zu: this.FilterOutput_DispodingEvent();
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     void FilterOutput_DispodingEvent(object sender, System.EventArgs e);
 
     void FilterOutput_PropertyChanged(object sender, System.EventArgs e);
