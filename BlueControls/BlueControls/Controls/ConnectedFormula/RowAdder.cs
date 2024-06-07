@@ -23,6 +23,10 @@ using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.Enums;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -30,6 +34,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
     #region Fields
 
+    public List<RowAdderSingle> AdderSingle = new();
     private FilterCollection? _filterInput;
 
     #endregion
@@ -53,7 +58,22 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ColumnItem? AdditinalTextColumn { get; internal set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string EntityID { get; internal set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ColumnItem? EntityIDColumn { get; internal set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -82,6 +102,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ColumnItem? OriginIDColumn { get; internal set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
     [Browsable(false)]
@@ -99,6 +124,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; } = false;
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ColumnItem? TextKeyColumn { get; internal set; }
 
     #endregion
 
@@ -195,6 +225,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     public void ParentFilterOutput_Changed() { }
 
     public void RowsInput_Changed() { }
+
+    protected override void OnPaint(PaintEventArgs e) {
+        HandleChangesNow();
+        base.OnPaint(e);
+    }
 
     #endregion
 }

@@ -232,21 +232,16 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        //var i = _itemAccepts.DatabaseInput(this)?.Column[_eingangsWertSpalte];
-        //var o = DatabaseOutput?.Column[_filterSpalte];
-        //var con = new InputRowOutputFilterControl(i, o, _filtertype) {
-        //    Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe
-        //};
-        //con.DoOutputSettings(this);
-        //con.DoInputSettings(parent, this);
-
-        //return con;
-
         var con = new RowAdder {
-            //ColumnName = _columnName
-            //EditType = EditType,
-            //CaptionPosition = CaptionPosition
+            AdditinalTextColumn = AdditinalTextColumn,
+
+            EntityID = EntityID,
+            EntityIDColumn = EntityIDColumn,
+            OriginIDColumn = OriginIDColumn,
+
+            TextKeyColumn = TextKeyColumn,
         };
+        con.AdderSingle.AddRange(_addersingle);
 
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);

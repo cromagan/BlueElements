@@ -30,7 +30,7 @@ using BlueDatabase;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-internal class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
+public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
 
     #region Fields
 
