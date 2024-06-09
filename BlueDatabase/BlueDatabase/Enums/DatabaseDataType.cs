@@ -130,7 +130,7 @@ public enum DatabaseDataType : byte {
     DatabaseVariables = 71,
 
     EventScriptVersion = 72,
-    EventScriptErrorMessage = 73,
+    ScriptNeedFix = 73,
 
     /// <summary>
     /// Datum/Uhrzeit, bis zu dem die Undos engelesen und fest verankert wurden.

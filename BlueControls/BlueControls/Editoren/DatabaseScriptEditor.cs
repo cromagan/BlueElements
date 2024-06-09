@@ -60,7 +60,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         eventScriptEditor.Enabled = false;
         Database = database;
 
-        if (!string.IsNullOrEmpty(Database.EventScriptErrorMessage)) {
+        if (!string.IsNullOrEmpty(Database.ScriptNeedFix)) {
             var l = new List<string> {
                 "### ACHTUNG - EINMALIGE ANZEIGE ###",
                 "Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
@@ -70,12 +70,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 " ",
                 "Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
                 " ",
-                Database.EventScriptErrorMessage
+                Database.ScriptNeedFix
             };
             l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
         }
 
-        Database.EventScriptErrorMessage = string.Empty;
+        Database.ScriptNeedFix = string.Empty;
 
         FormManager.RegisterForm(this);
     }
@@ -543,7 +543,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
-        Database.EventScriptErrorMessage = string.Empty;
+        Database.ScriptNeedFix = string.Empty;
 
         #endregion
     }

@@ -2984,7 +2984,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
             }
 
-            if (db.IsAdministrator() && !db.ReadOnly && !string.IsNullOrEmpty(db.EventScriptErrorMessage)) {
+            if (db.IsAdministrator() && !db.ReadOnly && !string.IsNullOrEmpty(db.ScriptNeedFix)) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, 8);
                 BlueFont.DrawString(gr, "Skripte müssen repariert werden", _columnFont, Brushes.Blue, 90, 12);
             }

@@ -1191,7 +1191,7 @@ public partial class TableView : FormWithStatusBar {
             }
         }
 
-        if (!string.IsNullOrEmpty(db.EventScriptErrorMessage) || !string.IsNullOrEmpty(db.CheckScriptError())) {
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix) || !string.IsNullOrEmpty(db.CheckScriptError())) {
             var d = ItemOf("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);

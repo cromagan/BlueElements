@@ -96,13 +96,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _creator;
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-    private string _eventScriptErrorMessage = string.Empty;
     private string _eventScriptTmp = string.Empty;
     private long _eventScriptVersion = 1;
     private double _globalScale = 1f;
     private string _globalShowPass = string.Empty;
     private bool _isInSave;
     private bool _readOnly;
+    private string _scriptNeedFix = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -303,16 +303,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (_eventScriptTmp == l.ToString(false)) { return; }
             _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty);
 
-            EventScriptErrorMessage = string.Empty;
-        }
-    }
-
-    public string EventScriptErrorMessage {
-        get => _eventScriptErrorMessage;
-        set {
-            if (_eventScriptErrorMessage == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, UserName, DateTime.UtcNow, string.Empty);
-            OnScriptMessageChanged();
+            ScriptNeedFix = string.Empty;
         }
     }
 
@@ -359,9 +350,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public bool HasPendingChanges { get; protected set; }
+
     public bool IsDisposed { get; private set; }
+
     public string KeyName => IsDisposed ? string.Empty : ConnectionData.UniqueId;
+
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
+
     public bool LogUndo { get; set; } = true;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -383,6 +378,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public RowCollection Row { get; }
+
+    public string ScriptNeedFix {
+        get => _scriptNeedFix;
+        set {
+            if (_scriptNeedFix == value) { return; }
+            _ = ChangeData(DatabaseDataType.ScriptNeedFix, null, null, _scriptNeedFix, value, UserName, DateTime.UtcNow, string.Empty);
+            OnScriptMessageChanged();
+        }
+    }
 
     public RowSortDefinition? SortDefinition {
         get => _sortDefinition;
@@ -905,7 +909,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
             SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString());
-            SaveToByteList(l, DatabaseDataType.EventScriptErrorMessage, db.EventScriptErrorMessage);
+            SaveToByteList(l, DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
@@ -1166,7 +1170,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         EventScriptVersion = sourceDatabase.EventScriptVersion;
-        EventScriptErrorMessage = sourceDatabase.EventScriptErrorMessage;
+        ScriptNeedFix = sourceDatabase.ScriptNeedFix;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
             Tags = new(sourceDatabase.Tags.Clone());
@@ -1392,12 +1396,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.export) ||
                 (s.EventTypes.HasFlag(ScriptEventTypes.value_changed) && !extended)) {
-                maxtime = 2;
+                maxtime = 10;
             }
 
             if (s.EventTypes.HasFlag(ScriptEventTypes.loaded) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
-                maxtime = 10;
+                maxtime = 20;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
@@ -1442,7 +1446,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             if (st.ElapsedMilliseconds > maxtime * 1000) {
                 if (wichtigerProzess) { ExecutingFirstLvlScript--; }
-                return new ScriptEndedFeedback("Das Skript hat eine zu lange Laufzeit.", false, false, s.KeyName);
+                return new ScriptEndedFeedback("Das Skript hat eine zu lange Laufzeit.", false, true, s.KeyName);
             }
 
             if (!scf.AllOk) {
@@ -1941,7 +1945,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; } // Nicht ReadOnly!
-        if (checkMessageTo && !string.IsNullOrEmpty(_eventScriptErrorMessage)) { return false; }
+        if (checkMessageTo && !string.IsNullOrEmpty(_scriptNeedFix)) { return false; }
         return true;
     }
 
@@ -2712,8 +2716,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _eventScriptVersion = LongParse(value);
                 break;
 
-            case DatabaseDataType.EventScriptErrorMessage:
-                _eventScriptErrorMessage = value;
+            case DatabaseDataType.ScriptNeedFix:
+                _scriptNeedFix = value;
                 break;
 
             case DatabaseDataType.UndoInOne:
