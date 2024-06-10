@@ -26,6 +26,8 @@ using System.Collections.ObjectModel;
 using static BlueDatabase.Database;
 using BlueControls.ItemCollectionList;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace BlueControls.Interfaces;
 
@@ -124,7 +126,11 @@ public sealed class ItemSendFilter {
         item.OnPropertyChanged();
     }
 
-    public Database? DatabaseOutputGet() {
+    public Database? DatabaseOutputGet(IItemSendFilter item) {
+        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase && !ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) {
+            return ias.DatabaseInput;
+        }
+
         if (string.IsNullOrEmpty(tempDatabaseNametoLoad)) { return _databaseOutput; }
         _databaseOutput = GetById(new ConnectionInfo(tempDatabaseNametoLoad, null, string.Empty), false, null, true);
 
@@ -134,7 +140,10 @@ public sealed class ItemSendFilter {
 
     public void DatabaseOutputSet(Database? value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
-        if (value == DatabaseOutputGet()) { return; }
+
+        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase && !ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return; }
+
+        if (value == DatabaseOutputGet(item)) { return; }
 
         _databaseOutput = value;
         tempDatabaseNametoLoad = string.Empty;
@@ -154,11 +163,32 @@ public sealed class ItemSendFilter {
         item.OnPropertyChanged();
     }
 
-    public List<GenericControl> GetStyleOptions(IItemSendFilter item, int widthOfControl) {
-        var l = new List<GenericControl> {
-            new FlexiControl("Ausgang:", widthOfControl, true),
-            new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables())
-        };
+    public List<GenericControl> GetProperties(IItemSendFilter item, int widthOfControl) {
+        var l = new List<GenericControl>();
+        l.Add(new FlexiControl("Ausgang:", widthOfControl, true));
+
+        var enableOutput = true;
+        Database? outp = null;
+
+        if(item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase) {
+            enableOutput = ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None);
+
+            outp = ias.DatabaseInput;
+            if (outp is not null) {  enableOutput = false;}
+
+        }
+
+
+        if (!enableOutput) {
+
+            if (outp != null) {
+                l.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
+            }
+
+
+        } else {
+            l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables()));
+        }
 
         return l;
     }
@@ -173,10 +203,10 @@ public sealed class ItemSendFilter {
         item.OnPropertyChanged();
     }
 
-    public List<string> ParsableTags() {
+    public List<string> ParsableTags(IItemSendFilter item) {
         List<string> result = [];
 
-        result.ParseableAdd("OutputDatabase", DatabaseOutputGet()); // Nicht _database, weil sie evtl. noch nicht geladen ist
+        result.ParseableAdd("OutputDatabase", item.DatabaseOutput); // Nicht _database, weil sie evtl. noch nicht geladen ist
 
         result.ParseableAdd("SentToChildIds", _childIds, false);
 

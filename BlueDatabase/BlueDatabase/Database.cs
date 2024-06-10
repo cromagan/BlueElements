@@ -2549,7 +2549,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsColumnTag()) {
             if (column == null || column.IsDisposed || Column.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
-                return ("Wert nicht gesetzt!", null, null);
+                //return ("Wert nicht gesetzt!", null, null);
+                return (string.Empty, null, null);
             }
             column.Invalidate_ContentWidth();
             return (column.SetValueInternal(type, value), column, null);

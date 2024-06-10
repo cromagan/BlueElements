@@ -37,6 +37,7 @@ partial class RowAdder {
             this.lstTexte.Name = "lstTexte";
             this.lstTexte.Size = new System.Drawing.Size(381, 419);
             this.lstTexte.TabIndex = 0;
+            this.lstTexte.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstTexte_ItemClicked);
             // 
             // RowAdder
             // 

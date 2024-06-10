@@ -33,7 +33,7 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
     /// <summary>
     /// Ein Wert, der bei ParentFilterOutput_Changed zumindest neu berechnet oder invalidiert werden muss.
     /// Zum Berechnen sollte die Routine DoInputFilter benutzt werden.
-    /// Enthält die DatabaseInput und auch die berechnete Zeile.
+    /// Enthält die DatabaseInputGet und auch die berechnete Zeile.
     /// </summary>
     public FilterCollection? FilterInput { get; set; }
 

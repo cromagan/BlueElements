@@ -101,7 +101,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public ColumnItem? AdditinalTextColumn {
         get {
-            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
 
             var c = dbout?.Column[_additionalTextColumnName];
             return c == null || c.IsDisposed ? null : c;
@@ -129,12 +129,12 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
 
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
     public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
+        get => _itemSends.DatabaseOutputGet(this);
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
@@ -165,7 +165,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     /// </summary>
     public ColumnItem? EntityIDColumn {
         get {
-            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
 
             var c = dbout?.Column[_entityIDColumnName];
             return c == null || c.IsDisposed ? null : c;
@@ -191,9 +191,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
+    public bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-
-    public bool MustBeOneRow => true;
 
     /// <summary>
     /// Eine Spalte in der Ziel-Datenbank.
@@ -203,7 +202,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
-            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
 
             var c = dbout?.Column[_originIDColumnName];
             return c == null || c.IsDisposed ? null : c;
@@ -244,7 +243,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public ColumnItem? TextKeyColumn {
         get {
-            if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
+            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
 
             var c = dbout?.Column[_textKeyColumnName];
             return c == null || c.IsDisposed ? null : c;
@@ -344,9 +343,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
 
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
         var inr = _itemAccepts.GetFilterFromGet(this);
@@ -354,7 +353,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             l.Add(new FlexiControlForProperty<string>(() => EntityID));
         }
 
-        if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
+        if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
@@ -457,7 +456,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
         //result.ParseableAdd("TargetDatabase", _targetDatabase); // Nicht _database, weil sie evtl. noch nicht geladen ist
 

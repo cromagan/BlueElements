@@ -357,7 +357,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         txt += "<br><br><b><u>Eigenschaften:</b></u>";
 
         if (from is IItemAcceptFilter ias) {
-            if (ias.MustBeOneRow) {
+            if (ias.InputMustBeOneRow) {
                 txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
                     "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Datenbank ergeben,<br>" +
                     "   da die Werte der Zeile in dem Element benutzt werden können.";

@@ -77,8 +77,23 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     public string CaptionForEditor => "Import Element";
 
-    [Description("Aus dieser Datenbank werden die Zeilen konvertiert und importiert.")]
-    public Database? Database { get; set; }
+    //[Description("Aus dieser Datenbank werden die Zeilen konvertiert und importiert.")]
+    //public Database? Database { get; set; }
+
+    public Database? Database {
+        get {
+            if (string.IsNullOrEmpty(tempDatabaseNametoLoad)) { return _database; }
+            _database = GetById(new ConnectionInfo(tempDatabaseNametoLoad, null, string.Empty), false, null, true);
+
+            tempDatabaseNametoLoad = string.Empty;
+            return _database;
+        }
+
+        set {
+            _database = value;
+            tempDatabaseNametoLoad = string.Empty;
+        }
+    }
 
     public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
 
@@ -108,16 +123,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     #region Methods
 
-    public Database? DatabaseGet() {
-        if (string.IsNullOrEmpty(tempDatabaseNametoLoad)) { return _database; }
-        _database = GetById(new ConnectionInfo(tempDatabaseNametoLoad, null, string.Empty), false, null, true);
-
-        tempDatabaseNametoLoad = string.Empty;
-        return _database;
-    }
-
     public string ErrorReason() {
-        if (Database == null || Database.IsDisposed) { return "Datenbank fehlt."; }
+        if (Database is not Database db || db.IsDisposed) { return "Datenbank fehlt."; }
 
         if (string.IsNullOrEmpty(_textKey)) { return "TextKey-Id-Generierung fehlt"; }
         if (!_textKey.Contains("~")) { return "TextKey-ID-Generierung muss mit Variablen definiert werden."; }
@@ -131,19 +138,6 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && !Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
-        }
-
-        return l;
-    }
-
-    public List<GenericControl> GetStyleOptions() {
-        var l = new List<GenericControl>();
-        //new FlexiControl("Ausgang:", widthOfControl, true),
-        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
-
-        if (Database != null && Database.IsDisposed) {
             l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
             l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
@@ -186,7 +180,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     public override string ToString() {
         List<string> result = [];
 
-        result.ParseableAdd("Database", DatabaseGet()); // Nicht _database, weil sie evtl. noch nicht geladen ist
+        result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
         result.ParseableAdd("TextKey", _textKey);
         result.ParseableAdd("AdditionalText", _additionalText);
 

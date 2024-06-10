@@ -79,11 +79,11 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
+        get => _itemSends.DatabaseOutputGet(this);
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
@@ -101,9 +101,8 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
+    public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-
-    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -168,40 +167,25 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [];
 
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
-
-
+        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
 
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
 
-
         if (DatabaseOutput is Database db && !db.IsDisposed) {
-
-
             var u2 = new List<AbstractListItem>();
             foreach (var thisC in db.ColumnArrangements) {
                 u2.Add(ItemOf(thisC));
             }
             l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
-
         }
 
-
-
-
-
-
-
-
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
         if (DatabaseOutput is Database db2 && !db2.IsDisposed) {
             var u = new List<AbstractListItem>();
             u.AddRange(ItemsOf(typeof(Filterausgabe)));
             l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
         }
-
-
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));
@@ -254,7 +238,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         return result.Parseable(base.ToString());
     }

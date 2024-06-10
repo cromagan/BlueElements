@@ -400,7 +400,7 @@ public static class IO {
     /// </summary>
     /// <param name="pfad"></param>
     public static string PathParent(this string pfad) {
-        pfad = pfad.CheckPath();
+        //pfad = pfad.CheckPath();
         var z = pfad.Length;
 
         while (true) {

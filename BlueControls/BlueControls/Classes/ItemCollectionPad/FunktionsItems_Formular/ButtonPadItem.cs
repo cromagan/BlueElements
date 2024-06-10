@@ -166,7 +166,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Knopf, den der Benutzer drücken kann und eine Aktion startet.";
 
@@ -184,9 +184,8 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+    public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-
-    public bool MustBeOneRow => false;
 
     public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();
@@ -306,7 +305,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
+        List<GenericControl> l = [.. _itemAccepts.GetProperties(this, widthOfControl)];
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 

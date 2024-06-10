@@ -72,11 +72,11 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
+        get => _itemSends.DatabaseOutputGet(this);
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
@@ -84,9 +84,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public List<int> InputColorId => [OutputColorId];
 
+    public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
-
-    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -150,7 +149,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemSends.GetStyleOptions(this, widthOfControl),
+            .. _itemSends.GetProperties(this, widthOfControl),
             //new FlexiControl(),
             .. base.GetProperties(widthOfControl),
         ];
@@ -199,7 +198,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
         return result.Parseable(base.ToString());
     }
 

@@ -171,28 +171,28 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     ///
     /// </summary>
     /// <param name="textkey"></param>
-    /// <returns>PFAD1/PFAD2/PFAD3/</returns>
-    public static string RepairTextKey(string textkey) => textkey.Replace("\\", "/").Trim("/").ToUpper() + "/";
+    /// <returns>PFAD1\\PFAD2\\PFAD3\\</returns>
+    public static string RepairTextKey(string textkey, bool ucase) {
+        var nt = textkey.Replace("/", "\\");
+        nt = nt.Replace("\\\\\\\\", "\\");
+        nt = nt.Replace("\\\\\\", "\\");
+        nt = nt.Replace("\\\\", "\\");
+        nt = nt.Replace("\\\\", "\\");
+        nt = nt.Trim("\\") + "\\";
 
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+        if (ucase) { nt = nt.ToUpper(); }
 
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+        return nt.RemoveChars(Constants.Char_PfadSonderZeichen);
+    }
 
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
-
-    public void HandleChangesNow() {
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
+    public void FillListBox() {
         if (string.IsNullOrEmpty(EntityID) || EntityIDColumn == null) { return; }
 
         if (TextKeyColumn == null) { return; }
 
         if (!FilterInputChangedHandled) {
             FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterOutput.Database, true);
+            this.DoInputFilter(FilterInput?.Database, true);
         }
 
         RowsInputChangedHandled = true;
@@ -212,6 +212,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
         FilterOutput.ChangeTo(new FilterItem(EntityIDColumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, generatedentityID));
 
+        List<string> olditems = lstTexte.Items.ToListOfString();
+
         foreach (var thisAdder in AdderSingle) {
             if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
 
@@ -222,14 +224,24 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
                 if (generatedTextKey == thisAdder.TextKey) { continue; }
 
+                generatedTextKey = RepairTextKey(generatedTextKey, false);
+
                 if (!ShowMe(generatedTextKey)) { continue; }
 
-                var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+                olditems.Remove(generatedTextKey);
 
-                var it = new AdderItem(db, EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKey, AdditinalTextColumn, additionaltext);
+                if (lstTexte.Items.Get(generatedTextKey) == null) {
+                    var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
 
-                lstTexte.ItemAdd(ItemOf(it));
+                    var it = new AdderItem(db, EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKey, AdditinalTextColumn, additionaltext);
+
+                    lstTexte.ItemAdd(ItemOf(it));
+                }
             }
+        }
+
+        foreach (var thisit in olditems) {
+            lstTexte.Remove(thisit);
         }
 
         //#region Combobox suchen
@@ -294,6 +306,21 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         //#endregion
     }
 
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
+
+    public void HandleChangesNow() {
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        FillListBox();
+    }
+
     public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     public void ParentFilterOutput_Changed() { }
@@ -305,11 +332,28 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         base.OnPaint(e);
     }
 
-    private bool Selected(string textkey) => _selected.Contains(RepairTextKey(textkey));
+    private void lstTexte_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        _selected.Clear();
+        _selected.AddRange(lstTexte.Checked);
+
+
+
+        if (Selected(e.Item.KeyName)) {
+
+
+        }
+
+
+
+
+        FillListBox();
+    }
+
+    private bool Selected(string textkey) => _selected.Contains(RepairTextKey(textkey, true), false);
 
     private bool ShowMe(string textkey) {
-        var t = RepairTextKey(textkey);
-        if (t.CountString("/") == 1) { return true; }
+        var t = RepairTextKey(textkey, true);
+        if (t.CountString("\\") < 2) { return true; }
         if (Selected(t)) { return true; }
         return Selected(t.PathParent());
     }

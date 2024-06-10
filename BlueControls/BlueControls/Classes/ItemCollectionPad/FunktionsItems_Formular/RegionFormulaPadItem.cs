@@ -86,7 +86,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
 
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
@@ -94,9 +94,8 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
+    public bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-
-    public bool MustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -182,7 +181,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
         u.AddRange(ItemsOf(typeof(GroupBoxStyle)));
 
         List<GenericControl> l =
-            [.. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            [.. _itemAccepts.GetProperties(this, widthOfControl),
                 new FlexiControl("Eigenschaften:", widthOfControl, true),
                 new FlexiControlForProperty<string>(() => Child, cl),
 

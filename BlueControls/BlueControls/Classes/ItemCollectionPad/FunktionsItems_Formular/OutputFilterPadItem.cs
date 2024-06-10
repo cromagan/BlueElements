@@ -94,7 +94,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public ColumnItem? Column {
         get {
-            var c = DatabaseInput?.Column[_columnName];
+            var c = DatabaseOutput?.Column[_columnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
@@ -110,12 +110,12 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
 
     public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
+        get => _itemSends.DatabaseOutputGet(this);
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
@@ -133,9 +133,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
+    public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-
-    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -206,7 +205,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
             var lst = new List<AbstractListItem>();
@@ -215,7 +214,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }
 
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
@@ -301,7 +300,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
         result.ParseableAdd("ColumnName", _columnName);
         //result.ParseableAdd("CaptionText", _überschrift);

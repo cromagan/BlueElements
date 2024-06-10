@@ -83,7 +83,7 @@ internal class AdderItem : IHasDatabase, IReadableTextWithKey {
     public string GeneratedentityID { get; }
 
     /// <summary>
-    /// Enstpricht TextKey  (Zutaten/Mehl/)
+    /// Enstpricht TextKey  (Zutaten\\Mehl\\)
     /// </summary>
     public string KeyName { get; }
 
@@ -96,9 +96,9 @@ internal class AdderItem : IHasDatabase, IReadableTextWithKey {
     #region Methods
 
     public string ReadableText() {
-        var t = KeyName.CountString("/");
+        var t = Math.Max(KeyName.CountString("\\") - 1, 0);
 
-        return new string(' ', t * 4) + KeyName.TrimEnd("/").FileNameWithSuffix();
+        return new string(' ', t * 6) + KeyName.TrimEnd("\\").FileNameWithSuffix();
     }
 
     public QuickImage? SymbolForReadableText() => null;

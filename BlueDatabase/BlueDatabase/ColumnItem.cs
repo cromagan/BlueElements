@@ -1915,6 +1915,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
 
         if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
 
+
+        if (_function == ColumnFunction.Schlüsselspalte) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
+
         if (_function == ColumnFunction.RelationText) { return QuickImage.Get(ImageCode.Herz, 16); }
 
         //if (_function == ColumnFunction.FarbeInteger) { return QuickImage.Get(ImageCode.Pinsel, 16); }

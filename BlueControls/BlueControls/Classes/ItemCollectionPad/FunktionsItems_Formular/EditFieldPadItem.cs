@@ -120,7 +120,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
@@ -139,7 +139,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override bool MustBeInDrawingArea => true;
 
-    public bool MustBeOneRow => true;
+    public bool InputMustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -210,7 +210,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
+        List<GenericControl> l = [.. _itemAccepts.GetProperties(this, widthOfControl)];
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 

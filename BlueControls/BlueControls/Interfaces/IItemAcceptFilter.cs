@@ -38,7 +38,7 @@ public interface IItemAcceptFilter : IHasKeyName, IPropertyChangedFeedback, IHas
     #region Properties
 
     /// <summary>
-    /// Bestimmt die Filterberechung und bestimmt, ob der Filterder Parents weiterverwendet werde kann.
+    /// Bestimmt die Filterberechung und bestimmt, ob der Filter der Parents weiterverwendet werden kann.
     /// 'One' spart immens Rechenleistung
     /// </summary>
     public AllowedInputFilter AllowedInputFilter { get; }
@@ -55,7 +55,7 @@ public interface IItemAcceptFilter : IHasKeyName, IPropertyChangedFeedback, IHas
     /// Das heißt aber auch, dass die eingehenden Filter nur eine Zeile ergeben dürfen.
     /// Wird aktuell nur für die Description des Skript-Editors benutzt
     /// </summary>
-    public bool MustBeOneRow { get; }
+    public bool InputMustBeOneRow { get; }
 
     public string Page { get; }
 
@@ -128,10 +128,15 @@ public sealed class ItemAcceptFilter {
         }
     }
 
-    public Database? DatabaseInput(IItemAcceptFilter item) {
-        if (item.DatabaseInputMustMatchOutputDatabase) {
-            return item is IItemSendFilter iiss ? iiss.DatabaseOutput : null;
-        }
+    /// <summary>
+    /// Holt die Datebank aus dem erst Parent, da das Output
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public Database? DatabaseInputGet(IItemAcceptFilter item) {
+        //if (item.DatabaseInputMustMatchOutputDatabase) {
+        //    return item is IItemSendFilter iiss ? iiss.DatabaseOutput : null;
+        //}
 
         var g = GetFilterFromGet(item);
 
@@ -148,7 +153,7 @@ public sealed class ItemAcceptFilter {
     }
 
     public string ErrorReason(IItemAcceptFilter item) =>
-        //if (item.DatabaseInput is not Database db || db.IsDisposed) {
+        //if (item.DatabaseInputGet is not Database db || db.IsDisposed) {
         //    return "Eingehende Datenbank unbekannt";
         //}
         string.Empty;
@@ -206,7 +211,7 @@ public sealed class ItemAcceptFilter {
         item.UpdateSideOptionMenu();
     }
 
-    public List<GenericControl> GetStyleOptions(IItemAcceptFilter item, int widthOfControl) {
+    public List<GenericControl> GetProperties(IItemAcceptFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
             new FlexiControl("Eingang:", widthOfControl, true)
         };

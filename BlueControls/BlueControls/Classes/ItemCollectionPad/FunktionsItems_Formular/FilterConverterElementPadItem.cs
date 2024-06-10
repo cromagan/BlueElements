@@ -75,11 +75,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
     public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
+        get => _itemSends.DatabaseOutputGet(this);
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
@@ -125,9 +125,8 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+    public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
-
-    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -167,7 +166,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var i = _itemAccepts.DatabaseInput(this)?.Column[_eingangsWertSpalte];
+        var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(i, o, _filtertype) {
             Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe
@@ -202,7 +201,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
 
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
@@ -219,16 +218,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
         l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
-        l.Add(new FlexiControl());
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+        //l.Add(new FlexiControl());
+        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
-        if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
+        if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbout.Column, true));
             l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
         }
 
-        l.Add(new FlexiControl());
+        //l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));
 
         return l;
@@ -296,7 +295,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
         result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);

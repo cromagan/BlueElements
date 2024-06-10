@@ -66,7 +66,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     #region Properties
 
     public static string ClassId => "FI-SelectRowWithDropDownMenu";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
 
     [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
     public string Anzeige {
@@ -96,18 +96,18 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
+        get => _itemSends.DatabaseOutputGet(this);
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann,<br>die durch die Vor-Filter bestimmt wurden.";
+    public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+    public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -174,10 +174,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
-            new FlexiControl(),
-            .. _itemSends.GetStyleOptions(this, widthOfControl),
-            new FlexiControl(),
+            .. _itemAccepts.GetProperties(this, widthOfControl),
+            .. _itemSends.GetProperties(this, widthOfControl),
             new FlexiControl("Einstellungen:", -1, true),
             new FlexiControlForProperty<string>(() => Überschrift),
             new FlexiControlForProperty<string>(() => Anzeige),
@@ -187,7 +185,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
-        l.Add(new FlexiControl());
+        //l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
@@ -249,7 +247,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);

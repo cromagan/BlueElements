@@ -71,14 +71,14 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
 
-    public bool MustBeOneRow => true;
+    public bool InputMustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -129,7 +129,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            .. _itemAccepts.GetProperties(this, widthOfControl),
             new FlexiControlForProperty<string>(() => Bild_Dateiname),
             new FlexiControl(),
             .. base.GetProperties(widthOfControl),

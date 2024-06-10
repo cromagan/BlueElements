@@ -75,7 +75,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
@@ -94,7 +94,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
 
     public override bool MustBeInDrawingArea => true;
 
-    public bool MustBeOneRow => true;
+    public bool InputMustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -160,7 +160,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            .. _itemAccepts.GetProperties(this, widthOfControl),
             new FlexiControlForProperty<string>(() => Pfad),
             new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
             new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
