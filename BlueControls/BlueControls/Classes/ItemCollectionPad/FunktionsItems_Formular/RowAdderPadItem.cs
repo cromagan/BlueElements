@@ -40,6 +40,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
 public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable, ISimpleEditor {
+    //EntityID: Käsekuchen
+    //OriginID: Zutaten#Vegetarisch/Mehl#100 g
+    //TextKey: Vegetarisch/Mehl
+    //AdditionalText: 100 g
 
     #region Fields
 
@@ -50,10 +54,26 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     private string _additionalTextColumnName = string.Empty;
 
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
+    private string _entityID = string.Empty;
+
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
     private string _entityIDColumnName = string.Empty;
 
-    private string _inputDatabase_EntityID = string.Empty;
-
+    /// <summary>
+    /// Eine Spalte in der Ziel-Datenbank.
+    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
+    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// </summary>
     private string _originIDColumnName = string.Empty;
 
     private string _textKeyColumnName = string.Empty;
@@ -122,17 +142,27 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
                                           "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
                                             "Diese ID wird auch aus Ausgangsfilter weitergegeben.";
 
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
     [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.\r\nBeispiele: Rezepetname, Personenname, Beleg-Nummer")]
     public string EntityID {
-        get => _inputDatabase_EntityID;
+        get => _entityID;
         set {
             if (IsDisposed) { return; }
-            if (_inputDatabase_EntityID == value) { return; }
-            _inputDatabase_EntityID = value;
+            if (_entityID == value) { return; }
+            _entityID = value;
             OnPropertyChanged();
         }
     }
 
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
     public ColumnItem? EntityIDColumn {
         get {
             if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
@@ -142,6 +172,11 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         }
     }
 
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
     [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID der eingehenden Datenbank gespeichert.\r\nDadurch können verschiedene Datensätze gespeichert werden.")]
     public string EntityIDColumnName {
         get => _entityIDColumnName;
@@ -160,6 +195,12 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public bool MustBeOneRow => true;
 
+    /// <summary>
+    /// Eine Spalte in der Ziel-Datenbank.
+    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
+    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
             if (_itemSends.DatabaseOutputGet() is not Database dbout || dbout.IsDisposed) { return null; }
@@ -169,6 +210,12 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         }
     }
 
+    /// <summary>
+    /// Eine Spalte in der Ziel-Datenbank.
+    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
+    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// </summary>
     [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string OriginIDColumnName {
         get => _originIDColumnName;
@@ -204,7 +251,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird ein Textschlüssel gespeichert. Mit diesem kann dann die Ziel-Datenbank weiter Aktionen ausführen..")]
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird ein Textschlüssel gespeichert. Mit diesem kann dann die Ziel-Datenbank weitere Aktionen ausführen.")]
     public string TextKeyColumnName {
         get => _textKeyColumnName;
         set {
@@ -259,8 +306,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (string.IsNullOrEmpty(_inputDatabase_EntityID)) { return "Id-Generierung fehlt"; }
-        if (!_inputDatabase_EntityID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
+        if (string.IsNullOrEmpty(_entityID)) { return "Id-Generierung fehlt"; }
+        if (!_entityID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
         if (EntityIDColumn is not ColumnItem eic || eic.IsDisposed) {
             return "Spalte, in der die Entitäten-ID geschrieben werden soll, fehlt";
@@ -345,7 +392,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         switch (key) {
             case "entityid":
-                _inputDatabase_EntityID = value.FromNonCritical();
+                _entityID = value.FromNonCritical();
                 return true;
 
             case "entityidcolumnname":
@@ -369,7 +416,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
                     _addersingle.Add(new RowAdderSingle(this, pair2.Value.FromNonCritical()));
                 }
 
-                break;
+                return true;
 
                 //case "edittype":
                 //    _bearbeitung = (EditTypeFormula)IntParse(value);
@@ -414,7 +461,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         //result.ParseableAdd("TargetDatabase", _targetDatabase); // Nicht _database, weil sie evtl. noch nicht geladen ist
 
-        result.ParseableAdd("EntityID", _inputDatabase_EntityID);
+        result.ParseableAdd("EntityID", _entityID);
         result.ParseableAdd("EntityIDColumnName", _entityIDColumnName);
         result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
         result.ParseableAdd("TextKeyColumnName", _textKeyColumnName);

@@ -51,7 +51,14 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     public static void Show(IEditable? toEdit, Type? type) => Show(toEdit, type, true);
 
     public static void Show(IEditable? toEdit, Type? type, bool isDialog) {
+
+        if (type == null && toEdit is ISimpleEditor) { type = typeof(EditorEasy); }
+
+
         if (toEdit == null || type == null) { return; }
+
+
+        if (type == null && toEdit is not ISimpleEditor) { return; }
 
         if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
 

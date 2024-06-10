@@ -39,9 +39,11 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     private Database? _database;
 
     /// <summary>
-    /// Erkennung, welche ID die Zeile hat
+    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
+    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
+    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
     /// </summary>
-    private string _originID = string.Empty;
+    private string _textKey = string.Empty;
 
     private string tempDatabaseNametoLoad = string.Empty;
 
@@ -84,18 +86,23 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     public string KeyName { get; private set; } = string.Empty;
 
+    public string QuickInfo => ReadableText();
+
+    /// <summary>
+    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
+    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
+    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
+    /// </summary>
     [Description("Die Herkunft-Id, die mit Variablen der erzeugt wird.\r\nDiese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.\r\nDie Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl")]
-    public string OriginID {
-        get => _originID;
+    public string TextKey {
+        get => _textKey;
         set {
             //if (IsDisposed) { return; }
-            if (_originID == value) { return; }
-            _originID = value;
+            if (_textKey == value) { return; }
+            _textKey = value;
             //OnPropertyChanged();
         }
     }
-
-    public string QuickInfo => ReadableText();
 
     #endregion
 
@@ -112,8 +119,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     public string ErrorReason() {
         if (Database == null || Database.IsDisposed) { return "Datenbank fehlt."; }
 
-        if (string.IsNullOrEmpty(_originID)) { return "Herkunft-Id-Generierung fehlt"; }
-        if (!_originID.Contains("~")) { return "Herkunft-ID-Generierung muss mit Variablen definiert werden."; }
+        if (string.IsNullOrEmpty(_textKey)) { return "TextKey-Id-Generierung fehlt"; }
+        if (!_textKey.Contains("~")) { return "TextKey-ID-Generierung muss mit Variablen definiert werden."; }
 
         return string.Empty;
     }
@@ -124,7 +131,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && !Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => OriginID, 5));
+            l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
             l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
 
@@ -137,7 +144,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => OriginID, 5));
+            l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
             l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
 
@@ -157,8 +164,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
                 return true;
 
-            case "originid":
-                _originID = value.FromNonCritical();
+            case "textkey":
+                _textKey = value.FromNonCritical();
                 return true;
 
             case "additionaltext":
@@ -180,7 +187,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         List<string> result = [];
 
         result.ParseableAdd("Database", DatabaseGet()); // Nicht _database, weil sie evtl. noch nicht geladen ist
-        result.ParseableAdd("OriginId", _originID);
+        result.ParseableAdd("TextKey", _textKey);
         result.ParseableAdd("AdditionalText", _additionalText);
 
         return result.Parseable();

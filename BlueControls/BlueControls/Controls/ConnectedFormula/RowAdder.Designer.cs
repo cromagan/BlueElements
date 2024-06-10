@@ -25,12 +25,24 @@ partial class RowAdder {
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
     private void InitializeComponent() {
+            this.lstTexte = new BlueControls.Controls.ListBox();
             this.SuspendLayout();
+            // 
+            // lstTexte
+            // 
+            this.lstTexte.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstTexte.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.lstTexte.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstTexte.Location = new System.Drawing.Point(0, 0);
+            this.lstTexte.Name = "lstTexte";
+            this.lstTexte.Size = new System.Drawing.Size(381, 419);
+            this.lstTexte.TabIndex = 0;
             // 
             // RowAdder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lstTexte);
             this.Name = "RowAdder";
             this.Size = new System.Drawing.Size(381, 419);
             this.ResumeLayout(false);
@@ -38,4 +50,6 @@ partial class RowAdder {
     }
 
     #endregion
+
+    private ListBox lstTexte;
 }

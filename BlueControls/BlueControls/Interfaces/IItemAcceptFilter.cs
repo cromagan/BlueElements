@@ -230,7 +230,7 @@ public sealed class ItemAcceptFilter {
             foreach (var thisR in item.Parent) {
                 if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
                     //if (outp == null || outp == rfp.DatabaseOutput) {
-                    if (rfp != item && rfp.IsOk()) {
+                    if (rfp != item) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                     }
 

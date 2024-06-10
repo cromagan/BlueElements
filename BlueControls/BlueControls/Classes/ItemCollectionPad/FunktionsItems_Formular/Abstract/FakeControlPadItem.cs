@@ -137,6 +137,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public bool IsVisibleForMe(string mode, bool nowDrawing) {
         //if(!Bei_Export_sichtbar ) { return false; }
         if (!MustBeInDrawingArea && !nowDrawing) { return false; } // Unwichtiges Element
+
+        if (!MustBeInDrawingArea && VisibleFor.Count == 0) { return true; } // Unwichtiges Element
+
         if (VisibleFor.Count == 0) { return false; }
         if (string.IsNullOrEmpty(mode)) { return true; }
 

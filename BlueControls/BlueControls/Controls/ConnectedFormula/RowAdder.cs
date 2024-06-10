@@ -28,6 +28,50 @@ using BlueControls.Enums;
 using System.Drawing;
 using System.Windows.Forms;
 
+using BlueBasics;
+using BlueControls.Interfaces;
+using BlueDatabase;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.Enums;
+using System.Drawing;
+using System.Windows.Forms;
+
+using BlueDatabase.Interfaces;
+using BlueBasics.Interfaces;
+
+using BlueBasics;
+
+using BlueBasics.Enums;
+
+using BlueBasics.Interfaces;
+
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+
+using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+
+using System.Collections.ObjectModel;
+
+using System.Drawing;
+
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using static BlueBasics.Constants;
+using static BlueBasics.Converter;
+using static BlueBasics.IO;
+using static BlueDatabase.Database;
+using BlueControls.EventArgs;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueControls.ItemCollectionList;
+using BlueScript;
+using BlueScript.Methods;
+
 namespace BlueControls.Controls;
 
 public partial class RowAdder : System.Windows.Forms.UserControl, IControlAcceptFilter, IControlSendFilter, IControlUsesRow {
@@ -36,6 +80,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
     public List<RowAdderSingle> AdderSingle = new();
     private FilterCollection? _filterInput;
+
+    private List<string> _selected = new();
 
     #endregion
 
@@ -65,11 +111,21 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
 
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string EntityID { get; internal set; }
 
+    /// <summary>
+    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
+    /// Dadurch können verschiedene Datensätze gespeichert werden.
+    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -99,6 +155,12 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 08");
 
+    /// <summary>
+    /// Eine Spalte in der Ziel-Datenbank.
+    /// In diese wird die generierte ID des klickbaren Elements gespeichert.
+    /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -125,6 +187,21 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; } = false;
 
+    /// <summary>
+    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
+    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
+    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ColumnItem? TextKey { get; internal set; }
+
+    /// <summary>
+    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
+    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
+    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -133,6 +210,13 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     #endregion
 
     #region Methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="textkey"></param>
+    /// <returns>PFAD1/PFAD2/PFAD3/</returns>
+    public static string RepairTextKey(string textkey) => textkey.Replace("\\", "/").Trim("/").ToUpper() + "/";
 
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
@@ -143,20 +227,54 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void HandleChangesNow() {
-        Develop.DebugPrint_NichtImplementiert(true);
-        //if (IsDisposed) { return; }
-        //if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        //if (!FilterInputChangedHandled) {
-        //    FilterInputChangedHandled = true;
-        //    this.DoInputFilter(FilterOutput.Database, true);
-        //}
+        if (string.IsNullOrEmpty(EntityID) || EntityIDColumn == null) { return; }
 
-        //RowsInputChangedHandled = true;
+        if (TextKeyColumn == null) { return; }
 
-        //if (!Allinitialized) { _ = CreateSubControls(); }
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(FilterOutput.Database, true);
+        }
 
-        //this.DoRows();
+        RowsInputChangedHandled = true;
+
+        this.DoRows();
+
+        var rowIn = this.RowSingleOrNull();
+
+        if (rowIn == null) {
+            this.Invalidate_FilterOutput();
+            return;
+        }
+
+        var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
+
+        if (generatedentityID == EntityID) { return; }
+
+        FilterOutput.ChangeTo(new FilterItem(EntityIDColumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, generatedentityID));
+
+        foreach (var thisAdder in AdderSingle) {
+            if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
+
+            foreach (var thisRow in db.Row) {
+                if (thisRow == null || thisRow.IsDisposed) { continue; }
+
+                var generatedTextKey = thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null);
+
+                if (generatedTextKey == thisAdder.TextKey) { continue; }
+
+                if (!ShowMe(generatedTextKey)) { continue; }
+
+                var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+
+                var it = new AdderItem(db, EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKey, AdditinalTextColumn, additionaltext);
+
+                lstTexte.ItemAdd(ItemOf(it));
+            }
+        }
 
         //#region Combobox suchen
 
@@ -229,6 +347,15 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     protected override void OnPaint(PaintEventArgs e) {
         HandleChangesNow();
         base.OnPaint(e);
+    }
+
+    private bool Selected(string textkey) => _selected.Contains(RepairTextKey(textkey));
+
+    private bool ShowMe(string textkey) {
+        var t = RepairTextKey(textkey);
+        if (t.CountString("/") == 1) { return true; }
+        if (Selected(t)) { return true; }
+        return Selected(t.PathParent());
     }
 
     #endregion

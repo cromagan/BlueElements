@@ -168,10 +168,15 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [];
 
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+
+
+
+        l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
+
+
         if (DatabaseOutput is Database db && !db.IsDisposed) {
-            var u = new List<AbstractListItem>();
-            u.AddRange(ItemsOf(typeof(Filterausgabe)));
-            l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
+
 
             var u2 = new List<AbstractListItem>();
             foreach (var thisC in db.ColumnArrangements) {
@@ -179,10 +184,25 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
             }
             l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
 
-            l.Add(new FlexiControl());
         }
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+
+
+
+
+
+
+
+
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+
+        if (DatabaseOutput is Database db2 && !db2.IsDisposed) {
+            var u = new List<AbstractListItem>();
+            u.AddRange(ItemsOf(typeof(Filterausgabe)));
+            l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
+        }
+
+
+
         l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));
 

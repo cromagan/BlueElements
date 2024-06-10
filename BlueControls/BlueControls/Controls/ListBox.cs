@@ -899,7 +899,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
+        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie) {
             ie.Edit();
         }
     }
@@ -949,7 +949,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             AddAndCheck(ali);
         }
 
-        if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) {
+        if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie) {
             ie.Edit();
         }
 
@@ -1105,7 +1105,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
             var editok = false;
 
-            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie && ie.Editor != null) { editok = true; }
+            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli) {
+                if (rli.Item is IEditable ie && ie.Editor != null) { editok = true; }
+                if (rli.Item is ISimpleEditor) { editok = true; }
+            }
 
             if (editok) {
                 btnEdit.Width = 16;
