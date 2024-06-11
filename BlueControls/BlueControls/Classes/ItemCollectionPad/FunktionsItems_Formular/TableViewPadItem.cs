@@ -250,7 +250,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
     #endregion

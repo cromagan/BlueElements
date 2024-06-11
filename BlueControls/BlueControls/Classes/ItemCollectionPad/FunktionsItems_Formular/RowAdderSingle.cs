@@ -37,7 +37,6 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     private static RowAdderPadItem? _parent = null;
     private string _additionalText = string.Empty;
-    private int _count = 0;
     private Database? _database;
 
     /// <summary>
@@ -62,7 +61,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         _parent = parent;
 
         if (count >= 0) {
-            _count = count;
+            Count = count;
         }
     }
 
@@ -86,7 +85,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     //[Description("Aus dieser Datenbank werden die Zeilen konvertiert und importiert.")]
     //public Database? Database { get; set; }
 
-    public int Count => _count;
+    public int Count { get; private set; } = 0;
 
     public Database? Database {
         get {
@@ -175,7 +174,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
                 return true;
 
             case "count":
-                _count = IntParse(value);
+                Count = IntParse(value);
                 return true;
         }
         return false;
@@ -195,7 +194,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
         result.ParseableAdd("TextKey", _textKey);
         result.ParseableAdd("AdditionalText", _additionalText);
-        result.ParseableAdd("Count", _count);
+        result.ParseableAdd("Count", Count);
 
         return result.Parseable();
     }

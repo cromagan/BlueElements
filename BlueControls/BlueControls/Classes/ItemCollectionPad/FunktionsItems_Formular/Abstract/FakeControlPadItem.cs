@@ -260,7 +260,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         //}
     }
 
-    protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, List<int>? colorId) {
+    protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, bool forPrinting, List<int>? colorId) {
         if (forPrinting) { return; }
 
         var arrowY = (int)(zoom * 12) * 0.35f;

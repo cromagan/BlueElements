@@ -39,7 +39,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         Controls.Add(ea);
 
-        Setup(string.Empty, ea, ea.Width + Skin.Padding * 2);
+        Setup(string.Empty, ea, ea.Width + (Skin.Padding * 2));
     }
 
     #endregion
@@ -51,12 +51,9 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     public static void Show(IEditable? toEdit, Type? type) => Show(toEdit, type, true);
 
     public static void Show(IEditable? toEdit, Type? type, bool isDialog) {
-
         if (type == null && toEdit is ISimpleEditor) { type = typeof(EditorEasy); }
 
-
         if (toEdit == null || type == null) { return; }
-
 
         if (type == null && toEdit is not ISimpleEditor) { return; }
 

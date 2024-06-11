@@ -129,7 +129,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         if (pic == null) { return; }
         CollectGarbage();
         try {
-            Bitmap clonedBitmap = new Bitmap(pic);
+            var clonedBitmap = new Bitmap(pic);
             clonedBitmap.RotateFlip(b);
             OnOverridePic(clonedBitmap, true);
         } catch (Exception ex) {

@@ -353,7 +353,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
     //protected override AbstractPadItem? TryCreate(string id, string name) {

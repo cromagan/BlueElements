@@ -18,42 +18,13 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Enums;
-using System.Drawing;
-using System.Windows.Forms;
-using BlueDatabase.Interfaces;
-using BlueBasics.Interfaces;
-
-using BlueBasics;
-
-using BlueBasics.Enums;
-
 using BlueBasics.Interfaces;
 
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-
-using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-
-using System.Collections.ObjectModel;
-
-using System.Drawing;
-
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
 using static BlueBasics.IO;
-using static BlueDatabase.Database;
 
 namespace BlueControls.Controls;
 
@@ -125,16 +96,13 @@ internal class AdderItem : IReadableTextWithKey {
     public QuickImage? SymbolForReadableText() => null;
 
     internal void RemoveRowsFromDatabase() {
-
         if (EntityIDColumn.Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var row in Rows) {
-
             var fi = new FilterCollection(db, "Zeilengenerator im Formular");
 
             fi.Add(new FilterItem(EntityIDColumn, FilterType.Istgleich_GroßKleinEgal, GeneratedentityID));
             fi.Add(new FilterItem(TextKeyColumn, FilterType.Istgleich_GroßKleinEgal, row.GeneratedTextKey));
-
 
             db.Row.Remove(fi, null, "Zeilengenerator im Formular");
             fi.Dispose();
@@ -152,8 +120,6 @@ internal class AdderItem : IReadableTextWithKey {
             //    }
             //}
         }
-
-
     }
 
     private string OriginId(AdderItemSingle ais) {

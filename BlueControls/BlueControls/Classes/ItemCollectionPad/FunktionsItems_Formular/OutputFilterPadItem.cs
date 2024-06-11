@@ -319,7 +319,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
     #endregion

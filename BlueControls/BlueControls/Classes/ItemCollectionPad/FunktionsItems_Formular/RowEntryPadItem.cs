@@ -213,7 +213,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
     #endregion
