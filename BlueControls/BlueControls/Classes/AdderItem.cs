@@ -37,7 +37,8 @@ internal class AdderItem : IReadableTextWithKey {
         GeneratedentityID = generatedentityID;
         OriginIDColumn = originIDColumn;
         TextKeyColumn = textKeyColumn;
-        KeyName = generatedTextKeyWOAsterix;
+        KeyName = generatedTextKeyWOAsterix.ToUpper();
+        KeyNameOri = generatedTextKeyWOAsterix;
         AdditinalTextColumn = additinalTextColumn;
     }
 
@@ -49,12 +50,19 @@ internal class AdderItem : IReadableTextWithKey {
 
     public ColumnItem EntityIDColumn { get; }
 
-    public string GeneratedentityID { get; }
+    public string GeneratedentityID { get; set; }
+
+    /// <summary>
+    /// Enstpricht TextKey  (ZUTATEN\\MEHL\\) OHNE *
+    /// </summary>
+    public string KeyName { get; }
+
+
 
     /// <summary>
     /// Enstpricht TextKey  (Zutaten\\Mehl\\) OHNE *
     /// </summary>
-    public string KeyName { get; }
+    public string KeyNameOri { get; }
 
     public ColumnItem? OriginIDColumn { get; }
 
@@ -69,7 +77,9 @@ internal class AdderItem : IReadableTextWithKey {
     #region Methods
 
     public void AddRowsToDatabase() {
-        if (EntityIDColumn.Database is not Database db || db.IsDisposed) { return; }
+        if (EntityIDColumn?.Database is not Database db || db.IsDisposed) { return; }
+        if(OriginIDColumn ==  null) { return; }
+        if (TextKeyColumn == null) { return; }
 
         foreach (var row in Rows) {
             var oriid = OriginId(row);
@@ -78,19 +88,31 @@ internal class AdderItem : IReadableTextWithKey {
                 var r = db.Row.GenerateAndAdd(GeneratedentityID, null, "Zeilengenerator im Formular");
 
                 if (r != null) {
+
+                    EntityIDColumn.MaxCellLenght = Math.Max(EntityIDColumn.MaxCellLenght, GeneratedentityID.Length);
                     r.CellSet(EntityIDColumn, GeneratedentityID, "Zeilengenerator im Formular");
+
+                    OriginIDColumn.MaxCellLenght = Math.Max(OriginIDColumn.MaxCellLenght, oriid.Length);
                     r.CellSet(OriginIDColumn, oriid, "Zeilengenerator im Formular");
+
+                    TextKeyColumn.MaxCellLenght = Math.Max(TextKeyColumn.MaxCellLenght, row.GeneratedTextKey.Length);
                     r.CellSet(TextKeyColumn, row.GeneratedTextKey, "Zeilengenerator im Formular");
-                    r.CellSet(AdditinalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
+
+                    if(AdditinalTextColumn != null) {
+                        AdditinalTextColumn.MaxCellLenght = Math.Max(AdditinalTextColumn.MaxCellLenght, row.Additionaltext.Length);
+                        r.CellSet(AdditinalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
+
+                    }
+
                 }
             }
         }
     }
 
     public string ReadableText() {
-        var t = Math.Max(KeyName.CountString("\\") - 1, 0);
+        var t = Math.Max(KeyNameOri.CountString("\\") - 1, 0);
 
-        return new string(' ', t * 6) + KeyName.TrimEnd("\\").FileNameWithSuffix();
+        return new string(' ', t * 6) + KeyNameOri.TrimEnd("\\").FileNameWithSuffix();
     }
 
     public QuickImage? SymbolForReadableText() => null;

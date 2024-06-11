@@ -38,7 +38,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     public List<RowAdderSingle> AdderSingle = new();
     private FilterCollection? _filterInput;
 
-    private List<string> _selected = new();
+    private bool _generating = false;
 
     #endregion
 
@@ -46,6 +46,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
     public RowAdder() {
         InitializeComponent();
+        ((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -193,9 +195,29 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     }
 
     public void FillListBox() {
-        if (string.IsNullOrEmpty(EntityID) || EntityIDColumn == null) { return; }
+        if (_generating) {
+            Develop.DebugPrint("Liste wird bereits erstellt!");
+            return;
+        }
+        _generating = true;
 
-        if (TextKeyColumn == null) { return; }
+        if (string.IsNullOrEmpty(EntityID) || EntityIDColumn == null) {
+            lstTexte.Enabled = false;
+            lstTexte.ItemClear();
+            lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
+            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
+            _generating = false;
+            return;
+        }
+
+        if (TextKeyColumn == null) {
+            lstTexte.Enabled = false;
+            lstTexte.ItemClear();
+            lstTexte.ItemAdd(ItemOf("Interner Fehler: TextKey", BlueBasics.Enums.ImageCode.Kritisch));
+            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
+            _generating = false;
+            return;
+        }
 
         if (!FilterInputChangedHandled) {
             FilterInputChangedHandled = true;
@@ -209,32 +231,38 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         var rowIn = this.RowSingleOrNull();
 
         if (rowIn == null) {
-            this.Invalidate_FilterOutput();
+            lstTexte.Enabled = false;
+            lstTexte.ItemClear();
+            lstTexte.ItemAdd(ItemOf("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information));
+            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
+            _generating = false;
             return;
         }
 
         var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
 
-        if (generatedentityID == EntityID) { return; }
+        if (generatedentityID == EntityID) {
+            lstTexte.Enabled = false;
+            lstTexte.ItemClear();
+            lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
+            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
+            _generating = false;
+            return;
+        }
+
+        lstTexte.Enabled = true;
 
         FilterOutput.ChangeTo(new FilterItem(EntityIDColumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, generatedentityID));
 
-        List<string> olditems = lstTexte.Items.ToListOfString();
-
-
+        List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.ToUpper()).ToList();
 
         foreach (var thisIT in lstTexte.Items) {
-
             if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
                 ai.Rows.Clear();
             }
-
         }
 
-
-
-
-
+        var selected = TextKeyColumn.Contents(FilterOutput, null).Select(s => s.ToUpper()).ToList();
 
         foreach (var thisAdder in AdderSingle) {
             if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
@@ -243,9 +271,9 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                 if (thisRow == null || thisRow.IsDisposed) { continue; }
 
                 var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), false, true);
-                if (!ShowMe(generatedTextKeyWOAsterix)) { continue; }
+                if (!ShowMe(selected, generatedTextKeyWOAsterix)) { continue; }
 
-                olditems.Remove(generatedTextKeyWOAsterix);
+                olditems.Remove(generatedTextKeyWOAsterix.ToUpper());
 
                 AdderItem? adderit = null;
 
@@ -263,6 +291,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
                     var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext);
                     adderit.Rows.Add(ai);
+
+                    adderit.GeneratedentityID = generatedentityID;
                 }
             }
         }
@@ -270,6 +300,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         foreach (var thisit in olditems) {
             lstTexte.Remove(thisit);
         }
+
+        lstTexte.UncheckAll();
+        lstTexte.Check(selected);
+
+        _generating = false;
 
         //#region Combobox suchen
 
@@ -360,30 +395,26 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     }
 
     private void lstTexte_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        _selected.Clear();
-        _selected.AddRange(lstTexte.Checked);
-        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-            if (Selected(e.Item.KeyName)) {
+        if (_generating) { return; }
 
+        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+            if (Selected(lstTexte.Checked, e.Item.KeyName)) {
                 ai.AddRowsToDatabase();
             } else {
                 ai.RemoveRowsFromDatabase();
             }
         }
 
-
-
-
         FillListBox();
     }
 
-    private bool Selected(string textkey) => _selected.Contains(RepairTextKey(textkey, true, true), false);
+    private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey, true, true), false);
 
-    private bool ShowMe(string textkey) {
+    private bool ShowMe(ICollection<string> selected, string textkey) {
         var t = RepairTextKey(textkey, true, true);
         if (t.CountString("\\") < 2) { return true; }
-        if (Selected(t)) { return true; }
-        return Selected(t.PathParent());
+        if (Selected(selected, t)) { return true; }
+        return Selected(selected, t.PathParent());
     }
 
     #endregion
