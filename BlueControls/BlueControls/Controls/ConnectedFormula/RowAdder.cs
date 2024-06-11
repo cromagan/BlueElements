@@ -27,6 +27,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using System.Linq;
 
 namespace BlueControls.Controls;
 
@@ -115,7 +116,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     /// Eine Spalte in der Ziel-Datenbank.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
-    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -172,7 +173,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     /// </summary>
     /// <param name="textkey"></param>
     /// <returns>PFAD1\\PFAD2\\PFAD3\\</returns>
-    public static string RepairTextKey(string textkey, bool ucase) {
+    public static string RepairTextKey(string textkey, bool ucase, bool cutaterix) {
         var nt = textkey.Replace("/", "\\");
         nt = nt.Replace("\\\\\\\\", "\\");
         nt = nt.Replace("\\\\\\", "\\");
@@ -182,7 +183,13 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
         if (ucase) { nt = nt.ToUpper(); }
 
-        return nt.RemoveChars(Constants.Char_PfadSonderZeichen);
+        var l = nt.SplitBy("*");
+
+        nt = l[0].RemoveChars(Constants.Char_PfadSonderZeichen);
+
+        if (cutaterix || l.Count() == 1) { return nt; }
+
+        return nt + "*" + l[1];
     }
 
     public void FillListBox() {
@@ -214,28 +221,48 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
         List<string> olditems = lstTexte.Items.ToListOfString();
 
+
+
+        foreach (var thisIT in lstTexte.Items) {
+
+            if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+                ai.Rows.Clear();
+            }
+
+        }
+
+
+
+
+
+
         foreach (var thisAdder in AdderSingle) {
             if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
 
             foreach (var thisRow in db.Row) {
                 if (thisRow == null || thisRow.IsDisposed) { continue; }
 
-                var generatedTextKey = thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null);
+                var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), false, true);
+                if (!ShowMe(generatedTextKeyWOAsterix)) { continue; }
 
-                if (generatedTextKey == thisAdder.TextKey) { continue; }
+                olditems.Remove(generatedTextKeyWOAsterix);
 
-                generatedTextKey = RepairTextKey(generatedTextKey, false);
+                AdderItem? adderit = null;
 
-                if (!ShowMe(generatedTextKey)) { continue; }
-
-                olditems.Remove(generatedTextKey);
-
-                if (lstTexte.Items.Get(generatedTextKey) == null) {
-                    var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
-
-                    var it = new AdderItem(db, EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKey, AdditinalTextColumn, additionaltext);
+                if (lstTexte.Items.Get(generatedTextKeyWOAsterix) is ItemCollectionList.ReadableListItem rli) {
+                    if (rli.Item is AdderItem ai) { adderit = ai; }
+                } else {
+                    var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKeyWOAsterix, AdditinalTextColumn);
 
                     lstTexte.ItemAdd(ItemOf(it));
+                }
+
+                if (adderit != null) {
+                    var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), true, false);
+                    var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+
+                    var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext);
+                    adderit.Rows.Add(ai);
                 }
             }
         }
@@ -335,12 +362,13 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     private void lstTexte_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         _selected.Clear();
         _selected.AddRange(lstTexte.Checked);
+        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+            if (Selected(e.Item.KeyName)) {
 
-
-
-        if (Selected(e.Item.KeyName)) {
-
-
+                ai.AddRowsToDatabase();
+            } else {
+                ai.RemoveRowsFromDatabase();
+            }
         }
 
 
@@ -349,10 +377,10 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         FillListBox();
     }
 
-    private bool Selected(string textkey) => _selected.Contains(RepairTextKey(textkey, true), false);
+    private bool Selected(string textkey) => _selected.Contains(RepairTextKey(textkey, true, true), false);
 
     private bool ShowMe(string textkey) {
-        var t = RepairTextKey(textkey, true);
+        var t = RepairTextKey(textkey, true, true);
         if (t.CountString("\\") < 2) { return true; }
         if (Selected(t)) { return true; }
         return Selected(t.PathParent());

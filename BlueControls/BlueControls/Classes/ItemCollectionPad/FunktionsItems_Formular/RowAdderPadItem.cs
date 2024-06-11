@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Drawing;
 using BlueControls.Editoren;
 using BlueDatabase.Enums;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -41,7 +42,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// </summary>
 public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable, ISimpleEditor {
     //EntityID: Käsekuchen
-    //OriginID: Zutaten#Vegetarisch/Mehl#100 g
+    //OriginID: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1 (AdderNo)
     //TextKey: Vegetarisch/Mehl
     //AdditionalText: 100 g
 
@@ -51,8 +52,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     private readonly ItemSendFilter _itemSends;
 
     private List<RowAdderSingle> _addersingle = new();
-
     private string _additionalTextColumnName = string.Empty;
+    private int _counter = 0;
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -72,7 +73,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     /// Eine Spalte in der Ziel-Datenbank.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
-    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     private string _originIDColumnName = string.Empty;
 
@@ -198,7 +199,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     /// Eine Spalte in der Ziel-Datenbank.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
-    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
@@ -213,7 +214,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     /// Eine Spalte in der Ziel-Datenbank.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
-    /// Beispiel: Zutaten#Vegetarisch/Mehl#100 g
+    /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string OriginIDColumnName {
@@ -373,7 +374,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public AbstractListItem? NewChild() {
-        var l = new RowAdderSingle(this);
+        if (_counter == int.MaxValue) { _counter = 0; }
+        _counter++;
+        var l = new RowAdderSingle(this, _counter);
         l.Editor = typeof(RowAdderSingleEditor);
         return ItemOf(l);
     }
@@ -408,6 +411,10 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
             case "additionaltextcolumnname":
                 _additionalTextColumnName = value;
+                return true;
+
+            case "counter":
+                _counter = IntParse(value);
                 return true;
 
             case "adders":
@@ -466,6 +473,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         result.ParseableAdd("TextKeyColumnName", _textKeyColumnName);
         result.ParseableAdd("AdditionalTextColumnName", _additionalTextColumnName);
         result.ParseableAdd("Adders", "Item", _addersingle);
+        result.ParseableAdd("Counter", _counter);
 
         return result.Parseable(base.ToString());
     }

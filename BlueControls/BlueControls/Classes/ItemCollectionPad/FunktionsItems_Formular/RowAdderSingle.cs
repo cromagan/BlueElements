@@ -25,6 +25,7 @@ using static BlueDatabase.Database;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using static BlueBasics.Converter;
 
 using BlueDatabase;
 
@@ -36,6 +37,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     private static RowAdderPadItem? _parent = null;
     private string _additionalText = string.Empty;
+    private int _count = 0;
     private Database? _database;
 
     /// <summary>
@@ -53,11 +55,15 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     #region Constructors
 
-    public RowAdderSingle(RowAdderPadItem parent, string toParse) : this(parent) => this.Parse(toParse);
+    public RowAdderSingle(RowAdderPadItem parent, string toParse) : this(parent, -1) => this.Parse(toParse);
 
-    public RowAdderSingle(RowAdderPadItem parent) : base() {
+    public RowAdderSingle(RowAdderPadItem parent, int count) : base() {
         KeyName = Generic.GetUniqueKey();
         _parent = parent;
+
+        if (count >= 0) {
+            _count = count;
+        }
     }
 
     #endregion
@@ -79,6 +85,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     //[Description("Aus dieser Datenbank werden die Zeilen konvertiert und importiert.")]
     //public Database? Database { get; set; }
+
+    public int Count => _count;
 
     public Database? Database {
         get {
@@ -127,7 +135,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         if (Database is not Database db || db.IsDisposed) { return "Datenbank fehlt."; }
 
         if (string.IsNullOrEmpty(_textKey)) { return "TextKey-Id-Generierung fehlt"; }
-        if (!_textKey.Contains("~")) { return "TextKey-ID-Generierung muss mit Variablen definiert werden."; }
+        //if (!_textKey.Contains("~")) { return "TextKey-ID-Generierung muss mit Variablen definiert werden."; }
 
         return string.Empty;
     }
@@ -165,6 +173,10 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
             case "additionaltext":
                 _additionalText = value.FromNonCritical();
                 return true;
+
+            case "count":
+                _count = IntParse(value);
+                return true;
         }
         return false;
     }
@@ -183,6 +195,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
         result.ParseableAdd("TextKey", _textKey);
         result.ParseableAdd("AdditionalText", _additionalText);
+        result.ParseableAdd("Count", _count);
 
         return result.Parseable();
     }

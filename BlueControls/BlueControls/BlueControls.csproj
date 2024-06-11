@@ -108,6 +108,7 @@
     <Compile Include="AdditionalScriptMethods\Method_MsgBox.cs" />
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="Classes\AdderItemSingle.cs" />
     <Compile Include="Classes\AdderItem.cs" />
     <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
       <SubType>UserControl</SubType>

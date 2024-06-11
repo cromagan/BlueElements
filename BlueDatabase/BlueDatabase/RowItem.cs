@@ -445,6 +445,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } while (true);
     }
 
+    public string Hash() {
+        if (Database is not Database db || db.IsDisposed) { return string.Empty; }
+
+        var thisss = string.Empty;
+
+        foreach (var thisColumnItem in db.Column) {
+            if (thisColumnItem.IsDisposed) { return string.Empty; }
+
+            thisss = thisss+ thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
+        }
+
+        return Generic.GetHashString(thisss);
+    }
+
     public void InvalidateCheckData() {
         LastCheckedRowFeedback = null;
         LastCheckedEventArgs = null;
