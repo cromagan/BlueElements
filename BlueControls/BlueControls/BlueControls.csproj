@@ -128,6 +128,12 @@
     <Compile Include="Editoren\EditorEasy.Designer.cs">
       <DependentUpon>EditorEasy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editoren\FilterCollectionEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editoren\FilterCollectionEditor.Designer.cs">
+      <DependentUpon>FilterCollectionEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editoren\RowEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -674,6 +680,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\EditorEasy.resx">
       <DependentUpon>EditorEasy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editoren\FilterCollectionEditor.resx">
+      <DependentUpon>FilterCollectionEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\RowEditor.resx">
       <DependentUpon>RowEditor.cs</DependentUpon>

@@ -118,6 +118,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
 
+    public event EventHandler<AbstractListItemEventArgs>? RemoveClicked;
+
     #endregion
 
     #region Properties
@@ -910,6 +912,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //if (_checkBehaviorx == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
         if (CheckboxDesign() != Design.Undefiniert) { return; }
 
+        OnRemoveClicked(new AbstractListItemEventArgs(_mouseOverItem));
+
         UnCheck(_mouseOverItem);
 
         if (_checkBehavior != CheckBehavior.AllSelected) {
@@ -1151,6 +1155,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
     private void RemoveAndUnRegister(AbstractListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;

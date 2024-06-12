@@ -28,6 +28,7 @@ using System.ComponentModel;
 using static BlueBasics.Converter;
 
 using BlueDatabase;
+using BlueControls.Editoren;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -102,6 +103,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
         set {
             _database = value;
+            _filterCollection = new FilterCollection(_database, "RowAdder");
             tempDatabaseNametoLoad = string.Empty;
         }
     }
@@ -112,17 +114,27 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     public FilterCollection Filter {
         get {
-            if (string.IsNullOrEmpty(tmpFiltercollection)) { return _filterCollection; }
+            if (string.IsNullOrEmpty(tmpFiltercollection)) {
+                _filterCollection ??= new FilterCollection(_database, "RowAdderSingle");
+                _filterCollection.Editor = typeof(FilterCollectionEditor);
+                return _filterCollection;
+            }
 
             _ = Database;
             _filterCollection = new FilterCollection(tmpFiltercollection);
 
             tmpFiltercollection = string.Empty;
+
+            _filterCollection.Editor = typeof(FilterCollectionEditor);
             return _filterCollection;
         }
 
         set {
+            if (_filterCollection == value) { return; }
+            if (_filterCollection != null) { _filterCollection.Dispose(); }
+
             _filterCollection = value;
+            _filterCollection.Editor = typeof(FilterCollectionEditor);
             tmpFiltercollection = string.Empty;
         }
     }

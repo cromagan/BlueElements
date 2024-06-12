@@ -35,7 +35,7 @@ namespace BlueDatabase;
 
 #nullable enable
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable {
 
     #region Fields
 
@@ -84,6 +84,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Properties
 
+    public string CaptionForEditor => "Filter-Sammlung";
     public int Count => IsDisposed ? 0 : _internal.Count;
 
     public Database? Database {
@@ -107,6 +108,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    public Type? Editor { get; set; }
     public bool IsDisposed { get; private set; }
 
     public string RowFilterText {

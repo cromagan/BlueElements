@@ -113,7 +113,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
     protected virtual void InitializeComponentDefaultValues() {
-        if (_toEdit is ISimpleEditor ise) { return; }
+        if (_toEdit is ISimpleEditor) { return; }
 
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
     }

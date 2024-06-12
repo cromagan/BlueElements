@@ -32,6 +32,7 @@ using System.Windows.Forms;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
+using BlueControls.Forms;
 
 #nullable enable
 
@@ -125,13 +126,6 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                     break;
                 }
 
-            case Accessor<IEditable>: {
-                    EditType = EditTypeFormula.Button;
-                    var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
-                    Size = new Size(s1.Width + 30, 22);
-                    break;
-                }
-
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
             {
                     if (list != null) {
@@ -143,6 +137,18 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
                         StyleComboBox(CreateSubControls() as ComboBox, list, ComboBoxStyle.DropDownList, true);
+                    } else if (_accessor.Get() is IEditable) {
+                        EditType = EditTypeFormula.Button;
+                        var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                        Size = new Size(s1.Width + 30, 22);
+
+                        if (CreateSubControls() is Button b) {
+                            b.ImageCode = "Stift|16";
+                            b.Text = "bearbeiten";
+                        }
+                    } else if (_accessor.Get() is null) {
+                        CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
+                        EditType = EditTypeFormula.nur_als_Text_anzeigen;
                     } else {
                         EditType = EditTypeFormula.Textfeld;
                         if (rowCount >= 2) {
@@ -224,6 +230,15 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         _checker.Tick -= Checker_Tick;
         //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
         base.Dispose(disposing);
+    }
+
+    protected override void OnButtonClicked() {
+        base.OnButtonClicked();
+        object? x = _accessor.Get();
+
+        if (x is IEditable iei) {
+            iei.Edit();
+        }
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -393,10 +408,10 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                 if (adb.Get() != db) { adb.Set(db); }
                 break;
 
-            case Accessor<IEditable> _:
-                //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
-                //if (adb.Get() != db) { adb.Set(db); }
-                break;
+            //case Accessor<IEditable> _:
+            //    //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+            //    //if (adb.Get() != db) { adb.Set(db); }
+            //    break;
 
             //case Accessor <enum> ae:
             //    FloatTryParse(Value, out var f);
@@ -405,7 +420,9 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
 
             default:
 
-                if (_accessor.Get() is Enum) {
+                if (_accessor.Get() is null) {
+                } else if (_accessor.Get() is IEditable) {
+                } else if (_accessor.Get() is Enum) {
                     _ = IntTryParse(Value, out var ef);
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
@@ -488,7 +505,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                 ValueSet(db.ConnectionData.UniqueId, true);
                 break;
 
-            case Accessor<IEditable> _:
+            case IEditable:
                 //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
                 //if (adb.Get() != db) { adb.Set(db); }
                 break;
