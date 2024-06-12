@@ -443,7 +443,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         var ext = chkExtendend.Checked && chkExtendend.Visible;
 
         _allowTemporay = true;
-        e.Feedback = Database?.ExecuteScript(_item, !_testmode, r, null, true, true, ext);
+        e.Feedback = Database?.ExecuteScript(_item, !_testmode, r, null, true, ext);
         _allowTemporay = false;
     }
 

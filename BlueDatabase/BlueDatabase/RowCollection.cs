@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace BlueDatabase;
@@ -179,11 +180,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static void ExecuteValueChangedEvent() {
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3 + WaitDelay) { return; }
-
-        if (Database.ExecutingFirstLvlScript > 0) { return; }
-
-        if (Pendingworker.Count > 2) { return; }
+        List<Database> l = [.. Database.AllFiles];
+        if (l.Count == 0) { return; }
+        l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
 
         lock (_executingchangedrowsx) {
             if (_executingchangedrows) { return; }
@@ -195,8 +194,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         while (NextRowToCeck() is RowItem row) {
             if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { break; }
-            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { break; }
-            if (Database.ExecutingFirstLvlScript > 0) { break; }
+
+            if (row.Database != l[0]) {
+                if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3 + WaitDelay) { break; }
+            }
+
+            if (Database.ExecutingScriptAnyDatabase > 0) { break; }
 
             WaitDelay = Pendingworker.Count * 5;
             if (Pendingworker.Count > 2) { break; }
@@ -492,7 +495,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0, null, true, true, false);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0, null, true, false);
 
             if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
@@ -596,7 +599,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 
-        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, true, true, 0.1f, null, true, true, false);
+        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, true, true, 0.1f, null, true, false);
         //if (db.Column.HasKeyColumns()) {
         //    _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null, true);
         //}
@@ -632,7 +635,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     /// <summary>
     /// Gibt Zeilen Zurück, die ein Update benötigen.
-    /// wenn oldestTo=True ist, wird nach den dringenen Updates die älteste Zeile zurückgegeben.
+    /// wenn oldestTo=True ist, wird nach den dringenen Updates die älteste Zeile zurückgegeben, Benutzerunabhängig
     /// </summary>
     /// <param name="oldestTo"></param>
     /// <returns></returns>
@@ -641,14 +644,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!db.CanDoValueChangedScript()) { return null; }
 
-        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
+        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization());
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUrgentUpdate());
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUpdate());
-        if (rowToCheck != null) { return rowToCheck; }
+        if (oldestTo || !db.AmITemporaryMaster(5, 55)) {
+            rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
+            if (rowToCheck != null) { return rowToCheck; }
+        }
 
         if (!oldestTo) { return null; }
 
@@ -819,7 +824,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             OnRowRemoving(new RowChangedEventArgs(row, reason));
 
             if (reason == Reason.SetCommand) {
-                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, false, false, true, 3, null, true, true, false);
+                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, false, false, true, 3, null, true, false);
             }
 
             foreach (var thisColumn in db.Column) {
@@ -844,43 +849,29 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     private static RowItem? NextRowToCeck() {
         List<Database> l = [.. Database.AllFiles];
-        l.Shuffle();
 
-        foreach (var thisDb in l) {
-            if (thisDb is Database db && !db.IsDisposed) {
-                if (!db.CanDoValueChangedScript()) { continue; }
-                var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
-                if (rowToCheck != null) { return rowToCheck; }
-            }
+        if (Constants.GlobalRnd.Next(10) == 1) {
+            l.Shuffle();
+        } else {
+            l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         }
 
         foreach (var thisDb in l) {
             if (thisDb is Database db && !db.IsDisposed) {
                 if (!db.CanDoValueChangedScript()) { continue; }
-                var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUrgentUpdate());
-                if (rowToCheck != null) { return rowToCheck; }
-            }
-        }
 
-        foreach (var thisDb in l) {
-            if (thisDb is Database db && !db.IsDisposed) {
-                if (!db.CanDoValueChangedScript()) { continue; }
-                //if (!db.HasValueChangedScript()) { continue; }
-                if (!db.AmITemporaryMaster(5, 55)) { continue; }
-
-                var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsUpdate());
+                var rowToCheck = db.Row.NextRowToCheck(false);
                 if (rowToCheck != null) { return rowToCheck; }
             }
         }
 
         WaitDelay = Math.Min(WaitDelay + 5, 100);
-
         return null;
     }
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem r || r.IsDisposed) { return; }
-        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null, true, true, false);
+        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null, true, false);
     }
 
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);

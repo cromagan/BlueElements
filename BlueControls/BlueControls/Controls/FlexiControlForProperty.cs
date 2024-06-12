@@ -125,6 +125,13 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                     break;
                 }
 
+            case Accessor<IEditable>: {
+                    EditType = EditTypeFormula.Button;
+                    var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                    Size = new Size(s1.Width + 30, 22);
+                    break;
+                }
+
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
             {
                     if (list != null) {
@@ -386,6 +393,11 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                 if (adb.Get() != db) { adb.Set(db); }
                 break;
 
+            case Accessor<IEditable> _:
+                //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+                //if (adb.Get() != db) { adb.Set(db); }
+                break;
+
             //case Accessor <enum> ae:
             //    FloatTryParse(Value, out var f);
             //    if (af.Get() != f) { af.Set(f); }
@@ -474,6 +486,11 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
 
             case Database db:
                 ValueSet(db.ConnectionData.UniqueId, true);
+                break;
+
+            case Accessor<IEditable> _:
+                //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+                //if (adb.Get() != db) { adb.Set(db); }
                 break;
 
             default:

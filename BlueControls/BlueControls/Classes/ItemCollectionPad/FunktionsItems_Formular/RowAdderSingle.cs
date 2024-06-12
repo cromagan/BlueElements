@@ -39,6 +39,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     private string _additionalText = string.Empty;
     private Database? _database;
 
+    private FilterCollection _filterCollection;
+
     /// <summary>
     /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
     /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
@@ -47,6 +49,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     private string _textKey = string.Empty;
 
     private string tempDatabaseNametoLoad = string.Empty;
+
+    private string tmpFiltercollection = string.Empty;
 
     #endregion
 
@@ -106,6 +110,23 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     public Type? Editor { get; set; }
 
+    public FilterCollection Filter {
+        get {
+            if (string.IsNullOrEmpty(tmpFiltercollection)) { return _filterCollection; }
+
+            _ = Database;
+            _filterCollection = new FilterCollection(tmpFiltercollection);
+
+            tmpFiltercollection = string.Empty;
+            return _filterCollection;
+        }
+
+        set {
+            _filterCollection = value;
+            tmpFiltercollection = string.Empty;
+        }
+    }
+
     public string KeyName { get; private set; } = string.Empty;
 
     public string QuickInfo => ReadableText();
@@ -145,6 +166,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && !Database.IsDisposed) {
+            l.Add(new FlexiControlForProperty<FilterCollection>(() => Filter));
+
             l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
             l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
@@ -163,6 +186,10 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
                     tempDatabaseNametoLoad = tempDatabaseNametoLoad.FilePath() + MakeValidTableName(tempDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempDatabaseNametoLoad.FileSuffix();
                 }
 
+                return true;
+
+            case "filter":
+                tmpFiltercollection = value.FromNonCritical();
                 return true;
 
             case "textkey":
@@ -192,6 +219,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         List<string> result = [];
 
         result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
+        result.ParseableAdd("Filter", Filter);
         result.ParseableAdd("TextKey", _textKey);
         result.ParseableAdd("AdditionalText", _additionalText);
         result.ParseableAdd("Count", Count);

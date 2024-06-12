@@ -329,7 +329,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         //if (IsInCache == null) { Develop.DebugPrint(FehlerArt.Fehler, "Refresh-Fehler"); }
 
-        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null, true, true, false);
+        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null, true, false);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
@@ -433,13 +433,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="eventname"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, float tryforsceonds, List<string>? attributes, bool wichtigerProzess, bool dbVariables, bool extended) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
-            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, produktivphase, attributes, wichtigerProzess, dbVariables, extended);
+            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, produktivphase, attributes, dbVariables, extended);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -453,7 +453,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem.IsDisposed) { return string.Empty; }
 
-            thisss = thisss+ thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
+            thisss = thisss + thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
         }
 
         return Generic.GetHashString(thisss);
@@ -520,24 +520,38 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return ok;
     }
 
-    public bool NeedsRowUpdate() {
+    /// <summary>
+    /// Gibt True zurück, wenn eine eigene Zeile initialisiert werden muss.
+    /// Alter Egal.
+    /// </summary>
+    /// <returns></returns>
+    public bool NeedsRowInitialization() {
         if (Database is not Database db || db.IsDisposed) { return false; }
         if (db.Column.SysRowState is not ColumnItem srs) { return false; }
         if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
         if (db.Column.SysRowChanger is not ColumnItem src) { return false; }
         return string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase);
-        //return db.IsAdministrator();
     }
 
-    public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                     CellGetLong(srs) < Database.EventScriptVersion;
+    /// <summary>
+    /// Gibt true zurück, wenn eine Zeile aktualisiert werden muss.
+    /// Benutzer und Alter egal.
+    /// </summary>
+    /// <returns></returns>
+    public bool NeedsRowUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
+                                         CellGetLong(srs) < Database.EventScriptVersion;
 
-    public bool NeedsUrgentUpdate() => NeedsUpdate() &&
+    /// <summary>
+    /// Gibt true zurück, wenn eine eigene Zeile aktualisiert werden.
+    /// Diese muss jünger als 5 Minuten sein und älter als 3 sekunden.
+    /// </summary>
+    /// <returns></returns>
+    public bool NeedsRowUpdateAfterChange() => NeedsRowUpdate() &&
                                            Database?.Column.SysRowChanger is ColumnItem srcr &&
                                            Database?.Column.SysRowChangeDate is ColumnItem srcd &&
                                            string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
                                            DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 5 &&
-                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 10;
+                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3;
 
     /// <summary>
     ///
@@ -614,6 +628,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>Wenn alles in Ordung ist</returns>
     public bool UpdateRow(bool onlyIfQuick, bool mustDoFullCheck, bool wichtig) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
+
+        if (!wichtig && Database.ExecutingScriptAnyDatabase > 0) { return false; }
+        if (db.ExecutingScript > 0) { return false; }
         if (db.Column.SysRowState is not ColumnItem srs) { return RepairAllLinks(); }
 
         var large = db.EventScript.Get(ScriptEventTypes.value_changed).Count;
@@ -626,7 +643,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         try {
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption}");
 
-            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, wichtig, true, mustDoFullCheck);
+            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustDoFullCheck);
             if (!ok.AllOk) { return false; }
 
             if (!RepairAllLinks()) { return false; }
@@ -768,11 +785,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="fullCheck"></param>
     /// <param name="produktivphase"></param>
     /// <param name="attributes"></param>
-    /// <param name="wichtigerProzess"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
-    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, List<string>? attributes, bool wichtigerProzess, bool dbVariables, bool extended) {
+    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not Database db || db.IsDisposed) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
@@ -780,7 +796,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        var script = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, wichtigerProzess, dbVariables, extended);
+        var script = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
 
         if (!script.AllOk) {
             //db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));

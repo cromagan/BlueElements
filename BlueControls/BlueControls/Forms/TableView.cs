@@ -196,7 +196,7 @@ public partial class TableView : FormWithStatusBar {
 
             case "Skript":
                 if (row != null && !row.IsDisposed) {
-                    var t = row.ExecuteScript(null, ev[1], true, true, true, 10, null, true, true, false).Protocol.JoinWithCr();
+                    var t = row.ExecuteScript(null, ev[1], true, true, true, 10, null, true, false).Protocol.JoinWithCr();
                     if (string.IsNullOrEmpty(t)) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
                     } else {
@@ -993,7 +993,7 @@ public partial class TableView : FormWithStatusBar {
                 }
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-                var s = db.ExecuteScript(sc, sc.ChangeValues, null, null, true, true, false);
+                var s = db.ExecuteScript(sc, sc.ChangeValues, null, null, true, false);
                 m = s.Protocol.JoinWithCr();
             }
 

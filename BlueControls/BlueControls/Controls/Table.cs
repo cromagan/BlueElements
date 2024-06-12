@@ -1429,7 +1429,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             state ^= States.Standard_HasFocus;
         }
 
-        if (Database is not Database db || db.IsDisposed || DesignMode || ShowWaitScreen || _drawing || db.DoingChanges > 0) {
+        if (Database is not Database db || db.IsDisposed) {
+            DrawWaitScreen(gr);
+            return;
+        }
+
+        db.LastUsedDate = DateTime.UtcNow;
+
+
+        if(db.ExecutingScript > 0 && _rowsFilteredAndPinned is null) {
+            DrawWaitScreen(gr);
+            return;
+        }
+
+
+        if (DesignMode || ShowWaitScreen || _drawing || db.DoingChanges > 0) {
             DrawWaitScreen(gr);
             return;
         }
@@ -2767,7 +2781,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
 
                 if (isAdmin) {
-                    if (rowScript && cellInThisDatabaseRow.NeedsUpdate()) {
+                    if (rowScript && cellInThisDatabaseRow.NeedsRowUpdate()) {
                         RowCollection.WaitDelay = 0;
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
                         //db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);
