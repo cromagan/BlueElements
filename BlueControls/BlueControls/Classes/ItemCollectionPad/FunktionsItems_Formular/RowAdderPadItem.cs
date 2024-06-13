@@ -370,6 +370,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         l.Add(new FlexiControl("Bausteine:", widthOfControl, true));
         l.Add(Childs());
 
+        l.AddRange(base.GetProperties(widthOfControl));
+
         return l;
     }
 
@@ -508,7 +510,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             AutoSort = false,
             ItemEditAllowed = true,
             CheckBehavior = CheckBehavior.AllSelected,
-            AddMethod = NewChild
+            AddMethod = NewChild,
+            Height = 60
         };
 
         CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);

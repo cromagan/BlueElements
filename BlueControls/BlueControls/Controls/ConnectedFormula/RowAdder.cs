@@ -286,28 +286,42 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
 
                     var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), false, true);
-                    if (!ShowMe(selected, generatedTextKeyWOAsterix)) { continue; }
 
-                    olditems.Remove(generatedTextKeyWOAsterix.ToUpper());
 
-                    AdderItem? adderit = null;
+                    var stufen = generatedTextKeyWOAsterix.SplitBy("\\");
 
-                    if (lstTexte.Items.Get(generatedTextKeyWOAsterix) is ItemCollectionList.ReadableListItem rli) {
-                        if (rli.Item is AdderItem ai) { adderit = ai; }
-                    } else {
-                        var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKeyWOAsterix, AdditinalTextColumn);
+                    var tmp = string.Empty; 
 
-                        lstTexte.ItemAdd(ItemOf(it));
-                    }
+                    for (var z = 0; z < stufen.Length; z++) {
 
-                    if (adderit != null) {
-                        var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), true, false);
-                        var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+                        var add = (z == stufen.Length - 1);
 
-                        var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext);
-                        adderit.Rows.Add(ai);
+                        tmp = tmp + stufen[z] + "\\";
 
-                        adderit.GeneratedentityID = generatedentityID;
+                        if (!ShowMe(selected, tmp)) { continue; }
+
+                        olditems.Remove(tmp.ToUpper());
+
+                        AdderItem? adderit = null;
+
+                        if (lstTexte.Items.Get(tmp) is ItemCollectionList.ReadableListItem rli) {
+                            if (rli.Item is AdderItem ai) { adderit = ai; }
+                        } else {
+                            var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, tmp, AdditinalTextColumn);
+
+                            lstTexte.ItemAdd(ItemOf(it));
+                        }
+
+                        if (adderit != null) {
+                            var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), true, false);
+                            var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+
+                            var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext, add);
+                            adderit.Rows.Add(ai);
+
+                            adderit.GeneratedentityID = generatedentityID;
+                        }
+
                     }
                 }
             }

@@ -576,9 +576,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     var (changes, files) = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
                     if (changes == null) {
-                        if (mustDoIt) { Develop.DebugPrint(FehlerArt.Fehler, "Aktualiserung fehlgeschlagen!"); }
-                        // Später ein neuer Versuch
                         _isInTimer = false;
+
+                        if (mustDoIt) {
+                            Develop.CheckStackForOverflow();
+                            Generic.Pause(1, false);
+                            CheckSysUndoNow(offDatabases, mustDoIt);
+                        }
+
+                        // Später ein neuer Versuch
                         return;
                     }
 

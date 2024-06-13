@@ -455,6 +455,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem.IsDisposed) { return string.Empty; }
 
+            if(thisColumnItem.IsSystemColumn()) { continue; }
+
+
             thisss = thisss + thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
         }
 

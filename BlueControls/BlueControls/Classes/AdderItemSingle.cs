@@ -25,17 +25,20 @@ internal class AdderItemSingle {
 
     #region Constructors
 
-    public AdderItemSingle(string generatedTextKey, RowItem thisRow, int count, string additionaltext) {
+
+
+    public AdderItemSingle(string generatedTextKey, RowItem thisRow, int count, string additionaltext, bool realAdder) {
         GeneratedTextKey = generatedTextKey;
         ThisRow = thisRow;
         Count = count;
         Additionaltext = additionaltext;
+        RealAdder = realAdder;
     }
 
     #endregion
 
     #region Properties
-
+    public bool RealAdder { get; }
     public string Additionaltext { get; }
     public int Count { get; }
     public string GeneratedTextKey { get; }
