@@ -116,12 +116,15 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         get {
             if (string.IsNullOrEmpty(tmpFiltercollection)) {
                 _filterCollection ??= new FilterCollection(_database, "RowAdderSingle");
+                _filterCollection.Database = _database;
                 _filterCollection.Editor = typeof(FilterCollectionEditor);
                 return _filterCollection;
             }
 
             _ = Database;
-            _filterCollection = new FilterCollection(tmpFiltercollection);
+            _filterCollection = new FilterCollection("RowAdderSingle");
+            _filterCollection.Database = _database;
+            _filterCollection.Parse(tmpFiltercollection);
 
             tmpFiltercollection = string.Empty;
 

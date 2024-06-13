@@ -22,6 +22,8 @@ using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System.Collections.Generic;
+using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
@@ -85,6 +87,24 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
                 cbxColumn.ItemAdd(ItemOf(thisColumn));
             }
         }
+    }
+
+    private void cbxColumn_TextChanged(object sender, System.EventArgs e) {
+        if (ToEdit is not FilterItem fi || fi.IsDisposed) { return; }
+
+        fi.Column = fi.Database?.Column[cbxColumn.Text];
+    }
+
+    private void cbxFilterType_TextChanged(object sender, System.EventArgs e) {
+        if (ToEdit is not FilterItem fi || fi.IsDisposed) { return; }
+
+        fi.FilterType = (FilterType)(IntParse(cbxFilterType.Text));
+    }
+
+    private void txbFilterText_TextChanged(object sender, System.EventArgs e) {
+        if (ToEdit is not FilterItem fi || fi.IsDisposed) { return; }
+
+        fi.SearchValue = (new List<string>() { txbFilterText.Text }).AsReadOnly();
     }
 
     #endregion

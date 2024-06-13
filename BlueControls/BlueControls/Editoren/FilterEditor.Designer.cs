@@ -37,20 +37,24 @@ partial class FilterEditor {
             this.cbxFilterType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxFilterType.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxFilterType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxFilterType.Location = new System.Drawing.Point(96, 24);
             this.cbxFilterType.Name = "cbxFilterType";
             this.cbxFilterType.Size = new System.Drawing.Size(216, 32);
             this.cbxFilterType.TabIndex = 0;
+            this.cbxFilterType.TextChanged += new System.EventHandler(this.cbxFilterType_TextChanged);
             // 
             // cbxColumn
             // 
             this.cbxColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxColumn.Location = new System.Drawing.Point(96, 64);
             this.cbxColumn.Name = "cbxColumn";
             this.cbxColumn.Size = new System.Drawing.Size(216, 32);
             this.cbxColumn.TabIndex = 1;
+            this.cbxColumn.TextChanged += new System.EventHandler(this.cbxColumn_TextChanged);
             // 
             // txbFilterText
             // 
@@ -60,8 +64,9 @@ partial class FilterEditor {
             this.txbFilterText.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbFilterText.Location = new System.Drawing.Point(96, 104);
             this.txbFilterText.Name = "txbFilterText";
-            this.txbFilterText.Size = new System.Drawing.Size(216, 32);
+            this.txbFilterText.Size = new System.Drawing.Size(216, 112);
             this.txbFilterText.TabIndex = 2;
+            this.txbFilterText.TextChanged += new System.EventHandler(this.txbFilterText_TextChanged);
             // 
             // capFilterType
             // 
@@ -96,7 +101,7 @@ partial class FilterEditor {
             this.Controls.Add(this.cbxColumn);
             this.Controls.Add(this.cbxFilterType);
             this.Name = "FilterEditor";
-            this.Size = new System.Drawing.Size(323, 144);
+            this.Size = new System.Drawing.Size(323, 224);
             this.ResumeLayout(false);
 
     }

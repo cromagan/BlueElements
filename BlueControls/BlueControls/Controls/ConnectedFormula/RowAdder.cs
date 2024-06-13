@@ -239,6 +239,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             return;
         }
 
+        rowIn.CheckRowDataIfNeeded();
+
         var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
 
         if (generatedentityID == EntityID) {
@@ -267,34 +269,50 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         foreach (var thisAdder in AdderSingle) {
             if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
 
+            var fi = ((FilterCollection)thisAdder.Filter.Clone("Adder Clone"));
+            foreach(var thisFi in fi) {
+                var t = rowIn.ReplaceVariables(thisFi.SearchValue.JoinWithCr(), false, false, rowIn.LastCheckedEventArgs?.Variables);
+                thisFi.SearchValue = t.SplitAndCutByCrToList().AsReadOnly();
+            }
+
+            var fi2 = fi.ToArray();
+
+
             foreach (var thisRow in db.Row) {
                 if (thisRow == null || thisRow.IsDisposed) { continue; }
 
-                var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), false, true);
-                if (!ShowMe(selected, generatedTextKeyWOAsterix)) { continue; }
 
-                olditems.Remove(generatedTextKeyWOAsterix.ToUpper());
+                if (thisRow.MatchesTo(fi2)) {
 
-                AdderItem? adderit = null;
 
-                if (lstTexte.Items.Get(generatedTextKeyWOAsterix) is ItemCollectionList.ReadableListItem rli) {
-                    if (rli.Item is AdderItem ai) { adderit = ai; }
-                } else {
-                    var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKeyWOAsterix, AdditinalTextColumn);
+                    var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), false, true);
+                    if (!ShowMe(selected, generatedTextKeyWOAsterix)) { continue; }
 
-                    lstTexte.ItemAdd(ItemOf(it));
-                }
+                    olditems.Remove(generatedTextKeyWOAsterix.ToUpper());
 
-                if (adderit != null) {
-                    var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), true, false);
-                    var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+                    AdderItem? adderit = null;
 
-                    var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext);
-                    adderit.Rows.Add(ai);
+                    if (lstTexte.Items.Get(generatedTextKeyWOAsterix) is ItemCollectionList.ReadableListItem rli) {
+                        if (rli.Item is AdderItem ai) { adderit = ai; }
+                    } else {
+                        var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, generatedTextKeyWOAsterix, AdditinalTextColumn);
 
-                    adderit.GeneratedentityID = generatedentityID;
+                        lstTexte.ItemAdd(ItemOf(it));
+                    }
+
+                    if (adderit != null) {
+                        var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), true, false);
+                        var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
+
+                        var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext);
+                        adderit.Rows.Add(ai);
+
+                        adderit.GeneratedentityID = generatedentityID;
+                    }
                 }
             }
+            fi.Dispose();
+
         }
 
         foreach (var thisit in olditems) {

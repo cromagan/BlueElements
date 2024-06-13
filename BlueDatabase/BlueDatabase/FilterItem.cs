@@ -206,7 +206,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public ReadOnlyCollection<string> SearchValue {
         get => _searchValue;
-        private set {
+        set {
             if (IsDisposed) { return; }
             if (!value.IsDifferentTo(_searchValue)) { return; }
             OnChanging();

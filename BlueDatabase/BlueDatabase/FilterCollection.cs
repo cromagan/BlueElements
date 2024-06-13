@@ -170,10 +170,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
 
         if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {
+            fi.Column = fi.Database?.Column.First();
             fi.FilterType = FilterType.AlwaysFalse;
             //Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!");
         }
-        if (!fi.IsOk()) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+        //if (!fi.IsOk()) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
 
         OnChanging();
 
