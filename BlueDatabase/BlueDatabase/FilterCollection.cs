@@ -240,15 +240,20 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Clear();
 
         if (fc != null) {
+            var reallydifferent = fc.ToString() != ToString();
             foreach (var thisf in fc) {
                 if (!Exists(thisf) && thisf.IsOk() && thisf.Clone() is FilterItem nfi) { AddAndRegisterEvents(nfi); }
             }
 
-            _rows = [];
-            _rows.AddRange(fc.Rows);
-            OnRowsChanged();
+            if (reallydifferent) {
+                _rows = [];
+                _rows.AddRange(fc.Rows);
+                OnRowsChanged();
+            }
         } else {
-            Invalidate_FilteredRows();
+            if (Count > 0) {
+                Invalidate_FilteredRows();
+            }
         }
 
         OnPropertyChanged();

@@ -61,6 +61,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public readonly List<UndoItem> Undo;
 
     /// <summary>
+    /// Wann die Datenbank zuletzt angeschaut / geöffnet / geladen wurde.
+    /// Bestimmt die Reihenfolge der Reparaturen
+    /// </summary>
+    public DateTime LastUsedDate = DateTime.UtcNow;
+
+    /// <summary>
     ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
     /// </summary>
     protected readonly List<UndoItem> ChangesNotIncluded = [];
@@ -200,8 +206,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
 
-    public event EventHandler? ScriptMessageChanged;
-
     public event EventHandler? SortParameterChanged;
 
     public event EventHandler? ViewChanged;
@@ -212,9 +216,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string DatabaseId => nameof(Database);
     public static int ExecutingScriptAnyDatabase { get; set; } = 0;
-
-
-    public int ExecutingScript { get; set; } = 0;
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
@@ -259,13 +260,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             OnViewChanged();
         }
     }
-
-
-    /// <summary>
-    /// Wann die Datenbank zuletzt angeschaut / geöffnet / geladen wurde.
-    /// Bestimmt die Reihenfolge der Reparaturen
-    /// </summary>
-    public DateTime LastUsedDate = DateTime.UtcNow;
 
     public virtual ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
@@ -326,6 +320,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
+    public int ExecutingScript { get; set; } = 0;
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
@@ -395,7 +390,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         set {
             if (_scriptNeedFix == value) { return; }
             _ = ChangeData(DatabaseDataType.ScriptNeedFix, null, null, _scriptNeedFix, value, UserName, DateTime.UtcNow, string.Empty);
-            OnScriptMessageChanged();
         }
     }
 
@@ -1239,6 +1233,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
         vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
         vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
@@ -2066,11 +2061,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public void OnInvalidateView() {
         if (IsDisposed) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    public void OnScriptMessageChanged() {
-        if (IsDisposed) { return; }
-        ScriptMessageChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnViewChanged() {
@@ -3133,7 +3123,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (e.Cancel) { return; }
 
         RowCollection.ExecuteValueChangedEvent();
-
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 10) { return; }
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { return; }

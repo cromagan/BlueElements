@@ -461,6 +461,11 @@ public partial class TableView : FormWithStatusBar {
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
+    protected virtual void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
+        OpenScriptEditor(Table.Database);
+        UpdateScripts(Table.Database);
+    }
+
     protected void ChangeDatabaseInTab(ConnectionInfo connectionId, TabPage? xtab) {
         if (xtab == null) {
             return;
@@ -851,11 +856,6 @@ public partial class TableView : FormWithStatusBar {
         MultiUserFile.SaveAll(true);
         Database.ForceSaveAll();
         Database.CheckSysUndoNow(Database.AllFiles, true);
-    }
-
-    private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
-        OpenScriptEditor(Table.Database);
-        UpdateScripts(Table.Database);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {

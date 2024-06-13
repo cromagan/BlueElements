@@ -1436,12 +1436,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         db.LastUsedDate = DateTime.UtcNow;
 
-
-        if(db.ExecutingScript > 0 && _rowsFilteredAndPinned is null) {
+        if (db.ExecutingScript > 0 && _rowsFilteredAndPinned is null) {
             DrawWaitScreen(gr);
             return;
         }
-
 
         if (DesignMode || ShowWaitScreen || _drawing || db.DoingChanges > 0) {
             DrawWaitScreen(gr);

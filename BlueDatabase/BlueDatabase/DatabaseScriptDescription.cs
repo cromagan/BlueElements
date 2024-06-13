@@ -35,13 +35,18 @@ public static class EventScriptExtension {
     #region Methods
 
     public static List<DatabaseScriptDescription> Get(this ReadOnlyCollection<DatabaseScriptDescription> scripts, ScriptEventTypes type) {
-        var l = new List<DatabaseScriptDescription>();
+        try {
+            var l = new List<DatabaseScriptDescription>();
 
-        foreach (var thisScript in scripts) {
-            if (thisScript.EventTypes.HasFlag(type)) { l.Add(thisScript); }
+            foreach (var thisScript in scripts) {
+                if (thisScript.EventTypes.HasFlag(type)) { l.Add(thisScript); }
+            }
+
+            return l;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return scripts.Get(type);
         }
-
-        return l;
     }
 
     #endregion
