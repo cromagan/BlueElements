@@ -31,6 +31,7 @@ partial class RowAdder {
             // lstTexte
             // 
             this.lstTexte.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstTexte.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             this.lstTexte.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.lstTexte.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstTexte.Location = new System.Drawing.Point(0, 0);

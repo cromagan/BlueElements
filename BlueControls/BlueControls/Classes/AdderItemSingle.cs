@@ -38,8 +38,8 @@ internal class AdderItemSingle {
     #endregion
 
     #region Properties
-    public bool RealAdder { get; }
-    public string Additionaltext { get; }
+    public bool RealAdder { get; set; }
+    public string Additionaltext { get; set; }
     public int Count { get; }
     public string GeneratedTextKey { get; }
     public RowItem ThisRow { get; }

@@ -28,6 +28,7 @@ using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using System.Linq;
+using System.Windows.Media.Animation;
 
 namespace BlueControls.Controls;
 
@@ -38,7 +39,9 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     public List<RowAdderSingle> AdderSingle = new();
     private FilterCollection? _filterInput;
 
-    private bool _generating = false;
+    private bool _ignoreCheckedChanged = false;
+
+    private List<string> selectedWOAdder = [];
 
     #endregion
 
@@ -195,18 +198,18 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     }
 
     public void FillListBox() {
-        if (_generating) {
+        if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
             return;
         }
-        _generating = true;
+        _ignoreCheckedChanged = true;
 
         if (string.IsNullOrEmpty(EntityID) || EntityIDColumn == null) {
             lstTexte.Enabled = false;
             lstTexte.ItemClear();
             lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
             FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _generating = false;
+            _ignoreCheckedChanged = false;
             return;
         }
 
@@ -215,7 +218,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             lstTexte.ItemClear();
             lstTexte.ItemAdd(ItemOf("Interner Fehler: TextKey", BlueBasics.Enums.ImageCode.Kritisch));
             FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _generating = false;
+            _ignoreCheckedChanged = false;
             return;
         }
 
@@ -235,7 +238,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             lstTexte.ItemClear();
             lstTexte.ItemAdd(ItemOf("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information));
             FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _generating = false;
+            _ignoreCheckedChanged = false;
             return;
         }
 
@@ -248,7 +251,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             lstTexte.ItemClear();
             lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
             FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _generating = false;
+            _ignoreCheckedChanged = false;
             return;
         }
 
@@ -264,7 +267,14 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             }
         }
 
-        var selected = TextKeyColumn.Contents(FilterOutput, null).Select(s => s.ToUpper()).ToList();
+        var selectedFromTable = TextKeyColumn.Contents(FilterOutput, null).Select(s => s.ToUpper()).ToList();
+
+        var selected = new List<string>();
+        RepearSelectedWOAdder(selectedFromTable);
+        selected.AddRange(selectedWOAdder);
+        selected.AddRange(selectedFromTable);
+
+        selected = selected.SortedDistinctList();
 
         foreach (var thisAdder in AdderSingle) {
             if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
@@ -284,6 +294,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                     foreach (var thisRowAdderRow in thisAdder.AdderSingleRows) {
                         var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisRowAdderRow.TextKey, false, true, null), false, true);
 
+                        //var checkall = selected.Contains(generatedTextKeyWOAsterix.ToUpper());
+
                         var stufen = generatedTextKeyWOAsterix.TrimEnd("\\").SplitBy("\\");
 
                         var tmp = string.Empty;
@@ -292,6 +304,12 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                             var add = (z == stufen.Length - 1);
 
                             tmp = tmp + stufen[z] + "\\";
+
+                            //if (checkall) {
+                            //    selected.AddIfNotExists(tmp.ToUpper());
+                            //    if(!add) { selectedWOAdder.AddIfNotExists(tmp.ToUpper()); }
+
+                            //}
 
                             if (!ShowMe(selected, tmp)) { continue; }
 
@@ -302,26 +320,36 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                             if (lstTexte.Items.Get(tmp) is ItemCollectionList.ReadableListItem rli) {
                                 if (rli.Item is AdderItem ai) { adderit = ai; }
                             } else {
-                                var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, tmp, AdditinalTextColumn);
+                                adderit = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, tmp, AdditinalTextColumn);
 
-                                lstTexte.ItemAdd(ItemOf(it));
+                                lstTexte.ItemAdd(ItemOf(adderit));
                             }
 
                             if (adderit != null) {
                                 var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(tmp, false, true, null), true, false);
-                                var additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
+                                var additionaltext = string.Empty;
 
-                                var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext, add);
+                                if (add) {
+                                    additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
+                                }
+
                                 var addme = true;
 
-                                foreach(var thisRowis in adderit.Rows) {
+                                foreach (var thisRowis in adderit.Rows) {
+                                    if (thisRowis.GeneratedTextKey == tmp.ToUpper()) {
+                                        if (!thisRowis.RealAdder) {
+                                            thisRowis.RealAdder = add;
+                                            thisRowis.Additionaltext = additionaltext;
+                                        }
 
-                                    if(thisRowis.GeneratedTextKey == tmp.ToUpper()) { addme = false;  break; }
-
-
+                                        addme = false;
+                                        break;
+                                    }
                                 }
-                                if (addme) { adderit.Rows.Add(ai); }
-                              
+                                if (addme) {
+                                    var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext, add);
+                                    adderit.Rows.Add(ai);
+                                }
 
                                 adderit.GeneratedentityID = generatedentityID;
                             }
@@ -339,68 +367,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         lstTexte.UncheckAll();
         lstTexte.Check(selected);
 
-        _generating = false;
-
-        //#region Combobox suchen
-
-        //ComboBox? cb = null;
-        //foreach (var thiscb in Controls) {
-        //    if (thiscb is ComboBox cbx) { cb = cbx; break; }
-        //}
-
-        //#endregion
-
-        //if (cb == null) { return; }
-
-        //var ex = cb.Items().ToList();
-
-        //#region Zeilen erzeugen
-
-        //if (RowsInput == null || !RowsInputChangedHandled) { return; }
-
-        //foreach (var thisR in RowsInput) {
-        //    if (cb[thisR.KeyName] == null) {
-        //        var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true, null);
-        //        cb.ItemAdd(ItemOf(tmpQuickInfo, thisR.KeyName));
-        //    } else {
-        //        ex.Remove(thisR.KeyName);
-        //    }
-        //}
-
-        //#endregion
-
-        //#region Veraltete Zeilen entfernen
-
-        //foreach (var thisit in ex) {
-        //    cb?.Remove(thisit);
-        //}
-
-        //#endregion
-
-        //#region Nur eine Zeile? auswählen!
-
-        //// nicht vorher auf null setzen, um Blinki zu vermeiden
-        //if (cb.ItemCount == 1) {
-        //    ValueSet(cb[0].KeyName, true);
-        //}
-
-        //if (cb.ItemCount < 2) {
-        //    DisabledReason = "Keine Auswahl möglich.";
-        //} else {
-        //    DisabledReason = string.Empty;
-        //}
-
-        //#endregion
-
-        //#region  Prüfen ob die aktuelle Auswahl passt
-
-        //// am Ende auf null setzen, um Blinki zu vermeiden
-
-        //if (cb[Value] == null) {
-        //    ValueSet(string.Empty, true);
-        //}
-
-        //#endregion
+        _ignoreCheckedChanged = false;
     }
 
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
@@ -414,7 +381,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     public void HandleChangesNow() {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
+        selectedWOAdder.Clear();
         FillListBox();
     }
 
@@ -430,17 +397,32 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     }
 
     private void lstTexte_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (_generating) { return; }
+        if (_ignoreCheckedChanged) { return; }
 
         if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
             if (Selected(lstTexte.Checked, e.Item.KeyName)) {
+                selectedWOAdder.AddIfNotExists(ai.KeyName);
+
                 ai.AddRowsToDatabase();
             } else {
+                selectedWOAdder.Remove(ai.KeyName);
                 ai.RemoveRowsFromDatabase();
             }
         }
 
         FillListBox();
+    }
+
+    private void RepearSelectedWOAdder(List<string> selectedFromTable) {
+        foreach (var thiss in selectedFromTable) {
+            var t = thiss.ToUpper().TrimEnd("\\").SplitBy("\\");
+
+            var n = string.Empty;
+            foreach (var item in t) {
+                n = n + item + "\\";
+                selectedWOAdder.AddIfNotExists(n);
+            }
+        }
     }
 
     private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey, true, true), false);

@@ -57,8 +57,6 @@ internal class AdderItem : IReadableTextWithKey {
     /// </summary>
     public string KeyName { get; }
 
-
-
     /// <summary>
     /// Enstpricht TextKey  (Zutaten\\Mehl\\) OHNE *
     /// </summary>
@@ -78,17 +76,18 @@ internal class AdderItem : IReadableTextWithKey {
 
     public void AddRowsToDatabase() {
         if (EntityIDColumn?.Database is not Database db || db.IsDisposed) { return; }
-        if(OriginIDColumn ==  null) { return; }
+        if (OriginIDColumn == null) { return; }
         if (TextKeyColumn == null) { return; }
 
         foreach (var row in Rows) {
             var oriid = OriginId(row);
 
             if (!string.IsNullOrEmpty(oriid)) {
+                if (!row.RealAdder) { continue; }
+
                 var r = db.Row.GenerateAndAdd(GeneratedentityID, null, "Zeilengenerator im Formular");
 
                 if (r != null) {
-
                     EntityIDColumn.MaxCellLenght = Math.Max(EntityIDColumn.MaxCellLenght, GeneratedentityID.Length);
                     r.CellSet(EntityIDColumn, GeneratedentityID, "Zeilengenerator im Formular");
 
@@ -98,12 +97,10 @@ internal class AdderItem : IReadableTextWithKey {
                     TextKeyColumn.MaxCellLenght = Math.Max(TextKeyColumn.MaxCellLenght, row.GeneratedTextKey.Length);
                     r.CellSet(TextKeyColumn, row.GeneratedTextKey, "Zeilengenerator im Formular");
 
-                    if(AdditinalTextColumn != null) {
+                    if (AdditinalTextColumn != null) {
                         AdditinalTextColumn.MaxCellLenght = Math.Max(AdditinalTextColumn.MaxCellLenght, row.Additionaltext.Length);
                         r.CellSet(AdditinalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
-
                     }
-
                 }
             }
         }

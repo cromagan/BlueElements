@@ -28,6 +28,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
@@ -46,6 +47,8 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
 
     private string _modus = string.Empty;
 
+    private Timer _timer;
+
     #endregion
 
     #region Constructors
@@ -59,6 +62,11 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
         InitFormula(null, null);
         ((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
+
+        _timer = new Timer();
+        _timer.Enabled = true;
+        _timer.Interval = 1000;
+        _timer.Tick += Checker_Tick;
     }
 
     #endregion
@@ -331,6 +339,7 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
     }
 
     public void InvalidateView() {
+        if (IsDisposed) { return; }
         _generated = false;
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
@@ -379,6 +388,10 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
             components?.Dispose();
         }
 
+        _timer.Enabled = false;
+        _timer.Tick -= Checker_Tick;
+        _timer.Dispose();
+
         base.Dispose(disposing);
     }
 
@@ -391,9 +404,15 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
     }
 
     protected override void OnPaint(PaintEventArgs e) {
-        //Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+        if (IsDisposed) { return; }
+
         base.OnPaint(e);
         GenerateView();
+
+        if (!_generated) {
+            _timer.Enabled = true;
+            return;
+        }
 
         HandleChangesNow();
     }
@@ -404,6 +423,7 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
 
         if (_generated) {
             InvalidateView();
+            _timer.Enabled = false;
         }
     }
 
@@ -422,6 +442,13 @@ public partial class ConnectedFormulaView : GroupBox, IBackgroundNone, IControlU
     private void _cf_PropertyChanged(object sender, System.EventArgs e) => InvalidateView();
 
     private void _database_Disposing(object sender, System.EventArgs e) => InitFormula(null, null);
+
+    private void Checker_Tick(object sender, System.EventArgs e) {
+        if (!_generated) {
+            Invalidate();
+            _timer.Stop();
+        }
+    }
 
     private void DoAutoX(List<FlexiControlForCell> autoc) {
         if (autoc.Count == 0) { return; }
