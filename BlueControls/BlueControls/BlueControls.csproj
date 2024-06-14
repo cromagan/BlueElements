@@ -110,6 +110,7 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\AdderItemSingle.cs" />
     <Compile Include="Classes\AdderItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderSingle.cs" />
     <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -431,7 +432,7 @@
     <Compile Include="Classes\ItemCollectionPad\Abstract\AbstractPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RegionFormulaPadItem.cs" />
-    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderSingle.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderSingleRow.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\ButtonPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\TableViewPadItem.cs" />

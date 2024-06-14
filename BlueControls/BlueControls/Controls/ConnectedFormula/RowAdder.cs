@@ -270,63 +270,66 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
 
             var fi = ((FilterCollection)thisAdder.Filter.Clone("Adder Clone"));
-            foreach(var thisFi in fi) {
+            foreach (var thisFi in fi) {
                 var t = rowIn.ReplaceVariables(thisFi.SearchValue.JoinWithCr(), false, false, rowIn.LastCheckedEventArgs?.Variables);
                 thisFi.SearchValue = t.SplitAndCutByCrToList().AsReadOnly();
             }
 
             var fi2 = fi.ToArray();
 
-
             foreach (var thisRow in db.Row) {
                 if (thisRow == null || thisRow.IsDisposed) { continue; }
 
-
                 if (thisRow.MatchesTo(fi2)) {
+                    foreach (var thisRowAdderRow in thisAdder.AdderSingleRows) {
+                        var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisRowAdderRow.TextKey, false, true, null), false, true);
+
+                        var stufen = generatedTextKeyWOAsterix.TrimEnd("\\").SplitBy("\\");
+
+                        var tmp = string.Empty;
+
+                        for (var z = 0; z < stufen.Length; z++) {
+                            var add = (z == stufen.Length - 1);
+
+                            tmp = tmp + stufen[z] + "\\";
+
+                            if (!ShowMe(selected, tmp)) { continue; }
+
+                            olditems.Remove(tmp.ToUpper());
+
+                            AdderItem? adderit = null;
+
+                            if (lstTexte.Items.Get(tmp) is ItemCollectionList.ReadableListItem rli) {
+                                if (rli.Item is AdderItem ai) { adderit = ai; }
+                            } else {
+                                var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, tmp, AdditinalTextColumn);
+
+                                lstTexte.ItemAdd(ItemOf(it));
+                            }
+
+                            if (adderit != null) {
+                                var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(tmp, false, true, null), true, false);
+                                var additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
+
+                                var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext, add);
+                                var addme = true;
+
+                                foreach(var thisRowis in adderit.Rows) {
+
+                                    if(thisRowis.GeneratedTextKey == tmp.ToUpper()) { addme = false;  break; }
 
 
-                    var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), false, true);
+                                }
+                                if (addme) { adderit.Rows.Add(ai); }
+                              
 
-
-                    var stufen = generatedTextKeyWOAsterix.SplitBy("\\");
-
-                    var tmp = string.Empty; 
-
-                    for (var z = 0; z < stufen.Length; z++) {
-
-                        var add = (z == stufen.Length - 1);
-
-                        tmp = tmp + stufen[z] + "\\";
-
-                        if (!ShowMe(selected, tmp)) { continue; }
-
-                        olditems.Remove(tmp.ToUpper());
-
-                        AdderItem? adderit = null;
-
-                        if (lstTexte.Items.Get(tmp) is ItemCollectionList.ReadableListItem rli) {
-                            if (rli.Item is AdderItem ai) { adderit = ai; }
-                        } else {
-                            var it = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, tmp, AdditinalTextColumn);
-
-                            lstTexte.ItemAdd(ItemOf(it));
+                                adderit.GeneratedentityID = generatedentityID;
+                            }
                         }
-
-                        if (adderit != null) {
-                            var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisAdder.TextKey, false, true, null), true, false);
-                            var additionaltext = thisRow.ReplaceVariables(thisAdder.AdditionalText, false, true, null);
-
-                            var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext, add);
-                            adderit.Rows.Add(ai);
-
-                            adderit.GeneratedentityID = generatedentityID;
-                        }
-
                     }
                 }
             }
             fi.Dispose();
-
         }
 
         foreach (var thisit in olditems) {

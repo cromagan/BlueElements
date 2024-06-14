@@ -29,25 +29,25 @@ using static BlueBasics.Converter;
 
 using BlueDatabase;
 using BlueControls.Editoren;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueControls.ItemCollectionList;
+using BlueScript;
+using BlueScript.Methods;
+using BlueDatabase.Enums;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
-
     #region Fields
 
     private static RowAdderPadItem? _parent = null;
-    private string _additionalText = string.Empty;
+
     private Database? _database;
 
     private FilterCollection _filterCollection;
-
-    /// <summary>
-    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
-    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
-    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
-    /// </summary>
-    private string _textKey = string.Empty;
 
     private string tempDatabaseNametoLoad = string.Empty;
 
@@ -65,6 +65,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         KeyName = Generic.GetUniqueKey();
         _parent = parent;
 
+        _filterCollection = new FilterCollection("RowAdderSingle");
+
         if (count >= 0) {
             Count = count;
         }
@@ -73,17 +75,6 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     #endregion
 
     #region Properties
-
-    [Description("Ein zusätzlicher Text, der mit Variablen erzeugt wird.\r\nKann jede Art von Informationen enthalten")]
-    public string AdditionalText {
-        get => _additionalText;
-        set {
-            //if (IsDisposed) { return; }
-            if (_additionalText == value) { return; }
-            _additionalText = value;
-            //OnPropertyChanged();
-        }
-    }
 
     public string CaptionForEditor => "Import Element";
 
@@ -146,30 +137,18 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     public string QuickInfo => ReadableText();
 
-    /// <summary>
-    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
-    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
-    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
-    /// </summary>
-    [Description("Die Herkunft-Id, die mit Variablen der erzeugt wird.\r\nDiese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.\r\nDie Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl")]
-    public string TextKey {
-        get => _textKey;
-        set {
-            //if (IsDisposed) { return; }
-            if (_textKey == value) { return; }
-            _textKey = value;
-            //OnPropertyChanged();
-        }
-    }
-
     #endregion
+
+    public ReadOnlyCollection<RowAdderSingleRow> AdderSingleRows => _addersinglerow.AsReadOnly();
+
+    private List<RowAdderSingleRow> _addersinglerow = new();
 
     #region Methods
 
     public string ErrorReason() {
         if (Database is not Database db || db.IsDisposed) { return "Datenbank fehlt."; }
 
-        if (string.IsNullOrEmpty(_textKey)) { return "TextKey-Id-Generierung fehlt"; }
+        //if (string.IsNullOrEmpty(_textKey)) { return "TextKey-Id-Generierung fehlt"; }
         //if (!_textKey.Contains("~")) { return "TextKey-ID-Generierung muss mit Variablen definiert werden."; }
 
         return string.Empty;
@@ -183,12 +162,107 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         if (Database != null && !Database.IsDisposed) {
             l.Add(new FlexiControlForProperty<FilterCollection>(() => Filter));
 
-            l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
+            //l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
+            //l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
+
+
+            l.Add(new FlexiControl("Zeilen:", widthOfControl, true));
+            l.Add(Childs());
+
+
         }
 
         return l;
     }
+
+
+
+
+    public AbstractListItem? NewChild() {
+
+        if (_parent is not RowAdderPadItem rapi || rapi.IsDisposed) { return null; }
+
+
+        //if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return null; }
+
+        //if (fc.Database is not Database db || db.IsDisposed) { return null; }
+
+        var l = new RowAdderSingleRow(this);
+        //l.Editor = typeof(FilterEditor);
+        _addersinglerow.Add(l);
+        return ItemOf(l);
+    }
+
+
+
+    private ListBox Childs() {
+        var childs = new ListBox {
+            AddAllowed = AddType.UserDef,
+            RemoveAllowed = true,
+            MoveAllowed = true,
+            AutoSort = false,
+            ItemEditAllowed = true,
+            CheckBehavior = CheckBehavior.AllSelected,
+            AddMethod = NewChild,
+            Height = 240
+        };
+
+        //CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);
+
+        foreach (var thisf in _addersinglerow) {
+            //if (File.Exists(thisf)) {
+            //    childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
+            //} else {
+            childs.AddAndCheck(ItemOf(thisf));
+            //}
+        }
+
+        childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
+        childs.Disposed += Childs_Disposed;
+
+        return childs;
+    }
+
+    private void Childs_Disposed(object sender, System.EventArgs e) {
+        if (sender is ListBox childs) {
+            childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
+            childs.Disposed -= Childs_Disposed;
+        }
+    }
+
+    private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
+        //if (IsDisposed) { return; }
+        _addersinglerow.Clear();
+
+        foreach (var item in ((ListBox)sender).CheckedItems()) {
+            if (item is ReadableListItem rli && rli.Item is RowAdderSingleRow ras) {
+                _addersinglerow.Add(ras);
+            }
+        }
+        //OnPropertyChanged();
+        //this.RaiseVersion();
+        //UpdateSideOptionMenu();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void ParseFinished(string parsed) { }
 
@@ -207,13 +281,15 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
                 tmpFiltercollection = value.FromNonCritical();
                 return true;
 
-            case "textkey":
-                _textKey = value.FromNonCritical();
+
+
+            case "rows":
+                foreach (var pair2 in value.GetAllTags()) {
+                    _addersinglerow.Add(new RowAdderSingleRow(this, pair2.Value.FromNonCritical()));
+                }
+
                 return true;
 
-            case "additionaltext":
-                _additionalText = value.FromNonCritical();
-                return true;
 
             case "count":
                 Count = IntParse(value);
@@ -235,8 +311,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
         result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
         result.ParseableAdd("Filter", Filter);
-        result.ParseableAdd("TextKey", _textKey);
-        result.ParseableAdd("AdditionalText", _additionalText);
+        result.ParseableAdd("Rows", "Item", _addersinglerow);
         result.ParseableAdd("Count", Count);
 
         return result.Parseable();
