@@ -650,7 +650,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-        if (oldestTo || !db.AmITemporaryMaster(5, 55)) {
+        if (oldestTo || db.AmITemporaryMaster(5, 55)) {
             rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
             if (rowToCheck != null) { return rowToCheck; }
         }
