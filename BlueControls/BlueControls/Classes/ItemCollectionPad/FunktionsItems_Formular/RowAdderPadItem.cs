@@ -279,16 +279,16 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => EntityID));
+            l.Add(new FlexiControlForProperty<string>(() => EntityID, widthOfControl));
         }
 
         if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
-            l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst, widthOfControl));
 
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalTextColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => AdditionalTextColumnName, lst, widthOfControl));
         }
 
         l.Add(new FlexiControl("Bausteine:", widthOfControl, true));

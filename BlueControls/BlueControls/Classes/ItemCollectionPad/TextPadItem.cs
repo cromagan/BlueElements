@@ -123,16 +123,16 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            new FlexiControlForProperty<string>(() => Text, 5)
+            new FlexiControlForProperty<string>(() => Text, 5, widthOfControl)
         ];
         var aursicht = new List<AbstractListItem>();
         aursicht.Add(ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig));
         aursicht.Add(ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren));
         aursicht.Add(ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig));
         //aursicht.Sort();
-        l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
-        l.Add(new FlexiControlForProperty<float>(() => Skalierung));
-        AddStyleOption(l);
+        l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht, widthOfControl));
+        l.Add(new FlexiControlForProperty<float>(() => Skalierung, widthOfControl));
+        //AddStyleOption(l);
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }

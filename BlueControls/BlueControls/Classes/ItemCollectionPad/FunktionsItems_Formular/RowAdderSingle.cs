@@ -145,10 +145,10 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     public List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
         //new FlexiControl("Ausgang:", widthOfControl, true),
-        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
+        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables(), widthOfControl));
 
         if (Database != null && !Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<FilterCollection>(() => Filter));
+            l.Add(new FlexiControlForProperty<FilterCollection>(() => Filter, widthOfControl));
 
             //l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
             //l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));

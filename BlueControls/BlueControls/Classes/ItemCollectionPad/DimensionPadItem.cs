@@ -170,14 +170,14 @@ public class DimensionPadItem : AbstractPadItem {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            new FlexiControlForProperty<float>(() => Länge_In_Mm),
-            new FlexiControlForProperty<string>(() => Text_Oben),
-            new FlexiControlForProperty<string>(() => Suffix),
-            new FlexiControlForProperty<string>(() => Text_Unten),
-            new FlexiControlForProperty<string>(() => Präfix)
+            new FlexiControlForProperty<float>(() => Länge_In_Mm, widthOfControl),
+            new FlexiControlForProperty<string>(() => Text_Oben, widthOfControl),
+            new FlexiControlForProperty<string>(() => Suffix, widthOfControl),
+            new FlexiControlForProperty<string>(() => Text_Unten, widthOfControl),
+            new FlexiControlForProperty<string>(() => Präfix, widthOfControl)
         ];
-        AddStyleOption(l);
-        l.Add(new FlexiControlForProperty<float>(() => Skalierung));
+        //AddStyleOption(l);
+        l.Add(new FlexiControlForProperty<float>(() => Skalierung, widthOfControl));
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }

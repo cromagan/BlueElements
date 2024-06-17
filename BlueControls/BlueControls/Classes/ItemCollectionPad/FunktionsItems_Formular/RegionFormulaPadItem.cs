@@ -183,9 +183,9 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
         List<GenericControl> l =
             [.. _itemAccepts.GetProperties(this, widthOfControl),
                 new FlexiControl("Eigenschaften:", widthOfControl, true),
-                new FlexiControlForProperty<string>(() => Child, cl),
+                new FlexiControlForProperty<string>(() => Child, cl, widthOfControl),
 
-                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u),
+                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u, widthOfControl),
                 .. base.GetProperties(widthOfControl),
             ];
 

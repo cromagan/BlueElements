@@ -130,7 +130,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         List<GenericControl> l =
         [
             .. _itemAccepts.GetProperties(this, widthOfControl),
-            new FlexiControlForProperty<string>(() => Bild_Dateiname),
+            new FlexiControlForProperty<string>(() => Bild_Dateiname, widthOfControl),
             new FlexiControl(),
             .. base.GetProperties(widthOfControl),
         ];

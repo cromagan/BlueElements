@@ -176,7 +176,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
             foreach (var thisC in db.ColumnArrangements) {
                 u2.Add(ItemOf(thisC));
             }
-            l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
+            l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2, widthOfControl));
         }
 
         l.AddRange(_itemSends.GetProperties(this, widthOfControl));
@@ -184,7 +184,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         if (DatabaseOutput is Database db2 && !db2.IsDisposed) {
             var u = new List<AbstractListItem>();
             u.AddRange(ItemsOf(typeof(Filterausgabe)));
-            l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
+            l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u, widthOfControl));
         }
 
         l.Add(new FlexiControl());

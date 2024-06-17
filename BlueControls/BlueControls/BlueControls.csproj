@@ -147,12 +147,6 @@
     <Compile Include="Editoren\FilterEditor.Designer.cs">
       <DependentUpon>FilterEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\RowAdderSingleEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editoren\RowAdderSingleEditor.Designer.cs">
-      <DependentUpon>RowAdderSingleEditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms_Database\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -690,9 +684,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\FilterEditor.resx">
       <DependentUpon>FilterEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\RowAdderSingleEditor.resx">
-      <DependentUpon>RowAdderSingleEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms_Database\AutoFilter.resx">
       <DependentUpon>AutoFilter.cs</DependentUpon>

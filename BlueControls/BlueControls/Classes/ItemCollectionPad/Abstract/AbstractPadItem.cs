@@ -291,8 +291,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         List<GenericControl> l =
         [
             new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
-            new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
+            new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit, widthOfControl),
+            new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar, widthOfControl)
         ];
         //if (AdditionalStyleOptions != null) {
         //    l.Add(new FlexiControl());
@@ -470,15 +470,15 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return x;
     }
 
-    internal void AddLineStyleOption(List<GenericControl> l) {
-        if (_parent == null) { return; }
-        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
-    }
+    //internal void AddLineStyleOption(List<GenericControl> l) {
+    //    if (_parent == null) { return; }
+    //    l.Add(new FlexiControlForProperty<PadStyles>(widthOfControl, () => Stil, widthOfControl, widthOfControl, Skin.GetRahmenArt(_parent.SheetStyle, true), widthOfControl, widthOfControl, widthOfControl));
+    //}
 
-    internal void AddStyleOption(List<GenericControl> l) {
-        if (_parent == null) { return; }
-        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
-    }
+    //internal void AddStyleOption(List<GenericControl> l) {
+    //    if (_parent == null) { return; }
+    //    l.Add(new FlexiControlForProperty<PadStyles>(widthOfControl, () => Stil, widthOfControl, widthOfControl, Skin.GetFonts(_parent.SheetStyle), widthOfControl, widthOfControl, widthOfControl));
+    //}
 
     protected abstract RectangleF CalculateUsedArea();
 

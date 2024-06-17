@@ -125,7 +125,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
                 vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
-                l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
+                l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, widthOfControl));
             }
         }
 

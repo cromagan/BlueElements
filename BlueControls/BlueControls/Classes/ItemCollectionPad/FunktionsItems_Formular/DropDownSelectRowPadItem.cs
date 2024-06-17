@@ -177,13 +177,13 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             .. _itemAccepts.GetProperties(this, widthOfControl),
             .. _itemSends.GetProperties(this, widthOfControl),
             new FlexiControl("Einstellungen:", -1, true),
-            new FlexiControlForProperty<string>(() => Überschrift),
-            new FlexiControlForProperty<string>(() => Anzeige),
+            new FlexiControlForProperty<string>(() => Überschrift, widthOfControl),
+            new FlexiControlForProperty<string>(() => Anzeige, widthOfControl),
         ];
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u, widthOfControl));
 
         //l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));

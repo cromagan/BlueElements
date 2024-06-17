@@ -116,17 +116,17 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             new FlexiControlForDelegate(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
             new FlexiControlForDelegate(Datei_laden, "Bild laden", ImageCode.Ordner),
             new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
+            new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2, widthOfControl),
             new FlexiControl()
         ];
         var comms = new List<AbstractListItem>();
         comms.Add(ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32")));
         comms.Add(ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
         comms.Add(ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
-        l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
+        l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms, widthOfControl));
         l.Add(new FlexiControl());
         AddLineStyleOption(l);
-        l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen));
+        l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen, widthOfControl));
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }

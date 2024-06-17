@@ -116,8 +116,8 @@ public class LinePadItem : AbstractPadItem {
         verhalt.Add(ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie)));
         verhalt.Add(ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie)));
         verhalt.Add(ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie)));
-        l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
-        AddLineStyleOption(l);
+        l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt, widthOfControl));
+        //AddLineStyleOption(l);
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }

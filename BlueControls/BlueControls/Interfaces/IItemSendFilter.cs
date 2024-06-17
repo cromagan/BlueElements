@@ -187,7 +187,7 @@ public sealed class ItemSendFilter {
 
 
         } else {
-            l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables()));
+            l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables(), widthOfControl));
         }
 
         return l;

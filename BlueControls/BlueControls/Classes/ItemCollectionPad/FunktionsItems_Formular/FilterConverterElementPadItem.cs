@@ -207,16 +207,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbin.Column, true));
-            l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
+            l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic, widthOfControl));
 
             var ic2 = new List<AbstractListItem>();
             ic2.AddRange(ItemsOf(typeof(FilterTypeRowInputItem)));
-            l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
+            l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2, widthOfControl));
         }
 
         var u2 = new List<AbstractListItem>();
         u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2, widthOfControl));
 
         //l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetProperties(this, widthOfControl));
@@ -224,7 +224,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbout.Column, true));
-            l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
+            l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic, widthOfControl));
         }
 
         //l.Add(new FlexiControl());
