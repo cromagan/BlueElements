@@ -137,9 +137,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override bool MustBeInDrawingArea => true;
-
     public bool InputMustBeOneRow => true;
+    public override bool MustBeInDrawingArea => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -210,33 +209,33 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [.. _itemAccepts.GetProperties(this, widthOfControl)];
+        List<GenericControl> result = [.. _itemAccepts.GetProperties(this, widthOfControl)];
 
-        if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
+        if (DatabaseInput is not Database db || db.IsDisposed) { return result; }
 
         var lst = new List<AbstractListItem>();
         lst.AddRange(ItemsOf(db.Column, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
+        result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
-        if (Column == null || Column.IsDisposed) { return l; }
+        if (Column == null || Column.IsDisposed) { return result; }
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
-        l.Add(new FlexiControlForProperty<bool>(() => AutoX));
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        result.Add(new FlexiControlForProperty<bool>(() => AutoX));
 
         var b = new List<AbstractListItem>();
         b.AddRange(GetAllowedEditTypes(Column));
-        l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+        result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
-        //l.Add(new FlexiControl());
-        //l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
-        //l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
+        //result.Add(new FlexiControl());
+        //result.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
+        //result.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        result.Add(new FlexiControl());
+        result.AddRange(base.GetProperties(widthOfControl));
+        return result;
     }
 
     public override void ParseFinished(string parsed) {

@@ -83,16 +83,6 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string EntityID { get; internal set; }
 
-    /// <summary>
-    /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
-    /// Dadurch können verschiedene Datensätze gespeichert werden.
-    /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnItem? EntityIDColumn { get; internal set; }
-
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -159,16 +149,6 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ColumnItem? TextKey { get; internal set; }
 
-    /// <summary>
-    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
-    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
-    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnItem? TextKeyColumn { get; internal set; }
-
     #endregion
 
     #region Methods
@@ -178,7 +158,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     /// </summary>
     /// <param name="textkey"></param>
     /// <returns>PFAD1\\PFAD2\\PFAD3\\</returns>
-    public static string RepairTextKey(string textkey, bool ucase, bool cutaterix) {
+    public static string RepairTextKey(string textkey, bool ucase) {
         var nt = textkey.Replace("/", "\\");
         nt = nt.Replace("\\\\\\\\", "\\");
         nt = nt.Replace("\\\\\\", "\\");
@@ -187,14 +167,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         nt = nt.Trim("\\") + "\\";
 
         if (ucase) { nt = nt.ToUpper(); }
-
-        var l = nt.SplitBy("*");
-
-        nt = l[0].RemoveChars(Constants.Char_PfadSonderZeichen);
-
-        if (cutaterix || l.Count() == 1) { return nt; }
-
-        return nt + "*" + l[1];
+        nt = nt.RemoveChars(Constants.Char_PfadSonderZeichen);
+        return nt;
     }
 
     public void FillListBox() {
@@ -204,7 +178,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         }
         _ignoreCheckedChanged = true;
 
-        if (string.IsNullOrEmpty(EntityID) || EntityIDColumn == null) {
+        if (string.IsNullOrEmpty(EntityID)) {
             lstTexte.Enabled = false;
             lstTexte.ItemClear();
             lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
@@ -213,10 +187,10 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             return;
         }
 
-        if (TextKeyColumn == null) {
+        if (OriginIDColumn == null) {
             lstTexte.Enabled = false;
             lstTexte.ItemClear();
-            lstTexte.ItemAdd(ItemOf("Interner Fehler: TextKey", BlueBasics.Enums.ImageCode.Kritisch));
+            lstTexte.ItemAdd(ItemOf("Interner Fehler: OriginIDColumn", BlueBasics.Enums.ImageCode.Kritisch));
             FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
             _ignoreCheckedChanged = false;
             return;
@@ -257,7 +231,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
         lstTexte.Enabled = true;
 
-        FilterOutput.ChangeTo(new FilterItem(EntityIDColumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, generatedentityID));
+        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.Istgleich, "<ID>" + generatedentityID));
 
         List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.ToUpper()).ToList();
 
@@ -267,7 +241,16 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             }
         }
 
-        var selectedFromTable = TextKeyColumn.Contents(FilterOutput, null).Select(s => s.ToUpper()).ToList();
+        List<string> selectedFromTable = new();
+
+        foreach (var thisR in FilterOutput.Rows) {
+            var l = thisR.CellGetList(OriginIDColumn);
+            if (l.Count() > 1 && l[1].StartsWith("<TK>")) {
+                selectedFromTable.AddIfNotExists(l[1].ToUpper().TrimStart("<TK>"));
+            }
+        }
+
+        //var selectedFromTable = TextKeyColumn.Contents(FilterOutput, null).Select(s => s.ToUpper()).ToList();
 
         var selected = new List<string>();
         RepearSelectedWOAdder(selectedFromTable);
@@ -292,41 +275,41 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
                 if (thisRow.MatchesTo(fi2)) {
                     foreach (var thisRowAdderRow in thisAdder.AdderSingleRows) {
-                        var generatedTextKeyWOAsterix = RepairTextKey(thisRow.ReplaceVariables(thisRowAdderRow.TextKey, false, true, null), false, true);
+                        var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisRowAdderRow.TextKey, false, true, null), false);
 
-                        //var checkall = selected.Contains(generatedTextKeyWOAsterix.ToUpper());
+                        //var checkall = selected.Contains(generatedTextKey.ToUpper());
 
-                        var stufen = generatedTextKeyWOAsterix.TrimEnd("\\").SplitBy("\\");
+                        var stufen = generatedTextKey.TrimEnd("\\").SplitBy("\\");
 
-                        var tmp = string.Empty;
+                        var generatedTextKey_Stufen = string.Empty;
 
                         for (var z = 0; z < stufen.Length; z++) {
                             var add = (z == stufen.Length - 1);
 
-                            tmp = tmp + stufen[z] + "\\";
+                            generatedTextKey_Stufen = generatedTextKey_Stufen + stufen[z] + "\\";
 
                             //if (checkall) {
-                            //    selected.AddIfNotExists(tmp.ToUpper());
-                            //    if(!add) { selectedWOAdder.AddIfNotExists(tmp.ToUpper()); }
+                            //    selected.AddIfNotExists(generatedTextKey_Stufen.ToUpper());
+                            //    if(!add) { selectedWOAdder.AddIfNotExists(generatedTextKey_Stufen.ToUpper()); }
 
                             //}
 
-                            if (!ShowMe(selected, tmp)) { continue; }
+                            if (!ShowMe(selected, generatedTextKey_Stufen)) { continue; }
 
-                            olditems.Remove(tmp.ToUpper());
+                            olditems.Remove(generatedTextKey_Stufen.ToUpper());
 
                             AdderItem? adderit = null;
 
-                            if (lstTexte.Items.Get(tmp) is ItemCollectionList.ReadableListItem rli) {
+                            if (lstTexte.Items.Get(generatedTextKey_Stufen) is ItemCollectionList.ReadableListItem rli) {
                                 if (rli.Item is AdderItem ai) { adderit = ai; }
                             } else {
-                                adderit = new AdderItem(EntityIDColumn, generatedentityID, OriginIDColumn, TextKeyColumn, tmp, AdditinalTextColumn);
+                                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey_Stufen, AdditinalTextColumn);
 
                                 lstTexte.ItemAdd(ItemOf(adderit));
                             }
 
                             if (adderit != null) {
-                                var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(tmp, false, true, null), true, false);
+                                //var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(generatedTextKey_Stufen, false, true, null), true);
                                 var additionaltext = string.Empty;
 
                                 if (add) {
@@ -336,7 +319,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                 var addme = true;
 
                                 foreach (var thisRowis in adderit.Rows) {
-                                    if (thisRowis.GeneratedTextKey == tmp.ToUpper()) {
+                                    if (thisRowis.GeneratedTextKey == generatedTextKey_Stufen.ToUpper()) {
                                         if (!thisRowis.RealAdder) {
                                             thisRowis.RealAdder = add;
                                             thisRowis.Additionaltext = additionaltext;
@@ -347,11 +330,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                     }
                                 }
                                 if (addme) {
-                                    var ai = new AdderItemSingle(generatedTextKey, thisRow, thisAdder.Count, additionaltext, add);
+                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, thisAdder.Count, additionaltext, add);
                                     adderit.Rows.Add(ai);
                                 }
 
-                                adderit.GeneratedentityID = generatedentityID;
+                                adderit.GeneratedEntityID = generatedentityID;
                             }
                         }
                     }
@@ -425,10 +408,10 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         }
     }
 
-    private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey, true, true), false);
+    private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey, true), false);
 
     private bool ShowMe(ICollection<string> selected, string textkey) {
-        var t = RepairTextKey(textkey, true, true);
+        var t = RepairTextKey(textkey, true);
         if (t.CountString("\\") < 2) { return true; }
         if (Selected(selected, t)) { return true; }
         return Selected(selected, t.PathParent());

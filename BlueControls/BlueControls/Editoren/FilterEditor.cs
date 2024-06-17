@@ -57,7 +57,7 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
         txbFilterText.Text = string.Empty;
     }
 
-    protected override bool Init(IEditable? toEdit) {
+    public override bool Init(IEditable? toEdit) {
         if (toEdit is not FilterItem fi || fi.IsDisposed) { return false; }
 
         cbxFilterType.Text = ((int)fi.FilterType).ToString();

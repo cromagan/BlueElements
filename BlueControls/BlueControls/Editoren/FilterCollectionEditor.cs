@@ -58,18 +58,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         capDatabase.Text = "Datenbank: ?";
     }
 
-    public AbstractListItem? NewChild() {
-        if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return null; }
-
-        if (fc.Database is not Database db || db.IsDisposed) { return null; }
-
-        var l = new FilterItem(db, FilterType.Istgleich_GroßKleinEgal, "?");
-        l.Editor = typeof(FilterEditor);
-        fc.Add(l);
-        return ItemOf(l);
-    }
-
-    protected override bool Init(IEditable? toEdit) {
+    public override bool Init(IEditable? toEdit) {
         if (toEdit is not FilterCollection fc || fc.IsDisposed) { return false; }
 
         if (fc.Database is not Database db || db.IsDisposed) { return false; }
@@ -82,6 +71,17 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         }
 
         return true;
+    }
+
+    public AbstractListItem? NewChild() {
+        if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return null; }
+
+        if (fc.Database is not Database db || db.IsDisposed) { return null; }
+
+        var l = new FilterItem(db, FilterType.Istgleich_GroßKleinEgal, "?");
+        l.Editor = typeof(FilterEditor);
+        fc.Add(l);
+        return ItemOf(l);
     }
 
     protected override void InitializeComponentDefaultValues() {

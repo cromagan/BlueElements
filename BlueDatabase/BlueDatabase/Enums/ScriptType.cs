@@ -32,5 +32,7 @@ public enum ScriptType {
 
     Row = 8,
 
+    List_Readonly = 9,
+
     undefiniert = 999
 }

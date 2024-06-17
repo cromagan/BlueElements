@@ -39,6 +39,8 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         Controls.Add(ea);
 
+        ea.Init(toEdit);
+
         Setup(string.Empty, ea, ea.Width + (Skin.Padding * 2));
     }
 

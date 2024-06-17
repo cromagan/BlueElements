@@ -1960,6 +1960,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public bool IsRowScriptPossible(bool checkMessageTo) {
+        return false;
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; } // Nicht ReadOnly!

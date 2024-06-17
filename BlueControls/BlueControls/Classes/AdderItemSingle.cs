@@ -25,11 +25,10 @@ internal class AdderItemSingle {
 
     #region Constructors
 
-
-
     public AdderItemSingle(string generatedTextKey, RowItem thisRow, int count, string additionaltext, bool realAdder) {
         GeneratedTextKey = generatedTextKey;
-        ThisRow = thisRow;
+        RowHash = thisRow.Hash();
+        RowKey = thisRow.KeyName;
         Count = count;
         Additionaltext = additionaltext;
         RealAdder = realAdder;
@@ -38,11 +37,13 @@ internal class AdderItemSingle {
     #endregion
 
     #region Properties
-    public bool RealAdder { get; set; }
+
     public string Additionaltext { get; set; }
     public int Count { get; }
     public string GeneratedTextKey { get; }
-    public RowItem ThisRow { get; }
+    public bool RealAdder { get; set; }
+    public string RowHash { get; }
+    public string RowKey { get; }
 
     #endregion
 }

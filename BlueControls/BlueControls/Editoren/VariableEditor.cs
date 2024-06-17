@@ -63,17 +63,7 @@ public partial class VariableEditor : EditorEasy {
         return list;
     }
 
-    public RowItem? RowOfVariable(string variable) {
-        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
-        return db.Row[variable];
-    }
-
-    public RowItem? RowOfVariable(Variable variable) {
-        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
-        return db.Row[variable.KeyName];
-    }
-
-    protected override bool Init(IEditable? variables) {
+    public override bool Init(IEditable? variables) {
         if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return false; }
         if (variables is not VariableCollection vc) { return false; }
 
@@ -95,6 +85,16 @@ public partial class VariableEditor : EditorEasy {
         }
 
         return true;
+    }
+
+    public RowItem? RowOfVariable(string variable) {
+        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
+        return db.Row[variable];
+    }
+
+    public RowItem? RowOfVariable(Variable variable) {
+        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
+        return db.Row[variable.KeyName];
     }
 
     protected override void InitializeComponentDefaultValues() {

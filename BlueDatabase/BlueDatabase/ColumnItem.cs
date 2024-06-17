@@ -1293,8 +1293,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 break;
 
             case ColumnFunction.Schlüsselspalte:
-                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly) {
-                    return "Schlüsselspalten müssen im Skript als ReadOnly vorhanden sein.";
+                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
+                    return "Schlüsselspalten dürfen im Skript nur als ReadOnly vorhanden sein.";
                 }
                 break;
 
@@ -1914,7 +1914,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         if (this == db.Column.SysLocked) { return QuickImage.Get(ImageCode.Schloss); }
 
         if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
-
 
         if (_function == ColumnFunction.Schlüsselspalte) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
 

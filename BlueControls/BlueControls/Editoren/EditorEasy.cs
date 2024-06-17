@@ -99,9 +99,16 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// </summary>
     /// <param name="toEdit"></param>
     /// <returns></returns>
-    protected virtual bool Init(IEditable? toEdit) {
+    public virtual bool Init(IEditable? toEdit) {
         if (_toEdit is ISimpleEditor ise) {
             DoForm(ise, this.Controls, this.Width);
+
+            foreach (var control in this.Controls) {
+                if (control is System.Windows.Forms.Control c) {
+                    Height = Math.Max(Height, c.Bottom);
+                }
+            }
+
             return true;
         }
 

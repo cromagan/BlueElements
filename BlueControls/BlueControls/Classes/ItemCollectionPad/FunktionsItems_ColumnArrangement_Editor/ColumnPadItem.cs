@@ -86,25 +86,25 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [];
-        if (Column == null || Column.IsDisposed) { return l; }
+        List<GenericControl> result = [];
+        if (Column == null || Column.IsDisposed) { return result; }
 
-        l.Add(new FlexiControlForProperty<string>(() => Datenbank));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<bool>(() => Permanent));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
-        l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
-        l.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
-        l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
+        result.Add(new FlexiControlForProperty<string>(() => Datenbank));
+        result.Add(new FlexiControl());
+        result.Add(new FlexiControlForProperty<bool>(() => Permanent));
+        result.Add(new FlexiControl());
+        result.Add(new FlexiControlForProperty<string>(() => Column.Caption));
+        result.Add(new FlexiControl());
+        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
+        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
+        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
+        result.Add(new FlexiControl());
+        result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
+        result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
         //if (AdditionalStyleOptions != null) {
-        //    l.Add(new FlexiControl());
-        //    l.AddRange(AdditionalStyleOptions);
+        //    result.Add(new FlexiControl());
+        //    result.AddRange(AdditionalStyleOptions);
         //}
 
         //var layouts =  new List<AbstractListItem>();
@@ -112,9 +112,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         //    ItemCollectionPad p = new(thisLayouts, string.Empty);
         //    layouts.GenerateAndAdd(p.Caption, p.Id, ImageCode.Stern);
         //}
-        //l.GenerateAndAdd(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
-        //l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        //result.GenerateAndAdd(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
+        //result.AddRange(base.GetProperties(widthOfControl));
+        return result;
     }
 
     public void Spalte_bearbeiten() {

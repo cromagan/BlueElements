@@ -41,29 +41,25 @@ using System.Collections.ObjectModel;
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable, IHasKeyName, IReadableText, IEditable, ISimpleEditor {
+
     #region Fields
 
-    private static RowAdderPadItem? _parent = null;
-
+    private List<RowAdderSingleRow> _addersinglerow = new();
     private Database? _database;
-
     private FilterCollection _filterCollection;
-
     private string tempDatabaseNametoLoad = string.Empty;
-
     private string tmpFiltercollection = string.Empty;
 
     #endregion
-
-    //public RowAdderSingle() : base(Generic.GetUniqueKey()) { }
 
     #region Constructors
 
     public RowAdderSingle(RowAdderPadItem parent, string toParse) : this(parent, -1) => this.Parse(toParse);
 
+    //public RowAdderSingle() : base(Generic.GetUniqueKey()) { }
     public RowAdderSingle(RowAdderPadItem parent, int count) : base() {
         KeyName = Generic.GetUniqueKey();
-        _parent = parent;
+        Parent = parent;
 
         _filterCollection = new FilterCollection("RowAdderSingle");
 
@@ -76,11 +72,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
     #region Properties
 
+    public ReadOnlyCollection<RowAdderSingleRow> AdderSingleRows => _addersinglerow.AsReadOnly();
     public string CaptionForEditor => "Import Element";
-
-    //[Description("Aus dieser Datenbank werden die Zeilen konvertiert und importiert.")]
-    //public Database? Database { get; set; }
-
     public int Count { get; private set; } = 0;
 
     public Database? Database {
@@ -100,7 +93,6 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     }
 
     public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
-
     public Type? Editor { get; set; }
 
     public FilterCollection Filter {
@@ -134,14 +126,10 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     }
 
     public string KeyName { get; private set; } = string.Empty;
-
+    public RowAdderPadItem? Parent { get; private set; } = null;
     public string QuickInfo => ReadableText();
 
     #endregion
-
-    public ReadOnlyCollection<RowAdderSingleRow> AdderSingleRows => _addersinglerow.AsReadOnly();
-
-    private List<RowAdderSingleRow> _addersinglerow = new();
 
     #region Methods
 
@@ -165,23 +153,15 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
             //l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
             //l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
 
-
             l.Add(new FlexiControl("Zeilen:", widthOfControl, true));
             l.Add(Childs());
-
-
         }
 
         return l;
     }
 
-
-
-
     public AbstractListItem? NewChild() {
-
-        if (_parent is not RowAdderPadItem rapi || rapi.IsDisposed) { return null; }
-
+        if (Parent is not RowAdderPadItem rapi || rapi.IsDisposed) { return null; }
 
         //if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return null; }
 
@@ -193,7 +173,55 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         return ItemOf(l);
     }
 
+    public void ParseFinished(string parsed) { }
 
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "database":
+                tempDatabaseNametoLoad = value.FromNonCritical();
+
+                if (tempDatabaseNametoLoad.IsFormat(FormatHolder.FilepathAndName)) {
+                    tempDatabaseNametoLoad = tempDatabaseNametoLoad.FilePath() + MakeValidTableName(tempDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempDatabaseNametoLoad.FileSuffix();
+                }
+
+                return true;
+
+            case "filter":
+                tmpFiltercollection = value.FromNonCritical();
+                return true;
+
+            case "rows":
+                foreach (var pair2 in value.GetAllTags()) {
+                    _addersinglerow.Add(new RowAdderSingleRow(this, pair2.Value.FromNonCritical()));
+                }
+
+                return true;
+
+            case "count":
+                Count = IntParse(value);
+                return true;
+        }
+        return false;
+    }
+
+    public string ReadableText() {
+        var b = ErrorReason();
+        if (!string.IsNullOrEmpty(b) || Database == null) { return b; }
+        return Database.Caption;
+    }
+
+    public QuickImage? SymbolForReadableText() => null;
+
+    public override string ToString() {
+        List<string> result = [];
+
+        result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
+        result.ParseableAdd("Filter", Filter);
+        result.ParseableAdd("Rows", "Item", _addersinglerow);
+        result.ParseableAdd("Count", Count);
+
+        return result.Parseable();
+    }
 
     private ListBox Childs() {
         var childs = new ListBox {
@@ -242,79 +270,6 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         //OnPropertyChanged();
         //this.RaiseVersion();
         //UpdateSideOptionMenu();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void ParseFinished(string parsed) { }
-
-    public bool ParseThis(string key, string value) {
-        switch (key) {
-            case "database":
-                tempDatabaseNametoLoad = value.FromNonCritical();
-
-                if (tempDatabaseNametoLoad.IsFormat(FormatHolder.FilepathAndName)) {
-                    tempDatabaseNametoLoad = tempDatabaseNametoLoad.FilePath() + MakeValidTableName(tempDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempDatabaseNametoLoad.FileSuffix();
-                }
-
-                return true;
-
-            case "filter":
-                tmpFiltercollection = value.FromNonCritical();
-                return true;
-
-
-
-            case "rows":
-                foreach (var pair2 in value.GetAllTags()) {
-                    _addersinglerow.Add(new RowAdderSingleRow(this, pair2.Value.FromNonCritical()));
-                }
-
-                return true;
-
-
-            case "count":
-                Count = IntParse(value);
-                return true;
-        }
-        return false;
-    }
-
-    public string ReadableText() {
-        var b = ErrorReason();
-        if (!string.IsNullOrEmpty(b) || Database == null) { return b; }
-        return Database.Caption;
-    }
-
-    public QuickImage? SymbolForReadableText() => null;
-
-    public override string ToString() {
-        List<string> result = [];
-
-        result.ParseableAdd("Database", Database); // Nicht _database, weil sie evtl. noch nicht geladen ist
-        result.ParseableAdd("Filter", Filter);
-        result.ParseableAdd("Rows", "Item", _addersinglerow);
-        result.ParseableAdd("Count", Count);
-
-        return result.Parseable();
     }
 
     #endregion

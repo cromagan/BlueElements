@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using BlueDatabase;
 using BlueControls.Editoren;
+using System.Data.Common;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -33,7 +34,6 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
     #region Fields
 
-    private static RowAdderSingle? _parent = null;
     private string _additionalText = string.Empty;
 
     /// <summary>
@@ -51,7 +51,7 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
     public RowAdderSingleRow(RowAdderSingle parent) : base() {
         KeyName = Generic.GetUniqueKey();
-        _parent = parent;
+        Parent = parent;
     }
 
     #endregion
@@ -73,16 +73,14 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
     public Database? Database {
         get {
-            return _parent?.Database;
+            return Parent?.Database;
         }
     }
 
     public string Description => "Ein Element, das beschreibt, wie die Daten zusammengetragen werden.";
-
     public Type? Editor { get; set; }
-
     public string KeyName { get; private set; } = string.Empty;
-
+    public RowAdderSingle? Parent { get; private set; } = null;
     public string QuickInfo => ReadableText();
 
     /// <summary>
@@ -115,16 +113,20 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
     }
 
     public List<GenericControl> GetProperties(int widthOfControl) {
-        var l = new List<GenericControl>();
+        var result = new List<GenericControl>();
         //new FlexiControl("Ausgang:", widthOfControl, true),
-        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
+        result.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && !Database.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
+            if (Parent?.Parent?.AdditinalTextColumn is ColumnItem Column) {
+                result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
+            }
+
+            result.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
+            result.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
         }
 
-        return l;
+        return result;
     }
 
     public void ParseFinished(string parsed) { }
