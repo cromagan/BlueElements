@@ -125,7 +125,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         comms.Add(ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
         l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms, widthOfControl));
         l.Add(new FlexiControl());
-        AddLineStyleOption(l);
+        AddLineStyleOption(l, widthOfControl);
         l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen, widthOfControl));
         l.AddRange(base.GetProperties(widthOfControl));
         return l;

@@ -470,15 +470,15 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return x;
     }
 
-    //internal void AddLineStyleOption(List<GenericControl> l) {
-    //    if (_parent == null) { return; }
-    //    l.Add(new FlexiControlForProperty<PadStyles>(widthOfControl, () => Stil, widthOfControl, widthOfControl, Skin.GetRahmenArt(_parent.SheetStyle, true), widthOfControl, widthOfControl, widthOfControl));
-    //}
+    internal void AddLineStyleOption(List<GenericControl> l, int widthOfControl) {
+        if (_parent == null) { return; }
+        l.Add(new FlexiControlForProperty<PadStyles>(widthOfControl, () => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true), widthOfControl));
+    }
 
-    //internal void AddStyleOption(List<GenericControl> l) {
-    //    if (_parent == null) { return; }
-    //    l.Add(new FlexiControlForProperty<PadStyles>(widthOfControl, () => Stil, widthOfControl, widthOfControl, Skin.GetFonts(_parent.SheetStyle), widthOfControl, widthOfControl, widthOfControl));
-    //}
+    internal void AddStyleOption(List<GenericControl> l, int widthOfControl) {
+        if (_parent == null) { return; }
+        l.Add(new FlexiControlForProperty<PadStyles>(widthOfControl, () => Stil, Skin.GetFonts(_parent.SheetStyle), widthOfControl));
+    }
 
     protected abstract RectangleF CalculateUsedArea();
 

@@ -132,7 +132,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         //aursicht.Sort();
         l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht, widthOfControl));
         l.Add(new FlexiControlForProperty<float>(() => Skalierung, widthOfControl));
-        //AddStyleOption(l);
+        AddStyleOption(l, widthOfControl);
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }

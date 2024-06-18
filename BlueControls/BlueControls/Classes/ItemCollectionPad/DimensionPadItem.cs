@@ -176,7 +176,7 @@ public class DimensionPadItem : AbstractPadItem {
             new FlexiControlForProperty<string>(() => Text_Unten, widthOfControl),
             new FlexiControlForProperty<string>(() => Präfix, widthOfControl)
         ];
-        //AddStyleOption(l);
+        AddStyleOption(l, widthOfControl);
         l.Add(new FlexiControlForProperty<float>(() => Skalierung, widthOfControl));
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
