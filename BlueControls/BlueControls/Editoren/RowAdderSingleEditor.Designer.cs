@@ -1,6 +1,7 @@
 ﻿namespace BlueControls.Editoren;
 
-partial class RowAdderSingleEditor {
+partial class RowAdderSingleEditor
+{
     /// <summary> 
     /// Erforderliche Designervariable.
     /// </summary>
@@ -10,8 +11,10 @@ partial class RowAdderSingleEditor {
     /// Verwendete Ressourcen bereinigen.
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
-    protected override void Dispose(bool disposing) {
-        if (disposing && (components != null)) {
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && (components != null))
+        {
             components.Dispose();
         }
         base.Dispose(disposing);
@@ -23,16 +26,17 @@ partial class RowAdderSingleEditor {
     /// Erforderliche Methode für die Designerunterstützung. 
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
-    private void InitializeComponent() {
-            this.SuspendLayout();
-            // 
-            // RowAdderSingleEditor
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Name = "RowAdderSingleEditor";
-            this.Size = new System.Drawing.Size(429, 331);
-            this.ResumeLayout(false);
+    private void InitializeComponent()
+    {
+        this.SuspendLayout();
+        // 
+        // RowAdderSingleEditor
+        // 
+        this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.Name = "RowAdderSingleEditor";
+        this.Size = new System.Drawing.Size(429, 331);
+        this.ResumeLayout(false);
 
     }
 

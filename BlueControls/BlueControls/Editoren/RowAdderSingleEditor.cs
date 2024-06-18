@@ -23,7 +23,8 @@ using BlueDatabase.Interfaces;
 
 namespace BlueControls.Editoren;
 
-public partial class RowAdderSingleEditor : EditorEasy, IHasDatabase {
+public partial class RowAdderSingleEditor : EditorEasy, IHasDatabase
+{
 
     #region Fields
 
@@ -33,7 +34,8 @@ public partial class RowAdderSingleEditor : EditorEasy, IHasDatabase {
 
     #region Constructors
 
-    public RowAdderSingleEditor() {
+    public RowAdderSingleEditor()
+    {
         InitializeComponent();
     }
 
@@ -41,8 +43,10 @@ public partial class RowAdderSingleEditor : EditorEasy, IHasDatabase {
 
     #region Properties
 
-    public Database? Database {
-        get {
+    public Database? Database
+    {
+        get
+        {
             if (_parent is null || _parent.IsDisposed) { return null; }
             return _parent.DatabaseInput;
         }
