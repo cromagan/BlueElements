@@ -161,9 +161,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
         List<GenericControl> l =
         [
             .. _itemAccepts.GetProperties(this, widthOfControl),
-            new FlexiControlForProperty<string>(() => Pfad, widthOfControl),
-            new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen, widthOfControl),
-            new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen, widthOfControl),
+            new FlexiControlForProperty<string>(() => Pfad),
+            new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
+            new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
             new FlexiControl(),
             .. base.GetProperties(widthOfControl),
         ];

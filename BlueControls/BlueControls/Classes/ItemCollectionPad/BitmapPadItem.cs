@@ -126,7 +126,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms, widthOfControl));
         l.Add(new FlexiControl());
         AddLineStyleOption(l, widthOfControl);
-        l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen, widthOfControl));
+        l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen));
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }
@@ -285,7 +285,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             Generic.CollectGarbage();
         }
         if (Stil != PadStyles.Undefiniert) {
-            if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
+            if (Parent?.SheetStyle != null && Parent.SheetStyleScale > 0) {
                 gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
             }
         }

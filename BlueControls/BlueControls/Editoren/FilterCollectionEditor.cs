@@ -84,9 +84,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         return ItemOf(l);
     }
 
-    protected override void InitializeComponentDefaultValues() {
-        lstFilter.AddMethod = NewChild;
-    }
+    protected override void InitializeComponentDefaultValues() => lstFilter.AddMethod = NewChild;
 
     private void lstFilter_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return; }

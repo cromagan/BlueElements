@@ -21,11 +21,10 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConnectedFormulaEditor));
             this.tabEditorStd = new System.Windows.Forms.TabPage();
-            this.groupBox2 = new BlueControls.Controls.GroupBox();
-            this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
             this.grpVorschau = new BlueControls.Controls.GroupBox();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnWeitere = new BlueControls.Controls.Button();
             this.btnRegionAdd = new BlueControls.Controls.Button();
             this.btnButton = new BlueControls.Controls.Button();
             this.btnBild = new BlueControls.Controls.Button();
@@ -51,7 +50,6 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.btnWeitere = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -60,7 +58,6 @@ namespace BlueControls.Forms {
             this.tabSeiten.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.tabEditorStd.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.grpVorschau.SuspendLayout();
             this.grpFelder.SuspendLayout();
             this.grpOptik.SuspendLayout();
@@ -134,7 +131,6 @@ namespace BlueControls.Forms {
             // tabEditorStd
             // 
             this.tabEditorStd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabEditorStd.Controls.Add(this.groupBox2);
             this.tabEditorStd.Controls.Add(this.grpVorschau);
             this.tabEditorStd.Controls.Add(this.grpFelder);
             this.tabEditorStd.Controls.Add(this.grpOptik);
@@ -147,29 +143,6 @@ namespace BlueControls.Forms {
             this.tabEditorStd.TabIndex = 4;
             this.tabEditorStd.Text = "Editor-Std.";
             // 
-            // groupBox2
-            // 
-            this.groupBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.groupBox2.Controls.Add(this.btnSkripteBearbeiten);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox2.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox2.Location = new System.Drawing.Point(920, 0);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(104, 81);
-            this.groupBox2.TabIndex = 5;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Felder";
-            // 
-            // btnSkripteBearbeiten
-            // 
-            this.btnSkripteBearbeiten.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
-            this.btnSkripteBearbeiten.Location = new System.Drawing.Point(8, 2);
-            this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
-            this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
-            this.btnSkripteBearbeiten.TabIndex = 46;
-            this.btnSkripteBearbeiten.Text = "Skripte";
-            // 
             // grpVorschau
             // 
             this.grpVorschau.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -178,7 +151,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpVorschau.Location = new System.Drawing.Point(760, 0);
             this.grpVorschau.Name = "grpVorschau";
-            this.grpVorschau.Size = new System.Drawing.Size(160, 81);
+            this.grpVorschau.Size = new System.Drawing.Size(88, 81);
             this.grpVorschau.TabIndex = 1;
             this.grpVorschau.TabStop = false;
             this.grpVorschau.Text = "Vorschau";
@@ -211,6 +184,17 @@ namespace BlueControls.Forms {
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
+            // 
+            // btnWeitere
+            // 
+            this.btnWeitere.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitere.ImageCode = "Frage|16";
+            this.btnWeitere.Location = new System.Drawing.Point(144, 46);
+            this.btnWeitere.Name = "btnWeitere";
+            this.btnWeitere.Size = new System.Drawing.Size(104, 22);
+            this.btnWeitere.TabIndex = 8;
+            this.btnWeitere.Text = "weitere...";
+            this.btnWeitere.Click += new System.EventHandler(this.btnWeitere_Click);
             // 
             // btnRegionAdd
             // 
@@ -496,17 +480,6 @@ namespace BlueControls.Forms {
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
             // 
-            // btnWeitere
-            // 
-            this.btnWeitere.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnWeitere.ImageCode = "Frage|16";
-            this.btnWeitere.Location = new System.Drawing.Point(144, 46);
-            this.btnWeitere.Name = "btnWeitere";
-            this.btnWeitere.Size = new System.Drawing.Size(104, 22);
-            this.btnWeitere.TabIndex = 8;
-            this.btnWeitere.Text = "weitere...";
-            this.btnWeitere.Click += new System.EventHandler(this.btnWeitere_Click);
-            // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -523,7 +496,6 @@ namespace BlueControls.Forms {
             this.tabSeiten.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.tabEditorStd.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
             this.grpVorschau.ResumeLayout(false);
             this.grpFelder.ResumeLayout(false);
             this.grpOptik.ResumeLayout(false);
@@ -565,8 +537,6 @@ namespace BlueControls.Forms {
         private Button btnBenutzerFilterWahl;
         private GroupBox grpArbeitsbereich;
         private Button btnArbeitsbereich;
-        private GroupBox groupBox2;
-        private Button btnSkripteBearbeiten;
         private Button btnRegionAdd;
         private Button btnWeitere;
     }

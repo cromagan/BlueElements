@@ -223,7 +223,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u, widthOfControl));
-        result.Add(new FlexiControlForProperty<bool>(() => AutoX, widthOfControl));
+        result.Add(new FlexiControlForProperty<bool>(() => AutoX));
 
         var b = new List<AbstractListItem>();
         b.AddRange(GetAllowedEditTypes(Column));

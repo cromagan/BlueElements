@@ -131,7 +131,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         aursicht.Add(ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig));
         //aursicht.Sort();
         l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht, widthOfControl));
-        l.Add(new FlexiControlForProperty<float>(() => Skalierung, widthOfControl));
+        l.Add(new FlexiControlForProperty<float>(() => Skalierung));
         AddStyleOption(l, widthOfControl);
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
@@ -246,9 +246,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         if (Stil != PadStyles.Undefiniert) {
             if (Parent == null) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
-            } else {
-                _txt = new ExtText(Stil, Parent.SheetStyle);
+                return;
             }
+
+            _txt = new ExtText(Stil, Parent.SheetStyle);
             _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist

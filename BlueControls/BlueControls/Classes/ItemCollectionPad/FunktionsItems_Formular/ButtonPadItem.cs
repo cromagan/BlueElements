@@ -313,7 +313,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => Beschriftung, widthOfControl));
+        l.Add(new FlexiControlForProperty<string>(() => Beschriftung));
 
         var im = QuickImage.Images();
 
@@ -359,10 +359,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         var m = Script.Commands.Get(_action);
 
         if (m is IUseableForButton ufb) {
-            if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0], widthOfControl)); }
-            if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2, ufb.ArgsForButtonDescription[1], widthOfControl)); }
-            if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3, ufb.ArgsForButtonDescription[2], widthOfControl)); }
-            if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3], widthOfControl)); }
+            if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0])); }
+            if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2, ufb.ArgsForButtonDescription[1])); }
+            if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3, ufb.ArgsForButtonDescription[2])); }
+            if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
         }
 
         l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3, widthOfControl));

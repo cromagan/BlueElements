@@ -71,7 +71,7 @@ namespace BlueControls.Controls
             // 
             // btnPlus
             // 
-            this.btnPlus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPlus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnPlus.ImageCode = "PlusZeichen|14";
             this.btnPlus.Location = new System.Drawing.Point(152, 144);
             this.btnPlus.Name = "btnPlus";

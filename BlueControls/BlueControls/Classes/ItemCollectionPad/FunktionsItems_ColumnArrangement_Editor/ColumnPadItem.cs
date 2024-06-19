@@ -89,15 +89,15 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         List<GenericControl> result = [];
         if (Column == null || Column.IsDisposed) { return result; }
 
-        result.Add(new FlexiControlForProperty<string>(() => Datenbank, widthOfControl));
+        result.Add(new FlexiControlForProperty<string>(() => Datenbank));
         result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<bool>(() => Permanent, widthOfControl));
+        result.Add(new FlexiControlForProperty<bool>(() => Permanent));
         result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<string>(() => Column.Caption, widthOfControl));
+        result.Add(new FlexiControlForProperty<string>(() => Column.Caption));
         result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1, widthOfControl));
-        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2, widthOfControl));
-        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3, widthOfControl));
+        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
+        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
+        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
         result.Add(new FlexiControl());
         result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5, widthOfControl));
         result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5, widthOfControl));

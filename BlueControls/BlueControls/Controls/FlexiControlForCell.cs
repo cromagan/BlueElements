@@ -784,9 +784,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = this.Database();
 
-    private void TextBox_TextChanged(object sender, System.EventArgs e) {
-        RestartMarker();
-    }
+    private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 
     private void ValueToCell() {
         if (IsFilling) { return; }

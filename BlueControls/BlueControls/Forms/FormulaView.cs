@@ -71,10 +71,7 @@ public partial class FormulaView : FormWithStatusBar {
         _ = LoadTab.ShowDialog();
     }
 
-    private void CheckButtons() {
-        btnSkripteBearbeiten.Enabled = CFormula.ConnectedFormula != null;
-        btnFormular.Enabled = CFormula.ConnectedFormula != null;
-    }
+    private void CheckButtons() => btnFormular.Enabled = CFormula.ConnectedFormula != null;
 
     private void FormulaSet(string? filename) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula);

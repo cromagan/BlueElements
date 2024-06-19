@@ -59,7 +59,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     /// <param name="expr"></param>
     /// <param name="list"></param>
     /// <param name="widthOfControl"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, int widthOfControl) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, widthOfControl) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, int widthOfControl) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
@@ -67,34 +67,34 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
     /// <param name="widthOfControl"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, int widthOfControl) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None, widthOfControl) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, int widthOfControl) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    /// <param name="widthOfControl"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int widthOfControl) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, widthOfControl) { }
+    ///
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText, int widthOfControl) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None, widthOfControl) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
 
-    public FlexiControlForProperty(int widthOfControl) : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, widthOfControl) { }
+    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed, int widthOfControl) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
 
         CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
         EditType = EditTypeFormula.Textfeld;
-        Size = new Size(widthOfControl, 24);
+        Size = new Size(200, 24);
 
         #region Caption setzen
 
@@ -122,7 +122,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
             case Accessor<ReadOnlyCollection<string>>: {
                     CaptionPosition = CaptionPosition.Über_dem_Feld;
                     EditType = EditTypeFormula.Listbox;
-                    Size = new Size(widthOfControl, 16 + (24 * rowCount));
+                    Size = new Size(200, 16 + (24 * rowCount));
                     var lb = CreateSubControls() as ListBox;
                     StyleListBox(lb, list, checkBehavior, addallowed);
 
@@ -136,7 +136,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
                         var (biggestItemX, biggestItemY, _, _) = ListBox.ItemData(list, Design.ComboBox_Textbox);
-                        var x2 = Math.Max(biggestItemX + 20 + s2.Width, widthOfControl);
+                        var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
                         StyleComboBox(CreateSubControls() as ComboBox, list, ComboBoxStyle.DropDownList, true);
@@ -156,12 +156,12 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         EditType = EditTypeFormula.Textfeld;
                         if (rowCount >= 2) {
                             CaptionPosition = CaptionPosition.Über_dem_Feld;
-                            Size = new Size(widthOfControl, 16 + (24 * rowCount));
+                            Size = new Size(200, 16 + (24 * rowCount));
                             MultiLine = true;
                             this.GetStyleFrom(FormatHolder.Text);
                         } else {
                             CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
-                            Size = new Size(widthOfControl, 24);
+                            Size = new Size(200, 24);
                             MultiLine = false;
                             switch (_accessor) {
                                 case Accessor<string>:

@@ -163,12 +163,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
                     }
                     return true; // Alles beim Alten
                 }
-                var rowtmp = Database.Row[n];
-                if (rowtmp == null) {
-                    MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, ImageCode.Warnung, "OK");
-                } else {
+
+                if (Database?.Row[n] is RowItem rowtmp) {
                     _rowKey = rowtmp.KeyName;
                     MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, ImageCode.Warnung, "OK");
+                } else {
+                    MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, ImageCode.Warnung, "OK");
                 }
                 return true; // Alles beim Alten
         }

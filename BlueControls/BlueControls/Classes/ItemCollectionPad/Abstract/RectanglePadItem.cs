@@ -89,7 +89,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
         List<GenericControl> l =
         [
             new FlexiControl(),
-            new FlexiControlForProperty<int>(() => Drehwinkel, widthOfControl),
+            new FlexiControlForProperty<int>(() => Drehwinkel),
             .. base.GetProperties(widthOfControl),
         ];
         return l;

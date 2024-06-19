@@ -118,9 +118,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         Close();
     }
 
-    private void _table_VisibleRowsChanged(object sender, System.EventArgs e) {
-        CheckButtons();
-    }
+    private void _table_VisibleRowsChanged(object sender, System.EventArgs e) => CheckButtons();
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 

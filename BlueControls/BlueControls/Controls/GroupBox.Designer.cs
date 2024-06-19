@@ -29,9 +29,6 @@ namespace BlueControls.Controls
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
-        private void InitializeComponent()
-        {
-            components = new Container();
-        }
+        private void InitializeComponent() => components = new Container();
     }
 }

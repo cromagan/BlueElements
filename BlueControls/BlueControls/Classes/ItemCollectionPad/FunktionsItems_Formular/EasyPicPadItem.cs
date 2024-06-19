@@ -76,9 +76,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public override bool MustBeInDrawingArea => true;
-
     public bool InputMustBeOneRow => true;
+    public override bool MustBeInDrawingArea => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -130,7 +129,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         List<GenericControl> l =
         [
             .. _itemAccepts.GetProperties(this, widthOfControl),
-            new FlexiControlForProperty<string>(() => Bild_Dateiname, widthOfControl),
+            new FlexiControlForProperty<string>(() => Bild_Dateiname),
             new FlexiControl(),
             .. base.GetProperties(widthOfControl),
         ];

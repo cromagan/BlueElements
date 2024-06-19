@@ -318,8 +318,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         List<GenericControl> l =
         [
             new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit, widthOfControl),
-            new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar, widthOfControl)
+            new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
+            new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         ];
         //if (AdditionalStyleOptions != null) {
         //    l.Add(new FlexiControl());

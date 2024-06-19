@@ -58,21 +58,21 @@ public static class SimpleEditorExtension {
 
         if (element is null) { return; }
 
-        var stdWidth = width - (Skin.Padding * 4);
+        //var stdWidth = width - (Skin.Padding * 4);
 
-        var flexis = element.GetProperties(stdWidth);
+        var flexis = element.GetProperties(width);
         if (flexis.Count == 0) { return; }
 
         //Rückwärts inserten
 
         if (element is IErrorCheckable iec && !iec.IsOk()) {
-            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth, false)); // Fehlergrund
-            flexis.Insert(0, new FlexiControl("Achtung!", stdWidth, true));
+            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), width, false)); // Fehlergrund
+            flexis.Insert(0, new FlexiControl("Achtung!", width, true));
         }
 
         if (!string.IsNullOrEmpty(element.Description)) {
-            flexis.Insert(0, new FlexiControl(element.Description, stdWidth, false)); // Beschreibung
-            flexis.Insert(0, new FlexiControl("Beschreibung:", stdWidth, true));
+            flexis.Insert(0, new FlexiControl(element.Description, width, false)); // Beschreibung
+            flexis.Insert(0, new FlexiControl("Beschreibung:", width, true));
         }
 
         #region  SideMenu erstellen
@@ -85,7 +85,7 @@ public static class SimpleEditorExtension {
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = stdWidth;
+                thisFlexi.Width = width- Skin.Padding*2;
             }
         }
 

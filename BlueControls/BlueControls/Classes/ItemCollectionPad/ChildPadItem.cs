@@ -107,8 +107,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            new FlexiControlForProperty<string>(() => Name, widthOfControl),
-            new FlexiControlForProperty<Color>(() => Randfarbe, widthOfControl)
+            new FlexiControlForProperty<string>(() => Name),
+            new FlexiControlForProperty<Color>(() => Randfarbe)
         ];
         var lage = new List<AbstractListItem>();
         lage.Add(ItemOf("ohne", "-1"));

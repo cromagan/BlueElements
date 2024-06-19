@@ -97,9 +97,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
-    private void cbxColDateiname_TextChanged(object sender, System.EventArgs e) {
-        CheckButtons();
-    }
+    private void cbxColDateiname_TextChanged(object sender, System.EventArgs e) => CheckButtons();
 
     private void CheckButtons() {
         if (_database == null) {

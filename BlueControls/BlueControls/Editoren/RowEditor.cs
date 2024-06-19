@@ -51,9 +51,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
 
     #region Methods
 
-    public override void Clear() {
-        formular.InitFormula(null, Database);
-    }
+    public override void Clear() => formular.InitFormula(null, Database);
 
     public override bool Init(IEditable? toEdit) {
         RowItem? row = null;

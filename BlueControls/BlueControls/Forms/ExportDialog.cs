@@ -287,10 +287,12 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e) => Close();
 
     private void LayoutEditor_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
         Enabled = false;
         var n = cbxLayoutWahl.Text;
         cbxLayoutWahl.Text = string.Empty;
-        TableView.OpenLayoutEditor(Database, n);
+        TableView.OpenLayoutEditor(db, n);
         BefülleLayoutDropdowns();
         if (cbxLayoutWahl[n] != null) {
             cbxLayoutWahl.Text = n;

@@ -94,9 +94,7 @@ internal class AdderItem : IReadableTextWithKey {
         }
     }
 
-    public string ReadableText() {
-        return new string(' ', Indent * 6) + Last;
-    }
+    public string ReadableText() => new string(' ', Indent * 6) + Last;
 
     public QuickImage? SymbolForReadableText() => null;
 

@@ -27,10 +27,7 @@ namespace BlueControls.Controls
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
-        private void InitializeComponent()
-        {
-            components = new Container();
-        }
+        private void InitializeComponent() => components = new Container();
         #endregion
 
     }

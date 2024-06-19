@@ -177,8 +177,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             .. _itemAccepts.GetProperties(this, widthOfControl),
             .. _itemSends.GetProperties(this, widthOfControl),
             new FlexiControl("Einstellungen:", -1, true),
-            new FlexiControlForProperty<string>(() => Überschrift, widthOfControl),
-            new FlexiControlForProperty<string>(() => Anzeige, widthOfControl),
+            new FlexiControlForProperty<string>(() => Überschrift),
+            new FlexiControlForProperty<string>(() => Anzeige),
         ];
 
         var u = new List<AbstractListItem>();

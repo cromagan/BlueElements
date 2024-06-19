@@ -71,9 +71,9 @@ public class SymbolPadItem : RectanglePadItem {
         List<GenericControl> l =
         [
             new FlexiControlForProperty<Symbol>(() => Symbol, comms, widthOfControl),
-            new FlexiControlForProperty<float>(() => Randdicke, widthOfControl),
-            new FlexiControlForProperty<Color>(() => Randfarbe, widthOfControl),
-            new FlexiControlForProperty<Color>(() => Hintergrundfarbe, widthOfControl),
+            new FlexiControlForProperty<float>(() => Randdicke),
+            new FlexiControlForProperty<Color>(() => Randfarbe),
+            new FlexiControlForProperty<Color>(() => Hintergrundfarbe),
             .. base.GetProperties(widthOfControl),
         ];
         return l;
