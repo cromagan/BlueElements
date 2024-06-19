@@ -35,7 +35,7 @@ internal class Method_DeleteFile : Method, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
 
     public List<List<string>> ArgsForButton => Args;
     public List<string> ArgsForButtonDescription => ["Datei"];
@@ -49,7 +49,7 @@ internal class Method_DeleteFile : Method, IUseableForButton {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
 
     public override bool MustUseReturnValue => false;
 
@@ -69,21 +69,33 @@ internal class Method_DeleteFile : Method, IUseableForButton {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var filn = attvar.ValueStringGet(0);
+        var files = new List<string>();
 
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+        for (var z = 0; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs1) { files.Add(vs1.ValueString); }
+            if (attvar.Attributes[z] is VariableListString vl1) { files.AddRange(vl1.ValueList); }
+        }
+        files = files.SortedDistinctList();
 
-        if (!IO.FileExists(filn)) {
-            return DoItFeedback.Wahr();
+        if (!scp.ProduktivPhase) {
+            return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert.");
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
+        foreach (var filn in files) {
+            if (!filn.IsFormat(FormatHolder.FilepathAndName)) {
+                return new DoItFeedback(infos.Data, "Dateinamen-Fehler!");
+            }
 
-        try {
-            return new DoItFeedback(IO.DeleteFile(filn, false));
-        } catch {
-            return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn);
+            if (IO.FileExists(filn)) {
+                try {
+                    if (!IO.DeleteFile(filn, false)) { return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn); }
+                } catch {
+                    return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn);
+                }
+            }
         }
+
+        return DoItFeedback.Wahr();
     }
 
     public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
