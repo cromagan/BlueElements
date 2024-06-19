@@ -17,7 +17,6 @@
 
 #nullable enable
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;

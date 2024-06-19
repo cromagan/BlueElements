@@ -688,7 +688,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc.ToArray()) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
         var did = false;
 
-
         foreach (var thisKey in keys) {
             if (Remove(thisKey, comment)) { did = true; }
           

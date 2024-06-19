@@ -178,13 +178,11 @@ public sealed class ItemSendFilter {
 
         }
 
-
         if (!enableOutput) {
 
             if (outp != null) {
                 l.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
             }
-
 
         } else {
             l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables(), widthOfControl));
