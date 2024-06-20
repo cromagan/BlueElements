@@ -692,6 +692,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.GetStyleFrom(this);
         control.DropDownStyle = style;
         control.ItemClear();
+        control.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         if (list != null) {
             control.ItemAddRange(list);
         }

@@ -135,12 +135,6 @@
     <Compile Include="Editoren\FilterCollectionEditor.Designer.cs">
       <DependentUpon>FilterCollectionEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\RowAdderSingleEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editoren\RowAdderSingleEditor.Designer.cs">
-      <DependentUpon>RowAdderSingleEditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editoren\RowEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -684,9 +678,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\FilterCollectionEditor.resx">
       <DependentUpon>FilterCollectionEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\RowAdderSingleEditor.resx">
-      <DependentUpon>RowAdderSingleEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\RowEditor.resx">
       <DependentUpon>RowEditor.cs</DependentUpon>

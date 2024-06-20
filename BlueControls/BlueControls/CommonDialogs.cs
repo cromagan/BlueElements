@@ -22,6 +22,7 @@ using BlueDatabase;
 
 using System.Collections.Generic;
 using BlueControls.ItemCollectionList;
+using BlueControls.BlueDatabaseDialogs;
 
 #nullable enable
 
@@ -44,7 +45,11 @@ internal static class CommonDialogs {
 
         if (x == null || x.Count != 1) { return null; }
 
-        return Database.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword, true);
+        var db = Database.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword, true);
+        if (db != null) {
+            db.Editor = typeof(DatabaseHeadEditor);
+        }
+        return db;
     }
 
     #endregion

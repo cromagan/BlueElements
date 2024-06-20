@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System;
 using System.Collections.Generic;
 using static BlueDatabase.Database;
 
@@ -28,7 +29,7 @@ namespace BlueDatabase;
 /// <summary>
 /// Informationen über eine Datenbank oder wie diese erzeugt werden kann.
 /// </summary>
-public class ConnectionInfo : IReadableTextWithKey {
+public class ConnectionInfo : IReadableTextWithKey, IEditable {
 
     #region Fields
 
@@ -124,6 +125,8 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// </summary>
     public string AdditionalData { get; } = string.Empty;
 
+    public string CaptionForEditor => "Datenbank-Beschreibung";
+
     //public event EventHandler? PropertyChanged;
     /// <summary>
     /// Eine Kennung, die von von Database abgeleiten Klassen erkannt werden kann.
@@ -132,6 +135,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// </summary>
     public string DatabaseId { get; } = string.Empty;
 
+    public Type? Editor { get; set; }
     public string KeyName => UniqueId;
     public string MustBeFreezed { get; } = string.Empty;
 

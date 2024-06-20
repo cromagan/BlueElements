@@ -211,22 +211,22 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(db.Column, true));
 
-            l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst, widthOfControl));
+            l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }
 
         l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u, widthOfControl));
+        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         var u2 = new List<AbstractListItem>();
         u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2, widthOfControl));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
         var u3 = new List<AbstractListItem>();
         u3.AddRange(ItemsOf(typeof(FlexiFilterDefaultFilter)));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3, widthOfControl));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));

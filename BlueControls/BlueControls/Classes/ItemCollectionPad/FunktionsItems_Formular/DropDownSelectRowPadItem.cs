@@ -183,7 +183,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u, widthOfControl));
+        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         //l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));

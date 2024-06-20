@@ -286,9 +286,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
-            l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst, widthOfControl));
+            l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
 
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalTextColumnName, lst, widthOfControl));
+            l.Add(new FlexiControlForProperty<string>(() => AdditionalTextColumnName, lst));
         }
 
         l.Add(new FlexiControl("Bausteine:", widthOfControl, true));
@@ -303,7 +303,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         if (_counter == int.MaxValue) { _counter = 0; }
         _counter++;
         var l = new RowAdderSingle(this, _counter);
-        l.Editor = typeof(RowAdderSingleEditor);
         return ItemOf(l);
     }
 

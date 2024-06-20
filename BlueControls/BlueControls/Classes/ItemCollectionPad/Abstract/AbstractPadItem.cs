@@ -36,8 +36,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IPropertyChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName, ISimpleEditor
-{
+public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IPropertyChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName, ISimpleEditor {
 
     #region Fields
 
@@ -76,11 +75,9 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     #region Properties
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
-    public bool Bei_Export_sichtbar
-    {
+    public bool Bei_Export_sichtbar {
         get => _beiExportSichtbar;
-        set
-        {
+        set {
             if (IsDisposed) { return; }
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
@@ -102,11 +99,9 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     public ObservableCollection<PointM> MovablePoint { get; } = [];
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
-    public string Page
-    {
+    public string Page {
         get => _page;
-        set
-        {
+        set {
             if (_page == value) { return; }
             _page = value;
             OnPropertyChanged();
@@ -119,13 +114,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
-    public ItemCollectionPad? Parent
-    {
+    public ItemCollectionPad? Parent {
         get => _parent;
-        set
-        {
-            if (_parent == null || _parent == value)
-            {
+        set {
+            if (_parent == null || _parent == value) {
                 _parent = value;
                 //OnParentChanged();
                 return;
@@ -139,11 +131,9 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     public virtual string QuickInfo { get; set; } = string.Empty;
 
-    public PadStyles Stil
-    {
+    public PadStyles Stil {
         get => _style;
-        set
-        {
+        set {
             if (_style == value) { return; }
             _style = value;
             ProcessStyleChange();
@@ -158,20 +148,16 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
     /// </summary>
     /// <remarks></remarks>
-    public RectangleF UsedArea
-    {
-        get
-        {
+    public RectangleF UsedArea {
+        get {
             if (_usedArea.IsEmpty) { _usedArea = CalculateUsedArea(); }
             return _usedArea;
         }
     }
 
-    public int ZoomPadding
-    {
+    public int ZoomPadding {
         get => _zoomPadding;
-        set
-        {
+        set {
             if (_zoomPadding == value) { return; }
             _zoomPadding = value;
             OnPropertyChanged();
@@ -186,8 +172,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     public virtual void AddedToCollection() { }
 
-    public object? Clone()
-    {
+    public object? Clone() {
         var x = ToString();
 
         var i = NewByParsing<AbstractPadItem>(x);
@@ -204,10 +189,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     //    }
     //    return null;
     //}
-    public int CompareTo(object obj)
-    {
-        if (obj is AbstractPadItem v)
-        {
+    public int CompareTo(object obj) {
+        if (obj is AbstractPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);
         }
 
@@ -233,8 +216,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
     /// </summary>
     /// <remarks></remarks>
-    public virtual bool Contains(PointF value, float zoomfactor)
-    {
+    public virtual bool Contains(PointF value, float zoomfactor) {
         var tmp = UsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
 
         var ne = (6 / zoomfactor) + 1;
@@ -248,18 +230,15 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     //            case "classid":
     //                ding = thisIt.Value;
     //                break;
-    public void Dispose()
-    {
+    public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
     //    var x = code.GetAllTags();
-    public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting)
-    {
-        if (_parent == null)
-        {
+    public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
+        if (_parent == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert");
             return;
         }
@@ -268,31 +247,24 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
         var positionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
 
-        if (IsInDrawingArea(positionModified, sizeOfParentControl))
-        {
+        if (IsInDrawingArea(positionModified, sizeOfParentControl)) {
             DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         }
 
         #region Verknüpfte Pfeile Zeichnen
 
-        if (!forPrinting)
-        {
+        if (!forPrinting) {
             var line = 1f;
             if (zoom > 1) { line = zoom; }
 
-            foreach (var thisV in _parent.Connections)
-            {
-                if (thisV.Item1 == this && thisV.Bei_Export_sichtbar)
-                {
-                    if (_parent.Contains(thisV.Item2) && thisV.Item2 != this)
-                    {
-                        if (thisV.Item2.Bei_Export_sichtbar)
-                        {
+            foreach (var thisV in _parent.Connections) {
+                if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
+                    if (_parent.Contains(thisV.Item2) && thisV.Item2 != this) {
+                        if (thisV.Item2.Bei_Export_sichtbar) {
                             var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
                             var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
 
-                            if (Geometry.GetLenght(t1, t2) > 1)
-                            {
+                            if (Geometry.GetLenght(t1, t2) > 1) {
                                 gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
                                 var wi = Geometry.Winkel(t1, t2);
                                 if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
@@ -313,8 +285,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// und werden bei nicht gebrauchen automatisch disposed
     /// </summary>
     /// <returns></returns>
-    public virtual List<GenericControl> GetProperties(int widthOfControl)
-    {
+    public virtual List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
             new FlexiControl(),
@@ -338,18 +309,15 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
-    public bool IsVisibleOnPage(string page)
-    {
+    public bool IsVisibleOnPage(string page) {
         if (string.IsNullOrEmpty(_page)) { return true; }
 
         return string.Equals(_page, page, StringComparison.OrdinalIgnoreCase);
     }
 
-    public void Move(float x, float y)
-    {
+    public void Move(float x, float y) {
         if (x == 0 && y == 0) { return; }
-        foreach (var t in PointsForSuccesfullyMove)
-        {
+        foreach (var t in PointsForSuccesfullyMove) {
             t.Move(x, y);
         }
         OnPropertyChanged();
@@ -358,8 +326,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// <summary>
     /// Invalidiert UsedArea und löst das Ereignis Changed aus
     /// </summary>
-    public override void OnPropertyChanged()
-    {
+    public override void OnPropertyChanged() {
         _usedArea = default;
         base.OnPropertyChanged();
     }
@@ -374,10 +341,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     //    ParseFinished(parsestring);
     //}
 
-    public override bool ParseThis(string key, string value)
-    {
-        switch (key)
-        {
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
             case "classid": // Wurde bereits abgefragt, dadurch st erst die Routine aufgerufen worden
             case "type":
             case "enabled":
@@ -395,14 +360,11 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
             case "point":
                 if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
 
-                foreach (var thisPoint in MovablePoint)
-                {
-                    if (value.Contains("Name=" + thisPoint.KeyName + ","))
-                    {
+                foreach (var thisPoint in MovablePoint) {
+                    if (value.Contains("Name=" + thisPoint.KeyName + ",")) {
                         thisPoint.Parse(value);
                     }
-                    if (value.Contains("Name=\"" + thisPoint.KeyName + "\","))
-                    {
+                    if (value.Contains("Name=\"" + thisPoint.KeyName + "\",")) {
                         thisPoint.Parse(value);
                     }
                 }
@@ -426,8 +388,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
             case "key":
             case "keyname":
             case "internalname":
-                if (value != KeyName)
-                {
+                if (value != KeyName) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + KeyName);
                 }
                 return true;
@@ -463,8 +424,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// </summary>
     public virtual void ProcessStyleChange() { }
 
-    public override string ToString()
-    {
+    public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
@@ -474,12 +434,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         result.ParseableAdd("QuickInfo", QuickInfo);
         result.ParseableAdd("ZoomPadding", _zoomPadding);
 
-        foreach (var thisPoint in MovablePoint)
-        {
+        foreach (var thisPoint in MovablePoint) {
             result.ParseableAdd("Point", thisPoint as IStringable);
         }
-        if (!string.IsNullOrEmpty(Gruppenzugehörigkeit))
-        {
+        if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
         }
 
@@ -503,34 +461,28 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
     /// </summary>
     /// <remarks></remarks>
-    public RectangleF ZoomToArea()
-    {
+    public RectangleF ZoomToArea() {
         var x = UsedArea;
         if (_zoomPadding == 0) { return x; }
         x.Inflate(-ZoomPadding, -ZoomPadding);
         return x;
     }
 
-    internal void AddLineStyleOption(List<GenericControl> l, int widthOfControl)
-    {
+    internal void AddLineStyleOption(List<GenericControl> l, int widthOfControl) {
         if (_parent == null) { return; }
-        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true), widthOfControl));
+        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
     }
 
-    internal void AddStyleOption(List<GenericControl> l, int widthOfControl)
-    {
+    internal void AddStyleOption(List<GenericControl> l, int widthOfControl) {
         if (_parent == null) { return; }
-        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle), widthOfControl));
+        l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_parent.SheetStyle)));
     }
 
     protected abstract RectangleF CalculateUsedArea();
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!IsDisposed)
-        {
-            if (disposing)
-            {
+    protected virtual void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
@@ -543,30 +495,23 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         }
     }
 
-    protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting)
-    {
-        try
-        {
-            if (!forPrinting)
-            {
-                if (positionModified.Width > 1 && positionModified.Height > 1)
-                {
+    protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        try {
+            if (!forPrinting) {
+                if (positionModified.Width > 1 && positionModified.Height > 1) {
                     gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionModified);
                 }
-                if (positionModified.Width < 1 && positionModified.Height < 1)
-                {
+                if (positionModified.Width < 1 && positionModified.Height < 1) {
                     gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
                     gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
                 }
             }
 
-            if (!_beiExportSichtbar)
-            {
+            if (!_beiExportSichtbar) {
                 var q = QuickImage.Get("Drucker|16||1");
                 gr.DrawImage(q, positionModified.X, positionModified.Y);
             }
-        }
-        catch { }
+        } catch { }
     }
 
     protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
@@ -575,34 +520,26 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         sizeOfParentControl.Height == 0 ||
         drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
-    private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.NewItems != null)
-        {
-            foreach (var thisit in e.NewItems)
-            {
-                if (thisit is PointM p)
-                {
+    private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        if (e.NewItems != null) {
+            foreach (var thisit in e.NewItems) {
+                if (thisit is PointM p) {
                     p.Moving += PointMoving;
                     p.Moved += PointMoved;
                 }
             }
         }
 
-        if (e.OldItems != null)
-        {
-            foreach (var thisit in e.OldItems)
-            {
-                if (thisit is PointM p)
-                {
+        if (e.OldItems != null) {
+            foreach (var thisit in e.OldItems) {
+                if (thisit is PointM p) {
                     p.Moving -= PointMoving;
                     p.Moved -= PointMoved;
                 }
             }
         }
 
-        if (e.Action == NotifyCollectionChangedAction.Reset)
-        {
+        if (e.Action == NotifyCollectionChangedAction.Reset) {
             Develop.DebugPrint_NichtImplementiert(true);
         }
     }

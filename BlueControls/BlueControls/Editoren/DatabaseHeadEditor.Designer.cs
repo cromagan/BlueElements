@@ -47,6 +47,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.btnTabellenAnsicht = new BlueControls.Controls.Button();
+            this.btnSkripte = new BlueControls.Controls.Button();
+            this.btnSpaltenAnordnungen = new BlueControls.Controls.Button();
             this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
             this.butSystemspaltenErstellen = new BlueControls.Controls.Button();
             this.btnOptimize = new BlueControls.Controls.Button();
@@ -81,6 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1244, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -118,7 +122,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // PermissionGroups_NewRow
             // 
             this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.PermissionGroups_NewRow.AddMethod = null;
             this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PermissionGroups_NewRow.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
@@ -152,7 +155,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // DatenbankAdmin
             // 
             this.DatenbankAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.DatenbankAdmin.AddMethod = null;
             this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.DatenbankAdmin.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
@@ -206,7 +208,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // lbxSortierSpalten
             // 
             this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
-            this.lbxSortierSpalten.AddMethod = null;
             this.lbxSortierSpalten.AutoSort = false;
             this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
             this.lbxSortierSpalten.FilterText = null;
@@ -255,7 +256,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTags.Location = new System.Drawing.Point(624, 24);
             this.txbTags.MultiLine = true;
             this.txbTags.Name = "txbTags";
-            this.txbTags.Size = new System.Drawing.Size(601, 643);
+            this.txbTags.Size = new System.Drawing.Size(601, 639);
             this.txbTags.TabIndex = 26;
             this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -317,6 +318,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.btnTabellenAnsicht);
+            this.tabAllgemein.Controls.Add(this.btnSkripte);
+            this.tabAllgemein.Controls.Add(this.btnSpaltenAnordnungen);
             this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.butSystemspaltenErstellen);
             this.tabAllgemein.Controls.Add(this.btnOptimize);
@@ -333,12 +337,45 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAllgemein.Controls.Add(this.capTags);
             this.tabAllgemein.Controls.Add(this.txbCaption);
             this.tabAllgemein.Controls.Add(this.capCaption);
-            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
+            this.tabAllgemein.Location = new System.Drawing.Point(4, 29);
             this.tabAllgemein.Name = "tabAllgemein";
             this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAllgemein.Size = new System.Drawing.Size(1233, 678);
+            this.tabAllgemein.Size = new System.Drawing.Size(1233, 674);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // btnTabellenAnsicht
+            // 
+            this.btnTabellenAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnTabellenAnsicht.ImageCode = "Tabelle|16";
+            this.btnTabellenAnsicht.Location = new System.Drawing.Point(216, 544);
+            this.btnTabellenAnsicht.Name = "btnTabellenAnsicht";
+            this.btnTabellenAnsicht.Size = new System.Drawing.Size(200, 32);
+            this.btnTabellenAnsicht.TabIndex = 53;
+            this.btnTabellenAnsicht.Text = "Tabellenansicht";
+            this.btnTabellenAnsicht.Click += new System.EventHandler(this.btnTabellenAnsicht_Click);
+            // 
+            // btnSkripte
+            // 
+            this.btnSkripte.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSkripte.ImageCode = "Skript|16";
+            this.btnSkripte.Location = new System.Drawing.Point(216, 624);
+            this.btnSkripte.Name = "btnSkripte";
+            this.btnSkripte.Size = new System.Drawing.Size(200, 32);
+            this.btnSkripte.TabIndex = 52;
+            this.btnSkripte.Text = "Skripte";
+            this.btnSkripte.Click += new System.EventHandler(this.btnSkripte_Click);
+            // 
+            // btnSpaltenAnordnungen
+            // 
+            this.btnSpaltenAnordnungen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSpaltenAnordnungen.ImageCode = "Spalte|16";
+            this.btnSpaltenAnordnungen.Location = new System.Drawing.Point(216, 584);
+            this.btnSpaltenAnordnungen.Name = "btnSpaltenAnordnungen";
+            this.btnSpaltenAnordnungen.Size = new System.Drawing.Size(200, 32);
+            this.btnSpaltenAnordnungen.TabIndex = 51;
+            this.btnSpaltenAnordnungen.Text = "Spaltenanordnung";
+            this.btnSpaltenAnordnungen.Click += new System.EventHandler(this.btnSpaltenAnordnungen_Click);
             // 
             // txbZeilenQuickInfo
             // 
@@ -348,7 +385,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 216);
             this.txbZeilenQuickInfo.MultiLine = true;
             this.txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
-            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(608, 190);
+            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(608, 186);
             this.txbZeilenQuickInfo.TabIndex = 43;
             this.txbZeilenQuickInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -356,7 +393,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.butSystemspaltenErstellen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.butSystemspaltenErstellen.ImageCode = "Spalte|16";
-            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(8, 632);
+            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(8, 624);
             this.butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
             this.butSystemspaltenErstellen.Size = new System.Drawing.Size(200, 32);
             this.butSystemspaltenErstellen.TabIndex = 49;
@@ -367,7 +404,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnOptimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOptimize.ImageCode = "Blitz|16";
-            this.btnOptimize.Location = new System.Drawing.Point(8, 590);
+            this.btnOptimize.Location = new System.Drawing.Point(8, 584);
             this.btnOptimize.Name = "btnOptimize";
             this.btnOptimize.QuickInfo = "Stellt alle Spalten um, \r\ndass die Daten";
             this.btnOptimize.Size = new System.Drawing.Size(200, 32);
@@ -379,7 +416,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbStandardFormulaFile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 486);
+            this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 482);
             this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
             this.txbStandardFormulaFile.Size = new System.Drawing.Size(608, 24);
             this.txbStandardFormulaFile.TabIndex = 47;
@@ -389,7 +426,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capStandardFormulaFile.CausesValidation = false;
-            this.capStandardFormulaFile.Location = new System.Drawing.Point(8, 470);
+            this.capStandardFormulaFile.Location = new System.Drawing.Point(8, 466);
             this.capStandardFormulaFile.Name = "capStandardFormulaFile";
             this.capStandardFormulaFile.Size = new System.Drawing.Size(152, 18);
             this.capStandardFormulaFile.Text = "Standard-Formular-Datei:";
@@ -398,7 +435,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 438);
+            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 434);
             this.txbAdditionalFiles.Name = "txbAdditionalFiles";
             this.txbAdditionalFiles.Size = new System.Drawing.Size(608, 24);
             this.txbAdditionalFiles.TabIndex = 45;
@@ -408,7 +445,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capAdditional.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capAdditional.CausesValidation = false;
-            this.capAdditional.Location = new System.Drawing.Point(8, 422);
+            this.capAdditional.Location = new System.Drawing.Point(8, 418);
             this.capAdditional.Name = "capAdditional";
             this.capAdditional.Size = new System.Drawing.Size(152, 18);
             this.capAdditional.Text = "Zugehörige-Dateien-Pfad:";
@@ -425,7 +462,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbGlobalScale.Location = new System.Drawing.Point(160, 518);
+            this.txbGlobalScale.Location = new System.Drawing.Point(160, 514);
             this.txbGlobalScale.Name = "txbGlobalScale";
             this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
             this.txbGlobalScale.TabIndex = 39;
@@ -434,7 +471,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capGlobalScale.CausesValidation = false;
-            this.capGlobalScale.Location = new System.Drawing.Point(8, 518);
+            this.capGlobalScale.Location = new System.Drawing.Point(8, 514);
             this.capGlobalScale.Name = "capGlobalScale";
             this.capGlobalScale.Size = new System.Drawing.Size(144, 18);
             this.capGlobalScale.Text = "Bevorzugtes Skalierung:";
@@ -443,7 +480,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(8, 550);
+            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(8, 544);
             this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
             this.btnSpaltenuebersicht.Size = new System.Drawing.Size(200, 32);
             this.btnSpaltenuebersicht.TabIndex = 35;
@@ -455,10 +492,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabRechte.Controls.Add(this.grpKennwort);
             this.tabRechte.Controls.Add(this.grpBenutzergruppen);
-            this.tabRechte.Location = new System.Drawing.Point(4, 25);
+            this.tabRechte.Location = new System.Drawing.Point(4, 29);
             this.tabRechte.Name = "tabRechte";
             this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRechte.Size = new System.Drawing.Size(1233, 678);
+            this.tabRechte.Size = new System.Drawing.Size(1233, 674);
             this.tabRechte.TabIndex = 4;
             this.tabRechte.Text = "Rechte";
             // 
@@ -468,10 +505,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSortierung.Controls.Add(this.lbxSortierSpalten);
             this.tabSortierung.Controls.Add(this.capSortierspalten);
             this.tabSortierung.Controls.Add(this.btnSortRichtung);
-            this.tabSortierung.Location = new System.Drawing.Point(4, 25);
+            this.tabSortierung.Location = new System.Drawing.Point(4, 29);
             this.tabSortierung.Name = "tabSortierung";
             this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSortierung.Size = new System.Drawing.Size(1233, 678);
+            this.tabSortierung.Size = new System.Drawing.Size(1233, 674);
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
@@ -479,10 +516,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabVariablen.Controls.Add(this.variableEditor);
-            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
+            this.tabVariablen.Location = new System.Drawing.Point(4, 29);
             this.tabVariablen.Name = "tabVariablen";
             this.tabVariablen.Padding = new System.Windows.Forms.Padding(3);
-            this.tabVariablen.Size = new System.Drawing.Size(1233, 678);
+            this.tabVariablen.Size = new System.Drawing.Size(1233, 674);
             this.tabVariablen.TabIndex = 7;
             this.tabVariablen.Text = "Variablen";
             // 
@@ -492,7 +529,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Editabe = true;
             this.variableEditor.Location = new System.Drawing.Point(3, 3);
             this.variableEditor.Name = "variableEditor";
-            this.variableEditor.Size = new System.Drawing.Size(1227, 672);
+            this.variableEditor.Size = new System.Drawing.Size(1227, 668);
             this.variableEditor.TabIndex = 1;
             // 
             // tabUndo
@@ -500,9 +537,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabUndo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabUndo.Controls.Add(this.tblUndo);
             this.tabUndo.Controls.Add(this.grpUndoActions);
-            this.tabUndo.Location = new System.Drawing.Point(4, 25);
+            this.tabUndo.Location = new System.Drawing.Point(4, 29);
             this.tabUndo.Name = "tabUndo";
-            this.tabUndo.Size = new System.Drawing.Size(1233, 678);
+            this.tabUndo.Size = new System.Drawing.Size(1233, 674);
             this.tabUndo.TabIndex = 6;
             this.tabUndo.Text = "Undo";
             // 
@@ -512,7 +549,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
-            this.tblUndo.Size = new System.Drawing.Size(1233, 608);
+            this.tblUndo.Size = new System.Drawing.Size(1233, 604);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
             this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
@@ -523,7 +560,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpUndoActions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpUndoActions.Controls.Add(this.btnClipboard);
             this.grpUndoActions.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.grpUndoActions.Location = new System.Drawing.Point(0, 608);
+            this.grpUndoActions.Location = new System.Drawing.Point(0, 604);
             this.grpUndoActions.Name = "grpUndoActions";
             this.grpUndoActions.Size = new System.Drawing.Size(1233, 70);
             this.grpUndoActions.TabIndex = 4;
@@ -606,5 +643,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabVariablen;
         private VariableEditor variableEditor;
         private Button btnDummyAdmin;
+        private Button btnSpaltenAnordnungen;
+        private Button btnSkripte;
+        private Button btnTabellenAnsicht;
     }
 }

@@ -97,12 +97,19 @@ public partial class DialogWithOkAndCancel : Form {
             wi += capText.Width;
             he += capText.Height;
         }
+
         if (centerControl != null) {
             centerControl.Top = he;
+            centerControl.Left = Skin.Padding;
+            centerControl.Width = Width - Skin.Padding * 2 - BorderWidth;
+            centerControl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             he = he + centerControl.Height + Skin.Padding;
         }
+
         wi = Math.Max(wi + BorderWidth, minWidth);
         Setup(wi, he);
+
+
         if (centerControl != null) {
             centerControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         }

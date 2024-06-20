@@ -602,6 +602,8 @@ public partial class TableView : FormWithStatusBar {
     protected bool SwitchTabToDatabase(ConnectionInfo? connectionInfo) {
         if (connectionInfo is null) { return false; }
 
+        connectionInfo.Editor = typeof(DatabaseHeadEditor);
+
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
                 if (ci.UniqueId.Equals(connectionInfo.UniqueId, StringComparison.OrdinalIgnoreCase)) {

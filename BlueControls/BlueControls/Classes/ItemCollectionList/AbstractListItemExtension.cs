@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
@@ -266,6 +267,8 @@ public static class AbstractListItemExtension {
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
                 var co = ItemOf(thisColumnItem);
+
+                thisColumnItem.Editor = typeof(ColumnEditor);
 
                 if (doCaptionSort) {
                     var capt = thisColumnItem.Ueberschriften ?? string.Empty;

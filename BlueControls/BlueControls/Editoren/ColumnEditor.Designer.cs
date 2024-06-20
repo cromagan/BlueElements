@@ -158,6 +158,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
+            this.btnSpaltenkopf = new BlueControls.Controls.Button();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -212,10 +213,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnzeige.Controls.Add(this.cbxRandLinks);
             this.tabAnzeige.Controls.Add(this.capLinkerRand);
             this.tabAnzeige.Controls.Add(this.capRechterRand);
-            this.tabAnzeige.Location = new System.Drawing.Point(4, 25);
+            this.tabAnzeige.Location = new System.Drawing.Point(4, 29);
             this.tabAnzeige.Name = "tabAnzeige";
             this.tabAnzeige.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAnzeige.Size = new System.Drawing.Size(993, 483);
+            this.tabAnzeige.Size = new System.Drawing.Size(993, 479);
             this.tabAnzeige.TabIndex = 0;
             this.tabAnzeige.Text = "Anzeige";
             // 
@@ -227,7 +228,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbFixedColumnWidth.Name = "txbFixedColumnWidth";
             this.txbFixedColumnWidth.QuickInfo = "Wenn ein Wert >0 eingegeben wird, \r\nwird die Spalte immer in dieser Breite angeze" +
     "igt.";
-            this.txbFixedColumnWidth.RaiseChangeDelay = 0;
             this.txbFixedColumnWidth.Size = new System.Drawing.Size(96, 24);
             this.txbFixedColumnWidth.Suffix = "Pixel";
             this.txbFixedColumnWidth.TabIndex = 42;
@@ -315,7 +315,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxAlign.Location = new System.Drawing.Point(384, 136);
             this.cbxAlign.Name = "cbxAlign";
-            this.cbxAlign.RaiseChangeDelay = 0;
             this.cbxAlign.Regex = null;
             this.cbxAlign.Size = new System.Drawing.Size(128, 24);
             this.cbxAlign.TabIndex = 7;
@@ -331,9 +330,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbReplacer.Name = "txbReplacer";
             this.txbReplacer.QuickInfo = "Texte in der Spalte werden mit diesen Angaben <b>optisch</b> ersetzt.<br><i><u>Be" +
     "ispiel:</i></u>Beispiel-Text|Bsp.-Txt";
-            this.txbReplacer.RaiseChangeDelay = 0;
             this.txbReplacer.Regex = null;
-            this.txbReplacer.Size = new System.Drawing.Size(985, 217);
+            this.txbReplacer.Size = new System.Drawing.Size(985, 213);
             this.txbReplacer.SpellCheckingEnabled = true;
             this.txbReplacer.TabIndex = 35;
             // 
@@ -367,7 +365,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbPrefix.Location = new System.Drawing.Point(56, 48);
             this.txbPrefix.Name = "txbPrefix";
-            this.txbPrefix.RaiseChangeDelay = 0;
             this.txbPrefix.Regex = null;
             this.txbPrefix.Size = new System.Drawing.Size(168, 24);
             this.txbPrefix.TabIndex = 36;
@@ -412,7 +409,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift3.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift3.Location = new System.Drawing.Point(624, 56);
             this.txbUeberschift3.Name = "txbUeberschift3";
-            this.txbUeberschift3.RaiseChangeDelay = 0;
             this.txbUeberschift3.Regex = null;
             this.txbUeberschift3.Size = new System.Drawing.Size(288, 24);
             this.txbUeberschift3.TabIndex = 38;
@@ -422,7 +418,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift2.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift2.Location = new System.Drawing.Point(624, 32);
             this.txbUeberschift2.Name = "txbUeberschift2";
-            this.txbUeberschift2.RaiseChangeDelay = 0;
             this.txbUeberschift2.Regex = null;
             this.txbUeberschift2.Size = new System.Drawing.Size(288, 24);
             this.txbUeberschift2.TabIndex = 37;
@@ -432,7 +427,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift1.Location = new System.Drawing.Point(624, 8);
             this.txbUeberschift1.Name = "txbUeberschift1";
-            this.txbUeberschift1.RaiseChangeDelay = 0;
             this.txbUeberschift1.Regex = null;
             this.txbUeberschift1.Size = new System.Drawing.Size(288, 24);
             this.txbUeberschift1.TabIndex = 36;
@@ -458,7 +452,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxEinheit.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxEinheit.Location = new System.Drawing.Point(56, 8);
             this.cbxEinheit.Name = "cbxEinheit";
-            this.cbxEinheit.RaiseChangeDelay = 0;
             this.cbxEinheit.Regex = null;
             this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
             this.cbxEinheit.TabIndex = 31;
@@ -487,7 +480,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRandRechts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRandRechts.Location = new System.Drawing.Point(384, 88);
             this.cbxRandRechts.Name = "cbxRandRechts";
-            this.cbxRandRechts.RaiseChangeDelay = 0;
             this.cbxRandRechts.Regex = null;
             this.cbxRandRechts.Size = new System.Drawing.Size(128, 24);
             this.cbxRandRechts.TabIndex = 25;
@@ -507,7 +499,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRandLinks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxRandLinks.Location = new System.Drawing.Point(248, 88);
             this.cbxRandLinks.Name = "cbxRandLinks";
-            this.cbxRandLinks.RaiseChangeDelay = 0;
             this.cbxRandLinks.Regex = null;
             this.cbxRandLinks.Size = new System.Drawing.Size(128, 24);
             this.cbxRandLinks.TabIndex = 24;
@@ -536,7 +527,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxScriptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxScriptType.Location = new System.Drawing.Point(232, 272);
             this.cbxScriptType.Name = "cbxScriptType";
-            this.cbxScriptType.RaiseChangeDelay = 0;
             this.cbxScriptType.Regex = null;
             this.cbxScriptType.Size = new System.Drawing.Size(304, 24);
             this.cbxScriptType.TabIndex = 43;
@@ -564,7 +554,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAdditionalCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxAdditionalCheck.Location = new System.Drawing.Point(232, 232);
             this.cbxAdditionalCheck.Name = "cbxAdditionalCheck";
-            this.cbxAdditionalCheck.RaiseChangeDelay = 0;
             this.cbxAdditionalCheck.Regex = null;
             this.cbxAdditionalCheck.Size = new System.Drawing.Size(304, 24);
             this.cbxAdditionalCheck.TabIndex = 34;
@@ -584,7 +573,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxFunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxFunction.Location = new System.Drawing.Point(8, 32);
             this.cbxFunction.Name = "cbxFunction";
-            this.cbxFunction.RaiseChangeDelay = 0;
             this.cbxFunction.Regex = null;
             this.cbxFunction.Size = new System.Drawing.Size(312, 24);
             this.cbxFunction.TabIndex = 27;
@@ -618,10 +606,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabBearbeitung.Controls.Add(this.btnEditableStandard);
             this.tabBearbeitung.Controls.Add(this.capUserGroupEdit);
             this.tabBearbeitung.Controls.Add(this.btnEditableDropdown);
-            this.tabBearbeitung.Location = new System.Drawing.Point(4, 25);
+            this.tabBearbeitung.Location = new System.Drawing.Point(4, 29);
             this.tabBearbeitung.Name = "tabBearbeitung";
             this.tabBearbeitung.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBearbeitung.Size = new System.Drawing.Size(993, 483);
+            this.tabBearbeitung.Size = new System.Drawing.Size(993, 479);
             this.tabBearbeitung.TabIndex = 1;
             this.tabBearbeitung.Text = "Bearbeitung";
             // 
@@ -661,7 +649,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAuswaehlbareWerte.Location = new System.Drawing.Point(8, 64);
             this.txbAuswaehlbareWerte.MultiLine = true;
             this.txbAuswaehlbareWerte.Name = "txbAuswaehlbareWerte";
-            this.txbAuswaehlbareWerte.RaiseChangeDelay = 0;
             this.txbAuswaehlbareWerte.Regex = null;
             this.txbAuswaehlbareWerte.Size = new System.Drawing.Size(520, 280);
             this.txbAuswaehlbareWerte.SpellCheckingEnabled = true;
@@ -757,9 +744,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAutoKorrektur.Controls.Add(this.txbRunden);
             this.tabAutoKorrektur.Controls.Add(this.capNachkommastellen);
             this.tabAutoKorrektur.Controls.Add(this.btnAutoEditAutoSort);
-            this.tabAutoKorrektur.Location = new System.Drawing.Point(4, 25);
+            this.tabAutoKorrektur.Location = new System.Drawing.Point(4, 29);
             this.tabAutoKorrektur.Name = "tabAutoKorrektur";
-            this.tabAutoKorrektur.Size = new System.Drawing.Size(993, 483);
+            this.tabAutoKorrektur.Size = new System.Drawing.Size(993, 479);
             this.tabAutoKorrektur.TabIndex = 6;
             this.tabAutoKorrektur.Text = "Auto-Korrektur";
             // 
@@ -783,9 +770,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAutoReplace.MultiLine = true;
             this.txbAutoReplace.Name = "txbAutoReplace";
             this.txbAutoReplace.QuickInfo = resources.GetString("txbAutoReplace.QuickInfo");
-            this.txbAutoReplace.RaiseChangeDelay = 0;
             this.txbAutoReplace.Regex = null;
-            this.txbAutoReplace.Size = new System.Drawing.Size(968, 288);
+            this.txbAutoReplace.Size = new System.Drawing.Size(968, 284);
             this.txbAutoReplace.SpellCheckingEnabled = true;
             this.txbAutoReplace.TabIndex = 39;
             // 
@@ -806,7 +792,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbMaxCellLenght.MaxTextLenght = 255;
             this.txbMaxCellLenght.Name = "txbMaxCellLenght";
             this.txbMaxCellLenght.QuickInfo = resources.GetString("txbMaxCellLenght.QuickInfo");
-            this.txbMaxCellLenght.RaiseChangeDelay = 0;
             this.txbMaxCellLenght.Regex = "^((-?[1-9]\\d*)|0)$";
             this.txbMaxCellLenght.Size = new System.Drawing.Size(96, 24);
             this.txbMaxCellLenght.TabIndex = 45;
@@ -818,7 +803,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoRemove.Location = new System.Drawing.Point(16, 136);
             this.txbAutoRemove.Name = "txbAutoRemove";
-            this.txbAutoRemove.RaiseChangeDelay = 0;
             this.txbAutoRemove.Regex = null;
             this.txbAutoRemove.Size = new System.Drawing.Size(968, 24);
             this.txbAutoRemove.TabIndex = 37;
@@ -865,7 +849,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbRunden.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRunden.Location = new System.Drawing.Point(232, 48);
             this.txbRunden.Name = "txbRunden";
-            this.txbRunden.RaiseChangeDelay = 0;
             this.txbRunden.Regex = null;
             this.txbRunden.Size = new System.Drawing.Size(88, 24);
             this.txbRunden.TabIndex = 11;
@@ -898,10 +881,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabFilter.Controls.Add(this.btnAutoFilterMoeglich);
             this.tabFilter.Controls.Add(this.btnAutoFilterTXTErlaubt);
             this.tabFilter.Controls.Add(this.btnAutoFilterErweitertErlaubt);
-            this.tabFilter.Location = new System.Drawing.Point(4, 25);
+            this.tabFilter.Location = new System.Drawing.Point(4, 29);
             this.tabFilter.Name = "tabFilter";
             this.tabFilter.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFilter.Size = new System.Drawing.Size(993, 483);
+            this.tabFilter.Size = new System.Drawing.Size(993, 479);
             this.tabFilter.TabIndex = 2;
             this.tabFilter.Text = "Filter";
             // 
@@ -938,7 +921,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbJoker.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbJoker.Location = new System.Drawing.Point(4, 233);
             this.txbJoker.Name = "txbJoker";
-            this.txbJoker.RaiseChangeDelay = 0;
             this.txbJoker.Regex = null;
             this.txbJoker.Size = new System.Drawing.Size(312, 24);
             this.txbJoker.TabIndex = 7;
@@ -987,10 +969,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabQuickInfo.Controls.Add(this.Caption18);
             this.tabQuickInfo.Controls.Add(this.Caption17);
             this.tabQuickInfo.Controls.Add(this.btnQI_Vorschau);
-            this.tabQuickInfo.Location = new System.Drawing.Point(4, 25);
+            this.tabQuickInfo.Location = new System.Drawing.Point(4, 29);
             this.tabQuickInfo.Name = "tabQuickInfo";
             this.tabQuickInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabQuickInfo.Size = new System.Drawing.Size(993, 483);
+            this.tabQuickInfo.Size = new System.Drawing.Size(993, 479);
             this.tabQuickInfo.TabIndex = 3;
             this.tabQuickInfo.Text = "Quickinfo";
             // 
@@ -1002,9 +984,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAdminInfo.Location = new System.Drawing.Point(512, 24);
             this.txbAdminInfo.MultiLine = true;
             this.txbAdminInfo.Name = "txbAdminInfo";
-            this.txbAdminInfo.RaiseChangeDelay = 0;
             this.txbAdminInfo.Regex = null;
-            this.txbAdminInfo.Size = new System.Drawing.Size(473, 424);
+            this.txbAdminInfo.Size = new System.Drawing.Size(473, 420);
             this.txbAdminInfo.SpellCheckingEnabled = true;
             this.txbAdminInfo.TabIndex = 3;
             this.txbAdminInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
@@ -1018,9 +999,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbQuickinfo.Location = new System.Drawing.Point(8, 24);
             this.txbQuickinfo.MultiLine = true;
             this.txbQuickinfo.Name = "txbQuickinfo";
-            this.txbQuickinfo.RaiseChangeDelay = 0;
             this.txbQuickinfo.Regex = null;
-            this.txbQuickinfo.Size = new System.Drawing.Size(496, 424);
+            this.txbQuickinfo.Size = new System.Drawing.Size(496, 420);
             this.txbQuickinfo.SpellCheckingEnabled = true;
             this.txbQuickinfo.TabIndex = 0;
             this.txbQuickinfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
@@ -1047,7 +1027,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // btnQI_Vorschau
             // 
             this.btnQI_Vorschau.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnQI_Vorschau.Location = new System.Drawing.Point(889, 456);
+            this.btnQI_Vorschau.Location = new System.Drawing.Point(889, 452);
             this.btnQI_Vorschau.Name = "btnQI_Vorschau";
             this.btnQI_Vorschau.Size = new System.Drawing.Size(96, 24);
             this.btnQI_Vorschau.TabIndex = 1;
@@ -1059,10 +1039,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSonstiges.Controls.Add(this.txbTags);
             this.tabSonstiges.Controls.Add(this.Caption8);
-            this.tabSonstiges.Location = new System.Drawing.Point(4, 25);
+            this.tabSonstiges.Location = new System.Drawing.Point(4, 29);
             this.tabSonstiges.Name = "tabSonstiges";
             this.tabSonstiges.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSonstiges.Size = new System.Drawing.Size(993, 483);
+            this.tabSonstiges.Size = new System.Drawing.Size(993, 479);
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
             // 
@@ -1075,9 +1055,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTags.Location = new System.Drawing.Point(4, 31);
             this.txbTags.MultiLine = true;
             this.txbTags.Name = "txbTags";
-            this.txbTags.RaiseChangeDelay = 0;
             this.txbTags.Regex = null;
-            this.txbTags.Size = new System.Drawing.Size(980, 441);
+            this.txbTags.Size = new System.Drawing.Size(980, 437);
             this.txbTags.TabIndex = 30;
             this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -1096,7 +1075,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxSort.Location = new System.Drawing.Point(232, 312);
             this.cbxSort.Name = "cbxSort";
-            this.cbxSort.RaiseChangeDelay = 0;
             this.cbxSort.Regex = null;
             this.cbxSort.Size = new System.Drawing.Size(304, 24);
             this.cbxSort.TabIndex = 35;
@@ -1108,7 +1086,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRegex.Location = new System.Drawing.Point(8, 168);
             this.txbRegex.Name = "txbRegex";
-            this.txbRegex.RaiseChangeDelay = 0;
             this.txbRegex.Size = new System.Drawing.Size(976, 48);
             this.txbRegex.TabIndex = 9;
             // 
@@ -1136,7 +1113,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAllowedChars.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAllowedChars.Location = new System.Drawing.Point(8, 88);
             this.txbAllowedChars.Name = "txbAllowedChars";
-            this.txbAllowedChars.RaiseChangeDelay = 0;
             this.txbAllowedChars.Regex = null;
             this.txbAllowedChars.Size = new System.Drawing.Size(976, 56);
             this.txbAllowedChars.TabIndex = 30;
@@ -1158,7 +1134,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxLinkedDatabase.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxLinkedDatabase.Location = new System.Drawing.Point(224, 16);
             this.cbxLinkedDatabase.Name = "cbxLinkedDatabase";
-            this.cbxLinkedDatabase.RaiseChangeDelay = 0;
             this.cbxLinkedDatabase.Regex = null;
             this.cbxLinkedDatabase.Size = new System.Drawing.Size(752, 24);
             this.cbxLinkedDatabase.TabIndex = 38;
@@ -1224,7 +1199,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbName.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbName.Location = new System.Drawing.Point(8, 56);
             this.txbName.Name = "txbName";
-            this.txbName.RaiseChangeDelay = 0;
             this.txbName.Regex = null;
             this.txbName.Size = new System.Drawing.Size(296, 24);
             this.txbName.TabIndex = 0;
@@ -1246,7 +1220,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbCaption.Location = new System.Drawing.Point(312, 32);
             this.txbCaption.MultiLine = true;
             this.txbCaption.Name = "txbCaption";
-            this.txbCaption.RaiseChangeDelay = 0;
             this.txbCaption.Regex = null;
             this.txbCaption.Size = new System.Drawing.Size(681, 64);
             this.txbCaption.TabIndex = 2;
@@ -1306,9 +1279,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDatenFormat.Controls.Add(this.cbxFunction);
             this.tabDatenFormat.Controls.Add(this.capFunction);
             this.tabDatenFormat.Controls.Add(this.btnMultiline);
-            this.tabDatenFormat.Location = new System.Drawing.Point(4, 25);
+            this.tabDatenFormat.Location = new System.Drawing.Point(4, 29);
             this.tabDatenFormat.Name = "tabDatenFormat";
-            this.tabDatenFormat.Size = new System.Drawing.Size(993, 483);
+            this.tabDatenFormat.Size = new System.Drawing.Size(993, 479);
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
             // 
@@ -1331,7 +1304,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbMaxTextLenght.MaxTextLenght = 255;
             this.txbMaxTextLenght.Name = "txbMaxTextLenght";
             this.txbMaxTextLenght.QuickInfo = resources.GetString("txbMaxTextLenght.QuickInfo");
-            this.txbMaxTextLenght.RaiseChangeDelay = 0;
             this.txbMaxTextLenght.Regex = "^((-?[1-9]\\d*)|0)$";
             this.txbMaxTextLenght.Size = new System.Drawing.Size(96, 24);
             this.txbMaxTextLenght.TabIndex = 47;
@@ -1476,9 +1448,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSpaltenVerlinkung.Controls.Add(this.capLinkedDatabase);
             this.tabSpaltenVerlinkung.Controls.Add(this.capTargetColumn);
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxLinkedDatabase);
-            this.tabSpaltenVerlinkung.Location = new System.Drawing.Point(4, 25);
+            this.tabSpaltenVerlinkung.Location = new System.Drawing.Point(4, 29);
             this.tabSpaltenVerlinkung.Name = "tabSpaltenVerlinkung";
-            this.tabSpaltenVerlinkung.Size = new System.Drawing.Size(993, 483);
+            this.tabSpaltenVerlinkung.Size = new System.Drawing.Size(993, 479);
             this.tabSpaltenVerlinkung.TabIndex = 11;
             this.tabSpaltenVerlinkung.Text = "Spalten-Verlinkung";
             // 
@@ -1488,10 +1460,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblFilterliste.Arrangement = "";
-            this.tblFilterliste.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Gewähle_Zeile;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";
-            this.tblFilterliste.Size = new System.Drawing.Size(968, 396);
+            this.tblFilterliste.Size = new System.Drawing.Size(968, 392);
             this.tblFilterliste.TabIndex = 39;
             // 
             // cbxTargetColumn
@@ -1502,7 +1473,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxTargetColumn.Location = new System.Drawing.Point(224, 48);
             this.cbxTargetColumn.Name = "cbxTargetColumn";
-            this.cbxTargetColumn.RaiseChangeDelay = 0;
             this.cbxTargetColumn.Regex = null;
             this.cbxTargetColumn.Size = new System.Drawing.Size(752, 24);
             this.cbxTargetColumn.TabIndex = 5;
@@ -1549,16 +1519,27 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capTabellenname
             // 
             this.capTabellenname.CausesValidation = false;
-            this.capTabellenname.Location = new System.Drawing.Point(12, 1);
+            this.capTabellenname.Location = new System.Drawing.Point(40, 0);
             this.capTabellenname.Name = "capTabellenname";
-            this.capTabellenname.Size = new System.Drawing.Size(988, 24);
+            this.capTabellenname.Size = new System.Drawing.Size(940, 24);
             this.capTabellenname.Text = "Tabellenname:";
             this.capTabellenname.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             this.capTabellenname.Translate = false;
             // 
+            // btnSpaltenkopf
+            // 
+            this.btnSpaltenkopf.ImageCode = "Stift|16";
+            this.btnSpaltenkopf.Location = new System.Drawing.Point(8, 0);
+            this.btnSpaltenkopf.Name = "btnSpaltenkopf";
+            this.btnSpaltenkopf.QuickInfo = "Spaltenkopf bearbeiten";
+            this.btnSpaltenkopf.Size = new System.Drawing.Size(32, 24);
+            this.btnSpaltenkopf.TabIndex = 49;
+            this.btnSpaltenkopf.Click += new System.EventHandler(this.btnSpaltenkopf_Click);
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(1007, 685);
+            this.Controls.Add(this.btnSpaltenkopf);
             this.Controls.Add(this.capTabellenname);
             this.Controls.Add(this.caption5);
             this.Controls.Add(this.butAktuellVor);
@@ -1710,5 +1691,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbMaxTextLenght;
         private Caption capMaxTextLenght;
         private Button btnMaxTextLenght;
+        private Button btnSpaltenkopf;
     }
 }

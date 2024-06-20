@@ -70,7 +70,7 @@ public class SymbolPadItem : RectanglePadItem {
         comms.Add(ItemOf("Bruchlinie", ((int)Symbol.Bruchlinie).ToString()));
         List<GenericControl> l =
         [
-            new FlexiControlForProperty<Symbol>(() => Symbol, comms, widthOfControl),
+            new FlexiControlForProperty<Symbol>(() => Symbol, comms),
             new FlexiControlForProperty<float>(() => Randdicke),
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe),

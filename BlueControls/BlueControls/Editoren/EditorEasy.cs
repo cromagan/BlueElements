@@ -82,12 +82,10 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// Reseted Formulare. Löscht z.B. Texte, Tabellen-Einträge, etc
     /// </summary>
     public virtual void Clear() {
-        if (_toEdit is ISimpleEditor) { return; }
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
     }
 
     public virtual IEditable? GetCloneOfCurrent() {
-        if (ToEdit is null or ISimpleEditor) { return null; }
         if (!string.IsNullOrEmpty(Error)) { return null; }
 
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
@@ -100,18 +98,6 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// <param name="toEdit"></param>
     /// <returns></returns>
     public virtual bool Init(IEditable? toEdit) {
-        if (_toEdit is ISimpleEditor ise) {
-            DoForm(ise, this.Controls, this.Width);
-
-            foreach (var control in this.Controls) {
-                if (control is System.Windows.Forms.Control c) {
-                    Height = Math.Max(Height, c.Bottom);
-                }
-            }
-
-            return true;
-        }
-
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
         return false;
     }
@@ -120,8 +106,6 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
     protected virtual void InitializeComponentDefaultValues() {
-        if (_toEdit is ISimpleEditor) { return; }
-
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
     }
 

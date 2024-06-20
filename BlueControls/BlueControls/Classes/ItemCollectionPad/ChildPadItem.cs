@@ -113,8 +113,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         var lage = new List<AbstractListItem>();
         lage.Add(ItemOf("ohne", "-1"));
         lage.Add(ItemOf("Links oben", ((int)Alignment.Top_Left).ToString()));
-        l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage, widthOfControl));
-        l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5, widthOfControl));
+        l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
+        l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
         l.AddRange(base.GetProperties(widthOfControl));
         return l;
     }

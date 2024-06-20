@@ -216,18 +216,18 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         var lst = new List<AbstractListItem>();
         lst.AddRange(ItemsOf(db.Column, true));
 
-        result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst, widthOfControl));
+        result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
         if (Column == null || Column.IsDisposed) { return result; }
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u, widthOfControl));
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
         result.Add(new FlexiControlForProperty<bool>(() => AutoX));
 
         var b = new List<AbstractListItem>();
         b.AddRange(GetAllowedEditTypes(Column));
-        result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b, widthOfControl));
+        result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
         //result.Add(new FlexiControl());
         //result.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));

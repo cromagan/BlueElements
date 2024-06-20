@@ -84,6 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1060, 24);
             this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -97,7 +98,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.eventScriptEditor.Location = new System.Drawing.Point(3, 3);
             this.eventScriptEditor.Name = "eventScriptEditor";
             this.eventScriptEditor.ScriptText = "";
-            this.eventScriptEditor.Size = new System.Drawing.Size(1046, 508);
+            this.eventScriptEditor.Size = new System.Drawing.Size(1046, 504);
             this.eventScriptEditor.TabIndex = 6;
             this.eventScriptEditor.TabStop = false;
             this.eventScriptEditor.ExecuteScript += new System.EventHandler<BlueScript.EventArgs.ScriptEventArgs>(this.eventScriptEditor_ExecuteScript);
@@ -122,10 +123,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabSkriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSkriptEditor.Controls.Add(this.eventScriptEditor);
-            this.tabSkriptEditor.Location = new System.Drawing.Point(4, 25);
+            this.tabSkriptEditor.Location = new System.Drawing.Point(4, 29);
             this.tabSkriptEditor.Name = "tabSkriptEditor";
             this.tabSkriptEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSkriptEditor.Size = new System.Drawing.Size(1052, 514);
+            this.tabSkriptEditor.Size = new System.Drawing.Size(1052, 510);
             this.tabSkriptEditor.TabIndex = 1;
             this.tabSkriptEditor.Text = "Skript-Editor";
             // 
@@ -143,10 +144,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabKopfdaten.Controls.Add(this.btnVerlauf);
             this.tabKopfdaten.Controls.Add(this.capName);
             this.tabKopfdaten.Controls.Add(this.txbName);
-            this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
+            this.tabKopfdaten.Location = new System.Drawing.Point(4, 29);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(1052, 514);
+            this.tabKopfdaten.Size = new System.Drawing.Size(1052, 510);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -472,10 +473,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabStart.Controls.Add(this.grpAktionen);
             this.tabStart.Controls.Add(this.grpInfos);
             this.tabStart.Controls.Add(this.grpAusführen);
-            this.tabStart.Location = new System.Drawing.Point(4, 25);
+            this.tabStart.Location = new System.Drawing.Point(4, 29);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStart.Size = new System.Drawing.Size(1289, 81);
+            this.tabStart.Size = new System.Drawing.Size(1289, 77);
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             // 
@@ -488,7 +489,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAktionen.Location = new System.Drawing.Point(800, 3);
             this.grpAktionen.Name = "grpAktionen";
-            this.grpAktionen.Size = new System.Drawing.Size(208, 75);
+            this.grpAktionen.Size = new System.Drawing.Size(208, 71);
             this.grpAktionen.TabIndex = 2;
             this.grpAktionen.TabStop = false;
             this.grpAktionen.Text = "Aktionen";
@@ -516,7 +517,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpInfos.Location = new System.Drawing.Point(520, 3);
             this.grpInfos.Name = "grpInfos";
-            this.grpInfos.Size = new System.Drawing.Size(280, 75);
+            this.grpInfos.Size = new System.Drawing.Size(280, 71);
             this.grpInfos.TabIndex = 1;
             this.grpInfos.TabStop = false;
             this.grpInfos.Text = "Infos";
@@ -579,7 +580,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusführen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAusführen.Location = new System.Drawing.Point(3, 3);
             this.grpAusführen.Name = "grpAusführen";
-            this.grpAusführen.Size = new System.Drawing.Size(517, 75);
+            this.grpAusführen.Size = new System.Drawing.Size(517, 71);
             this.grpAusführen.TabIndex = 0;
             this.grpAusführen.TabStop = false;
             this.grpAusführen.Text = "Ausführen";

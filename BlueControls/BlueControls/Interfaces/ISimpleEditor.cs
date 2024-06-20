@@ -22,6 +22,7 @@ using BlueControls.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Windows.Media.Media3D;
 using static System.Windows.Forms.Control;
 
 namespace BlueBasics.Interfaces;
@@ -45,7 +46,7 @@ public static class SimpleEditorExtension {
 
     #region Methods
 
-    public static void DoForm(ISimpleEditor? element, ControlCollection controls, int width) {
+    public static void DoForm(this ISimpleEditor? element, ControlCollection controls, int width) {
 
         #region  SideMenu leeren
 
@@ -85,11 +86,27 @@ public static class SimpleEditorExtension {
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = width- Skin.Padding*2;
+                thisFlexi.Width = width - Skin.Padding * 2;
             }
         }
 
         #endregion
+    }
+
+    public static UserControl GetControl(this ISimpleEditor? element) {
+        var l = new UserControl();
+        l.Width = 100;
+        l.Height = 100;
+        l.Visible = true;
+
+        element.DoForm(l.Controls, l.Width);
+
+        foreach (var control in l.Controls) {
+            if (control is System.Windows.Forms.Control c) {
+                l.Height = Math.Max(l.Height, c.Bottom);
+            }
+        }
+        return l;
     }
 
     #endregion

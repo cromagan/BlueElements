@@ -132,7 +132,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
                 ItemCollectionPad p = new(thisLayouts);
                 layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }
-            l.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts, widthOfControl));
+            l.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
         }
         l.AddRange(base.GetProperties(widthOfControl));
         return l;

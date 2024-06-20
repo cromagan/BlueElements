@@ -39,6 +39,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using BlueControls.ItemCollectionList;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -653,7 +654,9 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         foreach (var thisfile in _databaseFiles) {
-            _ = Database.GetById(new ConnectionInfo(thisfile, null, string.Empty), false, null, true);
+            var db = Database.GetById(new ConnectionInfo(thisfile, null, string.Empty), false, null, true);
+
+            if (db != null) { db.Editor = typeof(DatabaseHeadEditor); }
         }
 
         _saved = false;

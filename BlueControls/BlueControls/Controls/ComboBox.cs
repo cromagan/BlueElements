@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -60,6 +61,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private List<AbstractListItem> _item = new();
     private Design _itemDesign;
+    private bool _itemEditAllowed = false;
+
     private string? _lastClickedText;
 
     #endregion
@@ -73,6 +76,10 @@ public partial class ComboBox : TextBox, ITranslateable {
         MouseHighlight = true;
         SetStyle(ControlStyles.ContainerControl, true);
         btnDropDown.Left = Width - btnDropDown.Width;
+        btnDropDown.Top = 0;
+        btnDropDown.Height = Height;
+
+        btnEdit.Left = Width - btnDropDown.Width - btnEdit.Width;
         btnDropDown.Top = 0;
         btnDropDown.Height = Height;
     }
@@ -139,6 +146,16 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     public int ItemCount => _item.Count;
 
+    [DefaultValue(false)]
+    public bool ItemEditAllowed {
+        get => _itemEditAllowed;
+        set {
+            if (_itemEditAllowed == value) { return; }
+            _itemEditAllowed = value;
+            btnEdit.Visible = false;
+        }
+    }
+
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
@@ -186,7 +203,10 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     public void ShowMenu(object? sender, MouseEventArgs? e) {
-        if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
+        if (IsDisposed) { return; }
+        btnEdit.Visible = false;
+
+        if (_btnDropDownIsIn || !Enabled) { return; }
         _btnDropDownIsIn = true;
         OnDropDownShowing();
         if (_item.Count == 0) { _btnDropDownIsIn = false; return; }
@@ -234,6 +254,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         if (_drawStyle != ComboboxStyle.TextBox) {
+            btnEdit.Visible = false;
             if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
             _eTxt ??= new ExtText((Design)_drawStyle, state);
@@ -253,6 +274,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (i == null) {
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
+            btnEdit.Invalidate();
             return;
         }
 
@@ -261,6 +283,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
+            btnEdit.Invalidate();
             return;
         }
 
@@ -269,6 +292,7 @@ public partial class ComboBox : TextBox, ITranslateable {
                 if (tempVar2.Symbol == null && tempVar2.IsClickable()) {
                     base.DrawControl(gr, state);
                     btnDropDown.Invalidate();
+                    btnEdit.Invalidate();
                     return;
                 }
             }
@@ -297,6 +321,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         FloatingForm.Close(this);
         btnDropDown.Enabled = Enabled;
         btnDropDown.Invalidate();
+
+        btnEdit.Visible = false;
     }
 
     protected override void OnGotFocus(System.EventArgs e) {
@@ -315,6 +341,31 @@ public partial class ComboBox : TextBox, ITranslateable {
         CheckLostFocus(e);
     }
 
+    protected override void OnMouseEnter(System.EventArgs e) {
+        base.OnMouseEnter(e);
+
+        if (!_itemEditAllowed) { return; }
+
+        var _mouseOverItem = _item.Get(Text);
+
+        var editok = false;
+
+        if (_mouseOverItem is ReadableListItem rli) {
+            if (rli.Item is IEditable ie && ie.Editor != null) { editok = true; }
+            if (rli.Item is ISimpleEditor) { editok = true; }
+        }
+
+        btnEdit.Visible = editok;
+    }
+
+    protected override void OnMouseLeave(System.EventArgs e) {
+        base.OnMouseLeave(e);
+
+        if (base.ContainsMouse()) { return; }
+
+        btnEdit.Visible = false;
+    }
+
     protected override void OnMouseUp(MouseEventArgs e) {
         if (e.Button != MouseButtons.Right) {
             // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
@@ -328,18 +379,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    //protected override void OnMouseEnter(System.EventArgs e)
-    //{
-    //    base.OnMouseEnter(e);
-    //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
-    //    Invalidate();
-    //}
-    //protected override void OnMouseLeave(System.EventArgs e)
-    //{
-    //    base.OnMouseLeave(e);
-    //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
-    //    Invalidate();
-    //}
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);
         FloatingForm.Close(this);
@@ -347,11 +386,24 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
 
+    private void btnEdit_Click(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        FloatingForm.Close(this);
+
+        var _mouseOverItem = _item.Get(Text);
+
+        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie) {
+            ie.Edit();
+        }
+    }
+
+    private void btnEdit_MouseLeave(object sender, System.EventArgs e) => OnMouseLeave(e);
+
     //}
     private void CheckLostFocus(System.EventArgs e) {
         try {
             if (btnDropDown == null) { return; }
-            if (!btnDropDown.Focused && !Focused && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
+            if (!btnDropDown.Focused && !btnEdit.Focused && !Focused && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
         } catch { }
     }
 

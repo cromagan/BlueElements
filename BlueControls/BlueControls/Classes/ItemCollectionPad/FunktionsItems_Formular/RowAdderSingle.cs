@@ -37,6 +37,7 @@ using BlueScript;
 using BlueScript.Methods;
 using BlueDatabase.Enums;
 using System.Collections.ObjectModel;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -80,7 +81,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         get {
             if (string.IsNullOrEmpty(tempDatabaseNametoLoad)) { return _database; }
             _database = GetById(new ConnectionInfo(tempDatabaseNametoLoad, null, string.Empty), false, null, true);
-
+            _database.Editor = typeof(DatabaseHeadEditor);
             tempDatabaseNametoLoad = string.Empty;
             return _database;
         }
@@ -145,7 +146,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     public List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
         //new FlexiControl("Ausgang:", widthOfControl, true),
-        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables(), widthOfControl));
+        l.Add(new FlexiControlForProperty<Database?>(() => Database, ItemSendFilter.AllAvailableTables()));
 
         if (Database != null && !Database.IsDisposed) {
             l.Add(new FlexiControlForProperty<FilterCollection>(() => Filter));

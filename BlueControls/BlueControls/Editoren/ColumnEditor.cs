@@ -69,7 +69,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
             if (value == _column) { return; }
             if (IsDisposed) { return; }
 
-            AllOk();
+            if (_column != null && !_column.IsDisposed) { AllOk(); }
+
             if (value is ColumnItem c) {
                 _column = c;
             } else {
@@ -205,6 +206,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (!AllOk()) { return; }
         _column.GetStyleFrom(ColumnFormatHolder.Text);
         Column_DatenAuslesen();
+    }
+
+    private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+
+        db.Edit(typeof(DatabaseHeadEditor));
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {

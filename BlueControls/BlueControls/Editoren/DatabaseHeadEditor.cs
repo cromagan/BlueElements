@@ -81,9 +81,19 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     public IEditable? ToEdit {
         set {
-            if (value is Database db) {
+            Database? db = null;
+
+            if (value is Database dbx) {
+                db = dbx;
+            } else if (value is ConnectionInfo ci) {
+                db = Database.GetById(ci, false, null, true);
+            }
+
+            if (db != null && !db.IsDisposed) {
                 Database = db;
-            } else { Database = null; }
+            } else {
+                Database = null;
+            }
         }
     }
 
@@ -235,7 +245,28 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void btnOptimize_Click(object sender, System.EventArgs e) => Database?.Optimize();
 
+    private void btnSkripte_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
+        var se = new DatabaseScriptEditor(db);
+        _ = se.ShowDialog();
+    }
+
+    private void btnSpaltenAnordnungen_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
+        var x = new ColumnArrangementPadEditor(db);
+        _ = x.ShowDialog();
+    }
+
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
+
+    private void btnTabellenAnsicht_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
+        var c = new TableView(db, false, true);
+        c.ShowDialog();
+    }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }

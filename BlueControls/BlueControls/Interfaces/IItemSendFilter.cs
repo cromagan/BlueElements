@@ -28,6 +28,7 @@ using BlueControls.ItemCollectionList;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using System.Reflection;
 using System.ComponentModel;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Interfaces;
 
@@ -99,6 +100,7 @@ public sealed class ItemSendFilter {
         var ld2 = new List<AbstractListItem>();
 
         foreach (var thisd in ld) {
+            thisd.Editor = typeof(DatabaseHeadEditor);
             ld2.Add(ItemOf(thisd));
         }
         return ld2;
@@ -170,22 +172,19 @@ public sealed class ItemSendFilter {
         var enableOutput = true;
         Database? outp = null;
 
-        if(item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase) {
+        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase) {
             enableOutput = ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None);
 
             outp = ias.DatabaseInput;
-            if (outp is not null) {  enableOutput = false;}
-
+            if (outp is not null) { enableOutput = false; }
         }
 
         if (!enableOutput) {
-
             if (outp != null) {
                 l.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
             }
-
         } else {
-            l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables(), widthOfControl));
+            l.Add(new FlexiControlForProperty<Database?>(() => item.DatabaseOutput, AllAvailableTables()));
         }
 
         return l;

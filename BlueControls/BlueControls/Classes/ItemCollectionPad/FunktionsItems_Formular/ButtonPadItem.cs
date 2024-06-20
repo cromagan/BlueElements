@@ -322,7 +322,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             c.Add(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
-        l.Add(new FlexiControlForProperty<string>(() => Bild, c, widthOfControl));
+        l.Add(new FlexiControlForProperty<string>(() => Bild, c));
 
         //var sn = new  List<AbstractListItem>(true) {
         //    "#Neue Zeile in der Datenbank anlegen"
@@ -340,7 +340,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         za.Add(ItemOf("...genau eine oder mehr Zeilen gefunden wurden", ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()));
         za.Add(ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString()));
 
-        l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za, widthOfControl));
+        l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 
         var co = new List<AbstractListItem>();
 
@@ -354,7 +354,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         l.Add(new FlexiControl("Aktion bei Drücken:", widthOfControl, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => Aktion, co, widthOfControl));
+        l.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
         var m = Script.Commands.Get(_action);
 
@@ -365,7 +365,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
         }
 
-        l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3, widthOfControl));
+        l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
 
         l.AddRange(base.GetProperties(widthOfControl));
 

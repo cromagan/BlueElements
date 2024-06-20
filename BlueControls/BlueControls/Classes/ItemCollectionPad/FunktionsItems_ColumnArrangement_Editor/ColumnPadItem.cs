@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -87,20 +88,26 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
-        if (Column == null || Column.IsDisposed) { return result; }
+        if (Column?.Database is not Database db || Column.IsDisposed) { return result; }
 
-        result.Add(new FlexiControlForProperty<string>(() => Datenbank));
+        db.Editor = typeof(DatabaseHeadEditor);
+        Column.Editor = typeof(ColumnEditor);
+
+        result.Add(new FlexiControlForDelegate(Column.Database.Edit, "Tabelle: " + Datenbank, ImageCode.Datenbank));
+        //result.Add(new FlexiControlForProperty<string>(() => Datenbank));
+        result.Add(new FlexiControlForDelegate(Column.Edit, "Spalte: " + Column.Caption, ImageCode.Spalte));
         result.Add(new FlexiControl());
         result.Add(new FlexiControlForProperty<bool>(() => Permanent));
         result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<string>(() => Column.Caption));
+        //result.Add(new FlexiControlForProperty<string>(() => Column.Caption));
+
         result.Add(new FlexiControl());
         result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
         result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
         result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
         result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5, widthOfControl));
-        result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5, widthOfControl));
+        result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
+        result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
         //if (AdditionalStyleOptions != null) {
         //    result.Add(new FlexiControl());

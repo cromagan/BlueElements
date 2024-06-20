@@ -258,6 +258,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var newc = db.Column.GenerateAndAdd();
 
         if (newc == null) { return; }
+        newc.Editor = typeof(ColumnEditor);
 
         if (vorlage != null) {
             newc.CloneFrom(vorlage, false);

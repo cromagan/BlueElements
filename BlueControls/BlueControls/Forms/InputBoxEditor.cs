@@ -20,8 +20,17 @@
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
 using BlueControls.Interfaces;
-using BlueDatabase;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Temporär;
+using System.Drawing;
+using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using System;
+using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
@@ -29,19 +38,17 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxEditor() : this(null, null) { }
+    private InputBoxEditor() : this(null) { }
 
-    private InputBoxEditor(IEditable? toEdit, EditorEasy? ea) : base(false, true) {
+    private InputBoxEditor(Control? centerControl) : base(false, true) {
         InitializeComponent();
 
-        if (toEdit == null) { return; }
-        if (ea == null) { return; }
+        //if (toEdit == null) { return; }
+        if (centerControl == null) { return; }
 
-        Controls.Add(ea);
+        Controls.Add(centerControl);
 
-        ea.Init(toEdit);
-
-        Setup(string.Empty, ea, ea.Width + (Skin.Padding * 2));
+        Setup(string.Empty, centerControl, centerControl.Width + (Skin.Padding * 2));
     }
 
     #endregion
@@ -53,10 +60,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     public static void Show(IEditable? toEdit, Type? type) => Show(toEdit, type, true);
 
     public static void Show(IEditable? toEdit, Type? type, bool isDialog) {
-        if (type == null && toEdit is ISimpleEditor) { type = typeof(EditorEasy); }
-
-        if (toEdit == null || type == null) { return; }
-
+        if (toEdit == null) { return; }
         if (type == null && toEdit is not ISimpleEditor) { return; }
 
         if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
@@ -66,14 +70,20 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         Form? mb = null;
 
         try {
-            object myObject = Activator.CreateInstance(toEdit.Editor);
+            if (toEdit is ISimpleEditor ise) {
+                mb = new InputBoxEditor(ise.GetControl());
+            } else {
+                object myObject = Activator.CreateInstance(toEdit.Editor);
 
-            if (myObject is IIsEditor ie) {
-                ie.ToEdit = toEdit;
-                if (ie is EditorEasy ea) {
-                    mb = new InputBoxEditor(toEdit, ea);
-                } else if (ie is Form frm) {
-                    mb = frm;
+                if (myObject is IIsEditor ie) {
+                    ie.ToEdit = toEdit;
+                    if (ie is EditorEasy ea) {
+                        ea.Init(toEdit);
+
+                        mb = new InputBoxEditor(ea);
+                    } else if (ie is Form frm) {
+                        mb = frm;
+                    }
                 }
             }
         } catch { }

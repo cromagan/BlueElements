@@ -33,6 +33,7 @@ using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using BlueControls.Forms;
+using BlueControls.BlueDatabaseDialogs;
 
 #nullable enable
 
@@ -58,16 +59,16 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    /// <param name="widthOfControl"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, int widthOfControl) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
+    ///
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
-    /// <param name="widthOfControl"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount, int widthOfControl) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None) { }
+    ///
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
@@ -273,6 +274,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         control.ItemAddRange(list);
         control.AddAllowed = addallowed;
         control.RemoveAllowed = false;
+        control.ItemEditAllowed = string.Equals(Generic.UserGroup, Administrator, StringComparison.OrdinalIgnoreCase);
 
         ValueSet(string.Empty, true);
         //control.Check(Value.SplitByCr());
@@ -408,7 +410,11 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
 
             case Accessor<Database?> adb:
                 var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
-                if (adb.Get() != db) { adb.Set(db); }
+                if (db != null) { db.Editor = typeof(DatabaseHeadEditor); }
+
+                if (adb.Get() != db) {
+                    adb.Set(db);
+                }
                 break;
 
             //case Accessor<IEditable> _:

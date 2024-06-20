@@ -148,7 +148,7 @@ public partial class PadEditor : PadEditorReadOnly {
         Pad.Item.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
     }
 
-    private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => SimpleEditorExtension.DoForm(Pad.LastClickedItem, tabElementEigenschaften.Controls, tabElementEigenschaften.Width);
+    private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften.Controls, tabElementEigenschaften.Width);
 
     private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
         // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
