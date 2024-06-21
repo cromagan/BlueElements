@@ -55,6 +55,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public const string DatabaseVersion = "4.02";
     public static readonly ObservableCollection<Database> AllFiles = [];
 
+    public static int MaxMasterCount = 3;
+
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
@@ -2467,7 +2469,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thisDb in Database.AllFiles) {
             if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45) && thisDb.MultiUser) {
                 masters++;
-                if (masters > 8) { return false; }
+                if (masters >= MaxMasterCount) { return false; }
             }
         }
 

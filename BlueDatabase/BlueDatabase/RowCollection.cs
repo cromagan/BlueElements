@@ -300,6 +300,32 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         unique = unique.Except(notUnique).ToList();
     }
 
+    /// <summary>
+    /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
+    /// </summary>
+    /// <returns></returns>
+    public static RowItem? NextRowToCeck() {
+        List<Database> l = [.. Database.AllFiles];
+
+        if (Constants.GlobalRnd.Next(10) == 1) {
+            l.Shuffle();
+        } else {
+            l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+        }
+
+        foreach (var thisDb in l) {
+            if (thisDb is Database db && !db.IsDisposed) {
+                if (!db.CanDoValueChangedScript()) { continue; }
+
+                var rowToCheck = db.Row.NextRowToCheck(false);
+                if (rowToCheck != null) { return rowToCheck; }
+            }
+        }
+
+        WaitDelay = Math.Min(WaitDelay + 5, 100);
+        return null;
+    }
+
     public static string UniqueKeyValue() {
         var x = 9999;
         do {
@@ -690,7 +716,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisKey in keys) {
             if (Remove(thisKey, comment)) { did = true; }
-          
         }
 
         if (pinned != null && pinned.Count > 0) {
@@ -843,32 +868,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
-
-    /// <summary>
-    /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
-    /// </summary>
-    /// <returns></returns>
-    private static RowItem? NextRowToCeck() {
-        List<Database> l = [.. Database.AllFiles];
-
-        if (Constants.GlobalRnd.Next(10) == 1) {
-            l.Shuffle();
-        } else {
-            l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
-        }
-
-        foreach (var thisDb in l) {
-            if (thisDb is Database db && !db.IsDisposed) {
-                if (!db.CanDoValueChangedScript()) { continue; }
-
-                var rowToCheck = db.Row.NextRowToCheck(false);
-                if (rowToCheck != null) { return rowToCheck; }
-            }
-        }
-
-        WaitDelay = Math.Min(WaitDelay + 5, 100);
-        return null;
-    }
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem r || r.IsDisposed) { return; }
