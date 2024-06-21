@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -148,6 +149,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
         con.Arrangement = _defaultArrangement;
+        con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         return con;
     }
 

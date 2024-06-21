@@ -84,6 +84,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private bool _drawing;
 
+    private bool _editButton = false;
     private FilterCollection? _filterInput;
     private bool _isinClick;
 
@@ -249,6 +250,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Database? Database { get; private set; }
+
+    [DefaultValue(false)]
+    public bool EditButton {
+        get => _editButton;
+        set {
+            if (_editButton == value) { return; }
+            _editButton = value;
+            btnEdit.Visible = _editButton;
+        }
+    }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -2391,6 +2402,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 
     private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
+
+    private void btnEdit_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        db.Edit(typeof(DatabaseHeadEditor));
+    }
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool preverDropDown) {
         var f = EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true);

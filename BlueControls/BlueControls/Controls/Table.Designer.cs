@@ -16,75 +16,91 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.BCB = new ComboBox();
-            this.BTB = new TextBox();
-            this.SliderX = new Slider();
-            this.SliderY = new Slider();
+            this.BCB = new BlueControls.Controls.ComboBox();
+            this.BTB = new BlueControls.Controls.TextBox();
+            this.SliderX = new BlueControls.Controls.Slider();
+            this.SliderY = new BlueControls.Controls.Slider();
+            this.btnEdit = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // BCB
             // 
-            this.BCB.Cursor = Cursors.IBeam;
-            this.BCB.Location = new Point(48, 160);
+            this.BCB.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.BCB.Location = new System.Drawing.Point(48, 160);
             this.BCB.Name = "BCB";
-            this.BCB.Size = new Size(120, 24);
+            this.BCB.Size = new System.Drawing.Size(120, 24);
             this.BCB.TabIndex = 8;
-            this.BCB.Verhalten = SteuerelementVerhalten.Steuerelement_Anpassen;
+            this.BCB.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             this.BCB.Visible = false;
-            this.BCB.Enter += new EventHandler(this.BB_Enter);
-            this.BCB.Esc += new EventHandler(this.BB_ESC);
-            this.BCB.Tab += new EventHandler(this.BB_TAB);
-            this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
+            this.BCB.Enter += new System.EventHandler(this.BB_Enter);
+            this.BCB.Esc += new System.EventHandler(this.BB_ESC);
+            this.BCB.Tab += new System.EventHandler(this.BB_TAB);
+            this.BCB.LostFocus += new System.EventHandler(this.BB_LostFocus);
             // 
             // BTB
             // 
-            this.BTB.Cursor = Cursors.IBeam;
-            this.BTB.Location = new Point(48, 136);
+            this.BTB.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.BTB.Location = new System.Drawing.Point(48, 136);
             this.BTB.Name = "BTB";
-            this.BTB.Size = new Size(120, 24);
+            this.BTB.Size = new System.Drawing.Size(120, 24);
             this.BTB.TabIndex = 7;
-            this.BTB.Verhalten = SteuerelementVerhalten.Steuerelement_Anpassen;
+            this.BTB.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             this.BTB.Visible = false;
-            this.BTB.Enter += new EventHandler(this.BB_Enter);
-            this.BTB.Esc += new EventHandler(this.BB_ESC);
-            this.BTB.Tab += new EventHandler(this.BB_TAB);
-            this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
-            this.BTB.NeedDatabaseOfAdditinalSpecialChars += BTB_NeedDatabaseOfAdditinalSpecialChars;
+            this.BTB.Enter += new System.EventHandler(this.BB_Enter);
+            this.BTB.Esc += new System.EventHandler(this.BB_ESC);
+            this.BTB.Tab += new System.EventHandler(this.BB_TAB);
+            this.BTB.LostFocus += new System.EventHandler(this.BB_LostFocus);
             // 
             // SliderX
             // 
-            this.SliderX.Dock = DockStyle.Bottom;
+            this.SliderX.CausesValidation = false;
+            this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.SliderX.Enabled = false;
-            this.SliderX.Location = new Point(0, 414);
+            this.SliderX.Location = new System.Drawing.Point(0, 414);
             this.SliderX.Name = "SliderX";
-            this.SliderX.Size = new Size(1107, 18);
-            this.SliderX.SmallChange = 16f;
-            this.SliderX.ValueChanged += new EventHandler(this.SliderX_ValueChanged);
+            this.SliderX.Size = new System.Drawing.Size(1107, 18);
+            this.SliderX.SmallChange = 16F;
+            this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
             // SliderY
             // 
-            this.SliderY.Dock = DockStyle.Right;
+            this.SliderY.CausesValidation = false;
+            this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
             this.SliderY.Enabled = false;
-            this.SliderY.Location = new Point(1107, 0);
+            this.SliderY.Location = new System.Drawing.Point(1107, 0);
             this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = Orientation.Senkrecht;
-            this.SliderY.Size = new Size(18, 432);
-            this.SliderY.SmallChange = 16f;
-            this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChanged);
+            this.SliderY.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
+            this.SliderY.Size = new System.Drawing.Size(18, 432);
+            this.SliderY.SmallChange = 16F;
+            this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
+            // 
+            // btnEdit
+            // 
+            this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEdit.ImageCode = "Stift|14";
+            this.btnEdit.Location = new System.Drawing.Point(1072, 384);
+            this.btnEdit.Name = "btnEdit";
+            this.btnEdit.Size = new System.Drawing.Size(24, 24);
+            this.btnEdit.TabIndex = 49;
+            this.btnEdit.Visible = false;
+            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
             // 
             // Table
             // 
+            this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.BCB);
             this.Controls.Add(this.BTB);
             this.Controls.Add(this.SliderX);
             this.Controls.Add(this.SliderY);
             this.Name = "Table";
-            this.Size = new Size(1125, 432);
+            this.Size = new System.Drawing.Size(1125, 432);
             this.ResumeLayout(false);
+
         }
         private ComboBox BCB;
         private TextBox BTB;
         private Slider SliderX;
         private Slider SliderY;
+        private Button btnEdit;
     }
 }
