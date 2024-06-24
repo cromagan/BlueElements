@@ -312,6 +312,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                 //var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(generatedTextKey_Stufen, false, true, null), true);
                                 var additionaltext = string.Empty;
 
+                                var num = thisAdder.Count + ". " + thisRowAdderRow.Count;
+
                                 if (add) {
                                     additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
                                 }
@@ -319,7 +321,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                 var addme = true;
 
                                 foreach (var thisRowis in adderit.Rows) {
-                                    if (thisRowis.GeneratedTextKey == generatedTextKey_Stufen.ToUpper()) {
+                                    if (thisRowis.GeneratedTextKey == generatedTextKey_Stufen.ToUpper() &&
+                                        num == thisRowis.Count) {
                                         if (!thisRowis.RealAdder) {
                                             thisRowis.RealAdder = add;
                                             thisRowis.Additionaltext = additionaltext;
@@ -330,7 +333,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                     }
                                 }
                                 if (addme) {
-                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, thisAdder.Count + ". " + thisRowAdderRow.Count, additionaltext, add);
+                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, num, additionaltext, add);
                                     adderit.Rows.Add(ai);
                                 }
 
