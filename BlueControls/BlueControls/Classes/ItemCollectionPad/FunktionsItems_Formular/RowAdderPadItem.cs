@@ -424,8 +424,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var childs = new ListBox {
             AddAllowed = AddType.UserDef,
             RemoveAllowed = true,
-            MoveAllowed = true,
-            AutoSort = false,
+            MoveAllowed = false,
+            AutoSort = true,
             ItemEditAllowed = true,
             CheckBehavior = CheckBehavior.AllSelected,
             AddMethod = NewChild,

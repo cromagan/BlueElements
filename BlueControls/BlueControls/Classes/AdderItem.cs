@@ -130,7 +130,7 @@ internal class AdderItem : IReadableTextWithKey {
 
         var id = "<ID>" + GeneratedEntityID + "\r";
         id = id + "<TK>" + ais.GeneratedTextKey + "\r";
-        id = id + "<CT>" + ais.Count.ToString() + "\r";
+        id = id + "<CT>" + ais.Count + "\r";
         id = id + "<RK>" + ais.RowKey + "\r";
         id = id + "<RH>" + ais.RowHash + "\r";
 

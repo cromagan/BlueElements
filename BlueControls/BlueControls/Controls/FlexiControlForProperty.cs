@@ -158,8 +158,8 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         if (rowCount >= 2) {
                             CaptionPosition = CaptionPosition.Über_dem_Feld;
                             Size = new Size(200, 16 + (24 * rowCount));
-                            MultiLine = true;
                             this.GetStyleFrom(FormatHolder.Text);
+                            MultiLine = true;
                         } else {
                             CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
                             Size = new Size(200, 24);

@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
@@ -25,11 +26,11 @@ internal class AdderItemSingle {
 
     #region Constructors
 
-    public AdderItemSingle(string generatedTextKey, RowItem thisRow, int count, string additionaltext, bool realAdder) {
+    public AdderItemSingle(string generatedTextKey, RowItem thisRow, string count, string additionaltext, bool realAdder) {
         GeneratedTextKey = generatedTextKey;
         RowHash = thisRow.Hash();
         RowKey = thisRow.KeyName;
-        Count = count;
+        Count = count.ReduceToChars("0123456789.");
         Additionaltext = additionaltext;
         RealAdder = realAdder;
     }
@@ -39,7 +40,7 @@ internal class AdderItemSingle {
     #region Properties
 
     public string Additionaltext { get; set; }
-    public int Count { get; }
+    public string Count { get; }
     public string GeneratedTextKey { get; }
     public bool RealAdder { get; set; }
     public string RowHash { get; }

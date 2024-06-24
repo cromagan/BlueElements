@@ -71,7 +71,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         try {
             if (toEdit is ISimpleEditor ise) {
-                mb = new InputBoxEditor(ise.GetControl());
+                mb = new InputBoxEditor(ise.GetControl(400));
             } else {
                 object myObject = Activator.CreateInstance(toEdit.Editor);
 

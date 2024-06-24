@@ -25,8 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using BlueDatabase;
-using BlueControls.Editoren;
-using System.Data.Common;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -47,11 +46,15 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
     #region Constructors
 
-    public RowAdderSingleRow(RowAdderSingle parent, string toParse) : this(parent) => this.Parse(toParse);
+    public RowAdderSingleRow(RowAdderSingle parent, string toParse) : this(parent, 0) => this.Parse(toParse);
 
-    public RowAdderSingleRow(RowAdderSingle parent) : base() {
+    public RowAdderSingleRow(RowAdderSingle parent, int count) : base() {
         KeyName = Generic.GetUniqueKey();
         Parent = parent;
+
+        if (count >= 0) {
+            Count = count;
+        }
     }
 
     #endregion
@@ -70,6 +73,7 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
     }
 
     public string CaptionForEditor => "Import Element One Row";
+    public int Count { get; private set; } = 0;
 
     public Database? Database {
         get {
@@ -119,11 +123,11 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
         if (Database != null && !Database.IsDisposed) {
             if (Parent?.Parent?.AdditinalTextColumn is ColumnItem Column) {
-                result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
+                result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 7));
             }
 
-            result.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
-            result.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
+            result.Add(new FlexiControlForProperty<string>(() => TextKey, 1));
+            result.Add(new FlexiControlForProperty<string>(() => AdditionalText, 7));
         }
 
         return result;
@@ -140,6 +144,10 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
             case "additionaltext":
                 _additionalText = value.FromNonCritical();
                 return true;
+
+            case "count":
+                Count = IntParse(value);
+                return true;
         }
         return false;
     }
@@ -147,7 +155,7 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
     public string ReadableText() {
         var b = ErrorReason();
         if (!string.IsNullOrEmpty(b) || Database == null) { return b; }
-        return _textKey;
+        return _textKey + "          {" + _additionalText + "}";
     }
 
     public QuickImage? SymbolForReadableText() => null;
@@ -157,6 +165,7 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
         result.ParseableAdd("TextKey", _textKey);
         result.ParseableAdd("AdditionalText", _additionalText);
+        result.ParseableAdd("Count", Count);
 
         return result.Parseable();
     }

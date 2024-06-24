@@ -323,8 +323,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        if (!db.CanDoValueChangedScript()) {
-            LastCheckedMessage = "Zeilenprüfung deaktiviert";
+        if (!string.IsNullOrEmpty(Database.ScriptNeedFix)) {
+            LastCheckedMessage = "Skripte fehlerhaft";
             return;
         }
 
@@ -589,6 +589,28 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return txt; }
 
         var erg = txt;
+
+        if (varcol != null) {
+            foreach (var vari in varcol) {
+                if (!erg.Contains("~")) { return erg; }
+
+                if (vari != null) {
+                    if (erg.ToUpperInvariant().Contains("~" + vari.KeyName.ToUpperInvariant())) {
+                        var replacewith = vari.SearchValue;
+
+                        //if (vari is VariableString vs) { replacewith =  vs.v}
+
+                        if (removeLineBreaks && !readableValue) {
+                            replacewith = replacewith.Replace("\r\n", " ");
+                            replacewith = replacewith.Replace("\r", " ");
+                        }
+
+                        erg = erg.Replace("~" + vari.KeyName.ToUpperInvariant() + "~", replacewith, RegexOptions.IgnoreCase);
+                    }
+                }
+            }
+        }
+
         // Variablen ersetzen
         foreach (var column in db.Column) {
             if (!erg.Contains("~")) { return erg; }
@@ -598,9 +620,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     var replacewith = CellGetString(column);
                     if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
 
-                    if (varcol != null) {
-                        if (varcol.Get(column.KeyName) is Variable v) { replacewith = v.SearchValue; }
-                    }
+                    //if (varcol != null) {
+                    //    if (varcol.Get(column.KeyName) is Variable v) { replacewith = v.SearchValue; }
+                    //}
 
                     if (removeLineBreaks && !readableValue) {
                         replacewith = replacewith.Replace("\r\n", " ");

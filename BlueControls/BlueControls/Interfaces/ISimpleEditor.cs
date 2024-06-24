@@ -93,9 +93,9 @@ public static class SimpleEditorExtension {
         #endregion
     }
 
-    public static UserControl GetControl(this ISimpleEditor? element) {
+    public static UserControl GetControl(this ISimpleEditor? element, int widthOfControl) {
         var l = new UserControl();
-        l.Width = 100;
+        l.Width = widthOfControl;
         l.Height = 100;
         l.Visible = true;
 

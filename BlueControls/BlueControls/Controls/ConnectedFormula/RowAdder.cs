@@ -330,7 +330,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                     }
                                 }
                                 if (addme) {
-                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, thisAdder.Count, additionaltext, add);
+                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, thisAdder.Count + ". " + thisRowAdderRow.Count, additionaltext, add);
                                     adderit.Rows.Add(ai);
                                 }
 

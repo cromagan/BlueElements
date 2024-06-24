@@ -182,7 +182,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static void ExecuteValueChangedEvent() {
         List<Database> l = [.. Database.AllFiles];
         if (l.Count == 0) { return; }
-        l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+        try {
+            l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+        } catch { return; }
 
         lock (_executingchangedrowsx) {
             if (_executingchangedrows) { return; }

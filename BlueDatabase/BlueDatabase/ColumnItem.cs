@@ -26,6 +26,7 @@ using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -237,7 +238,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
     }
 
-    //    #endregion Standard-Werte
+    [Description("Ein Information für Administratoren. Freier Text.\r\nWird als Quickinfo angezeigt, wenn der Admininstror\r\n mit der Maus über den Spaltenkopf fährt.")]
     public string AdminInfo {
         get => _adminInfo;
         set {

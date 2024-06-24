@@ -24,18 +24,12 @@ using BlueControls.Interfaces;
 using static BlueDatabase.Database;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using static BlueBasics.Converter;
-
 using BlueDatabase;
 using BlueControls.Editoren;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-using BlueScript;
-using BlueScript.Methods;
-using BlueDatabase.Enums;
 using System.Collections.ObjectModel;
 using BlueControls.BlueDatabaseDialogs;
 
@@ -48,6 +42,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
     private List<RowAdderSingleRow> _addersinglerow = new();
     private Database? _database;
     private FilterCollection _filterCollection;
+    private int _subcounter = 0;
     private string tempDatabaseNametoLoad = string.Empty;
     private string tmpFiltercollection = string.Empty;
 
@@ -151,8 +146,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         if (Database != null && !Database.IsDisposed) {
             l.Add(new FlexiControlForProperty<FilterCollection>(() => Filter));
 
-            //l.Add(new FlexiControlForProperty<string>(() => TextKey, 5));
-            //l.Add(new FlexiControlForProperty<string>(() => AdditionalText, 5));
+            l.Add(new FlexiControl("<Imagecode=Information|16> Es werden zu jeder Zeile, die nach der Filterung übrig bleiben, folgende Einträge erzeugt:", widthOfControl, false));
 
             l.Add(new FlexiControl("Zeilen:", widthOfControl, true));
             l.Add(Childs());
@@ -168,7 +162,10 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
 
         //if (fc.Database is not Database db || db.IsDisposed) { return null; }
 
-        var l = new RowAdderSingleRow(this);
+        if (_subcounter == int.MaxValue) { _subcounter = 0; }
+        _subcounter++;
+
+        var l = new RowAdderSingleRow(this, _subcounter);
         //l.Editor = typeof(FilterEditor);
         _addersinglerow.Add(l);
         return ItemOf(l);
@@ -201,6 +198,10 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
             case "count":
                 Count = IntParse(value);
                 return true;
+
+            case "subcounter":
+                _subcounter = IntParse(value);
+                return true;
         }
         return false;
     }
@@ -220,6 +221,7 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         result.ParseableAdd("Filter", Filter);
         result.ParseableAdd("Rows", "Item", _addersinglerow);
         result.ParseableAdd("Count", Count);
+        result.ParseableAdd("SubCounter", _subcounter);
 
         return result.Parseable();
     }
@@ -228,8 +230,8 @@ public class RowAdderSingle : IParseable, IReadableTextWithKey, IErrorCheckable,
         var childs = new ListBox {
             AddAllowed = AddType.UserDef,
             RemoveAllowed = true,
-            MoveAllowed = true,
-            AutoSort = false,
+            MoveAllowed = false,
+            AutoSort = true,
             ItemEditAllowed = true,
             CheckBehavior = CheckBehavior.AllSelected,
             AddMethod = NewChild,
