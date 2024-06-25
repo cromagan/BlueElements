@@ -41,10 +41,8 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
 public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable, ISimpleEditor {
-    //EntityID: Käsekuchen
     //OriginID: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1 (AdderNo)
     //TextKey: Vegetarisch/Mehl
-    //AdditionalText: 100 g
 
     #region Fields
 
@@ -52,7 +50,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     private readonly ItemSendFilter _itemSends;
 
     private List<RowAdderSingle> _addersingle = new();
-    private string _additionalTextColumnName = string.Empty;
     private int _counter = 0;
 
     /// <summary>
@@ -90,27 +87,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     #region Properties
 
     public static string ClassId => "FI-RowAdder";
-
-    public ColumnItem? AdditinalTextColumn {
-        get {
-            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
-
-            var c = dbout?.Column[_additionalTextColumnName];
-            return c == null || c.IsDisposed ? null : c;
-        }
-    }
-
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird der Zusatztext gespeichert.\r\nBeispiele: Anzahl oder Objekt-Beschreibungen")]
-    public string AdditionalTextColumnName {
-        get => _additionalTextColumnName;
-        set {
-            if (IsDisposed) { return; }
-            if (_additionalTextColumnName == value) { return; }
-            _additionalTextColumnName = value;
-            OnPropertyChanged();
-            //UpdateSideOptionMenu();
-        }
-    }
 
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
@@ -219,8 +195,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new RowAdder {
-            AdditinalTextColumn = AdditinalTextColumn,
-
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,
         };
@@ -253,14 +227,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
         }
 
-        if (AdditinalTextColumn is not ColumnItem atc || atc.IsDisposed) {
-            return "Spalte, in der der zusätzliche Text geschrieben werden soll, fehlt";
-        }
-
-        if (atc.Function != ColumnFunction.Schlüsselspalte) {
-            return "Die Spalte für den zusätzlichen Text muss eine Schlüsselspalte sein.";
-        }
-
         foreach (var thisAdder in _addersingle) {
             b = thisAdder.ErrorReason();
             if (!string.IsNullOrEmpty(b)) { return "Ein Eintrag der Ergänzer ist falsch:" + b; }
@@ -287,8 +253,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             lst.AddRange(ItemsOf(dbout.Column, true));
 
             l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
-
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalTextColumnName, lst));
         }
 
         l.Add(new FlexiControl("Bausteine:", widthOfControl, true));
@@ -333,7 +297,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
                 return true;
 
             case "additionaltextcolumnname":
-                _additionalTextColumnName = value;
+                //_additionalTextColumnName = value;
                 return true;
 
             case "counter":
@@ -392,7 +356,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         result.ParseableAdd("EntityID", _entityID);
         result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
-        result.ParseableAdd("AdditionalTextColumnName", _additionalTextColumnName);
+        //result.ParseableAdd("AdditionalTextColumnName", _additionalTextColumnName);
         result.ParseableAdd("Adders", "Item", _addersingle);
         result.ParseableAdd("Counter", _counter);
         return result.Parseable(base.ToString());

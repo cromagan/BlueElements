@@ -111,6 +111,7 @@
     <Compile Include="Classes\AdderItemSingle.cs" />
     <Compile Include="Classes\AdderItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderSingle.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderSingleCell.cs" />
     <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
       <SubType>UserControl</SubType>
     </Compile>

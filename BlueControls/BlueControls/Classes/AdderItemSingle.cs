@@ -18,7 +18,9 @@
 #nullable enable
 
 using BlueBasics;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls;
 
@@ -26,25 +28,26 @@ internal class AdderItemSingle {
 
     #region Constructors
 
-    public AdderItemSingle(string generatedTextKey, RowItem thisRow, string count, string additionaltext, bool realAdder) {
+    public AdderItemSingle(string generatedTextKey, RowItem thisRow, string count, bool realAdder, List<RowAdderSingleCell> columns) {
         GeneratedTextKey = generatedTextKey;
-        RowHash = thisRow.Hash();
-        RowKey = thisRow.KeyName;
+        //RowHash = thisRow.Hash();
+        //RowKey = thisRow.KeyName;
         Count = count.ReduceToChars("0123456789.");
-        Additionaltext = additionaltext;
+        Columns = columns;
         RealAdder = realAdder;
+        Row = thisRow;
     }
 
     #endregion
 
     #region Properties
 
-    public string Additionaltext { get; set; }
+    public List<RowAdderSingleCell> Columns { get; private set; }
     public string Count { get; }
     public string GeneratedTextKey { get; }
     public bool RealAdder { get; set; }
-    public string RowHash { get; }
-    public string RowKey { get; }
+
+    public RowItem Row { get; set; }
 
     #endregion
 }

@@ -25,28 +25,30 @@ using BlueBasics.Interfaces;
 
 using BlueDatabase.Enums;
 using static BlueBasics.IO;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls;
 
+/// <summary>
+/// Diese Element kennt den Schlüssel und alle Zeilen, die erzeugt werden müssen.
+/// </summary>
 internal class AdderItem : IReadableTextWithKey {
 
     #region Constructors
 
-    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKeyWOAsterix, ColumnItem? additinalTextColumn) {
+    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKey) {
         GeneratedEntityID = generatedentityID;
         OriginIDColumn = originIDColumn;
 
-        Indent = Math.Max(generatedTextKeyWOAsterix.CountString("\\") - 1, 0);
-        Last = generatedTextKeyWOAsterix.TrimEnd("\\").FileNameWithSuffix();
-        KeyName = generatedTextKeyWOAsterix.ToUpper();
-        AdditinalTextColumn = additinalTextColumn;
+        Indent = Math.Max(generatedTextKey.CountString("\\") - 1, 0);
+        Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix();
+        KeyName = generatedTextKey.ToUpper();
     }
 
     #endregion
 
     #region Properties
 
-    public ColumnItem? AdditinalTextColumn { get; }
     public string GeneratedEntityID { get; set; }
     public int Indent { get; private set; }
 
@@ -68,9 +70,10 @@ internal class AdderItem : IReadableTextWithKey {
 
     public void AddRowsToDatabase() {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
-        if (AdditinalTextColumn == null) { return; }
 
         foreach (var row in Rows) {
+            if (row.Columns == null || row.Columns.Count == 0) { continue; }
+
             var oriid = OriginId(row);
             if (!string.IsNullOrEmpty(oriid)) {
                 if (!row.RealAdder) { continue; }
@@ -84,11 +87,14 @@ internal class AdderItem : IReadableTextWithKey {
                     OriginIDColumn.AfterEditQuickSortRemoveDouble = false;
                     OriginIDColumn.ScriptType = ScriptType.Nicht_vorhanden;
                     OriginIDColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.\r\n" +
-                        "Sie darf weder gelesen noch verändert werden. Dafür ist die Zusatz-Text-Spalte vorhanden.";
+                        "Sie darf weder gelesen noch verändert werden.";
                     r.CellSet(OriginIDColumn, oriid, "Zeilengenerator im Formular");
 
-                    AdditinalTextColumn.MaxCellLenght = Math.Max(AdditinalTextColumn.MaxCellLenght, row.Additionaltext.Length);
-                    r.CellSet(AdditinalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
+                    foreach (var thisColumn in row.Columns) {
+                        if (!string.IsNullOrWhiteSpace(thisColumn.ReplaceableText)) {
+                            r.CellSet(thisColumn.Column, thisColumn.ReplacedText(row.Row), "Zeilengenerator im Formular");
+                        }
+                    }
                 }
             }
         }
@@ -119,7 +125,7 @@ internal class AdderItem : IReadableTextWithKey {
             //        r.CellSet(EntityIDColumn, GeneratedEntityID, "Zeilengenerator im Formular");
             //        r.CellSet(OriginIDColumn, oriid, "Zeilengenerator im Formular");
             //        r.CellSet(TextKeyColumn, row.GeneratedTextKey, "Zeilengenerator im Formular");
-            //        r.CellSet(AdditinalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
+            //        r.CellSet(AdditionalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
             //    }
             //}
         }
@@ -131,8 +137,8 @@ internal class AdderItem : IReadableTextWithKey {
         var id = "<ID>" + GeneratedEntityID + "\r";
         id = id + "<TK>" + ais.GeneratedTextKey + "\r";
         id = id + "<CT>" + ais.Count + "\r";
-        id = id + "<RK>" + ais.RowKey + "\r";
-        id = id + "<RH>" + ais.RowHash + "\r";
+        id = id + "<RK>" + ais.Row.KeyName + "\r";
+        id = id + "<RH>" + ais.Row.Hash() + "\r";
 
         return id;
     }

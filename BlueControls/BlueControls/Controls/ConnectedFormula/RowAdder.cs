@@ -66,11 +66,6 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnItem? AdditinalTextColumn { get; internal set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
 
     /// <summary>
@@ -303,20 +298,20 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                             if (lstTexte.Items.Get(generatedTextKey_Stufen) is ItemCollectionList.ReadableListItem rli) {
                                 if (rli.Item is AdderItem ai) { adderit = ai; }
                             } else {
-                                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey_Stufen, AdditinalTextColumn);
+                                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey_Stufen);
 
                                 lstTexte.ItemAdd(ItemOf(adderit));
                             }
 
                             if (adderit != null) {
                                 //var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(generatedTextKey_Stufen, false, true, null), true);
-                                var additionaltext = string.Empty;
+                                //var additionaltext = string.Empty;
 
-                                var num = thisAdder.Count + ". " + thisRowAdderRow.Count;
+                                var num = thisAdder.Count + "." + thisRowAdderRow.Count;
 
-                                if (add) {
-                                    additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
-                                }
+                                //if (add) {
+                                //    additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
+                                //}
 
                                 var addme = true;
 
@@ -325,7 +320,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                         num == thisRowis.Count) {
                                         if (!thisRowis.RealAdder) {
                                             thisRowis.RealAdder = add;
-                                            thisRowis.Additionaltext = additionaltext;
+                                            //thisRowis.Columns = thisRow.Columns;
                                         }
 
                                         addme = false;
@@ -333,7 +328,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                                     }
                                 }
                                 if (addme) {
-                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, num, additionaltext, add);
+                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, num, add, thisRowAdderRow.Columns);
                                     adderit.Rows.Add(ai);
                                 }
 
