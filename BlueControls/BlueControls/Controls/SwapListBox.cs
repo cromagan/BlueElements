@@ -62,7 +62,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
             MoveItemBetweenList(Suggest, Main, thisCheck, true);
         }
 
-        List<string> l = [..Main.Checked];
+        List<string> l = [.. Main.Checked];
 
         foreach (var thisl in l) {
             if (!toCheck.Contains(thisl, false)) {
@@ -143,6 +143,11 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     //    OnItemCheckedChanged();
     //}
+
+    private void Main_ItemAddedByClick(object sender, AbstractListItemEventArgs e) {
+        MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
+        OnItemCheckedChanged();
+    }
 
     private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 

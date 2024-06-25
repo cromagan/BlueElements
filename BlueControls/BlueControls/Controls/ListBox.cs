@@ -108,11 +108,16 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Events
 
+    /// <summary>
+    /// Wir am Anfang des dirket nach dem Klicken ausgelöst. Damit können Items z.B. zurückgeschreiben werden.
+    /// </summary>
     public event EventHandler? AddClicked;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
+
+    public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
     public event EventHandler? ItemCheckedChanged;
 
@@ -951,10 +956,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (toAdd is AbstractListItem ali) {
             AddAndCheck(ali);
-        }
 
-        if (_itemEditAllowed && toAdd is ReadableListItem rli && rli.Item is IEditable ie) {
-            ie.Edit();
+            if (_itemEditAllowed && ali is ReadableListItem rli && rli.Item is IEditable ie) {
+                ie.Edit();
+            }
+
+            OnItemAddedByClick(new AbstractListItemEventArgs(ali));
         }
 
         DoMouseMovement();
@@ -1153,6 +1160,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y + (int)SliderY.Value));
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 

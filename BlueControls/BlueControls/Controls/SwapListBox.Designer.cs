@@ -69,6 +69,8 @@ namespace BlueControls.Controls {
             this.Main.Size = new System.Drawing.Size(345, 115);
             this.Main.TabIndex = 0;
             this.Main.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Main_ItemClicked);
+            this.Main.ItemAddedByClick += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Main_ItemAddedByClick);
+
             // 
             // btnFilterDel
             // 
