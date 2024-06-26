@@ -29,6 +29,12 @@ using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using System.Linq;
 using System.Windows.Media.Animation;
+using BlueScript.Variables;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using System.Runtime.InteropServices;
+using BlueBasics.Enums;
 
 namespace BlueControls.Controls;
 
@@ -36,12 +42,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
     #region Fields
 
-    public List<RowAdderSingle> AdderSingle = new();
     private FilterCollection? _filterInput;
-
     private bool _ignoreCheckedChanged = false;
-
-    private List<string> selectedWOAdder = [];
 
     #endregion
 
@@ -134,6 +136,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; } = false;
 
+    public string Script { get; set; }
+
     /// <summary>
     /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
     /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
@@ -148,12 +152,30 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
     #region Methods
 
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, List<string> selected, string entitiId, RowItem rowIn) {
+        var generatedentityID = rowIn.ReplaceVariables(entitiId, false, true, null);
+
+        var vars = new VariableCollection();
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
+        vars.Add(new VariableListString("CurrentlySelected", selected, true, string.Empty));
+        vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
+
+        var scp = new ScriptProperties("Row-Adder", MethodType.Standard, true, [], null);
+
+        var sc = new BlueScript.Script(vars, string.Empty, scp);
+        sc.ScriptText = scripttext;
+        return sc.Parse(0, "Main", null);
+    }
+
     /// <summary>
     ///
     /// </summary>
     /// <param name="textkey"></param>
     /// <returns>PFAD1\\PFAD2\\PFAD3\\</returns>
-    public static string RepairTextKey(string textkey, bool ucase) {
+    public static string RepairTextKey(string textkey) {
         var nt = textkey.Replace("/", "\\");
         nt = nt.Replace("\\\\\\\\", "\\");
         nt = nt.Replace("\\\\\\", "\\");
@@ -161,9 +183,17 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         nt = nt.Replace("\\\\", "\\");
         nt = nt.Trim("\\") + "\\";
 
-        if (ucase) { nt = nt.ToUpper(); }
+        //if (ucase) { nt = nt.ToUpper(); }
         nt = nt.RemoveChars(Constants.Char_PfadSonderZeichen);
         return nt;
+    }
+
+    public void Fehler(string txt, ImageCode symbol) {
+        lstTexte.Enabled = false;
+        lstTexte.ItemClear();
+        lstTexte.ItemAdd(ItemOf(txt, symbol));
+        FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
+        _ignoreCheckedChanged = false;
     }
 
     public void FillListBox() {
@@ -203,11 +233,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         var rowIn = this.RowSingleOrNull();
 
         if (rowIn == null) {
-            lstTexte.Enabled = false;
-            lstTexte.ItemClear();
-            lstTexte.ItemAdd(ItemOf("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information));
-            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _ignoreCheckedChanged = false;
+            Fehler("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information);
             return;
         }
 
@@ -216,19 +242,37 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
 
         if (generatedentityID == EntityID) {
-            lstTexte.Enabled = false;
-            lstTexte.ItemClear();
-            lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
-            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _ignoreCheckedChanged = false;
+            Fehler("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(Script)) {
+            Fehler("Interner Fehler: Kein Skript vorhanden", BlueBasics.Enums.ImageCode.Kritisch);
+            return;
+        }
+
+        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.BeginntMit, generatedentityID + "\\"));
+
+        var selected = OriginIDColumn.Contents(FilterOutput, null);
+        selected = selected.SortedDistinctList().Select(s => s.TrimStart(generatedentityID + "\\")).ToList();
+
+        var scf = ExecuteScript(Script, selected, EntityID, rowIn);
+
+        if (!scf.AllOk) {
+            Fehler("Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText, BlueBasics.Enums.ImageCode.Kritisch);
+            return;
+        }
+
+        var menu = scf.Variables?.GetList("Menu");
+
+        if (menu == null || menu.Count < 1) {
+            Fehler("Interner Fehler: Skript gab kein Menu zurück", BlueBasics.Enums.ImageCode.Kritisch);
             return;
         }
 
         lstTexte.Enabled = true;
 
-        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.Istgleich, "<ID>" + generatedentityID));
-
-        List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.ToUpper()).ToList();
+        List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.TrimStart(generatedentityID + "\\")).ToList();
 
         foreach (var thisIT in lstTexte.Items) {
             if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
@@ -236,109 +280,26 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             }
         }
 
-        List<string> selectedFromTable = new();
+        menu = RepairMenu(menu);
 
-        foreach (var thisR in FilterOutput.Rows) {
-            var l = thisR.CellGetList(OriginIDColumn);
-            if (l.Count() > 1 && l[1].StartsWith("<TK>")) {
-                selectedFromTable.AddIfNotExists(l[1].ToUpper().TrimStart("<TK>"));
-            }
-        }
+        foreach (var generatedTextKey in menu) {
+            if (!ShowMe(selected, generatedTextKey)) { continue; }
 
-        //var selectedFromTable = TextKeyColumn.Contents(FilterOutput, null).Select(s => s.ToUpper()).ToList();
+            olditems.Remove(generatedTextKey);
 
-        var selected = new List<string>();
-        RepearSelectedWOAdder(selectedFromTable);
-        selected.AddRange(selectedWOAdder);
-        selected.AddRange(selectedFromTable);
+            AdderItem? adderit = null;
 
-        selected = selected.SortedDistinctList();
-
-        foreach (var thisAdder in AdderSingle) {
-            if (thisAdder.Database is not Database db || db.IsDisposed) { continue; }
-
-            var fi = ((FilterCollection)thisAdder.Filter.Clone("Adder Clone"));
-            foreach (var thisFi in fi) {
-                var t = rowIn.ReplaceVariables(thisFi.SearchValue.JoinWithCr(), false, false, rowIn.LastCheckedEventArgs?.Variables);
-                thisFi.SearchValue = t.SplitAndCutByCrToList().AsReadOnly();
+            if (lstTexte.Items.Get(generatedTextKey) is ItemCollectionList.ReadableListItem rli) {
+                if (rli.Item is AdderItem ai) { adderit = ai; }
+            } else {
+                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey);
+                lstTexte.ItemAdd(ItemOf(adderit));
             }
 
-            var fi2 = fi.ToArray();
-
-            foreach (var thisRow in db.Row) {
-                if (thisRow == null || thisRow.IsDisposed) { continue; }
-
-                if (thisRow.MatchesTo(fi2)) {
-                    foreach (var thisRowAdderRow in thisAdder.AdderSingleRows) {
-                        var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(thisRowAdderRow.TextKey, false, true, null), false);
-
-                        //var checkall = selected.Contains(generatedTextKey.ToUpper());
-
-                        var stufen = generatedTextKey.TrimEnd("\\").SplitBy("\\");
-
-                        var generatedTextKey_Stufen = string.Empty;
-
-                        for (var z = 0; z < stufen.Length; z++) {
-                            var add = (z == stufen.Length - 1);
-
-                            generatedTextKey_Stufen = generatedTextKey_Stufen + stufen[z] + "\\";
-
-                            //if (checkall) {
-                            //    selected.AddIfNotExists(generatedTextKey_Stufen.ToUpper());
-                            //    if(!add) { selectedWOAdder.AddIfNotExists(generatedTextKey_Stufen.ToUpper()); }
-
-                            //}
-
-                            if (!ShowMe(selected, generatedTextKey_Stufen)) { continue; }
-
-                            olditems.Remove(generatedTextKey_Stufen.ToUpper());
-
-                            AdderItem? adderit = null;
-
-                            if (lstTexte.Items.Get(generatedTextKey_Stufen) is ItemCollectionList.ReadableListItem rli) {
-                                if (rli.Item is AdderItem ai) { adderit = ai; }
-                            } else {
-                                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey_Stufen, rowIn);
-
-                                lstTexte.ItemAdd(ItemOf(adderit));
-                            }
-
-                            if (adderit != null) {
-                                //var generatedTextKey = RepairTextKey(thisRow.ReplaceVariables(generatedTextKey_Stufen, false, true, null), true);
-                                //var additionaltext = string.Empty;
-
-                                var num = thisAdder.Count + "." + thisRowAdderRow.Count;
-
-                                //if (add) {
-                                //    additionaltext = thisRow.ReplaceVariables(thisRowAdderRow.AdditionalText, false, true, null);
-                                //}
-
-                                var addme = true;
-
-                                foreach (var thisRowis in adderit.Rows) {
-                                    if (thisRowis.GeneratedTextKey == generatedTextKey_Stufen.ToUpper() &&
-                                        num == thisRowis.Count) {
-                                        if (!thisRowis.RealAdder) {
-                                            thisRowis.RealAdder = add;
-                                            //thisRowis.Columns = thisRow.Columns;
-                                        }
-
-                                        addme = false;
-                                        break;
-                                    }
-                                }
-                                if (addme) {
-                                    var ai = new AdderItemSingle(generatedTextKey_Stufen, thisRow, num, add, thisRowAdderRow.Columns);
-                                    adderit.Rows.Add(ai);
-                                }
-
-                                adderit.GeneratedEntityID = generatedentityID;
-                            }
-                        }
-                    }
-                }
+            if (adderit != null) {
+                adderit.Rows.Add(generatedTextKey);
+                adderit.GeneratedEntityID = generatedentityID;
             }
-            fi.Dispose();
         }
 
         foreach (var thisit in olditems) {
@@ -362,7 +323,6 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     public void HandleChangesNow() {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-        selectedWOAdder.Clear();
         FillListBox();
     }
 
@@ -381,12 +341,9 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         if (_ignoreCheckedChanged) { return; }
 
         if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-            if (Selected(lstTexte.Checked, e.Item.KeyName)) {
-                selectedWOAdder.AddIfNotExists(ai.KeyName);
-
+            if (lstTexte.Checked.Contains(rli.KeyName)) {
                 ai.AddRowsToDatabase();
             } else {
-                selectedWOAdder.Remove(ai.KeyName);
                 ai.RemoveRowsFromDatabase();
             }
         }
@@ -394,22 +351,26 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         FillListBox();
     }
 
-    private void RepearSelectedWOAdder(List<string> selectedFromTable) {
-        foreach (var thiss in selectedFromTable) {
-            var t = thiss.ToUpper().TrimEnd("\\").SplitBy("\\");
+    private List<string> RepairMenu(List<string> menu) {
+        var m = new List<string>();
+
+        foreach (var thiss in menu) {
+            var t = thiss.TrimEnd("\\").SplitBy("\\");
 
             var n = string.Empty;
             foreach (var item in t) {
                 n = n + item + "\\";
-                selectedWOAdder.AddIfNotExists(n);
+                m.Add(n);
             }
         }
+
+        return m.SortedDistinctList();
     }
 
-    private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey, true), false);
+    private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey));
 
     private bool ShowMe(ICollection<string> selected, string textkey) {
-        var t = RepairTextKey(textkey, true);
+        var t = RepairTextKey(textkey);
         if (t.CountString("\\") < 2) { return true; }
         if (Selected(selected, t)) { return true; }
         return Selected(selected, t.PathParent());

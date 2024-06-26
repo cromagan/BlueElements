@@ -553,7 +553,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnBefehlsUebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 4;
             this.btnBefehlsUebersicht.Text = "Befehls-Übersicht";
-            this.btnBefehlsUebersicht.Click += new System.EventHandler(this.btnBefehlsUebersicht_Click);
+            this.btnBefehlsUebersicht.Click += new System.EventHandler(DatabaseScriptEditor.btnBefehlsUebersicht_Click);
             // 
             // btnZusatzDateien
             // 

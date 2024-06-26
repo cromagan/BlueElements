@@ -35,6 +35,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
+using System.Security.Permissions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -42,8 +43,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Fields
 
+    public static Befehlsreferenz? _befehlsReferenz;
     private bool _allowTemporay;
-    private Befehlsreferenz? _befehlsReferenz;
     private Database? _database;
     private DatabaseScriptDescription? _item;
 
@@ -177,6 +178,17 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Methods
 
+    public static void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
+        if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
+            _befehlsReferenz.Close();
+            _befehlsReferenz?.Dispose();
+            _befehlsReferenz = null;
+        }
+
+        _befehlsReferenz = new Befehlsreferenz();
+        _befehlsReferenz.Show();
+    }
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
@@ -250,17 +262,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void btnAusführen_Click(object sender, System.EventArgs e) {
         _testmode = false;
         eventScriptEditor.TesteScript(txbName.Text);
-    }
-
-    private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
-        if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
-            _befehlsReferenz.Close();
-            _befehlsReferenz?.Dispose();
-            _befehlsReferenz = null;
-        }
-
-        _befehlsReferenz = new Befehlsreferenz();
-        _befehlsReferenz.Show();
     }
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor));

@@ -36,14 +36,13 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Constructors
 
-    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKey, RowItem uniqueRow) {
+    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKey) {
         GeneratedEntityID = generatedentityID;
         OriginIDColumn = originIDColumn;
-        UniqueRow = uniqueRow;
 
         Indent = Math.Max(generatedTextKey.CountString("\\") - 1, 0);
         Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix();
-        KeyName = generatedTextKey.ToUpper();
+        KeyName = generatedTextKey;
     }
 
     #endregion
@@ -61,8 +60,7 @@ internal class AdderItem : IReadableTextWithKey {
     public string Last { get; private set; }
     public ColumnItem? OriginIDColumn { get; }
     public string QuickInfo => KeyName;
-    public List<AdderItemSingle> Rows { get; } = new List<AdderItemSingle>();
-    public RowItem UniqueRow { get; set; }
+    public List<string> Rows { get; } = new List<string>();
 
     #endregion
 
@@ -72,12 +70,8 @@ internal class AdderItem : IReadableTextWithKey {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var row in Rows) {
-            if (row.Columns == null || row.Columns.Count == 0) { continue; }
-
             var oriid = OriginId(row);
             if (!string.IsNullOrEmpty(oriid)) {
-                if (!row.RealAdder) { continue; }
-
                 var r = db.Row.GenerateAndAdd(GeneratedEntityID, null, "Zeilengenerator im Formular");
 
                 if (r != null) {
@@ -85,16 +79,9 @@ internal class AdderItem : IReadableTextWithKey {
                     OriginIDColumn.MultiLine = true;
                     OriginIDColumn.AfterEditAutoCorrect = false;
                     OriginIDColumn.AfterEditQuickSortRemoveDouble = false;
-                    OriginIDColumn.ScriptType = ScriptType.Nicht_vorhanden;
-                    OriginIDColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.\r\n" +
-                        "Sie darf weder gelesen noch verändert werden.";
+                    OriginIDColumn.ScriptType = ScriptType.String_Readonly;
+                    OriginIDColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.";
                     r.CellSet(OriginIDColumn, oriid, "Zeilengenerator im Formular");
-
-                    foreach (var thisColumn in row.Columns) {
-                        if (!string.IsNullOrWhiteSpace(thisColumn.ReplaceableText)) {
-                            r.CellSet(thisColumn.Column, thisColumn.ReplacedText(row.Row, UniqueRow), "Zeilengenerator im Formular");
-                        }
-                    }
                 }
             }
         }
@@ -109,38 +96,15 @@ internal class AdderItem : IReadableTextWithKey {
 
         foreach (var row in Rows) {
             var fi = new FilterCollection(db, "Zeilengenerator im Formular");
-
-            fi.Add(new FilterItem(OriginIDColumn, FilterType.Istgleich_UND_GroßKleinEgal, ["<ID>" + GeneratedEntityID, "<TK>" + row.GeneratedTextKey]));
-            //fi.Add(new FilterItem(origin, FilterType.Istgleich_GroßKleinEgal, row.GeneratedTextKey));
-
+            fi.Add(new FilterItem(OriginIDColumn, FilterType.Istgleich_UND_GroßKleinEgal, OriginId(row)));
             db.Row.Remove(fi, null, "Zeilengenerator im Formular");
             fi.Dispose();
-
-            //var oriid = OriginId(row);
-
-            //if (!string.IsNullOrEmpty(oriid)) {
-            //    var r = db.Row.GenerateAndAdd(GeneratedEntityID, null, "Zeilengenerator im Formular");
-
-            //    if (r != null) {
-            //        r.CellSet(EntityIDColumn, GeneratedEntityID, "Zeilengenerator im Formular");
-            //        r.CellSet(OriginIDColumn, oriid, "Zeilengenerator im Formular");
-            //        r.CellSet(TextKeyColumn, row.GeneratedTextKey, "Zeilengenerator im Formular");
-            //        r.CellSet(AdditionalTextColumn, row.Additionaltext, "Zeilengenerator im Formular");
-            //    }
-            //}
         }
     }
 
-    private string OriginId(AdderItemSingle ais) {
+    private string OriginId(string ais) {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return string.Empty; }
-
-        var id = "<ID>" + GeneratedEntityID + "\r";
-        id = id + "<TK>" + ais.GeneratedTextKey + "\r";
-        id = id + "<CT>" + ais.Count + "\r";
-        id = id + "<RK>" + ais.Row.KeyName + "\r";
-        id = id + "<RH>" + ais.Row.Hash() + "\r";
-
-        return id;
+        return GeneratedEntityID + "\\" + ais;
     }
 
     #endregion

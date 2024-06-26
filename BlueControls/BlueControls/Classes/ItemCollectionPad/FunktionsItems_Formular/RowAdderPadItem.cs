@@ -34,6 +34,7 @@ using System.Drawing;
 using BlueControls.Editoren;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -46,11 +47,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     #region Fields
 
+    public string Script = string.Empty;
     private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
-
-    private List<RowAdderSingle> _addersingle = new();
-    private int _counter = 0;
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -197,8 +196,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var con = new RowAdder {
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,
+            Script = Script
         };
-        con.AdderSingle.AddRange(_addersingle);
 
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
@@ -220,16 +219,15 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         if (!_entityID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
         if (OriginIDColumn is not ColumnItem oic || oic.IsDisposed) {
-            return "Spalte, in der die  Herkunft-ID geschrieben werden soll, fehlt";
+            return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";
         }
 
         if (oic.Function != ColumnFunction.Schlüsselspalte) {
             return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
         }
 
-        foreach (var thisAdder in _addersingle) {
-            b = thisAdder.ErrorReason();
-            if (!string.IsNullOrEmpty(b)) { return "Ein Eintrag der Ergänzer ist falsch:" + b; }
+        if (string.IsNullOrEmpty(Script)) {
+            return "Kein Skript definiert.";
         }
 
         return string.Empty;
@@ -246,6 +244,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var inr = _itemAccepts.GetFilterFromGet(this);
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
             l.Add(new FlexiControlForProperty<string>(() => EntityID));
+            l.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
         if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
@@ -255,19 +254,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
         }
 
-        l.Add(new FlexiControl("Bausteine:", widthOfControl, true));
-        l.Add(Childs());
-
         l.AddRange(base.GetProperties(widthOfControl));
 
         return l;
-    }
-
-    public AbstractListItem? NewChild() {
-        if (_counter == int.MaxValue) { _counter = 0; }
-        _counter++;
-        var l = new RowAdderSingle(this, _counter);
-        return ItemOf(l);
     }
 
     public override void ParseFinished(string parsed) {
@@ -301,27 +290,14 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
                 return true;
 
             case "counter":
-                _counter = IntParse(value);
                 return true;
 
             case "adders":
-                foreach (var pair2 in value.GetAllTags()) {
-                    _addersingle.Add(new RowAdderSingle(this, pair2.Value.FromNonCritical()));
-                }
-
                 return true;
 
-                //case "edittype":
-                //    _bearbeitung = (EditTypeFormula)IntParse(value);
-                //    return true;
-
-                //case "caption":
-                //    _überschriftanordung = (CaptionPosition)IntParse(value);
-                //    return true;
-
-                //case "autodistance":
-                //    _autoX = value.FromPlusMinus();
-                //    return true;
+            case "script":
+                Script = value.FromNonCritical();
+                return true;
         }
         return false;
     }
@@ -338,6 +314,13 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
+    public void Skript_Bearbeiten() {
+        var x = new AdderScriptEditor();
+        x.Item = this;
+        x.Database = this.DatabaseInput;
+        x.ShowDialog();
+    }
+
     public override QuickImage? SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
@@ -351,14 +334,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
-
-        //result.ParseableAdd("TargetDatabase", _targetDatabase); // Nicht _database, weil sie evtl. noch nicht geladen ist
-
         result.ParseableAdd("EntityID", _entityID);
         result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
-        //result.ParseableAdd("AdditionalTextColumnName", _additionalTextColumnName);
-        result.ParseableAdd("Adders", "Item", _addersingle);
-        result.ParseableAdd("Counter", _counter);
+        result.ParseableAdd("Script", Script);
         return result.Parseable(base.ToString());
     }
 
@@ -382,55 +360,6 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
-    }
-
-    private ListBox Childs() {
-        var childs = new ListBox {
-            AddAllowed = AddType.UserDef,
-            RemoveAllowed = true,
-            MoveAllowed = false,
-            AutoSort = true,
-            ItemEditAllowed = true,
-            CheckBehavior = CheckBehavior.AllSelected,
-            AddMethod = NewChild,
-            Height = 60
-        };
-
-        CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);
-
-        foreach (var thisf in _addersingle) {
-            //if (File.Exists(thisf)) {
-            //    childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
-            //} else {
-            childs.AddAndCheck(ItemOf(thisf));
-            //}
-        }
-
-        childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
-        childs.Disposed += Childs_Disposed;
-
-        return childs;
-    }
-
-    private void Childs_Disposed(object sender, System.EventArgs e) {
-        if (sender is ListBox childs) {
-            childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
-            childs.Disposed -= Childs_Disposed;
-        }
-    }
-
-    private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        _addersingle.Clear();
-
-        foreach (var item in ((ListBox)sender).CheckedItems()) {
-            if (item is ReadableListItem rli && rli.Item is RowAdderSingle ras) {
-                _addersingle.Add(ras);
-            }
-        }
-        OnPropertyChanged();
-        this.RaiseVersion();
-        UpdateSideOptionMenu();
     }
 
     #endregion
