@@ -36,9 +36,10 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Constructors
 
-    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKey) {
+    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKey, RowItem uniqueRow) {
         GeneratedEntityID = generatedentityID;
         OriginIDColumn = originIDColumn;
+        UniqueRow = uniqueRow;
 
         Indent = Math.Max(generatedTextKey.CountString("\\") - 1, 0);
         Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix();
@@ -59,10 +60,9 @@ internal class AdderItem : IReadableTextWithKey {
 
     public string Last { get; private set; }
     public ColumnItem? OriginIDColumn { get; }
-
     public string QuickInfo => KeyName;
-
     public List<AdderItemSingle> Rows { get; } = new List<AdderItemSingle>();
+    public RowItem UniqueRow { get; set; }
 
     #endregion
 
@@ -92,7 +92,7 @@ internal class AdderItem : IReadableTextWithKey {
 
                     foreach (var thisColumn in row.Columns) {
                         if (!string.IsNullOrWhiteSpace(thisColumn.ReplaceableText)) {
-                            r.CellSet(thisColumn.Column, thisColumn.ReplacedText(row.Row), "Zeilengenerator im Formular");
+                            r.CellSet(thisColumn.Column, thisColumn.ReplacedText(row.Row, UniqueRow), "Zeilengenerator im Formular");
                         }
                     }
                 }

@@ -110,6 +110,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _globalShowPass = string.Empty;
     private bool _isInSave;
     private bool _readOnly;
+
+    private bool _completing = false;
     private string _scriptNeedFix = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
@@ -1277,6 +1279,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
+        if (_completing) { return "Aktuell läuft ein kritischer Prozess, Datenbank wird neu erstellt."; }
+
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
@@ -2488,27 +2492,30 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
-        var m = EditableErrorReason(EditableErrorReasonType.Save);
-        if (!string.IsNullOrEmpty(m)) { return false; }
+        _completing = true;
 
-        if (string.IsNullOrEmpty(Filename)) { return false; }
+
+        var m = EditableErrorReason(EditableErrorReasonType.Save);
+        if (!string.IsNullOrEmpty(m)) { _completing = false; return false; }
+
+        if (string.IsNullOrEmpty(Filename)) { _completing = false;  return false; }
 
         Develop.SetUserDidSomething();
         var tmpFileName = WriteTempFileToDisk(setfileStateUtcDateTo);
         Develop.SetUserDidSomething();
-        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
+        if (string.IsNullOrEmpty(tmpFileName)) { _completing = false; return false; }
 
         if (FileExists(Backupdateiname())) {
-            if (!DeleteFile(Backupdateiname(), false)) { return false; }
+            if (!DeleteFile(Backupdateiname(), false)) { _completing = false; return false; }
         }
         Develop.SetUserDidSomething();
         // Haupt-Datei wird zum Backup umbenannt
-        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
+        if (!MoveFile(Filename, Backupdateiname(), false)) { _completing = false; return false; }
 
         if (FileExists(Filename)) {
             // Paralleler Prozess hat gespeichert?!?
             _ = DeleteFile(tmpFileName, false);
-            return false;
+            _completing = false; return false;
         }
 
         // --- TmpFile wird zum Haupt ---
@@ -2516,6 +2523,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.SetUserDidSomething();
         HasPendingChanges = false;
         FileStateUTCDate = setfileStateUtcDateTo;
+
+        _completing = false;
         return true;
     }
 

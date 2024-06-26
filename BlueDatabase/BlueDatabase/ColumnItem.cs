@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.SqlTypes;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -2133,13 +2134,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             case DatabaseDataType.ColumnName:
                 var oldname = _name;
                 _name = newvalue.ToUpperInvariant();
-                var ok = Database?.Column.ChangeName(oldname, _name) ?? false;
+                var ok = Database?.Column.ChangeName(oldname, _name) ?? "Datenbank verworfen";
 
-                if (!ok) {
-                    Database?.Freeze("Schwerer Spalten Umbenennungsfehler!");
-                    return "Schwerer Spalten Umbenennungsfehler!";
+                if (!string.IsNullOrEmpty(ok)) {
+                    var reason = "Schwerer Spalten Umbenennungsfehler, " + ok;
+
+                    Database?.Freeze(reason);
+                    return reason;
                 }
-
                 break;
 
             case DatabaseDataType.ColumnCaption:

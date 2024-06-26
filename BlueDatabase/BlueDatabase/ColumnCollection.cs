@@ -391,20 +391,20 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    for (var index = 0; index < _internal.Count; index++) {
     //        if (column == _internal.ElementAt(index).Value) { return index; }
     //    }
-    internal bool ChangeName(string oldName, string newName) {
-        if (oldName == newName) { return true; }
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
+    internal string ChangeName(string oldName, string newName) {
+        if (oldName == newName) { return string.Empty; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         var ok = _internal.TryRemove(oldName.ToUpperInvariant(), out var vcol);
-        if (!ok) { return false; }
+        if (!ok) { return "Entfernen fehlgeschlagen"; }
 
         ok = _internal.TryAdd(newName.ToUpperInvariant(), vcol);
-        if (!ok) { return false; }
+        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
 
         ok = Database.Cell.ChangeColumnName(oldName, newName);
-        if (!ok) { return false; }
+        if (!ok) { return "Namensänderung fehlgeschlagen"; }
         Database?.RepairColumnArrangements(Reason.SetCommand);
-        return true;
+        return string.Empty;
     }
 
     /// <summary>

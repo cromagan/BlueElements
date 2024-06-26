@@ -51,6 +51,10 @@ public class RowAdderSingleCell : IParseable, IErrorCheckable, IHasKeyName {
 
     public string ReplaceableText { get; internal set; } = string.Empty;
 
+    public List<string> DropdownItems { get; internal set; } = new();
+
+
+
     #endregion
 
     #region Methods
@@ -68,6 +72,12 @@ public class RowAdderSingleCell : IParseable, IErrorCheckable, IHasKeyName {
             case "text":
                 ReplaceableText = value.FromNonCritical();
                 return true;
+
+            case "dropdownitems":
+                DropdownItems = value.FromNonCritical().SplitAndCutByCrToList();
+                return true;
+
+
         }
         return false;
     }
@@ -78,12 +88,13 @@ public class RowAdderSingleCell : IParseable, IErrorCheckable, IHasKeyName {
         List<string> result = [];
         result.ParseableAdd("Column", Column);
         result.ParseableAdd("Text", ReplaceableText);
+        result.ParseableAdd("DropdownItems", DropdownItems.JoinWithCr());
         return result.Parseable();
     }
 
-    internal string ReplacedText(RowItem thisRow) {
+    internal string ReplacedText(RowItem thisRow, RowItem uniqueRow) {
         var nt = thisRow.ReplaceVariables(ReplaceableText, false, true, null);
-
+        nt = uniqueRow.ReplaceVariables(nt, false, true, null);
         return nt;
     }
 

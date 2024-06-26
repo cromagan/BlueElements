@@ -205,6 +205,7 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
             c.Column = thisRow.CellGetString("SpalteName");
             c.ReplaceableText = thisRow.CellGetString("Text");
+            c.DropdownItems = thisRow.CellGetList("DropDown");
             Columns.Add(c);
         }
     }
@@ -220,10 +221,11 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
         foreach (var thisr in db2.Row) {
             thisr.CellSet("Text", string.Empty, string.Empty);
+            thisr.CellSet("DropDown", string.Empty, string.Empty);
         }
 
         if (db2.Column["SpalteName"] is not ColumnItem c) { _filling = false; return; }
-        if (db2.Row.Count== 0) {
+        if (db2.Row.Count == 0) {
 
 
             foreach (var thisc in db.Column) {
@@ -244,6 +246,7 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
             if (r != null) {
                 r.CellSet("Text", thisc.ReplaceableText, string.Empty);
+                r.CellSet("DropDown", thisc.DropdownItems, string.Empty);
             }
         }
 
@@ -273,11 +276,22 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
             b.DropdownAllesAbwählenErlaubt = true;
             b.DropdownBearbeitungErlaubt = true;
 
+
+            var ddl = _tmpEditDB.Column.GenerateAndAdd("DropDown", "DropDownItems", ColumnFormatHolder.Text);
+            if (ddl == null || ddl.IsDisposed) { return null; }
+            ddl.QuickInfo = "~Spaltenname~ und/oder fester Text";
+            ddl.MultiLine = true;
+            ddl.TextBearbeitungErlaubt = true;
+            ddl.DropdownAllesAbwählenErlaubt = true;
+            ddl.DropdownBearbeitungErlaubt = true;
+
+
+
             var dd = b.DropDownItems.Clone();
             var or = b.OpticalReplace.Clone();
 
             foreach (var thisColumn in db.Column) {
-                if (thisColumn.Function.CanBeCheckedByRules() && !thisColumn.MultiLine) {
+                if (thisColumn.Function.CanBeCheckedByRules()) {
                     dd.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~");
                     or.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
@@ -285,9 +299,9 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
 
             if (DatabaseOfUniqeRow is Database db2) {
                 foreach (var thisColumn in db2.Column) {
-                    if (thisColumn.Function.CanBeCheckedByRules() && !thisColumn.MultiLine) {
-                        dd.Add("~UNI_" + thisColumn.KeyName.ToLowerInvariant() + "~");
-                        or.Add("~UNI_" + thisColumn.KeyName.ToLowerInvariant() + "~|[Herkunft-Zeile, Spalte: " + thisColumn.ReadableText() + "]");
+                    if (thisColumn.Function.CanBeCheckedByRules()) {
+                        dd.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~");
+                        or.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~|[Herkunft-Zeile, Spalte: " + thisColumn.ReadableText() + "]");
                     }
                 }
             }
@@ -295,11 +309,16 @@ public class RowAdderSingleRow : IParseable, IReadableTextWithKey, IErrorCheckab
             b.DropDownItems = dd.AsReadOnly();
             b.OpticalReplace = or.AsReadOnly();
 
+            ddl.DropDownItems = dd.AsReadOnly();
+            ddl.OpticalReplace = or.AsReadOnly();
+
+
             _tmpEditDB.RepairAfterParse();
             var car = _tmpEditDB.ColumnArrangements.CloneWithClones();
 
             car[1].Add(sp, false);
             car[1].Add(b, false);
+            car[1].Add(ddl, false);
 
             _tmpEditDB.ColumnArrangements = car.AsReadOnly();
 

@@ -298,7 +298,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                             if (lstTexte.Items.Get(generatedTextKey_Stufen) is ItemCollectionList.ReadableListItem rli) {
                                 if (rli.Item is AdderItem ai) { adderit = ai; }
                             } else {
-                                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey_Stufen);
+                                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey_Stufen, rowIn);
 
                                 lstTexte.ItemAdd(ItemOf(adderit));
                             }
