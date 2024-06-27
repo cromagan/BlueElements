@@ -880,7 +880,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         var count = 0;
         if (!iAmThePureBinSaver && _pureBinSaver.IsBusy) { return (string.Empty, string.Empty, null); }
         if (_doingTempFile) {
-            if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
+            //if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
             return (string.Empty, string.Empty, null);
         }
 

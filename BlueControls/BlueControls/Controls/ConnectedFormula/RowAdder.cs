@@ -187,7 +187,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         nt = nt.Replace("\\\\\\", "\\");
         nt = nt.Replace("\\\\", "\\");
         nt = nt.Replace("\\\\", "\\");
-        nt = nt.Trim("\\") + "\\";
+        nt = nt.Trim("\\");
 
         //if (ucase) { nt = nt.ToUpper(); }
         nt = nt.RemoveChars(Constants.Char_PfadSonderZeichen);
@@ -210,7 +210,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         _ignoreCheckedChanged = true;
 
         if (string.IsNullOrEmpty(EntityID)) {
-            Fehler("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
+            Fehler("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch);
             return;
         }
 
@@ -244,10 +244,10 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             return;
         }
 
-        if (generatedentityID.Contains("\\")) {
-            Fehler("Interner Fehler: Ungültiges Zeichen in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch);
-            return;
-        }
+        if (generatedentityID.Contains("\\")) { Fehler("Interner Fehler: Ungültiges Zeichen (\\) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
+        if (generatedentityID.Contains("#")) { Fehler("Interner Fehler: Ungültiges Zeichen (#) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
+        if (generatedentityID.Contains("~")) { Fehler("Interner Fehler: Ungültiges Zeichen (~) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
+        if (generatedentityID.Contains("*")) { Fehler("Interner Fehler: Ungültiges Zeichen (*) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
 
         if (string.IsNullOrEmpty(Script)) {
             Fehler("Interner Fehler: Kein Skript vorhanden", BlueBasics.Enums.ImageCode.Kritisch);
@@ -257,7 +257,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.BeginntMit, generatedentityID + "\\"));
 
         var selected = OriginIDColumn.Contents(FilterOutput, null);
-        selected = selected.SortedDistinctList().Select(s => s.TrimStart(generatedentityID + "\\")).ToList();
+        selected = selected.Select(s => s.TrimStart(generatedentityID + "\\").Trim("\\")).ToList().SortedDistinctList();
 
         var scf = ExecuteScript(Script, selected, EntityID, rowIn);
 
@@ -273,25 +273,41 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             return;
         }
 
+        foreach (var item in menu) {
+            if (item.Contains("*")) { Fehler("Interner Fehler: Menüpunkte dürfen kein * enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            if (item.Contains(";")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ; enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            if (item.Contains("#")) { Fehler("Interner Fehler: Menüpunkte dürfen kein # enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            if (item.Contains("~")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ~ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+        }
+
         var infos = scf.Variables?.GetList("Infos") ?? new List<string>();
 
-        while (infos.Count < menu.Count) { infos.Add(string.Empty); }
+        foreach (var item in infos) {
+            if (item.Contains("*")) { Fehler("Interner Fehler: Infos dürfen kein * enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            //if (item.Contains(";")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ; enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            if (item.Contains("#")) { Fehler("Interner Fehler: Infos dürfen kein # enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            if (item.Contains("~")) { Fehler("Interner Fehler: Infos dürfen kein ~ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+
+            if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
+                Fehler("Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein", BlueBasics.Enums.ImageCode.Kritisch); return;
+            }
+        
+        }
 
         lstTexte.Enabled = true;
 
-        List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.TrimStart(generatedentityID + "\\")).ToList();
+        List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
 
         foreach (var thisIT in lstTexte.Items) {
             if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-                ai.Keys.Clear();
-                ai.Infos.Clear();
+                ai.KeysAndInfo.Clear();
             }
         }
 
-        menu = RepairMenu(menu);
+        var keyAndInfo = RepairMenu(menu, infos);
 
-        for (var z = 0; z < menu.Count; z++) {
-            var key = menu[z];
+        for (var z = 0; z < keyAndInfo.Count; z++) {
+            var key = keyAndInfo[z].SplitBy("#")[0];
 
             if (!ShowMe(selected, key)) { continue; }
 
@@ -303,14 +319,12 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
                 if (rli.Item is AdderItem ai) { adderit = ai; }
             } else {
                 adderit = new AdderItem(generatedentityID, OriginIDColumn, AdditionalInfoColumn, key);
+                adderit.GeneratedEntityID = generatedentityID;
                 lstTexte.ItemAdd(ItemOf(adderit));
             }
 
             if (adderit != null) {
-                adderit.Keys.Add(key);
-                adderit.Infos.Add(infos[z]);
-
-                adderit.GeneratedEntityID = generatedentityID;
+                adderit.KeysAndInfo.Add(keyAndInfo[z]);
             }
         }
 
@@ -363,17 +377,27 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         FillListBox();
     }
 
-    private List<string> RepairMenu(List<string> menu) {
+    private List<string> RepairMenu(List<string> menu, List<string> infos) {
         var m = new List<string>();
 
-        foreach (var thiss in menu) {
-            var t = thiss.TrimEnd("\\").SplitBy("\\");
+        for (var z = 0; z < menu.Count; z++) {
+            menu[z] = menu[z].Trim("\\");
+        }
+
+        for (var z2 = 0; z2 < menu.Count; z2++) {
+            var t = menu[z2].SplitBy("\\");
 
             var n = string.Empty;
             foreach (var item in t) {
-                n = n + item + "\\";
-                m.Add(n);
+                n = ( n + "\\" + item).Trim("\\");
+
+                if (!menu.Contains(n)) {
+                    // Nur Fehlende aufnehmen. Die existenten werden am Schluß eh hinzugefügt
+                    m.Add(n + "#");
+                }
             }
+
+            m.Add(menu[z2] + "#" + infos[z2]);
         }
 
         return m.SortedDistinctList();
@@ -383,7 +407,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
     private bool ShowMe(ICollection<string> selected, string textkey) {
         var t = RepairTextKey(textkey);
-        if (t.CountString("\\") < 2) { return true; }
+        if (t.CountString("\\") < 1) { return true; }
         if (Selected(selected, t)) { return true; }
         return Selected(selected, t.PathParent());
     }
