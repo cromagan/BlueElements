@@ -212,13 +212,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             db.OnCanDoScript(e);
             if (e.Cancel) { break; }
 
+            Develop.SetUserDidSomething();
             row.UpdateRow(false, false, false);
-
+            Develop.SetUserDidSomething();
             if (start.ElapsedMilliseconds > 30000) { break; }
         }
 
         lock (_executingchangedrowsx) {
-            Develop.SetUserDidSomething();
+
             _executingchangedrows = false;
         }
     }

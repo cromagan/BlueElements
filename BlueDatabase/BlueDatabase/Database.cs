@@ -2492,12 +2492,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
-        _completing = true;
+     
 
 
         var m = EditableErrorReason(EditableErrorReasonType.Save);
-        if (!string.IsNullOrEmpty(m)) { _completing = false; return false; }
+      
 
+        if (!string.IsNullOrEmpty(m)) { return false; }
+
+        _completing = true;
         if (string.IsNullOrEmpty(Filename)) { _completing = false;  return false; }
 
         Develop.SetUserDidSomething();
@@ -3491,8 +3494,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private string WriteTempFileToDisk(DateTime setfileStateUtcDateTo) {
-        var f = EditableErrorReason(EditableErrorReasonType.Save);
-        if (!string.IsNullOrEmpty(f)) { return string.Empty; }
+        // Wegen Completing
+        //var f = EditableErrorReason(EditableErrorReasonType.Save);
+        //if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
         var dataUncompressed = ToListOfByte(this, 1200, setfileStateUtcDateTo)?.ToArray();
 
