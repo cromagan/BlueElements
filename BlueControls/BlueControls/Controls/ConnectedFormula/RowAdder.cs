@@ -169,7 +169,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
 
-        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database, true, [], null);
+        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn);
 
         var sc = new BlueScript.Script(vars, string.Empty, scp);
         sc.ScriptText = scripttext;
@@ -210,20 +210,12 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         _ignoreCheckedChanged = true;
 
         if (string.IsNullOrEmpty(EntityID)) {
-            lstTexte.Enabled = false;
-            lstTexte.ItemClear();
-            lstTexte.ItemAdd(ItemOf("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
-            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _ignoreCheckedChanged = false;
+            Fehler("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch));
             return;
         }
 
         if (OriginIDColumn == null) {
-            lstTexte.Enabled = false;
-            lstTexte.ItemClear();
-            lstTexte.ItemAdd(ItemOf("Interner Fehler: OriginIDColumn", BlueBasics.Enums.ImageCode.Kritisch));
-            FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
-            _ignoreCheckedChanged = false;
+            Fehler("Interner Fehler: OriginIDColumn", BlueBasics.Enums.ImageCode.Kritisch);
             return;
         }
 
