@@ -101,7 +101,7 @@ public class DropDownListItem : AbstractListItem {
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, Design.ComboBox_Textbox, vState, positionModified);
-            var but = new Rectangle(positionModified.Width-16, positionModified.Top, 16,16);
+            var but = new Rectangle(positionModified.Right-16, positionModified.Top, 16,16);
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
 

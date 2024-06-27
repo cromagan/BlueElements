@@ -34,11 +34,11 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Constructors
 
-    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, ColumnItem? additionalInfoColumn, string generatedTextKey) {
-        GeneratedEntityID = generatedentityID;
-        OriginIDColumn = originIDColumn;
+    public AdderItem(string generatedTextKey) {
+        //GeneratedEntityID = generatedentityID;
+        //OriginIDColumn = originIDColumn;
 
-        AdditionalInfoColumn = additionalInfoColumn;
+        //AdditionalInfoColumn = additionalInfoColumn;
 
         Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix();
         KeyName = generatedTextKey;
@@ -46,10 +46,10 @@ internal class AdderItem : IReadableTextWithKey {
 
     #endregion
 
-    #region Properties
+    //public ColumnItem? AdditionalInfoColumn { get; }
+    //public string GeneratedEntityID { get; set; }
 
-    public ColumnItem? AdditionalInfoColumn { get; }
-    public string GeneratedEntityID { get; set; }
+    #region Properties
 
     /// <summary>
     /// Enstpricht TextKey  (ZUTATEN\\MEHL\\) OHNE #
@@ -59,18 +59,21 @@ internal class AdderItem : IReadableTextWithKey {
     public List<string> KeysAndInfo { get; } = new List<string>();
 
     public string Last { get; private set; }
-    public ColumnItem? OriginIDColumn { get; }
+
+    //public ColumnItem? OriginIDColumn { get; }
     public string QuickInfo => KeyName;
 
     #endregion
 
     #region Methods
 
-    public static void AddRowsToDatabase(ColumnItem? OriginIDColumn, List<string> KeysAndInfo, string GeneratedEntityID, string KeyName, ColumnItem? AdditionalInfoColumn) {
+    public static void AddRowsToDatabase(ColumnItem? OriginIDColumn, List<string> KeysAndInfo, string GeneratedEntityID, ColumnItem? AdditionalInfoColumn) {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
 
         for (var z = 0; z < KeysAndInfo.Count; z++) {
             var key = OriginId(KeysAndInfo[z], OriginIDColumn, GeneratedEntityID);
+
+            var KeyName = key.TrimStart(GeneratedEntityID + "\\");
 
             if (!string.IsNullOrEmpty(KeyName)) {
                 var r = db.Row.GenerateAndAdd(key, null, "Zeilengenerator im Formular");
@@ -100,15 +103,11 @@ internal class AdderItem : IReadableTextWithKey {
         }
     }
 
-    public string ReadableText() => Last;
-
-    public QuickImage? SymbolForReadableText() => null;
-
-    internal void RemoveRowsFromDatabase() {
+    public static void RemoveRowsFromDatabase(ColumnItem? OriginIDColumn, string GeneratedEntityId, string KeyName) {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
 
         var fi = new FilterCollection(db, "Zeilengenerator im Formular");
-        var key = OriginId(KeyName + "#", OriginIDColumn, GeneratedEntityID);
+        var key = OriginId(KeyName + "#", OriginIDColumn, GeneratedEntityId);
         fi.Add(new FilterItem(OriginIDColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
         db.Row.Remove(fi, null, "Zeilengenerator im Formular");
         fi.Dispose();
@@ -119,6 +118,10 @@ internal class AdderItem : IReadableTextWithKey {
         //db.Row.Remove(fi, null, "Zeilengenerator im Formular");
         //fi.Dispose();
     }
+
+    public string ReadableText() => Last;
+
+    public QuickImage? SymbolForReadableText() => null;
 
     private static string OriginId(string keyAndInfos, ColumnItem OriginIDColumn, string GeneratedEntityID) {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return string.Empty; }

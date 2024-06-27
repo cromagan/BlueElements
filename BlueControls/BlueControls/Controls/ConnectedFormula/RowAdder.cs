@@ -152,6 +152,8 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ColumnItem? TextKey { get; internal set; }
 
+    protected string GeneratedEntityId { get; private set; }
+
     #endregion
 
     #region Methods
@@ -236,6 +238,8 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
         rowIn.CheckRowDataIfNeeded();
 
+        GeneratedEntityId = string.Empty;
+
         var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
 
         if (generatedentityID == EntityID) {
@@ -301,6 +305,8 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
         Enabled = true;
 
+        GeneratedEntityId = generatedentityID;
+
         List<string> olditems = Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
 
         foreach (var thisIT in Items) {
@@ -331,15 +337,16 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                     ai.KeysAndInfo.Add(keyAndInfo[z]);
                 }
                 olditems.Remove(key);
-            } else if (parentvorhanden is ItemCollectionList.DropDownListItem dli) {
+            } else if (parentvorhanden is ItemCollectionList.DropDownListItem dli &&
+                !selected.Contains(key) ) {
                 dli.DDItems.Add(ItemOf(keyAndInfo[z], false));
                 olditems.Remove(parentname);
             } else {
-                var dd = key.EndsWith("+");
+                var dd = key.EndsWith("+") && !selected.Contains(key);
 
                 if (!dd) {
-                    var nai = new AdderItem(generatedentityID, OriginIDColumn, AdditionalInfoColumn, key);
-                    nai.GeneratedEntityID = generatedentityID;
+                    var nai = new AdderItem(key);
+                    //nai.GeneratedEntityID = generatedentityID;
                     nai.KeysAndInfo.Add(keyAndInfo[z]);
                     var it = ItemOf(nai);
                     it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
@@ -392,9 +399,9 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
         if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
             if (Checked.Contains(rli.KeyName)) {
-                AdderItem.AddRowsToDatabase(ai.OriginIDColumn, ai.KeysAndInfo, ai.GeneratedEntityID, ai.KeyName, ai.AdditionalInfoColumn);
+                AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
             } else {
-                ai.RemoveRowsFromDatabase();
+                AdderItem.RemoveRowsFromDatabase(OriginIDColumn, GeneratedEntityId, ai.KeyName);
             }
             FillListBox();
         }
@@ -419,6 +426,19 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     }
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        FloatingForm.Close(this);
+
+        //var KeysAndInfo = e.ClickedCommand;
+
+        //if (!string.IsNullOrEmpty(e.ClickedCommand) && _item.Get(e.ClickedCommand) is AbstractListItem bli) {
+        //    _lastClickedText = e.ClickedCommand;
+        //    Text = e.ClickedCommand;
+        //    OnItemClicked(new AbstractListItemEventArgs(bli));
+        //}
+        //_ = Focus();
+
+        AdderItem.AddRowsToDatabase(OriginIDColumn, [e.ClickedCommand], GeneratedEntityId, AdditionalInfoColumn);
+
         FillListBox();
     }
 
