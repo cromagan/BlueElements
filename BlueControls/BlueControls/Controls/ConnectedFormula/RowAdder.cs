@@ -68,6 +68,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ColumnItem? AdditionalInfoColumn { get; internal set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlAcceptFilter> Childs { get; } = [];
 
     /// <summary>
@@ -160,10 +165,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
         vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
-        vars.Add(new VariableListString("CurrentlySelected", selected, true, string.Empty));
+        vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
+        vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
 
-        var scp = new ScriptProperties("Row-Adder", MethodType.Standard, true, [], null);
+        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database, true, [], null);
 
         var sc = new BlueScript.Script(vars, string.Empty, scp);
         sc.ScriptText = scripttext;
@@ -246,6 +252,11 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             return;
         }
 
+        if (generatedentityID.Contains("\\")) {
+            Fehler("Interner Fehler: Ungültiges Zeichen in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch);
+            return;
+        }
+
         if (string.IsNullOrEmpty(Script)) {
             Fehler("Interner Fehler: Kein Skript vorhanden", BlueBasics.Enums.ImageCode.Kritisch);
             return;
@@ -270,34 +281,43 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             return;
         }
 
+        var infos = scf.Variables?.GetList("Infos") ?? new List<string>();
+
+        while (infos.Count < menu.Count) { infos.Add(string.Empty); }
+
         lstTexte.Enabled = true;
 
         List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.TrimStart(generatedentityID + "\\")).ToList();
 
         foreach (var thisIT in lstTexte.Items) {
             if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-                ai.Rows.Clear();
+                ai.Keys.Clear();
+                ai.Infos.Clear();
             }
         }
 
         menu = RepairMenu(menu);
 
-        foreach (var generatedTextKey in menu) {
-            if (!ShowMe(selected, generatedTextKey)) { continue; }
+        for (var z = 0; z < menu.Count; z++) {
+            var key = menu[z];
 
-            olditems.Remove(generatedTextKey);
+            if (!ShowMe(selected, key)) { continue; }
+
+            olditems.Remove(key);
 
             AdderItem? adderit = null;
 
-            if (lstTexte.Items.Get(generatedTextKey) is ItemCollectionList.ReadableListItem rli) {
+            if (lstTexte.Items.Get(key) is ItemCollectionList.ReadableListItem rli) {
                 if (rli.Item is AdderItem ai) { adderit = ai; }
             } else {
-                adderit = new AdderItem(generatedentityID, OriginIDColumn, generatedTextKey);
+                adderit = new AdderItem(generatedentityID, OriginIDColumn, AdditionalInfoColumn, key);
                 lstTexte.ItemAdd(ItemOf(adderit));
             }
 
             if (adderit != null) {
-                adderit.Rows.Add(generatedTextKey);
+                adderit.Keys.Add(key);
+                adderit.Infos.Add(infos[z]);
+
                 adderit.GeneratedEntityID = generatedentityID;
             }
         }

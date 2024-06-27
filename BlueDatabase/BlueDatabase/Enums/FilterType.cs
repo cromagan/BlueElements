@@ -26,8 +26,10 @@ public enum FilterType {
 
     // Filterarten allgemein -------------------------------------------------------
     Istgleich = 1 << 0,
+
     //  ZUR INFO:  Ungleich = 1 << 1
     Instr = 1 << 2,
+
     AlwaysFalse = 1 << 3,
     Between = 1 << 4,
     BeginntMit = 1 << 5,
@@ -53,6 +55,7 @@ public enum FilterType {
     Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal = Ungleich_MultiRowIgnorieren | UND | GroßKleinEgal,
     Ungleich_MultiRowIgnorieren_GroßKleinEgal = Ungleich_MultiRowIgnorieren | GroßKleinEgal,
     Instr_GroßKleinEgal = Instr | GroßKleinEgal,
+    BeginntMit_GroßKleinEgal = BeginntMit | GroßKleinEgal,
 
     //Instr_ODER_GroßKleinEgal = Instr | GroßKleinEgal | ODER,
     Instr_UND_GroßKleinEgal = Instr | GroßKleinEgal | UND

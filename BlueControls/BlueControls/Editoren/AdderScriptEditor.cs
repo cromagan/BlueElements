@@ -61,7 +61,13 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
 
         var l = new List<string> {
                 "In die Variable MENU muss das Menu erstellt werden.",
+                "Dies muss folgendens Format sein:",
+                "Backen",
+                "Backen\\Zutaten",
+                "Backen\\Zutaten\\Mehl",
                 " ",
+                "Parallel dazu kann die Variable Infos erstellt werden.",
+                "Freie Texte."
             };
         l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
 
@@ -201,7 +207,7 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
             e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
             return;
         }
-        
+
         WriteInfosBack();
 
         if (!_item.IsOk()) {

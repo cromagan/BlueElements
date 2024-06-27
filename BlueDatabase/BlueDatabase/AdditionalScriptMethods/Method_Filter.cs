@@ -36,13 +36,13 @@ public class Method_Filter : Method_Database {
     public override string Command => "filter";
 
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                         "Aktuell werden nur die FilterTypen 'is', 'isnot' und 'instr' unterstützt.\r\n" +
+                                         "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith' und 'instr' unterstützt.\r\n" +
                                          "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
                                          "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Datanbank und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Database | MethodType.IO ;
+    public override MethodType MethodType => MethodType.Database | MethodType.IO;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string StartSequence => "(";
@@ -107,6 +107,11 @@ public class Method_Filter : Method_Database {
 
             case "instr":
                 filtertype = FilterType.Instr_GroßKleinEgal;
+                break;
+
+            case "startswith":
+
+                filtertype = FilterType.BeginntMit_GroßKleinEgal;
                 break;
 
             default:

@@ -22,10 +22,8 @@ using BlueDatabase;
 using System.Collections.Generic;
 using System;
 using BlueBasics.Interfaces;
-
 using BlueDatabase.Enums;
 using static BlueBasics.IO;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls;
 
@@ -36,9 +34,11 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Constructors
 
-    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, string generatedTextKey) {
+    public AdderItem(string generatedentityID, ColumnItem? originIDColumn, ColumnItem? additionalInfoColumn, string generatedTextKey) {
         GeneratedEntityID = generatedentityID;
         OriginIDColumn = originIDColumn;
+
+        AdditionalInfoColumn = additionalInfoColumn;
 
         Indent = Math.Max(generatedTextKey.CountString("\\") - 1, 0);
         Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix();
@@ -49,18 +49,22 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Properties
 
+    public ColumnItem? AdditionalInfoColumn { get; }
     public string GeneratedEntityID { get; set; }
     public int Indent { get; private set; }
+
+    public List<string> Infos { get; } = new List<string>();
 
     /// <summary>
     /// Enstpricht TextKey  (ZUTATEN\\MEHL\\) OHNE *
     /// </summary>
     public string KeyName { get; }
 
+    public List<string> Keys { get; } = new List<string>();
+
     public string Last { get; private set; }
     public ColumnItem? OriginIDColumn { get; }
     public string QuickInfo => KeyName;
-    public List<string> Rows { get; } = new List<string>();
 
     #endregion
 
@@ -69,19 +73,29 @@ internal class AdderItem : IReadableTextWithKey {
     public void AddRowsToDatabase() {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
 
-        foreach (var row in Rows) {
-            var oriid = OriginId(row);
+        for (var z = 0; z < Keys.Count; z++) {
+            var oriid = OriginId(Keys[z]);
             if (!string.IsNullOrEmpty(oriid)) {
                 var r = db.Row.GenerateAndAdd(GeneratedEntityID, null, "Zeilengenerator im Formular");
 
                 if (r != null) {
                     OriginIDColumn.MaxCellLenght = Math.Max(OriginIDColumn.MaxCellLenght, oriid.Length);
-                    OriginIDColumn.MultiLine = true;
+                    OriginIDColumn.MultiLine = false;
                     OriginIDColumn.AfterEditAutoCorrect = false;
                     OriginIDColumn.AfterEditQuickSortRemoveDouble = false;
                     OriginIDColumn.ScriptType = ScriptType.String_Readonly;
                     OriginIDColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.";
                     r.CellSet(OriginIDColumn, oriid, "Zeilengenerator im Formular");
+
+                    if (AdditionalInfoColumn != null) {
+                        AdditionalInfoColumn.MaxCellLenght = Math.Max(AdditionalInfoColumn.MaxCellLenght, Infos[z].Length);
+                        AdditionalInfoColumn.MultiLine = false;
+                        AdditionalInfoColumn.AfterEditAutoCorrect = false;
+                        AdditionalInfoColumn.AfterEditQuickSortRemoveDouble = false;
+                        AdditionalInfoColumn.ScriptType = ScriptType.String_Readonly;
+                        AdditionalInfoColumn.AdminInfo = "Diese Spalte wird für Zusatzinfos de Textgenerators benutzt.";
+                        r.CellSet(AdditionalInfoColumn, Infos[z], "Zeilengenerator im Formular");
+                    }
                 }
             }
         }
@@ -94,7 +108,7 @@ internal class AdderItem : IReadableTextWithKey {
     internal void RemoveRowsFromDatabase() {
         if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
 
-        foreach (var row in Rows) {
+        foreach (var row in Keys) {
             var fi = new FilterCollection(db, "Zeilengenerator im Formular");
             fi.Add(new FilterItem(OriginIDColumn, FilterType.Istgleich_UND_GroßKleinEgal, OriginId(row)));
             db.Row.Remove(fi, null, "Zeilengenerator im Formular");

@@ -31,9 +31,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using BlueControls.Editoren;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
 using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -47,9 +45,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     #region Fields
 
-    public string Script = string.Empty;
     private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
+    private string _additinalInfoColumnName = string.Empty;
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -65,6 +63,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     private string _originIDColumnName = string.Empty;
+
+    private string _script = string.Empty;
 
     #endregion
 
@@ -86,6 +86,27 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     #region Properties
 
     public static string ClassId => "FI-RowAdder";
+
+    public ColumnItem? AdditionalInfoColumn {
+        get {
+            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
+
+            var c = dbout?.Column[_additinalInfoColumnName];
+            return c == null || c.IsDisposed ? null : c;
+        }
+    }
+
+    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
+    public string AdditionalInfoColumnName {
+        get => _additinalInfoColumnName;
+        set {
+            if (IsDisposed) { return; }
+            if (_additinalInfoColumnName == value) { return; }
+            _additinalInfoColumnName = value;
+            OnPropertyChanged();
+            //UpdateSideOptionMenu();
+        }
+    }
 
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
@@ -128,6 +149,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
     public bool InputMustBeOneRow => true;
+
     public override bool MustBeInDrawingArea => true;
 
     /// <summary>
@@ -177,6 +199,16 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
+    public string Script {
+        get { return _script; }
+
+        set {
+            if (value == _script) { return; }
+            _script = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -196,6 +228,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var con = new RowAdder {
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,
+            AdditionalInfoColumn = AdditionalInfoColumn,
             Script = Script
         };
 
@@ -226,6 +259,12 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
         }
 
+        if (AdditionalInfoColumn is ColumnItem aic && !aic.IsDisposed) {
+            if (aic.Function != ColumnFunction.Schlüsselspalte) {
+                return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
+            }
+        }
+
         if (string.IsNullOrEmpty(Script)) {
             return "Kein Skript definiert.";
         }
@@ -252,6 +291,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             lst.AddRange(ItemsOf(dbout.Column, true));
 
             l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
+            l.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));
         }
 
         l.AddRange(base.GetProperties(widthOfControl));
@@ -285,8 +325,8 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
                 _originIDColumnName = value;
                 return true;
 
-            case "additionaltextcolumnname":
-                //_additionalTextColumnName = value;
+            case "additionalinfocolumnname":
+                _additinalInfoColumnName = value;
                 return true;
 
             case "counter":
@@ -336,6 +376,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
         result.ParseableAdd("EntityID", _entityID);
         result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
+        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
         result.ParseableAdd("Script", Script);
         return result.Parseable(base.ToString());
     }
