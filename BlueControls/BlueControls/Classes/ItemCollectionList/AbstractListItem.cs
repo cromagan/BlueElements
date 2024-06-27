@@ -83,6 +83,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
+    public int Indent { get; set; }
+
     public bool IsCaption {
         get => _isCaption;
         protected set {
@@ -160,7 +162,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign) {
         if (itemdesign == Design.Undefiniert) { return; }
-        var positionModified = Pos with { X = Pos.X - xModifier, Y = Pos.Y - yModifier };
+        var positionModified = Pos with { X = Pos.X - xModifier + (Indent * 32), Y = Pos.Y - yModifier };
 
         if (checkboxDesign != Design.Undefiniert) {
             var design = Skin.DesignOf(checkboxDesign, state);

@@ -43,7 +43,7 @@ internal class Method_Compare : Method {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Werte, ...);";
+    public override string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Value1, ...);";
 
     #endregion
 

@@ -35,11 +35,15 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using System.Runtime.InteropServices;
 using BlueBasics.Enums;
+using BlueControls.ItemCollectionList;
+using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueControls.EventArgs;
 
 namespace BlueControls.Controls;
 
-public partial class RowAdder : System.Windows.Forms.UserControl, IControlAcceptFilter, IControlSendFilter, IControlUsesRow {
-
+public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFilter, IControlSendFilter, IControlUsesRow // System.Windows.Forms.UserControl,
+    {
     #region Fields
 
     private FilterCollection? _filterInput;
@@ -54,12 +58,6 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         ((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
     }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -83,7 +81,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string EntityID { get; internal set; }
+    public string EntityID { get; internal set; } = string.Empty;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -141,7 +139,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; } = false;
 
-    public string Script { get; set; }
+    [DefaultValue("")]
+    public string Script { get; set; } = string.Empty;
 
     /// <summary>
     /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
@@ -195,9 +194,9 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
     }
 
     public void Fehler(string txt, ImageCode symbol) {
-        lstTexte.Enabled = false;
-        lstTexte.ItemClear();
-        lstTexte.ItemAdd(ItemOf(txt, symbol));
+        Enabled = false;
+        ItemClear();
+        ItemAdd(ItemOf(txt, symbol));
         FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
         _ignoreCheckedChanged = false;
     }
@@ -259,6 +258,8 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         var selected = OriginIDColumn.Contents(FilterOutput, null);
         selected = selected.Select(s => s.TrimStart(generatedentityID + "\\").Trim("\\")).ToList().SortedDistinctList();
 
+        selected = RepairMenu(selected);
+
         var scf = ExecuteScript(Script, selected, EntityID, rowIn);
 
         if (!scf.AllOk) {
@@ -287,22 +288,31 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
             //if (item.Contains(";")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ; enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
             if (item.Contains("#")) { Fehler("Interner Fehler: Infos dürfen kein # enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
             if (item.Contains("~")) { Fehler("Interner Fehler: Infos dürfen kein ~ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
+            if (item.Contains("\\")) { Fehler("Interner Fehler: Infos dürfen kein \\ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
 
             if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
                 Fehler("Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein", BlueBasics.Enums.ImageCode.Kritisch); return;
             }
-        
         }
 
-        lstTexte.Enabled = true;
+        if (AdditionalInfoColumn != null && menu.Count != infos.Count) {
+            Fehler("Interner Fehler: Infos und Menuitems ungleich", BlueBasics.Enums.ImageCode.Kritisch); return;
+        }
 
-        List<string> olditems = lstTexte.Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
+        Enabled = true;
 
-        foreach (var thisIT in lstTexte.Items) {
+        List<string> olditems = Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
+
+        foreach (var thisIT in Items) {
             if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
                 ai.KeysAndInfo.Clear();
             }
+            if (thisIT is ItemCollectionList.DropDownListItem dli) {
+                dli.DDItems.Clear();
+            }
         }
+
+        menu.AddRange(selected);
 
         var keyAndInfo = RepairMenu(menu, infos);
 
@@ -311,29 +321,47 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
             if (!ShowMe(selected, key)) { continue; }
 
-            olditems.Remove(key);
+            var vorhanden = Items.Get(key);
 
-            AdderItem? adderit = null;
+            var parentname = key.PathParent().Trim("\\") + "~DD~";
+            var parentvorhanden = Items.Get(parentname);
 
-            if (lstTexte.Items.Get(key) is ItemCollectionList.ReadableListItem rli) {
-                if (rli.Item is AdderItem ai) { adderit = ai; }
+            if (vorhanden is ItemCollectionList.ReadableListItem rli) {
+                if (rli.Item is AdderItem ai) {
+                    ai.KeysAndInfo.Add(keyAndInfo[z]);
+                }
+                olditems.Remove(key);
+            } else if (parentvorhanden is ItemCollectionList.DropDownListItem dli) {
+                dli.DDItems.Add(ItemOf(keyAndInfo[z], false));
+                olditems.Remove(parentname);
             } else {
-                adderit = new AdderItem(generatedentityID, OriginIDColumn, AdditionalInfoColumn, key);
-                adderit.GeneratedEntityID = generatedentityID;
-                lstTexte.ItemAdd(ItemOf(adderit));
-            }
+                var dd = key.EndsWith("+");
 
-            if (adderit != null) {
-                adderit.KeysAndInfo.Add(keyAndInfo[z]);
+                if (!dd) {
+                    var nai = new AdderItem(generatedentityID, OriginIDColumn, AdditionalInfoColumn, key);
+                    nai.GeneratedEntityID = generatedentityID;
+                    nai.KeysAndInfo.Add(keyAndInfo[z]);
+                    var it = ItemOf(nai);
+                    it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
+
+                    ItemAdd(it);
+                    olditems.Remove(key);
+                } else {
+                    var ndli = new DropDownListItem(parentname, true, string.Empty);
+                    ndli.DDItems.Add(ItemOf(keyAndInfo[z], false));
+                    ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
+                    ItemAdd(ndli);
+                    olditems.Remove(parentname);
+                }
             }
         }
 
         foreach (var thisit in olditems) {
-            lstTexte.Remove(thisit);
+            Remove(thisit);
         }
 
-        lstTexte.UncheckAll();
-        lstTexte.Check(selected);
+        UncheckAll();
+        Check(selected);
 
         _ignoreCheckedChanged = false;
     }
@@ -352,32 +380,66 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
         FillListBox();
     }
 
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+    //public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     public void ParentFilterOutput_Changed() { }
 
     public void RowsInput_Changed() { }
+
+    protected override void OnItemClicked(AbstractListItemEventArgs e) {
+        if (_ignoreCheckedChanged) { return; }
+        base.OnItemClicked(e);
+
+        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+            if (Checked.Contains(rli.KeyName)) {
+                AdderItem.AddRowsToDatabase(ai.OriginIDColumn, ai.KeysAndInfo, ai.GeneratedEntityID, ai.KeyName, ai.AdditionalInfoColumn);
+            } else {
+                ai.RemoveRowsFromDatabase();
+            }
+            FillListBox();
+        }
+
+        if (e.Item is DropDownListItem dli) {
+            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + dli.Indent * 32;
+            var y = Cursor.Position.Y - MousePos().Y + dli.Pos.Bottom; //Identisch
+
+            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DDItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+            dropDownMenu.Cancel += DropDownMenu_Cancel;
+            dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
+        }
+    }
 
     protected override void OnPaint(PaintEventArgs e) {
         HandleChangesNow();
         base.OnPaint(e);
     }
 
-    private void lstTexte_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (_ignoreCheckedChanged) { return; }
-
-        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-            if (lstTexte.Checked.Contains(rli.KeyName)) {
-                ai.AddRowsToDatabase();
-            } else {
-                ai.RemoveRowsFromDatabase();
-            }
-        }
-
+    private void DropDownMenu_Cancel(object sender, System.EventArgs e) {
         FillListBox();
     }
 
+    private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        FillListBox();
+    }
+
+    private List<string> RepairMenu(List<string> menu) {
+        var m = new List<string>();
+
+        for (var z2 = 0; z2 < menu.Count; z2++) {
+            var t = menu[z2].Trim("\\").SplitBy("\\");
+
+            var n = string.Empty;
+            foreach (var item in t) {
+                n = (n + "\\" + item).Trim("\\");
+                m.Add(n);
+            }
+        }
+        return m.SortedDistinctList();
+    }
+
     private List<string> RepairMenu(List<string> menu, List<string> infos) {
+        while (infos.Count < menu.Count) { infos.Add(string.Empty); }
+
         var m = new List<string>();
 
         for (var z = 0; z < menu.Count; z++) {
@@ -389,7 +451,7 @@ public partial class RowAdder : System.Windows.Forms.UserControl, IControlAccept
 
             var n = string.Empty;
             foreach (var item in t) {
-                n = ( n + "\\" + item).Trim("\\");
+                n = (n + "\\" + item).Trim("\\");
 
                 if (!menu.Contains(n)) {
                     // Nur Fehlende aufnehmen. Die existenten werden am Schluß eh hinzugefügt

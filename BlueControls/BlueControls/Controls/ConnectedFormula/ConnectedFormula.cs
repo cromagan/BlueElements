@@ -61,7 +61,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
     private string _loadedVersion = "0.00";
     private MultiUserFile? _muf;
     private ItemCollectionPad.ItemCollectionPad? _padData;
-    private bool _saved;
+    private bool _parsing = false;
+    private bool _saved = true;
     private bool _saving;
 
     #endregion
@@ -71,6 +72,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
     public ConnectedFormula() : this(string.Empty) { }
 
     private ConnectedFormula(string filename) {
+        _parsing = true;
         AllFiles.Add(this);
         _muf = new MultiUserFile();
 
@@ -97,7 +99,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             _padData.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
         }
         Repair();
-        _saved = true;
+        _parsing = false;
     }
 
     #endregion
@@ -153,7 +155,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             if (_notAllowedChilds.JoinWithCr() == l.JoinWithCr()) { return; }
             _notAllowedChilds.Clear();
             _notAllowedChilds.AddRange(l);
-            _saved = false;
+            SetUnSaved();
             OnNotAllowedChildsChanged();
         }
     }
@@ -173,7 +175,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
             if (_saving || (_muf?.IsLoading ?? false)) { return; }
 
-            _saved = false;
+            SetUnSaved();
         }
     }
 
@@ -523,29 +525,14 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
     public void Save() => _muf?.Save(true);
 
-    //public void Variables_Add(VariableString va, bool isLoading) {
-    //    _variables.Add(va);
-    //    //ev.Changed += EventScript_Changed;
-    //    if (!isLoading) { Variables_Changed(); }
-    //}
-
-    //public void Variables_RemoveAll(bool isLoading) {
-    //    while (_variables.Count > 0) {
-    //        //var va = _variables[_eventScript.Count - 1];
-    //        //ev.Changed -= EventScript_Changed;
-
-    //        _variables.RemoveAt(_variables.Count - 1);
-    //    }
-
-    //    if (!isLoading) { Variables_Changed(); }
-    //}
-
     public QuickImage? SymbolForReadableText() {
         if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
+    //    if (!isLoading) { Variables_Changed(); }
+    //}
     /// <summary>
     /// Leert die eingehende List und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds
     /// </summary>
@@ -579,6 +566,8 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         }
     }
 
+    //        _variables.RemoveAt(_variables.Count - 1);
+    //    }
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
     /// Zeilenselectionen werden dabei ignoriert.
@@ -601,6 +590,10 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         return false;
     }
 
+    //public void Variables_RemoveAll(bool isLoading) {
+    //    while (_variables.Count > 0) {
+    //        //var va = _variables[_eventScript.Count - 1];
+    //        //ev.Changed -= EventScript_Changed;
     internal bool IsEditing() {
         var e = new EditingEventArgs();
 
@@ -609,6 +602,11 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         return e.Editing;
     }
 
+    //public void Variables_Add(VariableString va, bool isLoading) {
+    //    _variables.Add(va);
+    //    //ev.Changed += EventScript_Changed;
+    //    if (!isLoading) { Variables_Changed(); }
+    //}
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
@@ -659,7 +657,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
             if (db != null) { db.Editor = typeof(DatabaseHeadEditor); }
         }
 
-        _saved = false;
+        SetUnSaved();
     }
 
     private void Dispose(bool disposing) {
@@ -702,7 +700,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
         if (IsDisposed) { return; }
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
-        _saved = false;
+        SetUnSaved();
         OnPropertyChanged();
     }
 
@@ -759,6 +757,14 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
                     break;
             }
         }
+    }
+
+    private void SetUnSaved() {
+        if (_parsing || _saving) { return; }
+
+        if (_muf?.IsLoading ?? true) { return; }
+
+        _saved = false;
     }
 
     private void ToListOfByte(object sender, MultiUserToListEventArgs e) {

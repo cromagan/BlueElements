@@ -30,7 +30,7 @@ public static partial class Extensions {
     #region Methods
 
     public static bool Contains(this IEnumerable<string> collection, string searchKeyword, bool caseSensitive) {
-        if (caseSensitive) { Develop.DebugPrint(FehlerArt.Fehler, "CaseSensitive = True"); }
+        if (caseSensitive) { return collection.Contains(searchKeyword); }
         return collection.Any(item => string.Equals(item, searchKeyword, StringComparison.OrdinalIgnoreCase));
     }
 

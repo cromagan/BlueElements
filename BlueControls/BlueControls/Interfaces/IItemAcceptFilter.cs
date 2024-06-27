@@ -124,7 +124,7 @@ public sealed class ItemAcceptFilter {
 
         if (nl.IsDifferentTo(_inputColorId)) {
             _inputColorId = nl;
-            item.OnPropertyChanged();
+            //item.on;
         }
     }
 

@@ -109,8 +109,9 @@
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\AdderItem.cs" />
+    <Compile Include="Classes\ItemCollectionList\DropDownListItem.cs" />
     <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ConnectedFormula\RowAdder.Designer.cs">
       <DependentUpon>RowAdder.cs</DependentUpon>
