@@ -43,12 +43,13 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
-    private string _eingangsWertSpalte = string.Empty;
     private string _filterSpalte = string.Empty;
-    private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
-    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+    private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_schreibungsneutral;
+    private string _filterwert = string.Empty;
 
     #endregion
+
+    //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #region Constructors
 
@@ -83,23 +84,23 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Kann aus dem empfangenen Filtern einen komplett anderen Filter erstellen und ausgeben.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
+    public override string Description => "Erstellt einen Filter.\r\nEs kann eine Zeile empfangen. Dann können die Variablen der eingehenden Zeile benutzt werden, um den Filter-Wert zu berechnen.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
-    [Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
-    [DefaultValue("")]
-    public string Eingangs_Wert_Spalte {
-        get => _eingangsWertSpalte;
-        set {
-            if (IsDisposed) { return; }
-            if (value == _eingangsWertSpalte) { return; }
-            _eingangsWertSpalte = value;
-            this.DoChilds();
-            OnPropertyChanged();
-        }
-    }
+    //[Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
+    //[DefaultValue("")]
+    //public string Eingangs_Wert_Spalte {
+    //    get => _eingangsWertSpalte;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (value == _eingangsWertSpalte) { return; }
+    //        _eingangsWertSpalte = value;
+    //        this.DoChilds();
+    //        OnPropertyChanged();
+    //    }
+    //}
 
     [Description("Dieser Filter-Typ wird angewendet.")]
-    [DefaultValue(FilterTypeRowInputItem.Ist_GrossKleinEgal)]
+    [DefaultValue(FilterTypeRowInputItem.Ist_schreibungsneutral)]
     public FilterTypeRowInputItem Filter {
         get => _filtertype;
         set {
@@ -124,6 +125,19 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         }
     }
 
+    [Description("Nach diesem Wert wird gefiltert. Es können Variablen der eingehenden Zeile benutzt werden.")]
+    [DefaultValue("")]
+    public string Filter_Wert {
+        get => _filterwert;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _filterwert) { return; }
+            _filterwert = value;
+            this.DoChilds();
+            OnPropertyChanged();
+        }
+    }
+
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
@@ -138,15 +152,15 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-        get => _standard_bei_keiner_Eingabe;
-        set {
-            if (IsDisposed) { return; }
-            if (_standard_bei_keiner_Eingabe == value) { return; }
-            _standard_bei_keiner_Eingabe = value;
-            OnPropertyChanged();
-        }
-    }
+    //public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
+    //    get => _standard_bei_keiner_Eingabe;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (_standard_bei_keiner_Eingabe == value) { return; }
+    //        _standard_bei_keiner_Eingabe = value;
+    //        OnPropertyChanged();
+    //    }
+    //}
 
     protected override int SaveOrder => 1;
 
@@ -166,11 +180,9 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
+        //var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
-        var con = new InputRowOutputFilterControl(i, o, _filtertype) {
-            Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe
-        };
+        var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
 
@@ -187,9 +199,9 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (DatabaseInput?.Column[_eingangsWertSpalte] == null) {
-            return "Die Spalte, aus der der Filterwert kommen soll, fehlt.";
-        }
+        //if (DatabaseInput?.Column[_eingangsWertSpalte] == null) {
+        //    return "Die Spalte, aus der der Filterwert kommen soll, fehlt.";
+        //}
 
         if (DatabaseOutput?.Column[_filterSpalte] == null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
@@ -203,31 +215,27 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
         l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
 
+        //if (DatabaseInput is Database dbin && !dbin.IsDisposed) {
+        //    var u2 = new List<AbstractListItem>();
+        //    u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
+        //    l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
+        //}
+
+        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
+
         var inr = _itemAccepts.GetFilterFromGet(this);
-        if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
+        if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
             var ic = new List<AbstractListItem>();
-            ic.AddRange(ItemsOf(dbin.Column, true));
-            l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
+            ic.AddRange(ItemsOf(dbout.Column, true));
+            l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
 
             var ic2 = new List<AbstractListItem>();
             ic2.AddRange(ItemsOf(typeof(FilterTypeRowInputItem)));
             l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
+
+            l.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));
         }
 
-        var u2 = new List<AbstractListItem>();
-        u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
-
-        //l.Add(new FlexiControl());
-        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
-
-        if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
-            var ic = new List<AbstractListItem>();
-            ic.AddRange(ItemsOf(dbout.Column, true));
-            l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
-        }
-
-        //l.Add(new FlexiControl());
         l.AddRange(base.GetProperties(widthOfControl));
 
         return l;
@@ -248,8 +256,12 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
                 //ColorId = IntParse(value);
                 return true;
 
+            case "value":
+                _filterwert = value.FromNonCritical();
+                return true;
+
             case "inputcolumn":
-                _eingangsWertSpalte = value;
+                _filterwert = "~" + value.FromNonCritical() + "~";
                 return true;
 
             case "outputcolumn":
@@ -261,18 +273,14 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
                 return true;
 
             case "defaultemptyfilter":
-                _standard_bei_keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
+                //_standard_bei_keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
                 return true;
         }
         return false;
-
-        //result.ParseableAdd("InputColumn", _eigangsWertSpalte);
-        //result.ParseableAdd("OutputColumn", _filterSpalte);
-        //result.ParseableAdd("Filter", _filtertype);
     }
 
     public override string ReadableText() {
-        const string txt = "Filter aus Zeile: ";
+        const string txt = "Filter: ";
 
         if (this.IsOk() && DatabaseOutput != null) {
             return txt + DatabaseOutput.Caption;
@@ -297,10 +305,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
-        result.ParseableAdd("InputColumn", _eingangsWertSpalte);
+        result.ParseableAdd("Value", _filterwert);
+        //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);
         result.ParseableAdd("Filter", _filtertype);
-        result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
+
+        //if (DatabaseInput is not Database dbin || dbin.IsDisposed) {
+        //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+        //}
+
+        //result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
 
         return result.Parseable(base.ToString());
     }

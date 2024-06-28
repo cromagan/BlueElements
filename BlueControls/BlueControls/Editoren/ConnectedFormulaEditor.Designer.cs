@@ -122,6 +122,7 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1275, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -199,7 +200,7 @@ namespace BlueControls.Forms {
             // btnRegionAdd
             // 
             this.btnRegionAdd.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnRegionAdd.ImageCode = "Fragezeichen|16";
+            this.btnRegionAdd.ImageCode = "Layout|16";
             this.btnRegionAdd.Location = new System.Drawing.Point(8, 46);
             this.btnRegionAdd.Name = "btnRegionAdd";
             this.btnRegionAdd.Size = new System.Drawing.Size(136, 22);
@@ -318,7 +319,7 @@ namespace BlueControls.Forms {
             // btnDropdownmenu
             // 
             this.btnDropdownmenu.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDropdownmenu.ImageCode = "Textfeld2";
+            this.btnDropdownmenu.ImageCode = "Textfeld2|16|||||||||Pfeil_Unten_Scrollbar";
             this.btnDropdownmenu.Location = new System.Drawing.Point(136, 2);
             this.btnDropdownmenu.Name = "btnDropdownmenu";
             this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
@@ -329,18 +330,18 @@ namespace BlueControls.Forms {
             // btnFilterConverter
             // 
             this.btnFilterConverter.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnFilterConverter.ImageCode = "Trichter|16";
+            this.btnFilterConverter.ImageCode = "Trichter|16|||||||||PlusZeichen";
             this.btnFilterConverter.Location = new System.Drawing.Point(72, 2);
             this.btnFilterConverter.Name = "btnFilterConverter";
             this.btnFilterConverter.Size = new System.Drawing.Size(64, 66);
             this.btnFilterConverter.TabIndex = 3;
-            this.btnFilterConverter.Text = "Filter Converter";
+            this.btnFilterConverter.Text = "Filter";
             this.btnFilterConverter.Click += new System.EventHandler(this.btnFilterConverter_Click);
             // 
             // btnBenutzerFilterWahl
             // 
             this.btnBenutzerFilterWahl.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnBenutzerFilterWahl.ImageCode = "Trichter|16";
+            this.btnBenutzerFilterWahl.ImageCode = "Trichter|16|||||||||Textfeld2";
             this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(8, 2);
             this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
             this.btnBenutzerFilterWahl.Size = new System.Drawing.Size(64, 66);

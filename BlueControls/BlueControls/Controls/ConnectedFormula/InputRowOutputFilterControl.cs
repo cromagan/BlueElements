@@ -31,25 +31,30 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     #region Fields
 
-    private readonly ColumnItem? _inputcolumn;
+    private readonly string _filterwert;
 
     private readonly ColumnItem? _outputcolumn;
 
     private readonly FilterTypeRowInputItem _type;
 
     private FilterCollection? _filterInput;
-    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
 
+    //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+
     #region Constructors
 
-    public InputRowOutputFilterControl(ColumnItem? inputcolumn, ColumnItem? outputcolumn, FilterTypeRowInputItem type) {
-        _inputcolumn = inputcolumn;
+    public InputRowOutputFilterControl(string filterwert, ColumnItem? outputcolumn, FilterTypeRowInputItem type) {
+        _filterwert = filterwert;
         _outputcolumn = outputcolumn;
         _type = type;
         ((IControlSendFilter)this).RegisterEvents();
         ((IControlAcceptFilter)this).RegisterEvents();
+
+        HandleChangesNow(); // Wenn keine Input-Rows da sind
+
+
     }
 
     #endregion
@@ -88,16 +93,16 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-        get => _standard_bei_keiner_Eingabe;
-        set {
-            if (IsDisposed) { return; }
-            if (_standard_bei_keiner_Eingabe == value) { return; }
-            _standard_bei_keiner_Eingabe = value;
-        }
-    }
-
     #endregion
+
+    //public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
+    //    get => _standard_bei_keiner_Eingabe;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (_standard_bei_keiner_Eingabe == value) { return; }
+    //        _standard_bei_keiner_Eingabe = value;
+    //    }
+    //}
 
     #region Methods
 
@@ -129,25 +134,36 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
 
-        if (lastInputRow == null || _outputcolumn == null || _inputcolumn == null) {
-            if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-                FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
-            } else {
-                this.Invalidate_FilterOutput();
-            }
+        if (_outputcolumn == null) {
+            //if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+            FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
+            //} else {
+            //    this.Invalidate_FilterOutput();
+            //}
             return;
         }
+
+        var va = string.Empty;
+
+        if (lastInputRow != null) {
+            lastInputRow.CheckRowDataIfNeeded();
+            va = lastInputRow.ReplaceVariables(_filterwert, false, true, lastInputRow.LastCheckedEventArgs?.Variables);
+        } else {
+            if (FilterInput != null) {
+                FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
+                return;
+            }
+        }
+
+        //if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+        //    FilterOutput.ChangeTo(new FilterItem(_outputcolumn?.Database, "IO2"));
+        //    return;
+        //}
 
         FilterItem? f;
-        var va = lastInputRow.CellGetString(_inputcolumn);
-
-        if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-            FilterOutput.ChangeTo(new FilterItem(_outputcolumn?.Database, "IO2"));
-            return;
-        }
 
         switch (_type) {
-            case FilterTypeRowInputItem.Ist_GrossKleinEgal:
+            case FilterTypeRowInputItem.Ist_schreibungsneutral:
                 f = new FilterItem(_outputcolumn, FilterType.Istgleich_GroßKleinEgal, va);
                 break;
 
@@ -155,9 +171,14 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
                 f = new FilterItem(_outputcolumn, FilterType.Istgleich, va);
                 break;
 
-            case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
+            case FilterTypeRowInputItem.Ist_eines_der_Wörter_schreibungsneutral:
                 var list = va.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
                 f = new FilterItem(_outputcolumn, FilterType.Istgleich_ODER_GroßKleinEgal, list);
+                break;
+
+
+            case FilterTypeRowInputItem.Ist_nicht:
+                f = new FilterItem(_outputcolumn, FilterType.Ungleich_MultiRowIgnorieren, va);
                 break;
 
             default:
