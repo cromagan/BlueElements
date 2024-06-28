@@ -306,9 +306,9 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not TextListItem tl) { return; }
+        if (e.HotItem is not TextListItem tl || e.Item == null) { return; }
 
-        switch (e.ClickedCommand) {
+        switch (e.Item.KeyName) {
             case "DateiPfad÷ffnen":
                 _ = ExecuteFile(tl.KeyName.FilePath());
                 break;

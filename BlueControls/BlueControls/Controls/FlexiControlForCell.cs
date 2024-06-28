@@ -152,7 +152,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         var (column, row) = GetTmpVariables();
 
-        switch (e.ClickedCommand.ToLowerInvariant()) {
+        switch (e.Item.KeyName.ToLowerInvariant()) {
             case "spalteneigenschaftenbearbeiten":
                 TableView.OpenColumnEditor(column, null);
                 return true;
@@ -573,7 +573,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     }
 
     private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedCommand.ToLowerInvariant()) {
+        switch (e.Item.KeyName.ToLowerInvariant()) {
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
                     if (FileExists(t.KeyName)) {

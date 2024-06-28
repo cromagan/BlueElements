@@ -40,7 +40,7 @@ internal class AdderItem : IReadableTextWithKey {
 
         //AdditionalInfoColumn = additionalInfoColumn;
 
-        Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix();
+        Last = generatedTextKey.TrimEnd("\\").FileNameWithSuffix().Trim("+");
         KeyName = generatedTextKey;
     }
 

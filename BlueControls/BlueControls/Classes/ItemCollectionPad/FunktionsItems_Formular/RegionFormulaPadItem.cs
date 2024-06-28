@@ -301,7 +301,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not AbstractListItem it) { return; }
 
-        if (e.ClickedCommand.ToLowerInvariant() == "bearbeiten") {
+        if (e.Item.KeyName.ToLowerInvariant() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
             var x = new ConnectedFormulaEditor(it.KeyName, CFormula?.NotAllowedChilds);

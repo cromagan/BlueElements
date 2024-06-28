@@ -366,9 +366,9 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not BitmapListItem it) { return; }
+        if (e.HotItem is not BitmapListItem it || e.Item == null) { return; }
 
-        switch (e.ClickedCommand) {
+        switch (e.Item.KeyName) {
             case "Löschen":
                 var I = new FileInfo(it.KeyName);
                 var silent = !I.Attributes.HasFlag(FileAttributes.ReadOnly);
@@ -418,7 +418,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
             //    break;
 
             default:
-                Develop.DebugPrint(e.ClickedCommand);
+                Develop.DebugPrint(e.Item);
                 break;
         }
     }

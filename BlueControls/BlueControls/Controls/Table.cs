@@ -3078,7 +3078,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <returns></returns>
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
-        if (string.IsNullOrEmpty(e.ClickedCommand)) { return; }
+        if (e.Item == null) { return; }
 
         if (CurrentArrangement is not ColumnViewCollection ca) { return; }
 
@@ -3087,7 +3087,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (ck?.Column == null) { return; }
 
-        var toAdd = e.ClickedCommand;
+        var toAdd = e.Item.KeyName;
         var toRemove = string.Empty;
         if (toAdd == "#Erweitert") {
             Cell_Edit(ca, ck.Column, ck.RowData, false);

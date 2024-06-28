@@ -184,7 +184,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         if (e.HotItem is AbstractPadItem item) { thisItem = item; }
         var done = false;
         if (thisItem != null) {
-            switch (e.ClickedCommand.ToLowerInvariant()) {
+            switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "#vordergrund":
                     done = true;
                     thisItem.Parent?.InDenVordergrund(thisItem);

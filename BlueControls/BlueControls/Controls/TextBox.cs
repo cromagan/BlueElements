@@ -280,9 +280,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _cursorCharPos = IntParse(tags.TagGet("Cursorpos"));
         var word = tags.TagGet("Word");
 
-        var tmp = e.ClickedCommand;
-        if (e.ClickedCommand.StartsWith("#ChangeTo:")) {
-            newWord = e.ClickedCommand.Substring(10);
+        var tmp = e.Item.KeyName;
+        if (tmp.StartsWith("#ChangeTo:")) {
+            newWord = tmp.Substring(10);
             tmp = "#ChangeTo";
         }
 

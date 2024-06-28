@@ -367,15 +367,15 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not RowFormulaPadItem i) { return; }
+        if (e.HotItem is not RowFormulaPadItem i || e.Item == null) { return; }
 
-        switch (e.ClickedCommand) {
+        switch (e.Item.KeyName) {
             case "Bez+":
                 BezPlus(i);
                 break;
 
             default:
-                Develop.DebugPrint(e.ClickedCommand);
+                Develop.DebugPrint(e.Item);
                 break;
         }
         //RepairLinesAndFullProcessing();

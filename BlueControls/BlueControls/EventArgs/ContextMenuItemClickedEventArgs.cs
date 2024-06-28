@@ -17,22 +17,22 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionList;
+
 namespace BlueControls.EventArgs;
 
-public class ContextMenuItemClickedEventArgs : System.EventArgs {
+public class ContextMenuItemClickedEventArgs : AbstractListItemEventArgs {
 
     #region Constructors
 
-    public ContextMenuItemClickedEventArgs(string clickedCommand, object? hotItem) {
+    public ContextMenuItemClickedEventArgs(AbstractListItem clickedItem, object? hotItem) : base(clickedItem) {
         HotItem = hotItem;
-        ClickedCommand = clickedCommand;
     }
 
     #endregion
 
     #region Properties
 
-    public string ClickedCommand { get; }
     public object? HotItem { get; }
 
     #endregion

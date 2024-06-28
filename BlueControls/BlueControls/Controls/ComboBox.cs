@@ -415,9 +415,10 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
-        if (!string.IsNullOrEmpty(e.ClickedCommand) && _item.Get(e.ClickedCommand) is AbstractListItem bli) {
-            _lastClickedText = e.ClickedCommand;
-            Text = e.ClickedCommand;
+
+        if (e.Item is AbstractListItem bli) {
+            _lastClickedText = bli.KeyName;
+            Text = bli.KeyName;
             OnItemClicked(new AbstractListItemEventArgs(bli));
         }
         _ = Focus();

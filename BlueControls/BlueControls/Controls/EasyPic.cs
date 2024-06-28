@@ -163,7 +163,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     #region Methods
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedCommand) {
+        switch (e.Item.KeyName) {
             case "ExF":
                 PictureView epv = new(_bitmap);
                 epv.Show();

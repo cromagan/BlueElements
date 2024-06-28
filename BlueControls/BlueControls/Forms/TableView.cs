@@ -171,7 +171,7 @@ public partial class TableView : FormWithStatusBar {
 
         //var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
 
-        var ev = (e.ClickedCommand + "|").SplitAndCutBy("|");
+        var ev = (e.Item + "|").SplitAndCutBy("|");
 
         switch (ev[0]) {
             case "pinlösen":

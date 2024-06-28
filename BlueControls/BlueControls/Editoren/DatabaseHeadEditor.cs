@@ -381,7 +381,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         if (column == null) { return; }
 
-        switch (e.ClickedCommand) {
+        switch (e.Item.KeyName) {
             case "SpaltenSortierungAZ":
                 tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column, false);
                 break;

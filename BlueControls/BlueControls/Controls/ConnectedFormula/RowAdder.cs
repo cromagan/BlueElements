@@ -204,6 +204,8 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     }
 
     public void FillListBox() {
+  
+
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
             return;
@@ -327,26 +329,34 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
             if (!ShowMe(selected, key)) { continue; }
 
-            var vorhanden = Items.Get(key);
+            var check_Item = Items.Get(key);
 
-            var parentname = key.PathParent().Trim("\\") + "~DD~";
-            var parentvorhanden = Items.Get(parentname);
+            var dd_Name = key.PathParent().Trim("\\") + "~DD~";
+            var dd_BoxItem = Items.Get(dd_Name);
+            var dd_isItem = key.EndsWith("+") && !selected.Contains(key);
 
-            if (vorhanden is ItemCollectionList.ReadableListItem rli) {
+
+            if (check_Item is ItemCollectionList.ReadableListItem rli && !dd_isItem) {
 
                 #region Item vorhanden. Weiteren Adder hinzufügen
 
                 if (rli.Item is AdderItem ai) {
                     ai.KeysAndInfo.Add(keyAndInfo[z]);
                 }
+                rli.UserDefCompareKey = z.ToStringInt10();
+
+                rli.Enabled = !HasChildNode(selected,key);
+
+
                 olditems.Remove(key);
 
                 #endregion
-            } else if (parentvorhanden is ItemCollectionList.DropDownListItem dli && !selected.Contains(key)) {
+
+            } else if (dd_BoxItem is ItemCollectionList.DropDownListItem dli && dd_isItem) {
 
                 #region das Item ist ein Objekt unter einem Dropdown und NICHT separat gewählt.
 
-                var vorhandenDD = Items.Get(key);
+                var vorhandenDD = dli.DDItems.Get(key);
 
                 if (vorhandenDD is ItemCollectionList.ReadableListItem rliDD) {
 
@@ -355,7 +365,8 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                     if (rliDD.Item is AdderItem aiDD) {
                         aiDD.KeysAndInfo.Add(keyAndInfo[z]);
                     }
-
+                    dli.UserDefCompareKey = z.ToStringInt10();
+                    dli.Enabled = !HasChildNode(selected, key);
                     #endregion
                 } else {
                     var naiDD = new AdderItem(key);
@@ -363,15 +374,16 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                     var itDD = ItemOf(naiDD);
 
                     dli.DDItems.Add(itDD);
+                    dli.Enabled = !HasChildNode(selected, key);
                 }
-                olditems.Remove(parentname);
+                olditems.Remove(dd_Name);
 
                 #endregion
             } else {
 
                 #region Das Item ist neu. Einen einen Listen-Eintrag erstellen
 
-                var dd = key.EndsWith("+") && !selected.Contains(key);
+
 
                 #region Item allgemein erstellen
 
@@ -381,24 +393,28 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
                 #endregion
 
-                if (!dd) {
+                if (!dd_isItem) {
 
                     #region ....normal hinzufügen
 
                     it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     ItemAdd(it);
                     olditems.Remove(key);
+                    it.UserDefCompareKey = z.ToStringInt10();
+                    it.Enabled = !HasChildNode(selected, key);
 
                     #endregion
                 } else {
 
                     #region ... als Dropdownmenu hinzufügen
 
-                    var ndli = new DropDownListItem(parentname, true, string.Empty);
+                    var ndli = new DropDownListItem(dd_Name, true, string.Empty);
                     ndli.DDItems.Add(it);
                     ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     ItemAdd(ndli);
-                    olditems.Remove(parentname);
+                    olditems.Remove(dd_Name);
+                    ndli.UserDefCompareKey = z.ToStringInt10();
+                    ndli.Enabled = !HasChildNode(selected, key);
 
                     #endregion
                 }
@@ -415,6 +431,15 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         Check(selected);
 
         _ignoreCheckedChanged = false;
+    }
+
+    private bool HasChildNode(List<string> selected, string key) {
+
+        foreach (var thisS in selected) {
+            if (thisS.StartsWith(key + "\\")) { return true; }
+        }
+        return false;
+
     }
 
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
@@ -451,7 +476,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         }
 
         if (e.Item is DropDownListItem dli) {
-            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + dli.Indent * 32;
+            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + dli.Indent * 20;
             var y = Cursor.Position.Y - MousePos().Y + dli.Pos.Bottom; //Identisch
 
             var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DDItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
@@ -472,16 +497,9 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
 
-        //var KeysAndInfo = e.ClickedCommand;
-
-        //if (!string.IsNullOrEmpty(e.ClickedCommand) && _item.Get(e.ClickedCommand) is AbstractListItem bli) {
-        //    _lastClickedText = e.ClickedCommand;
-        //    Text = e.ClickedCommand;
-        //    OnItemClicked(new AbstractListItemEventArgs(bli));
-        //}
-        //_ = Focus();
-
-        AdderItem.AddRowsToDatabase(OriginIDColumn, [e.ClickedCommand], GeneratedEntityId, AdditionalInfoColumn);
+        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+            AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
+        }
 
         FillListBox();
     }

@@ -100,7 +100,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             thisContextMenu.Add(ItemOf(ContextMenuCommands.Abbruch));
             List<object?> infos =
             [
-                userMenu,
                 hotItem,
                 control
             ];
@@ -166,31 +165,30 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (e.HotItem == null) { return; }
 
         var infos = (List<object>)e.HotItem;
-        var userMmenu = (List<AbstractListItem>)infos[0];
-        var hotItem = infos[1];
-        //var tags = (List<string>)infos[2];
-        var ob = (IContextMenu)infos[2];
+        var hotItem = infos[0];
+        var ob = (IContextMenu)infos[1];
+
         Close(ListBoxAppearance.KontextMenu);
         Close(ob);
-        if (e.ClickedCommand.ToLowerInvariant() == "weiterebefehle") {
+        if (e.Item.KeyName.ToLowerInvariant() == "weiterebefehle") {
             var par = ob.ParentControlWithCommands();
             if (par != null) {
                 ContextMenuShow(par, null);
             }
             return;
         }
-        if (e.ClickedCommand.ToLowerInvariant() == "abbruch") { return; }
+        if (e.Item.KeyName.ToLowerInvariant() == "abbruch") { return; }
 
-        ContextMenuItemClickedEventArgs ex = new(e.ClickedCommand, hotItem);
+        ContextMenuItemClickedEventArgs ex = new(e.Item, hotItem);
         bool done;
-        if (userMmenu.Get(e.ClickedCommand) == null) {
+        if (e.Item == null) {
             done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
         } else {
             done = true; //keine Prüfung implementiert
             ob.OnContextMenuItemClicked(ex);
         }
         if (!done) {
-            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedCommand);
+            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.Item);
         }
     }
 
@@ -203,7 +201,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (!e.Item.IsClickable()) { return; }
 
         if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) {
-            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.KeyName, Tag)); // Das Control.Tag hier ist eigentlich das HotItem
+            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item, Tag)); // Das Control.Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }
     }

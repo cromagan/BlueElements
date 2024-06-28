@@ -35,12 +35,12 @@ using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
-#if DEBUG
+//#if DEBUG
 
 public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
-#else
-   public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
-#endif
+//#else
+//   public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IPropertyChangedFeedback //UserControl, IContextMenu//
+//#endif
 {
     #region Fields
 
@@ -81,7 +81,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
     #region Methods
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedCommand.ToLowerInvariant()) {
+        switch (e.Item.KeyName.ToLowerInvariant()) {
             case "variableninhalt kopieren":
                 _ = Generic.CopytoClipboard(_lastVariableContent);
                 return true;
