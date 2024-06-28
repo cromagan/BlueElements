@@ -68,12 +68,14 @@ public class Method_LookupFilterFirstValue : Method {
         }
 
         var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
-        if (v == null) { return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden"); }
-
+        if (v == null) { return new DoItFeedback(infos.Data, $"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?"); }
         if (v is VariableListString vl) {
             l.AddRange(vl.ValueList);
         } else if (v is VariableString vs) {
             var w = vs.ValueString;
+            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
+        } else if (v is VariableFloat vf) {
+            var w = vf.ValueForReplace;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");

@@ -57,9 +57,10 @@ public class Method_CellGetRow : BlueScript.Methods.Method {
         if (db.Column[attvar.ValueStringGet(0)] is not ColumnItem c) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var v = RowItem.CellToVariable(c, row, true, false);
-        if (v == null) {
-            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
-        }
+        if (v == null) { return new DoItFeedback(infos.Data, $"Wert der Variable konnte nicht gelesen werden - ist die Spalte {c.KeyName} 'im Skript vorhanden'?"); }
+        //if (v == null) {
+        //    return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
+        //}
 
         var l = new List<string>();
 
@@ -67,6 +68,9 @@ public class Method_CellGetRow : BlueScript.Methods.Method {
             l.AddRange(vl.ValueList);
         } else if (v is VariableString vs) {
             var w = vs.ValueString;
+            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
+        } else if (v is VariableFloat vf) {
+            var w = vf.ValueForReplace;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");

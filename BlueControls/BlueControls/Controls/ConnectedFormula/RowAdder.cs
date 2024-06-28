@@ -333,33 +333,77 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
             var parentvorhanden = Items.Get(parentname);
 
             if (vorhanden is ItemCollectionList.ReadableListItem rli) {
+
+                #region Item vorhanden. Weiteren Adder hinzufügen
+
                 if (rli.Item is AdderItem ai) {
                     ai.KeysAndInfo.Add(keyAndInfo[z]);
                 }
                 olditems.Remove(key);
-            } else if (parentvorhanden is ItemCollectionList.DropDownListItem dli &&
-                !selected.Contains(key) ) {
-                dli.DDItems.Add(ItemOf(keyAndInfo[z], false));
+
+                #endregion
+            } else if (parentvorhanden is ItemCollectionList.DropDownListItem dli && !selected.Contains(key)) {
+
+                #region das Item ist ein Objekt unter einem Dropdown und NICHT separat gewählt.
+
+                var vorhandenDD = Items.Get(key);
+
+                if (vorhandenDD is ItemCollectionList.ReadableListItem rliDD) {
+
+                    #region DD-Item vorhanden. Weiteren Adder hinzufügen
+
+                    if (rliDD.Item is AdderItem aiDD) {
+                        aiDD.KeysAndInfo.Add(keyAndInfo[z]);
+                    }
+
+                    #endregion
+                } else {
+                    var naiDD = new AdderItem(key);
+                    naiDD.KeysAndInfo.Add(keyAndInfo[z]);
+                    var itDD = ItemOf(naiDD);
+
+                    dli.DDItems.Add(itDD);
+                }
                 olditems.Remove(parentname);
+
+                #endregion
             } else {
+
+                #region Das Item ist neu. Einen einen Listen-Eintrag erstellen
+
                 var dd = key.EndsWith("+") && !selected.Contains(key);
 
-                if (!dd) {
-                    var nai = new AdderItem(key);
-                    //nai.GeneratedEntityID = generatedentityID;
-                    nai.KeysAndInfo.Add(keyAndInfo[z]);
-                    var it = ItemOf(nai);
-                    it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
+                #region Item allgemein erstellen
 
+                var nai = new AdderItem(key);
+                nai.KeysAndInfo.Add(keyAndInfo[z]);
+                var it = ItemOf(nai);
+
+                #endregion
+
+                if (!dd) {
+
+                    #region ....normal hinzufügen
+
+                    it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     ItemAdd(it);
                     olditems.Remove(key);
+
+                    #endregion
                 } else {
+
+                    #region ... als Dropdownmenu hinzufügen
+
                     var ndli = new DropDownListItem(parentname, true, string.Empty);
-                    ndli.DDItems.Add(ItemOf(keyAndInfo[z], false));
+                    ndli.DDItems.Add(it);
                     ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     ItemAdd(ndli);
                     olditems.Remove(parentname);
+
+                    #endregion
                 }
+
+                #endregion
             }
         }
 
