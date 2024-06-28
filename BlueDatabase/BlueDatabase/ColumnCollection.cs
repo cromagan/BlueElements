@@ -236,6 +236,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("Beschriftung");
         da.CellAdd("Überschriften");
         da.CellAdd("Datenformat");
+        da.CellAdd("Funktion");
         da.CellAdd("Quickinfo");
         da.CellAdd("Admin-Info");
         da.CellAdd("Tags");
@@ -255,7 +256,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem.Column)) { name = thisFormat.Name; }
                 }
                 da.CellAdd(name + " (" + thisColumnItem.Column.MaxCellLenght + " Char)");
-
+                da.CellAdd(thisColumnItem.Column.Function.ToString());
                 da.CellAdd(thisColumnItem.Column.QuickInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.Column.AdminInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.Column.Tags.JoinWith("<br>"));

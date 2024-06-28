@@ -349,7 +349,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     private bool HasFileName() {
         if (string.IsNullOrEmpty(_filename)) { return false; }
 
-        if (!_filename.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase)) { return false; }
+        if (!_filename.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase) && 
+            !_filename.FileSuffix().Equals("JPG", StringComparison.OrdinalIgnoreCase)) { return false; }
 
         if (string.IsNullOrEmpty(_filename.FilePath())) { return false; }
 

@@ -100,6 +100,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             thisContextMenu.Add(ItemOf(ContextMenuCommands.Abbruch));
             List<object?> infos =
             [
+                userMenu,
                 hotItem,
                 control
             ];
@@ -165,9 +166,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (e.HotItem == null) { return; }
 
         var infos = (List<object>)e.HotItem;
-        var hotItem = infos[0];
-        var ob = (IContextMenu)infos[1];
-
+        var userMmenu = (List<AbstractListItem>)infos[0];
+        var hotItem = infos[1];
+        var ob = (IContextMenu)infos[2];
         Close(ListBoxAppearance.KontextMenu);
         Close(ob);
         if (e.Item.KeyName.ToLowerInvariant() == "weiterebefehle") {
@@ -181,14 +182,14 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         ContextMenuItemClickedEventArgs ex = new(e.Item, hotItem);
         bool done;
-        if (e.Item == null) {
+        if (userMmenu.Get(e.Item.KeyName) == null) {
             done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
         } else {
             done = true; //keine Prüfung implementiert
             ob.OnContextMenuItemClicked(ex);
         }
         if (!done) {
-            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.Item);
+            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.Item.KeyName);
         }
     }
 
