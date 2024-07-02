@@ -29,11 +29,14 @@ partial class RowEditor {
             // 
             // formular
             // 
+            this.formular.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.formular.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
-            this.formular.Location = new System.Drawing.Point(8, 16);
+            this.formular.Location = new System.Drawing.Point(0, 0);
             this.formular.Mode = "";
             this.formular.Name = "formular";
-            this.formular.Size = new System.Drawing.Size(448, 400);
+            this.formular.Size = new System.Drawing.Size(523, 612);
             this.formular.TabIndex = 0;
             this.formular.TabStop = false;
             // 
@@ -41,7 +44,7 @@ partial class RowEditor {
             // 
             this.Controls.Add(this.formular);
             this.Name = "RowEditor";
-            this.Size = new System.Drawing.Size(468, 427);
+            this.Size = new System.Drawing.Size(523, 612);
             this.ResumeLayout(false);
 
     }
