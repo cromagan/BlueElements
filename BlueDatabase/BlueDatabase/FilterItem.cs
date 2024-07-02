@@ -416,6 +416,11 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case FilterType.Between | FilterType.UND:
                 return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
+
+            case FilterType.BeginntMit:
+                return nam + " beginnt mit '" + SearchValue[0] + "'";
+
+
             case FilterType.AlwaysFalse:
                 return "Immer FALSCH";
 

@@ -158,7 +158,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public FilterItem? this[int no] {
         get {
             if (no < 0 || no >= _internal.Count) { return null; }
-            return _internal[0];
+            return _internal[no];
         }
     }
 
@@ -316,6 +316,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public IEnumerator<FilterItem> GetEnumerator() => _internal.GetEnumerator();
 
+    public bool HasAlwaysFalse() {
+        foreach (var thisFi in this) {
+            if (thisFi.FilterType == FilterType.AlwaysFalse) { return true; }
+        }
+        return false;
+    }
+
     /// <summary>
     /// Gibt den Wert zurück, der in eine neue Zeile reingeschrieben wird
     /// </summary>
@@ -377,22 +384,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public bool IsRowFilterActiv() {
-
         var fi = this[null];
 
         return fi != null && fi.FilterType == FilterType.Instr;
-
     }
-
-    public bool HasAlwaysFalse() {
-        foreach (var thisFi in this) {
-            if (thisFi.FilterType == FilterType.AlwaysFalse) { return true; }
-        }
-        return false;   
-
-    }
-
-
 
     public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
