@@ -52,7 +52,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.IO ;
+    public override MethodType MethodType => MethodType.Database | MethodType.IO;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
@@ -114,7 +114,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         return Method_Row.RowToObjectFeedback(r[0]);
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => filterarg;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => filterarg;
 
     #endregion
 }

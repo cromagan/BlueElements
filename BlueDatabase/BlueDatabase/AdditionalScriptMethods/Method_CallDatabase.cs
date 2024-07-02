@@ -47,7 +47,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow  | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";
     public override string Returns => string.Empty;
@@ -93,7 +93,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + arg2 + "," + arg3;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => arg1 + "," + arg2 + "," + arg3;
 
     #endregion
 }

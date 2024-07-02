@@ -811,7 +811,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 var trichterSize = (AutoFilterSize - 4).ToString();
-                if (fi != null) {
+                if(Filter.HasAlwaysFalse() && viewItem.Column.AutoFilterSymbolPossible()) {
+                    trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000||170");
+                } else if (fi != null) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
                 } else if (Filter.MayHaveRowFilter(viewItem.Column)) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
@@ -1427,7 +1429,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (_databaseDrawError is DateTime dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
-                DrawWaitScreen(gr);
+                DrawWaitScreen(gr, string.Empty);
                 return;
             }
             _databaseDrawError = null;
@@ -1441,24 +1443,34 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         if (Database is not Database db || db.IsDisposed) {
-            DrawWaitScreen(gr);
+            DrawWaitScreen(gr, "Keine Datenbank geladen.");
             return;
         }
 
         db.LastUsedDate = DateTime.UtcNow;
 
         if (db.ExecutingScript > 0 && _rowsFilteredAndPinned is null) {
-            DrawWaitScreen(gr);
+            DrawWaitScreen(gr, string.Empty);
             return;
         }
 
         if (DesignMode || ShowWaitScreen || _drawing || db.DoingChanges > 0) {
-            DrawWaitScreen(gr);
+            DrawWaitScreen(gr, string.Empty);
             return;
         }
 
         if (CurrentArrangement is not ColumnViewCollection ca) {
-            DrawWaitScreen(gr);
+            DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
+            return;
+        }
+
+        if (!Filter.IsOk()) {
+            DrawWaitScreen(gr, Filter.ErrorReason());
+            return;
+        }
+
+        if (Filter.Database != null && Database != Filter.Database) {
+            DrawWaitScreen(gr, "Filter fremder Datenbank: " + Filter.Database.Caption);
             return;
         }
 
@@ -1470,7 +1482,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             // Haupt-Aufbau-Routine ------------------------------------
             //gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             if (!ComputeAllColumnPositions()) {
-                DrawWaitScreen(gr);
+                DrawWaitScreen(gr, string.Empty);
                 _drawing = false;
                 return;
             }
@@ -2341,8 +2353,22 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (columnviewitem.Column == null) { return; }
         if (!ca.ShowHead) { return; }
         if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
-        if (Filter.Any(thisFilter => thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin))) {
-            MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", ImageCode.Information, "OK");
+
+
+        if(Filter.HasAlwaysFalse()) {
+            MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
+            return;
+        }
+
+        var t = string.Empty;
+        foreach (var thisFilter in Filter) {
+            if (thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin)) {
+                t += "\r\n" + thisFilter.ReadableText();
+            }
+        }
+
+        if (!string.IsNullOrEmpty(t)) {
+            MessageBox.Show("<b>Diese(r) Filter wurde(n) automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
             return;
         }
         //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
@@ -3059,7 +3085,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void DrawWaitScreen(Graphics gr) {
+    private void DrawWaitScreen(Graphics gr, string info) {
         if (SliderX != null) { SliderX.Enabled = false; }
         if (SliderY != null) { SliderY.Enabled = false; }
 
@@ -3067,6 +3093,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         var i = QuickImage.Get(ImageCode.Uhr, 64);
         gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
+
+        BlueFont.DrawString(gr, info, _columnFont, Brushes.Blue, 12, 12);
+
         Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 

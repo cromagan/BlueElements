@@ -24,6 +24,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -118,14 +119,20 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
         Text = FilterOutput.ReadableText();
     }
 
+
+    protected override void OnMouseDown(MouseEventArgs e) {
+        base.OnMouseDown(e);
+        Text = FilterOutput.ReadableText();
+    }
+
     public void HandleChangesNow() {
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
 
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            this.DoInputFilter(null, false);
-        }
+        //if (!FilterInputChangedHandled) {
+        //    FilterInputChangedHandled = true;
+        //    this.DoInputFilter(null, false);
+        //}
 
         FilterInputChangedHandled = true;
 

@@ -267,11 +267,11 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
         if (Database.IsDisposed) { return "Datenbank verworfen"; }
 
-        if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
-
         if (_column != null && _column?.Database != Database) { return "Datenbanken inkonsistent"; }
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
+
+        if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
 
         if (_filterType.HasFlag(FilterType.Instr)) {
             foreach (var thisV in SearchValue) {
@@ -351,7 +351,17 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         // Bei Nich OK schön en Text zurück geben für FlexiControlForFilter
         if (!this.IsOk()) { return "Filter ohne Funktion"; }
 
-        if (_column == null) { return "Zeilen-Filter"; }
+        if (_filterType == FilterType.AlwaysFalse) {
+            return "Immer FALSCH";
+        }
+
+        if (_column == null) {
+            if (SearchValue.Count == 0) {
+                return "Zeilen-Filter";
+            } else {
+                return "Zeilen-Filter: " + SearchValue[0];
+            }
+        }
         var nam = _column.ReadableText();
 
         if (SearchValue.Count > 1) {

@@ -54,7 +54,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.IO ;
+    public override MethodType MethodType => MethodType.Database | MethodType.IO;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
@@ -113,8 +113,6 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
                     myRow.CellSet(srs, string.Empty, coment);
                 }
             }
-
-      
         } else {
             return new DoItFeedback(infos.Data, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
         }
@@ -154,7 +152,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
         return UniqueRow(infos, allFi, scp, $"Script-Befehl: 'UniqueRow' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => filterarg;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => filterarg;
 
     #endregion
 }

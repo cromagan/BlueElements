@@ -38,14 +38,14 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     #region Fields
 
     private string _action = string.Empty;
-
     private string _arg1 = string.Empty;
-
     private string _arg2 = string.Empty;
-
     private string _arg3 = string.Empty;
-
     private string _arg4 = string.Empty;
+    private string _arg5 = string.Empty;
+    private string _arg6 = string.Empty;
+    private string _arg7 = string.Empty;
+    private string _arg8 = string.Empty;
 
     private ButtonArgs _enabledwhenrows;
 
@@ -125,6 +125,58 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
             if (IsDisposed) { return; }
             if (_arg4 == value) { return; }
             _arg4 = value;
+            Invalidate();
+        }
+    }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string Arg5 {
+        get => _arg5;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg5 == value) { return; }
+            _arg5 = value;
+            Invalidate();
+        }
+    }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string Arg6 {
+        get => _arg6;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg6 == value) { return; }
+            _arg6 = value;
+            Invalidate();
+        }
+    }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string Arg7 {
+        get => _arg7;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg7 == value) { return; }
+            _arg7 = value;
+            Invalidate();
+        }
+    }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string Arg8 {
+        get => _arg8;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg8 == value) { return; }
+            _arg8 = value;
             Invalidate();
         }
     }
@@ -306,7 +358,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
         #endregion
 
-        var f = ufb.DoIt(vars, _arg1, _arg2, _arg3, _arg4, fis, rn, ai);
+        var f = ufb.DoIt(vars, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, fis, rn, ai);
 
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");

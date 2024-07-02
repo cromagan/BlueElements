@@ -50,7 +50,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow  | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 
@@ -98,7 +98,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + rowarg + "," + arg2;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => arg1 + "," + rowarg + "," + arg2;
 
     #endregion
 }

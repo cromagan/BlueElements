@@ -54,6 +54,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     private string _arg2 = string.Empty;
     private string _arg3 = string.Empty;
     private string _arg4 = string.Empty;
+    private string _arg5 = string.Empty;
+    private string _arg6 = string.Empty;
+    private string _arg7 = string.Empty;
+    private string _arg8 = string.Empty;
     private ButtonArgs _enabledwhenrows;
     private ExtText? _eTxt;
     private string _image = string.Empty;
@@ -127,6 +131,50 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_arg4 == value) { return; }
             _arg4 = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    public string Arg5 {
+        get => _arg5;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg5 == value) { return; }
+            _arg5 = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    public string Arg6 {
+        get => _arg6;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg6 == value) { return; }
+            _arg6 = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    public string Arg7 {
+        get => _arg7;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg7 == value) { return; }
+            _arg7 = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    public string Arg8 {
+        get => _arg8;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg8 == value) { return; }
+            _arg8 = value;
             OnPropertyChanged();
         }
     }
@@ -281,6 +329,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             Arg2 = _arg2,
             Arg3 = _arg3,
             Arg4 = _arg4,
+            Arg5 = _arg5,
+            Arg6 = _arg6,
+            Arg7 = _arg7,
+            Arg8 = _arg8,
             Action = _action,
             QuickInfo = ButtonQuickInfo
         };
@@ -363,6 +415,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2, ufb.ArgsForButtonDescription[1])); }
             if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3, ufb.ArgsForButtonDescription[2])); }
             if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
+            if (ufb.ArgsForButton.Count > 4) { l.Add(new FlexiControlForProperty<string>(() => Arg5, ufb.ArgsForButtonDescription[4])); }
+            if (ufb.ArgsForButton.Count > 5) { l.Add(new FlexiControlForProperty<string>(() => Arg6, ufb.ArgsForButtonDescription[5])); }
+            if (ufb.ArgsForButton.Count > 6) { l.Add(new FlexiControlForProperty<string>(() => Arg7, ufb.ArgsForButtonDescription[6])); }
+            if (ufb.ArgsForButton.Count > 7) { l.Add(new FlexiControlForProperty<string>(() => Arg8, ufb.ArgsForButtonDescription[7])); }
         }
 
         l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
@@ -406,6 +462,22 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
             case "arg4":
                 _arg4 = value.FromNonCritical();
+                return true;
+
+            case "arg5":
+                _arg5 = value.FromNonCritical();
+                return true;
+
+            case "arg6":
+                _arg6 = value.FromNonCritical();
+                return true;
+
+            case "arg7":
+                _arg7 = value.FromNonCritical();
+                return true;
+
+            case "arg8":
+                _arg8 = value.FromNonCritical();
                 return true;
 
             case "quickinfo":
@@ -459,6 +531,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         result.ParseableAdd("Arg2", _arg2);
         result.ParseableAdd("Arg3", _arg3);
         result.ParseableAdd("Arg4", _arg4);
+        result.ParseableAdd("Arg5", _arg5);
+        result.ParseableAdd("Arg6", _arg6);
+        result.ParseableAdd("Arg7", _arg7);
+        result.ParseableAdd("Arg8", _arg8);
 
         result.ParseableAdd("QuickInfo", _quickinfo);
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);

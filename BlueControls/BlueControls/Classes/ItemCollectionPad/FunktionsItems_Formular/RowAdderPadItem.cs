@@ -343,11 +343,11 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string ReadableText() {
-        const string txt = "Zeilengenerator ";
+        const string txt = "Zeilengenerator: " ;
 
-        //if (this.IsOk() && Column != null) {
-        //    return txt + Column.Caption;
-        //}
+        if (this.IsOk() && DatabaseOutput is Database dbout && ! dbout.IsDisposed) {
+            return txt + dbout.Caption;
+        }
 
         return txt + ErrorReason();
     }

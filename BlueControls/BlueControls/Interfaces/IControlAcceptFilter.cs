@@ -205,7 +205,7 @@ public static class ControlAcceptFilterExtension {
             if (fc2.Count == 0) { return null; }
 
             if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
-                return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent");
+                return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 1"), "Datenbanken inkonsistent");
             }
 
             return fc2;
@@ -217,7 +217,7 @@ public static class ControlAcceptFilterExtension {
             if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
                 if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
                     fc?.Dispose();
-                    return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent");
+                    return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 2"), "Datenbanken inkonsistent");
                 }
 
                 fc ??= new FilterCollection(fi.Database, "filterofsender");

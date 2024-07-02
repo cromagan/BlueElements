@@ -35,7 +35,7 @@ namespace BlueDatabase;
 
 #nullable enable
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable {
 
     #region Fields
 
@@ -298,6 +298,20 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         GC.SuppressFinalize(this);
     }
 
+    public string ErrorReason() {
+        foreach (var thisf in this) {
+            var f = thisf.ErrorReason();
+
+            if (!string.IsNullOrEmpty(f)) { return f; }
+
+            if (_database != thisf.Database) {
+                return "Filter haben unterschiedliche Datenbanken";
+            }
+        }
+
+        return string.Empty;
+    }
+
     IEnumerator IEnumerable.GetEnumerator() => _internal.GetEnumerator();
 
     public IEnumerator<FilterItem> GetEnumerator() => _internal.GetEnumerator();
@@ -362,7 +376,23 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return false;
     }
 
-    public bool IsRowFilterActiv() => this[null] != null;
+    public bool IsRowFilterActiv() {
+
+        var fi = this[null];
+
+        return fi != null && fi.FilterType == FilterType.Instr;
+
+    }
+
+    public bool HasAlwaysFalse() {
+        foreach (var thisFi in this) {
+            if (thisFi.FilterType == FilterType.AlwaysFalse) { return true; }
+        }
+        return false;   
+
+    }
+
+
 
     public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
@@ -556,7 +586,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="fi"></param>
     private void AddAndRegisterEvents(FilterItem fi) {
-        if (_internal.Count > 0 && _internal[0].Database != fi.Database) {
+        if (_internal.Count > 0 && _internal[0].Database != fi.Database && _internal[0].FilterType != FilterType.AlwaysFalse) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
         }
 

@@ -43,7 +43,7 @@ public interface IUseableForButton {
 
     public DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg);
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg);
 
     #endregion
 }
@@ -52,8 +52,8 @@ public static class UseableForButton {
 
     #region Methods
 
-    public static string DoIt(this IUseableForButton ufb, VariableCollection varCol, string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg, object? additionalInfo) {
-        List<string> args = [arg1, arg2, arg3, arg4];
+    public static string DoIt(this IUseableForButton ufb, VariableCollection varCol, string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg, object? additionalInfo) {
+        List<string> args = [arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8];
 
         for (var nr = 0; nr < args.Count; nr++) {
             //if (nr >= ufb.ArgsForButton.Count && !string.IsNullOrEmpty(args[nr])) {
@@ -65,7 +65,7 @@ public static class UseableForButton {
             }
         }
 
-        var s = ufb.TranslateButtonArgs(arg1, arg2, arg3, arg4, filterarg, rowarg);
+        var s = ufb.TranslateButtonArgs(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, filterarg, rowarg);
 
         var ld = new LogData("Knopfdruck", 0);
         var cdw = new CanDoFeedback(0, s, string.Empty, ld);

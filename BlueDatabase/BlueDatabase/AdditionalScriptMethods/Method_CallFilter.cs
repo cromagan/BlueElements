@@ -51,7 +51,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow  | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 
@@ -74,8 +74,6 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
-
-        //var db = MyDatabase(s);
         if (allFi.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var r = allFi.Rows;
@@ -102,7 +100,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + filterarg;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => arg1 + "," + filterarg;
 
     #endregion
 }
