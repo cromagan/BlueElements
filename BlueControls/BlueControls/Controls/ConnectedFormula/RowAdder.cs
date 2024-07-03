@@ -39,6 +39,7 @@ using BlueControls.ItemCollectionList;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.EventArgs;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Controls;
 
@@ -269,6 +270,23 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         var scf = ExecuteScript(Script, selected, EntityID, rowIn);
 
         if (!scf.AllOk) {
+
+            if (Generic.UserGroup == Constants.Administrator) {
+                var l = new List<string> {
+                "### ACHTUNG - EINMALIGE ANZEIGE ###",
+                generatedentityID,
+                //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+                //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                //"Datenbank: " + Database.Caption,
+                " ",
+                " ",
+                //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+                " ",
+               scf.ProtocolText
+            };
+                l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
+            }
+
             Fehler("Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText, BlueBasics.Enums.ImageCode.Kritisch);
             return;
         }

@@ -688,6 +688,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                         sliderY.Enabled = false;
                         setTo0 = true;
                     } else {
+                        sliderY.Left = Width - sliderY.Width;
                         sliderY.Enabled = true;
                         sliderY.Minimum = 0;
                         sliderY.SmallChange = 16;
