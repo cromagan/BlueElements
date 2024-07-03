@@ -493,6 +493,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!fi.IsOk()) { return false; }
 
+        if (fi.FilterType == FilterType.RowKey) {
+            if (fi.SearchValue.Count != 1) { return false; }
+            return KeyName == fi.SearchValue[0];
+        }
+
         //fi.Column?.RefreshColumnsData(); // Muss beim Ändern der Colum Property ausgeführt werden
 
         if (fi.Column == null) {

@@ -97,6 +97,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             UnRegisterDatabaseEvents();
 
             _database = null;
+            UnRegisterEvents(_internal);
             _internal.Clear();
 
             _database = value;
@@ -267,12 +268,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         // Handeln
         OnChanging();
         List<FilterItem> t = [.. _internal];
+        UnRegisterEvents(_internal);
         _internal.Clear();
         Invalidate_FilteredRows();
         OnPropertyChanged();
 
         // Aufräumen
-        UnRegisterEvents(t);
         foreach (var thisF in t) {
             thisF.Dispose();
         }
@@ -645,6 +646,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 }
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+            UnRegisterEvents(_internal);
             _internal.Clear();
             IsDisposed = true;
         }

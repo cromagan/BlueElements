@@ -255,7 +255,7 @@ public static class ControlAcceptFilterExtension {
         //icaf.FilterInput.Changed -= icaf.FilterOutput_PropertyChanged;
         icaf.FilterInput.DisposingEvent -= icaf.FilterInput_DispodingEvent;
 
-        if (icaf.Parents.Count != 1 && icaf.FilterInput != null) {
+        if (icaf.Parents.Count > 1 && icaf.FilterInput != null && icaf.FilterInputChangedHandled) {
             icaf.FilterInput.Dispose();
         }
     }

@@ -99,10 +99,10 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     }
 
     /// <summary>
-    /// Erstellt einen Filter, der die erste Spalte als Filter hat, mit dem Wert der Zeile.
+    /// Erstellt einen Filter, der den Zeilenschhlüssel sucht.
     /// </summary>
     /// <param name="row"></param>
-    public FilterItem(RowItem row) : this(EnsureNotNull(row.Database?.Column.First()), row) { }
+    public FilterItem(RowItem row) : this(row.Database, FilterType.RowKey, row.KeyName) { }
 
     private FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
@@ -271,6 +271,12 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 
+        if (_filterType == FilterType.RowKey) {
+            if (_column != null) { return "RowKey suche mit Spaltenangabe"; }
+            if (SearchValue.Count != 1) { return "RowKey mit ungültiger Suche"; }
+            return string.Empty;
+        }
+
         if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
 
         if (_filterType.HasFlag(FilterType.Instr)) {
@@ -416,13 +422,14 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case FilterType.Between | FilterType.UND:
                 return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
-
             case FilterType.BeginntMit:
                 return nam + " beginnt mit '" + SearchValue[0] + "'";
 
-
             case FilterType.AlwaysFalse:
                 return "Immer FALSCH";
+
+            case FilterType.RowKey:
+                return "Spezielle Zeile";
 
             default:
                 return nam + ": Spezial-Filter";

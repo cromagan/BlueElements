@@ -514,7 +514,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         } catch { }
     }
 
-    protected bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
+    public bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
         sizeOfParentControl.IsEmpty ||
         sizeOfParentControl.Width == 0 ||
         sizeOfParentControl.Height == 0 ||

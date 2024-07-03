@@ -34,6 +34,8 @@ public enum FilterType {
     Between = 1 << 4,
     BeginntMit = 1 << 5,
 
+    RowKey = 1 << 6,
+
     // Filter - Bits -----------------------------------------------------------------
     GroßKleinEgal = 1 << 7,
 
