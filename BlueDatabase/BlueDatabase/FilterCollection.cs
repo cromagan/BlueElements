@@ -387,7 +387,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public bool IsRowFilterActiv() {
         var fi = this[null];
 
-        return fi != null && fi.FilterType == FilterType.Instr;
+        return fi != null && fi.FilterType is FilterType.Instr or FilterType.Instr_UND_GroßKleinEgal or FilterType.Instr_GroßKleinEgal;
     }
 
     public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
