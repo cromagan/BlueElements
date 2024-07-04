@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -35,9 +36,13 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     #region Fields
 
     private ColumnItem? _column;
+
     private Database? _database;
+
     private FilterType _filterType = FilterType.AlwaysFalse;
+
     private string _origin = string.Empty;
+
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
@@ -187,6 +192,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     }
 
     public bool IsDisposed { get; private set; }
+
     public string KeyName { get; private set; }
 
     public string Origin {
@@ -289,6 +295,21 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     }
 
     public bool IsNullOrEmpty() => !this.IsOk();
+
+    public void Normalize() {
+        _searchValue = _searchValue.SortedDistinctList().AsReadOnly();
+
+        KeyName = "Normalized";
+
+        _origin = "Normalize";
+
+        if (_column != null) { _database = _column.Database; }
+
+        if (_searchValue.Count < 2) {
+            if (_filterType.HasFlag(FilterType.ODER)) { _filterType ^= FilterType.ODER; }
+            if (_filterType.HasFlag(FilterType.UND)) { _filterType ^= FilterType.UND; }
+        }
+    }
 
     public void OnChanging() {
         if (IsDisposed) { return; }

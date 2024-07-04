@@ -65,7 +65,7 @@ internal class Method_ForEach : Method {
         }
 
         var scx = new DoItFeedback(false, false);
-        var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break);
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break, scp.Stufe+1);
 
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");

@@ -20,8 +20,6 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -31,15 +29,14 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_DeleteFile : Method, IUseableForButton {
+internal class Method_DeleteFile : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
 
     public List<List<string>> ArgsForButton => Args;
-    public List<string> ArgsForButtonDescription => ["Datei"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+
 
     public override string Command => "deletefile";
 
@@ -53,7 +50,7 @@ internal class Method_DeleteFile : Method, IUseableForButton {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Eine Datei aus dem Dateisystem löschen";
+
 
     public override string Returns => VariableBool.ShortName_Variable;
 
@@ -98,7 +95,6 @@ internal class Method_DeleteFile : Method, IUseableForButton {
         return DoItFeedback.Wahr();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8,string filterarg, string rowarg) => arg1;
 
     #endregion
 }

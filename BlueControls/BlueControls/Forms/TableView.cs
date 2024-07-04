@@ -41,6 +41,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using BlueDatabase.AdditionalScriptMethods;
 
 namespace BlueControls.Forms;
 
@@ -284,6 +285,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "#datenüberprüfung":
                 if (row != null && !row.IsDisposed) {
                     row.UpdateRow(false, true, true);
+                    Method_RowUniqueAndInvalidate.DoAllRows();
                     //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
                 }
@@ -1039,6 +1041,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                         thisR.UpdateRow(false, true, true);
                         //thisR.CheckRowDataIfNeeded();
                     }
+
+                    Method_RowUniqueAndInvalidate.DoAllRows();
 
                     MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
                     lstAufgaben.Enabled = true;

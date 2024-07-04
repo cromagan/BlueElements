@@ -18,8 +18,8 @@
 #nullable enable
 
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
+using BlueDatabase.Interfaces;
+using BlueDatabase.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;

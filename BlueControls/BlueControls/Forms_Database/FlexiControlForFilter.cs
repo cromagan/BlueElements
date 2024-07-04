@@ -33,16 +33,18 @@ using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
+using static BlueControls.Interfaces.HasSettings;
 
 #nullable enable
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter, IDisposableExtended {
+public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter, IDisposableExtended, IHasSettings {
 
     #region Fields
 
+    private const int MaxCount = 20;
     private bool _doFilterDeleteButton;
 
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
@@ -136,6 +138,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
+    public bool SavesSettings { get; internal set; } = false;
+
+    public List<string> Settings { get; } = new();
+
+    public bool SettingsLoaded { get; set; }
+
+    public string SettingsManualFilename { get; set; }
+
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
         get => _standard_bei_keiner_Eingabe;
         set {
@@ -156,7 +166,19 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
+    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+        if (SavesSettings) {
+            this.LoadSettingsFromDisk(false);
+            if (FilterOutput.Count == 1) {
+                if (FilterOutput.Rows.Count == 1) {
+                    var toAdd = this.FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
+                    this.SettingsAdd(toAdd);
+                }
+            }
+        }
+
+        this.FilterOutput_PropertyChanged();
+    }
 
     public void HandleChangesNow() {
         if (IsDisposed) { return; }
@@ -326,6 +348,24 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
             if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText)); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
+            if (SavesSettings) {
+                this.LoadSettingsFromDisk(false);
+                var nr = -1;
+                var f = this.FilterHash();
+
+                for (var z = Settings.Count - 1; z >= 0; z--) {
+                    var x = Settings[z].SplitAndCutBy("|");
+                    if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f == x[0]) {
+                        nr++;
+                        if (nr < MaxCount) {
+                            var show = (nr + 1).ToStringInt3() + ": " + x[1];
+                            TextListItem it = new(show, x[1], null, false, true, nr.ToStringInt3());
+                            cbx.ItemAdd(it);
+                        }
+                    }
+                }
+            }
+
             cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }
     }

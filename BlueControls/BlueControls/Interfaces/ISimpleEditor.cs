@@ -86,7 +86,7 @@ public static class SimpleEditorExtension {
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = width - Skin.Padding * 2;
+                thisFlexi.Width = width - (Skin.Padding * 2);
             }
         }
 

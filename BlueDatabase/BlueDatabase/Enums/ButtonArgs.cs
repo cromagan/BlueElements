@@ -19,7 +19,7 @@
 
 using System;
 
-namespace BlueScript.EventArgs;
+namespace BlueDatabase.Enums;
 
 [Flags]
 public enum ButtonArgs {

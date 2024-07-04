@@ -18,19 +18,19 @@
 #nullable enable
 
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using BlueDatabase.Enums;
+
 using static BlueBasics.Generic;
 
-namespace BlueScript.Methods;
+namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_SetClipboard : Method, IUseableForButton {
+internal class Method_SetClipboard : BlueScript.Methods.Method, BlueDatabase.Interfaces.IUseableForButton {
 
     #region Properties
 
@@ -39,7 +39,7 @@ internal class Method_SetClipboard : Method, IUseableForButton {
     public List<List<string>> ArgsForButton => [StringVal];
 
     public List<string> ArgsForButtonDescription => ["Text"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+    public BlueDatabase.Enums.ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "setclipboard";
 
@@ -74,7 +74,7 @@ internal class Method_SetClipboard : Method, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8,string filterarg, string rowarg) => arg1;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => arg1;
 
     #endregion
 }

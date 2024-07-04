@@ -19,7 +19,6 @@
 
 using BlueScript.Enums;
 using BlueScript.EventArgs;
-using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -31,17 +30,16 @@ using BlueBasics;
 namespace BlueScript.Methods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_CallByFilename : Method, IUseableForButton {
+public class Method_CallByFilename : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
 
-    public List<List<string>> ArgsForButton => [StringVal, StringVal];
 
-    public List<string> ArgsForButtonDescription => ["Dateiname", "Attribut 0"];
 
-    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
+
+
 
     public override string Command => "callbyfilename";
 
@@ -57,7 +55,7 @@ public class Method_CallByFilename : Method, IUseableForButton {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Ein Skript aus dem Dateisystem ausführen";
+
 
     public override string Returns => string.Empty;
 
@@ -85,15 +83,21 @@ public class Method_CallByFilename : Method, IUseableForButton {
     public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, List<string>? attributes) {
         ScriptEndedFeedback scx;
 
+        if (scp.Stufe > 10) {
+            return new DoItFeedback(infos.Data, "'" + subname + "' wird zu verschachtelt aufgerufen.");
+        }
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe +1);
+
+
         if (keepVariables) {
             if (addMe != null) { varCol.Add(addMe); }
-            scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname, attributes);
+            scx = Script.Parse(varCol, scp2, reducedscripttext, lineadd, subname, attributes);
         } else {
             var tmpv = new VariableCollection();
             tmpv.AddRange(varCol);
             if (addMe != null) { tmpv.Add(addMe); }
 
-            scx = Script.Parse(tmpv, scp, reducedscripttext, lineadd, subname, attributes);
+            scx = Script.Parse(tmpv, scp2, reducedscripttext, lineadd, subname, attributes);
 
             #region Kritische Variablen Disposen
 
@@ -161,7 +165,6 @@ public class Method_CallByFilename : Method, IUseableForButton {
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8,string filterarg, string rowarg) => arg1 + "," + arg2;
 
     #endregion
 }

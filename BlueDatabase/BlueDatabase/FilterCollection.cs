@@ -45,6 +45,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private string _coment;
 
     private Database? _database;
+
     private List<RowItem>? _rows;
 
     #endregion
@@ -85,6 +86,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     #region Properties
 
     public string CaptionForEditor => "Filter-Sammlung";
+
     public int Count => IsDisposed ? 0 : _internal.Count;
 
     public Database? Database {
@@ -110,6 +112,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public Type? Editor { get; set; }
+
     public bool IsDisposed { get; private set; }
 
     public string RowFilterText {
@@ -202,8 +205,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    //public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
-
     public void ChangeTo(FilterItem? fi) {
         if (fi != null && fi.Database == _database && _internal.Count == 1 && Exists(fi)) { return; }
         if (fi == null && _database == null && _internal.Count == 0) { return; }
@@ -225,6 +226,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnPropertyChanged();
     }
 
+    //public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
     /// <summary>
     /// Effizente Methode um wenige Events auszulösen
     /// </summary>
@@ -391,6 +393,22 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
+
+    public void Normalize() {
+        foreach (var thisf in this) {
+            thisf.Normalize();
+        }
+        _coment = "Normalize";
+
+        var tmp = new List<FilterItem>();
+        tmp.AddRange(_internal);
+
+   
+        _internal.Clear();
+        _internal.AddRange(tmp.OrderBy(e => e.ReadableText()).ToList());
+
+
+    }
 
     public void OnPropertyChanged() {
         if (IsDisposed) { return; }

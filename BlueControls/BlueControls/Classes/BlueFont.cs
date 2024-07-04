@@ -53,7 +53,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private float _kapitälchenPlus = -1;
     private QuickImage? _nameInStyleSym;
     private float _oberlänge = -1;
-    private Pen _pen = new Pen(Brushes.Red);
+    private Pen _pen = new(Brushes.Red);
     private Bitmap? _sampleTextSym;
     private float _sizeTestedAndFailed = float.MaxValue;
     private float _sizeTestedAndOk = float.MinValue;

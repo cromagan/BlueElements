@@ -52,7 +52,7 @@ internal class Method_Do : Method {
 
         var du = 0;
 
-        var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break);
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break, scp.Stufe);
 
         DoItFeedback scx;
         do {

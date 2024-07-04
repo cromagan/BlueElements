@@ -18,8 +18,6 @@
 #nullable enable
 
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -30,15 +28,12 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_MoveFile : Method, IUseableForButton {
+internal class Method_MoveFile : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
 
-    public List<List<string>> ArgsForButton => Args;
-    public List<string> ArgsForButtonDescription => ["Von", "Nach"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "movefile";
 
@@ -52,7 +47,6 @@ internal class Method_MoveFile : Method, IUseableForButton {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Eine Datei im Dateisystem verschieben";
 
     public override string Returns => string.Empty;
 
@@ -90,7 +84,6 @@ internal class Method_MoveFile : Method, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8,string filterarg, string rowarg) => arg1 + "," + arg2;
 
     #endregion
 }

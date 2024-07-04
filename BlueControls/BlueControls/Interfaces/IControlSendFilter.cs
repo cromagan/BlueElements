@@ -97,10 +97,6 @@ public static class ControlSendSomethingExtension {
     }
 
     public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) {
-        if (dest is IHasSettings s) {
-            s.SettingsManualFilename = "%homepath%\\FRM_" + source.KeyName;
-        }
-
         dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
     }
 

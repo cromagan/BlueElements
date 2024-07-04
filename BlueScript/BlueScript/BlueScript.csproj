@@ -47,11 +47,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventArgs\ButtonArgs.cs" />
-    <Compile Include="Interfaces\IUsableForButton.cs" />
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />
-    <Compile Include="Methods\Method_Execute.cs" />
     <Compile Include="Methods\Method_MaxDate.cs" />
     <Compile Include="Methods\Method_Ping.cs" />
     <Compile Include="Methods\Method_Encrypt.cs" />
@@ -76,7 +73,6 @@
     <Compile Include="Methods\Method_RemoveDoubleSpaces.cs" />
     <Compile Include="Methods\Method_Return.cs" />
     <Compile Include="Methods\Method_SaveImage.cs" />
-    <Compile Include="Methods\Method_SetClipboard.cs" />
     <Compile Include="Methods\Method_CallByFilename.cs" />
     <Compile Include="Methods\Method_ContainsWhich.cs" />
     <Compile Include="Methods\Method_DirectoryExists.cs" />
@@ -170,6 +166,8 @@
       <Name>BlueBasics</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

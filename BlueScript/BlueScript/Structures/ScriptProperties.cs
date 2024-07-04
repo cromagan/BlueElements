@@ -26,21 +26,24 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties() : this(string.Empty, MethodType.Standard, false, [], null) { }
+    public ScriptProperties() : this(string.Empty, MethodType.Standard, false, [], null,0) { }
 
-    public ScriptProperties(string scriptname, MethodType allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo) {
+    public ScriptProperties(string scriptname, MethodType allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, int stufe) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
         ScriptAttributes = scriptAttributes;
         AdditionalInfo = additionalInfo;
+        Stufe = stufe;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo) { }
+    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods, int stufe) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, stufe) { }
 
     #endregion
 
     #region Properties
+
+    public int Stufe { get; }
 
     public object? AdditionalInfo { get; }
     public bool ProduktivPhase { get; }

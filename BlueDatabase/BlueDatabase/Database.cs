@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
@@ -1446,7 +1447,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(s.KeyName, allowedMethods, produktivphase, s.Attributes(), addinfo);
+            var scp = new ScriptProperties(s.KeyName, allowedMethods, produktivphase, s.Attributes(), addinfo, 0);
 
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
@@ -1519,6 +1520,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             ExecutingScript--;
             ExecutingScriptAnyDatabase--;
+
+            if (produktivphase && ExecutingScript == 0 && ExecutingScriptAnyDatabase == 0) {
+                Method_RowUniqueAndInvalidate.DoAllRows();
+            }
+
             return scf;
         } catch {
             Develop.CheckStackForOverflow();
@@ -2492,16 +2498,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
-     
+
 
 
         var m = EditableErrorReason(EditableErrorReasonType.Save);
-      
+
 
         if (!string.IsNullOrEmpty(m)) { return false; }
 
         _completing = true;
-        if (string.IsNullOrEmpty(Filename)) { _completing = false;  return false; }
+        if (string.IsNullOrEmpty(Filename)) { _completing = false; return false; }
 
         Develop.SetUserDidSomething();
         var tmpFileName = WriteTempFileToDisk(setfileStateUtcDateTo);

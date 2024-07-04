@@ -40,6 +40,7 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.EventArgs;
 using BlueControls.BlueDatabaseDialogs;
+using BlueDatabase.AdditionalScriptMethods;
 
 namespace BlueControls.Controls;
 
@@ -171,7 +172,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
 
-        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn);
+        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn,0);
 
         var sc = new BlueScript.Script(vars, string.Empty, scp);
         sc.ScriptText = scripttext;
@@ -290,6 +291,8 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
             Fehler("Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText, BlueBasics.Enums.ImageCode.Kritisch);
             return;
         }
+
+        Method_RowUniqueAndInvalidate.DoAllRows();
 
         var menu = scf.Variables?.GetList("Menu");
 

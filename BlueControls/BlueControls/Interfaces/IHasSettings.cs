@@ -68,7 +68,7 @@ public static class HasSettings {
     }
 
     public static void LoadSettingsFromDisk(this IHasSettings settings, bool loadalways) {
-        if (!settings.SettingsLoaded && !loadalways) { return; }
+        if (settings.SettingsLoaded && !loadalways) { return; }
 
         settings.Settings.Clear();
 
@@ -76,12 +76,13 @@ public static class HasSettings {
             var t = File.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             settings.Settings.AddRange(t.SplitAndCutByCr());
+
             settings.SettingsLoaded = true;
         }
     }
 
     public static void SaveSettingsToDisk(this IHasSettings settings) {
-        var pf = settings.SettingsFileName().FilePath();
+        var pf = settings.SettingsFileName().FilePath().CheckPath();
 
         if (string.IsNullOrEmpty(pf)) { return; }
 
@@ -91,13 +92,19 @@ public static class HasSettings {
 
         if (CanWriteInDirectory(pf)) {
             settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
+            settings.SettingsLoaded = true;
         }
     }
 
     public static void SetSetting(this IHasSettings settings, string tagname, string value) {
         settings.LoadSettingsFromDisk(false);
-        settings.Settings.TagSet(tagname, value.ToNonCritical());
-        settings.SaveSettingsToDisk();
+
+        var nval = value.ToNonCritical();
+
+        if (settings.GetSettings(tagname) != nval) {
+            settings.Settings.TagSet(tagname, nval);
+            settings.SaveSettingsToDisk();
+        }
     }
 
     /// <summary>
@@ -108,16 +115,16 @@ public static class HasSettings {
     /// <param name="settings"></param>
     /// <param name="s"></param>
     public static void SettingsAdd(this IHasSettings settings, string s) {
-        s = s.ToNonCritical();
-
         settings.LoadSettingsFromDisk(false);
+
+        s = s.Replace("\r", string.Empty).Replace("\n", string.Empty);
         if (settings.Settings.Count > 0) { settings.Settings.RemoveString(s, false); }
         settings.Settings.Add(s);
 
         settings.SaveSettingsToDisk();
     }
 
-    private static string SettingsFileName(this IHasSettings settings) => !string.IsNullOrEmpty(settings.SettingsManualFilename) ? settings.SettingsManualFilename.CheckFile() : "%homepath%\\" + settings.Name + ".settings";
+    private static string SettingsFileName(this IHasSettings settings) => !string.IsNullOrEmpty(settings.SettingsManualFilename) ? settings.SettingsManualFilename.CheckFile() : ("%homepath%\\" + Develop.AppName() + "\\" + settings.Name + ".ini").CheckFile();
 
     #endregion
 }

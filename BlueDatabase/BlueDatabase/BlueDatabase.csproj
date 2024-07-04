@@ -82,6 +82,7 @@
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AddRow.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="DatabaseMu.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Enums\ButtonArgs.cs" />
     <Compile Include="Enums\ColumnFunction.cs" />
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="Enums\FilterAusgabe.cs" />
@@ -159,6 +161,7 @@
     <Compile Include="Export.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterItem.cs" />
+    <Compile Include="Interfaces\IUseableForButton.cs" />
     <Compile Include="LanguageTool.cs" />
     <Compile Include="RowCollection.cs" />
     <Compile Include="RowData.cs" />

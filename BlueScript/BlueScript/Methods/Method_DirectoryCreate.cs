@@ -18,8 +18,6 @@
 #nullable enable
 
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -32,15 +30,12 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_DirectoryCreate : Method, IUseableForButton {
+internal class Method_DirectoryCreate : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
 
-    public List<List<string>> ArgsForButton => Args;
-    public List<string> ArgsForButtonDescription => ["Verzeichnissname"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "directorycreate";
 
@@ -81,7 +76,6 @@ internal class Method_DirectoryCreate : Method, IUseableForButton {
         return !DirectoryExists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8,string filterarg, string rowarg) => arg1;
 
     #endregion
 }

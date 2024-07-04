@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
-using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
@@ -412,12 +411,12 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         co += "~~~~~~~~~~~\r\n";
         co = co + Description + "\r\n";
 
-        if (this is IUseableForButton) {
-            co += "\r\n";
-            co += "Hinweis:\r\n";
-            co += "~~~~~~~~~~~~\r\n";
-            co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
-        }
+        //if (this is IUseableForButton) {
+        //    co += "\r\n";
+        //    co += "Hinweis:\r\n";
+        //    co += "~~~~~~~~~~~~\r\n";
+        //    co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
+        //}
 
         if (Verwendung.Count > 0) {
             co += "\r\n";

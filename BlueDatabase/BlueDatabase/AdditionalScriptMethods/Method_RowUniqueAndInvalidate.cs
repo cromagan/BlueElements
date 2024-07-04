@@ -20,17 +20,24 @@
 using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
+using BlueDatabase.Interfaces;
+using BlueDatabase.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton {
+
+    #region Fields
+
+    public static List<RowItem> InvalidatedRows = new();
+
+    #endregion
 
     #region Properties
 
@@ -56,10 +63,11 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
 
     public override MethodType MethodType => MethodType.Database | MethodType.IO;
 
-    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
+    public override bool MustUseReturnValue => false;
 
     public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen, wenn diese noch nicht vorhanden ist. Aber immer invalidieren.";
 
+    // Auch nur zum Zeilen Anlegen
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";
@@ -69,6 +77,17 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
     #endregion
 
     #region Methods
+
+    public static void DoAllRows() {
+
+        try {
+            while (InvalidatedRows.Count > 0) {
+                var r = InvalidatedRows[0];
+                InvalidatedRows.RemoveAt(0);
+                r.UpdateRow(false, true, true);
+            }
+        } catch { }
+    }
 
     public static DoItFeedback UniqueRow(CanDoFeedback infos, FilterCollection allFi, ScriptProperties scp, string coment) {
         Develop.CheckStackForOverflow();
@@ -111,6 +130,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
                 if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes > 15) {
                     //return new DoItFeedback(infos.Data, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
                     myRow.CellSet(srs, string.Empty, coment);
+                    InvalidatedRows.Add(myRow);
                 }
             }
         } else {

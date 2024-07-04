@@ -170,10 +170,6 @@ public static class ControlAcceptFilterExtension {
     public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();
 
-        if (dest is IHasSettings s) {
-            s.SettingsManualFilename = "%homepath%\\FRM_" + source.KeyName;
-        }
-
         foreach (var thisKey in source.Parents) {
             var it = source.Parent?[thisKey];
 
@@ -185,6 +181,23 @@ public static class ControlAcceptFilterExtension {
                 }
             }
         }
+    }
+
+    public static string FilterHash(this IControlAcceptFilter iaf) {
+        if (iaf.FilterInput is not FilterCollection fc) { return "NoFilter"; }
+
+        if (fc.Count == 0) { return "NoFilter"; }
+
+        if (!fc.IsOk()) { return string.Empty; }
+
+        if (fc.HasAlwaysFalse()) { return "FALSE"; }
+        var fn = (FilterCollection)fc.Clone("Normalize");
+        fn.Normalize();
+
+        var n = "F" + Generic.GetHashString(fn.ToString());
+        fn.Dispose();
+
+        return n;
     }
 
     public static void FilterInput_DispodingEvent(this IControlAcceptFilter icaf) {

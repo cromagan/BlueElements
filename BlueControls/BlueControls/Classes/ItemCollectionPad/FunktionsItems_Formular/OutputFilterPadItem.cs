@@ -177,6 +177,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         var con = new FlexiControlForFilter(Column, _überschriftanordung) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
             Filterart_bei_Texteingabe = _filterart_Bei_Texteingabe,
+            SavesSettings = true
         };
         //return con;
         con.DoOutputSettings(this);

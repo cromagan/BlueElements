@@ -20,8 +20,8 @@
 using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
+using BlueDatabase.Interfaces;
+using BlueDatabase.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;

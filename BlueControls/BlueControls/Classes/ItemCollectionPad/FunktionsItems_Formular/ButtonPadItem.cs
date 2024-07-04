@@ -27,8 +27,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueScript;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
 using BlueScript.Methods;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +36,8 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 
 #nullable enable
 

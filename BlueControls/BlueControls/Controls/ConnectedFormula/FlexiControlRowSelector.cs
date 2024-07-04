@@ -22,6 +22,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlUsesRow, IDisposableExtended {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlUsesRow, IDisposableExtended, IHasSettings {
 
     #region Fields
 
@@ -116,6 +117,11 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; set; } = false;
 
+    public List<string> Settings { get; } = new();
+
+    public bool SettingsLoaded { get; set; }
+    public string SettingsManualFilename { get; set; }
+
     #endregion
 
     #region Methods
@@ -174,7 +180,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         #region Veraltete Zeilen entfernen
 
         foreach (var thisit in ex) {
-            cb?.Remove(thisit);
+            cb.Remove(thisit);
         }
 
         #endregion
@@ -184,6 +190,12 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (cb.ItemCount == 1) {
             ValueSet(cb[0].KeyName, true);
+        } else {
+            var f = this.GetSettings(this.FilterHash());
+
+            if (!string.IsNullOrEmpty(f) && cb.Items().Get(f) is AbstractListItem ali) {
+                ValueSet(ali.KeyName, true);
+            }
         }
 
         if (cb.ItemCount < 2) {
@@ -227,7 +239,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
+        var f = this.FilterHash();
         var row = RowsInput?.Get(Value);
+        this.SetSetting(f, row?.KeyName ?? string.Empty);
 
         if (row == null) {
             this.Invalidate_FilterOutput();

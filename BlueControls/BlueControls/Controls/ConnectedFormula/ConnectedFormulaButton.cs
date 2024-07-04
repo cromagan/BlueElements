@@ -23,8 +23,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueScript;
-using BlueScript.EventArgs;
-using BlueScript.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -324,7 +324,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         var row = this.RowSingleOrNull();
 
         if (row?.Database is Database db && !db.IsDisposed) {
-            vars = db.CreateVariableCollection(row, true, false, false, false, false); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            vars = db.CreateVariableCollection(row, true, false, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = new VariableCollection();
         }
