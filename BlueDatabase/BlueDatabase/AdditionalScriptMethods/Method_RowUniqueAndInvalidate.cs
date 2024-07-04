@@ -84,7 +84,12 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
             while (InvalidatedRows.Count > 0) {
                 var r = InvalidatedRows[0];
                 InvalidatedRows.RemoveAt(0);
-                r.UpdateRow(false, true, true);
+
+                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed) {
+
+                    r.UpdateRow(false, true, true);
+                }
+
             }
         } catch { }
     }

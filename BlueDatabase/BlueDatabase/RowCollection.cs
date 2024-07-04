@@ -21,10 +21,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using BlueScript.Structures;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -890,6 +890,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
         OnRowAdded(new RowChangedEventArgs(row, reason));
+
+        if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
+            Method_RowUniqueAndInvalidate.InvalidatedRows.Add(row);
+        }
+
         return string.Empty;
     }
 
