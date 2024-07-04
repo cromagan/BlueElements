@@ -170,6 +170,10 @@ public static class ControlAcceptFilterExtension {
     public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();
 
+        if (dest is IHasSettings s) {
+            s.SettingsManualFilename = "%homepath%\\FRM_" + source.KeyName;
+        }
+
         foreach (var thisKey in source.Parents) {
             var it = source.Parent?[thisKey];
 

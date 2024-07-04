@@ -84,12 +84,25 @@ public static class ControlSendSomethingExtension {
         parent.Childs.Clear();
     }
 
+    /// <summary>
+    /// Spezielle Routine, wird von verschiedenen Stelle speziell aufgerufen.
+    /// evtl. ist IHasSettings bereits besonder abgehandelt
+    /// </summary>
+    /// <param name="dest"></param>
+    /// <param name="db"></param>
+    /// <param name="name"></param>
     public static void DoOutputSettings(this IControlSendFilter dest, Database? db, string name) {
         dest.Name = name;
         dest.FilterOutput.Database = db;
     }
 
-    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) => dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
+    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) {
+        if (dest is IHasSettings s) {
+            s.SettingsManualFilename = "%homepath%\\FRM_" + source.KeyName;
+        }
+
+        dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
+    }
 
     public static void FilterOutput_DispodingEvent(this IControlSendFilter icsf) {
         if (icsf.IsDisposed) { return; }

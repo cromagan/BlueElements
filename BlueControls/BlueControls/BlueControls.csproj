@@ -237,6 +237,7 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IHasSettings.cs" />
     <Compile Include="Interfaces\IIsEditor.cs" />
     <Compile Include="Interfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\IControlUsesRow.cs" />

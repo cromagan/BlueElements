@@ -36,7 +36,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
@@ -45,13 +44,11 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public partial class TableView : FormWithStatusBar {
+public partial class TableView : FormWithStatusBar, IHasSettings {
 
     #region Fields
 
     private bool _firstOne = true;
-
-    private List<string> _settings = [];
 
     #endregion
 
@@ -82,7 +79,7 @@ public partial class TableView : FormWithStatusBar {
 
         Check_OrderButtons();
 
-        LoadSettingsFromDisk();
+        this.LoadSettingsFromDisk(false);
 
         _ = SwitchTabToDatabase(database);
     }
@@ -91,7 +88,16 @@ public partial class TableView : FormWithStatusBar {
 
     #region Properties
 
+    public static bool SettingsLoadedStatic { get; set; }
+    public static List<string> SettingsStatic { get; set; } = new();
+
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
+
+    public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
+
+    public bool SettingsLoaded { get => SettingsLoadedStatic; set => SettingsLoadedStatic = value; }
+
+    public string SettingsManualFilename { get => Application.StartupPath + "\\" + Name + "-Settings.ini"; set { } }
 
     #endregion
 
@@ -412,7 +418,7 @@ public partial class TableView : FormWithStatusBar {
     protected void AddTabPage(ConnectionInfo? ci) {
         if (ci is null) { return; }
 
-        var toParse = _settings.TagGet("View_" + ci.TableName).FromNonCritical();
+        var toParse = this.GetSettings("View_" + ci.TableName);
 
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
@@ -578,7 +584,10 @@ public partial class TableView : FormWithStatusBar {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
 
-        SaveSettingsToDisk();
+        if (Table.Database is Database db && !db.IsDisposed) {
+            this.SetSetting("View_" + db.TableName, ViewToString());
+        }
+
         DatabaseSet(null, string.Empty);
         MultiUserFile.SaveAll(true);
         Database.ForceSaveAll();
@@ -725,6 +734,8 @@ public partial class TableView : FormWithStatusBar {
         return result.Parseable();
     }
 
+    private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
+
     //    Table.Database = db;
     //    if (Table.Database != null) {
     //        tbcDatabaseSelector.TabPages[toIndex].Text = db.Filename.FileNameWithoutSuffix();
@@ -734,9 +745,6 @@ public partial class TableView : FormWithStatusBar {
     //    Table.Enabled = true;
     //}
     //private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
-
-    private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
-
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
     private void btnAufräumen_Click(object sender, System.EventArgs e) {
@@ -963,16 +971,6 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private void LoadSettingsFromDisk() {
-        _settings = [];
-
-        if (FileExists(SettingsFileName())) {
-            var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);
-            t = t.RemoveChars("\n");
-            _settings.AddRange(t.SplitAndCutByCr());
-        }
-    }
-
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (!FileExists(LoadTab.FileName)) { return; }
 
@@ -1071,21 +1069,6 @@ public partial class TableView : FormWithStatusBar {
     //    } while (true);
     //}
 
-    /// <summary>
-    /// Speichert die aktuelle Ansicht in die Settings Datei und speichert das dann alles auf Festplatte
-    /// </summary>
-    private void SaveSettingsToDisk() {
-        if (Table.Database is Database db && !db.IsDisposed) {
-            _settings.TagSet("View_" + db.TableName, ViewToString().ToNonCritical());
-        }
-
-        if (CanWriteInDirectory(SettingsFileName().FilePath())) {
-            _settings.WriteAllText(SettingsFileName(), Encoding.UTF8, false);
-        }
-    }
-
-    private string SettingsFileName() => Application.StartupPath + "\\" + Name + "-Settings.ini";
-
     //private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
     //    column = Table.View_ColumnFirst();
     //    row = null;
@@ -1110,7 +1093,9 @@ public partial class TableView : FormWithStatusBar {
 
         e.TabPage.Tag = s;
 
-        SaveSettingsToDisk();
+        if (Table.Database is Database db && !db.IsDisposed) {
+            this.SetSetting("View_" + db.TableName, ViewToString());
+        }
     }
 
     /// <summary>

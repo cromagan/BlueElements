@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,20 +30,20 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.IO;
+using static BlueControls.Interfaces.HasSettings;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ItemClicked")]
-public sealed class LastFilesCombo : ComboBox {
+public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Fields
 
-    private bool _loaded;
     private int _maxCount = 20;
     private bool _mustExists = true;
-    private List<string> _settings = [];
-    private string _settingsfilename = string.Empty;
+
+    private string _settingsManualFilename = string.Empty;
 
     #endregion
 
@@ -53,21 +54,6 @@ public sealed class LastFilesCombo : ComboBox {
     #endregion
 
     #region Properties
-
-    /// <summary>
-    /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
-    /// </summary>
-    ///
-    [DefaultValue("")]
-    public string Filename {
-        get => _settingsfilename;
-        set {
-            if (_settingsfilename == value) { return; }
-            _settingsfilename = value;
-            LoadSettingsFromDisk();
-            GenerateMenu();
-        }
-    }
 
     [DefaultValue(20)]
     public int MaxCount {
@@ -89,6 +75,24 @@ public sealed class LastFilesCombo : ComboBox {
         }
     }
 
+    public List<string> Settings { get; } = new();
+    public bool SettingsLoaded { get; set; } = false;
+
+    /// <summary>
+    /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
+    /// </summary>
+    ///
+    [DefaultValue("")]
+    public string SettingsManualFilename {
+        get => _settingsManualFilename;
+        set {
+            if (_settingsManualFilename == value) { return; }
+            _settingsManualFilename = value;
+            this.LoadSettingsFromDisk(true);
+            GenerateMenu();
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -96,16 +100,9 @@ public sealed class LastFilesCombo : ComboBox {
     public void AddFileName(string? fileName, string additionalText) {
         if (fileName != null) {
             var s = fileName + "|" + additionalText;
-            s = s.Replace("\r\n", ";");
-            s = s.Replace("\r", ";");
-            s = s.Replace("\n", ";");
-            if (!_mustExists || FileExists(fileName)) {
-                if (!_loaded) { LoadSettingsFromDisk(); }
-                if (_settings.Count > 0) { _settings.RemoveString(fileName, false); }
-                if (_settings.Count > 0) { _settings.RemoveString(s, false); }
-                _settings.Add(s);
 
-                SaveSettingsToDisk();
+            if (!_mustExists || FileExists(fileName)) {
+                this.SettingsAdd(s);
             }
         }
         GenerateMenu();
@@ -119,7 +116,7 @@ public sealed class LastFilesCombo : ComboBox {
     protected override void OnHandleCreated(System.EventArgs e) {
         base.OnHandleCreated(e);
         CheckBack();
-        if (!_loaded) { LoadSettingsFromDisk(); }
+        this.LoadSettingsFromDisk(false);
         GenerateMenu();
     }
 
@@ -135,8 +132,8 @@ public sealed class LastFilesCombo : ComboBox {
         var nr = -1;
         var vis = false;
         ItemClear();
-        for (var z = _settings.Count - 1; z >= 0; z--) {
-            var x = _settings[z].SplitAndCutBy("|");
+        for (var z = Settings.Count - 1; z >= 0; z--) {
+            var x = Settings[z].SplitAndCutBy("|");
             if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null) {
                 if (!_mustExists || FileExists(x[0])) {
                     nr++;
@@ -163,31 +160,6 @@ public sealed class LastFilesCombo : ComboBox {
         Enabled = vis;
     }
 
-    private void LoadSettingsFromDisk() {
-        _settings = [];
-
-        if (FileExists(SettingsFileName())) {
-            var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);
-            t = t.RemoveChars("\n");
-            _settings.AddRange(t.SplitAndCutByCr());
-            _loaded = true;
-        }
-    }
-
-    private void SaveSettingsToDisk() {
-        var pf = SettingsFileName().FilePath();
-
-        if (string.IsNullOrEmpty(pf)) { return; }
-
-        if (!DirectoryExists(pf)) {
-            _ = Directory.CreateDirectory(pf);
-        }
-
-        if (CanWriteInDirectory(pf)) {
-            _settings.WriteAllText(SettingsFileName(), Encoding.UTF8, false);
-        }
-    }
-
     private void SetLastFilesStyle() {
         if (DrawStyle == ComboboxStyle.TextBox) {
             DrawStyle = ComboboxStyle.Button;
@@ -195,8 +167,6 @@ public sealed class LastFilesCombo : ComboBox {
         if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
         if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
     }
-
-    private string SettingsFileName() => !string.IsNullOrEmpty(_settingsfilename) ? _settingsfilename.CheckFile() : Application.StartupPath + "\\" + Name + "-Files.laf";
 
     #endregion
 }
