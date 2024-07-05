@@ -424,7 +424,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss befüllt sein"; }
                 if (Column == null) { return "Unbekannter Filter"; }
-                return nam + " <> " + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, Column.Prefix, Column.Suffix, Column.DoOpticalTranslation, Column.OpticalReplace);
+                return nam + " ist nicht '" + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, Column.Prefix, Column.Suffix, Column.DoOpticalTranslation, Column.OpticalReplace) + "'";
 
             case FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren:
 
