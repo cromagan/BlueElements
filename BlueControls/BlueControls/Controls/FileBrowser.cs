@@ -187,8 +187,11 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
-        RemoveWatcher();
-        base.Dispose();
+        if (Disposing) {
+            RemoveWatcher();
+        }
+
+        base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {

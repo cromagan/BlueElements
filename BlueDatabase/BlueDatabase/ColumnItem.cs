@@ -1451,8 +1451,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
             "SYS_LOCKED" or
             "SYS_ROWSTATE";
 
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, new ColumnEventArgs(this));
 
     public string QuickInfoText(string additionalText) {
@@ -2619,6 +2617,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
         }
         return txt;
     }
+
+    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// CallByFileName Aufrufe werden nicht geprüft

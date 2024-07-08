@@ -84,7 +84,6 @@ internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
     protected override void Dispose(bool disposing) {
         if (disposing) {
             this.DoDispose();
-            base.Dispose();
         }
         base.Dispose(disposing);
     }

@@ -279,8 +279,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         return !DoDrawings() ? default : PointToClient(Cursor.Position);
     }
 
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
     public void PerformAutoScale() {
         // NIX TUN!!!!
@@ -567,6 +565,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         }
         return s;
     }
+
+    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

@@ -118,6 +118,8 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
 
     #region Methods
 
+    #region Methods
+
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
@@ -324,21 +326,16 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
+
         if (disposing) {
-            OnDisposingEvent();
-            base.Dispose();
 
             InitFormula(null, null);
-
             ((IControlSendFilter)this).DoDispose();
-
             components?.Dispose();
+            _timer.Enabled = false;
+            _timer.Tick -= Checker_Tick;
+            _timer.Dispose();
         }
-
-        _timer.Enabled = false;
-        _timer.Tick -= Checker_Tick;
-        _timer.Dispose();
-
         base.Dispose(disposing);
     }
 
@@ -431,6 +428,8 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
 
         if (undone.Count > 0) { DoAutoX(undone); }
     }
+
+    #endregion
 
     #endregion
 

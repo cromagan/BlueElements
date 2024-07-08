@@ -2074,7 +2074,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         CanDoScript?.Invoke(this, e);
     }
 
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     public void OnInvalidateView() {
         if (IsDisposed) { return; }

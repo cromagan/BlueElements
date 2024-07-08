@@ -31,11 +31,4 @@ public interface IDisposableExtendedWithEvent : IDisposableExtended {
     public event EventHandler? DisposingEvent;
 
     #endregion
-
-    #region Methods
-
-    // ReSharper disable once UnusedMemberInSuper.Global
-    public void OnDisposingEvent();
-
-    #endregion
 }

@@ -56,7 +56,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
-            UnRegisterEventsAndDispose();
+            UnRegisterFilterInputAndDispose();
             _filterInput = value;
             RegisterEvents();
         }
@@ -201,12 +201,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     public void FilterInput_DispodingEvent(object sender, System.EventArgs e) {
-        UnRegisterEventsAndDispose();
-
-        if (FilterInput != null && !FilterInput.IsDisposed) {
-            FilterInput.Database = null;
-            FilterInput.Dispose();
-        }
+        UnRegisterFilterInputAndDispose();
     }
 
     public FilterCollection? GetInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
@@ -316,25 +311,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         RowsInput_Changed();
     }
 
-    public void UnRegisterEventsAndDispose() {
-        if (FilterInput == null) { return; }
-        FilterInput.RowsChanged -= FilterInput_RowsChanged;
-        //this.FilterInput.Changed -= this.FilterOutput_PropertyChanged;
-        FilterInput.DisposingEvent -= FilterInput_DispodingEvent;
-
-        if (Parents.Count > 1 && FilterInput != null && FilterInputChangedHandled) {
-            FilterInput.Dispose();
-        }
-    }
-
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            UnRegisterFilterInputAndDispose();
             Invalidate_RowsInput();
             Invalidate_FilterInput();
-            DisconnectChildParents(Parents);
+            DisconnectChildParents([.. Parents]);
         }
 
-        base.Dispose();
+        base.Dispose(disposing);
     }
 
     protected void DoRows() {
@@ -360,6 +345,18 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) {
         Invalidate_RowsInput();
+    }
+
+    private void UnRegisterFilterInputAndDispose() {
+        if (FilterInput == null || FilterInput.IsDisposed) { return; }
+        FilterInput.RowsChanged -= FilterInput_RowsChanged;
+        //this.FilterInput.Changed -= this.FilterOutput_PropertyChanged;
+        FilterInput.DisposingEvent -= FilterInput_DispodingEvent;
+
+        if (Parents.Count > 1 && FilterInput != null && FilterInputChangedHandled) {
+            FilterInput.Database = null;
+            FilterInput.Dispose();
+        }
     }
 
     #endregion
