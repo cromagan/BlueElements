@@ -679,12 +679,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-        if (oldestTo || db.AmITemporaryMaster(5, 55)) {
+        if (!oldestTo) { return null; }
+
+        if (db.AmITemporaryMaster(5, 55)) {
             rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
             if (rowToCheck != null) { return rowToCheck; }
         }
 
-        if (!oldestTo) { return null; }
+
 
         if (db.Column.SysRowState is not ColumnItem srs) { return null; }
         var l = long.MaxValue;

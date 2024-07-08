@@ -534,7 +534,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Gibt True zurück, wenn eine eigene Zeile initialisiert werden muss.
-    /// Alter Egal.
+    /// Alter kleiner 60 Minuten.
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowInitialization() {
@@ -542,6 +542,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowState is not ColumnItem srs) { return false; }
         if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
         if (db.Column.SysRowChanger is not ColumnItem src) { return false; }
+
+
+        if (db.Column.SysRowChangeDate is not ColumnItem srcd) { return false; }
+
+
+
+        if (DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 60 &&
+        DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3) { return false; }
+
+
         return string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -562,7 +572,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                                            Database?.Column.SysRowChanger is ColumnItem srcr &&
                                            Database?.Column.SysRowChangeDate is ColumnItem srcd &&
                                            string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
-                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 5 &&
+                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 15 &&
                                            DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3;
 
     /// <summary>
