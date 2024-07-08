@@ -19,21 +19,19 @@
 
 using BlueBasics;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueScript;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-internal class ConnectedFormulaButton : Button, IControlUsesRow {
+internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     #region Fields
 
@@ -49,15 +47,12 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     private ButtonArgs _enabledwhenrows;
 
-    private FilterCollection? _filterInput;
-
     #endregion
 
     #region Constructors
 
-    public ConnectedFormulaButton() : base() {
-        //((IControlSendFilter)this).RegisterEvents();
-        this.RegisterEvents();
+    public ConnectedFormulaButton() : base(false, false) {
+        RegisterEvents();
     }
 
     #endregion
@@ -191,54 +186,22 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            this.RegisterEvents();
-        }
+    public string ImageCode {
+        get => main.ImageCode;
+        set => main.ImageCode = value;
     }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<RowItem>? RowsInput { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; set; } = false;
+    public string Text {
+        get => main.Text;
+        set => main.Text = value;
+    }
 
     #endregion
 
     #region Methods
 
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
-
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
@@ -279,25 +242,9 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         Enabled = enabled;
     }
 
-    public void ParentFilterOutput_Changed() { }
+    private void ButtonError(string message) => Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
-    public void RowsInput_Changed() { }
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            this.DoDispose();
-        }
-        base.Dispose(disposing);
-    }
-
-    protected override void DrawControl(Graphics gr, States state) {
-        HandleChangesNow();
-        base.DrawControl(gr, state);
-    }
-
-    protected override void OnMouseUp(MouseEventArgs e) {
-        base.OnMouseUp(e);
-
+    private void F_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button != MouseButtons.Left) { return; }
 
         if (Script.Commands == null) {
@@ -364,8 +311,6 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
     }
-
-    private void ButtonError(string message) => Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
     #endregion
 }

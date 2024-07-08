@@ -44,48 +44,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Fields
 
-    protected bool Allinitialized;
-
-    ///// <summary>
-    ///// Wenn True, wird ValueChanged NICHT ausgelöst
-    ///// </summary>
-    protected bool IsFilling;
-
     private AdditionalCheck _additionalCheck = AdditionalCheck.None;
-
     private string _allowedChars = string.Empty;
-
     private string _caption = string.Empty;
-
     private Caption? _captionObject;
-
     private CaptionPosition _captionPosition = CaptionPosition.ohne;
 
     // None ist -1 und muss gesetzt sein!
     private int _controlX = -1;
 
     private string _disabledReason = string.Empty;
-
     private EditTypeFormula _editType;
-
     private bool _formatierungErlaubt;
-
     private Caption? _infoCaption;
-
     private string _infoText = string.Empty;
-
     private int _maxTextLenght = 4000;
-
     private bool _multiLine;
-
     private string _regex = string.Empty;
-
     private bool _showInfoWhenDisabled;
-
     private bool _spellChecking;
-
     private string _suffix = string.Empty;
-
     private bool _translateCaption = true;
 
     #endregion
@@ -129,6 +107,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Events
 
+    public event EventHandler? ButtonClicked;
+
     [Obsolete("Value Changed benutzen", true)]
     public new event EventHandler? TextChanged;
 
@@ -149,6 +129,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             UpdateControls();
         }
     }
+
+    public bool Allinitialized { get; private set; }
 
     [DefaultValue("")]
     public string AllowedChars {
@@ -190,6 +172,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_controlX == value) { return; }
             RemoveAll(); // Controls and Events entfernen!
             _controlX = value;
+        }
+    }
+
+    /// <summary>
+    /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
+    /// </summary>
+    [DefaultValue("")]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string DisabledReason {
+        get => _disabledReason;
+        set {
+            if (_disabledReason == value) { return; }
+            _disabledReason = value;
+            foreach (Control thisControl in Controls) {
+                thisControl.Enabled = thisControl == _infoCaption || Enabled;
+            }
+            DoInfoTextCaption(_disabledReason);
+            Invalidate();
         }
     }
 
@@ -241,6 +243,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Invalidate();
         }
     }
+
+    ///// <summary>
+    ///// Wenn True, wird ValueChanged NICHT ausgelöst
+    ///// </summary>
+    public bool IsFilling { get; protected set; }
 
     [DefaultValue(4000)]
     public int MaxTextLenght {
@@ -342,58 +349,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Value { get; private set; } = string.Empty;
 
-    /// <summary>
-    /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
-    /// </summary>
-    [DefaultValue("")]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected string DisabledReason {
-        get => _disabledReason;
-        set {
-            if (_disabledReason == value) { return; }
-            _disabledReason = value;
-            foreach (Control thisControl in Controls) {
-                thisControl.Enabled = thisControl == _infoCaption || Enabled;
-            }
-            DoInfoTextCaption(_disabledReason);
-            Invalidate();
-        }
-    }
-
     #endregion
 
     #region Methods
 
     /// <summary>
-    ///
-    /// </summary>
-    /// <param name="newvalue"></param>
-    /// <param name="updateControls"></param>
-    ///
-    public void ValueSet(string? newvalue, bool updateControls) {
-        if (IsDisposed) { return; }
-        newvalue ??= string.Empty;
-
-        if (Value == newvalue) { return; }
-
-        Value = newvalue;
-        if (updateControls) { UpdateValueToControl(); }
-        OnValueChanged();
-    }
-
-    protected virtual void CommandButton_Click(object sender, System.EventArgs e) {
-        if (_editType != EditTypeFormula.Button) { return; }
-        ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
-        OnButtonClicked();
-    }
-
-    /// <summary>
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    protected GenericControl? CreateSubControls() {
+    public GenericControl? CreateSubControls() {
         if (Allinitialized) {
             Develop.DebugPrint(FehlerArt.Warnung, "Bereits initialisiert");
             return null;
@@ -460,6 +424,68 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         return c;
     }
 
+    public Button? GetButton() {
+        foreach (var thisc in Controls) {
+            if (thisc is Button bt) { return bt; }
+        }
+        return null;
+    }
+
+    public ComboBox? GetComboBox() {
+        foreach (var thisc in Controls) {
+            if (thisc is ComboBox cbx) { return cbx; }
+        }
+        return null;
+    }
+
+    public void StyleComboBox(ComboBox control, IEnumerable<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+        control.Enabled = Enabled;
+        control.GetStyleFrom(this);
+        control.DropDownStyle = style;
+        control.ItemClear();
+        control.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
+        if (list != null) {
+            control.ItemAddRange(list);
+        }
+
+        if (removevalueIfNotExists) {
+            if (control[Value] == null) {
+                ValueSet(string.Empty, true);
+            }
+        }
+    }
+
+    public void StyleTextBox(TextBox control) {
+        control.Enabled = Enabled;
+        control.GetStyleFrom(this);
+        control.Verhalten = _multiLine || Height > 20
+            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="newvalue"></param>
+    /// <param name="updateControls"></param>
+    ///
+    public void ValueSet(string? newvalue, bool updateControls) {
+        if (IsDisposed) { return; }
+        newvalue ??= string.Empty;
+
+        if (Value == newvalue) { return; }
+
+        Value = newvalue;
+        if (updateControls) { UpdateValueToControl(); }
+        OnValueChanged();
+    }
+
+    protected virtual void CommandButton_Click(object sender, System.EventArgs e) {
+        if (_editType != EditTypeFormula.Button) { return; }
+        ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
+        OnButtonClicked();
+    }
+
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
@@ -519,20 +545,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected Button? GetButton() {
-        foreach (var thisc in Controls) {
-            if (thisc is Button bt) { return bt; }
-        }
-        return null;
-    }
-
-    protected ComboBox? GetComboBox() {
-        foreach (var thisc in Controls) {
-            if (thisc is ComboBox cbx) { return cbx; }
-        }
-        return null;
-    }
-
     protected ListBox? GetListBox() {
         foreach (var thisc in Controls) {
             if (thisc is ListBox lb) { return lb; }
@@ -540,7 +552,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         return null;
     }
 
-    protected virtual void OnButtonClicked() { }// => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
@@ -685,31 +697,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         Allinitialized = false;
-    }
-
-    protected void StyleComboBox(ComboBox control, IEnumerable<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-        control.Enabled = Enabled;
-        control.GetStyleFrom(this);
-        control.DropDownStyle = style;
-        control.ItemClear();
-        control.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
-        if (list != null) {
-            control.ItemAddRange(list);
-        }
-
-        if (removevalueIfNotExists) {
-            if (control[Value] == null) {
-                ValueSet(string.Empty, true);
-            }
-        }
-    }
-
-    protected void StyleTextBox(TextBox control) {
-        control.Enabled = Enabled;
-        control.GetStyleFrom(this);
-        control.Verhalten = _multiLine || Height > 20
-            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
-            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
     }
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {

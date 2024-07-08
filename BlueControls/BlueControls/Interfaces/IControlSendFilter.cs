@@ -21,6 +21,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
+using BlueControls.Controls;
 
 namespace BlueControls.Interfaces;
 
@@ -34,7 +35,7 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; }
+    public List<GenericControlReciver> Childs { get; }
 
     /// <summary>
     /// Sollte von DoOutputSettings befüllt werden.
@@ -44,8 +45,6 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; }
-
-    public string Name { get; set; }
 
     #endregion
 
@@ -67,8 +66,8 @@ public static class ControlSendSomethingExtension {
 
     #region Methods
 
-    public static void DisconnectChildParents(this IControlSendFilter parent, List<IControlAcceptFilter> childs) {
-        var c = new List<IControlAcceptFilter>();
+    public static void DisconnectChildParents(this IControlSendFilter parent, List<GenericControlReciver> childs) {
+        var c = new List<GenericControlReciver>();
         c.AddRange(childs);
 
         foreach (var thisChild in c) {
@@ -92,7 +91,6 @@ public static class ControlSendSomethingExtension {
     /// <param name="db"></param>
     /// <param name="name"></param>
     public static void DoOutputSettings(this IControlSendFilter dest, Database? db, string name) {
-        dest.Name = name;
         dest.FilterOutput.Database = db;
     }
 
@@ -118,10 +116,7 @@ public static class ControlSendSomethingExtension {
             thisChild.Invalidate_FilterInput();
             thisChild.ParentFilterOutput_Changed();
 
-            if (thisChild is IControlUsesRow icur) {
-                icur.Invalidate_RowsInput();
-                icur.RowsInput_Changed();
-            }
+            thisChild.Invalidate_RowsInput();
 
             thisChild.Invalidate();
         }

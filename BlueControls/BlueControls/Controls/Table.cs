@@ -58,7 +58,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendFilter {
+public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlSendFilter {
 
     #region Fields
 
@@ -85,7 +85,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private bool _drawing;
 
     private bool _editButton = false;
-    private FilterCollection? _filterInput;
+
     private bool _isinClick;
 
     private bool _isinDoubleClick;
@@ -217,7 +217,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; } = [];
+    public List<GenericControlReciver> Childs { get; } = [];
 
     public ColumnViewCollection? CurrentArrangement {
         get {
@@ -260,25 +260,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             btnEdit.Visible = _editButton;
         }
     }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
-            _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
-        }
-    }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -811,7 +792,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 var trichterSize = (AutoFilterSize - 4).ToString();
-                if(Filter.HasAlwaysFalse() && viewItem.Column.AutoFilterSymbolPossible()) {
+                if (Filter.HasAlwaysFalse() && viewItem.Column.AutoFilterSymbolPossible()) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000||170");
                 } else if (fi != null) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
@@ -1066,10 +1047,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         da.Save(filename, execute);
     }
 
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
@@ -1095,7 +1072,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         hotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
     }
 
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
 
@@ -1171,7 +1149,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void ParentFilterOutput_Changed() => HandleChangesNow();
+    public override void ParentFilterOutput_Changed() {
+        base.ParentFilterOutput_Changed();
+        HandleChangesNow();
+    }
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
@@ -1411,8 +1392,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Filter.RowsChanged -= Filter_PropertyChanged;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
                 ((IControlSendFilter)this).DoDispose();
-                ((IControlAcceptFilter)this).DoDispose();
-                //components?.Dispose();
             }
         } finally {
             base.Dispose(disposing);
@@ -1424,6 +1403,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _ = Invoke(new Action(() => DrawControl(gr, state)));
             return;
         }
+        base.DrawControl(gr, state);
 
         if (IsDisposed) { return; }
 
@@ -2354,8 +2334,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!ca.ShowHead) { return; }
         if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
 
-
-        if(Filter.HasAlwaysFalse()) {
+        if (Filter.HasAlwaysFalse()) {
             MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
             return;
         }

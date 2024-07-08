@@ -44,21 +44,20 @@ using BlueDatabase.AdditionalScriptMethods;
 
 namespace BlueControls.Controls;
 
-public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFilter, IControlSendFilter, IControlUsesRow // System.Windows.Forms.UserControl,
+public partial class RowAdder : GenericControlReciver, IControlSendFilter // System.Windows.Forms.UserControl,
     {
     #region Fields
 
-    private FilterCollection? _filterInput;
     private bool _ignoreCheckedChanged = false;
 
     #endregion
 
     #region Constructors
 
-    public RowAdder() {
+    public RowAdder() : base(false, false) {
         InitializeComponent();
         ((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        base.RegisterEvents();
     }
 
     #endregion
@@ -73,7 +72,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; } = [];
+    public List<GenericControlReciver> Childs { get; } = [];
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -84,25 +83,6 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string EntityID { get; internal set; } = string.Empty;
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
-        }
-    }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -119,27 +99,6 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ColumnItem? OriginIDColumn { get; internal set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<RowItem>? RowsInput { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; set; } = false;
 
     [DefaultValue("")]
     public string Script { get; set; } = string.Empty;
@@ -172,7 +131,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
 
-        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn,0);
+        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn, 0);
 
         var sc = new BlueScript.Script(vars, string.Empty, scp);
         sc.ScriptText = scripttext;
@@ -199,15 +158,13 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
     public void Fehler(string txt, ImageCode symbol) {
         Enabled = false;
-        ItemClear();
-        ItemAdd(ItemOf(txt, symbol));
+        f.ItemClear();
+        f.ItemAdd(ItemOf(txt, symbol));
         FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
         _ignoreCheckedChanged = false;
     }
 
     public void FillListBox() {
-  
-
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
             return;
@@ -271,7 +228,6 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         var scf = ExecuteScript(Script, selected, EntityID, rowIn);
 
         if (!scf.AllOk) {
-
             if (Generic.UserGroup == Constants.Administrator) {
                 var l = new List<string> {
                 "### ACHTUNG - EINMALIGE ANZEIGE ###",
@@ -318,21 +274,23 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
             if (item.Contains("\\")) { Fehler("Interner Fehler: Infos dürfen kein \\ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
 
             if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
-                Fehler("Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein", BlueBasics.Enums.ImageCode.Kritisch); return;
+                Fehler("Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein", BlueBasics.Enums.ImageCode.Kritisch);
+                return;
             }
         }
 
         if (AdditionalInfoColumn != null && menu.Count != infos.Count) {
-            Fehler("Interner Fehler: Infos und Menuitems ungleich", BlueBasics.Enums.ImageCode.Kritisch); return;
+            Fehler("Interner Fehler: Infos und Menuitems ungleich", BlueBasics.Enums.ImageCode.Kritisch);
+            return;
         }
 
         Enabled = true;
 
         GeneratedEntityId = generatedentityID;
 
-        List<string> olditems = Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
+        List<string> olditems = f.Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
 
-        foreach (var thisIT in Items) {
+        foreach (var thisIT in f.Items) {
             if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
                 ai.KeysAndInfo.Clear();
             }
@@ -350,12 +308,11 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
             if (!ShowMe(selected, key)) { continue; }
 
-            var check_Item = Items.Get(key);
+            var check_Item = f.Items.Get(key);
 
             var dd_Name = key.PathParent().Trim("\\") + "~DD~";
-            var dd_BoxItem = Items.Get(dd_Name);
+            var dd_BoxItem = f.Items.Get(dd_Name);
             var dd_isItem = key.EndsWith("+") && !selected.Contains(key);
-
 
             if (check_Item is ItemCollectionList.ReadableListItem rli && !dd_isItem) {
 
@@ -366,13 +323,11 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                 }
                 rli.UserDefCompareKey = z.ToStringInt10();
 
-                rli.Enabled = !HasChildNode(selected,key);
-
+                rli.Enabled = !HasChildNode(selected, key);
 
                 olditems.Remove(key);
 
                 #endregion
-
             } else if (dd_BoxItem is ItemCollectionList.DropDownListItem dli && dd_isItem) {
 
                 #region das Item ist ein Objekt unter einem Dropdown und NICHT separat gewählt.
@@ -388,6 +343,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                     }
                     dli.UserDefCompareKey = z.ToStringInt10();
                     dli.Enabled = !HasChildNode(selected, key);
+
                     #endregion
                 } else {
                     var naiDD = new AdderItem(key);
@@ -404,8 +360,6 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
 
                 #region Das Item ist neu. Einen einen Listen-Eintrag erstellen
 
-
-
                 #region Item allgemein erstellen
 
                 var nai = new AdderItem(key);
@@ -419,7 +373,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                     #region ....normal hinzufügen
 
                     it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
-                    ItemAdd(it);
+                    f.ItemAdd(it);
                     olditems.Remove(key);
                     it.UserDefCompareKey = z.ToStringInt10();
                     it.Enabled = !HasChildNode(selected, key);
@@ -432,7 +386,7 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
                     var ndli = new DropDownListItem(dd_Name, true, string.Empty);
                     ndli.DDItems.Add(it);
                     ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
-                    ItemAdd(ndli);
+                    f.ItemAdd(ndli);
                     olditems.Remove(dd_Name);
                     ndli.UserDefCompareKey = z.ToStringInt10();
                     ndli.Enabled = !HasChildNode(selected, key);
@@ -445,27 +399,14 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         }
 
         foreach (var thisit in olditems) {
-            Remove(thisit);
+            f.Remove(thisit);
         }
 
-        UncheckAll();
-        Check(selected);
+        f.UncheckAll();
+        f.Check(selected);
 
         _ignoreCheckedChanged = false;
     }
-
-    private bool HasChildNode(List<string> selected, string key) {
-
-        foreach (var thisS in selected) {
-            if (thisS.StartsWith(key + "\\")) { return true; }
-        }
-        return false;
-
-    }
-
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
@@ -475,35 +416,6 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
         FillListBox();
-    }
-
-    //public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
-    public void ParentFilterOutput_Changed() { }
-
-    public void RowsInput_Changed() { }
-
-    protected override void OnItemClicked(AbstractListItemEventArgs e) {
-        if (_ignoreCheckedChanged) { return; }
-        base.OnItemClicked(e);
-
-        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-            if (Checked.Contains(rli.KeyName)) {
-                AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
-            } else {
-                AdderItem.RemoveRowsFromDatabase(OriginIDColumn, GeneratedEntityId, ai.KeyName);
-            }
-            FillListBox();
-        }
-
-        if (e.Item is DropDownListItem dli) {
-            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + dli.Indent * 20;
-            var y = Cursor.Position.Y - MousePos().Y + dli.Pos.Bottom; //Identisch
-
-            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DDItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
-            dropDownMenu.Cancel += DropDownMenu_Cancel;
-            dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
-        }
     }
 
     protected override void OnPaint(PaintEventArgs e) {
@@ -523,6 +435,35 @@ public partial class RowAdder : BlueControls.Controls.ListBox, IControlAcceptFil
         }
 
         FillListBox();
+    }
+
+    private void F_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        if (_ignoreCheckedChanged) { return; }
+
+        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+            if (f.Checked.Contains(rli.KeyName)) {
+                AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
+            } else {
+                AdderItem.RemoveRowsFromDatabase(OriginIDColumn, GeneratedEntityId, ai.KeyName);
+            }
+            FillListBox();
+        }
+
+        if (e.Item is DropDownListItem dli) {
+            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + dli.Indent * 20;
+            var y = Cursor.Position.Y - MousePos().Y + dli.Pos.Bottom; //Identisch
+
+            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DDItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+            dropDownMenu.Cancel += DropDownMenu_Cancel;
+            dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
+        }
+    }
+
+    private bool HasChildNode(List<string> selected, string key) {
+        foreach (var thisS in selected) {
+            if (thisS.StartsWith(key + "\\")) { return true; }
+        }
+        return false;
     }
 
     private List<string> RepairMenu(List<string> menu) {

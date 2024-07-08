@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls {
     partial class FlexiControlForCell {
@@ -16,7 +17,17 @@ namespace BlueControls.Controls {
         /// </summary>
         private void InitializeComponent() {
             this.Marker = new BackgroundWorker();
+            this.f = new FlexiControl();
             this.SuspendLayout();
+            // 
+            // f
+            // 
+            this.f.Dock = DockStyle.Fill;
+            this.f.ControlAdded += F_ControlAdded;
+            this.f.ControlRemoved += F_ControlRemoved;
+            this.f.ValueChanged += F_ValueChanged;
+            this.f.EnabledChanged += F_EnabledChanged;
+            this.f.VisibleChanged += F_VisibleChanged;
             // 
             // Marker
             // 
@@ -27,8 +38,12 @@ namespace BlueControls.Controls {
             this.Marker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.Marker_RunWorkerCompleted);
             this.ResumeLayout(false);
         }
-        #endregion
+
+
+
+       #endregion
 
         private BackgroundWorker Marker;
+        private FlexiControl f;
     }
 }

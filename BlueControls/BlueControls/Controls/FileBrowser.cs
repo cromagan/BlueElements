@@ -23,10 +23,8 @@ using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-using BlueDatabase;
 using BlueScript.Variables;
 using Microsoft.Win32;
 using System;
@@ -44,12 +42,12 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControl, IControlUsesRow   //UserControl //
+public partial class FileBrowser : GenericControlReciver   //UserControl //
 {
     #region Fields
 
     private string _directory = string.Empty;
-    private FilterCollection? _filterInput;
+
     private string _lastcheck = string.Empty;
 
     private string _originalText = string.Empty;
@@ -63,10 +61,10 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     #region Constructors
 
-    public FileBrowser() {
+    public FileBrowser() : base(false, false) {
         InitializeComponent();
         //((IControlSendFilter)this).RegisterEvents();
-        this.RegisterEvents();
+        RegisterEvents();
     }
 
     #endregion
@@ -105,22 +103,6 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            this.RegisterEvents();
-        }
-    }
-
-    public bool FilterInputChangedHandled { get; set; }
-
     public string OriginalText {
         get => _originalText;
         set {
@@ -129,27 +111,6 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
             CheckButtons(DirectoryExists(_directory));
         }
     }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<RowItem>? RowsInput { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; set; } = false;
 
     public string Sort {
         get => _sort;
@@ -163,10 +124,6 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     #endregion
 
     #region Methods
-
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
     public string GetStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
@@ -188,7 +145,8 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         return exekey == null ? string.Empty : exekey.GetValue("").ToString();
     }
 
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
@@ -218,15 +176,11 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         CreateWatcher();
     }
 
-    public void ParentFilterOutput_Changed() { }
-
     public void Reload() {
         var p = _directory;
         Directory = string.Empty;
         Directory = p;
     }
-
-    public void RowsInput_Changed() { }
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
@@ -234,11 +188,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         RemoveWatcher();
-        if (disposing) {
-            this.DoDispose();
-            components?.Dispose();
-        }
-        base.Dispose(disposing);
+        base.Dispose();
     }
 
     protected override void DrawControl(Graphics gr, States state) {

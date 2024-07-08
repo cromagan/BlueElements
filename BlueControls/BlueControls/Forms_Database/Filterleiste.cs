@@ -91,7 +91,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; } = [];
+    public List<GenericControlReciver> Childs { get; } = [];
 
     /// <summary>
     /// Ist immer identisch mit den Filtern der Tableview.

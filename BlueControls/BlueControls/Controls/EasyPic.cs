@@ -23,12 +23,10 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
@@ -36,12 +34,11 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IControlUsesRow {
+public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBackgroundNone {
 
     #region Fields
 
@@ -49,7 +46,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     private string _filename = string.Empty;
 
-    private FilterCollection? _filterInput;
     private string _originalText = string.Empty;
 
     private int _panelMoveDirection;
@@ -64,7 +60,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
         //((IControlSendFilter)this).RegisterEvents();
-        this.RegisterEvents();
+        RegisterEvents();
     }
 
     #endregion
@@ -96,25 +92,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            this.RegisterEvents();
-        }
-    }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
-
     public string OriginalText {
         get => _originalText;
         set {
@@ -122,27 +99,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
             ZoomFitInvalidateAndCheckButtons();
         }
     }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<RowItem>? RowsInput { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; set; } = false;
 
     [DefaultValue(0)]
     public new int TabIndex {
@@ -188,7 +144,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         if (string.IsNullOrEmpty(_filename)) { return true; }
         if (!FileExists(_filename)) { return true; }
 
-        if (MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
+        if (BlueControls.Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
         if (DeleteFile(_filename, false)) {
             _bitmap = null;
@@ -199,10 +155,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
-
     public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
         hotItem = null;
         if (_bitmap != null) {
@@ -210,7 +162,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
@@ -221,7 +174,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
         RowsInputChangedHandled = true;
 
-        this.DoRows();
+        DoRows();
 
         var ct = string.Empty;
 
@@ -236,26 +189,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void ParentFilterOutput_Changed() { }
-
-    public void RowsInput_Changed() { }
-
-    //Inherits Windows.Forms.UserControl
-    //UserControl überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-    [DebuggerNonUserCode]
-    protected override void Dispose(bool disposing) {
-        try {
-            if (disposing) {
-                this.DoDispose();
-                components?.Dispose();
-            }
-        } finally {
-            base.Dispose(disposing);
-        }
-    }
-
     protected override void DrawControl(Graphics gr, States state) {
-        HandleChangesNow();
+        base.DrawControl(gr, state);
 
         if (state.HasFlag(States.Standard_MouseOver)) { state ^= States.Standard_MouseOver; }
         if (state.HasFlag(States.Standard_MousePressed)) { state ^= States.Standard_MousePressed; }
@@ -349,7 +284,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     private bool HasFileName() {
         if (string.IsNullOrEmpty(_filename)) { return false; }
 
-        if (!_filename.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase) && 
+        if (!_filename.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase) &&
             !_filename.FileSuffix().Equals("JPG", StringComparison.OrdinalIgnoreCase)) { return false; }
 
         if (string.IsNullOrEmpty(_filename.FilePath())) { return false; }

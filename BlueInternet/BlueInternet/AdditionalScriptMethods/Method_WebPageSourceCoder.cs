@@ -40,7 +40,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
     public override string Description => "Gibt den Quell-Code-Text der Webpage zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
@@ -50,14 +50,11 @@ internal class Method_WebPageSourceCode : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
 
-        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
-
-        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(infos.Data, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
+        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
 
         try {
             Generic.CollectGarbage();
@@ -67,7 +64,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
             var task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
             }
 
             if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result) {
@@ -93,9 +90,9 @@ internal class Method_WebPageSourceCode : Method_WebPage {
             //    Console.WriteLine(frameHtml.Result);
             //}
 
-            return new DoItFeedback(infos.Data, "Quellcode konnte nicht gelesen werden.");
+            return new DoItFeedback(ld, "Quellcode konnte nicht gelesen werden.");
         } catch (Exception ex) {
-            return new DoItFeedback(infos.Data, "Quellcode konnte nicht gelesen werden: " + ex);
+            return new DoItFeedback(ld, "Quellcode konnte nicht gelesen werden: " + ex);
         }
     }
 

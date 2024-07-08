@@ -111,6 +111,15 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\AdderItem.cs" />
     <Compile Include="Classes\ItemCollectionList\DropDownListItem.cs" />
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.Designer.cs">
+      <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\FlexiControlRowSelector.Designer.cs">
+      <DependentUpon>FlexiControlRowSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\GenericControlReciver.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -241,8 +250,6 @@
     <Compile Include="Interfaces\IHasSettings.cs" />
     <Compile Include="Interfaces\IIsEditor.cs" />
     <Compile Include="Interfaces\IAutosizable.cs" />
-    <Compile Include="Interfaces\IControlUsesRow.cs" />
-    <Compile Include="Interfaces\IControlAcceptFilter.cs" />
     <Compile Include="Interfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\IItemAcceptFilter.cs" />
     <Compile Include="Interfaces\IControlSendFilter.cs" />
@@ -676,6 +683,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaButton.resx">
+      <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectedFormula\RowAdder.resx">
       <DependentUpon>RowAdder.cs</DependentUpon>
     </EmbeddedResource>

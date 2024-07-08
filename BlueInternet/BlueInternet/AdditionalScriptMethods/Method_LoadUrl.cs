@@ -56,11 +56,8 @@ internal class Method_LoadUrl : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //https://keyholesoftware.com/2019/02/11/create-your-own-web-bots-in-net-with-cefsharp/
-
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.

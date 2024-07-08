@@ -28,7 +28,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, IControlSendFilter {
+internal class InputRowOutputFilterControl : GenericControlReciver, IControlSendFilter {
 
     #region Fields
 
@@ -38,24 +38,18 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     private readonly FilterTypeRowInputItem _type;
 
-    private FilterCollection? _filterInput;
-
     #endregion
-
-    //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #region Constructors
 
-    public InputRowOutputFilterControl(string filterwert, ColumnItem? outputcolumn, FilterTypeRowInputItem type) {
+    public InputRowOutputFilterControl(string filterwert, ColumnItem? outputcolumn, FilterTypeRowInputItem type) : base(false, false) {
         _filterwert = filterwert;
         _outputcolumn = outputcolumn;
         _type = type;
         ((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        base.RegisterEvents();
 
         HandleChangesNow(); // Wenn keine Input-Rows da sind
-
-
     }
 
     #endregion
@@ -65,23 +59,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; } = [];
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
-        }
-    }
-
-    public bool FilterInputChangedHandled { get; set; }
+    public List<GenericControlReciver> Childs { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -89,27 +67,9 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 05");
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
     #endregion
 
-    //public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-    //    get => _standard_bei_keiner_Eingabe;
-    //    set {
-    //        if (IsDisposed) { return; }
-    //        if (_standard_bei_keiner_Eingabe == value) { return; }
-    //        _standard_bei_keiner_Eingabe = value;
-    //    }
-    //}
-
     #region Methods
-
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
@@ -119,13 +79,8 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
         Text = FilterOutput.ReadableText();
     }
 
-
-    protected override void OnMouseDown(MouseEventArgs e) {
-        base.OnMouseDown(e);
-        Text = FilterOutput.ReadableText();
-    }
-
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
 
@@ -183,7 +138,6 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
                 f = new FilterItem(_outputcolumn, FilterType.Istgleich_ODER_GroßKleinEgal, list);
                 break;
 
-
             case FilterTypeRowInputItem.Ist_nicht:
                 f = new FilterItem(_outputcolumn, FilterType.Ungleich_MultiRowIgnorieren, va);
                 break;
@@ -196,14 +150,21 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
         FilterOutput.ChangeTo(f);
     }
 
-    public void ParentFilterOutput_Changed() => HandleChangesNow();
+    public override void ParentFilterOutput_Changed() {
+        base.ParentFilterOutput_Changed();
+        HandleChangesNow();
+    }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
             ((IControlSendFilter)this).DoDispose();
-            ((IControlAcceptFilter)this).DoDispose();
         }
         base.Dispose(disposing);
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e) {
+        base.OnMouseDown(e);
+        Text = FilterOutput.ReadableText();
     }
 
     #endregion

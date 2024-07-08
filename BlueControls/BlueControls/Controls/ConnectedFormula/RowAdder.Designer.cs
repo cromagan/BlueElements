@@ -1,4 +1,6 @@
-﻿namespace BlueControls.Controls;
+﻿using System.Windows.Forms;
+
+namespace BlueControls.Controls;
 
 partial class RowAdder {
     /// <summary> 
@@ -25,19 +27,29 @@ partial class RowAdder {
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
     private void InitializeComponent() {
+            this.f = new ListBox();
             this.SuspendLayout();
+            //
+            // f
+            //
+            this.f.Dock = DockStyle.Fill;   
+            this.f.AddAllowed = BlueControls.Enums.AddType.None;
+            this.f.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
+            this.f.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.f.ItemClicked += F_ItemClicked;
             // 
             // RowAdder
             // 
             this.Name = "RowAdder";
-            this.AddAllowed = BlueControls.Enums.AddType.None;
-            this.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.Size = new System.Drawing.Size(381, 419);
             this.Size = new System.Drawing.Size(381, 419);
             this.ResumeLayout(false);
     }
 
+
+
     #endregion
+
+    public ListBox f;
 
 }

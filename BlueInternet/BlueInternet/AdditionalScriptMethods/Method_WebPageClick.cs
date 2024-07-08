@@ -48,14 +48,11 @@ internal class Method_WebPageClick : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
 
-        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
-
-        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(infos.Data, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
+        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
 
         try {
 
@@ -72,7 +69,7 @@ internal class Method_WebPageClick : Method_WebPage {
             var task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
             }
 
             if (!task.IsFaulted && task.Result.Success && task.Result.Result is "success") { return DoItFeedback.Null(); }
@@ -102,7 +99,7 @@ internal class Method_WebPageClick : Method_WebPage {
             task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
             }
 
             if (!task.IsFaulted && task.Result.Success && task.Result.Result is "success") { return DoItFeedback.Null(); }
@@ -124,18 +121,18 @@ internal class Method_WebPageClick : Method_WebPage {
             task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
             }
 
             if (!task.IsFaulted && task.Result.Success && task.Result.Result is "success") { return DoItFeedback.Null(); }
 
-            //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
+            //return new DoItFeedback(ld, "Fehler: Der Button wurde nicht gefunden.");
 
             #endregion
 
-            return new DoItFeedback(infos.Data, "Fehler beim Klicken des Buttons: " + task.Exception?.Message);
+            return new DoItFeedback(ld, "Fehler beim Klicken des Buttons: " + task.Exception?.Message);
         } catch {
-            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des Button-Befehles.");
+            return new DoItFeedback(ld, "Allgemeiner Fehler beim Ausführen des Button-Befehles.");
         }
     }
 

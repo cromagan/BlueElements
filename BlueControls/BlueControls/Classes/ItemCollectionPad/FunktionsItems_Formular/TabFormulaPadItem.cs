@@ -83,9 +83,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public override bool MustBeInDrawingArea => true;
-
     public bool InputMustBeOneRow => true;
+    public override bool MustBeInDrawingArea => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -177,10 +176,10 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
                         cc = new ConnectedFormulaView(pg, modes);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
-                        cc.InitFormula(cf, cc.Database());
+                        cc.InitFormula(cf, cc.DatabaseInput());
                         cc.Dock = DockStyle.Fill;
                         cc.DoInputSettings(parentView, this);
-                        cc.DoOutputSettings(cc.Database(), cc.Name);
+                        cc.DoOutputSettings(cc.DatabaseInput(), cc.Name);
                         //cc.HandleChangesNow();
 
                         //cc.GenerateView();

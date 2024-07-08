@@ -31,91 +31,51 @@ using System.Drawing;
 using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
-//using static BlueDatabase.Database;
-
 #nullable enable
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlUsesRow, IDisposableExtended, IHasSettings {
+public partial class FlexiControlRowSelector : GenericControlReciver, IControlSendFilter, IDisposableExtended, IHasSettings {
 
     #region Fields
 
     private readonly string _showformat;
 
-    private FilterCollection? _filterInput;
-
     #endregion
 
     #region Constructors
 
-    public FlexiControlRowSelector(Database? database, string caption, string showFormat) : base() {
-        CaptionPosition = CaptionPosition.Über_dem_Feld;
-        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+    public FlexiControlRowSelector(Database? database, string caption, string showFormat) : base(false, false) {
+        f.CaptionPosition = CaptionPosition.Über_dem_Feld;
+        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-        Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
+        f.Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
         if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
         ((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        RegisterEvents();
     }
 
     #endregion
 
     #region Properties
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; } = [];
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
-        }
-    }
+    public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
+    public List<GenericControlReciver> Childs { get; } = [];
+
+    public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<RowItem>? RowsInput { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; set; } = false;
 
     public List<string> Settings { get; } = new();
 
@@ -126,15 +86,12 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     #region Methods
 
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
-
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
@@ -145,7 +102,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         RowsInputChangedHandled = true;
 
-        if (!Allinitialized) { _ = CreateSubControls(); }
+        if (!f.Allinitialized) { _ = f.CreateSubControls(); }
 
         this.DoRows();
 
@@ -189,19 +146,19 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (cb.ItemCount == 1) {
-            ValueSet(cb[0].KeyName, true);
+            f.ValueSet(cb[0].KeyName, true);
         } else {
-            var f = this.GetSettings(this.FilterHash());
+            var fh = this.GetSettings(this.FilterHash());
 
-            if (!string.IsNullOrEmpty(f) && cb.Items().Get(f) is AbstractListItem ali) {
-                ValueSet(ali.KeyName, true);
+            if (!string.IsNullOrEmpty(fh) && cb.Items().Get(fh) is AbstractListItem ali) {
+                f.ValueSet(ali.KeyName, true);
             }
         }
 
         if (cb.ItemCount < 2) {
-            DisabledReason = "Keine Auswahl möglich.";
+            f.DisabledReason = "Keine Auswahl möglich.";
         } else {
-            DisabledReason = string.Empty;
+            f.DisabledReason = string.Empty;
         }
 
         #endregion
@@ -210,38 +167,27 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         // am Ende auf null setzen, um Blinki zu vermeiden
 
-        if (cb[Value] == null) {
-            ValueSet(string.Empty, true);
+        if (cb[f.Value] == null) {
+            f.ValueSet(string.Empty, true);
         }
 
         #endregion
     }
 
-    public void ParentFilterOutput_Changed() { }
-
-    public void RowsInput_Changed() { }
-
     protected override void Dispose(bool disposing) {
         if (disposing) {
             ((IControlSendFilter)this).DoDispose();
-            ((IControlUsesRow)this).DoDispose();
+
             Tag = null;
         }
 
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-        HandleChangesNow();
-        base.DrawControl(gr, state);
-    }
-
-    protected override void OnValueChanged() {
-        base.OnValueChanged();
-
-        var f = this.FilterHash();
-        var row = RowsInput?.Get(Value);
-        this.SetSetting(f, row?.KeyName ?? string.Empty);
+    private void F_ValueChanged(object sender, System.EventArgs e) {
+        var fh = this.FilterHash();
+        var row = RowsInput?.Get(f.Value);
+        this.SetSetting(fh, row?.KeyName ?? string.Empty);
 
         if (row == null) {
             this.Invalidate_FilterOutput();

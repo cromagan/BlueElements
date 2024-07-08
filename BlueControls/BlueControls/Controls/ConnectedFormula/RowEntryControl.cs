@@ -25,20 +25,14 @@ using System.ComponentModel;
 
 namespace BlueControls.Controls;
 
-internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFilter {
-
-    #region Fields
-
-    private FilterCollection? _filterInput;
-
-    #endregion
+internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
 
     #region Constructors
 
-    public RowEntryControl(Database? database) : base() {
+    public RowEntryControl(Database? database) : base(false, false) {
         this.DoOutputSettings(database, Name);
         ((IControlSendFilter)this).RegisterEvents();
-        ((IControlAcceptFilter)this).RegisterEvents();
+        base.RegisterEvents();
     }
 
     #endregion
@@ -48,65 +42,24 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlAcceptFilter> Childs { get; } = [];
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
-        get => _filterInput;
-        set {
-            if (_filterInput == value) { return; }
-            this.UnRegisterEventsAndDispose();
-            _filterInput = value;
-            ((IControlAcceptFilter)this).RegisterEvents();
-        }
-    }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
+    public List<GenericControlReciver> Childs { get; } = [];
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 06");
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<RowItem>? RowsInput { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; } = false;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; set; } = false;
-
     #endregion
 
     #region Methods
-
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
-
-    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
+        base.HandleChangesNow();
+
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
 
@@ -126,14 +79,12 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
         }
     }
 
-    public void ParentFilterOutput_Changed() { }
-
-    public void RowsInput_Changed() => HandleChangesNow();
+    public override void RowsInput_Changed() => HandleChangesNow();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
             ((IControlSendFilter)this).DoDispose();
-            ((IControlUsesRow)this).DoDispose();
+            base.Dispose();
         }
         base.Dispose(disposing);
     }

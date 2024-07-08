@@ -57,8 +57,7 @@ public class GenericControl : Control {
 
     #region Constructors
 
-    protected GenericControl() : this(false, false) {
-    }
+    protected GenericControl() : this(false, false) { }
 
     protected GenericControl(bool doubleBuffer, bool useBackgroundBitmap) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.

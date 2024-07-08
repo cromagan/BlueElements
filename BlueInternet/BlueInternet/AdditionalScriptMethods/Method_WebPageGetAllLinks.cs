@@ -36,7 +36,7 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
     public override string Description => "Gibt eine Liste aller Links zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
@@ -46,14 +46,11 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
 
-        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
-
-        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(infos.Data, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
+        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
 
         try {
             const string script = @"var inputs = document.getElementsByTagName('a');
@@ -77,9 +74,9 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
             }
 
             // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
-            return new DoItFeedback(infos.Data, "Fehler beim Extrahieren der Links: " + task.Exception?.Message);
+            return new DoItFeedback(ld, "Fehler beim Extrahieren der Links: " + task.Exception?.Message);
         } catch {
-            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Auslesen der Links.");
+            return new DoItFeedback(ld, "Allgemeiner Fehler beim Auslesen der Links.");
         }
     }
 
