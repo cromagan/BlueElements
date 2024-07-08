@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using System;
 
 namespace BlueBasics.Interfaces;

@@ -35,7 +35,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -543,14 +542,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
         if (db.Column.SysRowChanger is not ColumnItem src) { return false; }
 
-
         if (db.Column.SysRowChangeDate is not ColumnItem srcd) { return false; }
-
-
 
         if (DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 60 &&
         DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3) { return false; }
-
 
         return string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase);
     }

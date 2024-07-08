@@ -26,6 +26,7 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using BlueBasics.Interfaces;
 
 #nullable enable
 
@@ -36,7 +37,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-public class GenericControl : Control {
+public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     #region Fields
 

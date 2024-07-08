@@ -22,7 +22,6 @@ using BlueControls.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using System.Windows.Media.Media3D;
 using static System.Windows.Forms.Control;
 
 namespace BlueBasics.Interfaces;

@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace BlueControls.Controls;
 
@@ -32,7 +32,7 @@ internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
     public RowEntryControl(Database? database) : base(false, false) {
         this.DoOutputSettings(database, Name);
         ((IControlSendFilter)this).RegisterEvents();
-        base.RegisterEvents();
+        RegisterEvents();
     }
 
     #endregion
@@ -65,14 +65,14 @@ internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
 
         if (!FilterInputChangedHandled) {
             FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterOutput.Database, true);
+            DoInputFilter(FilterOutput.Database, true);
         }
 
         FilterInputChangedHandled = true;
 
-        this.DoRows();
+        DoRows();
 
-        if (this.RowSingleOrNull() is RowItem r) {
+        if (RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));
         } else {
             FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
@@ -83,7 +83,7 @@ internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            ((IControlSendFilter)this).DoDispose();
+            this.DoDispose();
             base.Dispose();
         }
         base.Dispose(disposing);

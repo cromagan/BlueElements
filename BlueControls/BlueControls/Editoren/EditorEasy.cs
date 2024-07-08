@@ -18,13 +18,9 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
-using System;
 using System.Windows.Forms;
-using static BlueBasics.Interfaces.SimpleEditorExtension;
 
 namespace BlueControls.Editoren;
 

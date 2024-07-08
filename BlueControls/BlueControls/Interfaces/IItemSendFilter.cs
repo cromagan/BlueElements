@@ -26,8 +26,6 @@ using System.Collections.ObjectModel;
 using static BlueDatabase.Database;
 using BlueControls.ItemCollectionList;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using System.Reflection;
-using System.ComponentModel;
 using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Interfaces;

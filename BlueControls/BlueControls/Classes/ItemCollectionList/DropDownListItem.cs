@@ -23,34 +23,31 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Controls;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Windows.Forms.AxHost;
 
 namespace BlueControls.ItemCollectionList;
 
 public class DropDownListItem : AbstractListItem {
 
-    #region Constructors
+    #region Fields
 
-    public DropDownListItem(string keyName,  bool enabled, string userDefCompareKey) : base(keyName, enabled) {
-        IsCaption = false;
-        UserDefCompareKey = userDefCompareKey;
-    }
+    public List<AbstractListItem> DDItems = new();
 
     public AbstractListItem? Selected;
 
-    public List<AbstractListItem> DDItems = new();
+    #endregion
+
+    #region Constructors
+
+    public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
+        IsCaption = false;
+        UserDefCompareKey = userDefCompareKey;
+    }
 
     #endregion
 
     #region Properties
 
     public override string QuickInfo => string.Empty;
-
-
-
-
 
     #endregion
 
@@ -59,20 +56,14 @@ public class DropDownListItem : AbstractListItem {
     public override bool FilterMatch(string filterText) => false;
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
-
-  
         var he = 16;
 
         foreach (var item in DDItems) {
             var s = item.HeightForListBox(style, columnWidth, itemdesign);
 
-   
             he = Math.Max(he, s);
         }
         return he;
-
-
-
     }
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
@@ -80,13 +71,14 @@ public class DropDownListItem : AbstractListItem {
         var he = 16;
 
         foreach (var item in DDItems) {
-            var s= item.SizeUntouchedForListBox(itemdesign);
+            var s = item.SizeUntouchedForListBox(itemdesign);
 
             wi = Math.Max(wi, s.Width);
             he = Math.Max(he, s.Height);
         }
         return new Size(wi, he);
     }
+
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
@@ -97,26 +89,21 @@ public class DropDownListItem : AbstractListItem {
             Selected.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
         }
 
-
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, Design.ComboBox_Textbox, vState, positionModified);
-            var but = new Rectangle(positionModified.Right-16, positionModified.Top, 16,16);
+            var but = new Rectangle(positionModified.Right - 16, positionModified.Top, 16, 16);
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
 
-           BlueControls.Controls.Button.DrawButton(null, gr, Design.Button_ComboBox, vState, qi, Alignment.Horizontal_Vertical_Center, false, null, null, but, false);
-
+            BlueControls.Controls.Button.DrawButton(null, gr, Design.Button_ComboBox, vState, qi, Alignment.Horizontal_Vertical_Center, false, null, null, but, false);
 
             //Skin.Draw_Back(gr, Design.Button_ComboBox, vState, but, null, false);
             //Skin.Draw_Border(gr, Design.Button_ComboBox, vState, but);
-
         }
     }
 
     protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
-
-
 
     #endregion
 }

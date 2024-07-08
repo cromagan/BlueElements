@@ -17,13 +17,9 @@
 
 #nullable enable
 
-using System;
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
@@ -33,12 +29,9 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
-using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
-using BlueScript;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

@@ -20,14 +20,10 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
-using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls;
 

@@ -17,15 +17,11 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System.Data.Common;
-using System.Data.Design;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;

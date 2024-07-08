@@ -30,10 +30,8 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace BlueDatabase;
@@ -219,7 +217,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         lock (_executingchangedrowsx) {
-
             _executingchangedrows = false;
         }
     }
@@ -685,8 +682,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
             if (rowToCheck != null) { return rowToCheck; }
         }
-
-
 
         if (db.Column.SysRowState is not ColumnItem srs) { return null; }
         var l = long.MaxValue;

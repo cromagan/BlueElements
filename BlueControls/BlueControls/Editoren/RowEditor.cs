@@ -17,14 +17,9 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System.Windows.Controls;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Editoren;
 

@@ -20,14 +20,12 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -109,7 +107,7 @@ public partial class FlexiControlRowSelector : GenericControlReciver, IControlSe
         #region Combobox suchen
 
         ComboBox? cb = null;
-        foreach (var thiscb in Controls) {
+        foreach (var thiscb in f.Controls) {
             if (thiscb is ComboBox cbx) { cb = cbx; break; }
         }
 

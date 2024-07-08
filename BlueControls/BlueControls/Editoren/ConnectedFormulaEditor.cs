@@ -27,7 +27,6 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

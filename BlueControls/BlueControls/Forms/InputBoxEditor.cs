@@ -20,15 +20,6 @@
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
 using BlueControls.Interfaces;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.Temporär;
-using System.Drawing;
-using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using System;
 using System.Windows.Forms;
 

@@ -18,26 +18,18 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
-using BlueScript;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using System;
-using System.Windows.Documents;
 
 namespace BlueControls.Controls;
 
-public class GenericControlReciver : GenericControl, IDisposableExtendedWithEvent {
+public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Fields
 
@@ -109,9 +101,7 @@ public class GenericControlReciver : GenericControl, IDisposableExtendedWithEven
 
         var isnew = !Parents.Contains(parent);
         var newFilters = parent.FilterOutput.Count > 0;
-        var doDatabaseAfter = false;
-
-        doDatabaseAfter = DatabaseInput() == null;
+        var doDatabaseAfter = DatabaseInput() == null;
 
         if (isnew) {
             Parents.AddIfNotExists(parent);
@@ -281,10 +271,8 @@ public class GenericControlReciver : GenericControl, IDisposableExtendedWithEven
         Invalidate();
     }
 
-    public void OnDisposingEvent() => throw new NotImplementedException();
-
     /// <summary>
-    /// Entweder ignorieeren oder HandleChangesNow aufrufen
+    /// Entweder ignorieren oder HandleChangesNow aufrufen
     /// </summary>
     public virtual void ParentFilterOutput_Changed() { }
 

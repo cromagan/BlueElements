@@ -40,7 +40,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : GenericControlReciver, IDisposableExtended {
+public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Fields
 
@@ -465,7 +465,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IDisposableExt
         #region  in Frage kommende Textbox ermitteln txb
 
         TextBox? txb = null;
-        foreach (var control in Controls) {
+        foreach (var control in f.Controls) {
             if (control is TextBox t) { txb = t; }
         }
 
@@ -607,7 +607,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IDisposableExt
             }
         }
 
-        foreach (var thisControl in Controls) {
+        foreach (var thisControl in f.Controls) {
             switch (thisControl) {
                 case ComboBox comboBox:
                     var item2 = new List<AbstractListItem>();

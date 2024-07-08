@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -35,7 +34,6 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
-using System.Security.Permissions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

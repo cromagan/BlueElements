@@ -26,8 +26,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Runtime.CompilerServices;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -36,8 +34,8 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
 
     #region Fields
 
-    public static List<RowItem> InvalidatedRows = new();
     public static List<RowItem> DidRows = new();
+    public static List<RowItem> InvalidatedRows = new();
 
     #endregion
 
@@ -81,9 +79,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
     #region Methods
 
     public static void DoAllRows() {
-
         if (Database.ExecutingScriptAnyDatabase != 0 || InvalidatedRows.Count > 0) { return; }
-
 
         DidRows.Clear();
         try {
@@ -100,7 +96,6 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
         } catch { }
 
         DidRows.Clear();
-
     }
 
     public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {

@@ -19,12 +19,9 @@
 
 using BlueScript;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
 using System.Collections.Generic;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -54,7 +51,7 @@ public class Method_RowNext : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mr = MyRow(scp);
         if (mr == null || mr.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
 

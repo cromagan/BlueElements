@@ -11,28 +11,38 @@
         /// </summary>
         private IContainer components = null;
 
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
-        private void InitializeComponent()
-        {
-            this.f = new FlexiControl();
+        private void InitializeComponent() {
+            this.f = new BlueControls.Controls.FlexiControl();
             this.SuspendLayout();
             // 
             // f
             // 
-            this.f.Dock = DockStyle.Fill;
-            this.f.ValueChanged += F_ValueChanged;
-            this.f.ButtonClicked += F_ButtonClick;
+            this.f.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.f.EditType = BlueDatabase.Enums.EditTypeFormula.Line;
+            this.f.Location = new System.Drawing.Point(0, 0);
+            this.f.Name = "f";
+            this.f.Size = new System.Drawing.Size(150, 150);
+            this.f.TabIndex = 0;
+            this.f.ButtonClicked += new System.EventHandler(this.F_ButtonClick);
+            this.f.ValueChanged += new System.EventHandler(this.F_ValueChanged);
             // 
-            // FlexiControlForCell
+            // FlexiControlForFilter
             // 
-            this.Name = "FlexiControlForCell";
+            this.Controls.Add(this.f);
+            this.Name = "FlexiControlForFilter";
             this.ResumeLayout(false);
+
         }
+
         #endregion
+
+  
         private FlexiControl f;
     }
 }

@@ -23,10 +23,6 @@ using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Interfaces.ParseableExtension;
-using BlueDatabase.AdditionalScriptMethods;
-using BlueScript.Methods;
-using System.Collections.Generic;
-using System.Data.Common;
 
 namespace BlueScript;
 

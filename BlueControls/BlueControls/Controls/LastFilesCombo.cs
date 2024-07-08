@@ -26,11 +26,7 @@ using BlueControls.ItemCollectionList;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
 using static BlueBasics.IO;
-using static BlueControls.Interfaces.HasSettings;
 
 namespace BlueControls.Controls;
 

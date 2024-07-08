@@ -40,7 +40,6 @@ using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
 using BlueControls.ItemCollectionList;
 using BlueBasics.Interfaces;
-using BlueControls.Editoren;
 
 namespace BlueControls.Controls;
 
