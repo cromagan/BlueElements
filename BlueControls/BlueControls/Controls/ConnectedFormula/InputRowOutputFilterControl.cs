@@ -19,16 +19,13 @@
 
 using BlueBasics;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-internal class InputRowOutputFilterControl : GenericControlReciver, IControlSendFilter {
+internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
     #region Fields
 
@@ -46,42 +43,17 @@ internal class InputRowOutputFilterControl : GenericControlReciver, IControlSend
         _filterwert = filterwert;
         _outputcolumn = outputcolumn;
         _type = type;
-        ((IControlSendFilter)this).RegisterEvents();
-        base.RegisterEvents();
-
-        HandleChangesNow(); // Wenn keine Input-Rows da sind
     }
-
-    #endregion
-
-    #region Properties
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 05");
 
     #endregion
 
     #region Methods
 
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
-        this.FilterOutput_PropertyChanged();
-
-        Text = FilterOutput.ReadableText();
-    }
-
     public override void HandleChangesNow() {
-        base.HandleChangesNow();
         if (IsDisposed) { return; }
+
+        base.HandleChangesNow();
+
         if (FilterInputChangedHandled) { return; }
 
         //if (!FilterInputChangedHandled) {
@@ -155,11 +127,9 @@ internal class InputRowOutputFilterControl : GenericControlReciver, IControlSend
         HandleChangesNow();
     }
 
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            ((IControlSendFilter)this).DoDispose();
-        }
-        base.Dispose(disposing);
+    protected override void OnCreateControl() {
+        base.OnCreateControl();
+        HandleChangesNow(); // Wenn keine Input-Rows da sind
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {

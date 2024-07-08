@@ -120,6 +120,9 @@
     <Compile Include="Controls\ConnectedFormula\GenericControlReciver.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\ConnectedFormula\GenericControlReciverSender.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ConnectedFormula\RowAdder.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -252,7 +255,6 @@
     <Compile Include="Interfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\IItemAcceptFilter.cs" />
-    <Compile Include="Interfaces\IControlSendFilter.cs" />
     <Compile Include="Interfaces\IItemSendFilter.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaView.cs">

@@ -58,11 +58,11 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlSendFilter {
+public partial class Table : GenericControlReciverSender, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase {
 
     #region Fields
 
-    public readonly FilterCollection Filter = new("FilterInput 50");
+    public readonly FilterCollection Filter = new("DefaultTableFilter");
 
     private readonly List<string> _collapsed = [];
 
@@ -154,7 +154,6 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
         MouseHighlight = false;
         Filter.PropertyChanged += Filter_PropertyChanged;
         Filter.RowsChanged += Filter_PropertyChanged;
-        ((IControlSendFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -214,11 +213,6 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
         }
     }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
     public ColumnViewCollection? CurrentArrangement {
         get {
             if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
@@ -264,20 +258,10 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 07");
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Filterausgabe FilterOutputType { get; set; } = Filterausgabe.Gewähle_Zeile;
 
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -680,8 +664,6 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
             OnSelectedRowChanged(new RowEventArgs(setedrow));
 
             if (FilterOutputType == Filterausgabe.Gewähle_Zeile) {
-                this.DoOutputSettings(db, Name);
-                // FilterOutput.Add(new FilterItem(setedrow));
                 FilterOutput.ChangeTo(new FilterItem(setedrow));
             }
         }
@@ -720,7 +702,7 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
         _databaseDrawError = null;
         InitializeSkin(); // Neue Schriftgrößen
         if (Database is Database db2 && !db2.IsDisposed) {
-            this.DoOutputSettings(db2, Name);
+            FilterOutput.Database = db2;
 
             db2.Cell.CellValueChanged += _Database_CellValueChanged;
             db2.Loaded += _Database_DatabaseLoaded;
@@ -1046,10 +1028,6 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
         da.AddFoot();
         da.Save(filename, execute);
     }
-
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
@@ -1391,7 +1369,6 @@ public partial class Table : GenericControlReciver, IContextMenu, IBackgroundNon
                 Filter.PropertyChanged -= Filter_PropertyChanged;
                 Filter.RowsChanged -= Filter_PropertyChanged;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
-                ((IControlSendFilter)this).DoDispose();
             }
         } finally {
             base.Dispose(disposing);

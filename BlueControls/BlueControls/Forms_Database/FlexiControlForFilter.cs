@@ -39,7 +39,7 @@ using BlueControls.ItemCollectionList;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : GenericControlReciver, IControlSendFilter, IDisposableExtended, IHasSettings {
+public partial class FlexiControlForFilter : GenericControlReciverSender, IDisposableExtended, IHasSettings {
 
     #region Fields
 
@@ -70,20 +70,12 @@ public partial class FlexiControlForFilter : GenericControlReciver, IControlSend
         f.ShowInfoWhenDisabled = true;
         _origin = string.Empty;
         _fromInputFilter = false;
-        ((IControlSendFilter)this).RegisterEvents();
-        base.RegisterEvents();
         DefaultCaptionPosition = defaultCaptionPosition;
-        F_ValueChanged(null, System.EventArgs.Empty);
     }
 
     #endregion
 
     #region Properties
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
 
     /// <summary>
     /// Da die CaptionPosition von dem Steuerelement bei bedarf geämndert wird,
@@ -100,12 +92,6 @@ public partial class FlexiControlForFilter : GenericControlReciver, IControlSend
             F_ValueChanged(null, System.EventArgs.Empty);
         }
     }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 02");
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -134,9 +120,7 @@ public partial class FlexiControlForFilter : GenericControlReciver, IControlSend
 
     #region Methods
 
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+    public override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
             if (FilterOutput.Count == 1) {
@@ -147,7 +131,7 @@ public partial class FlexiControlForFilter : GenericControlReciver, IControlSend
             }
         }
 
-        this.FilterOutput_PropertyChanged();
+        base.FilterOutput_PropertyChanged(this, System.EventArgs.Empty);
     }
 
     public override void HandleChangesNow() {
@@ -214,6 +198,11 @@ public partial class FlexiControlForFilter : GenericControlReciver, IControlSend
         if (e.Control is Button btn) {
             DoButtonStyle(btn);
         }
+    }
+
+    protected override void OnCreateControl() {
+        base.OnCreateControl();
+        F_ValueChanged(this, System.EventArgs.Empty);
     }
 
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {

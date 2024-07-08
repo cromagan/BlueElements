@@ -50,7 +50,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
     #region Constructors
 
     public ConnectedFormulaButton() : base(false, false) {
-        RegisterEvents();
+        InitializeComponent();
     }
 
     #endregion
@@ -189,7 +189,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         set => main.ImageCode = value;
     }
 
-    public string Text {
+    public new string Text {
         get => main.Text;
         set => main.Text = value;
     }

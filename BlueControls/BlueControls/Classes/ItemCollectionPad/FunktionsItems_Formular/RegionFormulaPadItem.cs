@@ -149,7 +149,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
             con.Text = txt;
         }
 
-        con.DoInputSettings(parent, this);
+        con.DoDefaultSettings(parent, this);
         con.InitFormula(cf, DatabaseInput);
 
         return con;

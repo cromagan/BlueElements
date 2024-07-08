@@ -176,8 +176,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.DatabaseInput());
                         cc.Dock = DockStyle.Fill;
-                        cc.DoInputSettings(parentView, this);
-                        cc.DoOutputSettings(cc.DatabaseInput(), cc.Name);
+                        cc.DoDefaultSettings(parentView, this);
+
                         //cc.HandleChangesNow();
 
                         //cc.GenerateView();

@@ -152,8 +152,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             CaptionPosition = CaptionPosition
         };
 
-        con.DoOutputSettings(this);
-        con.DoInputSettings(parent, this);
+        con.DoDefaultSettings(parent, this);
 
         return con;
     }

@@ -70,7 +70,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendFilter> Parents { get; } = [];
+    public List<GenericControlReciverSender> Parents { get; } = [];
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -91,7 +91,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Methods
 
-    public void ConnectChildParents(IControlSendFilter parent) {
+    public void ConnectChildParents(GenericControlReciverSender parent) {
         if (RowsInputManualSeted) {
             Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
         }
@@ -126,8 +126,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return null;
     }
 
-    public void DisconnectChildParents(List<IControlSendFilter> parents) {
-        var p = new List<IControlSendFilter>();
+    public void DisconnectChildParents(List<GenericControlReciverSender> parents) {
+        var p = new List<GenericControlReciverSender>();
         p.AddRange(parents);
 
         foreach (var parent in p) {
@@ -135,11 +135,33 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
-    public void DisconnectChildParents(IControlSendFilter parent) {
+    public void DisconnectChildParents(GenericControlReciverSender parent) {
         Parents.Remove(parent);
 
         if (parent.Childs.Contains(this)) {
             parent.Childs.Remove(this);
+        }
+    }
+
+    /// <summary>
+    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptFilter übernommen.
+    /// </summary>
+    /// <param name="dest"></param>
+    /// <param name="parent"></param>
+    /// <param name="source"></param>
+    public void DoDefaultSettings(ConnectedFormulaView parent, IItemAcceptFilter source) {
+        Name = source.DefaultItemToControlName();
+
+        foreach (var thisKey in source.Parents) {
+            var it = source.Parent?[thisKey];
+
+            if (it is IItemToControl itc) {
+                var ff = parent.SearchOrGenerate(itc);
+
+                if (ff is GenericControlReciverSender ffx) {
+                    ConnectChildParents(ffx);
+                }
+            }
         }
     }
 
@@ -158,28 +180,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
             FilterInput.Add(new FilterItem(mustbeDatabase, string.Empty));
             //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
-        }
-    }
-
-    /// <summary>
-    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptFilter übernommen.
-    /// </summary>
-    /// <param name="dest"></param>
-    /// <param name="parent"></param>
-    /// <param name="source"></param>
-    public void DoInputSettings(ConnectedFormulaView parent, IItemAcceptFilter source) {
-        Name = source.DefaultItemToControlName();
-
-        foreach (var thisKey in source.Parents) {
-            var it = source.Parent?[thisKey];
-
-            if (it is IItemToControl itc) {
-                var ff = parent.SearchOrGenerate(itc);
-
-                if (ff is IControlSendFilter ffx) {
-                    ConnectChildParents(ffx);
-                }
-            }
         }
     }
 
@@ -271,13 +271,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// </summary>
     public virtual void ParentFilterOutput_Changed() { }
 
-    public void RegisterEvents() {
-        if (FilterInput == null || FilterInput.IsDisposed) { return; }
-        FilterInput.RowsChanged += FilterInput_RowsChanged;
-        //this.FilterInput.Changed += this.FilterOutput_PropertyChanged;
-        FilterInput.DisposingEvent += FilterInput_DispodingEvent;
-    }
-
     public RowItem? RowSingleOrNull() {
         if (IsDisposed) { return null; }
         if (RowsInput == null || RowsInput.Count != 1) { return null; }
@@ -343,14 +336,24 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         HandleChangesNow();
     }
 
+    protected override void OnCreateControl() {
+        base.OnCreateControl();
+        RegisterEvents();
+    }
+
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) {
         Invalidate_RowsInput();
+    }
+
+    private void RegisterEvents() {
+        if (FilterInput == null || FilterInput.IsDisposed) { return; }
+        FilterInput.RowsChanged += FilterInput_RowsChanged;
+        FilterInput.DisposingEvent += FilterInput_DispodingEvent;
     }
 
     private void UnRegisterFilterInputAndDispose() {
         if (FilterInput == null || FilterInput.IsDisposed) { return; }
         FilterInput.RowsChanged -= FilterInput_RowsChanged;
-        //this.FilterInput.Changed -= this.FilterOutput_PropertyChanged;
         FilterInput.DisposingEvent -= FilterInput_DispodingEvent;
 
         if (Parents.Count > 1 && FilterInput != null && FilterInputChangedHandled) {

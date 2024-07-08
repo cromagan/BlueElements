@@ -186,8 +186,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             CaptionPosition = CaptionPosition
         };
 
-        con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(this);
+        con.DoDefaultSettings(parent, this);
+
         return con;
     }
 

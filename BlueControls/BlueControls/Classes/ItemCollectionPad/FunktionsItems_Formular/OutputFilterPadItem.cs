@@ -179,9 +179,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
             Filterart_bei_Texteingabe = _filterart_Bei_Texteingabe,
             SavesSettings = true
         };
-        //return con;
-        con.DoOutputSettings(this);
-        con.DoInputSettings(parent, this);
+
+        con.DoDefaultSettings(parent, this);
 
         return con;
     }

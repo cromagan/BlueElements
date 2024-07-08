@@ -107,8 +107,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
             OriginalText = Bild_Dateiname
         };
 
-        con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(this);
+        con.DoDefaultSettings(parent, this);
         return con;
     }
 

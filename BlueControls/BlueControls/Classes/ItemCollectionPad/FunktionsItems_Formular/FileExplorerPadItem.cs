@@ -80,6 +80,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
+    public bool InputMustBeOneRow => true;
+
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
         get => _leere_Ordner_Löschen;
@@ -93,8 +95,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
     }
 
     public override bool MustBeInDrawingArea => true;
-
-    public bool InputMustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -138,8 +138,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
             CreateDir = _bei_Bedarf_Erzeugen,
             DeleteDir = _leere_Ordner_Löschen
         };
-        con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(this);
+        con.DoDefaultSettings(parent, this);
 
         return con;
     }

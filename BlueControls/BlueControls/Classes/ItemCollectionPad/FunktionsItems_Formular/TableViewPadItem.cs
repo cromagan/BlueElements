@@ -146,8 +146,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new Table();
         con.DatabaseSet(DatabaseOutput, string.Empty);
-        con.DoOutputSettings(this);
-        con.DoInputSettings(parent, this);
+        con.DoDefaultSettings(parent, this);
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         return con;

@@ -183,8 +183,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         //var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
-        con.DoOutputSettings(this);
-        con.DoInputSettings(parent, this);
+        con.DoDefaultSettings(parent, this);
 
         return con;
     }

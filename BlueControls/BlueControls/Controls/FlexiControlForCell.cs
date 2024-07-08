@@ -66,21 +66,12 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.EditType = editType;
         ColumnName = columnName;
 
-        RegisterEvents();
         var (column, row) = GetTmpVariables();
         StyleControls(column, row);
         CheckEnabledState(column, row);
     }
 
     #endregion
-
-    //#region Events
-
-    //public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    //public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
-
-    //#endregion
 
     #region Properties
 

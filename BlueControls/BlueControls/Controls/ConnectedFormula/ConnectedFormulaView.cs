@@ -37,7 +37,7 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNone, IControlSendFilter, IDisposable {
+public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgroundNone, IDisposable {
 
     #region Fields
 
@@ -59,8 +59,6 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
         Page = page;
         Mode = mode;
         InitFormula(null, null);
-        ((IControlSendFilter)this).RegisterEvents();
-        base.RegisterEvents();
 
         _timer = new Timer();
         _timer.Enabled = true;
@@ -72,11 +70,6 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
 
     #region Properties
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
     public ConnectedFormula.ConnectedFormula? ConnectedFormula { get; private set; }
 
     public new ControlCollection Controls {
@@ -85,11 +78,6 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
             return base.Controls;
         }
     }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
@@ -117,12 +105,6 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
     #endregion
 
     #region Methods
-
-    #region Methods
-
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public void GenerateView() {
         if (IsDisposed) { return; }
@@ -326,11 +308,8 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
-
         if (disposing) {
-
             InitFormula(null, null);
-            ((IControlSendFilter)this).DoDispose();
             components?.Dispose();
             _timer.Enabled = false;
             _timer.Tick -= Checker_Tick;
@@ -428,8 +407,6 @@ public partial class ConnectedFormulaView : GenericControlReciver, IBackgroundNo
 
         if (undone.Count > 0) { DoAutoX(undone); }
     }
-
-    #endregion
 
     #endregion
 

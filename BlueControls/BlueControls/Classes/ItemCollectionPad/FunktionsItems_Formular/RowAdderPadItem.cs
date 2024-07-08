@@ -232,8 +232,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
             Script = Script
         };
 
-        con.DoOutputSettings(this);
-        con.DoInputSettings(parent, this);
+        con.DoDefaultSettings(parent, this);
 
         return con;
     }
@@ -343,9 +342,9 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string ReadableText() {
-        const string txt = "Zeilengenerator: " ;
+        const string txt = "Zeilengenerator: ";
 
-        if (this.IsOk() && DatabaseOutput is Database dbout && ! dbout.IsDisposed) {
+        if (this.IsOk() && DatabaseOutput is Database dbout && !dbout.IsDisposed) {
             return txt + dbout.Caption;
         }
 

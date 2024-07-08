@@ -59,8 +59,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
-        //((IControlSendFilter)this).RegisterEvents();
-        RegisterEvents();
     }
 
     #endregion

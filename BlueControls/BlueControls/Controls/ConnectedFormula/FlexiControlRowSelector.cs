@@ -25,7 +25,6 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -33,7 +32,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ConnectedFormula;
 
-public partial class FlexiControlRowSelector : GenericControlReciver, IControlSendFilter, IDisposableExtended, IHasSettings {
+public partial class FlexiControlRowSelector : GenericControlReciverSender, IDisposableExtended, IHasSettings {
 
     #region Fields
 
@@ -44,6 +43,7 @@ public partial class FlexiControlRowSelector : GenericControlReciver, IControlSe
     #region Constructors
 
     public FlexiControlRowSelector(Database? database, string caption, string showFormat) : base(false, false) {
+        InitializeComponent();
         f.CaptionPosition = CaptionPosition.Über_dem_Feld;
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
@@ -53,8 +53,6 @@ public partial class FlexiControlRowSelector : GenericControlReciver, IControlSe
         if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
-        ((IControlSendFilter)this).RegisterEvents();
-        RegisterEvents();
     }
 
     #endregion
@@ -63,30 +61,16 @@ public partial class FlexiControlRowSelector : GenericControlReciver, IControlSe
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
     public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
 
     public List<string> Settings { get; } = new();
 
     public bool SettingsLoaded { get; set; }
-    public string SettingsManualFilename { get; set; }
+    public string SettingsManualFilename { get; set; } = string.Empty;
 
     #endregion
 
     #region Methods
-
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public override void HandleChangesNow() {
         base.HandleChangesNow();
@@ -174,8 +158,6 @@ public partial class FlexiControlRowSelector : GenericControlReciver, IControlSe
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            ((IControlSendFilter)this).DoDispose();
-
             Tag = null;
         }
 

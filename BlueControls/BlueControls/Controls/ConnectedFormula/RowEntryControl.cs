@@ -17,45 +17,20 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
 namespace BlueControls.Controls;
 
-internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
+internal class RowEntryControl : GenericControlReciverSender {
 
     #region Constructors
 
-    public RowEntryControl(Database? database) : base(false, false) {
-        this.DoOutputSettings(database, Name);
-        ((IControlSendFilter)this).RegisterEvents();
-        RegisterEvents();
-    }
-
-    #endregion
-
-    #region Properties
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 06");
+    public RowEntryControl() : base(false, false) { }
 
     #endregion
 
     #region Methods
-
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     public override void HandleChangesNow() {
         base.HandleChangesNow();
@@ -80,13 +55,6 @@ internal class RowEntryControl : GenericControlReciver, IControlSendFilter {
     }
 
     public override void RowsInput_Changed() => HandleChangesNow();
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            this.DoDispose();
-        }
-        base.Dispose(disposing);
-    }
 
     #endregion
 }

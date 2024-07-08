@@ -337,8 +337,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             QuickInfo = ButtonQuickInfo
         };
 
-        con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(this);
+        con.DoDefaultSettings(parent, this);
 
         return con;
     }

@@ -33,7 +33,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgroundNone //  System.Windows.Forms.UserControl //
+public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone //  System.Windows.Forms.UserControl //
 {
     #region Fields
 
@@ -53,10 +53,9 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
 
     #region Constructors
 
-    public Filterleiste() {
+    public Filterleiste() : base(false, false) {
         InitializeComponent();
         FillFilters();
-        this.RegisterEvents();
     }
 
     #endregion
@@ -84,23 +83,6 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
 
     [DefaultValue(false)]
     public bool AutoPin { get; set; }
-
-    /// <summary>
-    /// Enthält nur die FlexControlforFilter
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
-    /// <summary>
-    /// Ist immer identisch mit den Filtern der Tableview.
-    /// Er entspricht den Input-Filtern der einzelenen FlexControlForFiler
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 01");
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
@@ -135,10 +117,6 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     #endregion
 
     #region Methods
-
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
 
     internal void FillFilters() {
         if (IsDisposed) { return; }
@@ -246,7 +224,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                         } else {
                             // Na gut, eben neuen Flex erstellen
                             flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld);
-                            flx.DoOutputSettings(thisColumn.Database, flx.Name);
+                            flx.FilterOutput.Database = thisColumn.Database;
                             flx.ConnectChildParents(this);
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
@@ -295,7 +273,6 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            this.DoDispose();
             components?.Dispose();
         }
         base.Dispose(disposing);

@@ -63,8 +63,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
     public FileBrowser() : base(false, false) {
         InitializeComponent();
-        //((IControlSendFilter)this).RegisterEvents();
-        RegisterEvents();
     }
 
     #endregion

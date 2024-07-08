@@ -115,9 +115,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new RowEntryControl(DatabaseOutput);
-        con.DoOutputSettings(this);
-        con.DoInputSettings(parent, this);
+        var con = new RowEntryControl();
+        con.DoDefaultSettings(parent, this);
 
         // Besonderheit:
         // RowEntryPadItem hat niemals Parents.

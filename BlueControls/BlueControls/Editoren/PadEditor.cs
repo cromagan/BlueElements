@@ -67,7 +67,7 @@ public partial class PadEditor : PadEditorReadOnly {
 
     #region Methods
 
-    public virtual void ItemChanged() {
+    public void ItemChanged() {
         Pad.ZoomFit();
 
         if (Pad?.Item?.SheetStyle != null) {

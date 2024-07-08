@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,7 +38,7 @@ using BlueDatabase.AdditionalScriptMethods;
 
 namespace BlueControls.Controls;
 
-public partial class RowAdder : GenericControlReciver, IControlSendFilter // System.Windows.Forms.UserControl,
+public partial class RowAdder : GenericControlReciverSender // System.Windows.Forms.UserControl,
     {
     #region Fields
 
@@ -51,8 +50,6 @@ public partial class RowAdder : GenericControlReciver, IControlSendFilter // Sys
 
     public RowAdder() : base(false, false) {
         InitializeComponent();
-        ((IControlSendFilter)this).RegisterEvents();
-        base.RegisterEvents();
     }
 
     #endregion
@@ -64,11 +61,6 @@ public partial class RowAdder : GenericControlReciver, IControlSendFilter // Sys
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ColumnItem? AdditionalInfoColumn { get; internal set; }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciver> Childs { get; } = [];
-
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
     /// Dadurch können verschiedene Datensätze gespeichert werden.
@@ -78,11 +70,6 @@ public partial class RowAdder : GenericControlReciver, IControlSendFilter // Sys
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string EntityID { get; internal set; } = string.Empty;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput 08");
 
     /// <summary>
     /// Eine Spalte in der Ziel-Datenbank.
@@ -98,17 +85,7 @@ public partial class RowAdder : GenericControlReciver, IControlSendFilter // Sys
     [DefaultValue("")]
     public string Script { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Die Herkunft-Id, die mit Variablen der erzeugt wird.
-    /// Diese Id muss für jede Zeile der eingehenden Datenbank einmalig sein.
-    /// Die Struktur muss wie ein Dateipfad aufgebaut sein. z.B. Kochen\\Zutaten\\Vegetarisch\\Mehl
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnItem? TextKey { get; internal set; }
-
-    protected string GeneratedEntityId { get; private set; }
+    protected string GeneratedEntityId { get; private set; } = string.Empty;
 
     #endregion
 
@@ -403,14 +380,11 @@ public partial class RowAdder : GenericControlReciver, IControlSendFilter // Sys
         _ignoreCheckedChanged = false;
     }
 
-    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
-
-    public void FilterOutput_PropertyChanged(object sender, System.EventArgs e) => this.FilterOutput_PropertyChanged();
-
-    public void HandleChangesNow() {
+    public override void HandleChangesNow() {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
         FillListBox();
+        base.HandleChangesNow();
     }
 
     protected override void OnPaint(PaintEventArgs e) {

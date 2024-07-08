@@ -30,16 +30,13 @@ using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IItemToControl, IErrorCheckable {
+public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IItemToControl, IErrorCheckable, IItemAcceptFilter {
 
     #region Properties
 
     public ReadOnlyCollection<string> ChildIds { get; set; }
     public Database? DatabaseOutput { get; set; }
     int OutputColorId { get; set; }
-    public string Page { get; }
-
-    public ItemCollectionPad.ItemCollectionPad? Parent { get; }
 
     #endregion
 
@@ -49,11 +46,7 @@ public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPr
 
     public void RemoveChild(IItemAcceptFilter remove);
 
-    public void UpdateSideOptionMenu();
-
     #endregion
-
-    //public void RemoveAllConnections();
 }
 
 public static class ItemSendFilterExtension {
