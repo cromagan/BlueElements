@@ -47,20 +47,17 @@ internal class Method_ChangeDateTimeFormat : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d = attvar.ValueDateGet(0);
 
         if (d == null) {
-            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
         }
 
         try {
             return new DoItFeedback(d.Value.ToString(attvar.ReadableText(1), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
+            return new DoItFeedback(ld, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
         }
     }
 

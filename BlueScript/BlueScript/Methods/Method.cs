@@ -261,39 +261,39 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     ///
     /// </summary>
     /// <param name="varCol"></param>
-    /// <param name="infos"></param>
+    /// <param name="ld"></param>
     /// <param name="scp"></param>
     /// <param name="newcommand">Erwartet wird: X=5;</param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static DoItFeedback VariablenBerechnung(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp, string newcommand, bool generateVariable) {
+    public static DoItFeedback VariablenBerechnung(VariableCollection varCol, LogData ld, ScriptProperties scp, string newcommand, bool generateVariable) {
         //if (s.BerechneVariable == null) { return new DoItFeedback(infos.LogData, s, "Interner Fehler"); }
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
-        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(infos.Data, "Fehler mit = - Zeichen"); }
+        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(ld, "Fehler mit = - Zeichen"); }
 
         var varnam = newcommand.Substring(0, pos);
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.Data, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(ld, varnam + " ist kein gültiger Variablen-Name"); }
 
         var vari = varCol.Get(varnam);
         if (generateVariable && vari != null) {
-            return new DoItFeedback(infos.Data, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback(ld, "Variable " + varnam + " ist bereits vorhanden.");
         }
         if (!generateVariable && vari == null) {
-            return new DoItFeedback(infos.Data, "Variable " + varnam + " nicht vorhanden.");
+            return new DoItFeedback(ld, "Variable " + varnam + " nicht vorhanden.");
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
         List<List<string>> sargs = [[Variable.Any_Plain]];
 
-        var attvar = SplitAttributeToVars(varCol, value, sargs, 0, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, value, sargs, 0, ld, scp);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, attvar.ErrorMessage); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(ld, attvar.ErrorMessage); }
 
-        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback(infos.Data, "Variable unbekannt"); }
+        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback(ld, "Variable unbekannt"); }
 
         if (attvar.Attributes[0] is Variable v) {
             if (generateVariable) {
@@ -305,14 +305,17 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
             if (vari == null) {
                 // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
-                return new DoItFeedback(infos.Data, "Interner Fehler");
+                return new DoItFeedback(ld, "Interner Fehler");
             }
 
-            return vari.GetValueFrom(v, infos.Data);
+            return vari.GetValueFrom(v, ld);
         }
         // attvar.Attributes[0] müsste immer eine Variable sein...
-        return new DoItFeedback(infos.Data, "Interner Fehler");
+        return new DoItFeedback(ld, "Interner Fehler");
     }
+
+
+
 
     public CanDoFeedback CanDo(ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
@@ -351,11 +354,18 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         return new CanDoFeedback(pos, "Kann nicht geparst werden", false, ld);
     }
 
-    //        //if (s != null) { line += lb; }
-    //    }
-    //    return new SplittedAttributesFeedback(feedbackVariables);
-    //}
-    public abstract DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
+
+    public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+
+
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+
+        return DoIt(varCol, attvar, scp, infos.LogData);
+    }
+  
+
+    public abstract DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld);
 
     //        feedbackVariables.Add(v);
     public string HintText() {
@@ -456,39 +466,4 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
     #endregion
 
-    //public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection varcol, ScriptProperties scp, CanDoFeedback infos, List<List<string>> types, bool endlessArgs) {
-    //    if (types.Count == 0) {
-    //        return string.IsNullOrEmpty(infos.AttributText)
-    //            ? new SplittedAttributesFeedback(new VariableCollection())
-    //            : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
-    //    }
-
-    //    var attributes = SplitAttributeToString(infos.AttributText);
-    //    if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler."); }
-    //    if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-    //    if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
-
-    //    //  Variablen und Routinen ersetzen
-    //    VariableCollection feedbackVariables = new();
-    //    for (var n = 0; n < attributes.Count; n++) {
-    //        attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
-
-    //        var exceptetType = n < types.Count ? types[n] : types[types.Count - 1]; // Bei Endlessargs den letzten nehmen
-    //        var mustBeVar = exceptetType.Count > 0 && exceptetType[0].StartsWith("*");
-
-    //        // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
-    //        Variable? v;
-
-    //        if (mustBeVar) {
-    //            var varn = attributes[n];
-
-    //            if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
-
-    //            v = varcol.Get(varn);
-    //            if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
-    //        } else {
-    //            var tmp2 = Variable.GetVariableByParsing(attributes[n], infos.Data, varcol, scp);
-    //            if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
-    //            v = tmp2.Variable;
-    //        }
 }

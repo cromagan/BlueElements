@@ -66,16 +66,13 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (SetErrorAllowed(varCol)) { return new DoItFeedback(infos.Data, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 
         if (row == null || row.IsDisposed) {
-            return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
+            return new DoItFeedback(ld, "Zeile nicht gefunden");
         }
 
         #region Attributliste erzeugen
@@ -91,8 +88,8 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
         var s2 = row.ExecuteScript(null, vs, false, false, scp.ProduktivPhase, 0, a, false, true);
         if (!s2.AllOk) {
-            infos.Data.Protocol.AddRange(s2.Protocol);
-            return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
+            ld.Protocol.AddRange(s2.Protocol);
+            return new DoItFeedback(ld, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
         }
 
         return DoItFeedback.Null();

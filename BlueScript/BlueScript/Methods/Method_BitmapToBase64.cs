@@ -38,7 +38,7 @@ internal class Method_BitmapToBase64 : Method {
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard  | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.Standard | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
@@ -48,10 +48,7 @@ internal class Method_BitmapToBase64 : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         string x;
 
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
@@ -64,7 +61,7 @@ internal class Method_BitmapToBase64 : Method {
                 break;
 
             default:
-                return new DoItFeedback(infos.Data, "Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
+                return new DoItFeedback(ld, "Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
         }
 
         return new DoItFeedback(x);

@@ -29,7 +29,7 @@ public readonly struct CanDoFeedback {
         MustAbort = mustabort;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
-        Data = ld;
+        LogData = ld;
     }
 
     public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {
@@ -38,7 +38,7 @@ public readonly struct CanDoFeedback {
         MustAbort = false;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        Data = ld;
+        LogData = ld;
     }
 
     #endregion
@@ -60,7 +60,7 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public int ContinueOrErrorPosition { get; }
 
-    public LogData Data { get; }
+    public LogData LogData { get; }
 
     /// <summary>
     /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.

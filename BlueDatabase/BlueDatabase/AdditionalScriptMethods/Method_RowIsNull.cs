@@ -35,8 +35,8 @@ public class Method_RowIsNull : Method {
     public override List<List<string>> Args => [RowVar];
     public override string Command => "rowisnull";
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
@@ -47,13 +47,8 @@ public class Method_RowIsNull : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(infos.Data, "Kein Zeilenobjekt übergeben."); }
-
-        //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(ld, "Kein Zeilenobjekt übergeben."); }
 
         return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

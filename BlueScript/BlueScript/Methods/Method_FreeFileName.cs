@@ -48,15 +48,11 @@ internal class Method_FreeFileName : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(infos.Data, "Verzeichnis existiert nicht");
+            return new DoItFeedback(ld, "Verzeichnis existiert nicht");
         }
 
         var zeichen = Constants.Char_AZ.ToLowerInvariant() + Constants.Char_Numerals + Constants.Char_AZ.ToUpperInvariant();

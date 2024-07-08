@@ -46,10 +46,7 @@ public class Method_ImportLinked : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var t = "Befehl: ImportLinked";
 
         varCol.RemoveWithComment(t);
@@ -57,7 +54,7 @@ public class Method_ImportLinked : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
+        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Zeilenfehler!"); }
 
         #endregion
 
@@ -67,16 +64,16 @@ public class Method_ImportLinked : Method_Database {
             if (thisColumn.Function is not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
-            if (linkedDatabase == null || linkedDatabase.IsDisposed) { return new DoItFeedback(infos.Data, "Verlinkte Datenbank nicht vorhanden"); }
+            if (linkedDatabase == null || linkedDatabase.IsDisposed) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
 
             var targetColumn = linkedDatabase.Column[thisColumn.LinkedCell_ColumnNameOfLinkedDatabase];
-            if (targetColumn == null) { return new DoItFeedback(infos.Data, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
+            if (targetColumn == null) { return new DoItFeedback(ld, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedDatabase, thisColumn, r, varCol);
-            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback(infos.Data, "Berechnungsfehler: " + info); }
+            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback(ld, "Berechnungsfehler: " + info); }
 
             var rows = fc.Rows;
-            if (rows.Count > 1) { return new DoItFeedback(infos.Data, "Suchergebnis liefert mehrere Ergebnisse."); }
+            if (rows.Count > 1) { return new DoItFeedback(ld, "Suchergebnis liefert mehrere Ergebnisse."); }
 
             var v = RowItem.CellToVariable(targetColumn, null, true, false);
 

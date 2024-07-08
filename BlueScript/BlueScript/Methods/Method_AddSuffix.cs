@@ -34,9 +34,8 @@ internal class Method_AddSuffix : Method {
     public override List<List<string>> Args => [ListStringVar, StringVal];
     public override string Command => "addsuffix";
     public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
-    public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -47,11 +46,8 @@ internal class Method_AddSuffix : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);
 
@@ -59,7 +55,7 @@ internal class Method_AddSuffix : Method {
             tmpList[z] += attvar.ValueStringGet(1);
         }
 
-        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
 
         return DoItFeedback.Null();
     }

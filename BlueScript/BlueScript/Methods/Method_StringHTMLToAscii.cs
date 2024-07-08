@@ -48,10 +48,9 @@ internal class Method_StringHTMLToAscii : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(infos.Data, attvar.ValueStringGet(0).HtmlSpecialToNormalChar(attvar.ValueBoolGet(1)))
-            : DoItFeedback.AttributFehler(infos.Data, this, attvar);
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+
+        return new DoItFeedback(ld, attvar.ValueStringGet(0).HtmlSpecialToNormalChar(attvar.ValueBoolGet(1)));
     }
 
     #endregion

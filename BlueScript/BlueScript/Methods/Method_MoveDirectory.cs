@@ -44,11 +44,9 @@ internal class Method_MoveDirectory : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
 
     public override bool MustUseReturnValue => false;
-
-
 
     public override string Returns => string.Empty;
 
@@ -60,26 +58,21 @@ internal class Method_MoveDirectory : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var sop = attvar.ValueStringGet(0);
-        if (!DirectoryExists(sop)) { return new DoItFeedback(infos.Data, "Quell-Verzeichnis existiert nicht."); }
+        if (!DirectoryExists(sop)) { return new DoItFeedback(ld, "Quell-Verzeichnis existiert nicht."); }
         var dep = attvar.ValueStringGet(1);
 
-        if (DirectoryExists(dep)) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert bereits."); }
+        if (DirectoryExists(dep)) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert bereits."); }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveDirectory(sop, dep, false)) {
-            return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");
+            return new DoItFeedback(ld, "Verschieben fehlgeschlagen.");
         }
 
         return DoItFeedback.Null();
     }
 
-  
     #endregion
 }

@@ -47,15 +47,8 @@ internal class Method_Join : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        //if (string.IsNullOrEmpty(attvar.ValueString(0))) { return DoItFeedback.Null(infos, s, line); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tmp = attvar.ValueListStringGet(0);
-        //tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
-
         return new DoItFeedback(tmp.JoinWith(attvar.ValueStringGet(1)));
     }
 

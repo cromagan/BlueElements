@@ -47,11 +47,8 @@ internal class Method_Remove : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);
         for (var z = 2; z < attvar.Attributes.Count; z++) {
@@ -62,7 +59,7 @@ internal class Method_Remove : Method {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));
             }
         }
-        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList,ld) is DoItFeedback dif) { return dif; }
         return DoItFeedback.Null();
     }
 

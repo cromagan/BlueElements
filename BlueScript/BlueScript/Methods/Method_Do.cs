@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -47,8 +48,8 @@ internal class Method_Do : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var du = 0;
 
@@ -57,9 +58,9 @@ internal class Method_Do : Method {
         DoItFeedback scx;
         do {
             du++;
-            if (du > 100000) { return new DoItFeedback(infos.Data, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
+            if (du > 100000) { return new DoItFeedback(infos.LogData, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "Do-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }
@@ -67,6 +68,16 @@ internal class Method_Do : Method {
 
         return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
+    }
+
+
 
     #endregion
 }

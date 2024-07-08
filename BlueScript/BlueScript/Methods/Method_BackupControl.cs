@@ -48,22 +48,19 @@ internal class Method_BackupControl : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(infos.Data, "Dateipfad-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(ld, "Dateipfad-Fehler!"); }
 
         if (!IO.DirectoryExists(filn)) {
-            return new DoItFeedback(infos.Data, "Dateipfad existiert nicht.");
+            return new DoItFeedback(ld, "Dateipfad existiert nicht.");
         }
 
         var bvw = new BackupVerwalter(2, 20);
         var m = bvw.CleanUpDirectory(filn, attvar.ValueStringGet(1));
         if (string.IsNullOrEmpty(m)) { return DoItFeedback.Null(); }
-        return new DoItFeedback(infos.Data, "Fehler beim Ausführen");
+        return new DoItFeedback(ld, "Fehler beim Ausführen");
     }
 
     #endregion

@@ -36,7 +36,7 @@ public class Method_GenerateLayoutImage : Method_Database {
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow | MethodType.IO ;
+    public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow | MethodType.IO;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
@@ -46,14 +46,12 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
+        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Zeilenfehler!"); }
 
         #endregion
 
@@ -61,14 +59,14 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         var ind = attvar.ValueStringGet(0);
 
-        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback(infos.Data, "Layout nicht gefunden."); }
+        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback(ld, "Layout nicht gefunden."); }
 
         #endregion
 
         #region  scale  ermitteln (sc)
 
         var sc = attvar.ValueNumGet(1);
-        if (sc is < 0.1 or > 10) { return new DoItFeedback(infos.Data, "Skalierung nur von 0.1 bis 10 erlaubt."); }
+        if (sc is < 0.1 or > 10) { return new DoItFeedback(ld, "Skalierung nur von 0.1 bis 10 erlaubt."); }
 
         #endregion
 
@@ -77,13 +75,13 @@ public class Method_GenerateLayoutImage : Method_Database {
         var scx = l.ReplaceVariables(r);
 
         if (!scx.AllOk) {
-            infos.Data.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback(infos.Data, "Generierung fehlgeschlagen");
+            ld.Protocol.AddRange(scx.Protocol);
+            return new DoItFeedback(ld, "Generierung fehlgeschlagen");
         }
 
         var bmp = l.ToBitmap((float)sc, string.Empty);
 
-        if (bmp == null) { return new DoItFeedback(infos.Data, "Generierung fehlgeschlagen"); }
+        if (bmp == null) { return new DoItFeedback(ld, "Generierung fehlgeschlagen"); }
 
         return new DoItFeedback(bmp);
     }

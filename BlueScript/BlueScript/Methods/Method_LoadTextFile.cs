@@ -40,7 +40,7 @@ internal class Method_LoadTextFile : Method {
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO  | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.IO | MethodType.SpecialVariables;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
@@ -50,18 +50,15 @@ internal class Method_LoadTextFile : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ft = attvar.ValueStringGet(0).FileType();
 
         if (ft is not FileFormat.Textdocument and not FileFormat.CSV) {
-            return new DoItFeedback(infos.Data, "Datei ist kein Textformat: " + attvar.ValueStringGet(0));
+            return new DoItFeedback(ld, "Datei ist kein Textformat: " + attvar.ValueStringGet(0));
         }
 
         if (!IO.FileExists(attvar.ValueStringGet(0))) {
-            return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueStringGet(0));
+            return new DoItFeedback(ld, "Datei nicht gefunden: " + attvar.ValueStringGet(0));
         }
 
         try {
@@ -76,12 +73,12 @@ internal class Method_LoadTextFile : Method {
                     break;
 
                 default:
-                    return new DoItFeedback(infos.Data, "Import-Format unbekannt.");
+                    return new DoItFeedback(ld, "Import-Format unbekannt.");
             }
 
             return new DoItFeedback(importText);
         } catch {
-            return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueStringGet(0));
+            return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " + attvar.ValueStringGet(0));
         }
     }
 

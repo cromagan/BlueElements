@@ -79,7 +79,7 @@ public static class UseableForButton {
             AdditionalScriptMethods.Method_RowUniqueAndInvalidate.DoAllRows();
             return string.Empty;
         }
-        return cdw.Data.Protocol.JoinWithCr();
+        return cdw.LogData.Protocol.JoinWithCr();
     }
 
     #endregion

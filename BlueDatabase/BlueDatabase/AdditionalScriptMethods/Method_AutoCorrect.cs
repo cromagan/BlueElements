@@ -54,17 +54,14 @@ internal class Method_AutoCorrect : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var n = 0; n < attvar.Attributes.Count; n++) {
             var column = Column(scp, attvar, n);
-            if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden."); }
+            if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden."); }
             var columnVar = attvar.Attributes[n];
 
-            if (columnVar == null || columnVar.ReadOnly) { return new DoItFeedback(infos.Data, "Variable Schreibgeschützt."); }
-            if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback(infos.Data, "Spalte nicht veränderbar."); }
+            if (columnVar == null || columnVar.ReadOnly) { return new DoItFeedback(ld, "Variable Schreibgeschützt."); }
+            if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback(ld, "Spalte nicht veränderbar."); }
 
             var s = string.Empty;
             switch (columnVar) {

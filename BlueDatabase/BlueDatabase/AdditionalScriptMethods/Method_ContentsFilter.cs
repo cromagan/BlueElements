@@ -36,7 +36,7 @@ public class Method_ContentsFilter : Method {
     public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.MyDatabaseRow ;
+    public override MethodType MethodType => MethodType.MyDatabaseRow;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
 
@@ -48,18 +48,15 @@ public class Method_ContentsFilter : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
-        if (allFi.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (allFi.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         var returncolumn = db.Column[attvar.ReadableText(0)];
-        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
+        if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
         var x = returncolumn.Contents(allFi.Rows);
         return new DoItFeedback(x);
     }

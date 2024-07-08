@@ -45,24 +45,19 @@ public class Method_Lookup : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
-        }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) {
-            return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
+            return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }
 
         var c = db.Column[attvar.ValueStringGet(2)];
         if (c == null) {
-            return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
+            return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
         }
 
         if (db.Column.First() is not ColumnItem cf) {
-            return new DoItFeedback(infos.Data, "Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
+            return new DoItFeedback(ld, "Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }
 
         var r = RowCollection.MatchesTo(new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
@@ -79,7 +74,7 @@ public class Method_Lookup : Method_Database {
 
         //var v = RowItem.CellToVariable(c, r[0]);
         //if (v == null || v.Count != 1) {
-        //    return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(2));
+        //    return new DoItFeedback(ld, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(2));
         //}
 
         //if (v[0] is VariableListString vl) {
@@ -88,7 +83,7 @@ public class Method_Lookup : Method_Database {
         //    var w = vs.ValueString;
         //    if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         //} else {
-        //    return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
+        //    return new DoItFeedback(ld, "Spaltentyp nicht unterstützt.");
         //}
 
         return new DoItFeedback(r[0].CellGetList(c));

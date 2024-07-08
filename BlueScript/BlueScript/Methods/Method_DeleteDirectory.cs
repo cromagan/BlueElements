@@ -43,7 +43,7 @@ internal class Method_DeleteDirectory : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
 
     public override bool MustUseReturnValue => false;
 
@@ -57,24 +57,21 @@ internal class Method_DeleteDirectory : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
 
         if (!IO.DirectoryExists(filn)) {
             return DoItFeedback.Wahr();
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Löschen im Testmodus deaktiviert."); }
 
         try {
             return new DoItFeedback(IO.DeleteDir(filn, false));
         } catch {
-            return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn);
+            return new DoItFeedback(ld, "Fehler beim Löschen: " + filn);
         }
     }
 

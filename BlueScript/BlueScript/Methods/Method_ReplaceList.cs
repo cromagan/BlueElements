@@ -49,22 +49,19 @@ internal class Method_ReplaceList : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);
 
-        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
-        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
+        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback(ld, "Suchtext und Ersetzungstext sind identisch."); }
+        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(ld, "Suchtext und Ersetzungstext sind identisch."); }
 
         var ct = 0;
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback(infos.Data, "Überlauf bei ReplaceList."); }
+            if (ct > 10000) { return new DoItFeedback(ld, "Überlauf bei ReplaceList."); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (attvar.ValueBoolGet(2)) {
@@ -98,7 +95,7 @@ internal class Method_ReplaceList : Method {
             }
         } while (again);
 
-        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
         return DoItFeedback.Null();
     }
 

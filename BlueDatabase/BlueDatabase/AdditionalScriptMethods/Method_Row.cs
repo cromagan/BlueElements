@@ -57,16 +57,13 @@ public class Method_Row : Method {
 
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         var r = allFi.Rows;
 
-        if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
+        if (r.Count > 1) { return new DoItFeedback(ld, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
         if (r.Count is 0 or > 1) {
             return RowToObjectFeedback(null);

@@ -34,7 +34,7 @@ public class Method_UniqueRowId : BlueScript.Methods.Method {
     public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow ;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
@@ -44,11 +44,8 @@ public class Method_UniqueRowId : BlueScript.Methods.Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(RowCollection.UniqueKeyValue());
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        return new DoItFeedback(RowCollection.UniqueKeyValue());
     }
 
     #endregion

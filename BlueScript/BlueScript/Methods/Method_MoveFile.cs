@@ -58,27 +58,23 @@ internal class Method_MoveFile : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         var sop = attvar.ValueStringGet(0);
-
         var dep = attvar.ValueStringGet(1);
 
         //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback(infos.LogData, s, "Verzeichnis existiert nicht"); }
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert nicht"); }
-        if (!FileExists(sop)) { return new DoItFeedback(infos.Data, "Quelldatei existiert nicht."); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert nicht"); }
+        if (!FileExists(sop)) { return new DoItFeedback(ld, "Quelldatei existiert nicht."); }
 
         if (FileExists(dep)) {
-            return new DoItFeedback(infos.Data, "Zieldatei existiert bereits.");
+            return new DoItFeedback(ld, "Zieldatei existiert bereits.");
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveFile(sop, dep, false)) {
-            return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");
+            return new DoItFeedback(ld, "Verschieben fehlgeschlagen.");
         }
 
         return DoItFeedback.Null();

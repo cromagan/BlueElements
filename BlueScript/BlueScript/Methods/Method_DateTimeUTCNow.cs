@@ -48,15 +48,11 @@ internal class Method_DateTimeNowUTC : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage))
-            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         try {
             return new DoItFeedback(DateTime.UtcNow.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.");
+            return new DoItFeedback(ld, "Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.");
         }
     }
 

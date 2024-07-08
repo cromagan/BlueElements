@@ -44,7 +44,7 @@ public class Method_AddRowsUniqueAndInvalidate : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow ;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
@@ -54,39 +54,36 @@ public class Method_AddRowsUniqueAndInvalidate : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+        if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
 
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
         var keys = attvar.ValueListStringGet(1);
         keys = keys.SortedDistinctList();
 
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) {
-            return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf");
+            return new DoItFeedback(ld, "Stapelspeicherüberlauf");
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
 
         var c = db.Column.First();
 
-        if (c == null) { return new DoItFeedback(infos.Data, "Erste Spalte nicht vorhanden"); }
+        if (c == null) { return new DoItFeedback(ld, "Erste Spalte nicht vorhanden"); }
 
         foreach (var thisKey in keys) {
             var allFi = new FilterCollection(db, "Method_AddRowsUniqueAndInvalidate") {
                 new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, thisKey)
             };
 
-            var fb = Method_RowUniqueAndInvalidate.UniqueRow(infos, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+            var fb = Method_RowUniqueAndInvalidate.UniqueRow(ld, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }

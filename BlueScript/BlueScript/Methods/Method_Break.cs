@@ -47,9 +47,9 @@ internal class Method_Break : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) =>
-        //if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
-        //if (s.BreakFired) { return new DoItFeedback(infos.Data, "Break doppelt ausgelöst."); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
+        //if (s.Sub < 1) { return new DoItFeedback(ld, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
+        //if (s.BreakFired) { return new DoItFeedback(ld, "Break doppelt ausgelöst."); }
         //s.BreakFired = true;
         new(true, false);
 

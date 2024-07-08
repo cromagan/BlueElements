@@ -48,13 +48,9 @@ internal class Method_StringShortenWord : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
-        if (string.IsNullOrEmpty(txt)) {
-            return new DoItFeedback(txt);
-        }
+        if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(txt); }
         //TXT = TXT.HTMLSpecialToNormalChar();
         txt = txt.Replace("Sekunden", "Sek.");
         txt = txt.Replace("Sekunde", "Sek.");

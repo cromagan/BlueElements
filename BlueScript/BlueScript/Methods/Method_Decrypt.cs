@@ -47,14 +47,10 @@ internal class Method_Decrypt : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var wert = attvar.ValueStringGet(0).Decrypt(attvar.ValueStringGet(1));
 
-        if (wert == null) { return new DoItFeedback(infos.Data, "Entschlüsselung fehlgeschlagen."); }
+        if (wert == null) { return new DoItFeedback(ld, "Entschlüsselung fehlgeschlagen."); }
 
         return new DoItFeedback(wert);
     }

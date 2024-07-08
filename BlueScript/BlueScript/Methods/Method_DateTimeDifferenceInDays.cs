@@ -34,8 +34,8 @@ internal class Method_DateTimeDifferenceInDays : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "datetimedifferenceindays";
     public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
@@ -46,20 +46,17 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d1 = attvar.ValueDateGet(0);
 
         if (d1 == null) {
-            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
         }
 
         var d2 = attvar.ValueDateGet(1);
 
         if (d2 == null) {
-            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.");
         }
 
         return new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);

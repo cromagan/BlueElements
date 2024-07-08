@@ -41,9 +41,9 @@ internal class Method_DownloadWebPage : Method {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadwebpage";
     public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO ;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.IO;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
@@ -53,10 +53,7 @@ internal class Method_DownloadWebPage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var url = attvar.ValueStringGet(0);
         var varn = "X" + url.ReduceToChars(Constants.AllowedCharsVariableName);
 

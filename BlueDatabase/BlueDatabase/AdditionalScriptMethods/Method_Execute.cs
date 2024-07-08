@@ -48,7 +48,7 @@ internal class Method_Execte : Method, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO  | MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Einen Befehl an Windows übergeben";
@@ -60,35 +60,13 @@ internal class Method_Execte : Method, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        //const string comment = "Mit dem Befehl 'ExtractTags' erstellt";
-        //varCol.RemoveWithComment(comment);
-
-        //var tags = new List<string>();
-        //if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
-        //if (attvar.Attributes[0] is VariableListString vl) { tags.AddRange(vl.ValueList); }
-
-        //foreach (var thisw in tags) {
-        //    var x = thisw.SplitBy(attvar.ValueStringGet(1));
-
-        //    if (x.Length == 2) {
-        //        var vn = x[0].ToLowerInvariant().ReduceToChars(Constants.AllowedCharsVariableName);
-        //        var thisv = x[1].Trim();
-        //        if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-        //            varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));
-        //        }
-        //    }
-        //}
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         _ = IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
 
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8,string filterarg, string rowarg) => arg1 + ", " + arg2;
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => arg1 + ", " + arg2;
 
     #endregion
 }

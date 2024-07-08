@@ -48,8 +48,8 @@ internal class Method_ForEach : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);
 
@@ -57,11 +57,11 @@ internal class Method_ForEach : Method {
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.Data, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.LogData, varnam + " ist kein gültiger Variablen-Name"); }
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback(infos.Data, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
         }
 
         var scx = new DoItFeedback(false, false);
@@ -70,13 +70,22 @@ internal class Method_ForEach : Method {
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }
         }
 
         return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+    }
+
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

@@ -52,20 +52,17 @@ public class Method_SetError : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (!SetErrorAllowed(varCol)) { return new DoItFeedback(infos.Data, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         var r = MyRow(scp);
-        if (r == null || r.IsDisposed) { return new DoItFeedback(infos.Data, "Interner Fehler, Zeile nicht gefunden"); }
+        if (r == null || r.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
 
         r.LastCheckedRowFeedback ??= [];
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(scp, attvar, z);
-            if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Name(z)); }
+            if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(z)); }
             r.LastCheckedRowFeedback.Add(column.KeyName.ToUpperInvariant() + "|" + attvar.ValueStringGet(0));
         }
 

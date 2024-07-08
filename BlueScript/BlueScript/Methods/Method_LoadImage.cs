@@ -49,19 +49,17 @@ internal class Method_LoadImage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
-        // Da es keine Möglichit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
+        // Da es keine Möglichkeit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
 
         //if (attvar.ValueString(0).FileType() != FileFormat.Image) {
-        //    return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + attvar.ValueString(0));
+        //    return new DoItFeedback(ld, "Datei ist kein Bildformat: " + attvar.ValueString(0));
         //}
 
         //if (!IO.FileExists(attvar.ValueString(0))) {
-        //    return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueString(0));
+        //    return new DoItFeedback(ld, "Datei nicht gefunden: " + attvar.ValueString(0));
         //}
 
         try {
@@ -70,7 +68,7 @@ internal class Method_LoadImage : Method {
             return new DoItFeedback(bmp);
         } catch {
             return new DoItFeedback(null as Bitmap);
-            //return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
+            //return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
         }
     }
 

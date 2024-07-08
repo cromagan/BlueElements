@@ -58,22 +58,19 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
-        if (db == MyDatabase(scp)) { return new DoItFeedback(infos.Data, "Befehl Call benutzen!"); }
+        if (db == MyDatabase(scp)) { return new DoItFeedback(ld, "Befehl Call benutzen!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
         StackTrace stackTrace = new();
-        if (stackTrace.FrameCount > 400) { return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf"); }
+        if (stackTrace.FrameCount > 400) { return new DoItFeedback(ld, "Stapelspeicherüberlauf"); }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "CallDatabase im Testmodus deaktiviert."); }
 
         #region Attributliste erzeugen
 
@@ -87,7 +84,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
 
         if (!f.AllOk) {
-            return new DoItFeedback(infos.Data, f.ProtocolText);
+            return new DoItFeedback(ld, f.ProtocolText);
         }
 
         return DoItFeedback.Null();

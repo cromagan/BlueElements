@@ -50,10 +50,7 @@ internal class Method_Min : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {
@@ -81,7 +78,7 @@ internal class Method_Min : Method {
             return new DoItFeedback(l.Min());
         }
 
-        return new DoItFeedback(infos.Data, "Keine gültigen Werte angekommen");
+        return new DoItFeedback(ld, "Keine gültigen Werte angekommen");
     }
 
     #endregion

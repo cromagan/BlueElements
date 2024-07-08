@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -47,10 +48,19 @@ internal class Method_Exception : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen."); }
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen.")
-            : new DoItFeedback(infos.Data, "Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0));
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.LogData, "Die Ausführung wurde absichtlich abgebrochen."); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.LogData, "Die Ausführung wurde absichtlich abgebrochen.")
+            : new DoItFeedback(infos.LogData, "Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0));
+    }
+
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

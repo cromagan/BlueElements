@@ -46,22 +46,19 @@ public class Method_CellSetRow : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-        if (row?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Fehler in der Zeile"); }
+        if (row?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
 
         var columnToSet = db.Column[attvar.ValueStringGet(1)];
-        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }
+        if (columnToSet == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zellen setzen Testmodus deaktiviert."); }
 
         if (row == MyRow(scp)) {
-            return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
+            return new DoItFeedback(ld, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
         var value = string.Empty;

@@ -47,11 +47,8 @@ internal class Method_SortNum : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var nums = new List<double>();
         foreach (var txt in attvar.ValueListStringGet(0)) {
@@ -61,7 +58,7 @@ internal class Method_SortNum : Method {
         nums.Sort();
 
         if (attvar.Attributes[0] is not VariableListString vli) {
-            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
+            return DoItFeedback.AttributFehler(ld, this, attvar);
         }
 
         vli.ValueList = nums.ConvertAll(i => i.ToStringFloat5());

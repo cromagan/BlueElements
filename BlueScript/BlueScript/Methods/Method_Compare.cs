@@ -49,17 +49,14 @@ internal class Method_Compare : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ignorenull = attvar.ValueBoolGet(0);
         var cases = attvar.ValueBoolGet(1);
 
         string? firstval = null;
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback(infos.Data, "Variablentypen unterschiedlich."); }
+            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback(ld, "Variablentypen unterschiedlich."); }
 
             var hasval = !ignorenull;
             var val = string.Empty;

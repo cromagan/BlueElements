@@ -27,6 +27,7 @@ using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Runtime.CompilerServices;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -36,6 +37,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
     #region Fields
 
     public static List<RowItem> InvalidatedRows = new();
+    public static List<RowItem> DidRows = new();
 
     #endregion
 
@@ -80,51 +82,58 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
 
     public static void DoAllRows() {
 
+        if (Database.ExecutingScriptAnyDatabase != 0 || InvalidatedRows.Count > 0) { return; }
+
+
+        DidRows.Clear();
         try {
             while (InvalidatedRows.Count > 0) {
                 var r = InvalidatedRows[0];
                 InvalidatedRows.RemoveAt(0);
 
-                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed) {
+                DidRows.Add(r);
 
+                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
                     r.UpdateRow(false, true, true);
                 }
-
             }
         } catch { }
+
+        DidRows.Clear();
+
     }
 
-    public static DoItFeedback UniqueRow(CanDoFeedback infos, FilterCollection allFi, ScriptProperties scp, string coment) {
+    public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {
         Develop.CheckStackForOverflow();
         var r = allFi.Rows;
 
         if (r.Count > 5) {
-            return new DoItFeedback(infos.Data, "RowUniqueAndInvalidate gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
+            return new DoItFeedback(ld, "RowUniqueAndInvalidate gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
         }
 
         if (r.Count > 1) {
-            if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+            if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
 
             r[0].Database?.Row.Combine(r);
             r[0].Database?.Row.RemoveYoungest(r, true);
             r = allFi.Rows;
             if (r.Count > 1) {
-                return new DoItFeedback(infos.Data, "RowUniqueAndInvalidate gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
+                return new DoItFeedback(ld, "RowUniqueAndInvalidate gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
             }
         }
 
         RowItem? myRow;
 
         if (r.Count == 0) {
-            if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+            if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
             var (newrow, message) = RowCollection.GenerateAndAdd(allFi, coment);
-            if (newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + message); }
+            if (newrow == null) { return new DoItFeedback(ld, "Neue Zeile konnte nicht erstellt werden: " + message); }
             myRow = newrow;
         } else {
             myRow = r[0];
         }
 
-        if (myRow.Database is not Database db) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+        if (myRow.Database is not Database db) { return new DoItFeedback(ld, "Interner Fehler"); }
 
         if (db.Column.SysRowState is ColumnItem srs) {
             var v = myRow.CellGetLong(srs);
@@ -133,48 +142,45 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
                 var lastchange = RowItem.TimeCodeToUTCDateTime(v);
 
                 if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes > 15) {
-                    //return new DoItFeedback(infos.Data, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
+                    //return new DoItFeedback(ld, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
                     myRow.CellSet(srs, string.Empty, coment);
                     InvalidatedRows.Add(myRow);
                 }
             }
         } else {
-            return new DoItFeedback(infos.Data, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
+            return new DoItFeedback(ld, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
         }
 
         return Method_Row.RowToObjectFeedback(myRow);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null || allFi.Count == 0) {
-            return new DoItFeedback(infos.Data, "Fehler im Filter");
+            return new DoItFeedback(ld, "Fehler im Filter");
         }
 
         foreach (var thisFi in allFi) {
             if (thisFi.Column is not ColumnItem c) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, Spalte ungültig");
+                return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
             }
 
             if (thisFi.FilterType is not Enums.FilterType.Istgleich and not Enums.FilterType.Istgleich_GroßKleinEgal) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, nur 'is' ist erlaubt");
+                return new DoItFeedback(ld, "Fehler im Filter, nur 'is' ist erlaubt");
             }
 
             if (thisFi.SearchValue.Count != 1) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
+                return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
             }
             var l = allFi.InitValue(c, true);
             if (thisFi.SearchValue[0] != l) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
+                return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
             }
         }
         var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+        if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
 
-        return UniqueRow(infos, allFi, scp, $"Script-Befehl: 'UniqueRow' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+        return UniqueRow(ld, allFi, scp, $"Script-Befehl: 'UniqueRow' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
     }
 
     public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => filterarg;

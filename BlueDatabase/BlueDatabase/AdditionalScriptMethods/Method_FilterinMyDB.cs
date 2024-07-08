@@ -51,12 +51,9 @@ public class Method_FilterInMyDB : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 0);
-        if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         #region Typ ermitteln
 
@@ -75,7 +72,7 @@ public class Method_FilterInMyDB : Method_Database {
                 break;
 
             default:
-                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
+                return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
         }
 
         #endregion
@@ -83,7 +80,7 @@ public class Method_FilterInMyDB : Method_Database {
         var fii = new FilterItem(column, filtertype, attvar.ValueStringGet(2));
 
         if (!fii.IsOk()) {
-            return new DoItFeedback(infos.Data, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
+            return new DoItFeedback(ld, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
         }
 
         return new DoItFeedback(new VariableFilterItem(fii));

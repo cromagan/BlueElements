@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -52,11 +53,20 @@ internal class Method_Try : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Try-Befehl", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, null);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        var scx = Method_CallByFilename.CallSub(varCol, scp, infos.LogData, "Try-Befehl", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null);
         return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
+    }
+
 
     #endregion
 }

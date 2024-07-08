@@ -35,9 +35,8 @@ internal class Method_SplitWords : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "splitwords";
     public override string Description => "Gibt eine Liste aller Wörter zurück.\r\nDie Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.\r\nJedes Wort ist nur einmal in der Liste.";
-    public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
@@ -48,11 +47,7 @@ internal class Method_SplitWords : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
 
         var list = txt.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();

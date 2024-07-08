@@ -54,24 +54,21 @@ public class Method_RowNext : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mr = MyRow(scp);
-        if (mr == null || mr.IsDisposed) { return new DoItFeedback(infos.Data, "Interner Fehler, Zeile nicht gefunden"); }
+        if (mr == null || mr.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
 
         var column = Column(scp, attvar, 0);
-        if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
-        if (mr.Database != column.Database) { return new DoItFeedback(infos.Data, "Interner Fehler, Datenbanken stimmen nicht überein"); }
+        if (mr.Database != column.Database) { return new DoItFeedback(ld, "Interner Fehler, Datenbanken stimmen nicht überein"); }
 
-        if (mr.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Interner Fehler, Datenbanken verworfen"); }
+        if (mr.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Datenbanken verworfen"); }
 
         List<RowItem> r = [];
         if (attvar.Attributes.Count > 2) {
             using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-            if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+            if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
             r.AddRange(allFi.Rows);
         } else {
             r.AddRange(db.Row);
@@ -79,7 +76,7 @@ public class Method_RowNext : Method_Database {
 
         if (r.Count < 2) { return Method_Row.RowToObjectFeedback(null); }
 
-        if (mr.Database != r[0].Database) { return new DoItFeedback(infos.Data, "Filterfehler, falsche Datenbank"); }
+        if (mr.Database != r[0].Database) { return new DoItFeedback(ld, "Filterfehler, falsche Datenbank"); }
 
         if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null); }
 

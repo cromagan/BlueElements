@@ -65,15 +65,13 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Filter ermitteln (allfi)
 
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
 
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         #endregion
 
@@ -81,7 +79,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         var db = MyDatabase(scp);
 
-        if (db == null || allFi.Database != db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (db == null || allFi.Database != db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         #endregion
 
@@ -98,26 +96,26 @@ internal class Method_Export : Method_Database, IUseableForButton {
             cu = db.ColumnArrangements[0];
         }
 
-        if (cu == null) { return new DoItFeedback(infos.Data, "Ansicht-Fehler!"); }
+        if (cu == null) { return new DoItFeedback(ld, "Ansicht-Fehler!"); }
 
         #endregion
 
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
 
         var pf = filn.PathParent();
-        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback(infos.Data, "Verzeichniss existiert nicht"); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback(infos.Data, "Keine Schreibrechte im Zielverzeichniss."); }
+        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (!Directory.Exists(pf)) { return new DoItFeedback(ld, "Verzeichniss existiert nicht"); }
+        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback(ld, "Keine Schreibrechte im Zielverzeichniss."); }
 
-        if (File.Exists(filn)) { return new DoItFeedback(infos.Data, "Datei existiert bereits."); }
+        if (File.Exists(filn)) { return new DoItFeedback(ld, "Datei existiert bereits."); }
 
         #endregion
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Export im Testmodus deaktiviert."); }
 
         try {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
@@ -125,7 +123,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                 case "BDB": {
                         var bytes = Database.ToListOfByte(db, 100, db.FileStateUTCDate);
 
-                        if (bytes == null) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten."); }
+                        if (bytes == null) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
 
                         using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
                         x.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
@@ -136,20 +134,20 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
                 case "CSV":
                     var t = db.Export_CSV(FirstRow.ColumnInternalName, cu, r);
-                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten."); }
-                    if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
+                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
+                    if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
                     break;
 
                 //case "HTML":
                 //case "HTM":
-                //    if (!db.Export_HTML(filn, cu, r, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
+                //    if (!db.Export_HTML(filn, cu, r, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
                 //    break;
 
                 default:
-                    return new DoItFeedback(infos.Data, "Export-Format unbekannt.");
+                    return new DoItFeedback(ld, "Export-Format unbekannt.");
             }
         } catch {
-            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Erzeugen der Daten.");
+            return new DoItFeedback(ld, "Allgemeiner Fehler beim Erzeugen der Daten.");
         }
 
         return DoItFeedback.Null();

@@ -35,8 +35,8 @@ internal class Method_RandomInt : Method {
     public override List<List<string>> Args => [FloatVal];
     public override string Command => "randomint";
     public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
@@ -47,12 +47,8 @@ internal class Method_RandomInt : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        return new DoItFeedback(Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
     }
 
     #endregion

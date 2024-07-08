@@ -68,46 +68,43 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+        if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
 
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null || allFi.Count == 0) {
-            return new DoItFeedback(infos.Data, "Fehler im Filter");
+            return new DoItFeedback(ld, "Fehler im Filter");
         }
 
         foreach (var thisFi in allFi) {
             if (thisFi.Column is not ColumnItem c) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, Spalte ungültig");
+                return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
             }
 
             if (thisFi.FilterType is not Enums.FilterType.Istgleich and not Enums.FilterType.Istgleich_GroßKleinEgal) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, nur 'is' ist erlaubt");
+                return new DoItFeedback(ld, "Fehler im Filter, nur 'is' ist erlaubt");
             }
 
             if (thisFi.SearchValue.Count != 1) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
+                return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
             }
             var l = allFi.InitValue(c, true);
             if (thisFi.SearchValue[0] != l) {
-                return new DoItFeedback(infos.Data, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
+                return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
             }
         }
 
         var r = allFi.Rows;
 
         if (r.Count > 1) {
-            return new DoItFeedback(infos.Data, "RowUnique gescheitert, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
+            return new DoItFeedback(ld, "RowUnique gescheitert, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
         }
 
         if (r.Count == 0) {
-            if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+            if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
             var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
-            if (nr.newrow == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
+            if (nr.newrow == null) { return new DoItFeedback(ld, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
             return Method_Row.RowToObjectFeedback(nr.newrow);
         }
 

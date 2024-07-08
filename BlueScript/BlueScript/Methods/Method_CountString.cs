@@ -52,11 +52,7 @@ internal class Method_CountString : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         switch (attvar.Attributes[0]) {
             case VariableString vs:
                 return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
@@ -65,7 +61,7 @@ internal class Method_CountString : Method {
                 return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)));
         }
 
-        return new DoItFeedback(infos.Data, "Interner Fehler.");
+        return new DoItFeedback(ld, "Interner Fehler.");
     }
 
     #endregion

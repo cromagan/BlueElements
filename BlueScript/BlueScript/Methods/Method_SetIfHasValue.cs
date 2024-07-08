@@ -46,37 +46,34 @@ internal class Method_SetIfHasValue : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
-            if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback(infos.Data, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
+            if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback(ld, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
             switch (attvar.Attributes[z]) {
                 case VariableFloat vf:
                     if (vf.ValueNum != 0) {
-                        if (attvar.ValueNumSet(0, vf.ValueNum, infos.Data) is DoItFeedback dif) { return dif; }
+                        if (attvar.ValueNumSet(0, vf.ValueNum,ld) is DoItFeedback dif) { return dif; }
                         return DoItFeedback.Null();
                     }
                     break;
 
                 case VariableString vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
-                        if (attvar.ValueStringSet(0, vs.ValueString, infos.Data) is DoItFeedback dif2) { return dif2; }
+                        if (attvar.ValueStringSet(0, vs.ValueString, ld) is DoItFeedback dif2) { return dif2; }
                         return DoItFeedback.Null();
                     }
                     break;
 
                 case VariableBool vb:
-                    if (attvar.ValueBoolSet(0, vb.ValueBool, infos.Data) is DoItFeedback dif3) { return dif3; }
+                    if (attvar.ValueBoolSet(0, vb.ValueBool, ld) is DoItFeedback dif3) { return dif3; }
                     return DoItFeedback.Null();
 
                 case VariableListString vl:
-                    if (attvar.ValueListStringSet(0, vl.ValueList, infos.Data) is DoItFeedback dif4) { return dif4; }
+                    if (attvar.ValueListStringSet(0, vl.ValueList, ld) is DoItFeedback dif4) { return dif4; }
                     return DoItFeedback.Null();
             }
         }

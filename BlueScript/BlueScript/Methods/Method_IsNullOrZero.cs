@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -47,11 +48,11 @@ internal class Method_IsNullOrZero : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(infos.Data, this, attvar);
+                return DoItFeedback.AttributFehler(infos.LogData, this, attvar);
             }
 
             return DoItFeedback.Wahr();
@@ -68,8 +69,14 @@ internal class Method_IsNullOrZero : Method {
             return DoItFeedback.Falsch();
         }
 
-        return new DoItFeedback(infos.Data, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        return new DoItFeedback(infos.LogData, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
     }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
+    }
     #endregion
 }

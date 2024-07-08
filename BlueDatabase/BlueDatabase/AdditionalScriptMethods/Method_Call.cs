@@ -68,29 +68,26 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
 
         var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         var sc = db.EventScript.Get(vs);
-        if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs); }
+        if (sc == null) { return new DoItFeedback(ld, "Skript nicht vorhanden: " + vs); }
 
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
             if (!newat.Contains(thisAt)) {
-                return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
+                return new DoItFeedback(ld, "Aufzurufendes Skript hat andere Bedingungen.");
             }
         }
 
         var (f, error) = Script.ReduceText(sc.ScriptText);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
+            return new DoItFeedback(ld, "Fehler in Unter-Skript " + vs + ": " + error);
         }
 
         #region Attributliste erzeugen
@@ -102,7 +99,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
         #endregion
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, ld, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a);
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }

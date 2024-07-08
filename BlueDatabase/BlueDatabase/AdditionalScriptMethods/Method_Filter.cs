@@ -79,17 +79,14 @@ public class Method_Filter : Method_Database {
         return f;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         #region Spalte ermitteln
 
         var filterColumn = db.Column[attvar.ValueStringGet(1)];
-        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Datenbank nicht gefunden"); }
+        if (filterColumn == null) { return new DoItFeedback(ld, "Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Datenbank nicht gefunden"); }
 
         #endregion
 
@@ -115,7 +112,7 @@ public class Method_Filter : Method_Database {
                 break;
 
             default:
-                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
+                return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
         }
 
         #endregion
@@ -123,7 +120,7 @@ public class Method_Filter : Method_Database {
         var fii = new FilterItem(filterColumn, filtertype, attvar.ValueStringGet(3));
 
         if (!fii.IsOk()) {
-            return new DoItFeedback(infos.Data, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
+            return new DoItFeedback(ld, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
         }
 
         return new DoItFeedback(new VariableFilterItem(fii));

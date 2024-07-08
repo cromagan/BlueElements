@@ -25,8 +25,8 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
-namespace BlueControls.AdditionalScriptMethods;
 
+namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 public class Method_MsgBox : Method_Database {
@@ -38,7 +38,7 @@ public class Method_MsgBox : Method_Database {
     public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer einen Knopf drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType => MethodType.IO  | MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableFloat.ShortName_Variable;
     public override string StartSequence => "(";
@@ -48,10 +48,7 @@ public class Method_MsgBox : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
 
         var img = attvar.ValueStringGet(1);

@@ -35,7 +35,7 @@ internal class Method_ImportCsv : Method_Database {
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO ;
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
@@ -45,20 +45,17 @@ internal class Method_ImportCsv : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
         var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Import im Testmodus deaktiviert."); }
 
         var sx = db.ImportCsv(txt, true, true, sep, false, false);
 
@@ -66,7 +63,7 @@ internal class Method_ImportCsv : Method_Database {
             return DoItFeedback.Null();
         }
 
-        return new DoItFeedback(infos.Data, sx);
+        return new DoItFeedback(ld, sx);
     }
 
     #endregion

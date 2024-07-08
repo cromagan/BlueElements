@@ -37,7 +37,6 @@ internal class Method_DeleteFile : Method {
 
     public List<List<string>> ArgsForButton => Args;
 
-
     public override string Command => "deletefile";
 
     public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
@@ -50,8 +49,6 @@ internal class Method_DeleteFile : Method {
 
     public override bool MustUseReturnValue => false;
 
-
-
     public override string Returns => VariableBool.ShortName_Variable;
 
     public override string StartSequence => "(";
@@ -62,10 +59,7 @@ internal class Method_DeleteFile : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var files = new List<string>();
 
         for (var z = 0; z < attvar.Attributes.Count; z++) {
@@ -75,26 +69,25 @@ internal class Method_DeleteFile : Method {
         files = files.SortedDistinctList();
 
         if (!scp.ProduktivPhase) {
-            return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert.");
+            return new DoItFeedback(ld, "Löschen im Testmodus deaktiviert.");
         }
 
         foreach (var filn in files) {
             if (!filn.IsFormat(FormatHolder.FilepathAndName)) {
-                return new DoItFeedback(infos.Data, "Dateinamen-Fehler!");
+                return new DoItFeedback(ld, "Dateinamen-Fehler!");
             }
 
             if (IO.FileExists(filn)) {
                 try {
-                    if (!IO.DeleteFile(filn, false)) { return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn); }
+                    if (!IO.DeleteFile(filn, false)) { return new DoItFeedback(ld, "Fehler beim Löschen: " + filn); }
                 } catch {
-                    return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn);
+                    return new DoItFeedback(ld, "Fehler beim Löschen: " + filn);
                 }
             }
         }
 
         return DoItFeedback.Wahr();
     }
-
 
     #endregion
 }

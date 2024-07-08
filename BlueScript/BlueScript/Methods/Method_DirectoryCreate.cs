@@ -36,7 +36,6 @@ internal class Method_DirectoryCreate : Method {
 
     public override List<List<string>> Args => [StringVal];
 
-
     public override string Command => "directorycreate";
 
     public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
@@ -45,7 +44,7 @@ internal class Method_DirectoryCreate : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
 
     public override bool MustUseReturnValue => false;
 
@@ -61,10 +60,7 @@ internal class Method_DirectoryCreate : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var p = attvar.ValueStringGet(0).TrimEnd("\\");
 
         if (DirectoryExists(p)) { return DoItFeedback.Wahr(); }
@@ -75,7 +71,6 @@ internal class Method_DirectoryCreate : Method {
 
         return !DirectoryExists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
-
 
     #endregion
 }

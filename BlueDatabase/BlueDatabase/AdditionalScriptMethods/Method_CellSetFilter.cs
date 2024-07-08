@@ -35,7 +35,7 @@ public class Method_CellSetFilter : Method_Database {
     public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow ;
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
@@ -45,17 +45,14 @@ public class Method_CellSetFilter : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-
+   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         var db = allFi.Database;
-        if (db == null || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbank verworfen."); }
+        if (db == null || db.IsDisposed) { return new DoItFeedback(ld, "Datenbank verworfen."); }
 
-        if (db.Column[attvar.ValueStringGet(1)] is not ColumnItem columnToSet) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
+        if (db.Column[attvar.ValueStringGet(1)] is not ColumnItem columnToSet) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
 
         var r = allFi.Rows;
         if (r.Count is 0 or > 1) {
@@ -63,7 +60,7 @@ public class Method_CellSetFilter : Method_Database {
         }
 
         if (r[0] == MyRow(scp)) {
-            return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
+            return new DoItFeedback(ld, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
         var value = string.Empty;
