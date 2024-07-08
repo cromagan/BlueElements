@@ -86,17 +86,26 @@ public class Method_If : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var scpt = new ScriptProperties(scp, scp.AllowedMethods & ~MethodType.SpecialVariables, scp.Stufe +1);
 
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scpt);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, "Fehler innerhalb der runden Klammern des If-Befehls"); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.LogData, "Fehler innerhalb der runden Klammern des If-Befehls"); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, null);
+            var scx = Method_CallByFilename.CallSub(varCol, scp, infos.LogData, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null);
             if (!scx.AllOk) { return scx; }
             return new DoItFeedback(scx.BreakFired, scx.EndScript); // If muss die Breaks und Endsripts erhalten!
         }
 
         return DoItFeedback.Null();
     }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        // Dummy überschreibung.
+        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+
+        Develop.DebugPrint_NichtImplementiert(true);
+        return DoItFeedback.Falsch();
+    }
+
 
     #endregion
 }
