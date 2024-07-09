@@ -316,7 +316,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
-        GroupBox.DrawGroupBox(this, gr, state, _groupBoxStyle, Text);
+        var s = States.Standard;
+
+        if(!Enabled) { s = States.Standard_Disabled; }
+        GroupBox.DrawGroupBox(this, gr, s, _groupBoxStyle, Text);
         GenerateView();
 
         if (!_generated) {

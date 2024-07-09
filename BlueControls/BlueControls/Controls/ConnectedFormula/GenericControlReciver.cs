@@ -27,6 +27,7 @@ using BlueDatabase.EventArgs;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime;
 
 namespace BlueControls.Controls;
 
@@ -171,6 +172,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="source"></param>
     public void DoDefaultSettings(ConnectedFormulaView parent, IItemAcceptFilter source) {
         Name = source.DefaultItemToControlName();
+
+
+        if(this is IHasSettings ihs) {
+            ihs.SettingsManualFilename = ("%homepath%\\" + Develop.AppName() + "\\" + source.KeyName + ".ini").CheckFile();
+        }
+
 
         foreach (var thisKey in source.Parents) {
             var it = source.Parent?[thisKey];

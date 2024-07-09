@@ -173,8 +173,17 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         base.Dispose(disposing);
     }
 
-    protected override void OnControlAdded(ControlEventArgs e) {
-        base.OnControlAdded(e);
+
+    private void F_ControlRemoved(object sender, ControlEventArgs e) {
+        if (e.Control is ComboBox cbx) {
+            cbx.DropDownShowing -= Cbx_DropDownShowing;
+        }
+ }
+
+
+
+    private void F_ControlAdded(object sender, ControlEventArgs e) {
+
 
         if (e.Control is ComboBox cbx) {
             var item2 = new List<AbstractListItem>();

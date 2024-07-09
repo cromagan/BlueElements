@@ -30,6 +30,8 @@
             this.f.Size = new System.Drawing.Size(150, 150);
             this.f.TabIndex = 0;
             this.f.ButtonClicked += new System.EventHandler(this.F_ButtonClick);
+            this.f.ControlAdded += new ControlEventHandler(F_ControlAdded);
+            this.f.ControlRemoved += new ControlEventHandler(F_ControlRemoved);
             this.f.ValueChanged += new System.EventHandler(this.F_ValueChanged);
             // 
             // FlexiControlForFilter
@@ -40,9 +42,10 @@
 
         }
 
+
         #endregion
 
-  
+
         private FlexiControl f;
     }
 }

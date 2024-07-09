@@ -358,10 +358,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
     public GenericControl? CreateSubControls() {
-        if (Allinitialized) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Bereits initialisiert");
-            return null;
-        }
+        if (Allinitialized) { return null; }
 
         if (Width < 5 || Height < 5) {
             Develop.DebugPrint(FehlerArt.Warnung, "Width / Height zu klein");
@@ -425,6 +422,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public Button? GetButton() {
+        CreateSubControls();
         foreach (var thisc in Controls) {
             if (thisc is Button bt) { return bt; }
         }
@@ -432,6 +430,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public ComboBox? GetComboBox() {
+        CreateSubControls();
         foreach (var thisc in Controls) {
             if (thisc is ComboBox cbx) { return cbx; }
         }
@@ -546,6 +545,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     protected ListBox? GetListBox() {
+        CreateSubControls();
         foreach (var thisc in Controls) {
             if (thisc is ListBox lb) { return lb; }
         }
