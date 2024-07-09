@@ -174,7 +174,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
                         cc = new ConnectedFormulaView(pg, modes);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
-                        cc.InitFormula(cf, cc.DatabaseInput());
+                        cc.InitFormula(cf, cc.DatabaseInput);
                         cc.Dock = DockStyle.Fill;
                         cc.DoDefaultSettings(parentView, this);
 

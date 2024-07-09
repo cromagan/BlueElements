@@ -54,7 +54,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public event EventHandler<ColumnEventArgs>? ColumnDisposed;
 
-    public event EventHandler<ColumnEventArgs>? ColumnInternalChanged;
+    public event EventHandler<ColumnEventArgs>? ColumnPropertyChanged;
 
     public event EventHandler? ColumnRemoved;
 
@@ -617,7 +617,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
 
-    private void OnColumnPropertyChanged(object sender, System.EventArgs e) => ColumnInternalChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
+    private void OnColumnPropertyChanged(object sender, System.EventArgs e) => ColumnPropertyChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
 
     private void OnColumnRemoved() => ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
 

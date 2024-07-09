@@ -203,13 +203,9 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            this.DoInputFilter(null, false);
-        }
+        DoInputFilter(null, false);
 
-        RowsInputChangedHandled = true;
-        this.DoRows();
+        DoRows();
 
         bool enabled;
 

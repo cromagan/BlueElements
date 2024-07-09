@@ -45,7 +45,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
     #region Fields
 
     private string _columnName = string.Empty;
-    private Database? _lastDb;
 
     #endregion
 
@@ -77,7 +76,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     public string Caption { get => f.Caption; set => f.Caption = value; }
 
-    public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
+    public CaptionPosition CaptionPosition { get => f.CaptionPosition; set => f.CaptionPosition = value; }
 
     [DefaultValue("")]
     public string ColumnName {
@@ -97,7 +96,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
         set => f.ControlX = value;
     }
 
-    public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
+    public EditTypeFormula EditType { get => f.EditType; set => f.EditType = value; }
+    public string Value => f.Value; 
 
     #endregion
 
@@ -150,34 +150,10 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (DatabaseInput() != _lastDb && _lastDb != null) {
-            _lastDb.Cell.CellValueChanged -= Database_CellValueChanged;
-            _lastDb.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
-            _lastDb.Row.RowChecked -= Database_RowChecked;
-            _lastDb.Loaded -= _Database_Loaded;
-            _lastDb.Disposed -= _Database_Disposed;
-        }
-
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            DoInputFilter(null, false);
-        }
-
-        RowsInputChangedHandled = true;
+        DoInputFilter(null, false);
         DoRows();
 
         var (column, row) = GetTmpVariables();
-
-        if (DatabaseInput() != _lastDb) {
-            _lastDb = DatabaseInput();
-            if (_lastDb != null && !_lastDb.IsDisposed) {
-                _lastDb.Cell.CellValueChanged += Database_CellValueChanged;
-                _lastDb.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-                _lastDb.Row.RowChecked += Database_RowChecked;
-                _lastDb.Loaded += _Database_Loaded;
-                _lastDb.Disposed += _Database_Disposed;
-            }
-        }
 
         StyleControls(column, row);
         SetValueFromCell(column, row);
@@ -186,8 +162,83 @@ public partial class FlexiControlForCell : GenericControlReciver {
         row?.CheckRowDataIfNeeded();
 
         if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
-            Database_RowChecked(this, rce);
+            DatabaseInput_RowChecked(this, rce);
         }
+    }
+
+
+
+    protected override void DatabaseInput_Loaded(object sender, System.EventArgs e) {
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(() => DatabaseInput_Loaded(sender, e)));
+                return;
+            } catch {
+                // Kann dank Multitasking disposed sein
+                Develop.CheckStackForOverflow();
+                DatabaseInput_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
+                return;
+            }
+        }
+
+        var (column, row) = GetTmpVariables();
+        StyleControls(column, row);
+        SetValueFromCell(column, row);
+    }
+
+    protected override void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
+        var (column, row) = GetTmpVariables();
+
+        if (e.Column == column) {
+            StyleControls(column, row);
+            CheckEnabledState(column, row);
+            //OnNeedRefresh();
+        }
+    }
+
+    protected override void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) {
+        try {
+            if (InvokeRequired) {
+                _ = Invoke(new Action(() => DatabaseInput_CellValueChanged(sender, e)));
+                return;
+            }
+
+            var (column, row) = GetTmpVariables();
+
+            if (e.Row != row) { return; }
+
+            if (e.Column == column) { SetValueFromCell(column, row); }
+
+            if (e.Column == column || e.Column == e.Column.Database?.Column.SysLocked) { CheckEnabledState(column, row); }
+        } catch {
+            // Invoke: auf das verworfene Ojekt blah blah
+            if (!IsDisposed) {
+                Develop.CheckStackForOverflow();
+                DatabaseInput_CellValueChanged(sender, e);
+            }
+        }
+    }
+
+    protected override void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) {
+        var (column, row) = GetTmpVariables();
+
+        if (e.Row != row) { return; }
+        if (e.ColumnsWithErrors == null) {
+            f.InfoText = string.Empty;
+            return;
+        }
+
+        var newT = string.Empty;
+        foreach (var thisString in e.ColumnsWithErrors) {
+            var x = thisString.SplitAndCutBy("|");
+            if (column != null && string.Equals(x[0], column.KeyName, StringComparison.OrdinalIgnoreCase)) {
+                if (!string.IsNullOrEmpty(f.InfoText)) { f.InfoText += "<br><hr><br>"; }
+                newT += x[1];
+            }
+        }
+        f.InfoText = newT;
     }
 
     /// <summary>
@@ -218,28 +269,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (e.HotItem is BitmapListItem) {
             e.UserMenu.Add(Item("Bild öffnen"));
         }
-    }
-
-    private void _Database_Disposed(object sender, System.EventArgs e) => RowsInput_Changed();
-
-    private void _Database_Loaded(object sender, System.EventArgs e) {
-        if (Disposing || IsDisposed) { return; }
-
-        if (InvokeRequired) {
-            try {
-                _ = Invoke(new Action(() => _Database_Loaded(sender, e)));
-                return;
-            } catch {
-                // Kann dank Multitasking disposed sein
-                Develop.CheckStackForOverflow();
-                _Database_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
-                return;
-            }
-        }
-
-        var (column, row) = GetTmpVariables();
-        StyleControls(column, row);
-        SetValueFromCell(column, row);
     }
 
     private void ActivateMarker() {
@@ -273,59 +302,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
 
         f.DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false); // Rechteverwaltung einfliesen lassen.
-    }
-
-    private void Column_ItemInternalChanged(object sender, ColumnEventArgs e) {
-        var (column, row) = GetTmpVariables();
-
-        if (e.Column == column) {
-            StyleControls(column, row);
-            CheckEnabledState(column, row);
-            //OnNeedRefresh();
-        }
-    }
-
-    private void Database_CellValueChanged(object sender, CellChangedEventArgs e) {
-        try {
-            if (InvokeRequired) {
-                _ = Invoke(new Action(() => Database_CellValueChanged(sender, e)));
-                return;
-            }
-
-            var (column, row) = GetTmpVariables();
-
-            if (e.Row != row) { return; }
-
-            if (e.Column == column) { SetValueFromCell(column, row); }
-
-            if (e.Column == column || e.Column == e.Column.Database?.Column.SysLocked) { CheckEnabledState(column, row); }
-        } catch {
-            // Invoke: auf das verworfene Ojekt blah blah
-            if (!IsDisposed) {
-                Develop.CheckStackForOverflow();
-                Database_CellValueChanged(sender, e);
-            }
-        }
-    }
-
-    private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
-        var (column, row) = GetTmpVariables();
-
-        if (e.Row != row) { return; }
-        if (e.ColumnsWithErrors == null) {
-            f.InfoText = string.Empty;
-            return;
-        }
-
-        var newT = string.Empty;
-        foreach (var thisString in e.ColumnsWithErrors) {
-            var x = thisString.SplitAndCutBy("|");
-            if (column != null && string.Equals(x[0], column.KeyName, StringComparison.OrdinalIgnoreCase)) {
-                if (!string.IsNullOrEmpty(f.InfoText)) { f.InfoText += "<br><hr><br>"; }
-                newT += x[1];
-            }
-        }
-        f.InfoText = newT;
     }
 
     private void F_ControlAdded(object sender, ControlEventArgs e) {
@@ -413,7 +389,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             ColumnItem? tmpColumn;
             RowItem? tmpRow;
 
-            if (DatabaseInput() is Database db && !db.IsDisposed) {
+            if (DatabaseInput is Database db && !db.IsDisposed) {
                 tmpColumn = db.Column[_columnName];
                 tmpRow = RowSingleOrNull();
             } else {
@@ -451,7 +427,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        if (IsDisposed || DatabaseInput() is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || DatabaseInput is not Database db || db.IsDisposed) { return; }
 
         #region  in Frage kommende Textbox ermitteln txb
 
@@ -715,7 +691,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = DatabaseInput();
+    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = DatabaseInput;
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 

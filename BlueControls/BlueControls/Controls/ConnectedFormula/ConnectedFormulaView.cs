@@ -192,7 +192,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
 
         if (_generated) {
-            RowsInput_Changed();
+            Invalidate_RowsInput();
         }
     }
 
@@ -213,17 +213,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     }
 
     public override void HandleChangesNow() {
-        base.HandleChangesNow();
         if (IsDisposed) { return; }
+        base.HandleChangesNow();
+
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterOutput.Database, false);
-        }
-
-        RowsInputChangedHandled = true;
-        this.DoRows();
+        DoInputFilter(FilterOutput.Database, false);
+        DoRows();
 
         if (this.RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));
@@ -319,7 +315,15 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
         GroupBox.DrawGroupBox(this, gr, state, _groupBoxStyle, Text);
+        GenerateView();
+
+        if (!_generated) {
+            _timer.Enabled = true;
+            return;
+        }
+
         base.DrawControl(gr, state);
     }
 
@@ -329,20 +333,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         if (e.Control is RowEntryControl rec) {
             rec.ConnectChildParents(this);
         }
-    }
-
-    protected override void OnPaint(PaintEventArgs e) {
-        if (IsDisposed) { return; }
-
-        base.OnPaint(e);
-        GenerateView();
-
-        if (!_generated) {
-            _timer.Enabled = true;
-            return;
-        }
-
-        HandleChangesNow();
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {

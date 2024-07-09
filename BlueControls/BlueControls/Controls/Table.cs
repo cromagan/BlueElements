@@ -680,7 +680,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             db1.Loaded -= _Database_DatabaseLoaded;
             db1.Loading -= _Database_StoreView;
             db1.ViewChanged -= _Database_ViewChanged;
-            db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
+            db1.Column.ColumnPropertyChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
             //db1.Row.RowRemoved -= Row_RowRemoved; // macht Filter_PropertyChanged
@@ -708,7 +708,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             db2.Loaded += _Database_DatabaseLoaded;
             db2.Loading += _Database_StoreView;
             db2.ViewChanged += _Database_ViewChanged;
-            db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
+            db2.Column.ColumnPropertyChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
             //db2.Row.RowRemoved += Row_RowRemoved; // macht Filter_PropertyChanged
@@ -1055,11 +1055,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
 
-        FilterInputChangedHandled = true;
 
         if (Database is not Database db || db.IsDisposed) { return; }
 
-        this.DoInputFilter(FilterOutput.Database, false);
+        DoInputFilter(FilterOutput.Database, false);
 
         const string t = "Übergeordnetes Element";
 
@@ -1127,10 +1126,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         }
     }
 
-    public override void ParentFilterOutput_Changed() {
-        base.ParentFilterOutput_Changed();
-        HandleChangesNow();
-    }
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist

@@ -67,11 +67,6 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         foreach (var thisChild in Childs) {
             thisChild.Invalidate_FilterInput();
-            thisChild.ParentFilterOutput_Changed();
-
-            thisChild.Invalidate_RowsInput();
-
-            thisChild.Invalidate();
         }
     }
 

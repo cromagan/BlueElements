@@ -77,16 +77,10 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterOutput.Database, true);
-        }
-
-        RowsInputChangedHandled = true;
+        DoInputFilter(FilterOutput.Database, true);
+        DoRows();
 
         if (!f.Allinitialized) { _ = f.CreateSubControls(); }
-
-        this.DoRows();
 
         #region Combobox suchen
 

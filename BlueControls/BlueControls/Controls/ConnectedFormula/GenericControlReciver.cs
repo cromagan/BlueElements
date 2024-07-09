@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -32,6 +33,8 @@ namespace BlueControls.Controls;
 public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Fields
+
+    private Database? _databaseInput;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -48,11 +51,42 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Properties
 
+    public Database? DatabaseInput {
+        get => _databaseInput;
+
+        private set {
+            // Wichtig! Darf nur von HandelChangesNow befültg werden!
+            // Grund: Es wird hier nichts invalidiert!
+
+            if (value != null && value.IsDisposed) { value = null; }
+
+            if (value == _databaseInput) { return; }
+
+            if (_databaseInput != null) {
+                _databaseInput.Cell.CellValueChanged -= DatabaseInput_CellValueChanged;
+                _databaseInput.Column.ColumnPropertyChanged -= DatabaseInput_ColumnPropertyChanged;
+                _databaseInput.Row.RowChecked -= DatabaseInput_RowChecked;
+                _databaseInput.Loaded -= DatabaseInput_Loaded;
+                _databaseInput.Disposed -= DatabaseInput_Disposed;
+            }
+
+            _databaseInput = value;
+
+            if (_databaseInput != null && !_databaseInput.IsDisposed) {
+                _databaseInput.Cell.CellValueChanged += DatabaseInput_CellValueChanged;
+                _databaseInput.Column.ColumnPropertyChanged += DatabaseInput_ColumnPropertyChanged;
+                _databaseInput.Row.RowChecked += DatabaseInput_RowChecked;
+                _databaseInput.Loaded += DatabaseInput_Loaded;
+                _databaseInput.Disposed += DatabaseInput_Disposed;
+            }
+        }
+    }
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput {
+    protected FilterCollection? FilterInput {
         get => _filterInput;
         set {
             if (_filterInput == value) { return; }
@@ -65,7 +99,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterInputChangedHandled { get; set; }
+    protected bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -80,7 +114,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool RowsInputChangedHandled { get; set; }
+    protected bool RowsInputChangedHandled { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -101,29 +135,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         var isnew = !Parents.Contains(parent);
         var newFilters = parent.FilterOutput.Count > 0;
-        var doDatabaseAfter = DatabaseInput() == null;
+        var doDatabaseAfter = DatabaseInput == null;
 
-        if (isnew) {
-            Parents.AddIfNotExists(parent);
-        }
+        if (isnew) { Parents.AddIfNotExists(parent); }
 
         parent.Childs.AddIfNotExists(this);
 
-        if (newFilters && isnew) {
-            RowsInput_Changed();
+        if (newFilters && isnew) { Invalidate_FilterInput(); }
 
-            ParentFilterOutput_Changed();
-        }
-
-        if (doDatabaseAfter) {
-            RegisterEvents();
-        }
-    }
-
-    public Database? DatabaseInput() {
-        if (RowsInput != null && RowsInput.Count > 0) { return RowsInput[0].Database; }
-        if (FilterInput is FilterCollection fc) { return fc.Database; }
-        return null;
+        if (doDatabaseAfter) { RegisterEvents(); }
     }
 
     public void DisconnectChildParents(List<GenericControlReciverSender> parents) {
@@ -172,7 +192,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="mustbeDatabase"></param>
     /// <param name="doEmptyFilterToo"></param>
     public void DoInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || FilterInputChangedHandled) { return; }
+
+        FilterInputChangedHandled = true;
 
         FilterInput = GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
@@ -245,31 +267,34 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return fc;
     }
 
-    public virtual void HandleChangesNow() { }
+    public virtual void HandleChangesNow() {
+        if (IsDisposed) {
+            DatabaseInput = null;
+        } else if (RowsInput != null && RowsInput.Count > 0) {
+            DatabaseInput = RowsInput[0].Database;
+        } else if (FilterInput is FilterCollection fc) {
+            DatabaseInput = fc.Database;
+        } else {
+            DatabaseInput = null;
+        }
+    }
 
     /// <summary>
     /// Verwirft den aktuellen InputFilter.
     /// </summary>
-    public void Invalidate_FilterInput() {
+    public virtual void Invalidate_FilterInput() {
         if (IsDisposed) { return; }
-
         FilterInputChangedHandled = false;
-    }
-
-    public virtual void Invalidate_RowsInput() {
-        if (!RowsInputManualSeted) {
-            RowsInput = null;
-        }
-
-        RowsInputChangedHandled = false;
-        RowsInput_Changed();
+        Invalidate_RowsInput();
         Invalidate();
     }
 
-    /// <summary>
-    /// Entweder ignorieren oder HandleChangesNow aufrufen
-    /// </summary>
-    public virtual void ParentFilterOutput_Changed() { }
+    public virtual void Invalidate_RowsInput() {
+        if (IsDisposed) { return; }
+        if (!RowsInputManualSeted) { RowsInput = null; }
+        RowsInputChangedHandled = false;
+        Invalidate();
+    }
 
     public RowItem? RowSingleOrNull() {
         if (IsDisposed) { return null; }
@@ -277,19 +302,16 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return RowsInput[0];
     }
 
-    public virtual void RowsInput_Changed() { }
-
     public void SetToRow(RowItem? row) {
         if (IsDisposed) { return; }
         if (Parents.Count > 0) {
             Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
         }
 
-        var doAtabaseAfter = DatabaseInput() == null;
+        var doAtabaseAfter = _databaseInput == null;
 
         if (row == RowSingleOrNull()) { return; }
 
-        Invalidate_RowsInput();
         RowsInputManualSeted = true;
 
         RowsInput = [];
@@ -301,8 +323,18 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (doAtabaseAfter) { RegisterEvents(); }
         }
 
-        RowsInput_Changed();
+        Invalidate_RowsInput();
     }
+
+    protected virtual void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) { }
+
+    protected virtual void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
+
+    protected virtual void DatabaseInput_Disposed(object sender, System.EventArgs e) { }
+
+    protected virtual void DatabaseInput_Loaded(object sender, System.EventArgs e) { }
+
+    protected virtual void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) { }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
@@ -316,6 +348,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected void DoRows() {
+        if (RowsInputChangedHandled) { return; }
+
+        RowsInputChangedHandled = true;
+
         if (RowsInputManualSeted) { return; }
 
         if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "Filter unbehandelt!"); }
@@ -333,6 +369,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
         HandleChangesNow();
     }
 

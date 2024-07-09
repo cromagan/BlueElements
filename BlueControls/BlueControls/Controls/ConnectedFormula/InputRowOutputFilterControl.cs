@@ -56,14 +56,9 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
         if (FilterInputChangedHandled) { return; }
 
-        //if (!FilterInputChangedHandled) {
-        //    FilterInputChangedHandled = true;
-        //    this.DoInputFilter(null, false);
-        //}
+    
 
-        FilterInputChangedHandled = true;
-
-        this.DoInputFilter(null, false);
+        DoInputFilter(null, false);
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
@@ -122,8 +117,8 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         FilterOutput.ChangeTo(f);
     }
 
-    public override void ParentFilterOutput_Changed() {
-        base.ParentFilterOutput_Changed();
+    public override void Invalidate_FilterInput() {
+        base.Invalidate_FilterInput();
         HandleChangesNow();
     }
 

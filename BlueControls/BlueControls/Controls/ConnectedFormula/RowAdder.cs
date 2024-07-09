@@ -153,16 +153,10 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return;
         }
 
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterInput?.Database, true);
-        }
+        DoInputFilter(FilterInput?.Database, true);
+        DoRows();
 
-        RowsInputChangedHandled = true;
-
-        this.DoRows();
-
-        var rowIn = this.RowSingleOrNull();
+        var rowIn = RowSingleOrNull();
 
         if (rowIn == null) {
             Fehler("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information);
@@ -385,11 +379,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
         FillListBox();
         base.HandleChangesNow();
-    }
-
-    protected override void OnPaint(PaintEventArgs e) {
-        HandleChangesNow();
-        base.OnPaint(e);
     }
 
     private void DropDownMenu_Cancel(object sender, System.EventArgs e) {

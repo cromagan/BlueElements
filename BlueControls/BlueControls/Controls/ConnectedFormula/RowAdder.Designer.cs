@@ -41,7 +41,6 @@ partial class RowAdder {
             // 
             this.Name = "RowAdder";
             this.Size = new System.Drawing.Size(381, 419);
-            this.Size = new System.Drawing.Size(381, 419);
             this.ResumeLayout(false);
     }
 

@@ -33,18 +33,12 @@ internal class RowEntryControl : GenericControlReciverSender {
     #region Methods
 
     public override void HandleChangesNow() {
+        if (IsDisposed) { return; }
+        if (FilterInputChangedHandled && RowsInputChangedHandled) { return; }
+
         base.HandleChangesNow();
 
-        if (IsDisposed) { return; }
-        if (FilterInputChangedHandled) { return; }
-
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            DoInputFilter(FilterOutput.Database, true);
-        }
-
-        FilterInputChangedHandled = true;
-
+        DoInputFilter(FilterOutput.Database, true);
         DoRows();
 
         if (RowSingleOrNull() is RowItem r) {
@@ -54,7 +48,10 @@ internal class RowEntryControl : GenericControlReciverSender {
         }
     }
 
-    public override void RowsInput_Changed() => HandleChangesNow();
+    public override void Invalidate_RowsInput() {
+        base.Invalidate_RowsInput();
+        HandleChangesNow();
+    }
 
     #endregion
 }

@@ -138,9 +138,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
-        FilterInputChangedHandled = true;
 
-        this.DoInputFilter(null, false);
+
+        DoInputFilter(null, false);
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
@@ -159,8 +159,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         UpdateFilterData(filterSingle, _doFilterDeleteButton);
     }
 
-    public override void ParentFilterOutput_Changed() {
-        base.ParentFilterOutput_Changed();
+    public override void Invalidate_FilterInput() {
+        base.Invalidate_FilterInput();
         HandleChangesNow();
     }
 

@@ -148,15 +148,10 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (!FilterInputChangedHandled) {
-            FilterInputChangedHandled = true;
-            this.DoInputFilter(null, false);
-        }
-
-        RowsInputChangedHandled = true;
-
         RemoveWatcher();
-        this.DoRows();
+
+        DoInputFilter(null, false);
+        DoRows();
 
         var ct = string.Empty;
 
