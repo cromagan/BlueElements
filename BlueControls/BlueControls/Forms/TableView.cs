@@ -284,8 +284,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
             case "#datenüberprüfung":
                 if (row != null && !row.IsDisposed) {
-                    row.UpdateRow(false, true, true);
-                    Method_RowUniqueAndInvalidate.DoAllRows();
+                    row.UpdateRow(false, true, true, "Kontextmenü");
+                    Method_RowUniqueAndInvalidate.DoAllRows(row);
                     //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
                 }
@@ -1038,11 +1038,11 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                     }
 
                     foreach (var thisR in rows) {
-                        thisR.UpdateRow(false, true, true);
+                        thisR.UpdateRow(false, true, true, "Datenüberprüfung");
                         //thisR.CheckRowDataIfNeeded();
                     }
 
-                    Method_RowUniqueAndInvalidate.DoAllRows();
+                    Method_RowUniqueAndInvalidate.DoAllRows(null);
 
                     MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
                     lstAufgaben.Enabled = true;

@@ -111,8 +111,15 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\AdderItem.cs" />
     <Compile Include="Classes\ItemCollectionList\DropDownListItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\MonitorPadItem.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.Designer.cs">
       <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\Monitor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\Monitor.Designer.cs">
+      <DependentUpon>Monitor.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\ConnectedFormula\FlexiControlRowSelector.Designer.cs">
       <DependentUpon>FlexiControlRowSelector.cs</DependentUpon>
@@ -687,6 +694,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaButton.resx">
       <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ConnectedFormula\Monitor.resx">
+      <DependentUpon>Monitor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectedFormula\RowAdder.resx">
       <DependentUpon>RowAdder.cs</DependentUpon>

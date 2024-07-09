@@ -2106,7 +2106,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
-            contentHolderCellRow.UpdateRow(true, false, true);
+            contentHolderCellRow.UpdateRow(true, false, true, "Nach Benutzereingabe");
 
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }

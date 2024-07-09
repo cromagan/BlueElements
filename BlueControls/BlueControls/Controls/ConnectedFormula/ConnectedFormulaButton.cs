@@ -302,6 +302,8 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         var f = ufb.DoIt(vars, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, fis, rn, ai);
 
+        BlueDatabase.AdditionalScriptMethods.Method_RowUniqueAndInvalidate.DoAllRows(row);
+
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }

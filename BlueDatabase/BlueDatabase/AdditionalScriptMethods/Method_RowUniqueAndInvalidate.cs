@@ -78,24 +78,39 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
 
     #region Methods
 
-    public static void DoAllRows() {
+    public static void DoAllRows(RowItem? masterRow) {
         if (Database.ExecutingScriptAnyDatabase != 0 || InvalidatedRows.Count > 0) { return; }
+
+        var ra = 0;
+        var n = 0;
 
         DidRows.Clear();
         try {
             while (InvalidatedRows.Count > 0) {
+                n++;
                 var r = InvalidatedRows[0];
                 InvalidatedRows.RemoveAt(0);
 
                 DidRows.Add(r);
 
+                if (InvalidatedRows.Count > ra) {
+                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge ({InvalidatedRows.Count + DidRows.Count })");
+                    ra = InvalidatedRows.Count;
+                }
+
                 if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
-                    r.UpdateRow(false, true, true);
+                    if (masterRow?.Database != null) {
+                        r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
+                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"[{n.ToStringInt2()}] Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                    } else {
+                        r.UpdateRow(false, true, true, "Normales Update");
+                    }
                 }
             }
         } catch { }
 
         DidRows.Clear();
+        masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Updates abgearbeitet");
     }
 
     public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {

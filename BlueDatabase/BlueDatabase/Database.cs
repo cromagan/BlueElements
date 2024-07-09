@@ -1522,7 +1522,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ExecutingScriptAnyDatabase--;
 
             if (produktivphase && ExecutingScript == 0 && ExecutingScriptAnyDatabase == 0) {
-                Method_RowUniqueAndInvalidate.DoAllRows();
+                Method_RowUniqueAndInvalidate.DoAllRows(row);
             }
 
             return scf;

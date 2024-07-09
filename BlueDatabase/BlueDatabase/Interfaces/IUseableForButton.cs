@@ -57,10 +57,6 @@ public static class UseableForButton {
         List<string> args = [arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8];
 
         for (var nr = 0; nr < args.Count; nr++) {
-            //if (nr >= ufb.ArgsForButton.Count && !string.IsNullOrEmpty(args[nr])) {
-            //    return "Zu viele Argumente erhalten";
-            //}
-
             if (nr < ufb.ArgsForButton.Count && string.IsNullOrEmpty(args[nr])) {
                 return "Zu wenig Argumente erhalten";
             }
@@ -75,10 +71,6 @@ public static class UseableForButton {
 
         var erg = ufb.DoIt(varCol, cdw, scp);
 
-        if (erg.AllOk) {
-            AdditionalScriptMethods.Method_RowUniqueAndInvalidate.DoAllRows();
-            return string.Empty;
-        }
         return cdw.LogData.Protocol.JoinWithCr();
     }
 

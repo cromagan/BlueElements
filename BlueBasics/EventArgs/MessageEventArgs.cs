@@ -18,10 +18,11 @@
 #nullable enable
 
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 
 namespace BlueBasics.EventArgs;
 
-public class MessageEventArgs : System.EventArgs {
+public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
 
     #region Constructors
 
@@ -45,6 +46,25 @@ public class MessageEventArgs : System.EventArgs {
 
     // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public bool WrittenToLogifile { get; set; }
+
+    public string QuickInfo => Message;
+
+    public string KeyName => Generic.GetUniqueKey();
+
+    public string ReadableText() => Message;
+
+    public QuickImage? SymbolForReadableText() {
+
+        switch (Type) {
+
+            case FehlerArt.Warnung: return QuickImage.Get(ImageCode.Warnung, 16);
+            case FehlerArt.Fehler: return QuickImage.Get(ImageCode.Kreis, 16);
+            default: return null;
+        }
+
+
+
+    }
 
     #endregion
 }

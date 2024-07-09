@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -39,15 +40,20 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable, ICanDropMessages {
 
     #region Fields
 
     public RowCheckedEventArgs? LastCheckedEventArgs;
+
     public string? LastCheckedMessage;
+
     public List<string>? LastCheckedRowFeedback;
+
     private Database? _database;
+
     private DateTime? _isInCache;
+
     private string? _tmpQuickInfo;
 
     #endregion
@@ -71,6 +77,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #endregion
 
     #region Events
+
+    public event EventHandler<MessageEventArgs>? DropMessage;
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
@@ -665,7 +673,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
-    public bool UpdateRow(bool onlyIfQuick, bool mustDoFullCheck, bool wichtig) {
+    public bool UpdateRow(bool onlyIfQuick, bool mustDoFullCheck, bool wichtig, string reason) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
         if (!wichtig && Database.ExecutingScriptAnyDatabase > 0) { return false; }
@@ -692,7 +700,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (onlyIfQuick && mustDoFullCheck) { return false; }
 
         try {
-            db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption}");
+            db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
+            OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustDoFullCheck);
             if (!ok.AllOk) { return false; }
@@ -800,6 +809,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(_database?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
+
+    public void OnDropMessage(FehlerArt type, string message) {
+        if (IsDisposed) { return; }
+        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
+    }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
