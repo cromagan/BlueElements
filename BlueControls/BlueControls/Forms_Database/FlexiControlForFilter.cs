@@ -134,7 +134,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         base.FilterOutput_PropertyChanged(this, System.EventArgs.Empty);
     }
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }

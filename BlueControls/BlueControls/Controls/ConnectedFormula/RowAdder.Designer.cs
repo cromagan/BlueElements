@@ -26,22 +26,28 @@ partial class RowAdder {
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
     private void InitializeComponent() {
-            this.f = new ListBox();
+            this.f = new BlueControls.Controls.ListBox();
             this.SuspendLayout();
-            //
+            // 
             // f
-            //
-            this.f.Dock = DockStyle.Fill;   
+            // 
             this.f.AddAllowed = BlueControls.Enums.AddType.None;
             this.f.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             this.f.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.f.ItemClicked += F_ItemClicked;
+            this.f.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.f.Location = new System.Drawing.Point(0, 0);
+            this.f.Name = "f";
+            this.f.Size = new System.Drawing.Size(381, 419);
+            this.f.TabIndex = 0;
+            this.f.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.F_ItemClicked);
             // 
             // RowAdder
             // 
+            this.Controls.Add(this.f);
             this.Name = "RowAdder";
             this.Size = new System.Drawing.Size(381, 419);
             this.ResumeLayout(false);
+
     }
 
 

@@ -1050,7 +1050,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         hotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
     }
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }

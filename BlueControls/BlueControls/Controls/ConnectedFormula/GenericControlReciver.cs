@@ -267,7 +267,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return fc;
     }
 
-    public virtual void HandleChangesNow() {
+    protected virtual void HandleChangesNow() {
         if (IsDisposed) {
             DatabaseInput = null;
         } else if (RowsInput != null && RowsInput.Count > 0) {

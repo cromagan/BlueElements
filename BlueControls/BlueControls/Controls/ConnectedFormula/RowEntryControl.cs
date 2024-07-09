@@ -32,11 +32,12 @@ internal class RowEntryControl : GenericControlReciverSender {
 
     #region Methods
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled && RowsInputChangedHandled) { return; }
 
-        base.HandleChangesNow();
+
 
         DoInputFilter(FilterOutput.Database, true);
         DoRows();

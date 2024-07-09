@@ -374,7 +374,8 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _ignoreCheckedChanged = false;
     }
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
         FillListBox();

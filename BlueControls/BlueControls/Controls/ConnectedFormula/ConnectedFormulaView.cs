@@ -212,10 +212,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         ConnectedFormula = null;
     }
 
-    public override void HandleChangesNow() {
-        if (IsDisposed) { return; }
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
 
+        if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(FilterOutput.Database, false);

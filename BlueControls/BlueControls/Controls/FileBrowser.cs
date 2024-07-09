@@ -143,7 +143,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         return exekey == null ? string.Empty : exekey.GetValue("").ToString();
     }
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }

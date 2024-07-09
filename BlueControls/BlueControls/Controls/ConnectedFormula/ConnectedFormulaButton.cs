@@ -198,8 +198,9 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     #region Methods
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
+
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 

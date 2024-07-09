@@ -97,7 +97,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     public EditTypeFormula EditType { get => f.EditType; set => f.EditType = value; }
-    public string Value => f.Value; 
+    public string Value => f.Value;
 
     #endregion
 
@@ -145,7 +145,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Methods
 
-    public override void HandleChangesNow() {
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }

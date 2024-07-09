@@ -160,9 +160,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         }
     }
 
-    public override void HandleChangesNow() {
-        if (IsDisposed) { return; }
+    protected override void HandleChangesNow() {
         base.HandleChangesNow();
+        if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
