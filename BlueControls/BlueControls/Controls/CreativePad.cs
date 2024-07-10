@@ -291,7 +291,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         if (e == null || _item == null) { return []; }
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
         return _item.Where(thisItem => thisItem != null &&
-                                        thisItem.IsVisibleOnPage(CurrentPage) &&
+                                        thisItem.IsOnPage(CurrentPage) &&
                                         thisItem.Contains(p, Zoom)).ToList();
     }
 

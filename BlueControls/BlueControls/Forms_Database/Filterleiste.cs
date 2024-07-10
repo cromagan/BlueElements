@@ -93,7 +93,6 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
         set {
             if (_table == value) { return; }
             if (_table != null) {
-                //_table.DisconnectChildParents(this);
                 _table.DatabaseChanged -= _table_DatabaseChanged;
                 _table.FilterChanged -= _table_PinnedOrFilterChanged;
                 _table.PinnedChanged -= _table_PinnedOrFilterChanged;
@@ -104,7 +103,6 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
             GetÄhnlich();
             FillFilters();
             if (_table != null) {
-                //_table.ConnectChildParents(this);
                 _table.DatabaseChanged += _table_DatabaseChanged;
                 _table.FilterChanged += _table_PinnedOrFilterChanged;
                 _table.PinnedChanged += _table_PinnedOrFilterChanged;
@@ -225,7 +223,6 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
                             // Na gut, eben neuen Flex erstellen
                             flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld);
                             flx.FilterOutput.Database = thisColumn.Database;
-                            flx.ConnectChildParents(this);
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
                             //flx.DoOutputSettings(this);
@@ -258,7 +255,6 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
         #region Unnötige Flexis löschen
 
         foreach (var thisFlexi in flexsToDelete) {
-            thisFlexi.DisconnectChildParents(this);
             thisFlexi.FilterOutput.PropertyChanging -= FlexSingeFilter_FilterOutput_PropertyChanging;
             thisFlexi.FilterOutput.PropertyChanged -= FlexSingeFilter_FilterOutput_PropertyChanged;
             thisFlexi.Visible = false;
@@ -270,6 +266,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
         _isFilling = false;
     }
+
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

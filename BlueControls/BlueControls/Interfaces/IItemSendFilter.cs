@@ -30,7 +30,7 @@ using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IItemToControl, IErrorCheckable, IItemAcceptFilter {
+public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IErrorCheckable, IItemAcceptFilter {
 
     #region Properties
 

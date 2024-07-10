@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
@@ -142,34 +143,39 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             var autoc = new List<FlexiControlForCell>();
 
             foreach (var thisit in ConnectedFormula.PadData) {
-                if (thisit is IItemToControl thisitco && thisit.IsVisibleOnPage(Page)) {
-                    var o = SearchOrGenerate(thisitco);
+                if (thisit is IItemToControl thisitco && thisit.IsOnPage(Page)) {
+                    var con = SearchOrGenerate(thisitco, false);
 
-                    if (o != null) {
-                        _ = unused.Remove(o);
+                    if (con != null) {
+                        _ = unused.Remove(con);
 
                         if (thisit is FakeControlPadItem cspi) {
-                            o.Visible = cspi.IsVisibleForMe(Mode, true);
+                            con.Visible = cspi.IsVisibleForMe(Mode, true);
                         } else {
-                            o.Visible = true;
+                            con.Visible = true;
                         }
 
                         if (thisit is IAutosizable) {
                             foreach (var (item, newpos) in l) {
                                 if (item == thisit) {
-                                    o.Left = (int)newpos.Left + x1;
-                                    o.Top = (int)newpos.Top + y1;
-                                    o.Width = (int)newpos.Width;
-                                    o.Height = (int)newpos.Height;
+                                    con.Left = (int)newpos.Left + x1;
+                                    con.Top = (int)newpos.Top + y1;
+                                    con.Width = (int)newpos.Width;
+                                    con.Height = (int)newpos.Height;
                                 }
                             }
                         }
 
-                        if (thisit is TabFormulaPadItem c3) {
-                            c3.CreateTabs((TabControl)o, this, Mode);
+                        
+                        if(thisit is RowEntryPadItem rep) {
+                            DoDefaultSettings(null, rep);
                         }
 
-                        if (o.Visible && o is FlexiControlForCell fo &&
+                        if (thisit is TabFormulaPadItem tabItem) {
+                            tabItem.CreateTabs((TabControl)con, this, Mode);
+                        }
+
+                        if (con.Visible && con is FlexiControlForCell fo &&
                            thisit is EditFieldPadItem efpi && efpi.AutoX &&
                            efpi.CaptionPosition is CaptionPosition.Links_neben_dem_Feld or
                                                    CaptionPosition.Links_neben_dem_Feld_unsichtbar) { autoc.Add(fo); }
@@ -183,10 +189,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
 
         foreach (var thisc in unused) {
-            if (thisc is GenericControlReciver child) {
-                child.DisconnectChildParents(child.Parents);
-            }
-
             base.Controls.Remove(thisc);
             thisc?.Dispose();
         }
@@ -210,22 +212,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
 
         ConnectedFormula = null;
-    }
-
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
-        DoInputFilter(FilterOutput.Database, false);
-        DoRows();
-
-        if (this.RowSingleOrNull() is RowItem r) {
-            FilterOutput.ChangeTo(new FilterItem(r));
-        } else {
-            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
-        }
     }
 
     public void InitFormula(ConnectedFormula.ConnectedFormula? cf, Database? database) {
@@ -277,13 +263,15 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public Control? SearchOrGenerate(IItemToControl? thisit) {
+    public Control? SearchOrGenerate(IItemToControl? thisit, bool onlySerach) {
         if (thisit == null) { return null; }
 
         try {
             foreach (var thisC in base.Controls) {
                 if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
             }
+
+            if(onlySerach) {return null;}
 
             var c = thisit.CreateControl(this);
             if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
@@ -318,7 +306,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         if (IsDisposed) { return; }
         var s = States.Standard;
 
-        if(!Enabled) { s = States.Standard_Disabled; }
+        if (!Enabled) { s = States.Standard_Disabled; }
         GroupBox.DrawGroupBox(this, gr, s, _groupBoxStyle, Text);
         GenerateView();
 
@@ -330,13 +318,23 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         base.DrawControl(gr, state);
     }
 
-    protected override void OnControlAdded(ControlEventArgs e) {
-        base.OnControlAdded(e);
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
 
-        if (e.Control is RowEntryControl rec) {
-            rec.ConnectChildParents(this);
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        DoInputFilter(FilterOutput.Database, false);
+        DoRows();
+
+        if (this.RowSingleOrNull() is RowItem r) {
+            FilterOutput.ChangeTo(new FilterItem(r));
+        } else {
+            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
         }
     }
+
+
 
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }

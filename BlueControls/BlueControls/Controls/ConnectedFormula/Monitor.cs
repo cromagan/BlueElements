@@ -36,6 +36,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using BlueDatabase;
 using BlueBasics.EventArgs;
+using BlueBasics;
 
 namespace BlueControls.Controls;
 
@@ -60,7 +61,7 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
     #region Properties
 
 
-
+    int n = 99999;
 
     RowItem? _lastRow = null;
 
@@ -69,7 +70,7 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
 
         set {
 
-            if (_lastRow?.Database == null || _lastRow.Database.IsDisposed) { value = null; }
+            if (value?.Database == null || value.IsDisposed) { value = null; }
 
             if(_lastRow == value ) { return; }
 
@@ -77,11 +78,13 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
             if (_lastRow != null) {
                 _lastRow.DropMessage -= _lastRow_DropMessage;
             }
+            n = 99999;
             _lastRow = value;
             capInfo.Text = string.Empty;
             lstDone.ItemClear();
 
             if (_lastRow != null) {
+                capInfo.Text = "Überwache: " + _lastRow.CellFirstString();
                 _lastRow.DropMessage += _lastRow_DropMessage;
             }
 
@@ -92,12 +95,26 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
     }
 
     private void _lastRow_DropMessage(object sender, MessageEventArgs e) {
-     
-        if(!string.IsNullOrWhiteSpace(capInfo.Text)) {
-            lstDone.ItemAdd(ItemOf(e));
+
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(() => _lastRow_DropMessage(sender, e)));
+                return;
+            } catch {
+                return;
+            }
         }
 
-        capInfo.Text = e.Message;
+        n--;
+        if(n<0) { n = 99999; }
+
+        if (!string.IsNullOrWhiteSpace(capInfo.Text)) {
+            lstDone.ItemAdd(ItemOf(e, n.ToStringInt7()));  
+        }
+
+        //capInfo.Text = e.Message;
 
     }
 

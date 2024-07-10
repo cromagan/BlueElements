@@ -752,7 +752,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         var usedids = new List<int>();
 
         foreach (var thisIt in this) {
-            if (thisIt is IItemSendFilter hci && thisIt.IsVisibleOnPage(page)) {
+            if (thisIt is IItemSendFilter hci && thisIt.IsOnPage(page)) {
                 usedids.Add(hci.OutputColorId);
             }
         }

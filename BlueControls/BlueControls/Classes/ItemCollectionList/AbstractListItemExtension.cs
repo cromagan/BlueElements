@@ -214,6 +214,8 @@ public static class AbstractListItemExtension {
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
 
+    public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
+
     public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
         List<string> l = [];
 

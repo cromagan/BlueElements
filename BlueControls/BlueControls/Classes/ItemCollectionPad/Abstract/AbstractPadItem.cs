@@ -309,7 +309,13 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
-    public bool IsVisibleOnPage(string page) {
+    public bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
+        sizeOfParentControl.IsEmpty ||
+        sizeOfParentControl.Width == 0 ||
+        sizeOfParentControl.Height == 0 ||
+        drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
+
+    public bool IsOnPage(string page) {
         if (string.IsNullOrEmpty(_page)) { return true; }
 
         return string.Equals(_page, page, StringComparison.OrdinalIgnoreCase);
@@ -513,12 +519,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
             }
         } catch { }
     }
-
-    public bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
-        sizeOfParentControl.IsEmpty ||
-        sizeOfParentControl.Width == 0 ||
-        sizeOfParentControl.Height == 0 ||
-        drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
     private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {

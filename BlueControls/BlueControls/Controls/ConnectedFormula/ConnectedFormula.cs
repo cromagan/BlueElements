@@ -413,7 +413,7 @@ public sealed class ConnectedFormula : IPropertyChangedFeedback, IDisposableExte
 
         foreach (var thisc in padData) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                thisc.IsVisibleOnPage(page) &&
+                thisc.IsOnPage(page) &&
                 thisc.IsInDrawingArea(thisc.UsedArea, padData.SheetSizeInPix.ToSize())) {
                 its.Add(aas);
             }

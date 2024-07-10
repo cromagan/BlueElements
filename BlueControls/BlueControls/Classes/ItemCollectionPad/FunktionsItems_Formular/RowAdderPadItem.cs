@@ -39,9 +39,8 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
-public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable, ISimpleEditor {
-    //OriginID: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1 (AdderNo)
-    //TextKey: Vegetarisch/Mehl
+public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IHasVersion, IAutosizable, ISimpleEditor {
+
 
     #region Fields
 
@@ -224,7 +223,7 @@ public class RowAdderPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new RowAdder {
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,

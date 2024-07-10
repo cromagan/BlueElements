@@ -43,7 +43,7 @@ using BlueDatabase.Interfaces;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IAutosizable {
+public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -320,7 +320,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new ConnectedFormulaButton() {
             Text = _anzeige,
             ImageCode = _image + "|16",

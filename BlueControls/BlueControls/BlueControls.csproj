@@ -213,9 +213,6 @@
     <Compile Include="Controls\ConnectedFormula\InputRowOutputFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ConnectedFormula\RowEntryControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Controls\ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>

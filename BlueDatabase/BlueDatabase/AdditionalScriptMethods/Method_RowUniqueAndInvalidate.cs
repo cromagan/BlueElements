@@ -79,7 +79,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
     #region Methods
 
     public static void DoAllRows(RowItem? masterRow) {
-        if (Database.ExecutingScriptAnyDatabase != 0 || InvalidatedRows.Count > 0) { return; }
+        if (Database.ExecutingScriptAnyDatabase != 0 || DidRows.Count > 0) { return; }
 
         var ra = 0;
         var n = 0;
@@ -89,16 +89,17 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
             while (InvalidatedRows.Count > 0) {
                 n++;
                 var r = InvalidatedRows[0];
-                InvalidatedRows.RemoveAt(0);
+                    InvalidatedRows.RemoveAt(0);
 
-                DidRows.Add(r);
+           
 
                 if (InvalidatedRows.Count > ra) {
-                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge ({InvalidatedRows.Count + DidRows.Count })");
+                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count } insgesamt)");
                     ra = InvalidatedRows.Count;
                 }
 
                 if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
+                    DidRows.Add(r);
                     if (masterRow?.Database != null) {
                         r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
                         masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"[{n.ToStringInt2()}] Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");

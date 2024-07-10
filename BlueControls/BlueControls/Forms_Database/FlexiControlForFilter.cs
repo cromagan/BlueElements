@@ -167,7 +167,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
     protected override void Dispose(bool disposing) {
         if (disposing) {
             Tag = null;
-            Childs.Clear();
         }
 
         base.Dispose(disposing);

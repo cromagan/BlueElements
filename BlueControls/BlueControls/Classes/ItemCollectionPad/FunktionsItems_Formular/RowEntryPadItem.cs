@@ -36,7 +36,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
 /// Unsichtbares Element, wird nicht angezeigt.
 /// </summary>
-public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
@@ -114,16 +114,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new RowEntryControl();
-        con.DoDefaultSettings(parent, this);
 
-        // Besonderheit:
-        // RowEntryPadItem hat niemals Parents.
-        // Wird nachträglich bei OnControlAdded des ConnectedFormulaView gesetzt
-
-        return con;
-    }
 
     public override string ErrorReason() {
         var b = base.ErrorReason();

@@ -33,7 +33,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptFilter : IHasKeyName, IPropertyChangedFeedback, IHasVersion, IItemToControl, IErrorCheckable {
+public interface IItemAcceptFilter : IHasKeyName, IPropertyChangedFeedback, IHasVersion, IErrorCheckable {
 
     #region Properties
 
@@ -233,7 +233,7 @@ public sealed class ItemAcceptFilter {
 
             // Die Items, die man noch wählen könnte
             foreach (var thisR in item.Parent) {
-                if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
+                if (thisR.IsOnPage(item.Page) && thisR is IItemSendFilter rfp) {
                     //if (outp == null || outp == rfp.DatabaseOutput) {
                     if (rfp != item) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));

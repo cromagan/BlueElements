@@ -211,9 +211,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
 
-        UnRegisterDatabaseEvents();
-        _database = fi?.Database;
-        RegisterDatabaseEvents();
+        if (_database != fi?.Database) {
+            UnRegisterDatabaseEvents();
+            _database = fi?.Database;
+            RegisterDatabaseEvents();
+        }
 
         UnRegisterEvents(_internal);
         _internal.Clear();
@@ -403,7 +405,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var tmp = new List<FilterItem>();
         tmp.AddRange(_internal);
 
-   
+
         _internal.Clear();
         _internal.AddRange(tmp.OrderBy(e => e.ReadableText()).ToList());
 
@@ -624,6 +626,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private List<RowItem> CalculateFilteredRows() {
+        Develop.CheckStackForOverflow();
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
 
         var fi2 = _internal.ToArray();

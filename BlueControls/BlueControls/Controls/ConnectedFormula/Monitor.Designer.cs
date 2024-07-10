@@ -32,7 +32,7 @@ namespace BlueControls.Controls
             // lstDone
             // 
             this.lstDone.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lstDone.AutoSort = false;
+            this.lstDone.AutoSort = true;
             this.lstDone.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstDone.Location = new System.Drawing.Point(0, 24);
             this.lstDone.Name = "lstDone";

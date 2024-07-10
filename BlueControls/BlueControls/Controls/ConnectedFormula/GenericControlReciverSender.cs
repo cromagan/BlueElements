@@ -17,10 +17,16 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls;
 
@@ -48,18 +54,22 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Methods
 
-    public void DisconnectChildParents(List<GenericControlReciver> childs) {
-        var c = new List<GenericControlReciver>();
-        c.AddRange(childs);
-
-        foreach (var thisChild in c) {
-            thisChild.DisconnectChildParents(this);
-        }
-    }
-
-    public void DoDefaultSettings(ConnectedFormulaView parent, IItemSendFilter source) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemSendFilter source) {
         FilterOutput.Database = source.DatabaseOutput;
-        base.DoDefaultSettings(parent, source);
+        base.DoDefaultSettings(parentFormula, source);
+
+        if(parentFormula == null) {return; }
+
+        foreach (var thisKey in source.ChildIds) {
+            var it = source.Parent?[thisKey];
+
+            if (it is IItemToControl itc) {
+                var parentCon = parentFormula.SearchOrGenerate(itc, true);
+                if (parentCon is GenericControlReciver exitingChild) {
+                    ChildIsBorn(exitingChild);
+                }
+            } 
+        }
     }
 
     public virtual void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
@@ -74,9 +84,14 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     protected override void Dispose(bool disposing) {
         if (Disposing) {
-            DisconnectChildParents(Childs);
-
+            Parent.Controls.Remove(this);
             FilterOutput.Dispose();
+
+
+            foreach (var thisChild in Childs) {
+                thisChild.Parents.Remove(this);
+            }
+
 
             Childs.Clear();
         }
@@ -84,10 +99,33 @@ public class GenericControlReciverSender : GenericControlReciver {
         base.Dispose(disposing);
     }
 
+
     protected override void OnCreateControl() {
         FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;
         FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
         base.OnCreateControl();
+    }
+
+
+    internal void ChildIsBorn(GenericControlReciver child) {
+        if (child.RowsInputManualSeted) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
+        }
+
+        if (child.IsDisposed || IsDisposed) { return; }
+
+        var isnew = !child.Parents.Contains(this);
+        var newFilters = FilterOutput.Count > 0;
+        //var doDatabaseAfter = DatabaseInput == null;
+
+        if (isnew) { child.Parents.AddIfNotExists(this); }
+
+
+        Childs.AddIfNotExists(child);
+
+        if (newFilters && isnew) { child.Invalidate_FilterInput(); }
+
+        //if (doDatabaseAfter) { child.RegisterEvents(); }
     }
 
     private void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {

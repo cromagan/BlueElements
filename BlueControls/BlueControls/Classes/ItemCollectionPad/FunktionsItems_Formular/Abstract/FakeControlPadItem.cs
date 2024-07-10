@@ -48,7 +48,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IHasKeyName, IPropertyChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
+public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyName, IPropertyChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
 
     #region Fields
 
@@ -99,8 +99,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         OnPropertyChanged();
     }
 
-    //public abstract int InputColorId { get; set; }
-    public abstract Control? CreateControl(ConnectedFormulaView parent);
 
     public virtual string ErrorReason() {
         if (Parent == null) {

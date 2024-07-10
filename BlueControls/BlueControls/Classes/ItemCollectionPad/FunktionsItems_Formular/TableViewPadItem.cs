@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable {
 
     #region Fields
 
@@ -143,7 +143,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new Table();
         con.DatabaseSet(DatabaseOutput, string.Empty);
         con.DoDefaultSettings(parent, this);

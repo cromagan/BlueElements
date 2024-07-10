@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Unter-Element von ConnectedFormulaView
 /// </summary>
-public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
+public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -131,7 +131,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAuto
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
         var txt = "?";

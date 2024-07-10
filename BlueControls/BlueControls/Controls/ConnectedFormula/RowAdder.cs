@@ -136,7 +136,20 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _ignoreCheckedChanged = false;
     }
 
-    public void FillListBox() {
+
+
+
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled && !_mustUpdate) { return; }
+
+        DoInputFilter(FilterOutput.Database, true);
+        DoRows();
+        _mustUpdate = false;
+
+
+
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
             return;
@@ -374,16 +387,10 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _ignoreCheckedChanged = false;
     }
 
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-        FillListBox();
-        base.HandleChangesNow();
-    }
-
     private void DropDownMenu_Cancel(object sender, System.EventArgs e) {
-        FillListBox();
+        //FillListBox();
+        _mustUpdate = true;
+        Invalidate();
     }
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -393,8 +400,12 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
         }
 
-        FillListBox();
+        _mustUpdate = true;
+        //FillListBox();
+        Invalidate();
     }
+
+    bool _mustUpdate = true;
 
     private void F_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
@@ -405,7 +416,9 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             } else {
                 AdderItem.RemoveRowsFromDatabase(OriginIDColumn, GeneratedEntityId, ai.KeyName);
             }
-            FillListBox();
+            //FillListBox();
+            _mustUpdate = true;
+            Invalidate();
         }
 
         if (e.Item is DropDownListItem dli) {

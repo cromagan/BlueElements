@@ -19,6 +19,7 @@
 
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System;
 
 namespace BlueBasics.EventArgs;
 
@@ -31,12 +32,13 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
         Type = type;
         WrittenToLogifile = false;
         Shown = false;
+        Time = DateTime.Now;
     }
 
     #endregion
 
     #region Properties
-
+    public DateTime Time { get; }
     public string Message { get; }
 
     // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
@@ -51,7 +53,7 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
 
     public string KeyName => Generic.GetUniqueKey();
 
-    public string ReadableText() => Message;
+    public string ReadableText() => $"[{Time.ToString4()}]  {Message}";
 
     public QuickImage? SymbolForReadableText() {
 

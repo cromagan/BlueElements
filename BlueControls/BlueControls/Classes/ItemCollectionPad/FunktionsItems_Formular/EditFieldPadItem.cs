@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IHasVersion, IAutosizable {
+public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IHasVersion, IAutosizable {
 
     #region Fields
 
@@ -177,7 +177,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell {

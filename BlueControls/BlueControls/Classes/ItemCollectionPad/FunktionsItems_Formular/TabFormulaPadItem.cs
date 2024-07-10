@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
+public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -108,7 +108,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosiz
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         var con = new TabControl();
         con.Name = this.DefaultItemToControlName();
         // Die Input-Settings werden direkt auf das erzeugte

@@ -26,6 +26,7 @@ using BlueDatabase.Interfaces;
 using BlueScript.Variables;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Text;
 
 namespace BlueControls.Controls;
 
@@ -259,6 +260,9 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
             return;
         }
 
+        main.Enabled = false;
+        main.Refresh();
+
         HandleChangesNow();
 
         VariableCollection vars;
@@ -296,6 +300,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (row != null) {
             vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
             ai = row;
+            row.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Knopfdruck mit dieser Zeile");
         }
 
         #endregion
@@ -307,6 +312,10 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
+
+        row?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Knopfdruck ausgeführt");
+        main.Enabled = true;
+        main.Refresh();
     }
 
     #endregion

@@ -37,7 +37,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl, IReadableText,  IItemAcceptFilter, IItemSendFilter, IAutosizable {
 
     #region Fields
 
@@ -179,7 +179,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         //var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);

@@ -102,7 +102,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new EasyPic {
             OriginalText = Bild_Dateiname
         };

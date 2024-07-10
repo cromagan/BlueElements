@@ -35,7 +35,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class MonitorPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
+public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -100,7 +100,7 @@ public class MonitorPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizabl
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new Monitor();
         con.DoDefaultSettings(parent, this);
 

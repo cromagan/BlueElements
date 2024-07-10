@@ -35,7 +35,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
+public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -132,7 +132,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
             OriginalText = Pfad,
             CreateDir = _bei_Bedarf_Erzeugen,
