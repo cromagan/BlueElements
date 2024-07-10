@@ -101,6 +101,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _caption = string.Empty;
     private Timer? _checker;
     private int _checkerTickCount = -5;
+    private bool _completing = false;
     private string _createDate;
     private string _creator;
     private string _editNormalyError = string.Empty;
@@ -111,8 +112,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _globalShowPass = string.Empty;
     private bool _isInSave;
     private bool _readOnly;
-
-    private bool _completing = false;
     private string _scriptNeedFix = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
@@ -1253,6 +1252,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
         vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
         vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+        vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
 
         if (extendedVariable is bool e) {
             vars.Add(new VariableBool("Extended", e, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
@@ -1281,7 +1281,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
         if (_completing) { return "Aktuell läuft ein kritischer Prozess, Datenbank wird neu erstellt."; }
-
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
@@ -1572,13 +1571,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (l.Count == 1) { scriptname = l[0].KeyName; }
                 if (string.IsNullOrEmpty(scriptname)) {
                     // Script nicht definiert. Macht nix. ist eben keines gewünscht
+                    var vars = CreateVariableCollection(row, false, false, dbVariables, true, false);
 
                     if (eventname == ScriptEventTypes.export) {
-                        var vars = CreateVariableCollection(row, false, false, dbVariables, true, false);
-                        return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true);
+                        return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true, vars.GetBoolean("Successful") ?? false);
                     }
 
-                    return new ScriptEndedFeedback();
+                    return new ScriptEndedFeedback(vars, vars.GetBoolean("Successful") ?? false);
                 }
             }
 
@@ -2074,8 +2073,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         CanDoScript?.Invoke(this, e);
     }
 
-    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
     public void OnInvalidateView() {
         if (IsDisposed) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
@@ -2498,11 +2495,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
-
-
-
         var m = EditableErrorReason(EditableErrorReasonType.Save);
-
 
         if (!string.IsNullOrEmpty(m)) { return false; }
 
@@ -3330,6 +3323,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }

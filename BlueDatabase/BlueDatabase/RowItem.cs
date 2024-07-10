@@ -555,7 +555,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 60 &&
         DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3) { return false; }
 
-        return string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase);
+        if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
+
+        return !RowCollection.FailedRows.Contains(this);
     }
 
     /// <summary>
@@ -563,20 +565,28 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Benutzer und Alter egal.
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRowUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
-                                         CellGetLong(srs) < Database.EventScriptVersion;
+    public bool NeedsRowUpdate(bool ignoreFailed) {
+        if (Database?.Column.SysRowState is not ColumnItem srs) { return false; }
+       if( CellGetLong(srs) >= Database.EventScriptVersion) { return false; }
+        return ignoreFailed || !RowCollection.FailedRows.Contains(this);
+    }
 
     /// <summary>
     /// Gibt true zurück, wenn eine eigene Zeile aktualisiert werden.
     /// Diese muss jünger als 5 Minuten sein und älter als 3 sekunden.
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRowUpdateAfterChange() => NeedsRowUpdate() &&
+    public bool NeedsRowUpdateAfterChange() => NeedsRowUpdate(false) &&
                                            Database?.Column.SysRowChanger is ColumnItem srcr &&
                                            Database?.Column.SysRowChangeDate is ColumnItem srcd &&
                                            string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
                                            DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 15 &&
                                            DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3;
+
+    public void OnDropMessage(FehlerArt type, string message) {
+        if (IsDisposed) { return; }
+        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
+    }
 
     /// <summary>
     ///
@@ -704,11 +714,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustDoFullCheck);
+            if (!ok.Successful) {
+                RowCollection.FailedRows.AddIfNotExists(this);
+                return false;
+            }
+
             if (!ok.AllOk) { return false; }
 
             if (!RepairAllLinks()) { return false; }
 
             CellSet(srs, TimeCodeUTCNow(), "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
+
+            RowCollection.FailedRows.Remove(this);
 
             InvalidateCheckData();
             CheckRowDataIfNeeded();
@@ -809,11 +826,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(_database?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
-
-    public void OnDropMessage(FehlerArt type, string message) {
-        if (IsDisposed) { return; }
-        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
-    }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

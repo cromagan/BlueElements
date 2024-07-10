@@ -537,13 +537,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.NoUndo_NoInvalidate); }
         if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
+        RowCollection.FailedRows.Remove(row);
+
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
             if (db.Column.SysRowState is ColumnItem srs && srs != column) {
                 RowCollection.WaitDelay = 0;
                 if (column.Function == ColumnFunction.Schlüsselspalte) {
                     SetValueInternal(srs, row, string.Empty, reason);
                 } else {
-                    SetValueInternal(srs, row, "0", reason);
+                    if (row.CellGetLong(srs) > 0) {
+                        // wichitg, nur wenn >0, weil leere ZEilen dann nicht mehr kompett durchgerechnet werden
+                        SetValueInternal(srs, row, "0", reason);
+                    }
                 }
             }
         }

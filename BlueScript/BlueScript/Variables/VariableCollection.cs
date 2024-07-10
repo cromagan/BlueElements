@@ -187,6 +187,22 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
 
     //public object Clone() => new VariableCollection(ToList(), ReadOnly);
 
+    /// <summary>
+    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public bool? GetBoolean(string name) {
+        var v = _internal.Get(name);
+
+        if (v is not VariableBool vb) {
+            //Develop.DebugPrint("Falscher Datentyp");
+            return null;
+        }
+
+        return vb.ValueBool;
+    }
+
     public IEnumerator<Variable> GetEnumerator() => _internal.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();

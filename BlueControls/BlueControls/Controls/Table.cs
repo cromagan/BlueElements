@@ -2772,10 +2772,17 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
 
                 if (isAdmin) {
-                    if (rowScript && cellInThisDatabaseRow.NeedsRowUpdate()) {
-                        RowCollection.WaitDelay = 0;
-                        gr.FillRectangle(BrushRedTransparent, cellrectangle);
-                        //db.Row.AddRowWithChangedValue(cellInThisDatabaseRow);
+                    if (rowScript) {
+                        if (cellInThisDatabaseRow.NeedsRowUpdate(true)) {
+                            gr.FillRectangle(BrushRedTransparent, cellrectangle);
+                            if(RowCollection.FailedRows.Contains(cellInThisDatabaseRow)) {
+                                gr.FillRectangle(BrushRedTransparent, cellrectangle);
+                                gr.FillRectangle(BrushRedTransparent, cellrectangle);
+                                gr.FillRectangle(BrushRedTransparent, cellrectangle);
+                            } else {
+                                RowCollection.WaitDelay = 0;
+                            }
+                        }
                     }
                 }
 

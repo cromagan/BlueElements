@@ -27,7 +27,7 @@ public class ScriptEndedFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript, bool successful) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
@@ -35,6 +35,7 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(protocol);
         BreakFired = breakFired;
         EndScript = endscript;
+        Successful = successful;
         ScriptNeedFix = scriptNeedFix;
     }
 
@@ -55,13 +56,14 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(Protocol);
 
         AllOk = false;
+        Successful = false;
         ScriptNeedFix = scriptNeedFix;
     }
 
     /// <summary>
-    /// Wird verwendet, wenn ein Script beendet wird, ohne weiter Vorkommnisse
+    /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
     /// </summary>
-    public ScriptEndedFeedback() {
+    public ScriptEndedFeedback(VariableCollection variables, bool successful) {
         GiveItAnotherTry = false;
 
         Protocol = [];
@@ -69,6 +71,8 @@ public class ScriptEndedFeedback {
 
         AllOk = true;
         ScriptNeedFix = false;
+        Successful = successful;
+        Variables = variables;
     }
 
     #endregion
@@ -83,6 +87,9 @@ public class ScriptEndedFeedback {
     public List<string> Protocol { get; }
     public string ProtocolText { get; }
     public bool ScriptNeedFix { get; }
+
+    public bool Successful { get; }
+
     public VariableCollection? Variables { get; }
 
     #endregion

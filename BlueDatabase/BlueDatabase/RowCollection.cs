@@ -38,6 +38,8 @@ namespace BlueDatabase;
 
 public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasDatabase {
 
+    public static List<RowItem> FailedRows = new();
+
     #region Fields
 
     public static int WaitDelay = 0;
@@ -679,7 +681,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!oldestTo) { return null; }
 
         if (db.AmITemporaryMaster(5, 55)) {
-            rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate());
+            rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false));
             if (rowToCheck != null) { return rowToCheck; }
         }
 
@@ -689,7 +691,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in db.Row) {
             var t = thisRow.CellGetLong(srs);
-            if (t < l) {
+            if (t < l && !FailedRows.Contains(thisRow)) {
                 l = t;
                 r = thisRow;
             }
