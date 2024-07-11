@@ -91,7 +91,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
 
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg1 {
         get => _arg1;
         set {
@@ -102,7 +102,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg2 {
         get => _arg2;
         set {
@@ -113,7 +113,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg3 {
         get => _arg3;
         set {
@@ -124,7 +124,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg4 {
         get => _arg4;
         set {
@@ -135,7 +135,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg5 {
         get => _arg5;
         set {
@@ -146,7 +146,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg6 {
         get => _arg6;
         set {
@@ -157,7 +157,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg7 {
         get => _arg7;
         set {
@@ -168,7 +168,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    [Description("Muss befüllt werden.\r\nVariablen können benutzt werden.\r\nTexte müssen mit \" beginnen.")]
+    [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg8 {
         get => _arg8;
         set {

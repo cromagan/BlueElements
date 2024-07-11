@@ -95,7 +95,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => arg1 + "," + rowarg + "," + arg2;
+    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + rowarg + "," + args[1];
 
     #endregion
 }

@@ -102,7 +102,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
                     DidRows.Add(r);
                     if (masterRow?.Database != null) {
                         r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"[{n.ToStringInt2()}] Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
                     } else {
                         r.UpdateRow(false, true, true, "Normales Update");
                     }
@@ -194,7 +194,7 @@ public class Method_RowUniqueAndInvalidate : Method_Database, IUseableForButton 
         return UniqueRow(ld, allFi, scp, $"Script-Befehl: 'UniqueRow' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
     }
 
-    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string filterarg, string rowarg) => filterarg;
+    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;
 
     #endregion
 }

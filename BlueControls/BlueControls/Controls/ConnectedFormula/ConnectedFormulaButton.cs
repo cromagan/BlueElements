@@ -27,6 +27,7 @@ using BlueScript.Variables;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Text;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls;
 
@@ -304,8 +305,10 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         }
 
         #endregion
+        List<string> args = [_arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8];
+        
 
-        var f = ufb.DoIt(vars, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, fis, rn, ai);
+        var f = ufb.DoIt(vars, args, fis, rn, ai);
 
         BlueDatabase.AdditionalScriptMethods.Method_RowUniqueAndInvalidate.DoAllRows(row);
 
