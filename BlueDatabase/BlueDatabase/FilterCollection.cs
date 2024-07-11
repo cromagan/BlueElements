@@ -405,11 +405,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var tmp = new List<FilterItem>();
         tmp.AddRange(_internal);
 
-
         _internal.Clear();
         _internal.AddRange(tmp.OrderBy(e => e.ReadableText()).ToList());
-
-
     }
 
     public void OnPropertyChanged() {
@@ -602,8 +599,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="fi"></param>
     private void AddAndRegisterEvents(FilterItem fi) {
-        if (_internal.Count > 0 && _internal[0].Database != fi.Database && _internal[0].FilterType != FilterType.AlwaysFalse) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
+        if (_internal.Count > 0) {
+            if (fi.FilterType != FilterType.AlwaysFalse && _internal[0].FilterType != FilterType.AlwaysFalse) {
+                if (_internal[0].Database != fi.Database ) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
+                }
+            }
         }
 
         if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {

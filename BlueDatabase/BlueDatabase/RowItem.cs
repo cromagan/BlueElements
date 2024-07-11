@@ -552,8 +552,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (db.Column.SysRowChangeDate is not ColumnItem srcd) { return false; }
 
-        if (DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 60 &&
-        DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3) { return false; }
+        if (DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes > 60 ||
+        DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds < 3) { return false; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
