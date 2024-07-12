@@ -1,17 +1,13 @@
 ﻿
-    using System.ComponentModel;
-    using System.Windows.Forms;
+using System.ComponentModel;
+using System.Windows.Forms;
 
-    namespace BlueControls.Controls
-{
-    partial class FlexiControlForFilter
-    {
+namespace BlueControls.Controls{
+    partial class FlexiControlForFilter {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>
         private IContainer components = null;
-
-
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -41,11 +37,8 @@
             this.ResumeLayout(false);
 
         }
-
-
         #endregion
 
-
-        private FlexiControl f;
+        private BlueControls.Controls.FlexiControl f;
     }
 }

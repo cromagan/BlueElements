@@ -295,7 +295,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     public RowItem? RowSingleOrNull() {
         if (IsDisposed) { return null; }
-
+        if(DesignMode) {return null;}
 
         if (!RowsInputManualSeted) {
             if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
