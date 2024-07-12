@@ -481,7 +481,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected virtual void CommandButton_Click(object sender, System.EventArgs e) {
         if (_editType != EditTypeFormula.Button) { return; }
-        ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
+        //ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
         OnButtonClicked();
     }
 

@@ -134,11 +134,24 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         base.FilterOutput_PropertyChanged(this, System.EventArgs.Empty);
     }
 
+    public override void Invalidate_FilterInput() {
+        base.Invalidate_FilterInput();
+        HandleChangesNow();
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+           f.Dispose();
+            f = null;
+        }
+
+        base.Dispose(disposing);
+    }
+
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
-
 
         DoInputFilter(null, false);
 
@@ -159,58 +172,14 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         UpdateFilterData(filterSingle, _doFilterDeleteButton);
     }
 
-    public override void Invalidate_FilterInput() {
-        base.Invalidate_FilterInput();
-        HandleChangesNow();
-    }
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            Tag = null;
-        }
-
-        base.Dispose(disposing);
-    }
-
-
-    private void F_ControlRemoved(object sender, ControlEventArgs e) {
-        if (e.Control is ComboBox cbx) {
-            cbx.DropDownShowing -= Cbx_DropDownShowing;
-        }
- }
-
-
-
-    private void F_ControlAdded(object sender, ControlEventArgs e) {
-
-
-        if (e.Control is ComboBox cbx) {
-            var item2 = new List<AbstractListItem>();
-            item2.Add(ItemOf("Keine weiteren Einträge vorhanden", "|~"));
-
-            //var c = Filter.Column.Contents(null);
-            //foreach (var thiss in c)
-            //{
-            //    Item2.GenerateAndAdd("|" + thiss, thiss));
-            //}
-
-            if (TextEntryAllowed()) {
-                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
-            } else {
-                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDownList, false);
-            }
-
-            cbx.DropDownShowing += Cbx_DropDownShowing;
-        }
-
-        if (e.Control is Button btn) {
-            DoButtonStyle(btn);
-        }
-    }
-
     protected override void OnCreateControl() {
         base.OnCreateControl();
         F_ValueChanged(this, System.EventArgs.Empty);
+    }
+
+    protected override void OnQuickInfoChanged() {
+        base.OnQuickInfoChanged();
+        f.QuickInfo = QuickInfo;
     }
 
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
@@ -303,6 +272,37 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         Develop.Debugprint_BackgroundThread();
     }
 
+    private void F_ControlAdded(object sender, ControlEventArgs e) {
+        if (e.Control is ComboBox cbx) {
+            var item2 = new List<AbstractListItem>();
+            item2.Add(ItemOf("Keine weiteren Einträge vorhanden", "|~"));
+
+            //var c = Filter.Column.Contents(null);
+            //foreach (var thiss in c)
+            //{
+            //    Item2.GenerateAndAdd("|" + thiss, thiss));
+            //}
+
+            if (TextEntryAllowed()) {
+                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
+            } else {
+                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDownList, false);
+            }
+
+            cbx.DropDownShowing += Cbx_DropDownShowing;
+        }
+
+        if (e.Control is Button btn) {
+            DoButtonStyle(btn);
+        }
+    }
+
+    private void F_ControlRemoved(object sender, ControlEventArgs e) {
+        if (e.Control is ComboBox cbx) {
+            cbx.DropDownShowing -= Cbx_DropDownShowing;
+        }
+    }
+
     private void F_ValueChanged(object sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
@@ -370,7 +370,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
     }
 
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || f  is null) { return; }
 
         if (FilterSingleColumn == null) {
             this.Invalidate_FilterOutput();
@@ -382,6 +382,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         if (filterSingle != null) {
             nvalue = filterSingle.SearchValue.JoinWithCr();
         }
+
+
+        if (IsDisposed || f is null) { return; } // Kommt vor!
 
         f.ValueSet(nvalue, true);
 

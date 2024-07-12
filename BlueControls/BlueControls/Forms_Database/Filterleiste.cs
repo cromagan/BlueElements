@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -225,6 +226,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
+                            this.ChildIsBorn(flx);
                             //flx.DoOutputSettings(this);
                             //flx.DoInputSettings(parent, this);
                             flx.FilterOutput.PropertyChanging += FlexSingeFilter_FilterOutput_PropertyChanging;

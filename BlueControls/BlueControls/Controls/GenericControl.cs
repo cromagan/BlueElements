@@ -314,6 +314,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         if (disposing) {
             _bitmapOfControl?.Dispose();
             _bitmapOfControl = null;
+            Tag = null;
         }
     }
 
