@@ -346,15 +346,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
     }
 
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
 
-        // Ist komisch, muss aber so sein:
-        // Ist die View in einer Tab-Page, eine andere TabPage angezeigt und wird ConnectedFormula
-        // Invalidiert, wird beim herschalten die ConnectedFormulaVuew NICHT neu gezeichet.
-        // Dadurch wird der Filter bei DrawControll dann nicht neu berechnet
-        Invalidate();
-    }
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 

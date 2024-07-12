@@ -129,8 +129,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             UpdateControls();
         }
     }
-
-    public bool Allinitialized { get; private set; }
+    public bool Initializing { get; private set; } = false;
+    public bool Allinitialized { get; private set; } = false;
 
     [DefaultValue("")]
     public string AllowedChars {
@@ -357,35 +357,38 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    public GenericControl? CreateSubControls() {
-        if (Allinitialized) { return null; }
+    public void CreateSubControls() {
+        if (Allinitialized || Initializing) { return; }
+
+        Initializing = true;
 
         if (Width < 5 || Height < 5) {
             Develop.DebugPrint(FehlerArt.Warnung, "Width / Height zu klein");
-            return null;
+            Allinitialized = true;
+            Initializing = false;
+            return;
         }
 
-        Allinitialized = true;
-        GenericControl? c = null;
+    
         switch (_editType) {
             case EditTypeFormula.Line:
-                c = Control_Create_Line();
+                 Control_Create_Line();
                 break;
 
             case EditTypeFormula.Textfeld:
-                c = Control_Create_TextBox();
+                 Control_Create_TextBox();
                 break;
 
             case EditTypeFormula.Listbox:
-                c = Control_Create_ListBox();
+                 Control_Create_ListBox();
                 break;
 
             case EditTypeFormula.Textfeld_mit_Auswahlknopf:
-                c = Control_Create_ComboBox();
+                 Control_Create_ComboBox();
                 break;
 
             case EditTypeFormula.Ja_Nein_Knopf:
-                c = Control_Create_ButtonYesNo();
+                 Control_Create_ButtonYesNo();
                 break;
 
             case EditTypeFormula.None:
@@ -402,15 +405,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case EditTypeFormula.Farb_Auswahl_Dialog:
-                c = Control_Create_ButtonColor();
+                 Control_Create_ButtonColor();
                 break;
 
             case EditTypeFormula.Button:
-                c = Control_Create_ButtonCommand();
+                 Control_Create_ButtonCommand();
                 break;
 
             case EditTypeFormula.SwapListBox:
-                c = Control_Create_SwapListBox();
+                 Control_Create_SwapListBox();
                 break;
 
                 //default:
@@ -418,7 +421,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 //return null;
         }
         UpdateControls();
-        return c;
+        Allinitialized = true;
+        Initializing = false;
     }
 
     public Button? GetButton() {
@@ -437,8 +441,18 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         return null;
     }
 
-    public void StyleComboBox(ComboBox control, IEnumerable<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-        control.Enabled = Enabled;
+    public TextBox? GetTextBox() {
+        CreateSubControls();
+        foreach (var thisc in Controls) {
+            if (thisc is TextBox txb) { return txb; }
+        }
+        return null;
+    }
+
+    public void StyleComboBox(ComboBox? control, IEnumerable<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+        if (control == null) { return; }
+
+        //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.DropDownStyle = style;
         control.ItemClear();
@@ -455,7 +469,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public void StyleTextBox(TextBox control) {
-        control.Enabled = Enabled;
+        //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.Verhalten = _multiLine || Height > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
@@ -522,7 +536,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //        gr.FillRectangle(lgb, ClientRectangle);
         //    }
         //}
-        if (!Allinitialized) { _ = CreateSubControls(); }
+        if (!Allinitialized) { CreateSubControls(); }
         //if (_EditType == enEditTypeFormula.Listbox || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen) {
         //    ListBoxen(out var Main, out var Suggest);
         //    if (Suggest != null) {
@@ -978,19 +992,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
     }
 
-    //private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
-    //    if (IsFilling) { return; }
-    //    ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
-    //}
-    //private void SwapListBox_ItemAdded(object sender, ListEventArgs e) {
-    //    if (IsFilling) { return; }
-    //    ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
-    //}
-
-    //private void SwapListBox_ItemRemoved(object sender, System.EventArgs e) {
-    //    if (IsFilling) { return; }
-    //    ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
-    //}
 
     private void UpdateControls() {
         if (_captionObject is Caption c) { c.Translate = _translateCaption; }
@@ -1071,7 +1072,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
 
     private void UpdateValueToControl() {
-        if (!Allinitialized) { _ = CreateSubControls(); }
+        if (!Allinitialized) { CreateSubControls(); }
         IsFilling = true;
         foreach (Control control in Controls) {
             switch (control) {
@@ -1124,7 +1125,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ValueSet(((TextBox)sender).Text, false);
     }
 
-    // TODO: Erstellen!//if (_EditType != enEditTypeFormula.Button) { return; }//CheckIfChanged("+");//OnButtonClicked();
 
     private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
 

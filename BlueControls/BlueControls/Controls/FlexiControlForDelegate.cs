@@ -49,7 +49,7 @@ public class FlexiControlForDelegate : FlexiControl, IDisposableExtended {
         var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
         Size = new Size(s0.Width + 50 + 22, 30);
-        if (CreateSubControls() is Button c0) {
+        if (GetButton() is Button c0) {
             c0.Text = text;
             if (image is ImageCode im) {
                 c0.ImageCode = QuickImage.Get(im, 22).ToString();

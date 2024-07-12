@@ -144,11 +144,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled && !_mustUpdate) { return; }
 
-        DoInputFilter(FilterOutput.Database, true);
-        DoRows();
         _mustUpdate = false;
-
-
 
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
@@ -166,17 +162,15 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return;
         }
 
-        DoInputFilter(FilterInput?.Database, true);
-        DoRows();
 
+        DoInputFilter(null, true);
+        DoRows();
         var rowIn = RowSingleOrNull();
 
         if (rowIn == null) {
             Fehler("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information);
             return;
         }
-
-        rowIn.CheckRowDataIfNeeded();
 
         GeneratedEntityId = string.Empty;
 

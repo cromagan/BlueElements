@@ -44,6 +44,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Fields
 
+    private ColumnItem? _column = null;
     private string _columnName = string.Empty;
 
     #endregion
@@ -63,11 +64,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.ShowInfoWhenDisabled = true;
         f.CaptionPosition = captionPosition;
         f.EditType = editType;
-        ColumnName = columnName;
-
-        var (column, row) = GetTmpVariables();
-        StyleControls(column, row);
-        CheckEnabledState(column, row);
+        _columnName = columnName;
     }
 
     #endregion
@@ -84,10 +81,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
         set {
             if (_columnName == value) { return; }
             _columnName = value;
-
-            var (column, row) = GetTmpVariables();
-            StyleControls(column, row);
-            SetValueFromCell(column, row);
+            _column = null;
+            Invalidate_FilterInput();
         }
     }
 
@@ -145,28 +140,38 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Methods
 
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+    protected override void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) {
+        try {
+            if (InvokeRequired) {
+                _ = Invoke(new Action(() => DatabaseInput_CellValueChanged(sender, e)));
+                return;
+            }
 
-        DoInputFilter(null, false);
-        DoRows();
 
-        var (column, row) = GetTmpVariables();
+            if (e.Row != RowSingleOrNull()) { return; }
 
-        StyleControls(column, row);
-        SetValueFromCell(column, row);
-        CheckEnabledState(column, row);
+            if (e.Column == _column) {
+                SetValueFromCell(_column, e.Row);
+            }
 
-        row?.CheckRowDataIfNeeded();
+            if (e.Column == _column || e.Column == e.Column.Database?.Column.SysLocked) {
+                CheckEnabledState(_column, e.Row);
+            }
 
-        if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
-            DatabaseInput_RowChecked(this, rce);
+        } catch {
+            // Invoke: auf das verworfene Ojekt blah blah
+            if (!IsDisposed) {
+                Develop.CheckStackForOverflow();
+                DatabaseInput_CellValueChanged(sender, e);
+            }
         }
     }
 
-
+    protected override void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
+        if (e.Column == _column) {
+            Invalidate_FilterInput();
+        }
+    }
 
     protected override void DatabaseInput_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
@@ -183,48 +188,14 @@ public partial class FlexiControlForCell : GenericControlReciver {
             }
         }
 
-        var (column, row) = GetTmpVariables();
-        StyleControls(column, row);
-        SetValueFromCell(column, row);
-    }
-
-    protected override void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
-        var (column, row) = GetTmpVariables();
-
-        if (e.Column == column) {
-            StyleControls(column, row);
-            CheckEnabledState(column, row);
-            //OnNeedRefresh();
-        }
-    }
-
-    protected override void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) {
-        try {
-            if (InvokeRequired) {
-                _ = Invoke(new Action(() => DatabaseInput_CellValueChanged(sender, e)));
-                return;
-            }
-
-            var (column, row) = GetTmpVariables();
-
-            if (e.Row != row) { return; }
-
-            if (e.Column == column) { SetValueFromCell(column, row); }
-
-            if (e.Column == column || e.Column == e.Column.Database?.Column.SysLocked) { CheckEnabledState(column, row); }
-        } catch {
-            // Invoke: auf das verworfene Ojekt blah blah
-            if (!IsDisposed) {
-                Develop.CheckStackForOverflow();
-                DatabaseInput_CellValueChanged(sender, e);
-            }
-        }
+        Invalidate_FilterInput();
     }
 
     protected override void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) {
-        var (column, row) = GetTmpVariables();
 
-        if (e.Row != row) { return; }
+        if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
+
+        if (e.Row != RowSingleOrNull()) { return; }
         if (e.ColumnsWithErrors == null) {
             f.InfoText = string.Empty;
             return;
@@ -233,7 +204,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         var newT = string.Empty;
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");
-            if (column != null && string.Equals(x[0], column.KeyName, StringComparison.OrdinalIgnoreCase)) {
+            if (_column != null && string.Equals(x[0], _column.KeyName, StringComparison.OrdinalIgnoreCase)) {
                 if (!string.IsNullOrEmpty(f.InfoText)) { f.InfoText += "<br><hr><br>"; }
                 newT += x[1];
             }
@@ -255,6 +226,31 @@ public partial class FlexiControlForCell : GenericControlReciver {
         base.Dispose(disposing);
     }
 
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        if(!f.Allinitialized) { return; }
+
+        DoInputFilter(null, false);
+        DoRows();
+
+        var row = RowSingleOrNull();
+
+        _column ??= GetTmpColumn();
+
+        StyleControls(_column, row);
+        SetValueFromCell(_column, row);
+        CheckEnabledState(_column, row);
+
+        row?.CheckRowDataIfNeeded();
+
+        if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
+            DatabaseInput_RowChecked(this, rce);
+        }
+    }
+
     //protected override void RemoveAll() {
     //    ValueToCell();
     //    base.RemoveAll();
@@ -273,10 +269,10 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private void ActivateMarker() {
         if (IsDisposed || !Visible || !Enabled) { return; }
-        var (column, _) = GetTmpVariables();
 
-        if (column == null || column.IsDisposed) { return; }
-        if (column.Function != ColumnFunction.RelationText) { return; }
+        if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
+        if (_column == null || _column.IsDisposed) { return; }
+        if (_column.Function != ColumnFunction.RelationText) { return; }
         Marker.RunWorkerAsync();
     }
 
@@ -329,8 +325,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 break;
         }
 
-        var (column, row) = GetTmpVariables();
-        StyleControls(column, row);
+        Invalidate_FilterInput();
     }
 
     private void F_ControlRemoved(object sender, ControlEventArgs e) {
@@ -384,24 +379,21 @@ public partial class FlexiControlForCell : GenericControlReciver {
         return gbColumn;
     }
 
-    private (ColumnItem? column, RowItem? row) GetTmpVariables() {
+    private ColumnItem? GetTmpColumn() {
         try {
             ColumnItem? tmpColumn;
-            RowItem? tmpRow;
 
             if (DatabaseInput is Database db && !db.IsDisposed) {
                 tmpColumn = db.Column[_columnName];
-                tmpRow = RowSingleOrNull();
             } else {
                 tmpColumn = null;
-                tmpRow = null;
             }
 
-            return (tmpColumn, tmpRow);
+            return tmpColumn;
         } catch {
             // Multitasking sei dank kann _database trotzem null sein...
             Develop.CheckStackForOverflow();
-            return GetTmpVariables();
+            return GetTmpColumn();
         }
     }
 
@@ -442,8 +434,10 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         if (Marker.CancellationPending) { return; }
 
-        var (_, row) = GetTmpVariables();
-        if (row == null || row.IsDisposed) { return; }
+
+        if(!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
+
+        if (RowSingleOrNull() is not RowItem row || row.IsDisposed) { return; }
         if (Marker.CancellationPending) { return; }
 
         var col = db.Column.First();
@@ -616,7 +610,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void StyleListBox(ListBox control, ColumnItem? column) {
-        control.Enabled = Enabled;
+        //control.Enabled = Enabled;
         //control.ItemClear();
         control.CheckBehavior = CheckBehavior.MultiSelection;
         if (column == null || column.IsDisposed) { return; }
@@ -669,7 +663,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
-        control.Enabled = Enabled;
+        //control.Enabled = Enabled;
         //control.UnCheck();
         control.SuggestionsClear();
         if (column == null || column.IsDisposed) { return; }
@@ -698,16 +692,20 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private void ValueToCell() {
         if (f.IsFilling) { return; }
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
-        var (column, row) = GetTmpVariables();
-        if (column == null || row == null) { return; }
-        if (column.IsDisposed || row.IsDisposed) { return; }
 
-        var oldVal = row.CellGetString(column);
+        if (_column == null || _column.IsDisposed) { return; }
+
+        if(!FilterInputChangedHandled || ! RowsInputChangedHandled) { return; }
+
+
+        if (RowSingleOrNull() is not RowItem row || row.IsDisposed) { return; }
+
+        var oldVal = row.CellGetString(_column);
         var newValue = f.Value;
 
         if (oldVal == newValue) { return; }
 
-        row.CellSet(column, newValue, "Über Formular bearbeitet (FlexiControl)");
+        row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
         //if (oldVal != row.CellGetString(column)) {
         //    _ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, false, false, true, 1);
         //    row.Database?.AddBackgroundWork(row);
