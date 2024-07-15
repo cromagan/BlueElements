@@ -26,9 +26,9 @@ namespace BlueControls.Controls
             // BCB
             // 
             this.BCB.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.BCB.Location = new System.Drawing.Point(48, 160);
+            this.BCB.Location = new System.Drawing.Point(48, 120);
             this.BCB.Name = "BCB";
-            this.BCB.Size = new System.Drawing.Size(120, 24);
+            this.BCB.Size = new System.Drawing.Size(128, 32);
             this.BCB.TabIndex = 8;
             this.BCB.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             this.BCB.Visible = false;
@@ -40,9 +40,9 @@ namespace BlueControls.Controls
             // BTB
             // 
             this.BTB.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.BTB.Location = new System.Drawing.Point(48, 136);
+            this.BTB.Location = new System.Drawing.Point(48, 88);
             this.BTB.Name = "BTB";
-            this.BTB.Size = new System.Drawing.Size(120, 24);
+            this.BTB.Size = new System.Drawing.Size(128, 32);
             this.BTB.TabIndex = 7;
             this.BTB.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             this.BTB.Visible = false;
@@ -55,10 +55,9 @@ namespace BlueControls.Controls
             // 
             this.SliderX.CausesValidation = false;
             this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.SliderX.Enabled = false;
-            this.SliderX.Location = new System.Drawing.Point(0, 414);
+            this.SliderX.Location = new System.Drawing.Point(0, 370);
             this.SliderX.Name = "SliderX";
-            this.SliderX.Size = new System.Drawing.Size(1107, 18);
+            this.SliderX.Size = new System.Drawing.Size(581, 18);
             this.SliderX.SmallChange = 16F;
             this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
@@ -66,11 +65,10 @@ namespace BlueControls.Controls
             // 
             this.SliderY.CausesValidation = false;
             this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
-            this.SliderY.Enabled = false;
-            this.SliderY.Location = new System.Drawing.Point(1107, 0);
+            this.SliderY.Location = new System.Drawing.Point(581, 0);
             this.SliderY.Name = "SliderY";
             this.SliderY.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
-            this.SliderY.Size = new System.Drawing.Size(18, 432);
+            this.SliderY.Size = new System.Drawing.Size(18, 388);
             this.SliderY.SmallChange = 16F;
             this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
             // 
@@ -78,7 +76,7 @@ namespace BlueControls.Controls
             // 
             this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEdit.ImageCode = "Stift|14";
-            this.btnEdit.Location = new System.Drawing.Point(1072, 384);
+            this.btnEdit.Location = new System.Drawing.Point(550, 338);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(24, 24);
             this.btnEdit.TabIndex = 49;
@@ -93,7 +91,7 @@ namespace BlueControls.Controls
             this.Controls.Add(this.SliderX);
             this.Controls.Add(this.SliderY);
             this.Name = "Table";
-            this.Size = new System.Drawing.Size(1125, 432);
+            this.Size = new System.Drawing.Size(599, 388);
             this.ResumeLayout(false);
 
         }

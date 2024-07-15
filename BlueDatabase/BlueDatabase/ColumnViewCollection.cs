@@ -35,6 +35,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
+    public int? _wiederHolungsSpaltenWidth;
     public bool ShowHead = true;
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_Show = [];
@@ -165,7 +166,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                if (xpos >= thisViewItem.OrderTmpSpalteX1 && xpos <= thisViewItem.OrderTmpSpalteX1 + thisViewItem.DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
+                if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
                     return thisViewItem.Column;
                 }
             }

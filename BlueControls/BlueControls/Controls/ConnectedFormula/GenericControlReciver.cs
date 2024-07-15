@@ -51,12 +51,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #endregion
 
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
-        Invalidate_FilterInput();
-    }
-
-
     #region Properties
 
     public Database? DatabaseInput {
@@ -119,16 +113,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected bool FilterInputChangedHandled { get; set; } = false;
 
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected bool FilterInputChangedHandling { get; private set; } = false;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool RowsInputChangedHandling { get; private set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -139,6 +127,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected bool RowsInputChangedHandled { get; private set; } = false;
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    protected bool RowsInputChangedHandling { get; private set; } = false;
 
     #endregion
 
@@ -295,7 +288,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     public RowItem? RowSingleOrNull() {
         if (IsDisposed) { return null; }
-        if(DesignMode) {return null;}
+        if (DesignMode) { return null; }
 
         if (!RowsInputManualSeted) {
             if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
@@ -364,8 +357,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected void DoRows() {
         if (RowsInputChangedHandled) { return; }
 
-
-
         RowsInputChangedHandled = true;
 
         if (RowsInputManualSeted) { return; }
@@ -409,6 +400,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected override void OnCreateControl() {
         base.OnCreateControl();
         RegisterEvents();
+    }
+
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+        Invalidate_FilterInput();
     }
 
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) {

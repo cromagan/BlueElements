@@ -61,8 +61,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     protected GenericControl() : this(false, false) { }
 
     protected GenericControl(bool doubleBuffer, bool useBackgroundBitmap) : base() {
-        // Dieser Aufruf ist für den Designer erforderlich.
-        // InitializeComponent()
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetStyle(ControlStyles.ContainerControl, false);
         SetStyle(ControlStyles.ResizeRedraw, false);

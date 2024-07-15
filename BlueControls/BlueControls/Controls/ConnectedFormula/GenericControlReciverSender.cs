@@ -58,7 +58,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.Database = source.DatabaseOutput;
         base.DoDefaultSettings(parentFormula, source);
 
-        if(parentFormula == null) {return; }
+        if (parentFormula == null) { return; }
 
         foreach (var thisKey in source.ChildIds) {
             var it = source.Parent?[thisKey];
@@ -68,7 +68,7 @@ public class GenericControlReciverSender : GenericControlReciver {
                 if (parentCon is GenericControlReciver exitingChild) {
                     ChildIsBorn(exitingChild);
                 }
-            } 
+            }
         }
     }
 
@@ -81,31 +81,6 @@ public class GenericControlReciverSender : GenericControlReciver {
     }
 
     public void Invalidate_FilterOutput() => FilterOutput.Clear();
-
-    protected override void Dispose(bool disposing) {
-        if (Disposing) {
-            Parent.Controls.Remove(this);
-            FilterOutput.Dispose();
-
-
-            foreach (var thisChild in Childs) {
-                thisChild.Parents.Remove(this);
-            }
-
-
-            Childs.Clear();
-        }
-
-        base.Dispose(disposing);
-    }
-
-
-    protected override void OnCreateControl() {
-        FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;
-        FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
-        base.OnCreateControl();
-    }
-
 
     internal void ChildIsBorn(GenericControlReciver child) {
         if (child.RowsInputManualSeted) {
@@ -120,12 +95,32 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         if (isnew) { child.Parents.AddIfNotExists(this); }
 
-
         Childs.AddIfNotExists(child);
 
         if (newFilters && isnew) { child.Invalidate_FilterInput(); }
 
         //if (doDatabaseAfter) { child.RegisterEvents(); }
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (Disposing) {
+            Parent.Controls.Remove(this);
+            FilterOutput.Dispose();
+
+            foreach (var thisChild in Childs) {
+                thisChild.Parents.Remove(this);
+            }
+
+            Childs.Clear();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    protected override void OnCreateControl() {
+        FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;
+        FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
+        base.OnCreateControl();
     }
 
     private void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {

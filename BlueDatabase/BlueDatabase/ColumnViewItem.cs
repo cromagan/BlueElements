@@ -44,7 +44,8 @@ public sealed class ColumnViewItem : IParseable {
         Parent = parent;
         ViewType = ViewType.None;
         Column = null;
-        OrderTmpSpalteX1 = null;
+        X_WithSlider = null;
+        X= null;
         TmpAutoFilterLocation = Rectangle.Empty;
         TmpReduceLocation = Rectangle.Empty;
         TmpDrawWidth = null;
@@ -57,7 +58,17 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnItem? Column { get; private set; }
 
-    public int? OrderTmpSpalteX1 { get; set; }
+
+
+    /// <summary>
+    /// Koordinate der Spalte mit einbrechneten Slider
+    /// </summary>
+    public int? X_WithSlider { get; set; }
+
+
+    /// <summary>
+    /// Koordinate der Spalte ohne Slider
+    public int? X { get; set; }
 
     public Rectangle TmpAutoFilterLocation { get; set; }
 

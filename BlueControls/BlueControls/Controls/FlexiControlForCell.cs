@@ -47,6 +47,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private ColumnItem? _column = null;
     private string _columnName = string.Empty;
 
+    private RowItem? _row;
+
     #endregion
 
     #region Constructors
@@ -147,8 +149,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 return;
             }
 
-
-            if (e.Row != RowSingleOrNull()) { return; }
+            if (e.Row != _row) { return; }
 
             if (e.Column == _column) {
                 SetValueFromCell(_column, e.Row);
@@ -157,7 +158,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
             if (e.Column == _column || e.Column == e.Column.Database?.Column.SysLocked) {
                 CheckEnabledState(_column, e.Row);
             }
-
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {
@@ -192,10 +192,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     protected override void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) {
-
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if (e.Row != RowSingleOrNull()) { return; }
+        if (e.Row != _row) { return; }
         if (e.ColumnsWithErrors == null) {
             f.InfoText = string.Empty;
             return;
@@ -231,22 +230,21 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if(!f.Allinitialized) { return; }
+        if (!f.Allinitialized) { return; }
 
         DoInputFilter(null, false);
         DoRows();
 
-        var row = RowSingleOrNull();
-
+        _row = RowSingleOrNull();
         _column ??= GetTmpColumn();
 
-        StyleControls(_column, row);
-        SetValueFromCell(_column, row);
-        CheckEnabledState(_column, row);
+        StyleControls(_column, _row);
+        SetValueFromCell(_column, _row);
+        CheckEnabledState(_column, _row);
 
-        row?.CheckRowDataIfNeeded();
+        _row?.CheckRowDataIfNeeded();
 
-        if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
+        if (_row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
             DatabaseInput_RowChecked(this, rce);
         }
     }
@@ -434,10 +432,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         if (Marker.CancellationPending) { return; }
 
+        if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if(!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
-
-        if (RowSingleOrNull() is not RowItem row || row.IsDisposed) { return; }
+        if (_row is not RowItem row || row.IsDisposed) { return; }
         if (Marker.CancellationPending) { return; }
 
         var col = db.Column.First();
@@ -695,10 +692,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         if (_column == null || _column.IsDisposed) { return; }
 
-        if(!FilterInputChangedHandled || ! RowsInputChangedHandled) { return; }
+        if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-
-        if (RowSingleOrNull() is not RowItem row || row.IsDisposed) { return; }
+        if (_row is not RowItem row || row.IsDisposed) { return; }
 
         var oldVal = row.CellGetString(_column);
         var newValue = f.Value;
