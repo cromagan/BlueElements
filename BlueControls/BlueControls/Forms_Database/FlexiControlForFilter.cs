@@ -104,7 +104,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
 
     public bool SettingsLoaded { get; set; }
 
-    public string SettingsManualFilename { get; set; }
+    public string SettingsManualFilename { get; set; } = string.Empty;
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
         get => _standard_bei_keiner_Eingabe;

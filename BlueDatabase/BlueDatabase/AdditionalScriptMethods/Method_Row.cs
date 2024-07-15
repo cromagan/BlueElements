@@ -39,7 +39,7 @@ public class Method_Row : Method {
                                           "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
                                           "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.\r\n" +
-                                          "Alternative: Die Befehle RowUnique und RowUniqueAndInvalidate kümmern sich darum, das immer eine Zeile zurückgegeben wird.";
+                                          "Alternative: Der Befehl RowUnique kümmert sich darum, das immer eine Zeile zurückgegeben wird.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;

@@ -101,7 +101,12 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     public string Page { get; }
 
-    public RowItem? ShowingRow => this.RowSingleOrNull();
+    public RowItem? ShowingRow {
+        get {
+            HandleChangesNow();
+            return this.RowSingleOrNull();
+        }
+    }
 
     #endregion
 
@@ -166,8 +171,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                             }
                         }
 
-                        
-                        if(thisit is RowEntryPadItem rep) {
+
+                        if (thisit is RowEntryPadItem rep) {
                             DoDefaultSettings(null, rep);
                         }
 
@@ -271,7 +276,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                 if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
             }
 
-            if(onlySerach) {return null;}
+            if (onlySerach) { return null; }
 
             var c = thisit.CreateControl(this);
             if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {

@@ -24,6 +24,8 @@ using BlueDatabase.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using BlueBasics;
+using System;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -44,9 +46,9 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
-                                          "Werden mehrere Zeilen gefunden, wird das Skript abgebrochen.\r\n" +
-                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
-                                          "Bessere Alternative: RowUniqueAndInvalidate";
+                                          "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
+                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
+
 
     public override bool GetCodeBlockAfter => false;
 
@@ -95,23 +97,63 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
             }
         }
 
-        var r = allFi.Rows;
+        //var r = allFi.Rows;
 
-        if (r.Count > 1) {
-            return new DoItFeedback(ld, "RowUnique gescheitert, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
-        }
+        //if (r.Count > 1) {
+        //    q
+        //    return new DoItFeedback(ld, "RowUnique gescheitert, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
+        //}
 
-        if (r.Count == 0) {
-            if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
-            var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
-            if (nr.newrow == null) { return new DoItFeedback(ld, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
-            return Method_Row.RowToObjectFeedback(nr.newrow);
-        }
+        //if (r.Count == 0) {
+        //    if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
+        //    var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
+        //    if (nr.newrow == null) { return new DoItFeedback(ld, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
+        //    return Method_Row.RowToObjectFeedback(nr.newrow);
+        //}
 
-        return Method_Row.RowToObjectFeedback(r[0]);
+        return UniqueRow(ld, allFi, scp, $"Script-Befehl: 'RowUnique' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;
+
+
+    public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {
+        Develop.CheckStackForOverflow();
+        var r = allFi.Rows;
+
+        if (r.Count > 5) {
+            return new DoItFeedback(ld, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
+        }
+
+        if (r.Count > 1) {
+            if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
+
+            r[0].Database?.Row.Combine(r);
+            r[0].Database?.Row.RemoveYoungest(r, true);
+            r = allFi.Rows;
+            if (r.Count != 1) {
+                return new DoItFeedback(ld, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
+            }
+
+            Method_RowInvalidate.InvalidatedRows.AddIfNotExists(r[0]);
+        }
+
+        RowItem? myRow;
+
+        if (r.Count == 0) {
+            if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
+            var (newrow, message) = RowCollection.GenerateAndAdd(allFi, coment);
+            if (newrow == null) { return new DoItFeedback(ld, "Neue Zeile konnte nicht erstellt werden: " + message); }
+            myRow = newrow;
+            Method_RowInvalidate. InvalidatedRows.AddIfNotExists(newrow);
+        } else {
+            myRow = r[0];
+        }
+
+
+        return Method_Row.RowToObjectFeedback(myRow);
+    }
+
 
     #endregion
 }

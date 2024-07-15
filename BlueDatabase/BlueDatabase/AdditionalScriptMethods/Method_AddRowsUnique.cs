@@ -28,19 +28,18 @@ using System.Diagnostics;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_AddRowsUniqueAndInvalidate : Method_Database {
+public class Method_AddRowsUnique : Method_Database {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, ListStringVar];
-    public override string Command => "addrowsuniqueandinvalidate";
+    public override string Command => "addrowsunique";
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
-                                             "Ist sie bereits mehrfacjh vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
+                                          "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
-                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
-                                          "Zusätzlich markiert, dass sie neu berechnet werden muss.";
+                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -48,7 +47,7 @@ public class Method_AddRowsUniqueAndInvalidate : Method_Database {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRowsUniqueAndInvalidate(database, ZusätzlichesSkript, keyvalues);";
+    public override string Syntax => "AddRowsUnique(database, ZusätzlichesSkript, keyvalues);";
 
     #endregion
 
@@ -79,11 +78,11 @@ public class Method_AddRowsUniqueAndInvalidate : Method_Database {
         if (c == null) { return new DoItFeedback(ld, "Erste Spalte nicht vorhanden"); }
 
         foreach (var thisKey in keys) {
-            var allFi = new FilterCollection(db, "Method_AddRowsUniqueAndInvalidate") {
+            var allFi = new FilterCollection(db, "Method_AddRows") {
                 new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, thisKey)
             };
 
-            var fb = Method_RowUniqueAndInvalidate.UniqueRow(ld, allFi, scp, $"Script-Befehl: 'AddRowsUniqueAndInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+            var fb = Method_RowUnique.UniqueRow(ld, allFi, scp, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }

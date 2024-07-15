@@ -77,9 +77,9 @@ public sealed class ItemSendFilter {
     private readonly List<string> _childIds = [];
 
     private Database? _databaseOutput;
+    private bool _databaseOutputLoaded = false;
+    private string _databaseOutputName = string.Empty;
     private int _outputColorId = -1;
-
-    private string tempDatabaseNametoLoad = string.Empty;
 
     #endregion
 
@@ -124,10 +124,11 @@ public sealed class ItemSendFilter {
             return ias.DatabaseInput;
         }
 
-        if (string.IsNullOrEmpty(tempDatabaseNametoLoad)) { return _databaseOutput; }
-        _databaseOutput = GetById(new ConnectionInfo(tempDatabaseNametoLoad, null, string.Empty), false, null, true);
+        if (_databaseOutputLoaded) { return _databaseOutput; }
+        _databaseOutput = GetById(new ConnectionInfo(_databaseOutputName, null, string.Empty), false, null, true);
 
-        tempDatabaseNametoLoad = string.Empty;
+        _databaseOutputLoaded = true;
+
         return _databaseOutput;
     }
 
@@ -139,7 +140,8 @@ public sealed class ItemSendFilter {
         if (value == DatabaseOutputGet(item)) { return; }
 
         _databaseOutput = value;
-        tempDatabaseNametoLoad = string.Empty;
+        _databaseOutputName = value?.KeyName ?? string.Empty;
+        _databaseOutputLoaded = true;
         item.RaiseVersion();
         item.DoChilds();
         item.OnPropertyChanged();
@@ -193,9 +195,7 @@ public sealed class ItemSendFilter {
 
     public List<string> ParsableTags(IItemSendFilter item) {
         List<string> result = [];
-
-        result.ParseableAdd("OutputDatabase", item.DatabaseOutput); // Nicht _database, weil sie evtl. noch nicht geladen ist
-
+        result.ParseableAdd("OutputDatabase", _databaseOutputName);
         result.ParseableAdd("SentToChildIds", _childIds, false);
 
         return result;
@@ -207,10 +207,11 @@ public sealed class ItemSendFilter {
         switch (key) {
             case "database":
             case "outputdatabase":
-                tempDatabaseNametoLoad = value.FromNonCritical();
+                _databaseOutputName = value.FromNonCritical();
+                _databaseOutputLoaded = false;
 
-                if (tempDatabaseNametoLoad.IsFormat(FormatHolder.FilepathAndName)) {
-                    tempDatabaseNametoLoad = tempDatabaseNametoLoad.FilePath() + MakeValidTableName(tempDatabaseNametoLoad.FileNameWithoutSuffix()) + "." + tempDatabaseNametoLoad.FileSuffix();
+                if (_databaseOutputName.IsFormat(FormatHolder.FilepathAndName)) {
+                    _databaseOutputName = _databaseOutputName.FilePath() + MakeValidTableName(_databaseOutputName.FileNameWithoutSuffix()) + "." + _databaseOutputName.FileSuffix();
                 }
 
                 return true;

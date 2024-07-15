@@ -891,7 +891,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         OnRowAdded(new RowChangedEventArgs(row, reason));
 
         if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-            Method_RowUniqueAndInvalidate.InvalidatedRows.Add(row);
+            Method_RowInvalidate.InvalidatedRows.Add(row);
         }
 
         return string.Empty;

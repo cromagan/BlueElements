@@ -77,7 +77,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalScriptMethods\Method_AddRowsUniqueAndInvalidate.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_AddRowsUnique.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
@@ -93,7 +93,7 @@
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_RowUniqueAndInvalidate.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowInvalidate.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Call.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallRow.cs" />

@@ -191,11 +191,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    /// <summary>
+    /// Reverse: TimeCodeUTCNow
+    /// </summary>
+    /// <param name="timeCode"></param>
+    /// <returns></returns>
     public static DateTime TimeCodeToUTCDateTime(long timeCode) {
         long originalTicks = (timeCode * 5000) + new DateTime(2024, 1, 1).Ticks;
         return new DateTime(originalTicks, DateTimeKind.Utc);
     }
 
+
+    /// <summary>
+    /// Reverse: TimeCodeToUTCDateTime
+    /// </summary>
+    /// <returns></returns>
     public static long TimeCodeUTCNow() {
         var t = DateTime.UtcNow.Ticks - new DateTime(2024, 1, 1).Ticks;
         return t / 5000;
