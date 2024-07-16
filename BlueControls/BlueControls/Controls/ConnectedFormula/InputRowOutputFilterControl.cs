@@ -80,6 +80,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
                 FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
                 return;
             }
+            va = _filterwert;
         }
 
         //if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {

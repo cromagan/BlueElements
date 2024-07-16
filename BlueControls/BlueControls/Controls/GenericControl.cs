@@ -465,14 +465,14 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
-        Invalidate();
+        base.OnSizeChanged(e);
         if (_bitmapOfControl != null) {
             if (_bitmapOfControl.Width < Width || _bitmapOfControl.Height < Height) {
                 _bitmapOfControl?.Dispose();
                 _bitmapOfControl = null;
             }
         }
-        base.OnSizeChanged(e);
+        Invalidate();
     }
 
     protected Form? ParentForm() => ParentForm(Parent);

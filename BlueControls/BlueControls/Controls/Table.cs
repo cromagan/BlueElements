@@ -137,7 +137,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     private RowItem? _unterschiede;
 
- 
+
 
     #endregion
 
@@ -836,7 +836,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
                     #region Spalte mit Bild zeichnen
 
                     Point pos = new(
-                        (int)viewItem.X_WithSlider+
+                        (int)viewItem.X_WithSlider +
                         (int)((viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - fs.Width) / 2.0), 3 + down);
                     gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmapCode, (int)viewItem.X_WithSlider + 2, (int)(pos.Y + fs.Height), viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 4, ca.HeadSize(_columnFont) - (int)(pos.Y + fs.Height) - 6 - 18);
                     // Dann der Text
@@ -1344,6 +1344,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         base.DrawControl(gr, state);
 
         if (IsDisposed) { return; }
+
+        _tmpCursorRect = Rectangle.Empty;
+
 
         if (_databaseDrawError is DateTime dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
@@ -2621,7 +2624,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             // Kommt vor, dass spontan doch geparsed wird...
             //if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count) { return false; }
 
-       
+
 
             foreach (var thisViewItem in ca) {
                 if (thisViewItem != null) {
@@ -2639,7 +2642,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             _mouseOverText = string.Empty;
             var wdh = true;
             var maxX = 0;
-       
+
             // Spalten berechnen
             foreach (var thisViewItem in ca) {
                 if (thisViewItem?.Column != null) {
@@ -2653,7 +2656,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
                     if (wdh) {
                         thisViewItem.X_WithSlider = thisViewItem.X;
                         maxX += thisViewItem.DrawWidth(displayRectangleWithoutSlider, _pix16, _cellFont);
-                        ca._wiederHolungsSpaltenWidth = Math.Max( maxX, (int)ca._wiederHolungsSpaltenWidth);
+                        ca._wiederHolungsSpaltenWidth = Math.Max(maxX, (int)ca._wiederHolungsSpaltenWidth);
                     } else {
                         thisViewItem.X_WithSlider = se ? (int)(maxX - sliderXVal) : maxX;
                         maxX += thisViewItem.DrawWidth(displayRectangleWithoutSlider, _pix16, _cellFont);
@@ -2793,10 +2796,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
 
-                if (!isCurrentThreadBackground && CursorPosColumn == cellInThisDatabaseColumn && CursorPosRow == cellInThisDatabaseRowData) {
+                if (!isCurrentThreadBackground && CursorPosRow == cellInThisDatabaseRowData) {
                     _tmpCursorRect = cellrectangle;
                     _tmpCursorRect.Height -= 1;
-                    Draw_Cursor(gr, displayRectangleWoSlider, false);
+
+                    if (CursorPosColumn == cellInThisDatabaseColumn) {
+
+                        Draw_Cursor(gr, displayRectangleWoSlider, false);
+                    }
                 }
 
                 #region Draw_CellTransparent
@@ -3133,9 +3140,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
         if (CurrentArrangement is not ColumnViewCollection ca) { return false; }
 
-        if (viewItem.X_WithSlider == null && !ComputeAllColumnPositions(ca,r)) { return false; }
+        if (viewItem.X_WithSlider == null && !ComputeAllColumnPositions(ca, r)) { return false; }
 
-        _ = ComputeAllColumnPositions(ca,r);
+        _ = ComputeAllColumnPositions(ca, r);
         if (viewItem.ViewType == ViewType.PermanentColumn) {
             if (viewItem.X_WithSlider + viewItem.DrawWidth(r, _pix16, _cellFont) <= r.Width) { return true; }
             //Develop.DebugPrint(enFehlerArt.Info,"Unsichtbare Wiederholungsspalte: " + ViewItem.Column.KeyName);
