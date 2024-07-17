@@ -416,7 +416,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         }
 
         if (e.Item is DropDownListItem dli) {
-            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + dli.Indent * 20;
+            var x = Cursor.Position.X - MousePos().X + dli.Pos.X + (dli.Indent * 20);
             var y = Cursor.Position.Y - MousePos().Y + dli.Pos.Bottom; //Identisch
 
             var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DDItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);

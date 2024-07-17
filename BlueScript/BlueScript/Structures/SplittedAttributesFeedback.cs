@@ -36,15 +36,18 @@ public readonly struct SplittedAttributesFeedback {
         FehlerTyp = ScriptIssueType.ohne;
     }
 
-    public SplittedAttributesFeedback(ScriptIssueType type, string error) {
+    public SplittedAttributesFeedback(ScriptIssueType type, string error, int attWithError) {
         Attributes = [];
         ErrorMessage = error;
         FehlerTyp = type;
+        AttWithError = attWithError;
     }
 
     #endregion
 
     #region Properties
+
+    public int AttWithError { get; }
 
     public VariableCollection Attributes { get; }
 

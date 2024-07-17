@@ -41,7 +41,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
 
     private readonly ItemAcceptFilter _itemAccepts;
     private bool _bei_Bedarf_Erzeugen;
+    private string _filter = string.Empty;
     private bool _leere_Ordner_Löschen;
+    private string _mindest_pfad = string.Empty;
     private string _pfad = string.Empty;
 
     #endregion
@@ -78,6 +80,18 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
+
+    public string Filter {
+        get => _filter;
+
+        set {
+            if (IsDisposed) { return; }
+            if (value == _filter) { return; }
+            _filter = value;
+            OnPropertyChanged();
+        }
+    }
+
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
     public bool InputMustBeOneRow => true;
@@ -90,6 +104,18 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
             if (IsDisposed) { return; }
             if (value == _leere_Ordner_Löschen) { return; }
             _leere_Ordner_Löschen = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [Description("Bis zu diesem Pfad kann maximal zurück gegangen werden.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
+    public string Mindest_Pfad {
+        get => _mindest_pfad;
+
+        set {
+            if (IsDisposed) { return; }
+            if (value == _mindest_pfad) { return; }
+            _mindest_pfad = value;
             OnPropertyChanged();
         }
     }
@@ -134,7 +160,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
-            OriginalText = Pfad,
+            Var_Directory = Pfad,
+            Var_DirectoryMin = Mindest_Pfad,
+            Filter = Filter,
             CreateDir = _bei_Bedarf_Erzeugen,
             DeleteDir = _leere_Ordner_Löschen
         };
@@ -161,6 +189,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         [
             .. _itemAccepts.GetProperties(this, widthOfControl),
             new FlexiControlForProperty<string>(() => Pfad),
+            new FlexiControlForProperty<string>(() => Mindest_Pfad),
+            new FlexiControlForProperty<string>(() => Filter),
             new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
             new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
             new FlexiControl(),
@@ -180,8 +210,17 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
+            case "path":
             case "pfad":
                 _pfad = value.FromNonCritical();
+                return true;
+
+            case "filter":
+                _filter = value.FromNonCritical();
+                return true;
+
+            case "pathmin":
+                _mindest_pfad = value.FromNonCritical();
                 return true;
 
             case "createdir":
@@ -217,7 +256,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("Pfad", _pfad);
+        result.ParseableAdd("Path", _pfad);
+        result.ParseableAdd("PathMin", _mindest_pfad);
+        result.ParseableAdd("Filter", _filter);
         result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
         result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
         return result.Parseable(base.ToString());

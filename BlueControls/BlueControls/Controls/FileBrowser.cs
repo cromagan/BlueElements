@@ -47,14 +47,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     #region Fields
 
     private string _directory = string.Empty;
-
-    private string _lastcheck = string.Empty;
-
-    private string _originalText = string.Empty;
+    private string _directoryMin = string.Empty;
+    private string _filter = "*";
+    private string _lastcheckcode = string.Empty;
     private string _sort = "Name";
-
     private string _todel = string.Empty;
-
+    private string _var_directory = string.Empty;
+    private string _var_directorymin = string.Empty;
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -69,9 +68,24 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
     #region Properties
 
-    public bool CreateDir { get; set; }
 
-    public bool DeleteDir { get; set; }
+    [DefaultValue(true)]
+    public bool DoDefaultHandling { get; set; } = true;
+
+    [DefaultValue(true)]
+    public bool AllowEdit { get; set; } = true;
+
+    [DefaultValue(true)]
+    public bool AllowDragDrop { get; set; } = true;
+
+    [DefaultValue(true)]
+    public bool AllowScreenshots { get; set; } = true;
+
+    [DefaultValue(false)]
+    public bool CreateDir { get; set; } = false;
+
+    [DefaultValue(false)]
+    public bool DeleteDir { get; set; } = false;
 
     public string Directory {
         get => IsDisposed ? string.Empty : _directory;
@@ -79,34 +93,51 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             if (IsDisposed) { return; }
             value = value.TrimEnd("\\") + "\\";
 
+            if (value == "\\") { value = string.Empty; }
+
             if (value == _directory) { return; }
 
-            RemoveWatcher();
-            if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
-            lsbFiles.ItemClear();
-
             _directory = value;
-            _lastcheck = string.Empty;
-
             txbPfad.Text = _directory;
 
-            CheckButtons(false); // Macht der Worker wieder heile
+            ReloadDirectory();
+        }
+    }
+
+    public string DirectoryMin {
+        get => IsDisposed ? string.Empty : _directoryMin;
+        set {
+            if (IsDisposed) { return; }
+            value = value.ToLower().TrimEnd("\\") + "\\";
+
+            if (value == "\\") { value = string.Empty; }
+
+            if (value == _directoryMin) { return; }
+
+            _directoryMin = value;
         }
     }
 
     public new bool Enabled {
         get => base.Enabled; set {
             base.Enabled = value;
-            CheckButtons(DirectoryExists(_directory));
+            CheckButtons(false);
         }
     }
 
-    public string OriginalText {
-        get => _originalText;
+    public string Filter {
+        get => IsDisposed ? string.Empty : _filter;
         set {
-            if (_originalText == value) { return; }
-            _originalText = value;
-            CheckButtons(DirectoryExists(_directory));
+            if (IsDisposed) { return; }
+
+            if (string.IsNullOrEmpty(value)) { value = "*"; }
+
+            value = value.ToLower();
+            if (value == _filter) { return; }
+
+            _filter = value;
+
+            ReloadDirectory();
         }
     }
 
@@ -115,8 +146,31 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         set {
             if (_sort == value) { return; }
             _sort = value;
-            Reload();
+            ReloadDirectory();
         }
+    }
+
+    public string Var_Directory {
+        get => _var_directory;
+        set {
+            if (_var_directory == value) { return; }
+            _var_directory = value;
+            InvalidateDiretoryAndCheckCode();
+        }
+    }
+
+    public string Var_DirectoryMin {
+        get => _var_directorymin;
+        set {
+            if (_var_directorymin == value) { return; }
+            _var_directorymin = value;
+            InvalidateDiretoryAndCheckCode();
+        }
+    }
+
+    private void InvalidateDiretoryAndCheckCode() {
+        _lastcheckcode = string.Empty;
+        ReloadDirectory();
     }
 
     #endregion
@@ -143,45 +197,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         return exekey == null ? string.Empty : exekey.GetValue("").ToString();
     }
 
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
-        RemoveWatcher();
-
-        DoInputFilter(null, false);
-        DoRows();
-
-        var ct = string.Empty;
-
-        var r = this.RowSingleOrNull();
-
-        if (r != null) {
-            r.CheckRowDataIfNeeded();
-
-            if (r.LastCheckedEventArgs?.Variables is VariableCollection list) {
-                ct = list.ReplaceInText(OriginalText);
-            }
-        }
-        Directory = ct;
-
-        CreateWatcher();
-    }
-
-    public void Reload() {
-        var p = _directory;
-        Directory = string.Empty;
-        Directory = p;
-    }
-
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         if (Disposing) {
-            RemoveWatcher();
+            ReloadDirectory();
         }
 
         base.Dispose(disposing);
@@ -192,11 +214,38 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
     }
 
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        DoInputFilter(null, false);
+        DoRows();
+
+        if (Parents.Count > 0) {
+            var tmpDirectory = string.Empty;
+            var tmpDirectoryMin = string.Empty;
+
+            var r = this.RowSingleOrNull();
+
+            if (r != null) {
+                r.CheckRowDataIfNeeded();
+
+                if (r.LastCheckedEventArgs?.Variables is VariableCollection list) {
+                    tmpDirectory = list.ReplaceInText(_var_directory);
+                    tmpDirectoryMin = list.ReplaceInText(_var_directorymin);
+                }
+            }
+
+            Directory = tmpDirectory;
+            DirectoryMin = tmpDirectoryMin;
+        }
+
+    }
+
     protected override void OnVisibleChanged(System.EventArgs e) {
-        if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
-        lsbFiles.ItemClear();
-        _lastcheck = string.Empty;
         base.OnVisibleChanged(e);
+        InvalidateDiretoryAndCheckCode();
     }
 
     private static bool AddThis(FileInfo fi) {
@@ -228,13 +277,16 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
+        if (!AllowScreenshots) { return; }
+
         var i = ScreenShot.GrabArea(ParentForm());
 
         var dateiPng = TempFile(_directory.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString4(), "PNG");
         i.Save(dateiPng, ImageFormat.Png);
         i.Dispose();
         CollectGarbage();
-        Reload();
+
+        ReloadDirectory();
     }
 
     private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(_directory);
@@ -242,11 +294,30 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     private void btnZurück_Click(object? sender, System.EventArgs e) => Directory = Directory.PathParent(1);
 
     private void CheckButtons(bool pfadexists) {
-        txbPfad.Enabled = Enabled && string.IsNullOrEmpty(OriginalText);
+        txbPfad.Enabled = string.IsNullOrEmpty(DirectoryMin) && Enabled && string.IsNullOrEmpty(Var_Directory);
         lsbFiles.Enabled = Enabled && pfadexists;
-        btnAddScreenShot.Enabled = Enabled && pfadexists;
-        btnExplorerÖffnen.Enabled = Enabled && pfadexists;
-        btnZurück.Enabled = Enabled && pfadexists;
+        btnAddScreenShot.Enabled = AllowScreenshots & Enabled && pfadexists;
+
+        btnExplorerÖffnen.Enabled = pfadexists && Enabled && (IsAdministrator() || AllowEdit);
+
+        if (string.IsNullOrEmpty(DirectoryMin)) {
+            btnZurück.Enabled = Enabled && pfadexists;
+        } else {
+
+            if (Directory.Equals(DirectoryMin, StringComparison.OrdinalIgnoreCase)) {
+                btnZurück.Enabled = false;
+            } else {
+                btnZurück.Enabled = Enabled && pfadexists;
+            }
+        }
+    }
+
+    private string CheckCode() {
+        if (InvokeRequired) {
+            return (string)Invoke(new Func<string>(CheckCode));
+        }
+
+        return _directory + "?" + Visible + "?" + _filter + "?" + _sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
     }
 
     private void chkFolder_Tick(object sender, System.EventArgs e) {
@@ -255,9 +326,9 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             return;
         }
 
-        if (ThumbGenerator.IsBusy) { return; }
+        if (ThumbGenerator.IsBusy || !this.Visible) { return; }
 
-        if (_lastcheck == _directory) { return; }
+        if (_lastcheckcode == CheckCode()) { return; }
 
         ThumbGenerator.RunWorkerAsync();
     }
@@ -289,6 +360,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private DragDropEffects CurrentState(DragEventArgs e) {
+        if (!AllowDragDrop) { return DragDropEffects.None; }
         if (!DirectoryExists(_directory)) { return DragDropEffects.None; }
 
         if (!CanWriteInDirectory(_directory)) { return DragDropEffects.None; }
@@ -298,8 +370,42 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         return e.AllowedEffect.HasFlag(DragDropEffects.Copy) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
+    private void ReloadDirectory() {
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(ReloadDirectory));
+                return;
+            } catch {
+                // Kann dank Multitasking disposed sein
+                Develop.CheckStackForOverflow();
+                ReloadDirectory();
+                return;
+            }
+        }
+
+        try {
+            if (_watcher != null) {
+                _watcher.EnableRaisingEvents = false;
+                _watcher.Changed -= Watcher_Changed;
+                _watcher.Created -= Watcher_Created;
+                _watcher.Deleted -= Watcher_Deleted;
+                _watcher.Renamed -= Watcher_Renamed;
+                _watcher.Error -= Watcher_Error;
+                //_watcher?.Dispose();
+                _watcher = null;
+            }
+        } catch { }
+
+        if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
+        lsbFiles.ItemClear();
+
+        //_lastcheckcode = string.Empty;
+        Invalidate();
+    }
+
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is not BitmapListItem it) { return; }
+        if (!AllowEdit) { return; }
         //if (it.Tag is not List<string> tags) { return; }
 
         //_ = e.UserMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
@@ -313,13 +419,14 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not BitmapListItem it || e.Item == null) { return; }
+        if (!AllowEdit) { return; }
 
         switch (e.Item.KeyName) {
             case "Löschen":
                 var I = new FileInfo(it.KeyName);
                 var silent = !I.Attributes.HasFlag(FileAttributes.ReadOnly);
                 if (FileDialogs.DeleteFile(I.FullName, !silent)) {
-                    Reload();
+                    ReloadDirectory();
                 }
                 break;
 
@@ -338,7 +445,8 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
                 _ = MoveFile(it.KeyName, nn, true);
 
-                Reload();
+                ReloadDirectory();
+
                 break;
 
             //case "Ausschneiden":
@@ -370,6 +478,9 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private void lsbFiles_DragDrop(object sender, DragEventArgs e) {
+
+        if (!AllowDragDrop) { return; }
+
         var tmp = CurrentState(e);
 
         if (tmp == DragDropEffects.None) { return; }
@@ -405,6 +516,9 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private void lsbFiles_DragEnter(object sender, DragEventArgs e) {
+        if (!AllowDragDrop) { e.Effect = DragDropEffects.None; return; }
+
+
         var tmp = CurrentState(e);
 
         if (e.AllowedEffect.HasFlag(tmp)) {
@@ -416,6 +530,11 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private void lsbFiles_ItemClicked(object sender, AbstractListItemEventArgs e) {
+
+        if (!DoDefaultHandling) { return; }
+
+
+
         if (File.Exists(e.Item.KeyName)) {
             switch (e.Item.KeyName.FileType()) {
                 case FileFormat.Link:
@@ -468,42 +587,16 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         Directory = e.Item.KeyName;
     }
 
-    private void RemoveWatcher() {
-        if (Disposing || IsDisposed) { return; }
-
-        if (InvokeRequired) {
-            try {
-                _ = Invoke(new Action(RemoveWatcher));
-                return;
-            } catch {
-                // Kann dank Multitasking disposed sein
-                Develop.CheckStackForOverflow();
-                RemoveWatcher();
-                return;
-            }
-        }
-
-        try {
-            if (_watcher != null) {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Changed -= Watcher_Changed;
-                _watcher.Created -= Watcher_Created;
-                _watcher.Deleted -= Watcher_Deleted;
-                _watcher.Renamed -= Watcher_Renamed;
-                _watcher.Error -= Watcher_Error;
-                //_watcher?.Dispose();
-                _watcher = null;
-            }
-        } catch { }
-    }
-
     private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
-        var newPath = _directory.Trim("\\") + "\\";
+        var newCheckCode = CheckCode();
 
-        if (_lastcheck == newPath) { return; }
-        if (!newPath.IsFormat(FormatHolder.Filepath)) { return; }
+        if (newCheckCode == _lastcheckcode) { return; }
 
-        _lastcheck = newPath;
+        _lastcheckcode = newCheckCode;
+
+        var dir = _directory;
+
+        if (!dir.IsFormat(FormatHolder.Filepath)) { return; }
 
         if (!Visible) { return; }
 
@@ -530,24 +623,25 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         #endregion
 
-        _todel = _lastcheck;
+        _todel = dir;
 
         #region Verzeichniss erstellen oder raus hier
 
-        if (!DirectoryExists(newPath)) {
-            if (CreateDir && Enabled) {
-                _ = System.IO.Directory.CreateDirectory(newPath);
+        if (!DirectoryExists(dir)) {
+            if (CreateDir && Enabled && RowsInputChangedHandled && FilterInputChangedHandled &&
+                !string.IsNullOrEmpty(dir) && dir.IsFormat(FormatHolder.Filepath)) {
+                _ = System.IO.Directory.CreateDirectory(dir);
             } else {
                 return;
             }
-            if (!DirectoryExists(newPath)) { return; }
+            if (!DirectoryExists(dir)) { return; }
         }
 
         #endregion
 
-        var allF = System.IO.Directory.GetFiles(newPath, "*", SearchOption.TopDirectoryOnly);
+        var allF = System.IO.Directory.GetFiles(dir, _filter, SearchOption.TopDirectoryOnly);
 
-        if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
+        if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
 
         #region  Buttons und Watcher einschalten
 
@@ -562,7 +656,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             var fi = new FileInfo(fileName);
 
             if (AddThis(fi)) {
-                if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
+                if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
 
                 var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
                     Padding = 6
@@ -595,7 +689,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         #region Verzeichniss objekte Flott erstellen
 
-        var allD = System.IO.Directory.GetDirectories(newPath, "*", SearchOption.TopDirectoryOnly);
+        var allD = System.IO.Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
             var fi = new FileInfo(thisString);
             if (AddThis(fi)) {
@@ -615,11 +709,11 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         #region  Vorschau Bilder erstellen
 
         foreach (var thisString in allF) {
-            if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
+            if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
             var fi = new FileInfo(thisString);
             if (AddThis(fi)) {
                 feedBack = ["Image", thisString, WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk)];
-                if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
+                if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
                 ThumbGenerator.ReportProgress(2, feedBack);
             }
         }
@@ -640,13 +734,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
                     CreateWatcher();
                 } else {
                     CheckButtons(false);
-                    RemoveWatcher();
                 }
 
                 break;
 
             case "add":
                 var ob = (BitmapListItem)gb[1];
+                if (_lastcheckcode != CheckCode()) { return; }
                 lsbFiles.ItemAdd(ob);
                 return;
 
@@ -677,21 +771,23 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
         //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }
-        Reload();
     }
 
-    private void Watcher_Created(object sender, FileSystemEventArgs e) => Reload();
+    private void Watcher_Created(object sender, FileSystemEventArgs e) => ReloadDirectory();
 
-    private void Watcher_Deleted(object sender, FileSystemEventArgs e) => Reload();
+
+    private void Watcher_Deleted(object sender, FileSystemEventArgs e) => ReloadDirectory();
+
 
     /// <summary>
     /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Watcher_Error(object sender, ErrorEventArgs e) => Reload();
+    private void Watcher_Error(object sender, ErrorEventArgs e) => ReloadDirectory();
 
-    private void Watcher_Renamed(object sender, RenamedEventArgs e) => Reload();
+
+    private void Watcher_Renamed(object sender, RenamedEventArgs e) => ReloadDirectory();
 
     #endregion
 }

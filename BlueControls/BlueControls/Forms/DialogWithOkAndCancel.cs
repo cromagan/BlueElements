@@ -101,7 +101,7 @@ public partial class DialogWithOkAndCancel : Form {
         if (centerControl != null) {
             centerControl.Top = he;
             centerControl.Left = Skin.Padding;
-            centerControl.Width = Width - Skin.Padding * 2 - BorderWidth;
+            centerControl.Width = Width - (Skin.Padding * 2) - BorderWidth;
             centerControl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             he = he + centerControl.Height + Skin.Padding;
         }

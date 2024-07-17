@@ -59,7 +59,7 @@ public class Method_AddRow : Method_Database {
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
         if (string.IsNullOrEmpty(attvar.ValueStringGet(1))) { return new DoItFeedback(ld, "KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[attvar.ValueString(1)];

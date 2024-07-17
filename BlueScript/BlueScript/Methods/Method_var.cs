@@ -50,7 +50,14 @@ internal class Method_Var : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.LogData, "Kein Text angekommen."); }
 
-        return VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
+        var vbe =  VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
+
+
+        if (vbe.AllOk) {  return vbe; }
+
+
+        return vbe;
+
     }
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.

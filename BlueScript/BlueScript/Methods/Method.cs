@@ -31,6 +31,12 @@ namespace BlueScript.Methods;
 
 public abstract class Method : IReadableTextWithKey, IReadableText {
 
+    protected void SetNotSuccesful(VariableCollection varCol) {
+        var b = varCol.Get("successful");
+
+        if (b is VariableBool vb) { vb.ValueBool = false; }
+    }
+
     #region Fields
 
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
@@ -205,15 +211,15 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback([])
-                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
+                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.",-1);
         }
 
         var attributes = SplitAttributeToString(attributText);
-        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen."); }
-        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
-        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.",-1); }
+        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.",-1); }
+        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.",-1); }
+        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.",-1); }
+        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.",-1); }
 
         //  Variablen und Routinen ersetzen
         VariableCollection feedbackVariables = [];
@@ -230,13 +236,13 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
             if (mustBeVar) {
                 var varn = attributes[n];
-                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
+                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), n); }
 
                 v = varcol?.Get(varn);
-                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
+                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), n); }
             } else {
                 var tmp2 = Variable.GetVariableByParsing(attributes[n], ld, varcol, scp);
-                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
+                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1), n); }
                 v = tmp2.Variable;
             }
 
@@ -248,7 +254,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
                 if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
+            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId, n); }
 
             feedbackVariables.Add(v);
 
@@ -291,7 +297,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         var attvar = SplitAttributeToVars(varCol, value, sargs, 0, ld, scp);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(ld, attvar.ErrorMessage); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(ld, "Der Wert nach dem '=' konnte nicht berechnet werden: " +  attvar.ErrorMessage); }
 
         if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback(ld, "Variable unbekannt"); }
 
