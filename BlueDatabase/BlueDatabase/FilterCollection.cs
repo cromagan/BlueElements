@@ -627,7 +627,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private List<RowItem> CalculateFilteredRows() {
-        Develop.CheckStackForOverflow();
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
 
         var fi2 = _internal.ToArray();
