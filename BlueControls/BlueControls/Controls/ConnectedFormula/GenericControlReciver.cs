@@ -47,6 +47,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #endregion
 
     #region Constructors
+    public GenericControlReciver() : base(false, false) { }
 
     public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap) : base(doubleBuffer, useBackgroundBitmap) { }
 
