@@ -158,7 +158,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FileBrowser {
             Var_Directory = Pfad,
             Var_DirectoryMin = Mindest_Pfad,
@@ -166,7 +166,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
             CreateDir = _bei_Bedarf_Erzeugen,
             DeleteDir = _leere_Ordner_Löschen
         };
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
     }

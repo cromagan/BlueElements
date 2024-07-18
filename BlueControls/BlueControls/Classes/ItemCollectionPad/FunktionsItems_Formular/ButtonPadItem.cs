@@ -320,7 +320,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedFormulaButton() {
             Text = _anzeige,
             ImageCode = _image + "|16",
@@ -337,7 +337,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
             QuickInfo = ButtonQuickInfo
         };
 
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
     }

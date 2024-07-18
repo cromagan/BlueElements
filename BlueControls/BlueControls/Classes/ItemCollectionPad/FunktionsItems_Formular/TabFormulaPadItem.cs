@@ -108,7 +108,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TabControl();
         con.Name = this.DefaultItemToControlName();
         // Die Input-Settings werden direkt auf das erzeugte
@@ -117,7 +117,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         return con;
     }
 
-    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, string modes) {
+    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -158,7 +158,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
             #endregion
 
             if (cf != null) {
-                if (cf.HasVisibleItemsForMe(pgvis, modes)) {
+                if (cf.HasVisibleItemsForMe(pgvis, mode)) {
                     ConnectedFormulaView? cc;
 
                     if (existTab == null) {
@@ -171,12 +171,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
                         };
                         tabctrl.TabPages.Add(t);
 
-                        cc = new ConnectedFormulaView(pg, modes);
+                        cc = new ConnectedFormulaView(pg);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.DatabaseInput);
                         cc.Dock = DockStyle.Fill;
-                        cc.DoDefaultSettings(parentView, this);
+                        cc.DoDefaultSettings(parentView, this, mode);
 
                         //cc.HandleChangesNow();
 

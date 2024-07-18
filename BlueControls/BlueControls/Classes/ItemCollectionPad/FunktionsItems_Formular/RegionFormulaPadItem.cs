@@ -131,7 +131,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
         var txt = "?";
@@ -141,7 +141,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             txt = _child.FileNameWithoutSuffix();
         }
 
-        var con = new ConnectedFormulaView("Head", parent.Mode) {
+        var con = new ConnectedFormulaView("Head") {
             GroupBoxStyle = _rahmenStil
         };
 
@@ -149,7 +149,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             con.Text = txt;
         }
 
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
         con.InitFormula(cf, DatabaseInput);
 
         return con;

@@ -53,12 +53,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     #region Constructors
 
-    public ConnectedFormulaView() : this("Head", string.Empty) { }
+    public ConnectedFormulaView() : this("Head") { }
 
-    public ConnectedFormulaView(string page, string mode) : base(false, false) {
+    public ConnectedFormulaView(string page) : base(false, false) {
         InitializeComponent();
         Page = page;
-        Mode = mode;
         InitFormula(null, null);
 
         _timer = new Timer();
@@ -90,11 +89,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
     }
 
-    public string Mode {
-        get => _modus;
+    public override string Mode {
+        get => base.Mode;
         set {
-            if (_modus == value) { return; }
-            _modus = value;
+            if (base.Mode == value) { return; }
+            base.Mode = value;
             InvalidateView();
         }
     }
@@ -149,7 +148,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
             foreach (var thisit in ConnectedFormula.PadData) {
                 if (thisit is IItemToControl thisitco && thisit.IsOnPage(Page)) {
-                    var con = SearchOrGenerate(thisitco, false);
+                    var con = SearchOrGenerate(thisitco, false, Mode);
 
                     if (con != null) {
                         _ = unused.Remove(con);
@@ -173,7 +172,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
 
                         if (thisit is RowEntryPadItem rep) {
-                            DoDefaultSettings(null, rep);
+                            DoDefaultSettings(null, rep, Mode);
                         }
 
                         if (thisit is TabFormulaPadItem tabItem) {
@@ -268,7 +267,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public Control? SearchOrGenerate(IItemToControl? thisit, bool onlySerach) {
+    public Control? SearchOrGenerate(IItemToControl? thisit, bool onlySerach, string mode) {
         if (thisit == null) { return null; }
 
         try {
@@ -278,7 +277,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
             if (onlySerach) { return null; }
 
-            var c = thisit.CreateControl(this);
+            var c = thisit.CreateControl(this, mode);
             if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;

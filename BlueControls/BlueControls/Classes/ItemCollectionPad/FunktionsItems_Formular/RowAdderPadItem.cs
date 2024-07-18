@@ -223,7 +223,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new RowAdder {
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,
@@ -231,7 +231,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
             Script = Script
         };
 
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
     }

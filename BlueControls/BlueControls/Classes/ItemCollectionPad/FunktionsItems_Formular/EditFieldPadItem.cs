@@ -177,7 +177,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell {
@@ -186,7 +186,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
             CaptionPosition = CaptionPosition
         };
 
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
     }

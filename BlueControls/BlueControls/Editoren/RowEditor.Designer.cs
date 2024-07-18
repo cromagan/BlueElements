@@ -34,7 +34,6 @@ partial class RowEditor {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.formular.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.formular.Location = new System.Drawing.Point(0, 0);
-            this.formular.Mode = "";
             this.formular.Name = "formular";
             this.formular.Size = new System.Drawing.Size(523, 612);
             this.formular.TabIndex = 0;

@@ -143,10 +143,10 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new Table();
         con.DatabaseSet(DatabaseOutput, string.Empty);
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         return con;

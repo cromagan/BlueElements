@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime;
+using System.Runtime.InteropServices;
 
 namespace BlueControls.Controls;
 
@@ -52,6 +53,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #endregion
 
     #region Properties
+
+    public virtual string Mode { get; set; }
+
 
     public Database? DatabaseInput {
         get => _databaseInput;
@@ -143,8 +147,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="dest"></param>
     /// <param name="parentFormula"></param>
     /// <param name="source"></param>
-    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemAcceptFilter source) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemAcceptFilter source, string mode) {
         Name = source.DefaultItemToControlName();
+
+        Mode = mode;
+
+   
 
         if (this is IHasSettings ihs) {
             ihs.SettingsManualFilename = ("%homepath%\\" + Develop.AppName() + "\\" + source.KeyName + ".ini").CheckFile();
@@ -156,7 +164,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             var it = source.Parent?[thisKey];
 
             if (it is IItemToControl itc) {
-                var parentCon = parentFormula.SearchOrGenerate(itc, false);
+                var parentCon = parentFormula.SearchOrGenerate(itc, false, mode);
                 if (parentCon is GenericControlReciverSender parentConSender) {
                     parentConSender.ChildIsBorn(this);
                 }

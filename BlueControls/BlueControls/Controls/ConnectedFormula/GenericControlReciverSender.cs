@@ -54,9 +54,9 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Methods
 
-    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemSendFilter source) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemSendFilter source, string mode) {
         FilterOutput.Database = source.DatabaseOutput;
-        base.DoDefaultSettings(parentFormula, source);
+        base.DoDefaultSettings(parentFormula, source, mode);
 
         if (parentFormula == null) { return; }
 
@@ -64,7 +64,7 @@ public class GenericControlReciverSender : GenericControlReciver {
             var it = source.Parent?[thisKey];
 
             if (it is IItemToControl itc) {
-                var parentCon = parentFormula.SearchOrGenerate(itc, true);
+                var parentCon = parentFormula.SearchOrGenerate(itc, true, mode);
                 if (parentCon is GenericControlReciver exitingChild) {
                     ChildIsBorn(exitingChild);
                 }

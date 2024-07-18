@@ -529,10 +529,16 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         e.Effect = DragDropEffects.None;
     }
 
+    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
+
+    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
     private void lsbFiles_ItemClicked(object sender, AbstractListItemEventArgs e) {
 
-        if (!DoDefaultHandling) { return; }
+        OnItemClicked(e);
 
+
+        if (!DoDefaultHandling) { return; }
 
 
         if (File.Exists(e.Item.KeyName)) {

@@ -31,7 +31,7 @@ public interface IItemToControl : IHasKeyName, IHasVersion, ICloneable, IReadabl
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent);
+    public Control? CreateControl(ConnectedFormulaView parent, string mode);
 
     // ReSharper disable once UnusedMemberInSuper.Global
     public bool IsOnPage(string page);

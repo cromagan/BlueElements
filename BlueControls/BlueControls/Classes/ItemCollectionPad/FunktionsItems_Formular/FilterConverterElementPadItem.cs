@@ -179,11 +179,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         //var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
     }

@@ -146,13 +146,13 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FlexiControlRowSelector(DatabaseOutput, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition
         };
 
-        con.DoDefaultSettings(parent, this);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
     }
