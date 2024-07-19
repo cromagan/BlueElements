@@ -169,13 +169,13 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         return eText.LastSize();
     }
 
-    public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
 
-    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) => hotItem = null;
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        OnContextMenuInit(e);
+    }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public Size RequiredTextSize() {
         if (_design == Design.Undefiniert) { GetDesign(); }
@@ -248,6 +248,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             if (!string.IsNullOrEmpty(_text)) { _eText?.Draw(gr, 1); }
         } catch { }
     }
+
+    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);

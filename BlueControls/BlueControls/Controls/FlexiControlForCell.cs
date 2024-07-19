@@ -119,7 +119,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     //    return false;
     //}
 
-    //public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
+    //public void GetContextMenuItems(ContextMenuInitEventArgs e) {
     //    var (column, row) = GetTmpVariables();
     //    if (column?.Database != null && column.Database.IsAdministrator()) {
     //        items.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten));
@@ -257,11 +257,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.KeyName)) {
-                e.UserMenu.Add(ItemOf(ContextMenuCommands.DateiÖffnen));
+                e.ContextMenu.Add(ItemOf(ContextMenuCommands.DateiÖffnen));
             }
         }
         if (e.HotItem is BitmapListItem) {
-            e.UserMenu.Add(Item("Bild öffnen"));
+            e.ContextMenu.Add(Item("Bild öffnen"));
         }
     }
 
@@ -351,17 +351,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private void F_EnabledChanged(object sender, System.EventArgs e) {
-        RestartMarker();
-    }
+    private void F_EnabledChanged(object sender, System.EventArgs e) => RestartMarker();
 
-    private void F_ValueChanged(object sender, System.EventArgs e) {
-        ValueToCell();
-    }
+    private void F_ValueChanged(object sender, System.EventArgs e) => ValueToCell();
 
-    private void F_VisibleChanged(object sender, System.EventArgs e) {
-        RestartMarker();
-    }
+    private void F_VisibleChanged(object sender, System.EventArgs e) => RestartMarker();
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
         ColumnItem? gbColumn;

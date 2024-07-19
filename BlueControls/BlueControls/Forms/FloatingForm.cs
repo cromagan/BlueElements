@@ -34,7 +34,7 @@ public partial class FloatingForm : Form {
     #region Fields
 
     internal static readonly List<FloatingForm> AllBoxes = [];
-    private readonly Control? _connectedControl;
+    protected readonly Control? _connectedControl;
 
     #endregion
 
@@ -164,7 +164,7 @@ public partial class FloatingForm : Form {
 
     internal static void Close(Design design) => Close(null, design);
 
-    internal static void Close(object connectedControl) => Close(connectedControl, Design.Undefiniert);
+    internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefiniert);
 
     internal static bool IsShowing(object connectedControl) => AllBoxes.Any(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
 

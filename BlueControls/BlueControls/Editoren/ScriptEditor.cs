@@ -80,29 +80,29 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
 
     #region Methods
 
-    public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
         switch (e.Item.KeyName.ToLowerInvariant()) {
             case "variableninhalt kopieren":
                 _ = Generic.CopytoClipboard(_lastVariableContent);
-                return true;
+                return;
         }
 
-        return false;
+        OnContextMenuItemClicked(e);
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            items.Add(Item("Variableninhalt kopieren"));
+            e.ContextMenu.Add(Item("Variableninhalt kopieren"));
         }
 
-        hotItem = _lastWord;
+        e.HotItem = _lastWord;
+
+        OnContextMenuInit(e);
     }
 
     public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
@@ -116,7 +116,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var scp = new ScriptProperties("Skript-Editor: " + scriptname, MethodType.Standard, false, [], null,0);
+            var scp = new ScriptProperties("Skript-Editor: " + scriptname, MethodType.Standard, false, [], null, 0);
             var s = new Script(null, string.Empty, scp);
             ex.Feedback = s.Parse(0, "Main", null);
         }
@@ -137,6 +137,8 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
         }
         base.Dispose(disposing);
     }
+
+    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     private void OnExecuteScript(ScriptEventArgs scriptEventArgs) => ExecuteScript?.Invoke(this, scriptEventArgs);
 

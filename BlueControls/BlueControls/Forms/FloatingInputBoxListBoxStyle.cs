@@ -78,42 +78,22 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Close(control);
 
         var thisContextMenu = new List<AbstractListItem>();
-        var userMenu = new List<AbstractListItem>();
 
-        var translate = true;
-        control.GetContextMenuItems(e, thisContextMenu, out var hotItem);
+        var ce = new ContextMenuInitEventArgs(null, thisContextMenu, e);
 
-        ContextMenuInitEventArgs ec = new(hotItem, userMenu);
-        control.OnContextMenuInit(ec);
-        if (ec.Cancel) { return; }
-        if (!ec.Translate) { translate = false; }
-        if (thisContextMenu.Count > 0 && userMenu.Count > 0) { thisContextMenu.Add(Separator()); }
-        if (userMenu.Count > 0) { thisContextMenu.AddRange(userMenu); }
+        control.GetContextMenuItems(ce);
 
-        var par = control.ParentControlWithCommands();
+        if (ce.Cancel) { return; }
+
         if (thisContextMenu.Count > 0) {
-            if (par != null) {
-                thisContextMenu.Add(Separator());
-                thisContextMenu.Add(ItemOf(ContextMenuCommands.WeitereBefehle));
-            }
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf(ContextMenuCommands.Abbruch));
-            List<object?> infos =
-            [
-                userMenu,
-                hotItem,
-                control
-            ];
-            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, infos, (Control)control, translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
+            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
-        } else {
-            if (par != null) {
-                ContextMenuShow(par, e);
-            }
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) =>
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) =>
         new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
             connectedControl, translate, controlDesign, itemDesign, autosort);
 
@@ -165,31 +145,25 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem == null) { return; }
 
-        var infos = (List<object>)e.HotItem;
-        var userMmenu = (List<AbstractListItem>)infos[0];
-        var hotItem = infos[1];
-        var ob = (IContextMenu)infos[2];
+        //var infos = (List<object>)e.HotItem;
+        ////var userMmenu = (List<AbstractListItem>)infos[0];
+        //var hotItem = infos[1];
+        //var ob = (IContextMenu)infos[2];
         Close(ListBoxAppearance.KontextMenu);
-        Close(ob);
-        if (e.Item.KeyName.ToLowerInvariant() == "weiterebefehle") {
-            var par = ob.ParentControlWithCommands();
-            if (par != null) {
-                ContextMenuShow(par, null);
-            }
-            return;
-        }
+        Close(e.Control);
+        //if (e.Item.KeyName.ToLowerInvariant() == "weiterebefehle") {
+        //    var par = ob.ParentControlWithCommands();
+        //    if (par != null) {
+        //        ContextMenuShow(par, null);
+        //    }
+        //    return;
+        //}
         if (e.Item.KeyName.ToLowerInvariant() == "abbruch") { return; }
 
-        ContextMenuItemClickedEventArgs ex = new(e.Item, hotItem);
-        bool done;
-        if (userMmenu.Get(e.Item.KeyName) == null) {
-            done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
-        } else {
-            done = true; //keine Prüfung implementiert
-            ob.OnContextMenuItemClicked(ex);
-        }
-        if (!done) {
-            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.Item.KeyName);
+        ContextMenuItemClickedEventArgs ex = new(e.Item, e.HotItem, e.Control);
+
+        if (e.Control is IContextMenu cm) {
+            cm.DoContextMenuItemClick(ex);
         }
     }
 
@@ -202,7 +176,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (!e.Item.IsClickable()) { return; }
 
         if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) {
-            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item, Tag)); // Das Control.Tag hier ist eigentlich das HotItem
+            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item, Tag, _connectedControl)); // Das Control.Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }
     }

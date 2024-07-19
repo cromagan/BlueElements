@@ -47,9 +47,9 @@ public partial class ZoomPad : GenericControl {
 
     protected bool Fitting = true;
 
-    private float _shiftX = -1;
+    private float _shiftX = 0;
 
-    private float _shiftY = -1;
+    private float _shiftY = 0;
     private float _zoom = 1;
     private float _zoomFit = 1;
 
@@ -63,6 +63,7 @@ public partial class ZoomPad : GenericControl {
 
     #region Properties
 
+    [DefaultValue(0)]
     public float ShiftX {
         get => _shiftX;
         set {
@@ -72,6 +73,7 @@ public partial class ZoomPad : GenericControl {
         }
     }
 
+    [DefaultValue(0)]
     public float ShiftY {
         get => _shiftY;
         set {
@@ -81,6 +83,8 @@ public partial class ZoomPad : GenericControl {
         }
     }
 
+
+    [DefaultValue(1)]
     public float Zoom {
         get => _zoom;
         set {

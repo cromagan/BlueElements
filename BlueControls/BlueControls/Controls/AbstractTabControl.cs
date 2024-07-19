@@ -108,26 +108,13 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         base.OnMouseLeave(e);
     }
 
-    //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
-    //protected override void OnControlAdded(ControlEventArgs e) {
-    //    base.OnControlAdded(e);
-    //    if (e.Control is TabPage tp) {
-    //        tp.BackColor = this is RibbonBar ? Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard)
-    //                     : this is TabControl ? Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard)
-    //                     : Color.Red;
-    //        Invalidate();
-    //    }
-    //}
     protected override void OnMouseMove(MouseEventArgs e) {
         if (!HotTrack) { HotTrack = true; }
         HotTab = TestTab(new Point(e.X, e.Y));
         base.OnMouseMove(e);
     }
 
-    //protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-    //    base.OnMouseUp(e);
-    //    if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
-    //}
+
     protected override void OnPaintBackground(PaintEventArgs pevent) {
         // do not allow the background to be painted
         // Um flimmern zu vermeiden!

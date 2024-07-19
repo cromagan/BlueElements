@@ -406,7 +406,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return l.AsReadOnly();
     }
 
-    public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
 
     public new void Focus() {
         if (Focused()) { return; }
@@ -415,7 +415,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused();
 
-    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        e.HotItem = e.Mouse == null ? null : MouseOverNode(e.Mouse.X, e.Mouse.Y);
+        OnContextMenuInit(e);
+    }
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;

@@ -408,13 +408,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         if (!AllowEdit) { return; }
         //if (it.Tag is not List<string> tags) { return; }
 
-        //_ = e.UserMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
-        //_ = e.UserMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
-        //_ = e.UserMenu.Add(AddSeparator());
-        e.UserMenu.Add(ItemOf(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
-        e.UserMenu.Add(ItemOf(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
-        e.UserMenu.Add(Separator());
-        e.UserMenu.Add(ItemOf("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
+        //_ = e.CurrentMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
+        //_ = e.CurrentMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
+        //_ = e.CurrentMenu.Add(AddSeparator());
+        e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
+        e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
+        e.ContextMenu.Add(Separator());
+        e.ContextMenu.Add(ItemOf("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

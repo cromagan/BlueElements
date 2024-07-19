@@ -217,9 +217,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return n;
     }
 
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) {
-        UnRegisterFilterInputAndDispose();
-    }
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 
     public FilterCollection? GetInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {
@@ -416,9 +414,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_FilterInput();
     }
 
-    private void FilterInput_RowsChanged(object sender, System.EventArgs e) {
-        Invalidate_RowsInput();
-    }
+    private void FilterInput_RowsChanged(object sender, System.EventArgs e) => Invalidate_RowsInput();
 
     private void RegisterEvents() {
         if (FilterInput == null || FilterInput.IsDisposed) { return; }

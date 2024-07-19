@@ -39,23 +39,17 @@ namespace BlueControls.Forms {
             // 
             this.Pad1.Location = new System.Drawing.Point(544, 40);
             this.Pad1.Name = "Pad1";
-            this.Pad1.ShiftX = -1F;
-            this.Pad1.ShiftY = -1F;
             this.Pad1.Size = new System.Drawing.Size(528, 384);
             this.Pad1.TabIndex = 0;
             this.Pad1.Text = "Pad1";
-            this.Pad1.Zoom = 1F;
             // 
             // Pad2
             // 
             this.Pad2.Location = new System.Drawing.Point(8, 40);
             this.Pad2.Name = "Pad2";
-            this.Pad2.ShiftX = -1F;
-            this.Pad2.ShiftY = -1F;
             this.Pad2.Size = new System.Drawing.Size(528, 384);
             this.Pad2.TabIndex = 1;
             this.Pad2.Text = "Pad2";
-            this.Pad2.Zoom = 1F;
             // 
             // btn1
             // 

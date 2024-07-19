@@ -116,28 +116,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
 
     #region Methods
 
-    public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.Item.KeyName) {
-            case "ExF":
-                PictureView epv = new(_bitmap);
-                epv.Show();
-                return true;
-
-                //case "Speichern":
-                //    System.Windows.Forms.FolderBrowserDialog savOrt = new();
-                //    savOrt.ShowDialog();
-                //    if (!DirectoryExists(savOrt.SelectedPath)) {
-                //        MessageBox.Show("Abbruch!", ImageCode.Warnung, "OK");
-                //        return true;
-                //    }
-                //    var ndt = TempFile(savOrt.SelectedPath + "\\Bild.png");
-                //    _bitmap.Save(ndt, ImageFormat.Png);
-                //    ExecuteFile(ndt);
-                //    return true;
-        }
-        return false;
-    }
-
     public bool DeleteImageInFileSystem() {
         if (string.IsNullOrEmpty(_filename)) { return true; }
         if (!FileExists(_filename)) { return true; }
@@ -153,11 +131,53 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
-        hotItem = null;
-        if (_bitmap != null) {
-            items.Add(ItemOf("Externes Fenster öffnen", "ExF"));
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
+        switch (e.Item.KeyName) {
+            case "ExF":
+                PictureView epv = new(_bitmap);
+                epv.Show();
+                return;
+
+                //case "Speichern":
+                //    System.Windows.Forms.FolderBrowserDialog savOrt = new();
+                //    savOrt.ShowDialog();
+                //    if (!DirectoryExists(savOrt.SelectedPath)) {
+                //        MessageBox.Show("Abbruch!", ImageCode.Warnung, "OK");
+                //        return true;
+                //    }
+                //    var ndt = TempFile(savOrt.SelectedPath + "\\Bild.png");
+                //    _bitmap.Save(ndt, ImageFormat.Png);
+                //    ExecuteFile(ndt);
+                //    return true;
         }
+
+        OnContextMenuItemClicked(e);
+    }
+
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        e.HotItem = null;
+        if (_bitmap != null) {
+            e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", "ExF"));
+        }
+
+        OnContextMenuInit(e);
+    }
+
+    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+    protected override void DrawControl(Graphics gr, States state) {
+        base.DrawControl(gr, state);
+
+        if (state.HasFlag(States.Standard_MouseOver)) { state ^= States.Standard_MouseOver; }
+        if (state.HasFlag(States.Standard_MousePressed)) { state ^= States.Standard_MousePressed; }
+
+        Skin.Draw_Back(gr, Design.EasyPic, state, DisplayRectangle, this, true);
+
+        if (_bitmap != null) {
+            gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
+        }
+
+        Skin.Draw_Border(gr, Design.EasyPic, state, DisplayRectangle);
     }
 
     protected override void HandleChangesNow() {
@@ -177,24 +197,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         FileName = ct;
     }
 
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    protected override void DrawControl(Graphics gr, States state) {
-        base.DrawControl(gr, state);
-
-        if (state.HasFlag(States.Standard_MouseOver)) { state ^= States.Standard_MouseOver; }
-        if (state.HasFlag(States.Standard_MousePressed)) { state ^= States.Standard_MousePressed; }
-
-        Skin.Draw_Back(gr, Design.EasyPic, state, DisplayRectangle, this, true);
-
-        if (_bitmap != null) {
-            gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
-        }
-
-        Skin.Draw_Border(gr, Design.EasyPic, state, DisplayRectangle);
-    }
+    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);

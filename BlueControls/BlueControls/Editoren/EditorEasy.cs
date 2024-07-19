@@ -77,9 +77,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// <summary>
     /// Reseted Formulare. Löscht z.B. Texte, Tabellen-Einträge, etc
     /// </summary>
-    public virtual void Clear() {
-        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-    }
+    public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     public virtual IEditable? GetCloneOfCurrent() {
         if (!string.IsNullOrEmpty(Error)) { return null; }
@@ -101,9 +99,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
-    protected virtual void InitializeComponentDefaultValues() {
-        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-    }
+    protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);

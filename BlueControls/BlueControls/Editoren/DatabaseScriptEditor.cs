@@ -510,7 +510,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     //    if (e.HotItem is string txt) {
     //        var c = Database?.Column[txt);
     //        if (c is null) { return; }
-    //       e.UserMenu.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
+    //       e.CurrentMenu.Add(Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
     //    }
     //}
 

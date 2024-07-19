@@ -46,9 +46,7 @@ internal class Method_ToUpper : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        return new DoItFeedback(attvar.ValueStringGet(0).ToUpperInvariant());
-    }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(attvar.ValueStringGet(0).ToUpperInvariant());
 
     #endregion
 }

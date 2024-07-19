@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Windows.Forms;
 using BlueControls.ItemCollectionList;
 
 namespace BlueControls.EventArgs;
@@ -26,21 +27,23 @@ public class ContextMenuInitEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ContextMenuInitEventArgs(object? hotItem, List<AbstractListItem> userMenu) {
-        UserMenu = userMenu;
+    public ContextMenuInitEventArgs(object? hotItem, List<AbstractListItem> contextMenu, MouseEventArgs? mouse) {
+        ContextMenu = contextMenu;
         HotItem = hotItem;
         Translate = true;
         Cancel = false;
+        Mouse = mouse;
     }
 
     #endregion
 
     #region Properties
 
-    public bool Cancel { get; }
-    public object? HotItem { get; }
-    public bool Translate { get; }
-    public List<AbstractListItem> UserMenu { get; }
+    public bool Cancel { get; set; }
+    public List<AbstractListItem> ContextMenu { get; }
+    public object? HotItem { get; set; }
+    public MouseEventArgs? Mouse { get; }
+    public bool Translate { get; set; }
 
     #endregion
 }

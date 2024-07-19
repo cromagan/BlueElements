@@ -57,23 +57,23 @@ public static class Allgemein {
         } while (true);
     }
 
-    public static IContextMenu? ParentControlWithCommands(this object o) {
-        var par = o.ParentControl<IContextMenu>();
-        if (par == null) { return null; }
+    //public static IContextMenu? ParentControlWithCommands(this object o, List<AbstractListItem> currentContextMenu) {
+    //    var par = o.ParentControl<IContextMenu>();
+    //    if (par == null) { return null; }
 
-        List<AbstractListItem> thisContextMenu = [];
-        List<AbstractListItem> userMenu = [];
+    //    List<AbstractListItem> thisContextMenu = [];
 
-        var cancel = false;
-        par.GetContextMenuItems(null, thisContextMenu, out var hotItem);
-        if (cancel) { return null; }
 
-        ContextMenuInitEventArgs ec = new(hotItem, userMenu);
-        par.OnContextMenuInit(ec);
-        if (ec.Cancel) { return null; }
+    //    var cancel = false;
+    //    par.GetContextMenuItems(null, thisContextMenu, out var hotItem);
+    //    if (cancel) { return null; }
 
-        return thisContextMenu.Count > 0 || userMenu.Count > 0 ? par : null;
-    }
+    //    ContextMenuInitEventArgs ec = new(hotItem, userMenu);
+    //    par.OnContextMenuInit(ec);
+    //    if (ec.Cancel) { return null; }
+
+    //    return thisContextMenu.Count > 0 || userMenu.Count > 0 ? par : null;
+    //}
 
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }

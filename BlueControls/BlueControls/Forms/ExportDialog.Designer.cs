@@ -170,12 +170,9 @@ namespace BlueControls.Forms
             this.padVorschau.EditAllowed = false;
             this.padVorschau.Location = new System.Drawing.Point(232, 80);
             this.padVorschau.Name = "padVorschau";
-            this.padVorschau.ShiftX = -1F;
-            this.padVorschau.ShiftY = -1F;
             this.padVorschau.ShowInPrintMode = true;
             this.padVorschau.Size = new System.Drawing.Size(623, 480);
             this.padVorschau.TabIndex = 1;
-            this.padVorschau.Zoom = 1F;
             // 
             // Tabs
             // 
@@ -346,12 +343,9 @@ namespace BlueControls.Forms
             this.padPrint.EditAllowed = false;
             this.padPrint.Location = new System.Drawing.Point(5, 60);
             this.padPrint.Name = "padPrint";
-            this.padPrint.ShiftX = -1F;
-            this.padPrint.ShiftY = -1F;
             this.padPrint.ShowInPrintMode = true;
             this.padPrint.Size = new System.Drawing.Size(849, 568);
             this.padPrint.TabIndex = 2;
-            this.padPrint.Zoom = 1F;
             this.padPrint.BeginnPrint += new System.Drawing.Printing.PrintEventHandler(this.PrintPad_BeginnPrint);
             this.padPrint.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.PrintPad_PrintPage);
             // 
@@ -446,12 +440,9 @@ namespace BlueControls.Forms
             this.padSchachteln.EditAllowed = false;
             this.padSchachteln.Location = new System.Drawing.Point(8, 40);
             this.padSchachteln.Name = "padSchachteln";
-            this.padSchachteln.ShiftX = -1F;
-            this.padSchachteln.ShiftY = -1F;
             this.padSchachteln.ShowInPrintMode = true;
             this.padSchachteln.Size = new System.Drawing.Size(849, 584);
             this.padSchachteln.TabIndex = 3;
-            this.padSchachteln.Zoom = 1F;
             // 
             // tabDateiExport
             // 

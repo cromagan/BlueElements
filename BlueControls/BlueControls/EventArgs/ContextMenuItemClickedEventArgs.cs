@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueControls.ItemCollectionList;
+using System.Windows.Forms;
 
 namespace BlueControls.EventArgs;
 
@@ -25,14 +26,16 @@ public class ContextMenuItemClickedEventArgs : AbstractListItemEventArgs {
 
     #region Constructors
 
-    public ContextMenuItemClickedEventArgs(AbstractListItem clickedItem, object? hotItem) : base(clickedItem) {
+    public ContextMenuItemClickedEventArgs(AbstractListItem clickedItem, object? hotItem, Control? control) : base(clickedItem) {
         HotItem = hotItem;
+        Control = control;
     }
 
     #endregion
 
     #region Properties
 
+    public Control? Control { get; }
     public object? HotItem { get; }
 
     #endregion

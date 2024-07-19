@@ -137,8 +137,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     private RowItem? _unterschiede;
 
-
-
     #endregion
 
     #region Constructors
@@ -625,8 +623,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         Invalidate_SortedRowData();
     }
 
-    public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
-
     public void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
     public void CursorPos_Set(ColumnItem? column, RowData? row, bool ensureVisible) {
@@ -724,6 +720,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         ShowWaitScreen = false;
         OnDatabaseChanged();
     }
+
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
 
     public void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo, ColumnViewCollection ca) {
         if (!IsOnScreen(viewItem, displayRectangleWoSlider)) { return; }
@@ -1038,14 +1036,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? hotItem) {
-        hotItem = null;
-        if (e == null) { return; }
-
-        if (CurrentArrangement is not ColumnViewCollection ca) { return; }
-
-        CellOnCoordinate(ca, e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
-        hotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        e.HotItem = null;
+        if (e.Mouse != null) {
+            if (CurrentArrangement is not ColumnViewCollection ca) { return; }
+            CellOnCoordinate(ca, e.Mouse.X, e.Mouse.Y, out _mouseOverColumn, out _mouseOverRow);
+            e.HotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
+        }
+        OnContextMenuInit(e);
     }
 
     public void ImportBdb() {
@@ -1085,8 +1083,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void OpenSearchAndReplace() {
         if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditCurrently) || Database == null) { return; }
@@ -1347,7 +1343,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
         _tmpCursorRect = Rectangle.Empty;
 
-
         if (_databaseDrawError is DateTime dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
                 DrawWaitScreen(gr, string.Empty);
@@ -1528,6 +1523,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             _isinClick = false;
         }
     }
+
+    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnDoubleClick(System.EventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereigniss ausgelöst
@@ -2624,8 +2621,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             // Kommt vor, dass spontan doch geparsed wird...
             //if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count) { return false; }
 
-
-
             foreach (var thisViewItem in ca) {
                 if (thisViewItem != null) {
                     thisViewItem.X_WithSlider = null;
@@ -2636,7 +2631,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             var sliderXVal = SliderX.Value;
             var se = SliderX.Enabled;
 
-
             ca._wiederHolungsSpaltenWidth = 0;
 
             _mouseOverText = string.Empty;
@@ -2646,9 +2640,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             // Spalten berechnen
             foreach (var thisViewItem in ca) {
                 if (thisViewItem?.Column != null) {
-
-
-
                     if (thisViewItem.ViewType != ViewType.PermanentColumn) { wdh = false; }
 
                     thisViewItem.X = maxX;
@@ -2801,7 +2792,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
                     _tmpCursorRect.Height -= 1;
 
                     if (CursorPosColumn == cellInThisDatabaseColumn) {
-
                         Draw_Cursor(gr, displayRectangleWoSlider, false);
                     }
                 }

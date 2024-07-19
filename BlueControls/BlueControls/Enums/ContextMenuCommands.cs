@@ -46,8 +46,6 @@ public enum ContextMenuCommands {
     SuchenUndErsetzen = 18,
     Einfügen = 19,
     VorherigenInhaltWiederherstellen = 23,
-    WeitereBefehle = 24,
-
     SpaltenSortierungDefault = 25,
     Abbruch = 999
 }

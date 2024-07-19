@@ -151,10 +151,10 @@ public static class AbstractListItemExtension {
                 symbol = QuickImage.Get(ImageCode.Undo);
                 break;
 
-            case ContextMenuCommands.WeitereBefehle:
-                readableText = "Weitere Befehle";
-                symbol = QuickImage.Get(ImageCode.Hierarchie);
-                break;
+            //case ContextMenuCommands.WeitereBefehle:
+            //    readableText = "Weitere Befehle";
+            //    symbol = QuickImage.Get(ImageCode.Hierarchie);
+            //    break;
 
             default:
                 Develop.DebugPrint(command);

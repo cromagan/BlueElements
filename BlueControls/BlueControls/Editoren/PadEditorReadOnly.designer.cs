@@ -86,11 +86,8 @@ namespace BlueControls.Forms {
             this.Pad.Dock = DockStyle.Fill;
             this.Pad.Location = new Point(0, 136);
             this.Pad.Name = "Pad";
-            this.Pad.ShiftX = -1F;
-            this.Pad.ShiftY = -1F;
             this.Pad.Size = new Size(884, 200);
             this.Pad.TabIndex = 0;
-            this.Pad.Zoom = 1F;
             this.Pad.PropertyChanged += new EventHandler(this.Pad_PropertyChanged);
             this.Pad.DrawModeChanged += new EventHandler(this.Pad_DrawModChanged);
             this.Pad.GotNewItemCollection += new EventHandler(this.Pad_GotNewItemCollection);

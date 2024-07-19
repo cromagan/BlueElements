@@ -134,50 +134,14 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
         Item = null; // erst das Item!
     }
 
-    protected override void OnLoad(System.EventArgs e) {
-        base.OnLoad(e);
-
-        //var didMessage = false;
-
-        //var im = QuickImage.Images();
-        //foreach (var thisIm in im) {
-        //    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
-        //}
-
-        //lstEventScripts.ItemClear();
-        //if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-
-        //foreach (var thisSet in Database.EventScript) {
-        //    if (thisSet != null) {
-        //        var cap = "Sonstige";
-
-        //        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
-
-        //        var it = ItemOf(thisSet);
-        //        it.UserDefCompareKey = cap + Constants.SecondSortChar;
-
-        //        lstEventScripts.ItemAdd(it);
-
-        //        if (lstEventScripts[cap] == null) {
-        //            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));
-        //        }
-
-        //        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
-        //            didMessage = true;
-        //            EnableScript();
-        //        }
-        //    }
-        //}
-    }
+    protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}
 
     private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         Close();
     }
 
-    private void btnAusführen_Click(object sender, System.EventArgs e) {
-        eventScriptEditor.TesteScript("MAIN");
-    }
+    private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor));
 

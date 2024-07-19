@@ -122,11 +122,8 @@ namespace BlueControls.Forms
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
-            this.Pad.ShiftX = -1F;
-            this.Pad.ShiftY = -1F;
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
-            this.Pad.Zoom = 1F;
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon

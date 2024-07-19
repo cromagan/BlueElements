@@ -111,57 +111,57 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
 
         if (tbl != null && row != null) {
-            e.UserMenu.Add(ItemOf("Anheften", true));
+            e.ContextMenu.Add(ItemOf("Anheften", true));
             if (tbl.PinnedRows.Contains(row)) {
-                e.UserMenu.Add(ItemOf("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
+                e.ContextMenu.Add(ItemOf("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
             } else {
-                e.UserMenu.Add(ItemOf("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
+                e.ContextMenu.Add(ItemOf("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
             }
         }
 
         if (column != null) {
-            e.UserMenu.Add(ItemOf("Sortierung", true));
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungDefault, column.Function.CanBeCheckedByRules()));
+            e.ContextMenu.Add(ItemOf("Sortierung", true));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungDefault, column.Function.CanBeCheckedByRules()));
 
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
-            //_ = e.UserMenu.Add(AddSeparator());
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
+            //_ = e.CurrentMenu.Add(AddSeparator());
 
-            e.UserMenu.Add(ItemOf("Zelle", true));
-            e.UserMenu.Add(ItemOf("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules()));
-            e.UserMenu.Add(ItemOf("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Function.CanBeChangedByRules()));
-            e.UserMenu.Add(ItemOf("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules()));
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo));
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
-            //_ = e.UserMenu.Add(AddSeparator());
-            e.UserMenu.Add(ItemOf("Spalte", true));
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Zelle", true));
+            e.ContextMenu.Add(ItemOf("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules()));
+            e.ContextMenu.Add(ItemOf("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Function.CanBeChangedByRules()));
+            e.ContextMenu.Add(ItemOf("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules()));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
+            //_ = e.CurrentMenu.Add(AddSeparator());
+            e.ContextMenu.Add(ItemOf("Spalte", true));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
 
-            e.UserMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, db.IsAdministrator()));
-            e.UserMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, db.IsAdministrator()));
 
-            e.UserMenu.Add(ItemOf("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
-            e.UserMenu.Add(ItemOf("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
 
-            e.UserMenu.Add(ItemOf("Voting", "Voting", ImageCode.Herz, db.IsAdministrator() && editable && column.Function.CanBeChangedByRules()));
+            e.ContextMenu.Add(ItemOf("Voting", "Voting", ImageCode.Herz, db.IsAdministrator() && editable && column.Function.CanBeChangedByRules()));
 
-            //_ = e.UserMenu.Add(AddSeparator());
+            //_ = e.CurrentMenu.Add(AddSeparator());
         }
 
         if (row != null) {
-            e.UserMenu.Add(ItemOf("Zeile", true));
-            e.UserMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator()));
-            e.UserMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), true));
+            e.ContextMenu.Add(ItemOf("Zeile", true));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), true));
 
             var didmenu = false;
 
             foreach (var thiss in db.EventScript) {
                 if (thiss != null && thiss.UserGroups.Count > 0 && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
                     if (!didmenu) {
-                        e.UserMenu.Add(ItemOf("Skripte", true));
+                        e.ContextMenu.Add(ItemOf("Skripte", true));
                         didmenu = true;
                     }
-                    e.UserMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, thiss.SymbolForReadableText(), row != null && thiss.IsOk()));
+                    e.ContextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, thiss.SymbolForReadableText(), row != null && thiss.IsOk()));
                 }
             }
         }

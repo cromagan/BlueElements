@@ -301,8 +301,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.UserMenu.Add(ItemOf(ContextMenuCommands.DateiPfad÷ffnen));
-        e.UserMenu.Add(ItemOf(ContextMenuCommands.Kopieren));
+        e.ContextMenu.Add(ItemOf(ContextMenuCommands.DateiPfad÷ffnen));
+        e.ContextMenu.Add(ItemOf(ContextMenuCommands.Kopieren));
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

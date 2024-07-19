@@ -296,7 +296,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     //    return null;
     //}
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
+    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
 
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not AbstractListItem it) { return; }

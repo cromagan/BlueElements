@@ -178,44 +178,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     #region Methods
 
-    public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        AbstractPadItem? thisItem = null;
-
-        if (e.HotItem is AbstractPadItem item) { thisItem = item; }
-        var done = false;
-        if (thisItem != null) {
-            switch (e.Item.KeyName.ToLowerInvariant()) {
-                case "#vordergrund":
-                    done = true;
-                    thisItem.Parent?.InDenVordergrund(thisItem);
-                    break;
-
-                case "#hintergrund":
-                    done = true;
-                    thisItem.Parent?.InDenHintergrund(thisItem);
-                    break;
-
-                case "#vorne":
-                    done = true;
-                    thisItem.Parent?.EineEbeneNachVorne(thisItem);
-                    break;
-
-                case "#hinten":
-                    done = true;
-                    thisItem.Parent?.EineEbeneNachHinten(thisItem);
-                    break;
-
-                case "#duplicate":
-                    done = true;
-                    _item?.Add((AbstractPadItem)((ICloneable)thisItem).Clone());
-
-                    break;
-            }
-        }
-        Invalidate();
-        return done;
-    }
-
     public void CopyPrinterSettingsToWorkingArea() {
         if (_item == null || _item.IsDisposed) { return; }
         if (DruckerDokument.DefaultPageSettings.Landscape) {
@@ -226,6 +188,44 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
             _item.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
         }
+    }
+
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
+        AbstractPadItem? thisItem = null;
+
+        if (e.HotItem is AbstractPadItem item) { thisItem = item; }
+        var done = false;
+        if (thisItem != null) {
+            switch (e.Item.KeyName.ToLowerInvariant()) {
+                case "#vordergrund":
+                    done = true;
+                    thisItem.Parent?.InDenVordergrund(thisItem);
+                    return;
+
+                case "#hintergrund":
+                    done = true;
+                    thisItem.Parent?.InDenHintergrund(thisItem);
+                    return;
+
+                case "#vorne":
+                    done = true;
+                    thisItem.Parent?.EineEbeneNachVorne(thisItem);
+                    return;
+
+                case "#hinten":
+                    done = true;
+                    thisItem.Parent?.EineEbeneNachHinten(thisItem);
+                    return;
+
+                case "#duplicate":
+                    done = true;
+                    _item?.Add((AbstractPadItem)((ICloneable)thisItem).Clone());
+
+                    return;
+            }
+        }
+
+        OnContextMenuItemClicked(e);
     }
 
     public void DoKeyUp(KeyEventArgs e, bool hasbase) {
@@ -271,20 +271,23 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, List<AbstractListItem> items, out object? selectedHotItem) {
-        CheckHotItem(e, true);
-        selectedHotItem = HotItem;
-        if (selectedHotItem != null) {
-            items.Add(ItemOf("Allgemeine Element-Aktionen", true));
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        CheckHotItem(e.Mouse, true);
+        e.HotItem = HotItem;
+
+        if (e.HotItem != null) {
+            e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
             //items.GenerateAndAdd("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
             //items.Add(AddSeparator());
-            items.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, selectedHotItem is ICloneable));
-            items.Add(Separator());
-            items.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
-            items.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
-            items.Add(ItemOf("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));
-            items.Add(ItemOf("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten));
+            e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
+            e.ContextMenu.Add(Separator());
+            e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
+            e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
+            e.ContextMenu.Add(ItemOf("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));
+            e.ContextMenu.Add(ItemOf("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten));
         }
+
+        OnContextMenuInit(e);
     }
 
     public List<AbstractPadItem> HotItems(MouseEventArgs? e) {
@@ -296,8 +299,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
 
@@ -542,6 +543,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
     protected override RectangleF MaxBounds() => _item?.MaxBounds(_currentPage) ?? new RectangleF(0, 0, 0, 0);
+
+    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 
