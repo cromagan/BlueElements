@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
@@ -891,7 +890,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         OnRowAdded(new RowChangedEventArgs(row, reason));
 
         if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-            Method_RowInvalidate.InvalidatedRows.Add(row);
+            RowCollection.InvalidatedRows.Add(row);
         }
 
         return string.Empty;
@@ -927,6 +926,106 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         e.Row.RowChecked -= OnRowChecked;
         e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);
+    }
+
+    public static List<RowItem> DidRows = new();
+    public static List<RowItem> InvalidatedRows = new();
+
+
+    public static (RowItem? newrow, string message) UniqueRow(FilterCollection allFi, string coment) {
+
+        if (allFi.Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
+
+        if (allFi.Count < 1) { return (null, "Kein Filter angekommen."); }
+
+
+        var r = allFi.Rows;
+
+        if (r.Count > 5) {
+            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
+        }
+
+        if (r.Count > 1) {
+
+
+            r[0].Database?.Row.Combine(r);
+            r[0].Database?.Row.RemoveYoungest(r, true);
+            r = allFi.Rows;
+            if (r.Count != 1) {
+                return (null, "RowUnique gescheitert, Aufr‰umen fehlgeschlagen: " + allFi.ReadableText());
+            }
+            InvalidatedRows.AddIfNotExists(r[0]);
+        }
+
+        RowItem? myRow;
+
+        if (r.Count == 0) {
+            var (newrow, message) = RowCollection.GenerateAndAdd(allFi, coment);
+            if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
+            myRow = newrow;
+            RowCollection.InvalidatedRows.AddIfNotExists(newrow);
+        } else {
+            myRow = r[0];
+        }
+
+        return (myRow, string.Empty);
+
+    }
+    public static void DoAllInvalidatedRows(RowItem? masterRow) {
+        if (Database.ExecutingScriptAnyDatabase != 0 || DidRows.Count > 0) { return; }
+
+        var ra = 0;
+        var n = 0;
+
+        DidRows.Clear();
+        try {
+            while (InvalidatedRows.Count > 0) {
+                n++;
+                var r = InvalidatedRows[0];
+                InvalidatedRows.RemoveAt(0);
+
+
+
+                if (InvalidatedRows.Count > ra) {
+                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Eintr‰ge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
+                    ra = InvalidatedRows.Count;
+                }
+
+                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
+                    DidRows.Add(r);
+                    if (masterRow?.Database != null) {
+                        r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
+                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                    } else {
+                        r.UpdateRow(false, true, true, "Normales Update");
+                    }
+                }
+            }
+        } catch { }
+
+        DidRows.Clear();
+        masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Updates abgearbeitet");
+    }
+
+    public (RowItem? newrow, string message) UniqueRow(string value, string comment) {
+
+        if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen"); }
+
+
+        if (Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
+
+        if (db.Column.First() is not ColumnItem co) { return (null, "Spalte nicht vorhanden"); }
+
+        using var fic = new FilterCollection(db, "UnqiueRow");
+
+
+        var fi = new FilterItem(co, FilterType.Istgleich_GroﬂKleinEgal, value);
+
+        fic.Add(fi);
+
+        return UniqueRow(fic, comment);
+
+
     }
 
     #endregion

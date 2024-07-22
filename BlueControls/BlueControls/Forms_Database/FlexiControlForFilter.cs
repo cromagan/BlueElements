@@ -141,7 +141,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-           f.Dispose();
+            f.Dispose();
             f = null;
         }
 
@@ -239,7 +239,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
                 btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString());
             } else {
                 btn.ImageCode = "Trichter|16";
-                btn.Text = LanguageTool.DoTranslate("Gewählt:" + f.Value);
+                btn.Text = LanguageTool.DoTranslate("Gewählt: " + f.Value);
                 GenerateQickInfoText(null);
             }
         }
@@ -370,7 +370,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
     }
 
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
-        if (IsDisposed || f  is null) { return; }
+        if (IsDisposed || f is null) { return; }
 
         if (FilterSingleColumn == null) {
             this.Invalidate_FilterOutput();

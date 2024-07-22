@@ -1521,7 +1521,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ExecutingScriptAnyDatabase--;
 
             if (produktivphase && ExecutingScript == 0 && ExecutingScriptAnyDatabase == 0) {
-                Method_RowInvalidate.DoAllRows(row);
+                RowCollection.DoAllInvalidatedRows(row);
             }
 
             return scf;

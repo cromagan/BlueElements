@@ -28,11 +28,9 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.ItemCollectionList;
 using Form = BlueControls.Forms.Form;
 
 namespace BlueControls.Controls;

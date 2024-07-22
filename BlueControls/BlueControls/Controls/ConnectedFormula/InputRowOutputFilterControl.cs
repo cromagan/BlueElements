@@ -18,9 +18,12 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -49,12 +52,39 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
     #region Methods
 
+    public override void Invalidate_FilterInput() {
+        base.Invalidate_FilterInput();
+        HandleChangesNow();
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
+
+        var txt = string.Empty;
+
+        var qi = QuickImage.Get("Trichter|16");
+
+        if (FilterOutput.Count == 0) {
+            txt = "Kein Filter";
+
+            qi = null;
+        } else if (!FilterOutput.IsOk()) {
+            txt = FilterOutput.ErrorReason();
+
+            qi = QuickImage.Get("Warnung|16"); ;
+        } else {
+            txt = FilterOutput.ReadableText();
+        }
+
+        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+        Skin.Draw_FormatedText(gr, txt, Design.Caption, States.Standard, qi, Alignment.Horizontal_Vertical_Center, DisplayRectangle, null, false, false);
+    }
+
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
-
-    
 
         DoInputFilter(null, false);
         Invalidate();
@@ -114,11 +144,6 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         }
 
         FilterOutput.ChangeTo(f);
-    }
-
-    public override void Invalidate_FilterInput() {
-        base.Invalidate_FilterInput();
-        HandleChangesNow();
     }
 
     protected override void OnCreateControl() {

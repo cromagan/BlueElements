@@ -285,7 +285,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "#datenüberprüfung":
                 if (row != null && !row.IsDisposed) {
                     row.UpdateRow(false, true, true, "Kontextmenü");
-                    Method_RowInvalidate.DoAllRows(row);
+                    RowCollection.DoAllInvalidatedRows(row);
                     //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
                 }
@@ -1042,7 +1042,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                         //thisR.CheckRowDataIfNeeded();
                     }
 
-                    Method_RowInvalidate.DoAllRows(null);
+                    RowCollection.DoAllInvalidatedRows(null);
 
                     MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
                     lstAufgaben.Enabled = true;

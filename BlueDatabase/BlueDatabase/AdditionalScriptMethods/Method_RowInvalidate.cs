@@ -35,8 +35,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
     #region Fields
 
-    public static List<RowItem> DidRows = new();
-    public static List<RowItem> InvalidatedRows = new();
+
 
     #endregion
 
@@ -75,41 +74,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public static void DoAllRows(RowItem? masterRow) {
-        if (Database.ExecutingScriptAnyDatabase != 0 || DidRows.Count > 0) { return; }
 
-        var ra = 0;
-        var n = 0;
-
-        DidRows.Clear();
-        try {
-            while (InvalidatedRows.Count > 0) {
-                n++;
-                var r = InvalidatedRows[0];
-                    InvalidatedRows.RemoveAt(0);
-
-           
-
-                if (InvalidatedRows.Count > ra) {
-                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count } insgesamt)");
-                    ra = InvalidatedRows.Count;
-                }
-
-                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
-                    DidRows.Add(r);
-                    if (masterRow?.Database != null) {
-                        r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
-                    } else {
-                        r.UpdateRow(false, true, true, "Normales Update");
-                    }
-                }
-            }
-        } catch { }
-
-        DidRows.Clear();
-        masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Updates abgearbeitet");
-    }
 
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -118,7 +83,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         if (myRow?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
 
 
-        if (db.Column.SysRowState is  not ColumnItem srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
+        if (db.Column.SysRowState is not ColumnItem srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
 
         var m = CellCollection.EditableErrorReason(srs, myRow, EditableErrorReasonType.EditAcut, false, false, true, false);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
@@ -146,7 +111,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         //        return new DoItFeedback(ld, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
         //}
 
-        //Method_RowInvalidate.InvalidatedRows.Add(r[0]);
+
 
         //		    if (myRow.Database is not Database db) { return new DoItFeedback(ld, "Interner Fehler"); }
 
@@ -156,6 +121,8 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
 
         myRow.CellSet(srs, string.Empty, $"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+
+        RowCollection.InvalidatedRows.Add(myRow);
 
         return DoItFeedback.Null();
 

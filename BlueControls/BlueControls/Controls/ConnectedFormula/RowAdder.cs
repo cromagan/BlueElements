@@ -221,7 +221,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return;
         }
 
-        Method_RowInvalidate.DoAllRows(null);
+        RowCollection.DoAllInvalidatedRows(null);
 
         var menu = scf.Variables?.GetList("Menu");
 
