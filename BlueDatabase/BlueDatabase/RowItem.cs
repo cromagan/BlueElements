@@ -725,6 +725,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustDoFullCheck);
             if (!ok.Successful) {
+                db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
+                OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
+
                 RowCollection.FailedRows.AddIfNotExists(this);
                 return false;
             }
