@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.Forms;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BluePaint;
 
@@ -36,29 +37,39 @@ public partial class Tool_DummyGenerator {
     #region Methods
 
     private void CreateDummy() {
-        var w = MathFormulaParser.Ergebnis(X.Text);
-        var h = MathFormulaParser.Ergebnis(Y.Text);
-        if (w == null || (int)w < 2) {
+        var w = IntParse( MathFormulaParser.Ergebnis(X.Text));
+        var h = IntParse(MathFormulaParser.Ergebnis(Y.Text));
+        if (w < 2) {
             Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
             return;
         }
-        if (h == null || (int)h < 2) {
+        if (h < 2) {
             Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
             return;
         }
-        Bitmap newPic = new((int)w, (int)h);
+
+        var newPic = CreateDummy(TXT.Text, w, h);
+
+        OnOverridePic(newPic, true);
+    }
+
+
+    public static Bitmap CreateDummy(string text, int width, int height) {
+
+        Bitmap newPic = new(width, height);
         var gr = Graphics.FromImage(newPic);
         gr.Clear(Color.White);
         gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
-        if (!string.IsNullOrEmpty(TXT.Text)) {
+        if (!string.IsNullOrEmpty(text)) {
             Font f = new("Arial", 50, FontStyle.Bold);
-            var fs = gr.MeasureString(TXT.Text, f);
+            var fs = gr.MeasureString(text, f);
             gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
             gr.RotateTransform(-90);
-            BlueFont.DrawString(gr, TXT.Text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
+            BlueFont.DrawString(gr, text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
         }
-        OnOverridePic(newPic, true);
+        return newPic;
     }
+
 
     private void Erstellen_Click(object sender, System.EventArgs e) {
         CreateDummy();

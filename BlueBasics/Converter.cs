@@ -157,6 +157,16 @@ public static class Converter {
         return 0;
     }
 
+    public static int IntParse(int? s) {
+        if (s == null) { return 0; }
+        return (int)s;
+    }
+
+    public static int IntParse(double? s) {
+        if (s == null) { return 0; }
+        return (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
+    }
+
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
     /// </summary>

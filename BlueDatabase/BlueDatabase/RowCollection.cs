@@ -932,17 +932,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static List<RowItem> InvalidatedRows = new();
 
 
-    public static (RowItem? newrow, string message) UniqueRow(FilterCollection allFi, string coment) {
+    public static (RowItem? newrow, string message) UniqueRow(FilterCollection filter, string coment) {
 
-        if (allFi.Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
+        if (filter.Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
 
-        if (allFi.Count < 1) { return (null, "Kein Filter angekommen."); }
+        if (filter.Count < 1) { return (null, "Kein Filter angekommen."); }
 
 
-        var r = allFi.Rows;
+        var r = filter.Rows;
 
         if (r.Count > 5) {
-            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + allFi.ReadableText());
+            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText());
         }
 
         if (r.Count > 1) {
@@ -950,9 +950,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             r[0].Database?.Row.Combine(r);
             r[0].Database?.Row.RemoveYoungest(r, true);
-            r = allFi.Rows;
+            r = filter.Rows;
             if (r.Count != 1) {
-                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + allFi.ReadableText());
+                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
             }
             InvalidatedRows.AddIfNotExists(r[0]);
         }
@@ -960,7 +960,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message) = RowCollection.GenerateAndAdd(allFi, coment);
+            var (newrow, message) = RowCollection.GenerateAndAdd(filter, coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
             myRow = newrow;
             RowCollection.InvalidatedRows.AddIfNotExists(newrow);
