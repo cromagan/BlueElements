@@ -37,12 +37,13 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl, IReadableText,  IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable {
 
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
+    private string _fehler_text = string.Empty;
     private string _filterSpalte = string.Empty;
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_schreibungsneutral;
     private string _filterwert = string.Empty;
@@ -98,6 +99,18 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
     //        OnPropertyChanged();
     //    }
     //}
+
+    [Description("Text, der angezeigt wird, wenn kein Filter generiert werden kann")]
+    [DefaultValue("")]
+    public string Fehler_Text {
+        get => _fehler_text;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _fehler_text) { return; }
+            _fehler_text = value;
+            OnPropertyChanged();
+        }
+    }
 
     [Description("Dieser Filter-Typ wird angewendet.")]
     [DefaultValue(FilterTypeRowInputItem.Ist_schreibungsneutral)]
@@ -183,6 +196,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         //var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
+        con.ErrorText = _fehler_text;
         con.DoDefaultSettings(parent, this, mode);
 
         return con;
@@ -233,6 +247,8 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
             l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
 
             l.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));
+
+            l.Add(new FlexiControlForProperty<string>(() => Fehler_Text));
         }
 
         l.AddRange(base.GetProperties(widthOfControl));
@@ -253,6 +269,10 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         switch (key) {
             case "id":
                 //ColorId = IntParse(value);
+                return true;
+
+            case "errortext":
+                _fehler_text = value.FromNonCritical();
                 return true;
 
             case "value":
@@ -308,6 +328,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);
         result.ParseableAdd("Filter", _filtertype);
+        result.ParseableAdd("errortext", _fehler_text);
 
         //if (DatabaseInput is not Database dbin || dbin.IsDisposed) {
         //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;

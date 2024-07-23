@@ -618,6 +618,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row == null || row.IsDisposed) { return "Zeile ungültig!"; }
 
+        if (db != row.Database || db != column.Database) { return "Datenbank ungültig!"; }
+
         if (column.Function == ColumnFunction.Virtuelle_Spalte) {
             return SetValueInternal(column, row, value, Reason.NoUndo_NoInvalidate);
         }

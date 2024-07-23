@@ -295,6 +295,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
             return;
         }
 
+        if (row.Database != column.Database) {
+            f.DisabledReason = "Interner Fehler. Admin verständigen.";
+            return;
+        }
+
         f.DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false); // Rechteverwaltung einfliesen lassen.
     }
 

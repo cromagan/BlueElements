@@ -50,6 +50,12 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
     #endregion
 
+    #region Properties
+
+    public string ErrorText { get; set; }
+
+    #endregion
+
     #region Methods
 
     public override void Invalidate_FilterInput() {
@@ -66,7 +72,11 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         var qi = QuickImage.Get("Trichter|16");
 
         if (FilterOutput.Count == 0) {
-            txt = "Kein Filter";
+            if (string.IsNullOrEmpty(ErrorText)) {
+                txt = ErrorText;
+            } else {
+                txt = "Kein Filter";
+            }
 
             qi = null;
         } else if (!FilterOutput.IsOk()) {
@@ -74,11 +84,16 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
             qi = QuickImage.Get("Warnung|16"); ;
         } else {
-            txt = FilterOutput.ReadableText();
+            if (!string.IsNullOrEmpty(ErrorText) && FilterOutput.HasAlwaysFalse()) {
+                txt = ErrorText;
+                qi = null;
+            } else {
+                txt = FilterOutput.ReadableText();
+            }
         }
 
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        Skin.Draw_FormatedText(gr, txt, Design.Caption, States.Standard, qi, Alignment.Horizontal_Vertical_Center, DisplayRectangle, null, false, false);
+        Skin.Draw_FormatedText(gr, txt, Design.Caption, States.Standard, qi, Alignment.Top_Left, DisplayRectangle, null, false, false);
     }
 
     protected override void HandleChangesNow() {
@@ -107,7 +122,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
             va = lastInputRow.ReplaceVariables(_filterwert, false, true, lastInputRow.LastCheckedEventArgs?.Variables);
         } else {
             if (FilterInput != null) {
-                FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Database, "IO"));
                 return;
             }
             va = _filterwert;
