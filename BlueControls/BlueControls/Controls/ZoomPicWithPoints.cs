@@ -31,6 +31,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;
@@ -107,16 +108,11 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static Tuple<Bitmap?, List<string>> LoadFromDisk(string pathOfPicture) {
         Bitmap? bmp = null;
-        List<string> tags = [];
+
         if (FileExists(pathOfPicture)) {
             bmp = (Bitmap?)Image_FromFile(pathOfPicture);
         }
-        var ftxt = FilenameTxt(pathOfPicture);
-        if (FileExists(ftxt)) {
-            tags = File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
-        }
-        tags.TagSet("ImageFile", pathOfPicture);
-        return new Tuple<Bitmap?, List<string>>(bmp, tags);
+        return new Tuple<Bitmap?, List<string>>(bmp, LoadTags(pathOfPicture));
     }
 
     public BitmapListItem GenerateBitmapListItem() {
@@ -135,13 +131,27 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     public void LoadData(string pathOfPicture) {
-        var (bitmap, list) = LoadFromDisk(pathOfPicture);
+        var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
         Tags.Clear();
-        Tags.AddRange(list);
+        Tags.RemoveRange(tags);
         GeneratePointsFromTags();
         Invalidate();
     }
+
+
+    public static List<string> LoadTags(string pathOfPicture) {
+        List<string> tags = new();
+
+        var ftxt = FilenameTxt(pathOfPicture);
+        if (FileExists(ftxt)) {
+            tags = File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
+        }
+        tags.TagSet("ImageFile", pathOfPicture);
+        return tags;
+
+    }
+
 
     public void PointClear() {
         _points.Clear();
