@@ -23,7 +23,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
-
 namespace BlueDatabase.Interfaces;
 
 public interface IUseableForButton {
@@ -54,18 +53,22 @@ public static class UseableForButton {
     #region Methods
 
     public static string DoIt(this IUseableForButton ufb, VariableCollection varCol, List<string> args, string filterarg, string rowarg, object? additionalInfo) {
- 
-
         for (var nr = 0; nr < args.Count; nr++) {
             if (nr < ufb.ArgsForButton.Count && string.IsNullOrEmpty(args[nr])) {
                 return "Zu wenig Argumente erhalten";
             }
         }
 
-        var s = ufb.TranslateButtonArgs(args, filterarg, rowarg);
+        var sx = ufb.TranslateButtonArgs(args, filterarg, rowarg);
+
+        var t = BlueScript.Script.ReduceText(sx);
+
+        if (!string.IsNullOrEmpty(t.error)) {
+            return "Fehler beim Berechnen der Attribute: " + t.error;
+        }
 
         var ld = new LogData("Knopfdruck", 0);
-        var cdw = new CanDoFeedback(0, s, string.Empty, ld);
+        var cdw = new CanDoFeedback(0, t.reducedText, string.Empty, ld);
 
         var scp = new ScriptProperties("Knopfdruck im Formular", BlueScript.Enums.MethodType.AllDefault, true, [], additionalInfo, 0);
 

@@ -219,8 +219,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
                 case "#duplicate":
                     done = true;
-                    _item?.Add((AbstractPadItem)((ICloneable)thisItem).Clone());
-
+                    var n = (AbstractPadItem)((ICloneable)thisItem).Clone();
+                    n.KeyName = Generic.GetUniqueKey();
+                    _item?.Add(n);
                     return;
             }
         }
@@ -292,6 +293,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public List<AbstractPadItem> HotItems(MouseEventArgs? e) {
         if (e == null || _item == null) { return []; }
+
+        if (_givesMouseCommandsTo != null) {
+            return _givesMouseCommandsTo.HotItems(e, Zoom, ShiftX, ShiftY);
+        }
+
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
         return _item.Where(thisItem => thisItem != null &&
                                         thisItem.IsOnPage(CurrentPage) &&
@@ -362,6 +368,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public void Unselect() {
         _itemsToMove.Clear();
+        _givesMouseCommandsTo = null;
         Invalidate();
     }
 
@@ -455,16 +462,19 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     internal void DoMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (_givesMouseCommandsTo != null) {
-            if (!_givesMouseCommandsTo.MouseUp(e, Zoom, ShiftX, ShiftY)) {
-                _givesMouseCommandsTo = null;
-            } else {
-                return;
-            }
-        }
+
         switch (e.Button) {
             case MouseButtons.Left:
                 if (!EditAllowed) { return; }
+
+                if (_givesMouseCommandsTo != null) {
+                    if (!_givesMouseCommandsTo.MouseUp(e, Zoom, ShiftX, ShiftY)) {
+                        _givesMouseCommandsTo = null;
+                    } else {
+                        return;
+                    }
+                }
+
                 // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
                 AbstractPadItem? select = null;
                 if (_itemsToMove.Count == 1 && _itemsToMove[0] is PointM thispoint) {
@@ -525,7 +535,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
-            if (_givesMouseCommandsTo is AbstractPadItem pa) {
+            if (_givesMouseCommandsTo is AbstractPadItem pa && !pa.IsDisposed) {
                 var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
                 gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
             }

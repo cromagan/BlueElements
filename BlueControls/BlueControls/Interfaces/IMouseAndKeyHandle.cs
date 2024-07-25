@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionPad.Abstract;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace BlueControls.Interfaces;
@@ -24,6 +26,8 @@ namespace BlueControls.Interfaces;
 public interface IMouseAndKeyHandle {
 
     #region Methods
+
+    List<AbstractPadItem> HotItems(MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
     bool KeyUp(KeyEventArgs e, float zoom, float shiftX, float shiftY);
 
@@ -34,11 +38,4 @@ public interface IMouseAndKeyHandle {
     bool MouseUp(MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
     #endregion
-
-    //Function BlueCreativePad_MouseWheel(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
-    //Function MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
-    //Function MousefloatClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
-    //Function MouseEnter(sender As Object, e As System.EventArgs) As Boolean
-    //Function MouseHover(sender As Object, e As System.EventArgs) As Boolean
-    //Function MouseLeave(sender As Object, e As System.EventArgs) As Boolean
 }

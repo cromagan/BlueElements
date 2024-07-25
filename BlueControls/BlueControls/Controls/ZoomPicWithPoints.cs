@@ -115,6 +115,17 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return new Tuple<Bitmap?, List<string>>(bmp, LoadTags(pathOfPicture));
     }
 
+    public static List<string> LoadTags(string pathOfPicture) {
+        List<string> tags = new();
+
+        var ftxt = FilenameTxt(pathOfPicture);
+        if (FileExists(ftxt)) {
+            tags = File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
+        }
+        tags.TagSet("ImageFile", pathOfPicture);
+        return tags;
+    }
+
     public BitmapListItem GenerateBitmapListItem() {
         WritePointsInTags();
         return GenerateBitmapListItem(Bmp, Tags);
@@ -134,24 +145,10 @@ public partial class ZoomPicWithPoints : ZoomPic {
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
         Tags.Clear();
-        Tags.RemoveRange(tags);
+        Tags.AddRange(tags);
         GeneratePointsFromTags();
         Invalidate();
     }
-
-
-    public static List<string> LoadTags(string pathOfPicture) {
-        List<string> tags = new();
-
-        var ftxt = FilenameTxt(pathOfPicture);
-        if (FileExists(ftxt)) {
-            tags = File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
-        }
-        tags.TagSet("ImageFile", pathOfPicture);
-        return tags;
-
-    }
-
 
     public void PointClear() {
         _points.Clear();

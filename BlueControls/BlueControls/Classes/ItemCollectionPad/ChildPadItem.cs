@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Variables;
 using System;
@@ -29,10 +30,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -119,6 +119,12 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         return l;
     }
 
+    public List<AbstractPadItem> HotItems(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+        var e2 = ZoomMouse(e, zoom, shiftX, shiftY);
+        if (e2 == null || PadInternal == null) { return []; }
+        return PadInternal.HotItems(e2);
+    }
+
     public bool KeyUp(KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         PadInternal.DoKeyUp(e, false);
@@ -126,78 +132,23 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool MouseDown(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
-        var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-        var l2 = PadInternal.Item.MaxBounds(ZoomItems);
-        if (l1.Width <= 0 || l2.Height <= 0) { return false; }
-        var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
-        PadInternal.Zoom = 1f;
-        // Coordinaten auf Maßstab 1/1 scalieren
-        var x = (e.X - l1.X) / tZo;
-        var y = (e.Y - l1.Y) / tZo;
-        // Nullpunkt verschiebung laut Maxbounds
-        x += l2.X;
-        y += l2.Y;
-        // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-        x += (l2.Width - (l1.Width / tZo)) / 2;
-        y += (l2.Height - (l1.Height / tZo)) / 2;
-        x = Math.Min(x, int.MaxValue / 2f);
-        y = Math.Min(y, int.MaxValue / 2f);
-        x = Math.Max(x, int.MinValue / 2f);
-        y = Math.Max(y, int.MinValue / 2f);
-        MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
-        PadInternal.DoMouseDown(e2);
+        var e2 = ZoomMouse(e, zoom, shiftX, shiftY);
+        if (e2 == null) { return false; }
+        PadInternal?.DoMouseDown(e2);
         return true;
     }
 
     public bool MouseMove(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
-        var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-        var l2 = PadInternal.Item.MaxBounds(ZoomItems);
-        if (l1.Width <= 0 || l2.Height <= 0) { return false; }
-        float tZo = 1;
-        if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
-        PadInternal.Zoom = 1f;
-        // Coordinaten auf Maßstab 1/1 scalieren
-        var x = (e.X - l1.X) / tZo;
-        var y = (e.Y - l1.Y) / tZo;
-        // Nullpunkt verschiebung laut Maxbounds
-        x += l2.X;
-        y += l2.Y;
-        // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-        x += (l2.Width - (l1.Width / tZo)) / 2;
-        y += (l2.Height - (l1.Height / tZo)) / 2;
-        x = Math.Min(x, int.MaxValue / 2f);
-        y = Math.Min(y, int.MaxValue / 2f);
-        x = Math.Max(x, int.MinValue / 2f);
-        y = Math.Max(y, int.MinValue / 2f);
-        MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
-        PadInternal.DoMouseMove(e2);
+        var e2 = ZoomMouse(e, zoom, shiftX, shiftY);
+        if (e2 == null) { return false; }
+        PadInternal?.DoMouseMove(e2);
         return true;
     }
 
     public bool MouseUp(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
-        var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-        var l2 = PadInternal.Item.MaxBounds(ZoomItems);
-        if (l1.Width <= 0 || l2.Height <= 0) { return false; }
-        var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
-        PadInternal.Zoom = 1f;
-        // Coordinaten auf Maßstab 1/1 scalieren
-        var x = (e.X - l1.X) / tZo;
-        var y = (e.Y - l1.Y) / tZo;
-        // Nullpunkt verschiebung laut Maxbounds
-        x += l2.X;
-        y += l2.Y;
-        // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-        x += (l2.Width - (l1.Width / tZo)) / 2;
-        y += (l2.Height - (l1.Height / tZo)) / 2;
-        x = Math.Min(x, int.MaxValue / 2f);
-        y = Math.Min(y, int.MaxValue / 2f);
-        x = Math.Max(x, int.MinValue / 2f);
-        y = Math.Max(y, int.MinValue / 2f);
-        MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
-        PadInternal.DoMouseUp(e2);
+        var e2 = ZoomMouse(e, zoom, shiftX, shiftY);
+        if (e2 == null) { return false; }
+        PadInternal?.DoMouseUp(e2);
         return true;
     }
 
@@ -363,6 +314,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
+    private void _Pad_DoInvalidate(object sender, System.EventArgs e) => OnPropertyChanged();
+
     //protected override AbstractPadItem? TryCreate(string id, string name) {
     //    if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
     //        id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
@@ -371,14 +324,38 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     //    }
     //    return null;
     //}
-
-    private void _Pad_DoInvalidate(object sender, System.EventArgs e) => OnPropertyChanged();
-
     private void RemovePic() {
         if (_tmpBmp != null) {
             _tmpBmp?.Dispose();
             _tmpBmp = null;
         }
+    }
+
+    private MouseEventArgs? ZoomMouse(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return null; }
+        var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+        var l2 = PadInternal.Item.MaxBounds(ZoomItems);
+        if (l1.Width <= 0 || l2.Height <= 0) { return null; }
+        float tZo = 1;
+        if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
+        PadInternal.Zoom = 1f;
+
+        // Coordinaten auf Maßstab 1/1 scalieren
+        var x = (e.X - l1.X) / tZo;
+        var y = (e.Y - l1.Y) / tZo;
+
+        // Nullpunkt verschiebung laut Maxbounds
+        x += l2.X;
+        y += l2.Y;
+
+        // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
+        x += (l2.Width - (l1.Width / tZo)) / 2;
+        y += (l2.Height - (l1.Height / tZo)) / 2;
+        x = Math.Min(x, int.MaxValue / 2f);
+        y = Math.Min(y, int.MaxValue / 2f);
+        x = Math.Max(x, int.MinValue / 2f);
+        y = Math.Max(y, int.MinValue / 2f);
+        return new MouseEventArgs(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
     }
 
     #endregion
