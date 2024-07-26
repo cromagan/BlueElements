@@ -56,8 +56,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public const string DatabaseVersion = "4.02";
     public static readonly ObservableCollection<Database> AllFiles = [];
 
-    public static int MaxMasterCount = 3;
-
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
@@ -324,7 +322,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public int ExecutingScript { get; set; } = 0;
+    public int ExecutingScript { get; private set; } = 0;
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
@@ -435,7 +433,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string TemporaryDatabaseMasterTimeUtc {
         get => _temporaryDatabaseMasterTimeUtc;
-        private set {
+        protected set {
             if (_temporaryDatabaseMasterTimeUtc == value) { return; }
             _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUtc, value, UserName, DateTime.UtcNow, string.Empty);
         }
@@ -443,7 +441,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string TemporaryDatabaseMasterUser {
         get => _temporaryDatabaseMasterUser;
-        private set {
+        protected set {
             if (_temporaryDatabaseMasterUser == value) { return; }
             _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, null, _temporaryDatabaseMasterUser, value, UserName, DateTime.UtcNow, string.Empty);
         }
@@ -490,8 +488,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected DateTime IsInCache { get; set; } = new(0);
 
     protected string LoadedVersion { get; private set; }
-
-    protected virtual bool MultiUser => false;
 
     /// <summary>
     ///  Wann die Datei zuletzt geladen wurde. Einzige funktion, zu viele Ladezyklen hintereinander verhinden.
@@ -595,8 +591,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     var start = DateTime.UtcNow;
                     db.Shuffle();
                     foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(files, changes, fd, start);
-                        thisdb.TryToSetMeTemporaryMaster();
+                        thisdb.DoLastChanges(files, changes, start, fd);
+                        thisdb.DidLastChanges();
                     }
                 }
             }
@@ -1040,23 +1036,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
     /// <returns></returns>
-    public bool AmITemporaryMaster(int ranges, int rangee) {
+    public virtual bool AmITemporaryMaster(int ranges, int rangee) {
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
-
-        if (!MultiUser) { return true; }
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
-        if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
-
-        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
-        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
-
-        ranges = Math.Max(ranges, 0);
-        //rangee = Math.Min(rangee, 55);
-
-        // Info:
-        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
-        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
-        return mins > ranges && mins < rangee;
+        return true;
     }
 
     public bool CanDoPrepareFormulaCheckScript() {
@@ -1280,11 +1262,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
-        if (_completing) { return "Aktuell läuft ein kritischer Prozess, Datenbank wird neu erstellt."; }
+
+        if (DoingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
-        if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) { return "Datenbank wird noch geladen"; }
+        //if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) { return "Datenbank wird noch geladen"; }
 
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
@@ -1316,6 +1299,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         //---------- Save ------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.Save)) {
+            if (ExecutingScript > 0) { return "Es wird noch ein Skript ausgeführt."; }
             if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
@@ -1380,10 +1364,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
-
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
         if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, s.KeyName); }
+        if (_completing) { return new ScriptEndedFeedback("Aktuell wird die Datenbank kompletiert", false, false, s.KeyName); }
 
         var sce = CheckScriptError();
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
@@ -1533,7 +1517,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    /// <summary>
+      /// <summary>
     ///
     /// </summary>
     /// <param name="eventname"></param>
@@ -1543,8 +1527,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="attributes"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    /// <returns></returns>
-
+    /// <returns></returns>  
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
@@ -1600,6 +1583,27 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="s"></param>
+    /// <param name="produktivphase"></param>
+    /// <param name="row"></param>
+    /// <param name="attributes"></param>
+    /// <param name="dbVariables"></param>
+    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// <returns></returns>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="eventname"></param>
+    /// <param name="scriptname"></param>
+    /// <param name="produktivphase"></param>
+    /// <param name="row"></param>
+    /// <param name="attributes"></param>
+    /// <param name="dbVariables"></param>
+    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// <returns></returns>
     public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         var columnListtmp = columnList?.ToList();
         columnListtmp ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -2029,8 +2033,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
-
-        TryToSetMeTemporaryMaster();
     }
 
     public void LoadFromStream(Stream stream) {
@@ -2404,6 +2406,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
+    protected virtual void DidLastChanges() { }
+
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
@@ -2432,12 +2436,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="columnsAdded"></param>
     /// <param name="rowsAdded"></param>
     /// <param name="starttimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
-    protected virtual void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc) {
-        foreach (var thisro in rowsAdded) { thisro.IsInCache = DateTime.UtcNow; }
-        foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
+    protected virtual void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc, DateTime endTimeUtc) {
+        foreach (var thisro in rowsAdded) { thisro.IsInCache = IsInCache; }
+        foreach (var thisco in columnsAdded) { thisco.IsInCache = IsInCache; }
     }
 
-    protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime fromUtc, DateTime toUtc) => ([], null);
+    protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime startTimeUtc, DateTime endTimeUtc) => ([], null);
 
     protected bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
@@ -2454,34 +2458,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
-
-    protected virtual bool NewMasterPossible() {
-        if (ReadOnly) { return false; }
-        if (!MultiUser) { return false; }
-
-        if (DateTimeTryParse(TemporaryDatabaseMasterTimeUtc, out var c)) {
-            if (DateTime.UtcNow.Subtract(c).TotalMinutes < 60) { return false; }
-        }
-
-        if (!IsAdministrator()) { return false; }
-
-        // Skripte nicht abfragen! Sonst wird nie ein Master gewählt
-        // und Änderungen verweilen für immer in den Fragmenten
-        //if (!CanDoValueChangedScript()) { return false; }
-        //if (HasValueChangedScript()) { return false; }
-
-        if (RowCollection.WaitDelay > 90) { return true; }
-
-        var masters = 0;
-        foreach (var thisDb in Database.AllFiles) {
-            if (!thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45) && thisDb.MultiUser) {
-                masters++;
-                if (masters >= MaxMasterCount) { return false; }
-            }
-        }
-
-        return true;
-    }
 
     protected void OnLoaded() {
         if (IsDisposed) { return; }
@@ -2503,7 +2479,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(Filename)) { _completing = false; return false; }
 
         Develop.SetUserDidSomething();
-        var tmpFileName = WriteTempFileToDisk(setfileStateUtcDateTo);
+        var dataUncompressed = ToListOfByte(this, 1200, setfileStateUtcDateTo);
+
+        if (dataUncompressed == null) { _completing = false; return false; }
+        Develop.SetUserDidSomething();
+
+        var tmpFileName = WriteTempFileToDisk(dataUncompressed);
         Develop.SetUserDidSomething();
         if (string.IsNullOrEmpty(tmpFileName)) { _completing = false; return false; }
 
@@ -2771,21 +2752,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 return ("Datentyp unbekannt.", null, null);
         }
         return (string.Empty, null, null);
-    }
-
-    /// <summary>
-    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
-    /// </summary>
-    protected void TryToSetMeTemporaryMaster() {
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
-
-        if (AmITemporaryMaster(0, 60)) { return; }
-
-        if (!NewMasterPossible()) { return; }
-
-        RowCollection.WaitDelay = 0;
-        TemporaryDatabaseMasterUser = MyMasterCode;
-        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
     }
 
     protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
@@ -3196,9 +3162,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     /// <param name="files"></param>
     /// <param name="data"></param>
-    /// <param name="toUtc"></param>
     /// <param name="startTimeUtc">Nur um die Zeot stoppen zu können und lange Prozesse zu kürzen</param>
-    private void DoLastChanges(List<string>? files, List<UndoItem>? data, DateTime toUtc, DateTime startTimeUtc) {
+    /// <param name="endTimeUtc"></param>
+    private void DoLastChanges(List<string>? files, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
@@ -3247,12 +3213,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
             DoingChanges--;
-            IsInCache = toUtc;
-            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc);
+            IsInCache = endTimeUtc;
+            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
             OnInvalidateView();
         } catch {
             Develop.CheckStackForOverflow();
-            DoLastChanges(files, data, toUtc, startTimeUtc);
+            DoLastChanges(files, data, startTimeUtc, endTimeUtc);
         }
     }
 
@@ -3494,16 +3460,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return RefreshRowData(new List<RowItem> { row });
     }
 
-    private string WriteTempFileToDisk(DateTime setfileStateUtcDateTo) {
-        // Wegen Completing
-        //var f = EditableErrorReason(EditableErrorReasonType.Save);
-        //if (!string.IsNullOrEmpty(f)) { return string.Empty; }
+    private string WriteTempFileToDisk(List<byte> dataUncompressed) {
+        if (dataUncompressed.Count < 50) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, 1200, setfileStateUtcDateTo)?.ToArray();
-
-        if (dataUncompressed == null) { return string.Empty; }
-
-        var datacompressed = dataUncompressed.ZipIt() ?? dataUncompressed;
+        var datacompressed = dataUncompressed.ToArray().ZipIt();
 
         var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 

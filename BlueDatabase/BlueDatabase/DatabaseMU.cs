@@ -38,6 +38,8 @@ public class DatabaseMu : Database {
 
     #region Fields
 
+    public static int MaxMasterCount = 3;
+
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
     /// </summary>
@@ -64,11 +66,36 @@ public class DatabaseMu : Database {
 
     public new static string DatabaseId => nameof(DatabaseMu);
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
-    protected override bool MultiUser => true;
 
     #endregion
 
     #region Methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
+    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
+    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
+    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
+    /// </param>
+    /// <returns></returns>
+    public override bool AmITemporaryMaster(int ranges, int rangee) {
+        if (!base.AmITemporaryMaster(ranges, rangee)) { return false; }
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
+        if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
+
+        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
+        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
+
+        ranges = Math.Max(ranges, 0);
+        //rangee = Math.Min(rangee, 55);
+
+        // Info:
+        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
+        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
+        return mins > ranges && mins < rangee;
+    }
 
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (string.IsNullOrEmpty(Filename)) { return null; }
@@ -131,6 +158,11 @@ public class DatabaseMu : Database {
         return gb;
     }
 
+    protected override void DidLastChanges() {
+        base.DidLastChanges();
+        TryToSetMeTemporaryMaster();
+    }
+
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
@@ -152,14 +184,14 @@ public class DatabaseMu : Database {
         base.Dispose(disposing);
     }
 
-    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc) {
-        base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, starttimeUtc);
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime startTimeUtc, DateTime endTimeUtc) {
+        base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
         if (ReadOnly) { return; }
         if (files == null || files.Count < 1) { return; }
 
         _hasManyFragments = files.Count > 8 || ChangesNotIncluded.Count > 40;
 
-        if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { return; }
+        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { return; }
         //if (!Directory.Exists(OldFragmengtsPath())) { return; }
 
         #region Dateien, mit jungen Änderungen wieder entfernen, damit andere Datenbanken noch Zugriff haben
@@ -225,12 +257,12 @@ public class DatabaseMu : Database {
                 OnDropMessage(FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                 DeleteFile(thisf, 1, false);
                 //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
-                if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { break; }
+                if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }
             }
         }
     }
 
-    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime fromUtc, DateTime toUtc) {
+    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime fromUtc, DateTime endTimeUtc) {
         if (string.IsNullOrEmpty(FragmengtsPath())) { return new(); }
 
         if (!db.Any()) { return new(); }
@@ -296,7 +328,7 @@ public class DatabaseMu : Database {
                         var u = new UndoItem(thist);
                         if (tbn.Contains(u.TableName.ToUpperInvariant())) {
                             if (u.DateTimeUtc.Subtract(IsInCache).TotalSeconds > 0 &&
-                               u.DateTimeUtc.Subtract(toUtc).TotalSeconds < 0) {
+                               u.DateTimeUtc.Subtract(endTimeUtc).TotalSeconds < 0) {
                                 u.Container = thisf;
                                 l.Add(u);
                             }
@@ -326,21 +358,6 @@ public class DatabaseMu : Database {
         }
 
         return oo;
-    }
-
-    protected override bool NewMasterPossible() {
-        if (!base.NewMasterPossible()) { return false; }
-
-        if (_hasManyFragments) { return true; }
-        if (DateTime.UtcNow.Subtract(FileStateUTCDate).TotalDays > 3) { return true; } // Letze Komplettierung
-
-        if (DateTimeTryParse(TemporaryDatabaseMasterTimeUtc, out var c)) {
-            if (DateTime.UtcNow.Subtract(c).TotalDays > 1) { return true; }
-        } else {
-            return true;
-        }
-
-        return false;
     }
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
@@ -380,10 +397,30 @@ public class DatabaseMu : Database {
         return Filename.FilePath() + "Frgm\\";
     }
 
-    //private string OldFragmengtsPath() {
-    //    if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-    //    return Filename.FilePath() + "Frgm-Done\\";
-    //}
+    private bool NewMasterPossible() {
+        if (ReadOnly) { return false; }
+        if (!IsAdministrator()) { return false; }
+
+        if (DateTimeTryParse(TemporaryDatabaseMasterTimeUtc, out var dt)) {
+            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < 60) { return false; }
+            if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
+        }
+
+        if (RowCollection.WaitDelay > 90) { return true; }
+
+        if (_hasManyFragments) { return true; }
+        if (DateTime.UtcNow.Subtract(FileStateUTCDate).TotalDays > 3) { return true; } // Letze Komplettierung
+
+        var masters = 0;
+        foreach (var thisDb in Database.AllFiles) {
+            if (thisDb is DatabaseMu && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+                masters++;
+                if (masters >= MaxMasterCount) { return false; }
+            }
+        }
+
+        return true;
+    }
 
     private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {
@@ -406,6 +443,21 @@ public class DatabaseMu : Database {
         var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
         _writer.WriteLine(l.ToString());
         _writer.Flush();
+    }
+
+    /// <summary>
+    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
+    /// </summary>
+    private void TryToSetMeTemporaryMaster() {
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
+
+        if (AmITemporaryMaster(0, 60)) { return; }
+
+        if (!NewMasterPossible()) { return; }
+
+        RowCollection.WaitDelay = 0;
+        TemporaryDatabaseMasterUser = MyMasterCode;
+        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
     }
 
     #endregion
