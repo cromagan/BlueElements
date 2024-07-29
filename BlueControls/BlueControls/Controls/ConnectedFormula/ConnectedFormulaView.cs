@@ -53,10 +53,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     #region Constructors
 
-    public ConnectedFormulaView() : this("Head") { }
+    public ConnectedFormulaView() : this(string.Empty, "Head") { }
 
-    public ConnectedFormulaView(string page) : base(false, false) {
+    public ConnectedFormulaView(string mode, string page) : base(false, false) {
         InitializeComponent();
+        base.Mode = mode;
         Page = page;
         InitFormula(null, null);
 

@@ -831,6 +831,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return RepairUserGroups(l);
     }
 
+
+    /// <summary>
+    /// Standardisiert Benutzeruppen und eleminiert unterschiedliche Groﬂ/Klein-Schreibweisen
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public static List<string> RepairUserGroups(IEnumerable<string> e) {
         var l = new List<string>();
 

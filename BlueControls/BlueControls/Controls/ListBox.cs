@@ -71,6 +71,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private SizeF _lastCheckedMaxSize = Size.Empty;
     private Size _maxNeededItemSize;
 
+    /// <summary>
+    /// Einfaches Flag, dass die Buttons nur einblendet, wenn eine Mausbewegung stattgefunden hat.
+    /// Bei einem MouseWheel wird nichts eingeblendet
+    /// </summary>
+    private Point _mousepos = Point.Empty;
+    private bool _mousemoved = false;
+
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
     private AbstractListItem? _mouseOverItem;
 
@@ -838,8 +845,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         DoMouseMovement();
     }
 
+
+
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
+        if(e.X != _mousepos.X || e.Y != _mousepos.Y) { _mousemoved = true; }
+        _mousepos = new Point(e.X, e.Y);    
         DoMouseMovement();
     }
 
@@ -875,6 +886,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!SliderY.Visible) { return; }
+        _mousemoved = false;
         SliderY.DoMouseWheel(e);
     }
 
@@ -1043,7 +1055,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             isInForm = false;
         }
 
-        if (AddAllowed != AddType.None && isInForm) {
+        var showAdd = AddAllowed != AddType.None && isInForm;
+
+
+        showAdd = (showAdd && (SliderY.Value == SliderY.Maximum || _mousemoved));
+
+
+        if (showAdd) {
             btnPlus.Left = 2;
             btnPlus.Top = Height - 2 - btnPlus.Height;
             btnPlus.Visible = true;
@@ -1056,7 +1074,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (nd == _mouseOverItem) { return; }
         _mouseOverItem = nd;
 
-        if (_mouseOverItem != null) {
+        if (_mouseOverItem != null && _mousemoved) {
             var pos = _mouseOverItem.Pos.Right;
 
             #region down-Button
@@ -1183,6 +1201,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void SliderY_ValueChange(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         _mouseOverItem = null; // Damit die Buttons neu berechnet werden.
+        _mousemoved = false;
         DoMouseMovement();
         Invalidate();
     }

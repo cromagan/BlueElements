@@ -85,9 +85,7 @@ public class DropDownListItem : AbstractListItem {
             Skin.Draw_Back(gr, Design.ComboBox_Textbox, vState, positionModified, null, false);
         }
 
-        if (Selected != null) {
-            Selected.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
-        }
+        Selected?.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
 
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
         if (drawBorderAndBack) {

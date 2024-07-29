@@ -141,7 +141,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             txt = _child.FileNameWithoutSuffix();
         }
 
-        var con = new ConnectedFormulaView("Head") {
+        var con = new ConnectedFormulaView(mode, "Head") {
             GroupBoxStyle = _rahmenStil
         };
 

@@ -45,7 +45,6 @@ public static class Generic {
 
     public static bool IsAdministrator() => string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
 
-
     public static string UserGroup = Constants.Everybody;
 
     private static int _GetUniqueKeyCount;

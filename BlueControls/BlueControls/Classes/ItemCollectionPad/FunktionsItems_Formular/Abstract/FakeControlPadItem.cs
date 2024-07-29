@@ -24,19 +24,19 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.Polygons;
-using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 #nullable enable
 
@@ -69,7 +69,22 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyN
 
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
     public abstract bool MustBeInDrawingArea { get; }
-    public ReadOnlyCollection<string> VisibleFor { get; set; } = new([]);
+
+
+
+    private ReadOnlyCollection<string> _visibleFor = new ([]);
+    public ReadOnlyCollection<string> VisibleFor {
+        get=> _visibleFor;
+        set { 
+        
+            var tmp = Database.RepairUserGroups(value);
+            if(!value.IsDifferentTo(tmp)) { return; }
+
+            _visibleFor = tmp.AsReadOnly();
+            OnPropertyChanged();
+        
+        
+        } } 
     protected override int SaveOrder => 3;
 
     #endregion
@@ -176,8 +191,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyN
                 value = value.Replace("\r", "|");
                 var tmp = value.FromNonCritical().SplitBy("|").ToList();
                 if (tmp.Count == 0) { tmp.Add(Constants.Everybody); }
-                tmp = tmp.SortedDistinctList();
-                VisibleFor = tmp.AsReadOnly();
+                VisibleFor = Database.RepairUserGroups(tmp).AsReadOnly();
                 return true;
         }
         return false;

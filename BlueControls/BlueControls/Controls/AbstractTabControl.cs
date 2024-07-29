@@ -55,6 +55,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         UpdateStyles();
 
         TabDefaultOrder = Array.Empty<string>();
+        HotTrack = true;
     }
 
     #endregion
@@ -109,7 +110,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
-        if (!HotTrack) { HotTrack = true; }
+        if (IsDisposed) { return; }
         HotTab = TestTab(new Point(e.X, e.Y));
         base.OnMouseMove(e);
     }

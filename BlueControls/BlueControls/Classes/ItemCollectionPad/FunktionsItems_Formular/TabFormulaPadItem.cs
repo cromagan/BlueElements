@@ -171,7 +171,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
                         };
                         tabctrl.TabPages.Add(t);
 
-                        cc = new ConnectedFormulaView(pg);
+                        cc = new ConnectedFormulaView(mode, pg);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.DatabaseInput);
