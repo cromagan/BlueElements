@@ -180,7 +180,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
-    public event EventHandler<RowEventArgs>? SelectedRowChanged;
+    public event EventHandler<RowNullableEventArgs>? SelectedRowChanged;
 
     public event EventHandler? ViewChanged;
 
@@ -640,8 +640,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         CursorPosColumn = column;
         CursorPosRow = row;
 
-        if (CursorPosRow?.Row is not RowItem setedrow) { return; }
-        if (CursorPosColumn != column) { return; }
+
+        //if (CursorPosColumn != column) { return; }
 
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
@@ -655,10 +655,17 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         OnSelectedCellChanged(new CellExtEventArgs(CursorPosColumn, CursorPosRow));
 
         if (!sameRow) {
-            OnSelectedRowChanged(new RowEventArgs(setedrow));
+
+            OnSelectedRowChanged(new RowNullableEventArgs(row?.Row));
 
             if (FilterOutputType == Filterausgabe.Gewähle_Zeile) {
-                FilterOutput.ChangeTo(new FilterItem(setedrow));
+
+                if (row?.Row is RowItem setedrow) {
+                    FilterOutput.ChangeTo(new FilterItem(setedrow));
+                } else {
+                    FilterOutput.ChangeTo(new FilterItem(db, "Dummy"));
+                }
+
             }
         }
     }
@@ -3244,7 +3251,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
     //private void OnRowAdded(object sender, RowChangedEventArgs e) => RowAdded?.Invoke(sender, e);
-    private void OnSelectedRowChanged(RowEventArgs e) => SelectedRowChanged?.Invoke(this, e);
+    private void OnSelectedRowChanged(RowNullableEventArgs e) => SelectedRowChanged?.Invoke(this, e);
 
     private void OnViewChanged() {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);

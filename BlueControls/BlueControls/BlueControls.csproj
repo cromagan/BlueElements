@@ -442,7 +442,6 @@
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\ItemCollectionList\ReadableListItem.cs" />
-    <Compile Include="Classes\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
     <Compile Include="Classes\ItemCollectionPad\Abstract\AbstractPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RowAdderPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\RegionFormulaPadItem.cs" />

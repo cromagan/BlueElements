@@ -128,6 +128,7 @@
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="DatabaseScriptDescription.cs" />
     <Compile Include="EventArgs\RowChangedEventArgs.cs" />
+    <Compile Include="EventArgs\RowNullableEventArgs.cs" />
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="CellCollection.cs" />

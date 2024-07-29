@@ -19,13 +19,12 @@
 
 namespace BlueDatabase.EventArgs;
 
-public class CellNullableEventArgs : System.EventArgs {
+public class CellNullableEventArgs : RowNullableEventArgs {
 
     #region Constructors
 
-    public CellNullableEventArgs(ColumnItem? column, RowItem? row) {
+    public CellNullableEventArgs(ColumnItem? column, RowItem? row) : base(row) {
         Column = column;
-        Row = row;
     }
 
     #endregion
@@ -33,7 +32,6 @@ public class CellNullableEventArgs : System.EventArgs {
     #region Properties
 
     public ColumnItem? Column { get; }
-    public RowItem? Row { get; }
 
     #endregion
 }

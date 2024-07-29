@@ -48,11 +48,12 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyName, IPropertyChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
+public abstract class FakeControlPadItem : RectanglePadItem, IHasKeyName, IPropertyChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
 
     #region Fields
 
     public static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
+    private ReadOnlyCollection<string> _visibleFor = new([]);
 
     #endregion
 
@@ -69,22 +70,19 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyN
 
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
     public abstract bool MustBeInDrawingArea { get; }
+    public int Version { get; set; }
 
-
-
-    private ReadOnlyCollection<string> _visibleFor = new ([]);
     public ReadOnlyCollection<string> VisibleFor {
-        get=> _visibleFor;
-        set { 
-        
+        get => _visibleFor;
+        set {
             var tmp = Database.RepairUserGroups(value);
-            if(!value.IsDifferentTo(tmp)) { return; }
+            if (!_visibleFor.IsDifferentTo(tmp)) { return; }
 
             _visibleFor = tmp.AsReadOnly();
             OnPropertyChanged();
-        
-        
-        } } 
+        }
+    }
+
     protected override int SaveOrder => 3;
 
     #endregion
@@ -113,7 +111,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyN
         SetXPosition(anzbr, npos);
         OnPropertyChanged();
     }
-
 
     public virtual string ErrorReason() {
         if (Parent == null) {
@@ -187,6 +184,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyN
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
         switch (key) {
+            case "version":
+                Version = IntParse(value);
+                return true;
+
             case "visiblefor":
                 value = value.Replace("\r", "|");
                 var tmp = value.FromNonCritical().SplitBy("|").ToList();
@@ -227,7 +228,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IHasKeyN
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
-        //if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
+        result.ParseableAdd("Version", Version);
 
         if (MustBeInDrawingArea) {
             result.ParseableAdd("VisibleFor", VisibleFor, false);

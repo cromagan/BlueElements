@@ -690,7 +690,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
     }
 
-    protected virtual void Table_SelectedRowChanged(object sender, RowEventArgs e) {
+    protected virtual void Table_SelectedRowChanged(object sender, RowNullableEventArgs e) {
         if (InvokeRequired) {
             _ = Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
             return;
