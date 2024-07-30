@@ -172,8 +172,6 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
             return;
         }
 
-        RowItem? r = null;
-
         if (Database.Row.Count == 0) {
             e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
             return;
@@ -182,13 +180,13 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
             txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
         }
 
-        r = Database?.Row[txbTestZeile.Text];
+        RowItem? r = Database?.Row[txbTestZeile.Text];
         if (r == null || r.IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             return;
         }
 
-        e.Feedback = RowAdder.ExecuteScript(_item.Script, [], _item.EntityID, r);
+        e.Feedback = RowAdder.ExecuteScript(_item.Script, "Testmodus", _item.EntityID, r);
     }
 
     private void WriteInfosBack() {

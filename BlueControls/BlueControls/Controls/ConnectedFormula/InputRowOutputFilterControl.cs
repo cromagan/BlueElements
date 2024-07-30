@@ -67,7 +67,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
 
-        var txt = string.Empty;
+        string txt;
 
         var qi = QuickImage.Get("Trichter|16");
 
@@ -115,8 +115,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
             return;
         }
 
-        var va = string.Empty;
-
+        string? va;
         if (lastInputRow != null) {
             lastInputRow.CheckRowDataIfNeeded();
             va = lastInputRow.ReplaceVariables(_filterwert, false, true, lastInputRow.LastCheckedEventArgs?.Variables);

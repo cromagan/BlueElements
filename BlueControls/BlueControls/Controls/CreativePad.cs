@@ -194,31 +194,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         AbstractPadItem? thisItem = null;
 
         if (e.HotItem is AbstractPadItem item) { thisItem = item; }
-        var done = false;
+
         if (thisItem != null) {
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "#vordergrund":
-                    done = true;
                     thisItem.Parent?.InDenVordergrund(thisItem);
                     return;
 
                 case "#hintergrund":
-                    done = true;
                     thisItem.Parent?.InDenHintergrund(thisItem);
                     return;
 
                 case "#vorne":
-                    done = true;
                     thisItem.Parent?.EineEbeneNachVorne(thisItem);
                     return;
 
                 case "#hinten":
-                    done = true;
                     thisItem.Parent?.EineEbeneNachHinten(thisItem);
                     return;
 
                 case "#duplicate":
-                    done = true;
                     var n = (AbstractPadItem)((ICloneable)thisItem).Clone();
                     n.KeyName = Generic.GetUniqueKey();
                     _item?.Add(n);

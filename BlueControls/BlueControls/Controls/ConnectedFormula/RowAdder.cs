@@ -18,23 +18,22 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System;
+using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using System.Linq;
-using BlueScript.Variables;
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueBasics.Enums;
-using BlueControls.ItemCollectionList;
-using BlueControls.Enums;
-using BlueControls.Forms;
-using BlueControls.EventArgs;
-using BlueDatabase.AdditionalScriptMethods;
 
 namespace BlueControls.Controls;
 
@@ -43,6 +42,16 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     #region Fields
 
     private bool _ignoreCheckedChanged = false;
+
+    private List<string>? _infos;
+
+    private string _lastGeneratedEntityId = string.Empty;
+
+    private RowItem? _lastRow;
+
+    private List<string>? _menu;
+
+    private bool _mustUpdate = true;
 
     #endregion
 
@@ -85,13 +94,11 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     [DefaultValue("")]
     public string Script { get; set; } = string.Empty;
 
-    protected string GeneratedEntityId { get; private set; } = string.Empty;
-
     #endregion
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, List<string> selected, string entitiId, RowItem rowIn) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string entitiId, RowItem rowIn) {
         var generatedentityID = rowIn.ReplaceVariables(entitiId, false, true, null);
 
         var vars = new VariableCollection();
@@ -102,6 +109,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
+        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
 
         var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn, 0);
 
@@ -130,14 +138,13 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
     public void Fehler(string txt, ImageCode symbol) {
         Enabled = false;
+        _lastGeneratedEntityId = string.Empty;
+        _menu = null;
         f.ItemClear();
         f.ItemAdd(ItemOf(txt, symbol));
         FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
         _ignoreCheckedChanged = false;
     }
-
-
-
 
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
@@ -162,119 +169,57 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return;
         }
 
-
         DoInputFilter(null, true);
         DoRows();
         var rowIn = RowSingleOrNull();
+
+        if (rowIn != _lastRow) {
+            _menu = null;
+            _lastRow = rowIn;
+            _lastGeneratedEntityId = string.Empty;
+        }
 
         if (rowIn == null) {
             Fehler("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information);
             return;
         }
 
-        GeneratedEntityId = string.Empty;
+        var nowGeneratedId = GenerateEntityID(rowIn);
 
-        var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
-
-        if (generatedentityID == EntityID) {
-            Fehler("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch);
-            return;
-        }
-
-        if (generatedentityID.Contains("\\")) { Fehler("Interner Fehler: Ungültiges Zeichen (\\) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
-        if (generatedentityID.Contains("#")) { Fehler("Interner Fehler: Ungültiges Zeichen (#) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
-        if (generatedentityID.Contains("~")) { Fehler("Interner Fehler: Ungültiges Zeichen (~) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
-        if (generatedentityID.Contains("*")) { Fehler("Interner Fehler: Ungültiges Zeichen (*) in  EnitiyID", BlueBasics.Enums.ImageCode.Kritisch); return; }
+        if (!string.IsNullOrEmpty(nowGeneratedId.msg)) { Fehler(nowGeneratedId.msg, ImageCode.Kritisch); return; }
 
         if (string.IsNullOrEmpty(Script)) {
             Fehler("Interner Fehler: Kein Skript vorhanden", BlueBasics.Enums.ImageCode.Kritisch);
             return;
         }
 
-        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.BeginntMit, generatedentityID + "\\"));
+        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.BeginntMit, nowGeneratedId.newid + "\\"));
 
         var selected = OriginIDColumn.Contents(FilterOutput, null);
-        selected = selected.Select(s => s.TrimStart(generatedentityID + "\\").Trim("\\")).ToList().SortedDistinctList();
+        selected = selected.Select(s => s.TrimStart(nowGeneratedId.newid + "\\").Trim("\\")).ToList().SortedDistinctList();
 
         selected = RepairMenu(selected);
 
-        var scf = ExecuteScript(Script, selected, EntityID, rowIn);
+        var msg = GenerateMenuItems(rowIn, nowGeneratedId.newid);
 
-        if (!scf.AllOk) {
-            if (Generic.UserGroup == Constants.Administrator) {
-                var l = new List<string> {
-                "### ACHTUNG - EINMALIGE ANZEIGE ###",
-                generatedentityID,
-                //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
-                //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                //"Datenbank: " + Database.Caption,
-                " ",
-                " ",
-                //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
-                " ",
-               scf.ProtocolText
-            };
-                l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
-            }
-
-            Fehler("Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText, BlueBasics.Enums.ImageCode.Kritisch);
-            return;
-        }
-
-        RowCollection.DoAllInvalidatedRows(null);
-
-        var menu = scf.Variables?.GetList("Menu");
-
-        if (menu == null || menu.Count < 1) {
-            Fehler("Interner Fehler: Skript gab kein Menu zurück", BlueBasics.Enums.ImageCode.Kritisch);
-            return;
-        }
-
-        foreach (var item in menu) {
-            if (item.Contains("*")) { Fehler("Interner Fehler: Menüpunkte dürfen kein * enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            if (item.Contains(";")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ; enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            if (item.Contains("#")) { Fehler("Interner Fehler: Menüpunkte dürfen kein # enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            if (item.Contains("~")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ~ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-        }
-
-        var infos = scf.Variables?.GetList("Infos") ?? new List<string>();
-
-        foreach (var item in infos) {
-            if (item.Contains("*")) { Fehler("Interner Fehler: Infos dürfen kein * enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            //if (item.Contains(";")) { Fehler("Interner Fehler: Menüpunkte dürfen kein ; enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            if (item.Contains("#")) { Fehler("Interner Fehler: Infos dürfen kein # enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            if (item.Contains("~")) { Fehler("Interner Fehler: Infos dürfen kein ~ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-            if (item.Contains("\\")) { Fehler("Interner Fehler: Infos dürfen kein \\ enthalten", BlueBasics.Enums.ImageCode.Kritisch); return; }
-
-            if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
-                Fehler("Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein", BlueBasics.Enums.ImageCode.Kritisch);
-                return;
-            }
-        }
-
-        if (AdditionalInfoColumn != null && menu.Count != infos.Count) {
-            Fehler("Interner Fehler: Infos und Menuitems ungleich", BlueBasics.Enums.ImageCode.Kritisch);
-            return;
-        }
+        if (!string.IsNullOrEmpty(msg)) { Fehler(msg, ImageCode.Kritisch); return; }
 
         Enabled = true;
 
-        GeneratedEntityId = generatedentityID;
+        _lastGeneratedEntityId = nowGeneratedId.newid;
 
-        List<string> olditems = f.Items.ToListOfString().Select(s => s.Trim(generatedentityID + "\\")).ToList();
+        List<string> olditems = f.Items.ToListOfString().Select(s => s.Trim(_lastGeneratedEntityId + "\\")).ToList();
 
         foreach (var thisIT in f.Items) {
-            if (thisIT is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+            if (thisIT is ReadableListItem rli && rli.Item is AdderItem ai) {
                 ai.KeysAndInfo.Clear();
             }
-            if (thisIT is ItemCollectionList.DropDownListItem dli) {
+            if (thisIT is DropDownListItem dli) {
                 dli.DDItems.Clear();
             }
         }
 
-        menu.AddRange(selected);
-
-        var keyAndInfo = RepairMenu(menu, infos);
+        var keyAndInfo = RepairMenu([.. _menu, .. selected], _infos);
 
         for (var z = 0; z < keyAndInfo.Count; z++) {
             var key = keyAndInfo[z].SplitBy("#")[0];
@@ -391,7 +336,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         FloatingForm.Close(this);
 
         if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
-            AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
+            AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
         }
 
         _mustUpdate = true;
@@ -399,16 +344,14 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         Invalidate();
     }
 
-    bool _mustUpdate = true;
-
     private void F_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
         if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
             if (f.Checked.Contains(rli.KeyName)) {
-                AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, GeneratedEntityId, AdditionalInfoColumn);
+                AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
             } else {
-                AdderItem.RemoveRowsFromDatabase(OriginIDColumn, GeneratedEntityId, ai.KeyName);
+                AdderItem.RemoveRowsFromDatabase(OriginIDColumn, _lastGeneratedEntityId, ai.KeyName);
             }
             //FillListBox();
             _mustUpdate = true;
@@ -423,6 +366,89 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             dropDownMenu.Cancel += DropDownMenu_Cancel;
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         }
+    }
+
+    private (string msg, string newid) GenerateEntityID(RowItem rowIn) {
+        if (!string.IsNullOrEmpty(_lastGeneratedEntityId)) { return (string.Empty, _lastGeneratedEntityId); }
+
+        var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
+
+        if (generatedentityID == EntityID || string.IsNullOrEmpty(generatedentityID)) {
+            return ("Interner Fehler: EnitiyID", string.Empty);
+        }
+
+        if (generatedentityID.Contains("\\")) { return ("Interner Fehler: Ungültiges Zeichen (\\) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains("#")) { return ("Interner Fehler: Ungültiges Zeichen (#) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains("~")) { return ("Interner Fehler: Ungültiges Zeichen (~) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains("*")) { return ("Interner Fehler: Ungültiges Zeichen (*) in  EnitiyID", string.Empty); }
+
+        return (string.Empty, generatedentityID);
+    }
+
+    private string GenerateMenuItems(RowItem rowIn, string generatedentityID) {
+        if (_menu != null) { return string.Empty; }
+
+        _infos = new List<string>();
+
+        var scf = ExecuteScript(Script, Mode, EntityID, rowIn);
+
+        if (!scf.AllOk) {
+            if (Generic.UserGroup == Constants.Administrator) {
+                var l = new List<string> {
+                "### ACHTUNG - EINMALIGE ANZEIGE ###",
+                generatedentityID,
+                //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+                //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                //"Datenbank: " + Database.Caption,
+                " ",
+                " ",
+                //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+                " ",
+               scf.ProtocolText
+            };
+                l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
+            }
+
+            return "Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText;
+        }
+
+        RowCollection.DoAllInvalidatedRows(null);
+
+        var menu = scf.Variables?.GetList("Menu");
+
+        if (menu == null || menu.Count < 1) {
+            return "Interner Fehler: Skript gab kein Menu zurück";
+        }
+
+        foreach (var item in menu) {
+            if (item.Contains("*")) { return "Interner Fehler: Menüpunkte dürfen kein * enthalten"; }
+            if (item.Contains(";")) { return "Interner Fehler: Menüpunkte dürfen kein ; enthalten"; }
+            if (item.Contains("#")) { return "Interner Fehler: Menüpunkte dürfen kein # enthalten"; }
+            if (item.Contains("~")) { return "Interner Fehler: Menüpunkte dürfen kein ~ enthalten"; }
+        }
+
+        var infos = scf.Variables?.GetList("Infos") ?? new List<string>();
+
+        foreach (var item in infos) {
+            if (item.Contains("*")) { return "Interner Fehler: Infos dürfen kein * enthalten"; }
+            //if (item.Contains(";")) { return "Interner Fehler: Menüpunkte dürfen kein ; enthalten"; }
+            if (item.Contains("#")) { return "Interner Fehler: Infos dürfen kein # enthalten"; }
+            if (item.Contains("~")) { return "Interner Fehler: Infos dürfen kein ~ enthalten"; }
+            if (item.Contains("\\")) { return "Interner Fehler: Infos dürfen kein \\ enthalten"; }
+
+            if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
+                return "Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein";
+            }
+        }
+
+        if (AdditionalInfoColumn != null && menu.Count != infos.Count) {
+            return "Interner Fehler: Infos und Menuitems ungleich";
+        }
+
+        _menu = menu;
+        _infos = infos;
+
+        return string.Empty;
     }
 
     private bool HasChildNode(List<string> selected, string key) {
@@ -447,7 +473,9 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         return m.SortedDistinctList();
     }
 
-    private List<string> RepairMenu(List<string> menu, List<string> infos) {
+    private List<string> RepairMenu(List<string> menu, List<string>? infos) {
+        infos = infos ?? new List<string>();
+
         while (infos.Count < menu.Count) { infos.Add(string.Empty); }
 
         var m = new List<string>();
