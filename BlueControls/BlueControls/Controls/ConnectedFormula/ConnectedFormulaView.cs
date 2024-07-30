@@ -29,11 +29,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows;
 using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
-
-#nullable enable
 
 namespace BlueControls.Controls;
 
@@ -281,6 +278,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             var c = thisit.CreateControl(this, mode);
             if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
+                return null;
+            }
+
+            if(c is GenericControlReciver gci && gci.Item != thisit) {
+                Develop.DebugPrint("Item muss gesetzt werden!");
                 return null;
             }
 

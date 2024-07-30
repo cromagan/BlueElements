@@ -26,7 +26,6 @@ using BlueDatabase.Interfaces;
 using BlueScript.Variables;
 using System.ComponentModel;
 using System.Windows.Forms;
-using System.Text;
 using System.Collections.Generic;
 
 namespace BlueControls.Controls;

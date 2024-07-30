@@ -22,14 +22,13 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Runtime;
-using System.Runtime.InteropServices;
 
 namespace BlueControls.Controls;
 
@@ -99,6 +98,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; private set; } = false;
 
+    public AbstractPadItem? Item { get; set; } = null;
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -150,10 +151,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="source"></param>
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemAcceptFilter source, string mode) {
         Name = source.DefaultItemToControlName();
-
         Mode = mode;
-
-   
+       if (source is AbstractPadItem ali) { Item = ali; }
 
         if (this is IHasSettings ihs) {
             ihs.SettingsManualFilename = ("%homepath%\\" + Develop.AppName() + "\\" + source.KeyName + ".ini").CheckFile();

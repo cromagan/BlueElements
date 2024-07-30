@@ -44,6 +44,8 @@ namespace BlueControls.Forms {
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
+            this.btnEingehendeDatenbank = new BlueControls.Controls.Button();
+            this.btnAusgehendeDatenbank = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -112,6 +114,7 @@ namespace BlueControls.Forms {
             this.btnLastFormulas.ImageCode = "Ordner";
             this.btnLastFormulas.Location = new System.Drawing.Point(64, 2);
             this.btnLastFormulas.Name = "btnLastFormulas";
+            this.btnLastFormulas.SettingsLoaded = false;
             this.btnLastFormulas.Size = new System.Drawing.Size(104, 66);
             this.btnLastFormulas.TabIndex = 1;
             this.btnLastFormulas.Text = "zuletzt geöffnete Dateien";
@@ -156,7 +159,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminAllgemein.Enabled = false;
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminAllgemein.Location = new System.Drawing.Point(72, 0);
+            this.grpAdminAllgemein.Location = new System.Drawing.Point(400, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
             this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 81);
             this.grpAdminAllgemein.TabIndex = 7;
@@ -178,12 +181,14 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminBearbeiten.CausesValidation = false;
+            this.grpAdminBearbeiten.Controls.Add(this.btnAusgehendeDatenbank);
+            this.grpAdminBearbeiten.Controls.Add(this.btnEingehendeDatenbank);
             this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
             this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(72, 81);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
@@ -209,12 +214,36 @@ namespace BlueControls.Forms {
             // 
             this.CFormula.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFormula.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
+            this.CFormula.Item = null;
             this.CFormula.Location = new System.Drawing.Point(0, 110);
+            this.CFormula.Mode = "";
             this.CFormula.Name = "CFormula";
             this.CFormula.Size = new System.Drawing.Size(1202, 316);
             this.CFormula.TabIndex = 98;
             this.CFormula.TabStop = false;
             this.CFormula.Text = "CFO";
+            // 
+            // btnEingehendeDatenbank
+            // 
+            this.btnEingehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnEingehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Unten";
+            this.btnEingehendeDatenbank.Location = new System.Drawing.Point(72, 2);
+            this.btnEingehendeDatenbank.Name = "btnEingehendeDatenbank";
+            this.btnEingehendeDatenbank.Size = new System.Drawing.Size(64, 66);
+            this.btnEingehendeDatenbank.TabIndex = 45;
+            this.btnEingehendeDatenbank.Text = "Eingeh. Datenbank";
+            this.btnEingehendeDatenbank.Click += new System.EventHandler(this.btnEingehendeDatenbank_Click);
+            // 
+            // btnAusgehendeDatenbank
+            // 
+            this.btnAusgehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAusgehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Oben";
+            this.btnAusgehendeDatenbank.Location = new System.Drawing.Point(136, 2);
+            this.btnAusgehendeDatenbank.Name = "btnAusgehendeDatenbank";
+            this.btnAusgehendeDatenbank.Size = new System.Drawing.Size(64, 66);
+            this.btnAusgehendeDatenbank.TabIndex = 46;
+            this.btnAusgehendeDatenbank.Text = "Ausgeh. Datenbank";
+            this.btnAusgehendeDatenbank.Click += new System.EventHandler(this.btnAusgehendeDatenbank_Click);
             // 
             // FormulaView
             // 
@@ -255,5 +284,7 @@ namespace BlueControls.Forms {
         private Button btnFormular;
         private OpenFileDialog LoadTab;
         protected ConnectedFormulaView CFormula;
+        private Button btnAusgehendeDatenbank;
+        private Button btnEingehendeDatenbank;
     }
 }

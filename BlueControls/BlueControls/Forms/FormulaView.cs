@@ -17,24 +17,37 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.MultiUserFile;
+using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
+using System;
 using System.ComponentModel;
+using System.Windows.Forms;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
-
-#nullable enable
 
 namespace BlueControls.Forms;
 
 public partial class FormulaView : FormWithStatusBar {
+
+    #region Fields
+
+    private AbstractPadItem? _lastItem = null;
+
+    #endregion
 
     #region Constructors
 
     public FormulaView() => InitializeComponent();
 
     public FormulaView(string filename, string mode) : this() {
+        btnEingehendeDatenbank.Enabled = false;
+        btnAusgehendeDatenbank.Enabled |= false;
+
         CFormula.Mode = mode;
 
         FormulaSet(filename);
@@ -47,6 +60,20 @@ public partial class FormulaView : FormWithStatusBar {
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         CheckButtons();
+    }
+
+    private void btnAusgehendeDatenbank_Click(object sender, System.EventArgs e) {
+        if (_lastItem is IItemSendFilter sif && sif.DatabaseOutput is Database db && !db.IsDisposed) {
+            var c = new TableView(db, false, true);
+            c.ShowDialog();
+        }
+    }
+
+    private void btnEingehendeDatenbank_Click(object sender, System.EventArgs e) {
+        if (_lastItem is IItemAcceptFilter iaf && iaf.DatabaseInput is Database db && !db.IsDisposed) {
+            var c = new TableView(db, false, true);
+            c.ShowDialog();
+        }
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
@@ -73,7 +100,7 @@ public partial class FormulaView : FormWithStatusBar {
 
     private void CheckButtons() => btnFormular.Enabled = CFormula.ConnectedFormula != null;
 
-    private void FormulaSet(string? filename) {
+        private void FormulaSet(string? filename) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula);
 
         if (filename == null || !FileExists(filename)) {
@@ -154,6 +181,21 @@ public partial class FormulaView : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         FormulaSet(LoadTab.FileName);
+    }
+
+
+    private void SetItem(object? control) {
+        if (control is GenericControlReciver grc) {
+            _lastItem = grc.Item;
+        } else if (control is Control c) {
+            SetItem(c.Parent);
+            return;
+        } else {
+            _lastItem = null;
+        }
+
+        btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() &&  _lastItem is IItemAcceptFilter;
+        btnAusgehendeDatenbank.Enabled  = Generic.IsAdministrator() && _lastItem is IItemSendFilter;
     }
 
     #endregion

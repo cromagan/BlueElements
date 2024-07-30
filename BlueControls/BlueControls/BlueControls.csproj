@@ -548,7 +548,7 @@
     <Compile Include="Controls\EasyPic.Designer.cs">
       <DependentUpon>EasyPic.cs</DependentUpon>
     </Compile>
-    <Compile Include="EventArgs\BasicListItemEventArgs.cs" />
+    <Compile Include="EventArgs\AbstractListItemEventArgs.cs" />
     <Compile Include="EventArgs\ContextMenuInitEventArgs.cs" />
     <Compile Include="EventArgs\FilterCommandEventArgs.cs" />
     <Compile Include="Controls\FlexiControl.cs">
