@@ -133,7 +133,10 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
 
     public abstract bool ParseThis(string key, string value);
 
-    public override string ToString() {
+    public override string ToString() => ToParseableString();
+
+
+    public virtual string ToParseableString() {
         List<string> result = [];
 
         var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);

@@ -83,11 +83,11 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         if (_lastItem is not AbstractPadItem api) { return; }
 
         Database.ForceSaveAll();
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(false);
 
         InputBoxEditor.Show(api, true);
 
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(true);
 
         CFormula.InvalidateView();
     }
@@ -102,7 +102,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(true);
 
         if (e.Item == null) { return; }
         FormulaSet(e.Item.KeyName);
@@ -133,11 +133,13 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         FormulaSet(tmpFormula);
     }
 
+
+
     private void FormulaSet(ConnectedFormula.ConnectedFormula? cf) {
         if (IsDisposed) { return; }
 
         if (cf != null && !cf.IsDisposed) {
-            DropMessages = cf.IsAdministrator();
+            DropMessages = Generic.IsAdministrator();
         }
 
         CFormula.InitFormula(cf, null);

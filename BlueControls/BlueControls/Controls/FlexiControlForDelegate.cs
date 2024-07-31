@@ -52,7 +52,7 @@ public class FlexiControlForDelegate : FlexiControl, IDisposableExtended {
         if (GetButton() is Button c0) {
             c0.Text = text;
             if (image is ImageCode im) {
-                c0.ImageCode = QuickImage.Get(im, 22).ToString();
+                c0.ImageCode = QuickImage.Get(im, 22).ToParseableString();
             }
         }
 

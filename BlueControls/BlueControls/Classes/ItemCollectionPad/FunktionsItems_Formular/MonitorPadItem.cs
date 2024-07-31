@@ -165,14 +165,14 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         return QuickImage.Get(ImageCode.Textdatei, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
         //result.ParseableAdd("Pfad", _pfad);
         //result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
         //result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

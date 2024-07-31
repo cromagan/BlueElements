@@ -187,11 +187,11 @@ public abstract class RectanglePadItem : AbstractPadItem {
         _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         result.ParseableAdd("Rotation", Drehwinkel);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override RectangleF CalculateUsedArea() => new(Math.Min(_pLo.X, _pRu.X),

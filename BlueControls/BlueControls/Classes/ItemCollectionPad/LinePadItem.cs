@@ -139,11 +139,11 @@ public class LinePadItem : AbstractPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         result.ParseableAdd("Connection", Linien_Verhalten);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override RectangleF CalculateUsedArea() {
@@ -217,7 +217,7 @@ public class LinePadItem : AbstractPadItem {
     }
 
     private void CalcTempPoints() {
-        var newCode = _point1 + _point2.ToString();
+        var newCode = _point1 + _point2.ToParseableString();
         if (_calcTempPointsCode != newCode) {
             _calcTempPointsCode = newCode;
             _tempPoints = null;

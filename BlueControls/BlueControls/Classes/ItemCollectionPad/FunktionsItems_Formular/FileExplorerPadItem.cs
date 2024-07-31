@@ -252,7 +252,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
@@ -261,7 +261,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         result.ParseableAdd("Filter", _filter);
         result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
         result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

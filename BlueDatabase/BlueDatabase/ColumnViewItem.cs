@@ -45,7 +45,7 @@ public sealed class ColumnViewItem : IParseable {
         ViewType = ViewType.None;
         Column = null;
         X_WithSlider = null;
-        X= null;
+        X = null;
         TmpAutoFilterLocation = Rectangle.Empty;
         TmpReduceLocation = Rectangle.Empty;
         TmpDrawWidth = null;
@@ -58,18 +58,6 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnItem? Column { get; private set; }
 
-
-
-    /// <summary>
-    /// Koordinate der Spalte mit einbrechneten Slider
-    /// </summary>
-    public int? X_WithSlider { get; set; }
-
-
-    /// <summary>
-    /// Koordinate der Spalte ohne Slider
-    public int? X { get; set; }
-
     public Rectangle TmpAutoFilterLocation { get; set; }
 
     public int? TmpDrawWidth { get; set; }
@@ -79,6 +67,15 @@ public sealed class ColumnViewItem : IParseable {
     public Rectangle TmpReduceLocation { get; set; }
 
     public ViewType ViewType { get; set; }
+
+    /// <summary>
+    /// Koordinate der Spalte ohne Slider
+    public int? X { get; set; }
+
+    /// <summary>
+    /// Koordinate der Spalte mit einbrechneten Slider
+    /// </summary>
+    public int? X_WithSlider { get; set; }
 
     private ColumnViewCollection Parent { get; }
 
@@ -179,12 +176,14 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
 
-    public override string ToString() {
+    public string ToParseableString() {
         var result = new List<string>();
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
         return result.Parseable();
     }
+
+    public override string ToString() => ToParseableString();
 
     #endregion
 }

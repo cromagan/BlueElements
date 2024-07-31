@@ -80,7 +80,7 @@ public class VariableFilterItem : Variable {
 
     public override object Clone() {
         var v = new VariableFilterItem(KeyName);
-        v.Parse(ToString());
+        v.Parse(ToParseableString());
         return v;
     }
 

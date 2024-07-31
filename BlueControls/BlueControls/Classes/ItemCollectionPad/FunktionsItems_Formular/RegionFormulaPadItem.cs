@@ -63,7 +63,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         _itemAccepts = new();
 
         if (CFormula != null) {
-            CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
+            CFormula.PropertyChanged += CFormula_PropertyChanged;
         }
     }
 
@@ -202,7 +202,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             case "parent":
                 CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
                 if (CFormula != null) {
-                    CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
+                    CFormula.PropertyChanged += CFormula_PropertyChanged;
                 }
                 return true;
 
@@ -235,20 +235,20 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("Parent", CFormula);
+        result.ParseableAdd("Parent", CFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Child", _child);
         result.ParseableAdd("BorderStyle", _rahmenStil);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
             if (CFormula != null) {
-                CFormula.NotAllowedChildsChanged -= NotAllowedChilds_Changed;
+                CFormula.PropertyChanged -= CFormula_PropertyChanged;
             }
         }
     }
@@ -307,7 +307,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         }
     }
 
-    private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
+    private void CFormula_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (CFormula == null) { return; }
 

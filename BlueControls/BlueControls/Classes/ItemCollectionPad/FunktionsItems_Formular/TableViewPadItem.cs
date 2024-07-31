@@ -237,11 +237,11 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

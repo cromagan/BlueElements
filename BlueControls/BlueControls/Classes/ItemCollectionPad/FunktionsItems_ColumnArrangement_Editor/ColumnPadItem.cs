@@ -127,14 +127,14 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         TableView.OpenColumnEditor(Column, null, null);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
         result.ParseableAdd("Database", Column?.Database);
         result.ParseableAdd("ColumnName", Column);
 
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {

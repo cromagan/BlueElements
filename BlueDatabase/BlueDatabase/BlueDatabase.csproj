@@ -138,7 +138,7 @@
     <Compile Include="Enums\ScriptType.cs" />
     <Compile Include="Enums\TranslationType.cs" />
     <Compile Include="Enums\CaptionPosition.cs" />
-    <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
+    <Compile Include="EventArgs\DatabaseFileGiveBackEventArgs.cs" />
     <Compile Include="Interfaces\ITranslateAble.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />

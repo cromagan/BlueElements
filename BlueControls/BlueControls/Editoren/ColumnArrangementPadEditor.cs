@@ -214,7 +214,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (mitVorlage && ca != null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(db, ca.ToString(), newname));
+            car.Add(new ColumnViewCollection(db, ca.ToParseableString(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }

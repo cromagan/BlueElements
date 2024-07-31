@@ -245,7 +245,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
@@ -255,7 +255,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
         result.ParseableAdd("Caption", _überschriftanordung);
         //result.ParseableAdd("ID", ColorId);
 
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

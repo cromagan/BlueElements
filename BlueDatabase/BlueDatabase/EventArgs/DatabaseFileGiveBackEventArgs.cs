@@ -19,7 +19,7 @@
 
 namespace BlueDatabase.EventArgs;
 
-public class MultiUserFileGiveBackEventArgs : System.EventArgs {
+public class DatabaseFileGiveBackEventArgs : System.EventArgs {
 
     #region Properties
 

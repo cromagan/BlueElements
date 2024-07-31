@@ -89,7 +89,7 @@ public class VariableFloat : Variable {
 
     public override object Clone() {
         var v = new VariableFloat(KeyName);
-        v.Parse(ToString());
+        v.Parse(ToParseableString());
         return v;
     }
 

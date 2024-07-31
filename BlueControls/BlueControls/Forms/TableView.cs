@@ -768,7 +768,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
         Database.ForceSaveAll();
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(false);
 
         if (Table.Database is Database db && !db.IsDisposed) {
             _ = ExecuteFile(db.Filename.FilePath());
@@ -899,7 +899,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         Database.ForceSaveAll();
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(false);
         _ = ExecuteFile(Path.GetTempPath());
     }
 
@@ -1115,7 +1115,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Table.Refresh();
 
         Database.ForceSaveAll();
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(false);
 
         if (e.TabPage == null) { return; }
 

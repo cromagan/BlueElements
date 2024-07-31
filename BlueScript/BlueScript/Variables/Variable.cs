@@ -269,14 +269,14 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
     }
 
-    public new string ToString() {
+    public new string ToParseableString() {
         if (!ToStringPossible) { return string.Empty; }
 
         List<string> result = [];
         result.ParseableAdd("Value", ValueForReplace);
         result.ParseableAdd("Comment", Comment);
         result.ParseableAdd("ReadOnly", ReadOnly);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected abstract Variable? NewWithThisValue(object? x);

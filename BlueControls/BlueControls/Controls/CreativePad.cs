@@ -549,8 +549,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     protected override RectangleF MaxBounds() => _item?.MaxBounds(_currentPage) ?? new RectangleF(0, 0, 0, 0);
 
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 
     protected override void OnMouseDown(MouseEventArgs e) => DoMouseDown(e);

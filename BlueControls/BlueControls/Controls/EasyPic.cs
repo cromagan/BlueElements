@@ -197,8 +197,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         FileName = ct;
     }
 
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);
         if (!Enabled) {

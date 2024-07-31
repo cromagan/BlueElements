@@ -135,7 +135,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         return s;
     }
 
-    public object Clone() => new DatabaseScriptDescription(Database, ToString());
+    public object Clone() => new DatabaseScriptDescription(Database, ToParseableString());
 
     public override int CompareTo(object obj) {
         if (obj is DatabaseScriptDescription v) {
@@ -248,16 +248,16 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         return QuickImage.Get(symb, 16, c, Color.Transparent, h);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         try {
             if (IsDisposed) { return string.Empty; }
             List<string> result = [];
             result.ParseableAdd("NeedRow", _needRow);
             result.ParseableAdd("Events", _eventTypes);
-            return result.Parseable(base.ToString());
+            return result.Parseable(base.ToParseableString());
         } catch {
             Develop.CheckStackForOverflow();
-            return ToString();
+            return ToParseableString();
         }
     }
 

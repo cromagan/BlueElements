@@ -114,10 +114,8 @@
     <Compile Include="Enums\ScriptEventTypes.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="EventArgs\CancelReasonEventArgs.cs" />
+    <Compile Include="EventArgs\EditingEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
-    <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
-    <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
-    <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
     <Compile Include="Extensions\DateExtensions.cs" />
     <Compile Include="Extensions\FloatExtensions.cs" />
     <Compile Include="Extensions\IntExtensions.cs" />

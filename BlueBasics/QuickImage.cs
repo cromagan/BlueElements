@@ -322,6 +322,9 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
 
     public QuickImage SymbolForReadableText() => this;
 
+
+    public string ToParseableString() => Code;
+
     /// <summary>
     /// Gibt den ImageCode zurück
     /// </summary>

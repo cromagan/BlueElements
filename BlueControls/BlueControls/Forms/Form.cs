@@ -133,7 +133,8 @@ public partial class Form : System.Windows.Forms.Form {
 
         if (this is not FloatingForm and not MessageBox) {
             Database.ForceSaveAll();
-            MultiUserFile.ForceLoadSaveAll();
+            MultiUserFile.SaveAll(false);
+            MultiUserFile.SaveAll(true);
         }
 
         base.OnFormClosing(e);

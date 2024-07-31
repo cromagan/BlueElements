@@ -141,7 +141,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         get => _gridShow;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(_gridShow - value) < FineTolerance) { return; }
+            if (Math.Abs(_gridShow - value) < DefaultTolerance) { return; }
             _gridShow = value;
             OnPropertyChanged();
         }
@@ -155,7 +155,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         get => _gridsnap;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(_gridsnap - value) < FineTolerance) { return; }
+            if (Math.Abs(_gridsnap - value) < DefaultTolerance) { return; }
             _gridsnap = value;
             OnPropertyChanged();
         }
@@ -180,8 +180,8 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         get => _sheetSizeInMm;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(value.Width - _sheetSizeInMm.Width) < FineTolerance &&
-                Math.Abs(value.Height - _sheetSizeInMm.Height) < FineTolerance) { return; }
+            if (Math.Abs(value.Width - _sheetSizeInMm.Width) < DefaultTolerance &&
+                Math.Abs(value.Height - _sheetSizeInMm.Height) < DefaultTolerance) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
             GenPoints();
             OnPropertyChanged();
@@ -688,7 +688,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return I;
     }
 
-    public new string ToString() {
+    public new string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         //result.ParseableAdd("ID", KeyName);

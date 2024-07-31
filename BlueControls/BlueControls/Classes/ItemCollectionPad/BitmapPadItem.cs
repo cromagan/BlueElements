@@ -199,7 +199,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         return false;
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
@@ -211,7 +211,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         result.ParseableAdd("Padding", Padding);
         result.ParseableAdd("Image", Bitmap);
 
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {

@@ -239,7 +239,7 @@ public class DimensionPadItem : AbstractPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) => CalculateOtherPoints();
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         result.ParseableAdd("Text1", Text_Oben);
@@ -248,7 +248,7 @@ public class DimensionPadItem : AbstractPadItem {
         result.ParseableAdd("refix", Präfix);
         result.ParseableAdd("Suffix", Suffix);
         result.ParseableAdd("AdditionalScale", Skalierung);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override RectangleF CalculateUsedArea() {

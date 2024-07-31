@@ -102,7 +102,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    internal new string ToString() {
+    public string ToParseableString() {
         List<string> result = [];
         result.ParseableAdd("Item1", Item1.KeyName);
         result.ParseableAdd("Arrow1", ArrowOnItem1);

@@ -166,7 +166,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void AddUndoToTable(UndoItem work) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToString(), null, "New Undo Item");
+        var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToParseableString(), null, "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("ColumnName", work.ColName, string.Empty);

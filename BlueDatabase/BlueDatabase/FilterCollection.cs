@@ -246,7 +246,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Clear();
 
         if (fc != null) {
-            var reallydifferent = fc.ToString() != ToString();
+            var reallydifferent = fc.ToParseableString() != ToParseableString();
             foreach (var thisf in fc) {
                 if (!Exists(thisf) && thisf.IsOk() && thisf.Clone() is FilterItem nfi) { AddAndRegisterEvents(nfi); }
             }
@@ -475,7 +475,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <summary>
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
-    public void RemoveOtherAndAdd(FilterItem fi) {
+    public void RemoveOtherAndAdd(FilterItem? fi) {
+        if(fi == null) { return; }
         if (IsDisposed) { return; }
         if (Exists(fi)) { return; }
         if (!fi.IsOk()) {
@@ -565,7 +566,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public List<FilterItem> ToList() => _internal;
 
-    public override string ToString() {
+    public override string ToString() => ToParseableString();
+
+    public string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
@@ -601,7 +604,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void AddAndRegisterEvents(FilterItem fi) {
         if (_internal.Count > 0) {
             if (fi.FilterType != FilterType.AlwaysFalse && _internal[0].FilterType != FilterType.AlwaysFalse) {
-                if (_internal[0].Database != fi.Database ) {
+                if (_internal[0].Database != fi.Database) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
                 }
             }

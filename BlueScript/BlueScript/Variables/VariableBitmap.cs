@@ -70,7 +70,7 @@ public class VariableBitmap : Variable {
 
     public override object Clone() {
         var v = new VariableBitmap(KeyName);
-        v.Parse(ToString());
+        v.Parse(ToParseableString());
         return v;
     }
 

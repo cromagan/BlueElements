@@ -125,7 +125,9 @@ public sealed class RowSortDefinition : IParseable {
         }
     }
 
-    public override string ToString() {
+    public override string ToString() => ToParseableString();
+
+    public string ToParseableString() {
         var result = new List<string>();
         result.ParseableAdd("Reverse", Reverse);
         result.ParseableAdd("Columns", Columns, true);

@@ -275,7 +275,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
-        var n = "FontName-" + ToString();
+        var n = "FontName-" + ToParseableString();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
@@ -442,7 +442,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
-        var n = "Font-" + ToString();
+        var n = "Font-" + ToParseableString();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
@@ -459,14 +459,14 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             gr.DrawLine(Pen(1f), 3, 4, 29, 8);
         }
 
-        var n = "Line-" + ToString();
+        var n = "Line-" + ToParseableString();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
     }
 
-    public new string ToString() => ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
+    public new string ToParseableString() => ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
 
     internal SizeF CharSize(char c) {
         if (c <= _charSize.GetUpperBound(0)) {

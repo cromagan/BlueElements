@@ -179,14 +179,14 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public override void ProcessStyleChange() => RemovePic();
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         result.ParseableAdd("LayoutFileName", _layoutFileName);
         result.ParseableAdd("Database", Database);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
         if (Row is RowItem r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void GeneratePic() {

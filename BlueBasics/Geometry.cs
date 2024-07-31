@@ -163,11 +163,11 @@ public static class Geometry {
     public static PointF PointOnLine(PointF maus, float pX, float pY, float qX, float qY) {
         //http://de.wikipedia.org/wiki/Geradengleichung
         // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen
-        if (Math.Abs(pY - qY) < FineTolerance) // genau Waagerecht
+        if (Math.Abs(pY - qY) < DefaultTolerance) // genau Waagerecht
         {
             return maus with { Y = pY };
         }
-        if (Math.Abs(pX - qX) < FineTolerance) // genau Senkrecht
+        if (Math.Abs(pX - qX) < DefaultTolerance) // genau Senkrecht
         {
             return maus with { X = pX };
         }

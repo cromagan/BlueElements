@@ -175,7 +175,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     public virtual void AddedToCollection() { }
 
     public object? Clone() {
-        var x = ToString();
+        var x = ToParseableString();
 
         var i = NewByParsing<AbstractPadItem>(x);
         i?.Parse(x);
@@ -432,7 +432,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// </summary>
     public virtual void ProcessStyleChange() { }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
@@ -451,7 +451,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
         result.ParseableAdd("Tags", Tags, false);
 
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     public void UpdateSideOptionMenu() => OnDoUpdateSideOptionMenu();

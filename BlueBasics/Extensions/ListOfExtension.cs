@@ -155,7 +155,7 @@ public static partial class Extensions {
 
         foreach (var item in value) {
             var tmp2 = string.Empty;
-            if (item != null) { tmp2 = item.ToString(); }
+            if (item != null) { tmp2 = item.ToParseableString(); }
             if (!string.IsNullOrEmpty(tmp2)) {
                 txt = txt + nameofeveryItem + "=" + tmp2.ToNonCritical() + ", ";
             }
@@ -259,7 +259,7 @@ public static partial class Extensions {
 
         if (value is IDisposableExtended d && d.IsDisposed) { return; }
 
-        col.Add(tagname + "=" + value.ToString().ToNonCritical());
+        col.Add(tagname + "=" + value.ToParseableString().ToNonCritical());
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
@@ -449,7 +449,7 @@ public static partial class Extensions {
         var tmp = string.Empty;
         foreach (var item in l) {
             var tmp2 = string.Empty;
-            if (item != null) { tmp2 = item.ToString(); }
+            if (item != null) { tmp2 = item.ToParseableString(); }
             if (tmp2.Contains("\r")) { Develop.DebugPrint(FehlerArt.Fehler, "List.Tostring hat einen Zeilenumbruch gefunden."); }
             if (!removeEmpty || !string.IsNullOrEmpty(tmp2)) {
                 tmp = tmp + tmp2 + "\r";

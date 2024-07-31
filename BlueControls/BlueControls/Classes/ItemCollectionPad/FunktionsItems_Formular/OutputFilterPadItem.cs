@@ -296,7 +296,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IItemToControl, IReadable
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
 
@@ -307,7 +307,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IItemToControl, IReadable
         result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
         result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
 
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

@@ -128,7 +128,7 @@ public static class Constants {
     public static readonly int RowCaptionSizeY = 50;
     public static readonly Encoding Win1252 = Encoding.GetEncoding(1252);
     public static float DefaultTolerance = 0.0001f;
-    public static double FineTolerance = 0.0000001d;
+    //public static double FineTolerance = 0.0000001d; // Es werden nur 5 Nachkommastellen auf Festplatte gespeichert
     public static float IntTolerance = 0.5f;
 
     #endregion

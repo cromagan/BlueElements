@@ -290,7 +290,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
@@ -298,7 +298,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschriftanordung);
         result.ParseableAdd("AutoDistance", _autoX);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

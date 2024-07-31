@@ -100,7 +100,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public event EventHandler? Esc;
 
-    public event EventHandler<MultiUserFileGiveBackEventArgs>? NeedDatabaseOfAdditinalSpecialChars;
+    public event EventHandler<DatabaseFileGiveBackEventArgs>? NeedDatabaseOfAdditinalSpecialChars;
 
     public event EventHandler? Tab;
 
@@ -847,7 +847,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void AddSpecialChar() {
         var x = _cursorCharPos;
-        MultiUserFileGiveBackEventArgs e = new();
+        DatabaseFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
         var i = new List<AbstractListItem>();
 
@@ -1079,7 +1079,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void OnESC() => Esc?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
+    private void OnNeedDatabaseOfAdditinalSpecialChars(DatabaseFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
 
     private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
 

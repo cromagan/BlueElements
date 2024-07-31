@@ -458,7 +458,9 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public override string ToString() {
+    public override string ToString() => ToParseableString();
+
+    public string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
 
         try {
@@ -476,7 +478,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             return result.Parseable();
         } catch {
             Develop.CheckStackForOverflow();
-            return ToString();
+            return ToParseableString();
         }
     }
 

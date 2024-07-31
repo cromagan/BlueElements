@@ -17,7 +17,7 @@
 
 #nullable enable
 
-namespace BlueControls.EventArgs;
+namespace BlueBasics.EventArgs;
 
 public class EditingEventArgs : System.EventArgs {
 

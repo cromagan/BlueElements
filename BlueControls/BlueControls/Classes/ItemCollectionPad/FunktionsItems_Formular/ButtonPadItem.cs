@@ -517,7 +517,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
@@ -536,7 +536,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         result.ParseableAdd("QuickInfo", _quickinfo);
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
         result.ParseableAdd("Action", _action);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

@@ -23,7 +23,7 @@ public interface IStringable {
 
     #region Methods
 
-    string ToString();
+    string ToParseableString();
 
     #endregion
 }

@@ -244,7 +244,9 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         return null;
     }
 
-    public override string ToString() {
+    public override string ToString() => ToParseableString();
+
+    public virtual string ToParseableString() {
         try {
             if (IsDisposed) { return string.Empty; }
             List<string> result = [];
@@ -261,7 +263,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             return result.Parseable();
         } catch {
             Develop.CheckStackForOverflow();
-            return ToString();
+            return ToParseableString();
         }
     }
 

@@ -92,11 +92,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
-
     public event EventHandler<MoveEventArgs>? Moved;
 
     public event EventHandler<MoveEventArgs>? Moving;
+
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
@@ -127,7 +127,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     public float X {
         get => _x;
         set {
-            if (Math.Abs(_x - value) < FineTolerance) { return; }
+            if (Math.Abs(_x - value) < DefaultTolerance) { return; }
             SetTo(value, _y);
         }
     }
@@ -135,7 +135,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     public float Y {
         get => _y;
         set {
-            if (Math.Abs(_y - value) < FineTolerance) { return; }
+            if (Math.Abs(_y - value) < DefaultTolerance) { return; }
             SetTo(_x, value);
         }
     }
@@ -179,11 +179,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         SetTo(_x / magnitude, _y / magnitude);
     }
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
-
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
     public void OnMoving(MoveEventArgs e) => Moving?.Invoke(this, e);
+
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 
@@ -249,7 +249,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public void SetTo(int x, int y) => SetTo(x, (float)y);
 
-    public override string ToString() {
+    public string ToParseableString() {
         List<string> result = [];
 
         if (Parent != null) {
@@ -274,6 +274,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         result.ParseableAdd("Tag", _tag);
         return result.Parseable();
     }
+
+    public override string ToString() => ToParseableString();
 
     public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 

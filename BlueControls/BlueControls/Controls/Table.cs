@@ -305,7 +305,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
     public RowSortDefinition? SortDefinitionTemporary {
         get => _sortDefinitionTemporary;
         set {
-            if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ToString() == value.ToString()) { return; }
+            if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ToParseableString() == value.ToParseableString()) { return; }
             if (_sortDefinitionTemporary == value) { return; }
             _sortDefinitionTemporary = value;
             _Database_SortParameterChanged(this, System.EventArgs.Empty);
@@ -693,7 +693,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             db1.DisposingEvent -= _database_Disposing;
             db1.InvalidateView -= Database_InvalidateView;
             Database.ForceSaveAll();
-            MultiUserFile.ForceLoadSaveAll();
+            MultiUserFile.SaveAll(false);
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
@@ -2381,7 +2381,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 
-    private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
+    private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseFileGiveBackEventArgs e) => e.File = Database;
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }

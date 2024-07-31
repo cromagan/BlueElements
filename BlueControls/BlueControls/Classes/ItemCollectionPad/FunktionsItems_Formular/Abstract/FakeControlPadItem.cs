@@ -224,7 +224,7 @@ public abstract class FakeControlPadItem : RectanglePadItem, IHasKeyName, IPrope
 
     public abstract QuickImage? SymbolForReadableText();
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
 
@@ -234,7 +234,7 @@ public abstract class FakeControlPadItem : RectanglePadItem, IHasKeyName, IPrope
             result.ParseableAdd("VisibleFor", VisibleFor, false);
         }
 
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, int colorId, Alignment al, float valueArrow, float xmod) {

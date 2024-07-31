@@ -33,6 +33,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Security;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -59,7 +60,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         _itemAccepts = new();
 
         if (CFormula != null) {
-            CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
+            CFormula.PropertyChanged += CFormula_PropertyChanged;
         }
     }
 
@@ -261,7 +262,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
             case "parent":
                 CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
                 if (CFormula != null) {
-                    CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
+                    CFormula.PropertyChanged += CFormula_PropertyChanged;
                 }
                 return true;
 
@@ -300,19 +301,19 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("Parent", CFormula);
+        result.ParseableAdd("Parent", CFormula?.Filename ?? string.Empty );
         result.ParseableAdd("Childs", _childs, false);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
             if (CFormula != null) {
-                CFormula.NotAllowedChildsChanged -= NotAllowedChilds_Changed;
+                CFormula.PropertyChanged -= CFormula_PropertyChanged;
             }
         }
     }
@@ -396,7 +397,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         UpdateSideOptionMenu();
     }
 
-    private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
+    private void CFormula_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (CFormula == null) { return; }
 

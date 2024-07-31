@@ -147,7 +147,7 @@ public class UndoItem : IParseable {
         return false;
     }
 
-    public new string ToString() {
+    public string ToParseableString() {
         List<string> result = [];
 
         result.ParseableAdd("T", TableName);

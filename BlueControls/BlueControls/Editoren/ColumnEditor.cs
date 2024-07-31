@@ -120,7 +120,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
     }
 
     private void btnCalculateMaxCellLenght_Click(object sender, System.EventArgs e) {
@@ -224,7 +224,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
     }
 
     private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column?.Useage() ?? "Fehler");
@@ -374,8 +374,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         txbName.AllowedChars = Constants.AllowedCharsVariableName;
         txbCaption.Text = _column.Caption;
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToString();
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).ToString();
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToParseableString();
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).ToParseableString();
         btnMultiline.Checked = _column.MultiLine;
         cbxFunction.Text = ((int)_column.Function).ToString();
         cbxRandLinks.Text = ((int)_column.LineLeft).ToString();

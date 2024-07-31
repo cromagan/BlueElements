@@ -365,14 +365,14 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
         result.ParseableAdd("EntityID", _entityID);
         result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
         result.ParseableAdd("Script", Script);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

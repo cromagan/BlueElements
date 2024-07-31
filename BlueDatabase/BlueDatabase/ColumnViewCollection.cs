@@ -159,7 +159,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             : new ColumnViewItem(column, ViewType.Column, this));
     }
 
-    public object Clone() => new ColumnViewCollection(Database, ToString());
+    public object Clone() => new ColumnViewCollection(Database, ToParseableString());
 
     public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
@@ -386,7 +386,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public override string ToString() {
+    public string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
 
         var result = new List<string>();
@@ -400,6 +400,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         return result.Parseable();
     }
+
+    public override string ToString() => ToParseableString();
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

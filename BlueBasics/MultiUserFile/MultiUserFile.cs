@@ -32,32 +32,31 @@ using static BlueBasics.IO;
 
 namespace BlueBasics.MultiUserFile;
 
-public sealed class MultiUserFile : IDisposableExtended {
+public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseable, IPropertyChangedFeedback {
 
     #region Fields
 
     private static readonly List<MultiUserFile> AllFiles = [];
     private readonly Timer _checker;
-    private readonly BackgroundWorker _pureBinSaver;
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _checkedAndReloadNeed;
     private int _checkerTickCount = -5;
-    private bool _doingTempFile;
+
+    //private bool _doingTempFile;
     private string _editNormalyError = string.Empty;
+
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _filename = string.Empty;
     private string _inhaltBlockdatei = string.Empty;
     private bool _initialLoadDone;
-    private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
+
+    //private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
     private string _lastSaveCode;
 
-    //private static string _lockLastastfile = string.Empty;
     private int _lockload;
 
-    private int _reloadDelaySecond = 10;
-
-    //private int _loadingThreadId = -1;
+    //private int _reloadDelaySecond = 10;
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -67,17 +66,16 @@ public sealed class MultiUserFile : IDisposableExtended {
     public MultiUserFile() {
         AllFiles.Add(this);
         //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
-        _pureBinSaver = new BackgroundWorker {
-            WorkerReportsProgress = true
-        };
-        _pureBinSaver.DoWork += PureBinSaver_DoWork;
-        _pureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
+        //_pureBinSaver = new BackgroundWorker {
+        //    WorkerReportsProgress = true
+        //};
+        //_pureBinSaver.DoWork += PureBinSaver_DoWork;
+        //_pureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
         _checker = new Timer(Checker_Tick);
         Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
         _lastSaveCode = string.Empty;
-        AutoDeleteBak = false;
 
         _ = _checker.Change(2000, 2000);
     }
@@ -86,27 +84,29 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Events
 
-    public event EventHandler? DiscardPendingChanges;
-
-    public event EventHandler<MultiUserFileHasPendingChangesEventArgs>? HasPendingChanges;
+    public event EventHandler<EditingEventArgs>? Editing;
 
     public event EventHandler? Loaded;
 
-    public event EventHandler? Loading;
-
-    public event EventHandler<MultiUserParseEventArgs>? ParseExternal;
-
-    public event EventHandler? SavedToDisk;
-
-    public event EventHandler<CancelEventArgs>? Saving;
-
-    public event EventHandler<MultiUserToListEventArgs>? ToListOfByte;
+    public event EventHandler? PropertyChanged;
 
     #endregion
 
     #region Properties
 
-    public bool AutoDeleteBak { get; }
+    public string _createDate { get; private set; } = string.Empty;
+
+    public string _creator { get; private set; } = string.Empty;
+
+    public string _loadedVersion { get; private set; } = "0.00";
+
+    public bool _parsing { get; private set; } = false;
+
+    public bool _saved { get; private set; } = true;
+
+    public bool _saving { get; private set; } = false;
+
+    public abstract string _type { get; }
 
     /// <summary>
     /// Load oder SaveAsAndChangeTo benutzen
@@ -131,7 +131,10 @@ public sealed class MultiUserFile : IDisposableExtended {
     public bool IsInSaveingLoop { get; private set; }
 
     public bool IsLoading { get; private set; }
+
     public bool IsSaving { get; private set; }
+
+    public string KeyName => Filename;
 
     public bool ReloadNeeded {
         get {
@@ -144,6 +147,8 @@ public sealed class MultiUserFile : IDisposableExtended {
             return false;
         }
     }
+
+    public abstract string Version { get; }
 
     /// <summary>
     ///
@@ -161,18 +166,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     #endregion
 
     #region Methods
-
-    public static void ForceLoadSaveAll() {
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
-            thisFile?.ForceLoadSave();
-            if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                ForceLoadSaveAll();
-                return;
-            }
-        }
-    }
 
     /// <summary>
     ///
@@ -204,10 +197,10 @@ public sealed class MultiUserFile : IDisposableExtended {
             _ = AllFiles.Remove(this);
             if (disposing) {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-                _ = Save(false);
-                while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
-                // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
-                _pureBinSaver.Dispose();
+                //_ = Save(false);
+                //while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
+                //// https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
+                //_pureBinSaver.Dispose();
                 _checker.Dispose();
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
@@ -229,7 +222,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         if (mode == EditableErrorReasonType.Load) {
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 0.1) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+            //if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             return string.Empty;
         }
 
@@ -252,7 +245,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
 
             // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
-            if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+            //if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             if (IsInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
             if (IsLoading) { return "Aktuell werden Daten geladen."; }
         }
@@ -291,6 +284,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
         }
         return string.Empty;
+
         // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
         static bool CheckForLastError(ref DateTime nextCheckUtc, ref string lastMessage) {
             if (DateTime.UtcNow.Subtract(nextCheckUtc).TotalSeconds < 0) { return true; }
@@ -298,11 +292,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             nextCheckUtc = DateTime.UtcNow.AddSeconds(5);
             return false;
         }
-    }
-
-    public void ForceLoadSave() {
-        _checkerTickCount = Math.Max(_reloadDelaySecond, 10) + 10;
-        Checker_Tick(null);
     }
 
     public bool IsFileAllowedToLoad(string fileName) {
@@ -324,12 +313,12 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
         if (!FileExists(fileNameToLoad)) {
-            if (createWhenNotExisting) {
-                SaveAsAndChangeTo(fileNameToLoad);
-            } else {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                return;
-            }
+            //if (createWhenNotExisting) {
+            //    SaveAsAndChangeTo(fileNameToLoad);
+            //} else {
+            Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+            return;
+            //}
         }
         Filename = fileNameToLoad;
         ReCreateWatcher();
@@ -360,21 +349,21 @@ public sealed class MultiUserFile : IDisposableExtended {
 
                 if (_initialLoadDone && !ReloadNeeded) { return true; }
 
-                OnLoading(System.EventArgs.Empty);
+                //OnLoading(System.EventArgs.Empty);
 
                 var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(EditableErrorReasonType.Load);
                 if (bLoaded == null) { return false; }
 
-                OnParseExternal(bLoaded);
+                this.Parse(bLoaded.ToStringWin1252());
 
                 _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
 
                 _initialLoadDone = true;
                 _checkedAndReloadNeed = false;
 
-                RepairOldBlockFiles();
+                //RepairOldBlockFiles();
 
-                OnLoaded();
+                OnLoaded(this, System.EventArgs.Empty);
 
                 return ReloadNeeded;
             } catch {
@@ -384,6 +373,39 @@ public sealed class MultiUserFile : IDisposableExtended {
                 _ = Interlocked.Decrement(ref _lockload);
             }
         }
+        return false;
+    }
+
+    public void OnPropertyChanged() {
+        if (IsDisposed) { return; }
+        if (_saving || IsLoading) { return; }
+
+        _saved = false;
+        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    public virtual void ParseFinished(string parsed) { }
+
+    public virtual bool ParseThis(string key, string value) {
+        //if (base.ParseThis(key, value)) { return true};
+
+        switch (key.ToLowerInvariant()) {
+            case "type":
+                return true;
+
+            case "version":
+                _loadedVersion = value;
+                return true;
+
+            case "createdate":
+                _createDate = value.FromNonCritical();
+                return true;
+
+            case "createname":
+                _creator = value.FromNonCritical();
+                return true;
+        }
+
         return false;
     }
 
@@ -397,30 +419,26 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (IsInSaveingLoop) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        var x = new CancelEventArgs();
-
-        OnSaving(x);
-        if (x.Cancel) { return false; }
-
         //OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
         var d = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
-        if (!mustSave && AgeOfBlockDatei >= 0) { RepairOldBlockFiles(); return false; }
-        while (OnHasPendingChanges()) {
+        if (!mustSave && AgeOfBlockDatei >= 0) {  return false; }
+
+        while (!_saved) {
             IsInSaveingLoop = true;
 
             var f = string.Empty;
             if (!Load_Reload()) { f = "Reload fehlgeschlagen"; }
 
             if (string.IsNullOrEmpty(f)) {
-                var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk(false); // Dateiname, Stand der Originaldatei, was gespeichert wurde
-                f = SaveRoutine(false, tmpFileName, fileInfoBeforeSaving, dataUncompressed);
+                var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk();
+                f = SaveRoutine(tmpFileName, fileInfoBeforeSaving, dataUncompressed);
             }
 
             if (!string.IsNullOrEmpty(f)) {
                 if (DateTime.UtcNow.Subtract(d).TotalSeconds > 40) {
                     // Da liegt ein größerer Fehler vor...
                     if (mustSave) { Develop.DebugPrint(FehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f); }
-                    RepairOldBlockFiles();
+                    //RepairOldBlockFiles();
                     IsInSaveingLoop = false;
                     return false;
                 }
@@ -435,30 +453,15 @@ public sealed class MultiUserFile : IDisposableExtended {
         return true;
     }
 
-    public void SaveAsAndChangeTo(string newFileName) {
-        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
-        _ = Save(true); // Original-Datei speichern, die ist ja dann weg.
-        // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
-        // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
-        RemoveWatcher();
-        Filename = newFileName;
-        OnDiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
-        var l = OnToListOfByte();
+    public virtual string ToParseableString() {
+        var result = new List<string>();
 
-        if (l == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenfehler!");
-            throw new Exception("Datenfehler!");
-        }
+        result.ParseableAdd("Type", _type);
+        result.ParseableAdd("Version", Version);
+        result.ParseableAdd("CreateDate", _createDate);
+        result.ParseableAdd("CreateName", _creator);
 
-        using (FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
-            x.Write(l.ToArray(), 0, l.ToArray().Length);
-            x.Flush();
-            x.Close();
-        }
-        //_data_On_Disk = l;
-        _lastSaveCode = GetFileInfo(Filename, true);
-        _checkedAndReloadNeed = false;
-        CreateWatcher();
+        return result.Parseable();
     }
 
     // ReSharper disable once UnusedMember.Global
@@ -488,13 +491,32 @@ public sealed class MultiUserFile : IDisposableExtended {
         return true;
     }
 
+    protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
+
+    protected virtual void OnLoaded(object sender, System.EventArgs e) {
+        Loaded?.Invoke(this, e);
+    }
+
+    //    if (l == null) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Datenfehler!");
+    //        throw new Exception("Datenfehler!");
+    //    }
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
+    //public void SaveAsAndChangeTo(string newFileName) {
+    //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
+    //    _ = Save(true); // Original-Datei speichern, die ist ja dann weg.
+    //                    // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
+    //                    // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
+    //    RemoveWatcher();
+    //    Filename = newFileName;
+    //    OnDiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
+    //    var l = ToParseableString();
     private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
     private void Checker_Tick(object? state) {
         if (IsLoading) { return; }
-        if (_pureBinSaver.IsBusy || IsSaving) { return; }
+        if (IsSaving) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
 
         _checkerTickCount++;
@@ -502,39 +524,35 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         // Ausstehende Arbeiten ermittelen
 
-        var mustSave = OnHasPendingChanges();
-
-        if (!_checkedAndReloadNeed && !mustSave) {
+        if (!_checkedAndReloadNeed && _saved) {
             _checkerTickCount = 0;
             return;
         }
 
         // Zeiten berechnen
-        _reloadDelaySecond = Math.Max(_reloadDelaySecond, 10);
-        var countSave = (Math.Min((_reloadDelaySecond / 10f) + 1, 10) * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
+        var reloadDelaySecond = 30;
+        var saveDelaySecond = 10; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
 
         var mustReload = ReloadNeeded;
 
-        if (mustReload && mustSave) {
-            if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return; }
-            // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
-            _ = Load_Reload();
-            return;
-        }
-
-        if (mustSave && _checkerTickCount > countSave) {
-            if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
-            if (!_pureBinSaver.IsBusy) { _pureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage überflüssig sein. Ist sie aber nicht
+        if (!mustReload && _saved) {
             _checkerTickCount = 0;
             return;
         }
 
-        // Überhaupt nix besonderes. Ab und zu mal Reloaden
-        if (mustReload && _checkerTickCount > _reloadDelaySecond) {
-            RepairOldBlockFiles();
-            if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return; }
+        if (!_saved) {
+            if (_checkerTickCount > saveDelaySecond &&
+                string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
+                _ = Save(false);
+            }
+            return;
+        }
+
+        if (mustReload) {
+            if (_checkerTickCount > reloadDelaySecond &&
+                string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return; }
             _ = Load_Reload();
-            _checkerTickCount = 0;
+            return;
         }
     }
 
@@ -637,60 +655,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         return (bLoaded, tmpLastSaveCode2);
     }
 
-    private void OnDiscardPendingChanges() {
-        if (IsDisposed) { return; }
-        DiscardPendingChanges?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    private bool OnHasPendingChanges() {
-        var x = new MultiUserFileHasPendingChangesEventArgs();
-        HasPendingChanges?.Invoke(this, x);
-        return x.HasPendingChanges;
-    }
-
-    private void OnLoaded() {
-        if (IsDisposed) { return; }
-        Loaded?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    private void OnLoading(System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Loading?.Invoke(this, e);
-    }
-
-    private void OnParseExternal(byte[] toParse) => ParseExternal?.Invoke(this, new MultiUserParseEventArgs(toParse));
-
-    private void OnSavedToDisk() {
-        if (IsDisposed) { return; }
-        SavedToDisk?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    private void OnSaving(CancelEventArgs e) {
-        if (IsDisposed) { return; }
-        Saving?.Invoke(this, e);
-    }
-
-    private byte[]? OnToListOfByte() {
-        var x = new MultiUserToListEventArgs();
-
-        ToListOfByte?.Invoke(this, x);
-        return x.Data;
-    }
-
-    private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e) {
-        try {
-            var data = WriteTempFileToDisk(true);
-            _pureBinSaver.ReportProgress(100, data);
-        } catch { }            // OPeration completed bereits aufgerufen
-    }
-
-    private void PureBinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-        if (e.UserState == null) { return; }
-        var (s, item2, bytes) = ((string, string, byte[]))e.UserState;
-        // var Data = (Tuple<string, string, string>)e.UserState;
-        _ = SaveRoutine(true, s, item2, bytes);
-    }
-
     private void ReCreateWatcher() {
         RemoveWatcher();
         CreateWatcher();
@@ -711,27 +675,27 @@ public sealed class MultiUserFile : IDisposableExtended {
         } catch { }
     }
 
-    private void RepairOldBlockFiles() {
-        if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
-        _lastMessageUtc = DateTime.UtcNow;
-        var sec = AgeOfBlockDatei;
-        try {
-            // Nach 15 Minuten versuchen die Datei zu reparieren
-            if (sec >= 900) {
-                if (!FileExists(Filename)) { return; }
-                _ = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
-                if (!CreateBlockDatei()) { return; }
-                var autoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
-                if (!CopyFile(Filename, autoRepairName, false)) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 1: " + Filename);
-                    return;
-                }
-                if (!DeleteBlockDatei(true, false)) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
-                }
-            }
-        } catch { }
-    }
+    //private void RepairOldBlockFiles() {
+    //    if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
+    //    _lastMessageUtc = DateTime.UtcNow;
+    //    var sec = AgeOfBlockDatei;
+    //    try {
+    //        // Nach 15 Minuten versuchen die Datei zu reparieren
+    //        if (sec >= 900) {
+    //            if (!FileExists(Filename)) { return; }
+    //            _ = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
+    //            if (!CreateBlockDatei()) { return; }
+    //            var autoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
+    //            if (!CopyFile(Filename, autoRepairName, false)) {
+    //                Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 1: " + Filename);
+    //                return;
+    //            }
+    //            if (!DeleteBlockDatei(true, false)) {
+    //                Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
+    //            }
+    //        }
+    //    } catch { }
+    //}
 
     /// <summary>
     /// Entfernt im Regelfall die Temporäre Datei
@@ -741,16 +705,16 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// <param name="fileInfoBeforeSaving"></param>
     /// <param name="savedDataUncompressed"></param>
     /// <returns></returns>
-    private string SaveRoutine(bool fromParallelProzess, string? tmpFileName, string? fileInfoBeforeSaving, IReadOnlyCollection<byte>? savedDataUncompressed) {
+    private string SaveRoutine(string? tmpFileName, string? fileInfoBeforeSaving, IReadOnlyCollection<byte>? savedDataUncompressed) {
         if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
             fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
             savedDataUncompressed == null || savedDataUncompressed.Count == 0) { return Feedback("Keine Daten angekommen."); }
-        if (!fromParallelProzess && _pureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
-        if (fromParallelProzess && IsInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen."); }
+        if (IsInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen."); }
         var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f); }
         if (string.IsNullOrEmpty(Filename)) { return Feedback("Kein Dateiname angegeben"); }
         if (IsSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen."); }
+
         IsSaving = true;
         var erfolg = CreateBlockDatei();
         if (!erfolg) {
@@ -764,7 +728,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             return Feedback("Datei wurde inzwischen verändert.");
         }
 
-        var lb = OnToListOfByte();
+        var lb = ToParseableString().WIN1252_toByte();
         if (lb == null) { return Feedback("Daten-Fehler"); }
 
         if (!savedDataUncompressed.SequenceEqual(lb)) {
@@ -790,11 +754,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         _ = CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
         _ = DeleteBlockDatei(false, true);
 
-        // Evtl. das BAK löschen
-        if (AutoDeleteBak && FileExists(Backupdateiname())) {
-            _ = DeleteFile(Backupdateiname(), false);
-        }
-
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
         var (data, fileinfo) = LoadBytesFromDisk(EditableErrorReasonType.LoadForCheckingOnly);
         if (data == null || !savedDataUncompressed.SequenceEqual(data)) {
@@ -808,7 +767,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         _checkedAndReloadNeed = false;
         _lastSaveCode = fileinfo;
-        OnSavedToDisk();
+        _saved = true;
         IsSaving = false;
         return string.Empty;
 
@@ -818,7 +777,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
 
             //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
-            RepairOldBlockFiles();
+            //RepairOldBlockFiles();
             return txt;
         }
     }
@@ -875,35 +834,35 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// </summary>
     /// <param name="iAmThePureBinSaver"></param>
     /// <returns>Dateiname, Stand der Originaldatei, was gespeichert wurde</returns>
-    private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
+    private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk() {
         string fileInfoBeforeSaving;
         string tmpFileName;
         byte[]? dataUncompressed;
 
         var count = 0;
-        if (!iAmThePureBinSaver && _pureBinSaver.IsBusy) { return (string.Empty, string.Empty, null); }
-        if (_doingTempFile) {
-            //if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
-            return (string.Empty, string.Empty, null);
-        }
 
-        _doingTempFile = true;
+        //if (_doingTempFile) {
+        //    //if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
+        //    return (string.Empty, string.Empty, null);
+        //}
+
+        //_doingTempFile = true;
 
         while (true) {
             count++;
 
-            if (!iAmThePureBinSaver) {
-                // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
-                // Somit sollte des Programm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
-                // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
-                Develop.LastUserActionUtc = new DateTime(1900, 1, 1);
-            }
+            //if (!iAmThePureBinSaver) {
+            //    // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
+            //    // Somit sollte des Programm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
+            //    // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
+            //    Develop.LastUserActionUtc = new DateTime(1900, 1, 1);
+            //}
 
             var f = EditableErrorReason(EditableErrorReasonType.Save);
-            if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }
+            if (!string.IsNullOrEmpty(f)) {  return (string.Empty, string.Empty, null); }
 
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
-            dataUncompressed = OnToListOfByte();
+            dataUncompressed = ToParseableString().WIN1252_toByte();
 
             if (dataUncompressed != null && dataUncompressed.Length > 0) {
                 tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
@@ -920,14 +879,14 @@ public sealed class MultiUserFile : IDisposableExtended {
 
             if (count > 15) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename);
-                _doingTempFile = false;
+                //_doingTempFile = false;
                 return (string.Empty, string.Empty, null);
             }
 
             Pause(1, true);
         }
 
-        _doingTempFile = false;
+        //_doingTempFile = false;
         return (tmpFileName, fileInfoBeforeSaving, dataUncompressed);
     }
 

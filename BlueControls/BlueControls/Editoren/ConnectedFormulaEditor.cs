@@ -34,6 +34,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using BlueBasics.Interfaces;
 using BlueDatabase;
+using BlueBasics.EventArgs;
 
 #nullable enable
 
@@ -74,8 +75,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         FormulaSet(filename, notAllowedchilds);
 
-        MultiUserFile.ForceLoadSaveAll();
-        Database.ForceSaveAll();
+        //MultiUserFile.SaveAll(false);
+        //Database.ForceSaveAll();
     }
 
     public ConnectedFormulaEditor() : this(string.Empty, null) { }
@@ -196,37 +197,37 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(true);
         FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(true);
+        //MultiUserFile.SaveAll(true);
 
-        if (sender == btnSaveAs) {
-            if (CFormula == null) { return; }
-        }
+        //if (sender == btnSaveAs) {
+        //    if (CFormula == null) { return; }
+        //}
 
-        if (sender == btnNeuDB) {
-            if (CFormula != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
-        }
+        //if (sender == btnNeuDB) {
+        //    if (CFormula != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
+        //}
 
-        _ = SaveTab.ShowDialog();
-        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
-        if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+        //_ = SaveTab.ShowDialog();
+        //if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
+        //if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        if (sender == btnNeuDB) {
-            FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
-        }
-        if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
+        //if (sender == btnNeuDB) {
+        //    FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
+        //}
+        //if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
-        CFormula?.SaveAsAndChangeTo(SaveTab.FileName);
+        //CFormula?.SaveAsAndChangeTo(SaveTab.FileName);
 
-        FormulaSet(SaveTab.FileName, null);
+        //FormulaSet(SaveTab.FileName, null);
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.SaveAll(true);
         _ = LoadTab.ShowDialog();
     }
 
@@ -260,7 +261,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //ChooseDatabaseAndId(it);
     }
 
-    private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();
+    private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.SaveAll(true);
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (CFormula == null) { return; }

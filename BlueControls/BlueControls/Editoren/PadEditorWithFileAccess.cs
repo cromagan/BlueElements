@@ -95,7 +95,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
-        var t = Pad.Item.ToString();
+        var t = Pad.Item.ToParseableString();
         WriteAllText(_lastFileName, t, Constants.Win1252, false);
     }
 
@@ -104,7 +104,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {
         if (Pad?.Item == null) { return; }
 
-        var t = Pad.Item.ToString();
+        var t = Pad.Item.ToParseableString();
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         _lastFileName = SaveTab.FileName;

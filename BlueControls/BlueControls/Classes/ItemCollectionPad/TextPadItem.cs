@@ -198,13 +198,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         InvalidateText();
     }
 
-    public override string ToString() {
+    public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         result.ParseableAdd("ReadableText", _textOriginal);
         result.ParseableAdd("Alignment", _ausrichtung);
         result.ParseableAdd("AdditionalScale", Skalierung);
-        return result.Parseable(base.ToString());
+        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

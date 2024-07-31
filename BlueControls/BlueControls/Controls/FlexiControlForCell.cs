@@ -681,7 +681,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = DatabaseInput;
+    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseFileGiveBackEventArgs e) => e.File = DatabaseInput;
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 

@@ -233,7 +233,6 @@
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="Enums\FlexiFilterDefaultFilter.cs" />
     <Compile Include="Enums\FlexiFilterDefaultOutput.cs" />
-    <Compile Include="EventArgs\EditingEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="Classes\FormManager.cs" />
     <Compile Include="Forms\Voting.cs">

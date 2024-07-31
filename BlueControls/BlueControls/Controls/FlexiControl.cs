@@ -468,7 +468,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public void StyleTextBox(TextBox control) {
+    public void StyleTextBox(TextBox? control) {
+        if(control == null) { return; } 
         //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.Verhalten = _multiLine || Height > 20

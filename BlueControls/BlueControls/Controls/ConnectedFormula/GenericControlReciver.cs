@@ -209,7 +209,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         var fn = (FilterCollection)fc.Clone("Normalize");
         fn.Normalize();
 
-        var n = "F" + Generic.GetHashString(fn.ToString());
+        var n = "F" + Generic.GetHashString(fn.ToParseableString());
         fn.Dispose();
 
         return n;
