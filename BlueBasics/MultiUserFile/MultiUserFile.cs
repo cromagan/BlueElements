@@ -300,7 +300,10 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public void ForceLoadSave() => _checkerTickCount = Math.Max(_reloadDelaySecond, 10) + 10;
+    public void ForceLoadSave() {
+        _checkerTickCount = Math.Max(_reloadDelaySecond, 10) + 10;
+        Checker_Tick(null);
+    }
 
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
@@ -489,7 +492,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
-    private void Checker_Tick(object state) {
+    private void Checker_Tick(object? state) {
         if (IsLoading) { return; }
         if (_pureBinSaver.IsBusy || IsSaving) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }

@@ -76,6 +76,22 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         }
     }
 
+    private void btnElementBearbeiten_Click(object sender, System.EventArgs e) {
+        DebugPrint_InvokeRequired(InvokeRequired, true);
+        if (CFormula.ConnectedFormula == null) { return; }
+
+        if (_lastItem is not AbstractPadItem api) { return; }
+
+        Database.ForceSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
+
+        InputBoxEditor.Show(api, true);
+
+        MultiUserFile.ForceLoadSaveAll();
+
+        CFormula.InvalidateView();
+    }
+
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
@@ -199,10 +215,12 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is IItemSendFilter;
 
         if (_lastItem is FakeControlPadItem fcpi) {
-            capClicked.Text = "<imagecode=Information|16> " +    fcpi.MyClassId;
+            capClicked.Text = "<imagecode=Information|16> " + fcpi.MyClassId;
             capClicked.QuickInfo = fcpi.Description;
+            btnElementBearbeiten.Enabled = Generic.IsAdministrator();
         } else {
             capClicked.Text = "-";
+            btnElementBearbeiten.Enabled = false;
         }
     }
 

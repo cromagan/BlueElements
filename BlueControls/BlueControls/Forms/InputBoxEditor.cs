@@ -46,35 +46,45 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Methods
 
+    public static void Show(ISimpleEditor? toEdit, bool isDialog) {
+        if (toEdit == null) { return; }
+        if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
+
+        Form mb = new InputBoxEditor(toEdit.GetControl(400));
+
+        if (isDialog) {
+            _ = mb.ShowDialog();
+            mb.Dispose();
+        } else {
+            mb.Show();
+        }
+    }
+
     public static void Show(IEditable? toEdit, bool isDialog) => Show(toEdit, toEdit?.Editor, isDialog);
 
-    public static void Show(IEditable? toEdit, Type? type) => Show(toEdit, type, true);
+    public static void Show(IEditable? toEdit, Type? editortype) => Show(toEdit, editortype, true);
 
-    public static void Show(IEditable? toEdit, Type? type, bool isDialog) {
+    public static void Show(IEditable? toEdit, Type? editortype, bool isDialog) {
         if (toEdit == null) { return; }
-        if (type == null && toEdit is not ISimpleEditor) { return; }
+        if (editortype == null) { return; }
 
         if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
 
-        toEdit.Editor = type;
+        toEdit.Editor = editortype;
 
         Form? mb = null;
 
         try {
-            if (toEdit is ISimpleEditor ise) {
-                mb = new InputBoxEditor(ise.GetControl(400));
-            } else {
-                object myObject = Activator.CreateInstance(toEdit.Editor);
+            object myObject = Activator.CreateInstance(toEdit.Editor);
 
-                if (myObject is IIsEditor ie) {
-                    ie.ToEdit = toEdit;
-                    if (ie is EditorEasy ea) {
-                        ea.Init(toEdit);
+            if (myObject is IIsEditor ie) {
+                ie.ToEdit = toEdit;
+                if (ie is EditorEasy ea) {
+                    ea.Init(toEdit);
 
-                        mb = new InputBoxEditor(ea);
-                    } else if (ie is Form frm) {
-                        mb = frm;
-                    }
+                    mb = new InputBoxEditor(ea);
+                } else if (ie is Form frm) {
+                    mb = frm;
                 }
             }
         } catch { }

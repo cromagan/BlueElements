@@ -33,6 +33,7 @@ using System.ComponentModel;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using BlueBasics.Interfaces;
+using BlueDatabase;
 
 #nullable enable
 
@@ -72,6 +73,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem(string.Empty));
 
         FormulaSet(filename, notAllowedchilds);
+
+        MultiUserFile.ForceLoadSaveAll();
+        Database.ForceSaveAll();
     }
 
     public ConnectedFormulaEditor() : this(string.Empty, null) { }
