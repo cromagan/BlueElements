@@ -24,7 +24,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -35,10 +34,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using ListBox = BlueControls.Controls.ListBox;
-using TabControl = BlueControls.Controls.TabControl;
-
-#nullable enable
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -79,10 +75,10 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
-
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -108,8 +104,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new TabControl();
+    public Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
+        var con = new Controls.TabControl();
         con.Name = this.DefaultItemToControlName();
         // Die Input-Settings werden direkt auf das erzeugte
         //con.DoInputSettings(parent, this);
@@ -117,7 +113,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         return con;
     }
 
-    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
+    public void CreateTabs(Controls.TabControl tabctrl, Controls.ConnectedFormulaView parentView, string mode) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -159,7 +155,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
 
             if (cf != null) {
                 if (cf.HasVisibleItemsForMe(pgvis, mode)) {
-                    ConnectedFormulaView? cc;
+                    Controls.ConnectedFormulaView? cc;
 
                     if (existTab == null) {
 
@@ -171,7 +167,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
                         };
                         tabctrl.TabPages.Add(t);
 
-                        cc = new ConnectedFormulaView(mode, pg);
+                        cc = new Controls.ConnectedFormulaView(mode, pg);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.DatabaseInput);
@@ -188,7 +184,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
                         #region ConnectedFormulaView (cc) im Tab Suchen
 
                         foreach (var thisControl in existTab.Controls) {
-                            if (thisControl is ConnectedFormulaView cctmp) {
+                            if (thisControl is Controls.ConnectedFormulaView cctmp) {
                                 cc = cctmp;
                                 break;
                             }
@@ -353,15 +349,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new TabFormulaPadItem(name);
-    //    }
-    //    return null;
-    //}
-
-    private ListBox Childs() {
-        var childs = new ListBox {
+    private Controls.ListBox Childs() {
+        var childs = new Controls.ListBox {
             AddAllowed = AddType.OnlySuggests,
             RemoveAllowed = true,
             MoveAllowed = true,
@@ -392,7 +381,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     }
 
     private void Childs_Disposed(object sender, System.EventArgs e) {
-        if (sender is ListBox childs) {
+        if (sender is Controls.ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.Disposed -= Childs_Disposed;
         }
@@ -401,7 +390,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         _childs.Clear();
-        _childs.AddRange(((ListBox)sender).Checked);
+        _childs.AddRange(((Controls.ListBox)sender).Checked);
         OnPropertyChanged();
         this.RaiseVersion();
         UpdateSideOptionMenu();

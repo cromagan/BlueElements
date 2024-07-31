@@ -49,7 +49,6 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private string _columnName = string.Empty;
-
     private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
@@ -122,7 +121,6 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
-
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -136,9 +134,9 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     [DefaultValue(null)]
     [Browsable(false)]

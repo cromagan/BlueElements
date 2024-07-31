@@ -51,7 +51,6 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     private readonly ItemAcceptFilter _itemAccepts;
     private string _child = string.Empty;
-
     private GroupBoxStyle _rahmenStil = GroupBoxStyle.Normal;
 
     #endregion
@@ -87,15 +86,12 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-
     public bool DatabaseInputMustMatchOutputDatabase => false;
-
     public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
-
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -131,7 +127,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
         var txt = "?";
@@ -141,7 +137,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             txt = _child.FileNameWithoutSuffix();
         }
 
-        var con = new ConnectedFormulaView(mode, "Head") {
+        var con = new Controls.ConnectedFormulaView(mode, "Head") {
             GroupBoxStyle = _rahmenStil
         };
 

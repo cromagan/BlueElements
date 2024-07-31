@@ -27,8 +27,7 @@ using System.Drawing.Design;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueBasics.Interfaces;
-
-#nullable enable
+using BlueControls.Interfaces;
 
 //Inherits UserControl ' -> Gibt Focus an Child!
 //Inherits ContainerControl -> ?
@@ -37,7 +36,7 @@ using BlueBasics.Interfaces;
 
 namespace BlueControls.Controls;
 
-public class GenericControl : Control, IDisposableExtendedWithEvent {
+public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocusedChild {
 
     #region Fields
 
@@ -79,6 +78,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     #endregion
 
     #region Events
+
+    public event EventHandler<ControlEventArgs>? ChildGotFocus;
 
     public event EventHandler? DisposingEvent;
 
@@ -249,7 +250,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         if (IsDisposed || Disposing) { return false; }
         if (DesignMode) { return true; }
         if (_pform == null || _pform.IsDisposed || !_pform.Visible) { return false; }
-        if (_pform is BlueControls.Forms.Form bf && bf.isClosing) { return false; }
+        if (_pform is Forms.Form bf && bf.isClosing) { return false; }
         return Visible;
     }
 
@@ -329,6 +330,24 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     protected bool MousePressing() => _mousePressing;
+
+    protected override void OnControlAdded(ControlEventArgs e) {
+        base.OnControlAdded(e);
+
+        if (e.Control is ISendsFocusedChild sfc) {
+            sfc.ChildGotFocus += Sfc_ChildGotFocus;
+        }
+        e.Control.GotFocus += Control_GotFocus;
+    }
+
+    protected override void OnControlRemoved(ControlEventArgs e) {
+        base.OnControlRemoved(e);
+
+        if (e.Control is ISendsFocusedChild sfc) {
+            sfc.ChildGotFocus += Sfc_ChildGotFocus;
+        }
+        e.Control.GotFocus -= Control_GotFocus;
+    }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
         if (InvokeRequired) {
@@ -508,6 +527,11 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         } catch { }
     }
 
+    private void Control_GotFocus(object sender, System.EventArgs e) {
+        if(sender is not Control c) { return; }
+        OnChildGotFocus(new ControlEventArgs(c));
+    }
+
     private void DoDraw(Graphics gr) {
         if (_pform == null) { CheckBack(); }
 
@@ -565,7 +589,11 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         return s;
     }
 
+    private void OnChildGotFocus(ControlEventArgs e) => ChildGotFocus?.Invoke(this, e);
+
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
+    private void Sfc_ChildGotFocus(object sender, ControlEventArgs e) => OnChildGotFocus(e);
 
     #endregion
 }

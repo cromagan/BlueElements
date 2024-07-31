@@ -46,6 +46,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #endregion
 
     #region Constructors
+
     public GenericControlReciver() : base(false, false) { }
 
     public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap) : base(doubleBuffer, useBackgroundBitmap) { }
@@ -53,9 +54,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #endregion
 
     #region Properties
-
-    public virtual string Mode { get; set; }
-
 
     public Database? DatabaseInput {
         get => _databaseInput;
@@ -88,6 +86,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
+    public AbstractPadItem? Item { get; set; } = null;
+    public virtual string Mode { get; set; }
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -97,8 +98,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool RowsInputManualSeted { get; private set; } = false;
-
-    public AbstractPadItem? Item { get; set; } = null;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -152,7 +151,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemAcceptFilter source, string mode) {
         Name = source.DefaultItemToControlName();
         Mode = mode;
-       if (source is AbstractPadItem ali) { Item = ali; }
+        if (source is AbstractPadItem ali) { Item = ali; }
 
         if (this is IHasSettings ihs) {
             ihs.SettingsManualFilename = ("%homepath%\\" + Develop.AppName() + "\\" + source.KeyName + ".ini").CheckFile();

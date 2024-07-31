@@ -37,6 +37,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
     public static string ClassId => "Physics-Object";
     public override string Description => string.Empty;
     public List<Kraft> Kraft { get; } = [];
+    public override string MyClassId => ClassId;
     protected override int SaveOrder => 999;
 
     #endregion

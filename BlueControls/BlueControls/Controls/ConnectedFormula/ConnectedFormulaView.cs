@@ -168,7 +168,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                             }
                         }
 
-
                         if (thisit is RowEntryPadItem rep) {
                             DoDefaultSettings(null, rep, Mode);
                         }
@@ -281,7 +280,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                 return null;
             }
 
-            if(c is GenericControlReciver gci && gci.Item != thisit) {
+            if (c is GenericControlReciver gci && gci.Item != thisit) {
                 Develop.DebugPrint("Item muss gesetzt werden!");
                 return null;
             }
@@ -341,8 +340,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
     }
 
-
-
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
@@ -352,8 +349,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             _timer.Enabled = false;
         }
     }
-
-
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 

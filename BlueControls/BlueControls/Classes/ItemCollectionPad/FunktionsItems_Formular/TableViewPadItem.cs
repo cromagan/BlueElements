@@ -101,9 +101,9 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();

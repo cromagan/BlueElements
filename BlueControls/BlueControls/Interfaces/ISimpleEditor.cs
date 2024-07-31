@@ -101,7 +101,7 @@ public static class SimpleEditorExtension {
         element.DoForm(l.Controls, l.Width);
 
         foreach (var control in l.Controls) {
-            if (control is System.Windows.Forms.Control c) {
+            if (control is Control c) {
                 l.Height = Math.Max(l.Height, c.Bottom);
             }
         }

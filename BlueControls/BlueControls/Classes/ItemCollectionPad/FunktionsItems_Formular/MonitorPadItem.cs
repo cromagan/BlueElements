@@ -41,7 +41,6 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     private readonly ItemAcceptFilter _itemAccepts;
 
-
     #endregion
 
     #region Constructors
@@ -58,21 +57,15 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     #region Properties
 
     public static string ClassId => "FI-Monitor";
-    public AllowedInputFilter AllowedInputFilter =>  AllowedInputFilter.One;
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
-
-
-
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Zeigt Änderungen einer Zeile an.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => true;
-
-
-
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -82,8 +75,6 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
-
-
 
     protected override int SaveOrder => 5;
 
@@ -113,8 +104,6 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
         b = _itemAccepts.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
-
-
 
         return string.Empty;
     }
@@ -204,6 +193,4 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     }
 
     #endregion
-
-
 }

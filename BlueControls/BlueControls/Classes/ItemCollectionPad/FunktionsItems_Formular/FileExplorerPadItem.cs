@@ -93,7 +93,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => true;
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
@@ -121,6 +120,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     }
 
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     [DefaultValue(null)]
     [Browsable(false)]

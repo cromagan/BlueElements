@@ -72,7 +72,7 @@ public class LinePadItem : AbstractPadItem {
     public static string ClassId => "LINE";
     public override string Description => string.Empty;
     public ConectorStyle Linien_Verhalten { get; set; }
-
+    public override string MyClassId => ClassId;
     protected override int SaveOrder => 999;
 
     #endregion

@@ -969,7 +969,7 @@ namespace BlueControls.Forms {
         private SaveFileDialog SaveTab;
         private Button btnSuchenUndErsetzen;
         protected TabPage tabFormula;
-        private ConnectedFormulaView CFO;
+        private Controls.ConnectedFormulaView CFO;
         private Button btnFormular;
         private GroupBox grpHilfen;
         private Button ckbZeilenclickInsClipboard;

@@ -56,11 +56,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public static string ClassId => "FI-Column";
     public ColumnItem? Column { get; }
-
     public string Datenbank => IsDisposed || Column?.Database is not Database db || db.IsDisposed ? "?" : db.TableName;
-
     public override string Description => string.Empty;
-
+    public override string MyClassId => ClassId;
     /// <summary>
     /// Wird von Flexoptions aufgerufen
     /// </summary>

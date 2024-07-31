@@ -108,6 +108,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();

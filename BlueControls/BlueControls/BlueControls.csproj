@@ -242,11 +242,11 @@
     <Compile Include="Forms\Voting.Designer.cs">
       <DependentUpon>Voting.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormulaView.cs">
+    <Compile Include="Forms\ConnectedFormulaView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormulaView.Designer.cs">
-      <DependentUpon>FormulaView.cs</DependentUpon>
+    <Compile Include="Forms\ConnectedFormulaView.Designer.cs">
+      <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormWithStatusBar.cs">
       <SubType>Form</SubType>
@@ -255,6 +255,7 @@
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IHasSettings.cs" />
+    <Compile Include="Interfaces\ISendsFocusedChild.cs" />
     <Compile Include="Interfaces\IIsEditor.cs" />
     <Compile Include="Interfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\IHasVersion.cs" />
@@ -813,8 +814,8 @@
       <DependentUpon>Voting.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormulaView.resx">
-      <DependentUpon>FormulaView.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\ConnectedFormulaView.resx">
+      <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormWithStatusBar.resx">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>

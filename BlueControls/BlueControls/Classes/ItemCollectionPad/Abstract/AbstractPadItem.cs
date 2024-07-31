@@ -58,6 +58,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     private int _zoomPadding;
 
+    public abstract string MyClassId { get; }
+
     #endregion
 
     #region Constructors

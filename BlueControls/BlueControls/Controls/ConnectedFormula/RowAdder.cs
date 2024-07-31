@@ -37,7 +37,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
-public partial class RowAdder : GenericControlReciverSender // System.Windows.Forms.UserControl,
+public partial class RowAdder : GenericControlReciverSender // System.Windows.Forms.UserControl//,
     {
     #region Fields
 
@@ -232,7 +232,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             var dd_BoxItem = f.Items.Get(dd_Name);
             var dd_isItem = key.EndsWith("+") && !selected.Contains(key);
 
-            if (check_Item is ItemCollectionList.ReadableListItem rli && !dd_isItem) {
+            if (check_Item is ReadableListItem rli && !dd_isItem) {
 
                 #region Item vorhanden. Weiteren Adder hinzufügen
 
@@ -246,13 +246,13 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
                 olditems.Remove(key);
 
                 #endregion
-            } else if (dd_BoxItem is ItemCollectionList.DropDownListItem dli && dd_isItem) {
+            } else if (dd_BoxItem is DropDownListItem dli && dd_isItem) {
 
                 #region das Item ist ein Objekt unter einem Dropdown und NICHT separat gewählt.
 
                 var vorhandenDD = dli.DDItems.Get(key);
 
-                if (vorhandenDD is ItemCollectionList.ReadableListItem rliDD) {
+                if (vorhandenDD is ReadableListItem rliDD) {
 
                     #region DD-Item vorhanden. Weiteren Adder hinzufügen
 
@@ -335,7 +335,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
 
-        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+        if (e.Item is ReadableListItem rli && rli.Item is AdderItem ai) {
             AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
         }
 
@@ -344,10 +344,10 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         Invalidate();
     }
 
-    private void F_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+    private void F_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
-        if (e.Item is ItemCollectionList.ReadableListItem rli && rli.Item is AdderItem ai) {
+        if (e.Item is ReadableListItem rli && rli.Item is AdderItem ai) {
             if (f.Checked.Contains(rli.KeyName)) {
                 AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
             } else {

@@ -110,7 +110,7 @@ public class DimensionPadItem : AbstractPadItem {
     public static string ClassId => "DIMENSION";
     public override string Description => string.Empty;
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
-
+    public override string MyClassId => ClassId;
     public int Nachkommastellen { get; set; }
 
     public string Präfix { get; set; } = string.Empty;

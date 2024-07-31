@@ -73,11 +73,11 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
-
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     [DefaultValue(null)]
     [Browsable(false)]

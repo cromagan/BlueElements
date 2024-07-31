@@ -39,7 +39,7 @@ internal class Method_SetClipboard : BlueScript.Methods.Method, BlueDatabase.Int
     public List<List<string>> ArgsForButton => [StringVal];
 
     public List<string> ArgsForButtonDescription => ["Text"];
-    public BlueDatabase.Enums.ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "setclipboard";
 

@@ -23,8 +23,8 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 using static BlueBasics.Develop;
@@ -32,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public partial class FormulaView : FormWithStatusBar {
+public partial class ConnectedFormulaView : FormWithStatusBar {
 
     #region Fields
 
@@ -42,9 +42,9 @@ public partial class FormulaView : FormWithStatusBar {
 
     #region Constructors
 
-    public FormulaView() => InitializeComponent();
+    public ConnectedFormulaView() => InitializeComponent();
 
-    public FormulaView(string filename, string mode) : this() {
+    public ConnectedFormulaView(string filename, string mode) : this() {
         btnEingehendeDatenbank.Enabled = false;
         btnAusgehendeDatenbank.Enabled |= false;
 
@@ -98,9 +98,11 @@ public partial class FormulaView : FormWithStatusBar {
         _ = LoadTab.ShowDialog();
     }
 
+    private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);
+
     private void CheckButtons() => btnFormular.Enabled = CFormula.ConnectedFormula != null;
 
-        private void FormulaSet(string? filename) {
+    private void FormulaSet(string? filename) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula);
 
         if (filename == null || !FileExists(filename)) {
@@ -183,7 +185,6 @@ public partial class FormulaView : FormWithStatusBar {
         FormulaSet(LoadTab.FileName);
     }
 
-
     private void SetItem(object? control) {
         if (control is GenericControlReciver grc) {
             _lastItem = grc.Item;
@@ -194,8 +195,15 @@ public partial class FormulaView : FormWithStatusBar {
             _lastItem = null;
         }
 
-        btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() &&  _lastItem is IItemAcceptFilter;
-        btnAusgehendeDatenbank.Enabled  = Generic.IsAdministrator() && _lastItem is IItemSendFilter;
+        btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is IItemAcceptFilter;
+        btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is IItemSendFilter;
+
+        if (_lastItem is FakeControlPadItem fcpi) {
+            capClicked.Text = "<imagecode=Information|16> " +    fcpi.MyClassId;
+            capClicked.QuickInfo = fcpi.Description;
+        } else {
+            capClicked.Text = "-";
+        }
     }
 
     #endregion

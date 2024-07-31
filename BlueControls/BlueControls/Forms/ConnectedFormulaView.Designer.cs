@@ -7,7 +7,7 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms {
-    partial class FormulaView {
+    partial class ConnectedFormulaView {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -41,11 +41,12 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
+            this.btnAusgehendeDatenbank = new BlueControls.Controls.Button();
+            this.btnEingehendeDatenbank = new BlueControls.Controls.Button();
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
-            this.btnEingehendeDatenbank = new BlueControls.Controls.Button();
-            this.btnAusgehendeDatenbank = new BlueControls.Controls.Button();
+            this.capClicked = new BlueControls.Controls.Caption();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -159,7 +160,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminAllgemein.Enabled = false;
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminAllgemein.Location = new System.Drawing.Point(400, 0);
+            this.grpAdminAllgemein.Location = new System.Drawing.Point(624, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
             this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 81);
             this.grpAdminAllgemein.TabIndex = 7;
@@ -181,6 +182,7 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminBearbeiten.CausesValidation = false;
+            this.grpAdminBearbeiten.Controls.Add(this.capClicked);
             this.grpAdminBearbeiten.Controls.Add(this.btnAusgehendeDatenbank);
             this.grpAdminBearbeiten.Controls.Add(this.btnEingehendeDatenbank);
             this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
@@ -188,10 +190,32 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 81);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(624, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
+            // 
+            // btnAusgehendeDatenbank
+            // 
+            this.btnAusgehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAusgehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Oben";
+            this.btnAusgehendeDatenbank.Location = new System.Drawing.Point(144, 2);
+            this.btnAusgehendeDatenbank.Name = "btnAusgehendeDatenbank";
+            this.btnAusgehendeDatenbank.Size = new System.Drawing.Size(64, 66);
+            this.btnAusgehendeDatenbank.TabIndex = 46;
+            this.btnAusgehendeDatenbank.Text = "Ausgeh. Datenbank";
+            this.btnAusgehendeDatenbank.Click += new System.EventHandler(this.btnAusgehendeDatenbank_Click);
+            // 
+            // btnEingehendeDatenbank
+            // 
+            this.btnEingehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnEingehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Unten";
+            this.btnEingehendeDatenbank.Location = new System.Drawing.Point(80, 2);
+            this.btnEingehendeDatenbank.Name = "btnEingehendeDatenbank";
+            this.btnEingehendeDatenbank.Size = new System.Drawing.Size(64, 66);
+            this.btnEingehendeDatenbank.TabIndex = 45;
+            this.btnEingehendeDatenbank.Text = "Eingeh. Datenbank";
+            this.btnEingehendeDatenbank.Click += new System.EventHandler(this.btnEingehendeDatenbank_Click);
             // 
             // btnFormular
             // 
@@ -222,37 +246,24 @@ namespace BlueControls.Forms {
             this.CFormula.TabIndex = 98;
             this.CFormula.TabStop = false;
             this.CFormula.Text = "CFO";
+            this.CFormula.ChildGotFocus += new System.EventHandler<System.Windows.Forms.ControlEventArgs>(this.CFormula_ChildGotFocus);
             // 
-            // btnEingehendeDatenbank
+            // capClicked
             // 
-            this.btnEingehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnEingehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Unten";
-            this.btnEingehendeDatenbank.Location = new System.Drawing.Point(72, 2);
-            this.btnEingehendeDatenbank.Name = "btnEingehendeDatenbank";
-            this.btnEingehendeDatenbank.Size = new System.Drawing.Size(64, 66);
-            this.btnEingehendeDatenbank.TabIndex = 45;
-            this.btnEingehendeDatenbank.Text = "Eingeh. Datenbank";
-            this.btnEingehendeDatenbank.Click += new System.EventHandler(this.btnEingehendeDatenbank_Click);
+            this.capClicked.CausesValidation = false;
+            this.capClicked.Location = new System.Drawing.Point(216, 2);
+            this.capClicked.Name = "capClicked";
+            this.capClicked.Size = new System.Drawing.Size(336, 22);
+            this.capClicked.Text = "-";
             // 
-            // btnAusgehendeDatenbank
-            // 
-            this.btnAusgehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAusgehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Oben";
-            this.btnAusgehendeDatenbank.Location = new System.Drawing.Point(136, 2);
-            this.btnAusgehendeDatenbank.Name = "btnAusgehendeDatenbank";
-            this.btnAusgehendeDatenbank.Size = new System.Drawing.Size(64, 66);
-            this.btnAusgehendeDatenbank.TabIndex = 46;
-            this.btnAusgehendeDatenbank.Text = "Ausgeh. Datenbank";
-            this.btnAusgehendeDatenbank.Click += new System.EventHandler(this.btnAusgehendeDatenbank_Click);
-            // 
-            // FormulaView
+            // ConnectedFormulaView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1202, 450);
             this.Controls.Add(this.CFormula);
             this.Controls.Add(this.ribMain);
-            this.Name = "FormulaView";
+            this.Name = "ConnectedFormulaView";
             this.Text = "FormulaView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
@@ -283,8 +294,9 @@ namespace BlueControls.Forms {
         private GroupBox grpAdminBearbeiten;
         private Button btnFormular;
         private OpenFileDialog LoadTab;
-        protected ConnectedFormulaView CFormula;
+        protected Controls.ConnectedFormulaView CFormula;
         private Button btnAusgehendeDatenbank;
         private Button btnEingehendeDatenbank;
+        private Caption capClicked;
     }
 }

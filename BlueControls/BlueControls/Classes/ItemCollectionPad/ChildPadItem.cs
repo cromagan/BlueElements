@@ -72,6 +72,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
     public List<string> Eingebettete_Ansichten { get; }
 
+    public override string MyClassId => ClassId;
+
     [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
     public string Name {
         get => _name;

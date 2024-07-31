@@ -74,7 +74,6 @@ public class OutputFilterPadItem : FakeControlPadItem, IItemToControl, IReadable
 
     public static string ClassId => "FI-InputOutputElement";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
-
     public bool AutoSizeableHeight => false;
 
     public CaptionPosition CaptionPosition {
@@ -111,7 +110,6 @@ public class OutputFilterPadItem : FakeControlPadItem, IItemToControl, IReadable
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-
     public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
@@ -132,9 +130,9 @@ public class OutputFilterPadItem : FakeControlPadItem, IItemToControl, IReadable
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();

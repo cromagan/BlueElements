@@ -41,7 +41,6 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// </summary>
 public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable, ISimpleEditor {
 
-
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
@@ -108,7 +107,6 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     }
 
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
-
     public bool AutoSizeableHeight => true;
 
     public ReadOnlyCollection<string> ChildIds {
@@ -117,7 +115,6 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-
     public bool DatabaseInputMustMatchOutputDatabase => false;
 
     public Database? DatabaseOutput {
@@ -146,10 +143,9 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public bool InputMustBeOneRow => true;
-
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Eine Spalte in der Ziel-Datenbank.

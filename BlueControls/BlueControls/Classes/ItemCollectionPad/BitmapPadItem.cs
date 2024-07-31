@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Variables;
 using System;
@@ -30,12 +31,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -77,6 +76,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     public Bitmap? Bitmap { get; set; }
     public override string Description => string.Empty;
     public bool Hintergrund_Weiß_Füllen { get; set; }
+    public override string MyClassId => ClassId;
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
     public string Platzhalter_Für_Layout { get; set; } = string.Empty;
@@ -89,14 +89,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     public void Bildschirmbereich_wählen() {
         if (Bitmap != null) {
-            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (BlueControls.Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).CloneOfBitmap();
     }
 
     public void Datei_laden() {
         if (Bitmap != null) {
-            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (BlueControls.Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         OpenFileDialog e = new() {
             CheckFileExists = true,

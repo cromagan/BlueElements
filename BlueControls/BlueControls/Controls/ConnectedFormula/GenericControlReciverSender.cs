@@ -17,16 +17,12 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls;
 

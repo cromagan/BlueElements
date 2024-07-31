@@ -81,11 +81,10 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
     }
 
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
-
     public List<int> InputColorId => [OutputColorId];
-
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
+    public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -113,8 +112,6 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
     }
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
-
-
 
     public override string ErrorReason() {
         var b = base.ErrorReason();

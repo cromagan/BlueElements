@@ -33,8 +33,6 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 
-#nullable enable
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable {
@@ -50,12 +48,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
     #endregion
 
-    //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-
     #region Constructors
 
     public FilterConverterElementPadItem(string keyName) : this(keyName, null, null) { }
 
+    //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     public FilterConverterElementPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
         _itemSends = new();
@@ -69,7 +66,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
     public static string ClassId => "FI-FilterConverterElement";
     public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
-
     public bool AutoSizeableHeight => false;
 
     public ReadOnlyCollection<string> ChildIds {
@@ -87,19 +83,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
     public override string Description => "Erstellt einen Filter.\r\nEs kann eine Zeile empfangen. Dann können die Variablen der eingehenden Zeile benutzt werden, um den Filter-Wert zu berechnen.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
-    //[Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
-    //[DefaultValue("")]
-    //public string Eingangs_Wert_Spalte {
-    //    get => _eingangsWertSpalte;
-    //    set {
-    //        if (IsDisposed) { return; }
-    //        if (value == _eingangsWertSpalte) { return; }
-    //        _eingangsWertSpalte = value;
-    //        this.DoChilds();
-    //        OnPropertyChanged();
-    //    }
-    //}
-
     [Description("Text, der angezeigt wird, wenn kein Filter generiert werden kann")]
     [DefaultValue("")]
     public string Fehler_Text {
@@ -112,6 +95,18 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         }
     }
 
+    //[Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
+    //[DefaultValue("")]
+    //public string Eingangs_Wert_Spalte {
+    //    get => _eingangsWertSpalte;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (value == _eingangsWertSpalte) { return; }
+    //        _eingangsWertSpalte = value;
+    //        this.DoChilds();
+    //        OnPropertyChanged();
+    //    }
+    //}
     [Description("Dieser Filter-Typ wird angewendet.")]
     [DefaultValue(FilterTypeRowInputItem.Ist_schreibungsneutral)]
     public FilterTypeRowInputItem Filter {
@@ -154,6 +149,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
+    public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();

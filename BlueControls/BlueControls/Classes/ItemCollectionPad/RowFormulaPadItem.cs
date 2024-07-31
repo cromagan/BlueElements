@@ -98,6 +98,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         }
     }
 
+    public override string MyClassId => ClassId;
+
     public override string QuickInfo {
         get {
             var r = Row;

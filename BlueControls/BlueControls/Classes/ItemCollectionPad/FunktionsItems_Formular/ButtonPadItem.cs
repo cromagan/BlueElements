@@ -24,22 +24,19 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Methods;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
-using Button = BlueControls.Controls.Button;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
-
-#nullable enable
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -234,6 +231,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
+    public override string MyClassId => ClassId;
 
     public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();

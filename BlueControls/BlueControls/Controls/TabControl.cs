@@ -18,16 +18,24 @@
 #nullable enable
 
 using BlueControls.Enums;
+using BlueControls.Interfaces;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl {
+public class TabControl : AbstractTabControl, ISendsFocusedChild {
 
     #region Constructors
 
     public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<ControlEventArgs>? ChildGotFocus;
 
     #endregion
 
@@ -44,13 +52,50 @@ public class TabControl : AbstractTabControl {
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
-        if (e.Control is not TabPage tp) { return; }
+        if (e.Control is TabPage tab) {
+            tab.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+            Invalidate();
+            tab.ControlAdded += AddedControlInTabPage;
+            tab.ControlRemoved += RemovedControlInTabPage;
+        }
+    }
 
-        tp.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
-        Invalidate();
+    protected override void OnControlRemoved(ControlEventArgs e) {
+        base.OnControlRemoved(e);
+        if (e.Control is TabPage tab) {
+            tab.ControlAdded -= AddedControlInTabPage;
+            tab.ControlRemoved -= RemovedControlInTabPage;
+        }
     }
 
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
+
+    private void AddedControlInTabPage(object sender, ControlEventArgs e) {
+        if (e.Control is TabPage) { return; }
+
+        if (e.Control is ISendsFocusedChild sfc) {
+            sfc.ChildGotFocus += Sfc_ChildGotFocus;
+        }
+        e.Control.GotFocus += ControlInTabPage_GotFocus;
+    }
+
+    private void ControlInTabPage_GotFocus(object sender, System.EventArgs e) {
+        if (sender is not Control c) { return; }
+        OnChildGotFocus(new ControlEventArgs(c));
+    }
+
+    private void OnChildGotFocus(ControlEventArgs e) => ChildGotFocus?.Invoke(this, e);
+
+    private void RemovedControlInTabPage(object sender, ControlEventArgs e) {
+        if (e.Control is TabPage) { return; }
+
+        if (e.Control is ISendsFocusedChild sfc) {
+            sfc.ChildGotFocus -= Sfc_ChildGotFocus;
+        }
+        e.Control.GotFocus -= ControlInTabPage_GotFocus;
+    }
+
+    private void Sfc_ChildGotFocus(object sender, ControlEventArgs e) => OnChildGotFocus(e);
 
     #endregion
 }

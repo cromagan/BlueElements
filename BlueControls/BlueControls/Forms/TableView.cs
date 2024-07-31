@@ -26,9 +26,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -41,7 +39,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using BlueDatabase.AdditionalScriptMethods;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -385,7 +383,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        var w = new BlueControls.Forms.PadEditorWithFileAccess();
+        var w = new PadEditorWithFileAccess();
 
         if (!string.IsNullOrWhiteSpace(layoutToOpen)) {
             w.LoadFile(layoutToOpen);
@@ -417,15 +415,16 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
-    protected void AddTabPage(ConnectionInfo? ci) {
+    protected void AddTabPage(ConnectionInfo? ci, string settings) {
         if (ci is null) { return; }
 
-        var toParse = this.GetSettings("View_" + ci.TableName);
+ 
+
 
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName.ToTitleCase(),
-            Tag = new List<object> { ci, toParse }
+            Tag = new List<object> { ci, settings }
         };
         tbcDatabaseSelector.Controls.Add(nTabPage);
     }
@@ -632,7 +631,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             }
         }
 
-        AddTabPage(connectionInfo);
+        var settings = this.GetSettings("View_" + connectionInfo.TableName);
+
+        AddTabPage(connectionInfo, settings);
         return SwitchTabToDatabase(connectionInfo); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
