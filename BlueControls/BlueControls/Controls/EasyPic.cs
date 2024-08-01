@@ -154,6 +154,8 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         OnContextMenuItemClicked(e);
     }
 
+    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         e.HotItem = null;
         if (_bitmap != null) {

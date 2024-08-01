@@ -224,6 +224,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnContextMenuItemClicked(e);
     }
 
+    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
     public void DoKeyUp(KeyEventArgs e, bool hasbase) {
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.

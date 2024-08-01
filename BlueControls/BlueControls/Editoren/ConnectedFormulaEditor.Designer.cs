@@ -122,7 +122,6 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1275, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -140,7 +139,7 @@ namespace BlueControls.Forms {
             this.tabEditorStd.Location = new System.Drawing.Point(4, 25);
             this.tabEditorStd.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditorStd.Name = "tabEditorStd";
-            this.tabEditorStd.Size = new System.Drawing.Size(1267, 81);
+            this.tabEditorStd.Size = new System.Drawing.Size(876, 81);
             this.tabEditorStd.TabIndex = 4;
             this.tabEditorStd.Text = "Editor-Std.";
             // 
@@ -380,7 +379,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(876, 81);
+            this.tabFile.Size = new System.Drawing.Size(1267, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -422,6 +421,7 @@ namespace BlueControls.Forms {
             this.btnLetzteFormulare.ImageCode = "Ordner";
             this.btnLetzteFormulare.Location = new System.Drawing.Point(128, 2);
             this.btnLetzteFormulare.Name = "btnLetzteFormulare";
+            this.btnLetzteFormulare.SettingsLoaded = false;
             this.btnLetzteFormulare.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteFormulare.TabIndex = 1;
             this.btnLetzteFormulare.Text = "zuletzt geöffnete Dateien";
@@ -441,6 +441,7 @@ namespace BlueControls.Forms {
             // btnSaveAs
             // 
             this.btnSaveAs.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnSaveAs.Enabled = false;
             this.btnSaveAs.ImageCode = "Diskette";
             this.btnSaveAs.Location = new System.Drawing.Point(296, 2);
             this.btnSaveAs.Name = "btnSaveAs";

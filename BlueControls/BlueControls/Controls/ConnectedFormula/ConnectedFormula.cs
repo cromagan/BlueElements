@@ -61,8 +61,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     private ConnectedFormula(string filename) : base() {
         AllFiles.Add(this);
 
-        PadData = [];
-
+  
         if (FileExists(filename)) {
             Load(filename, true);
         }
@@ -79,7 +78,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
 
     #region Properties
 
-    public override string _type => "ConnectedFormula";
+    public override string Type => "ConnectedFormula";
 
     public string CaptionForEditor => "Formular";
 
@@ -429,7 +428,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
             }
 
             if (thisIt is FakeControlPadItem itcf) {
-                itcf.CFormula = this;
+                itcf.ParentFormula = this;
             }
         }
 
@@ -469,7 +468,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
         result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
 
         if (PadData != null) {
-            result.ParseableAdd("PadItemData", PadData.ToString());
+            result.ParseableAdd("PadItemData", PadData.ToParseableString());
         }
 
         return result.Parseable(base.ToParseableString());
@@ -566,9 +565,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
         base.OnLoaded(sender, e);
     }
 
-    private void PadData_PropertyChanged(object sender, System.EventArgs e) {
-        OnPropertyChanged();
-    }
+    private void PadData_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
     private void RegisterPadDataEvents() {
         if (_padData != null) {

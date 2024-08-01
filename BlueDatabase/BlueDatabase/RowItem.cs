@@ -699,11 +699,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!wichtig && Database.ExecutingScriptAnyDatabase > 0) { return false; }
 
         if (wichtig) {
-            var t = new Stopwatch();
-            t.Start();
+            var tim = Stopwatch.StartNew();
 
             while (db.ExecutingScript > 0) {
-                if (t.ElapsedMilliseconds > 10000) {
+                if (tim.ElapsedMilliseconds > 10000) {
                     break;
                 }
             }

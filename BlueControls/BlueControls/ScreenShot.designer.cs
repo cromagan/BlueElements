@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
 
 namespace BlueControls
 {

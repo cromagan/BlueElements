@@ -190,8 +190,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             _executingchangedrows = true;
         }
 
-        var start = new Stopwatch();
-        start.Start();
+        var tim = Stopwatch.StartNew();
 
         while (NextRowToCeck() is RowItem row) {
             if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { break; }
@@ -214,7 +213,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.SetUserDidSomething();
             row.UpdateRow(false, false, false, "Allgemeines Updates");
             Develop.SetUserDidSomething();
-            if (start.ElapsedMilliseconds > 30000) { break; }
+            if (tim.ElapsedMilliseconds > 30000) { break; }
         }
 
         lock (_executingchangedrowsx) {

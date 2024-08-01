@@ -59,8 +59,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
 
-        if (CFormula != null) {
-            CFormula.PropertyChanged += CFormula_PropertyChanged;
+        if (ParentFormula != null) {
+            ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
         }
     }
 
@@ -132,7 +132,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
                 pg = "Head";
                 pgvis = string.Empty;
             } else {
-                cf = CFormula;
+                cf = ParentFormula;
                 pg = thisc;
                 pgvis = thisc;
             }
@@ -260,9 +260,9 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
 
         switch (key) {
             case "parent":
-                CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
-                if (CFormula != null) {
-                    CFormula.PropertyChanged += CFormula_PropertyChanged;
+                ParentFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
+                if (ParentFormula != null) {
+                    ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
                 }
                 return true;
 
@@ -305,15 +305,15 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("Parent", CFormula?.Filename ?? string.Empty );
+        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty );
         result.ParseableAdd("Childs", _childs, false);
         return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            if (CFormula != null) {
-                CFormula.PropertyChanged -= CFormula_PropertyChanged;
+            if (ParentFormula != null) {
+                ParentFormula.PropertyChanged -= ParentFormula_PropertyChanged;
             }
         }
     }
@@ -360,7 +360,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
             CheckBehavior = CheckBehavior.AllSelected,
         };
 
-        CFormula?.AddChilds(childs.Suggestions, CFormula.NotAllowedChilds);
+        ParentFormula?.AddChilds(childs.Suggestions, ParentFormula.NotAllowedChilds);
 
         foreach (var thisf in _childs) {
             if (File.Exists(thisf)) {
@@ -397,15 +397,15 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         UpdateSideOptionMenu();
     }
 
-    private void CFormula_PropertyChanged(object sender, System.EventArgs e) {
+    private void ParentFormula_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (CFormula == null) { return; }
+        if (ParentFormula == null) { return; }
 
-        foreach (var thisl in CFormula.NotAllowedChilds) {
+        foreach (var thisl in ParentFormula.NotAllowedChilds) {
             _ = _childs.Remove(thisl);
         }
 
-        OnPropertyChanged();
+        //OnPropertyChanged();
     }
 
     #endregion

@@ -22,11 +22,10 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -37,26 +36,24 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     #region Fields
 
     private static readonly List<MultiUserFile> AllFiles = [];
-    private readonly Timer _checker;
+    private readonly System.Threading.Timer _checker;
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _checkedAndReloadNeed;
     private int _checkerTickCount = -5;
-
-    //private bool _doingTempFile;
-    private string _editNormalyError = string.Empty;
-
-    private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _filename = string.Empty;
     private string _inhaltBlockdatei = string.Empty;
     private bool _initialLoadDone;
 
-    //private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
+    /// <summary>
+    /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet
+    /// </summary>
+    private bool _isInSaveingLoop = false;
+
+    private bool _isLoading = false;
+    private bool _isSaved = true;
+    private bool _isSaving = false;
     private string _lastSaveCode;
-
-    private int _lockload;
-
-    //private int _reloadDelaySecond = 10;
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -65,18 +62,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     public MultiUserFile() {
         AllFiles.Add(this);
-        //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
-        //_pureBinSaver = new BackgroundWorker {
-        //    WorkerReportsProgress = true
-        //};
-        //_pureBinSaver.DoWork += PureBinSaver_DoWork;
-        //_pureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
-        _checker = new Timer(Checker_Tick);
+        _checker = new System.Threading.Timer(Checker_Tick);
         Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
         _lastSaveCode = string.Empty;
-
         _ = _checker.Change(2000, 2000);
     }
 
@@ -94,19 +84,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     #region Properties
 
-    public string _createDate { get; private set; } = string.Empty;
+    public string CreateDate { get; private set; } = string.Empty;
 
-    public string _creator { get; private set; } = string.Empty;
-
-    public string _loadedVersion { get; private set; } = "0.00";
-
-    public bool _parsing { get; private set; } = false;
-
-    public bool _saved { get; private set; } = true;
-
-    public bool _saving { get; private set; } = false;
-
-    public abstract string _type { get; }
+    public string Creator { get; private set; } = string.Empty;
 
     /// <summary>
     /// Load oder SaveAsAndChangeTo benutzen
@@ -124,17 +104,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     }
 
     public bool IsDisposed { get; private set; }
-
-    /// <summary>
-    /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet
-    /// </summary>
-    public bool IsInSaveingLoop { get; private set; }
-
-    public bool IsLoading { get; private set; }
-
-    public bool IsSaving { get; private set; }
-
     public string KeyName => Filename;
+    public string LoadedVersion { get; private set; } = "0.00";
 
     public bool ReloadNeeded {
         get {
@@ -148,6 +119,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    public abstract string Type { get; }
     public abstract string Version { get; }
 
     /// <summary>
@@ -176,7 +148,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
-            _ = thisFile?.Save(mustSave);
+            thisFile?.Save(mustSave);
             if (x != AllFiles.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 SaveAll(mustSave);
@@ -201,6 +173,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 //while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
                 //// https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
                 //_pureBinSaver.Dispose();
+                _watcher?.Dispose();
                 _checker.Dispose();
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
@@ -213,91 +186,46 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
-        //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
+        //----------Load ------------------------------------------------------------------------
         if (mode is EditableErrorReasonType.Load or EditableErrorReasonType.LoadForCheckingOnly) {
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-            var sec = AgeOfBlockDatei;
-            if (sec is >= 0 and < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
-        }
-
-        if (mode == EditableErrorReasonType.Load) {
+            //if (_initialLoadDone && AmIBlocker(true)) { return "Die Datei ist garade von dem PC geblockt und kann nur geschrieben werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 0.1) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            //if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             return string.Empty;
         }
 
         //----------Alle Edits und Save ------------------------------------------------------------------------
-        //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
-        //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
-        if (CheckForLastError(ref _editNormalyNextCheckUtc, ref _editNormalyError)) { return _editNormalyError; }
-        if (!string.IsNullOrEmpty(Filename)) {
-            if (!CanWriteInDirectory(Filename.FilePath())) {
-                _editNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
-                return _editNormalyError;
-            }
-        }
 
         //----------EditAcut, EditCurrently ----------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.EditAcut) || mode.HasFlag(EditableErrorReasonType.EditCurrently)) {
-            if (AgeOfBlockDatei > 60) {
-                _editNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
-                return _editNormalyError;
-            }
-
-            // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
-            //if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-            if (IsInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
-            if (IsLoading) { return "Aktuell werden Daten geladen."; }
+            if (!AmIBlocker(true)) { return "Ein anderer Benutzer bearbeitet aktuell die Datei."; }
+            if (_isInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
+            if (_isLoading) { return "Aktuell werden Daten geladen."; }
         }
 
         //----------EditCurrently, Save------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.EditCurrently) || mode.HasFlag(EditableErrorReasonType.Save)) {
+            if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+            if (!AmIBlocker(true)) { return "Ein anderer Benutzer bearbeitet aktuell die Datei."; }
             if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
         }
 
         //---------- Save ------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.Save)) {
-            if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
+            if (_isLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
-            if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
-            if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
-                return _canWriteError;
-            }
-            if (AgeOfBlockDatei >= 0) {
-                _canWriteError = "Beim letzten Versuch, die Datei zu speichern, ist der Speichervorgang nicht korrekt beendet worden. Speichern ist solange deaktiviert, bis ein Administrator die Freigabe zum Speichern erteilt.";
-                return _canWriteError;
-            }
-            try {
-                FileInfo f2 = new(Filename);
-                if (DateTime.UtcNow.Subtract(f2.LastWriteTimeUtc).TotalSeconds < 5) {
-                    _canWriteError = "Anderer Speichervorgang noch nicht abgeschlossen.";
-                    return _canWriteError;
-                }
-            } catch {
-                _canWriteError = "Dateizugriffsfehler.";
-                return _canWriteError;
-            }
             if (!CanWrite(Filename, 0.5)) {
                 _canWriteError = "Windows blockiert die Datei.";
                 return _canWriteError;
             }
         }
         return string.Empty;
-
-        // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
-        static bool CheckForLastError(ref DateTime nextCheckUtc, ref string lastMessage) {
-            if (DateTime.UtcNow.Subtract(nextCheckUtc).TotalSeconds < 0) { return true; }
-            lastMessage = string.Empty;
-            nextCheckUtc = DateTime.UtcNow.AddSeconds(5);
-            return false;
-        }
     }
 
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                _ = thisFile.Save(true);
+                thisFile.Save(true);
                 Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
                 return false;
             }
@@ -333,54 +261,58 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <returns>Gibt TRUE zurück, wenn die am Ende der Routine die Datei auf dem aktuellesten Stand ist</returns>
     public bool Load_Reload() {
-        if (string.IsNullOrEmpty(Filename)) { return true; }
-        WaitLoaded(true);
+        if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return false; }
 
-        if (Interlocked.CompareExchange(ref _lockload, 1, 0) == 0) {
+        try {
+            _isLoading = true;
+
+            if (_initialLoadDone && !ReloadNeeded) { return true; }
+
+            var (data, tmpLastSaveCode) = LoadFromDisk(EditableErrorReasonType.Load);
+            if (data.Length < 10) { return false; }
+
+            this.Parse(data);
+
+            _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
+
+            _initialLoadDone = true;
+            _checkedAndReloadNeed = false;
+
+            OnLoaded(this, System.EventArgs.Empty);
+
+            return ReloadNeeded;
+        } catch {
+            return false;
+        } finally {
+            _isLoading = false;
+        }
+    }
+
+    public bool LockEditing() {
+        if (AgeOfBlockDatei is < 0 or > 3600) {
+            //if (AmIBlocker()) { return false; }
+
+            var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+            // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
-                IsLoading = true;
-                //_lockLastastfile = Filename;
-
-                //if (_lockLastastfile.Contains("GEBINDETRANSPORT_BAUGRUPPEN")) {
-                //    _lockLastastfile = Filename;
-                //}
-
-                //_loadingThreadId = Thread.CurrentThread.ManagedThreadId;
-
-                if (_initialLoadDone && !ReloadNeeded) { return true; }
-
-                //OnLoading(System.EventArgs.Empty);
-
-                var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(EditableErrorReasonType.Load);
-                if (bLoaded == null) { return false; }
-
-                this.Parse(bLoaded.ToStringWin1252());
-
-                _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
-
-                _initialLoadDone = true;
-                _checkedAndReloadNeed = false;
-
-                //RepairOldBlockFiles();
-
-                OnLoaded(this, System.EventArgs.Empty);
-
-                return ReloadNeeded;
+                File.WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252);
+                _inhaltBlockdatei = tmpInhalt;
             } catch {
                 return false;
-            } finally {
-                IsLoading = false;
-                _ = Interlocked.Decrement(ref _lockload);
             }
+
+            // Kontrolle, ob kein Netzwerkkonflikt vorliegt
+            Pause(1, false);
         }
-        return false;
+
+        return AmIBlocker(false);
     }
 
     public void OnPropertyChanged() {
         if (IsDisposed) { return; }
-        if (_saving || IsLoading) { return; }
-
-        _saved = false;
+        if (_isSaving || _isLoading) { return; }
+        //Develop.CheckStackForOverflow();
+        _isSaved = false;
         PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -394,15 +326,15 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 return true;
 
             case "version":
-                _loadedVersion = value;
+                LoadedVersion = value;
                 return true;
 
             case "createdate":
-                _createDate = value.FromNonCritical();
+                CreateDate = value.FromNonCritical();
                 return true;
 
             case "createname":
-                _creator = value.FromNonCritical();
+                Creator = value.FromNonCritical();
                 return true;
         }
 
@@ -415,116 +347,91 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// Dadurch ist evtl. ein Reload nötig. Ein Reload wird nur bei Pending Changes ausgelöst!
     /// </summary>
     /// <param name="mustSave"></param>
-    public bool Save(bool mustSave) {
-        if (IsInSaveingLoop) { return false; }
-        if (string.IsNullOrEmpty(Filename)) { return false; }
+    public void Save(bool mustSave) {
+        if (_isInSaveingLoop) { return; }
+        if (string.IsNullOrEmpty(Filename)) { return; }
 
-        //OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
-        var d = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
-        if (!mustSave && AgeOfBlockDatei >= 0) {  return false; }
+        var tim = Stopwatch.StartNew();
 
-        while (!_saved) {
-            IsInSaveingLoop = true;
+        while (!_isSaved) {
+            _isInSaveingLoop = true;
 
-            var f = string.Empty;
-            if (!Load_Reload()) { f = "Reload fehlgeschlagen"; }
+            var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk();
+            var f = SaveRoutine(tmpFileName, fileInfoBeforeSaving, dataUncompressed);
 
-            if (string.IsNullOrEmpty(f)) {
-                var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk();
-                f = SaveRoutine(tmpFileName, fileInfoBeforeSaving, dataUncompressed);
-            }
+            if (string.IsNullOrEmpty(f) || !mustSave) { break; }
 
-            if (!string.IsNullOrEmpty(f)) {
-                if (DateTime.UtcNow.Subtract(d).TotalSeconds > 40) {
-                    // Da liegt ein größerer Fehler vor...
-                    if (mustSave) { Develop.DebugPrint(FehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f); }
-                    //RepairOldBlockFiles();
-                    IsInSaveingLoop = false;
-                    return false;
-                }
-                if (!mustSave && DateTime.UtcNow.Subtract(d).TotalSeconds > 5 && AgeOfBlockDatei < 0) {
-                    //Develop.DebugPrint(enFehlerArt.Info, "Optionales Speichern nach 5 Sekunden abgebrochen bei " + Filename + " " + f);
-                    IsInSaveingLoop = false;
-                    return false;
-                }
+            if (tim.ElapsedMilliseconds > 40000) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f);
+                break;
             }
         }
-        IsInSaveingLoop = false;
-        return true;
+
+        tim.Stop();
+        _isInSaveingLoop = false;
+        return;
     }
 
     public virtual string ToParseableString() {
         var result = new List<string>();
 
-        result.ParseableAdd("Type", _type);
+        result.ParseableAdd("Type", Type);
         result.ParseableAdd("Version", Version);
-        result.ParseableAdd("CreateDate", _createDate);
-        result.ParseableAdd("CreateName", _creator);
+        result.ParseableAdd("CreateDate", CreateDate);
+        result.ParseableAdd("CreateName", Creator);
 
         return result.Parseable();
     }
 
-    // ReSharper disable once UnusedMember.Global
-    public void UnlockHard() {
-        try {
-            _ = Load_Reload();
-            if (AgeOfBlockDatei >= 0) { _ = DeleteBlockDatei(true, true); }
-            _ = Save(true);
-        } catch { }
+    public void UnlockEditing() {
+        if (!AmIBlocker(false)) { return; }
+
+        Save(true);
+
+        if (DeleteFile(Blockdateiname(), false)) {
+            _inhaltBlockdatei = string.Empty;
+        }
     }
 
-    internal bool BlockDateiCheck() {
-        if (AgeOfBlockDatei < 0) {
-            //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Block-Datei zu jung\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
-            return false;
-        }
+    internal bool AmIBlocker(bool silent) {
+        if (AgeOfBlockDatei is < 0 or > 3600) { return false; }
+
+        string inhalt;
+
         try {
-            var inhalt2 = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
-            if (_inhaltBlockdatei != inhalt2) {
-                //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Inhalte unterschiedlich\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
-                return false;
-            }
+            inhalt = File.ReadAllText(Blockdateiname(), Constants.Win1252);
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            if (!silent) { MessageBox.Show("Dateisystem Fehler"); }
             return false;
         }
-        return true;
+
+        if (_inhaltBlockdatei == inhalt) { return true; }
+
+        if (!silent) {
+            MessageBox.Show("<b>Bearbeiten nicht möglich.</b>\r\n" + inhalt);
+        }
+
+        return false;
     }
 
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
-    protected virtual void OnLoaded(object sender, System.EventArgs e) {
-        Loaded?.Invoke(this, e);
-    }
+    protected virtual void OnLoaded(object sender, System.EventArgs e) => Loaded?.Invoke(this, e);
 
-    //    if (l == null) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Datenfehler!");
-    //        throw new Exception("Datenfehler!");
-    //    }
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
-    //public void SaveAsAndChangeTo(string newFileName) {
-    //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
-    //    _ = Save(true); // Original-Datei speichern, die ist ja dann weg.
-    //                    // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
-    //                    // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
-    //    RemoveWatcher();
-    //    Filename = newFileName;
-    //    OnDiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
-    //    var l = ToParseableString();
     private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
     private void Checker_Tick(object? state) {
-        if (IsLoading) { return; }
-        if (IsSaving) { return; }
+        if (IsDisposed) { return; }
+        if (_isLoading) { return; }
+        if (_isSaving) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
 
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
 
-        // Ausstehende Arbeiten ermittelen
-
-        if (!_checkedAndReloadNeed && _saved) {
+        if (!_checkedAndReloadNeed && _isSaved) {
             _checkerTickCount = 0;
             return;
         }
@@ -535,53 +442,20 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         var mustReload = ReloadNeeded;
 
-        if (!mustReload && _saved) {
+        if (!mustReload && _isSaved) {
             _checkerTickCount = 0;
             return;
         }
 
-        if (!_saved) {
-            if (_checkerTickCount > saveDelaySecond &&
-                string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
-                _ = Save(false);
-            }
+        if (!_isSaved) {
+            if (_checkerTickCount > saveDelaySecond) { Save(false); }
             return;
         }
 
         if (mustReload) {
-            if (_checkerTickCount > reloadDelaySecond &&
-                string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return; }
-            _ = Load_Reload();
+            if (_checkerTickCount > reloadDelaySecond) { Load_Reload(); }
             return;
         }
-    }
-
-    private bool CreateBlockDatei() {
-        var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
-        // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
-        try {
-            var bInhalt = tmpInhalt.UTF8_ToByte();
-            // Nicht Generic, wegen den strengen Datei-Rechten
-            using (FileStream x = new(Blockdateiname(), FileMode.Create, FileAccess.Write,
-                       FileShare.None)) {
-                x.Write(bInhalt, 0, bInhalt.Length);
-                x.Flush();
-                x.Close();
-            }
-            _inhaltBlockdatei = tmpInhalt;
-        } catch {
-            //Develop.DebugPrint(enFehlerArt.Warnung, ex);
-            return false;
-        }
-
-        if (AgeOfBlockDatei < 0) {
-            //Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
-            return false;
-        }
-
-        // Kontrolle, ob kein Netzwerkkonflikt vorliegt
-        Pause(1, false);
-        return BlockDateiCheck();
     }
 
     private void CreateWatcher() {
@@ -596,19 +470,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
-    private bool DeleteBlockDatei(bool ignorechecking, bool tryHard) {
-        if (ignorechecking || BlockDateiCheck()) {
-            if (DeleteFile(Blockdateiname(), tryHard)) {
-                _inhaltBlockdatei = string.Empty;
-                return true;
-            }
-        }
-        //if (mustDoIt) {
-        //    Develop.DebugPrint(enFehlerArt.Info, "Block-Datei nicht gelöscht\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
-        //}
-        return false;
-    }
-
     /// <summary>
     /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
     /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
@@ -616,43 +477,38 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
-    private (byte[]? data, string fileinfo) LoadBytesFromDisk(EditableErrorReasonType checkmode) {
-        string tmpLastSaveCode2;
-        var startTime = DateTime.UtcNow;
-        byte[] bLoaded;
+    private (string data, string fileinfo) LoadFromDisk(EditableErrorReasonType checkmode) {
+        string fileinfo;
+        string data;
+        var tim = Stopwatch.StartNew();
+
         while (true) {
             try {
-                if (_initialLoadDone && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
+                if (_initialLoadDone && !ReloadNeeded) { return (string.Empty, string.Empty); } // Problem hat sich aufgelöst
+
                 var f = EditableErrorReason(checkmode);
                 if (string.IsNullOrEmpty(f)) {
-                    var tmpLastSaveCode1 = GetFileInfo(Filename, true);
-                    bLoaded = File.ReadAllBytes(Filename);
-                    tmpLastSaveCode2 = GetFileInfo(Filename, true);
-                    if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
+                    var tmpFileInfo = GetFileInfo(Filename, true);
+                    data = File.ReadAllText(Filename, Constants.Win1252);
+                    fileinfo = GetFileInfo(Filename, true);
+                    if (tmpFileInfo == fileinfo) { break; }
+
                     f = "Datei wurde während des Ladens verändert.";
                 }
 
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20) {
-                    Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + Filename);
-                }
+                if (tim.ElapsedMilliseconds > 20000) { Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + Filename); }
 
                 Pause(0.5, false);
             } catch (Exception ex) {
                 // Home Office kann lange blokieren....
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
+                if (tim.ElapsedMilliseconds > 300000) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                    return (null, string.Empty);
+                    return (string.Empty, string.Empty);
                 }
             }
         }
 
-        if (bLoaded.IsZipped()) {
-            // Gezipte Daten-Kennung gefunden
-            var tmp = bLoaded.UnzipIt();
-
-            if (tmp != null) { bLoaded = tmp; }
-        }
-        return (bLoaded, tmpLastSaveCode2);
+        return (data, fileinfo);
     }
 
     private void ReCreateWatcher() {
@@ -675,28 +531,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         } catch { }
     }
 
-    //private void RepairOldBlockFiles() {
-    //    if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
-    //    _lastMessageUtc = DateTime.UtcNow;
-    //    var sec = AgeOfBlockDatei;
-    //    try {
-    //        // Nach 15 Minuten versuchen die Datei zu reparieren
-    //        if (sec >= 900) {
-    //            if (!FileExists(Filename)) { return; }
-    //            _ = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
-    //            if (!CreateBlockDatei()) { return; }
-    //            var autoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
-    //            if (!CopyFile(Filename, autoRepairName, false)) {
-    //                Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 1: " + Filename);
-    //                return;
-    //            }
-    //            if (!DeleteBlockDatei(true, false)) {
-    //                Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
-    //            }
-    //        }
-    //    } catch { }
-    //}
-
     /// <summary>
     /// Entfernt im Regelfall die Temporäre Datei
     /// </summary>
@@ -705,114 +539,68 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <param name="fileInfoBeforeSaving"></param>
     /// <param name="savedDataUncompressed"></param>
     /// <returns></returns>
-    private string SaveRoutine(string? tmpFileName, string? fileInfoBeforeSaving, IReadOnlyCollection<byte>? savedDataUncompressed) {
-        if (tmpFileName == null || string.IsNullOrEmpty(tmpFileName) ||
-            fileInfoBeforeSaving == null || string.IsNullOrEmpty(fileInfoBeforeSaving) ||
-            savedDataUncompressed == null || savedDataUncompressed.Count == 0) { return Feedback("Keine Daten angekommen."); }
-        if (IsInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen."); }
+    private string SaveRoutine(string tmpFileName, string fileInfoBeforeSaving, string dataUncompressed) {
+        if (_isSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen.", false); }
+
+        _isSaving = true;
+
+        if (string.IsNullOrEmpty(tmpFileName) || string.IsNullOrEmpty(fileInfoBeforeSaving) || dataUncompressed.Length < 10) { return Feedback("Keine Daten angekommen.", true); }
+
+        //if (_isInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen.", true); }
+
         var f = EditableErrorReason(EditableErrorReasonType.Save);
-        if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f); }
-        if (string.IsNullOrEmpty(Filename)) { return Feedback("Kein Dateiname angegeben"); }
-        if (IsSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen."); }
+        if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f, true); }
 
-        IsSaving = true;
-        var erfolg = CreateBlockDatei();
-        if (!erfolg) {
-            IsSaving = false;
-            return Feedback("Blockdatei konnte nicht erzeugt werden.");
-        }
-        // Blockdatei da, wir sind save. Andere Computer lassen die Datei ab jetzt in Ruhe!
-        if (GetFileInfo(Filename, true) != fileInfoBeforeSaving) {
-            _ = DeleteBlockDatei(false, true);
-            IsSaving = false;
-            return Feedback("Datei wurde inzwischen verändert.");
-        }
+        var lb = ToParseableString();
+        if (dataUncompressed != lb) { return Feedback("Daten wurden inzwischen verändert.", true); }
 
-        var lb = ToParseableString().WIN1252_toByte();
-        if (lb == null) { return Feedback("Daten-Fehler"); }
-
-        if (!savedDataUncompressed.SequenceEqual(lb)) {
-            _ = DeleteBlockDatei(false, true);
-            IsSaving = false;
-            return Feedback("Daten wurden inzwischen verändert.");
-        }
         // OK, nun gehts rund: Zuerst das Backup löschen
         if (FileExists(Backupdateiname())) {
-            if (!DeleteFile(Backupdateiname(), false)) { return Feedback("Backup löschen fehlgeschlagen"); }
+            if (!DeleteFile(Backupdateiname(), false)) { return Feedback("Backup löschen fehlgeschlagen", true); }
         }
 
         // Haupt-Datei wird zum Backup umbenannt
-        if (!MoveFile(Filename, Backupdateiname(), false)) { return Feedback("Umbenennen der Hauptdatei fehlgeschlagen"); }
+        if (!MoveFile(Filename, Backupdateiname(), false)) { return Feedback("Umbenennen der Hauptdatei fehlgeschlagen", true); }
 
         // --- TmpFile wird zum Haupt ---
         _ = MoveFile(tmpFileName, Filename, true);
 
-        //// ---- Steuerelemente Sagen, was gespeichert wurde
-        //_data_On_Disk = savedDataUncompressed;
-
-        // Und nun den Block entfernen
-        _ = CanWrite(Filename, 30); // sobald die Hauptdatei wieder frei ist
-        _ = DeleteBlockDatei(false, true);
-
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-        var (data, fileinfo) = LoadBytesFromDisk(EditableErrorReasonType.LoadForCheckingOnly);
-        if (data == null || !savedDataUncompressed.SequenceEqual(data)) {
+        var (data, fileinfo) = LoadFromDisk(EditableErrorReasonType.LoadForCheckingOnly);
+        if (data == null || dataUncompressed != data) {
             // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichtert und ungeladen.
             _checkedAndReloadNeed = true;
             _lastSaveCode = "Fehler";
-            //Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
-            IsSaving = false;
-            return Feedback("Speichervorgang fehlgeschlagen.");
+            return Feedback("Speichervorgang fehlgeschlagen.", true);
         }
 
         _checkedAndReloadNeed = false;
         _lastSaveCode = fileinfo;
-        _saved = true;
-        IsSaving = false;
+        _isSaved = true;
+        _isSaving = false;
         return string.Empty;
 
-        string Feedback(string txt) {
-            if (tmpFileName != null) {
-                _ = DeleteFile(tmpFileName, false);
-            }
-
-            //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
-            //RepairOldBlockFiles();
+        string Feedback(string txt, bool removeSaving) {
+            _ = DeleteFile(tmpFileName, false);
+            if (removeSaving) { _isSaving = false; }
             return txt;
         }
     }
 
-    /// <summary>
-    /// Wartet bis der Reload abgeschlossen ist.
-    /// Ist der LoadThread der aktuelle Thread, wir nicht gewartet!
-    /// </summary>
-    /// <param name="hardmode"></param>
-    private void WaitLoaded(bool hardmode) {
-        //if (_loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
-        var x = DateTime.UtcNow;
-        while (_lockload > 0) {
-            Develop.DoEvents();
-            if (!hardmode) { return; }
-            if (DateTime.UtcNow.Subtract(x).TotalMinutes > 1) {
-                if (hardmode) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
-                }
-                return;
-            }
-        }
-    }
-
     private void Watcher_Changed(object sender, FileSystemEventArgs e) {
+        if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
 
     private void Watcher_Created(object sender, FileSystemEventArgs e) {
+        if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
 
     private void Watcher_Deleted(object sender, FileSystemEventArgs e) {
+        if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
@@ -822,9 +610,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Watcher_Error(object sender, ErrorEventArgs e) => _checkedAndReloadNeed = true;
+    private void Watcher_Error(object sender, ErrorEventArgs e) {
+        if (IsDisposed) { return; }
+        _checkedAndReloadNeed = true;
+    }
 
     private void Watcher_Renamed(object sender, RenamedEventArgs e) {
+        if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
@@ -832,45 +624,29 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <summary>
     ///
     /// </summary>
-    /// <param name="iAmThePureBinSaver"></param>
     /// <returns>Dateiname, Stand der Originaldatei, was gespeichert wurde</returns>
-    private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk() {
+    private (string TMPFileName, string FileInfoBeforeSaving, string dataUncompressed) WriteTempFileToDisk() {
+        if (IsDisposed) { return (string.Empty, string.Empty, string.Empty); }
+
         string fileInfoBeforeSaving;
         string tmpFileName;
-        byte[]? dataUncompressed;
+        string dataUncompressed;
 
         var count = 0;
-
-        //if (_doingTempFile) {
-        //    //if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
-        //    return (string.Empty, string.Empty, null);
-        //}
-
-        //_doingTempFile = true;
 
         while (true) {
             count++;
 
-            //if (!iAmThePureBinSaver) {
-            //    // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
-            //    // Somit sollte des Programm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
-            //    // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
-            //    Develop.LastUserActionUtc = new DateTime(1900, 1, 1);
-            //}
-
             var f = EditableErrorReason(EditableErrorReasonType.Save);
-            if (!string.IsNullOrEmpty(f)) {  return (string.Empty, string.Empty, null); }
+            if (!string.IsNullOrEmpty(f)) { }
 
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
-            dataUncompressed = ToParseableString().WIN1252_toByte();
+            dataUncompressed = ToParseableString();
 
             if (dataUncompressed != null && dataUncompressed.Length > 0) {
                 tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
                 try {
-                    using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-                    x.Write(dataUncompressed, 0, dataUncompressed.Length);
-                    x.Flush();
-                    x.Close();
+                    File.WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252);
                     break;
                 } catch {
                     // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen
@@ -879,14 +655,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
             if (count > 15) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename);
-                //_doingTempFile = false;
-                return (string.Empty, string.Empty, null);
+                return (string.Empty, string.Empty, string.Empty);
             }
 
             Pause(1, true);
         }
-
-        //_doingTempFile = false;
         return (tmpFileName, fileInfoBeforeSaving, dataUncompressed);
     }
 

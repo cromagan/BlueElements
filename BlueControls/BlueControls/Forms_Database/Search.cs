@@ -22,9 +22,8 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueDatabase;
-using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
-using MessageBox = BlueControls.Forms.MessageBox;
+using BlueControls.Forms;
+
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -53,7 +52,7 @@ public sealed partial class Search : Form {
 
     #region Methods
 
-    protected override void OnFormClosing(FormClosingEventArgs e) {
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
         _table.SelectedCellChanged -= SelectedCellChanged;
     }

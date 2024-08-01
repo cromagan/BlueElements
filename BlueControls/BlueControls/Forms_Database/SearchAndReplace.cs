@@ -26,9 +26,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
-using MessageBox = BlueControls.Forms.MessageBox;
+using BlueControls.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -56,7 +54,7 @@ internal sealed partial class SearchAndReplace : Form {
 
     #region Methods
 
-    protected override void OnFormClosing(FormClosingEventArgs e) {
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
         _table.SelectedCellChanged -= SelectedCellChanged;
     }

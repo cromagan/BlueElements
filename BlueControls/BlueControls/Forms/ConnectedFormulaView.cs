@@ -85,10 +85,12 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
+
+        if (!CFormula.ConnectedFormula.LockEditing()) { return; }
         InputBoxEditor.Show(api, true);
 
         MultiUserFile.SaveAll(true);
-
+        CFormula.ConnectedFormula.UnlockEditing();
         CFormula.InvalidateView();
     }
 
@@ -96,8 +98,12 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
 
+
+        if (!CFormula.ConnectedFormula.LockEditing()) { return; }
+
         var x = new ConnectedFormulaEditor(CFormula.ConnectedFormula.Filename, null);
-        x.Show();
+        x.ShowDialog();
+        CFormula.ConnectedFormula.UnlockEditing();
         CFormula.InvalidateView();
     }
 

@@ -322,22 +322,7 @@ public static class IO {
         }
     }
 
-    // public static string LoadFromDisk(string DateiName) {
-    // switch (DateiName.FileSuffix()) {
-    //        case "XML":
-    //            return File.ReadAllText(DateiName, Encoding.UTF8);
-    //        default:
-    //            return File.ReadAllText(DateiName, Encoding.Defxault);
-    //    }
-    // }
-    //public static string LoadFromDiskUTF8(string dateiName)
-    //{
-    //    return File.ReadAllText(dateiName, Encoding.UTF8);
-    //}
-    //public static string LoadFromDisk(string dateiName,Encoding code)
-    //{
-    //    return File.ReadAllText(dateiName, code);
-    //}
+
     public static string GetFileInfo(string filename, bool mustDo) {
         try {
             FileInfo f = new(filename);

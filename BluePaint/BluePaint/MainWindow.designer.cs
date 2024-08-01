@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel;
-using System.Windows.Forms;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using Button = BlueControls.Controls.Button;
-using Form = BlueControls.Forms.Form;
-using GroupBox = BlueControls.Controls.GroupBox;
+using BlueControls.Forms;
 
 namespace BluePaint
 {
@@ -550,8 +547,8 @@ namespace BluePaint
         private Button btnOeffnen;
         private Button btnSaveAs;
         private Button btnNeu;
-        private OpenFileDialog LoadTab;
-        private SaveFileDialog SaveTab;
+        private System.Windows.Forms.OpenFileDialog LoadTab;
+        private System.Windows.Forms.SaveFileDialog SaveTab;
         private Button btnSave;
         internal Button btnGrößeÄndern;
         private Button btn100;

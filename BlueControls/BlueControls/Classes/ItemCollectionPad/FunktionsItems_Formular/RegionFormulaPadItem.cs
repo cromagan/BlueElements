@@ -62,8 +62,8 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     public RegionFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();
 
-        if (CFormula != null) {
-            CFormula.PropertyChanged += CFormula_PropertyChanged;
+        if (ParentFormula != null) {
+            ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
         }
     }
 
@@ -171,7 +171,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var cl = new List<AbstractListItem>();
 
-        CFormula?.AddChilds(cl, CFormula.NotAllowedChilds);
+        ParentFormula?.AddChilds(cl, ParentFormula.NotAllowedChilds);
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(GroupBoxStyle)));
@@ -200,9 +200,9 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
         switch (key) {
             case "parent":
-                CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
-                if (CFormula != null) {
-                    CFormula.PropertyChanged += CFormula_PropertyChanged;
+                ParentFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
+                if (ParentFormula != null) {
+                    ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
                 }
                 return true;
 
@@ -239,7 +239,7 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("Parent", CFormula?.Filename ?? string.Empty);
+        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Child", _child);
         result.ParseableAdd("BorderStyle", _rahmenStil);
         return result.Parseable(base.ToParseableString());
@@ -247,8 +247,8 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            if (CFormula != null) {
-                CFormula.PropertyChanged -= CFormula_PropertyChanged;
+            if (ParentFormula != null) {
+                ParentFormula.PropertyChanged -= ParentFormula_PropertyChanged;
             }
         }
     }
@@ -300,18 +300,18 @@ public class RegionFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         if (e.Item.KeyName.ToLowerInvariant() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(it.KeyName, CFormula?.NotAllowedChilds);
+            var x = new ConnectedFormulaEditor(it.KeyName, ParentFormula?.NotAllowedChilds);
             _ = x.ShowDialog();
             MultiUserFile.SaveAll(false);
             x.Dispose();
         }
     }
 
-    private void CFormula_PropertyChanged(object sender, System.EventArgs e) {
+    private void ParentFormula_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (CFormula == null) { return; }
+        if (ParentFormula == null) { return; }
 
-        if (CFormula.NotAllowedChilds.Contains(_child)) {
+        if (ParentFormula.NotAllowedChilds.Contains(_child)) {
             Child = string.Empty;
         }
 

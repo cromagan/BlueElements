@@ -1,20 +1,7 @@
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Windows.Forms;
-using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using Button = BlueControls.Controls.Button;
-using ColorDialog = System.Windows.Forms.ColorDialog;
-using ComboBox = BlueControls.Controls.ComboBox;
-using Form = BlueControls.Forms.Form;
-using GroupBox = BlueControls.Controls.GroupBox;
-using ListBox = BlueControls.Controls.ListBox;
-using TabControl = BlueControls.Controls.TabControl;
-using TabPage = System.Windows.Forms.TabPage;
-using TextBox = BlueControls.Controls.TextBox;
+using BlueControls.Forms;
+using System.Diagnostics;
+
 
 namespace BlueControls.BlueDatabaseDialogs {
     internal sealed partial class ColumnEditor : Form {
@@ -1568,7 +1555,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnOk;
         private TextBox txbName;
         private Caption Caption3;
-        private ColorDialog ColorDia;
+        private System.Windows.Forms.ColorDialog ColorDia;
         private Button btnQI_Vorschau;
         private TextBox txbQuickinfo;
         private Button btnZeilenFilterIgnorieren;
@@ -1604,12 +1591,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         private ComboBox cbxFunction;
         private TextBox txbTags;
         private TabControl tabControl;
-        private TabPage tabAnzeige;
-        private TabPage tabBearbeitung;
-        private TabPage tabAutoKorrektur;
-        private TabPage tabFilter;
-        private TabPage tabQuickInfo;
-        private TabPage tabSonstiges;
+        private System.Windows.Forms.TabPage tabAnzeige;
+        private System.Windows.Forms.TabPage tabBearbeitung;
+        private System.Windows.Forms.TabPage tabAutoKorrektur;
+        private System.Windows.Forms.TabPage tabFilter;
+        private System.Windows.Forms.TabPage tabQuickInfo;
+        private System.Windows.Forms.TabPage tabSonstiges;
         private Button btnIgnoreLock;
         private Button btnLogUndo;
         private Button btnSpellChecking;
@@ -1678,9 +1665,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         private ComboBox cbxScriptType;
         private Caption capScriptType;
         private Button btnSchnellBit;
-        private TabPage tabDatenFormat;
+        private System.Windows.Forms.TabPage tabDatenFormat;
         private GroupBox grpSchnellformat;
-        private TabPage tabSpaltenVerlinkung;
+        private System.Windows.Forms.TabPage tabSpaltenVerlinkung;
         private Table tblFilterliste;
         private TextBox txbMaxCellLenght;
         private Caption capMaxCellLenght;

@@ -59,8 +59,8 @@ public abstract class FakeControlPadItem : RectanglePadItem, IHasKeyName, IPrope
 
     #region Constructors
 
-    protected FakeControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName) {
-        CFormula = cformula;
+    protected FakeControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula) : base(keyName) {
+        ParentFormula = parentFormula;
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }
 
@@ -68,7 +68,7 @@ public abstract class FakeControlPadItem : RectanglePadItem, IHasKeyName, IPrope
 
     #region Properties
 
-    public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
+    public ConnectedFormula.ConnectedFormula? ParentFormula { get; set; }
     public abstract bool MustBeInDrawingArea { get; }
     public int Version { get; set; }
 

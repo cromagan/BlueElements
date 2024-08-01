@@ -331,15 +331,18 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (_cFormula != null) {
             _cFormula.Editing -= _cFormula_Editing;
+            _cFormula.UnlockEditing();
         }
 
         _cFormula = formular;
+        var editable = false;
 
         if (_cFormula != null) {
             _cFormula.Editing += _cFormula_Editing;
+            editable= _cFormula.LockEditing();
         }
 
-        if (notAllowedchilds != null && CFormula != null) {
+        if (notAllowedchilds != null && CFormula != null && editable) {
             var l = new List<string>();
             l.AddRange(CFormula.NotAllowedChilds);
             l.AddRange(notAllowedchilds);

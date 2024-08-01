@@ -31,7 +31,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
+
 
 namespace BlueControls.Controls;
 
@@ -263,7 +263,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     private void GetDesign() {
         _design = Design.Undefiniert;
         if (Parent == null) { return; }
-        if (Parent is Form fm) { _design = fm.Design; }
+        if (Parent is Forms.Form fm) { _design = fm.Design; }
         switch (_design) {
             case Design.Form_QuickInfo:
             case Design.Form_DesktopBenachrichtigung:

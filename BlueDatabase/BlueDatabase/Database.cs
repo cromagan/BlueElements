@@ -1442,8 +1442,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 ScriptText = s.ScriptText
             };
 
-            var st = new Stopwatch();
-            st.Start();
+            var tim = Stopwatch.StartNew();
 
             var scf = sc.Parse(0, s.KeyName, attributes);
 
@@ -1451,7 +1450,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Fehlerprüfungen
 
-            if (st.ElapsedMilliseconds > maxtime * 1000) {
+            if (tim.ElapsedMilliseconds > maxtime * 1000) {
                 ExecutingScript--;
                 ExecutingScriptAnyDatabase--;
                 return new ScriptEndedFeedback("Das Skript hat eine zu lange Laufzeit.", false, true, s.KeyName);

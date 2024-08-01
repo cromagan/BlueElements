@@ -437,7 +437,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         }
 
         // Initialisieren einer Stopwatch für die Zeitüberwachung
-        var stopwatch = Stopwatch.StartNew();
+        var tim = Stopwatch.StartNew();
         do {
             try {
                 Width = bmp.Width;
@@ -450,9 +450,9 @@ public class BitmapExt : IDisposable, IDisposableExtended {
                 LockBits();
             } catch (Exception ex) {
                 // Überprüfen, ob die Zeitüberschreitung erreicht ist
-                if (stopwatch.Elapsed.TotalSeconds > 5) {
+                if (tim.Elapsed.TotalSeconds > 5) {
                     // Protokollieren des Fehlers
-                    stopwatch.Stop();
+                    tim.Stop();
                     Develop.DebugPrint("Bild konnte nicht geklont werden", ex);
                     Width = -1;
                     Height = -1;
