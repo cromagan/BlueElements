@@ -691,6 +691,9 @@
     <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaButton.resx">
       <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaView.resx">
+      <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectedFormula\Monitor.resx">
       <DependentUpon>Monitor.cs</DependentUpon>
       <SubType>Designer</SubType>

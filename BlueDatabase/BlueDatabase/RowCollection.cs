@@ -37,10 +37,11 @@ namespace BlueDatabase;
 
 public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasDatabase {
 
-    public static List<RowItem> FailedRows = new();
-
     #region Fields
 
+    public static List<RowItem> DidRows = new();
+    public static List<RowItem> FailedRows = new();
+    public static List<RowItem> InvalidatedRows = new();
     public static int WaitDelay = 0;
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static bool _executingchangedrows;
@@ -178,6 +179,40 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         db.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
     }
 
+    public static void DoAllInvalidatedRows(RowItem? masterRow) {
+        if (Database.ExecutingScriptAnyDatabase != 0 || DidRows.Count > 0) { return; }
+
+        var ra = 0;
+        var n = 0;
+
+        DidRows.Clear();
+        try {
+            while (InvalidatedRows.Count > 0) {
+                n++;
+                var r = InvalidatedRows[0];
+                InvalidatedRows.RemoveAt(0);
+
+                if (InvalidatedRows.Count > ra) {
+                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
+                    ra = InvalidatedRows.Count;
+                }
+
+                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
+                    DidRows.Add(r);
+                    if (masterRow?.Database != null) {
+                        r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
+                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                    } else {
+                        r.UpdateRow(false, true, true, "Normales Update");
+                    }
+                }
+            }
+        } catch { }
+
+        DidRows.Clear();
+        masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Updates abgearbeitet");
+    }
+
     public static void ExecuteValueChangedEvent() {
         List<Database> l = [.. Database.AllFiles];
         if (l.Count == 0) { return; }
@@ -192,7 +227,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var tim = Stopwatch.StartNew();
 
-        while (NextRowToCeck() is RowItem row) {
+        while (NextRowToCeck(false) is RowItem row) {
             if (row.IsDisposed || row.Database is not Database db || db.IsDisposed) { break; }
 
             if (row.Database != l[0]) {
@@ -304,7 +339,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
     /// </summary>
     /// <returns></returns>
-    public static RowItem? NextRowToCeck() {
+    public static RowItem? NextRowToCeck(bool oldestTo) {
         List<Database> l = [.. Database.AllFiles];
 
         if (Constants.GlobalRnd.Next(10) == 1) {
@@ -313,17 +348,38 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         }
 
+        RowItem? oldrow = null;
+
         foreach (var thisDb in l) {
             if (thisDb is Database db && !db.IsDisposed) {
                 if (!db.CanDoValueChangedScript()) { continue; }
 
                 var rowToCheck = db.Row.NextRowToCheck(false);
                 if (rowToCheck != null) { return rowToCheck; }
+
+                if (oldestTo) {
+                    var tmpo = db.Row.NextRowToCheck(true);
+                    oldrow = RowCollection.OlderState(tmpo, oldrow);
+                }
             }
         }
 
+        if (oldrow != null) { return oldrow; }
+
         WaitDelay = Math.Min(WaitDelay + 5, 100);
         return null;
+    }
+
+    public static RowItem? OlderState(RowItem? row1, RowItem? row2) {
+        if (row1 == null) { return row2; }
+        if (row2 == null) { return row1; }
+
+        if (row1.Database?.Column.SysRowState is not ColumnItem srs1 ||
+            row2.Database?.Column.SysRowState is not ColumnItem srs2) {
+            return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
+        }
+
+        return row1.CellGetLong(srs1) < row2.CellGetLong(srs2) ? row1 : row2;
     }
 
     public static string UniqueKeyValue() {
@@ -342,6 +398,41 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (ok) { return unique; }
         } while (true);
+    }
+
+    public static (RowItem? newrow, string message) UniqueRow(FilterCollection filter, string coment) {
+        if (filter.Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
+
+        if (filter.Count < 1) { return (null, "Kein Filter angekommen."); }
+
+        var r = filter.Rows;
+
+        if (r.Count > 5) {
+            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText());
+        }
+
+        if (r.Count > 1) {
+            r[0].Database?.Row.Combine(r);
+            r[0].Database?.Row.RemoveYoungest(r, true);
+            r = filter.Rows;
+            if (r.Count != 1) {
+                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
+            }
+            InvalidatedRows.AddIfNotExists(r[0]);
+        }
+
+        RowItem? myRow;
+
+        if (r.Count == 0) {
+            var (newrow, message) = RowCollection.GenerateAndAdd(filter, coment);
+            if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
+            myRow = newrow;
+            RowCollection.InvalidatedRows.AddIfNotExists(newrow);
+        } else {
+            myRow = r[0];
+        }
+
+        return (myRow, string.Empty);
     }
 
     public (List<RowData> rows, long visiblerowcount) CalculateSortedRows(IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
@@ -797,6 +888,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    public (RowItem? newrow, string message) UniqueRow(string value, string comment) {
+        if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen"); }
+
+        if (Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
+
+        if (db.Column.First() is not ColumnItem co) { return (null, "Spalte nicht vorhanden"); }
+
+        using var fic = new FilterCollection(db, "UnqiueRow");
+
+        var fi = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal, value);
+
+        fic.Add(fi);
+
+        return UniqueRow(fic, comment);
+    }
+
     internal static List<RowItem> MatchesTo(FilterItem fi) {
         List<RowItem> l = [];
 
@@ -925,106 +1032,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         e.Row.RowChecked -= OnRowChecked;
         e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);
-    }
-
-    public static List<RowItem> DidRows = new();
-    public static List<RowItem> InvalidatedRows = new();
-
-
-    public static (RowItem? newrow, string message) UniqueRow(FilterCollection filter, string coment) {
-
-        if (filter.Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
-
-        if (filter.Count < 1) { return (null, "Kein Filter angekommen."); }
-
-
-        var r = filter.Rows;
-
-        if (r.Count > 5) {
-            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText());
-        }
-
-        if (r.Count > 1) {
-
-
-            r[0].Database?.Row.Combine(r);
-            r[0].Database?.Row.RemoveYoungest(r, true);
-            r = filter.Rows;
-            if (r.Count != 1) {
-                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
-            }
-            InvalidatedRows.AddIfNotExists(r[0]);
-        }
-
-        RowItem? myRow;
-
-        if (r.Count == 0) {
-            var (newrow, message) = RowCollection.GenerateAndAdd(filter, coment);
-            if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
-            myRow = newrow;
-            RowCollection.InvalidatedRows.AddIfNotExists(newrow);
-        } else {
-            myRow = r[0];
-        }
-
-        return (myRow, string.Empty);
-
-    }
-    public static void DoAllInvalidatedRows(RowItem? masterRow) {
-        if (Database.ExecutingScriptAnyDatabase != 0 || DidRows.Count > 0) { return; }
-
-        var ra = 0;
-        var n = 0;
-
-        DidRows.Clear();
-        try {
-            while (InvalidatedRows.Count > 0) {
-                n++;
-                var r = InvalidatedRows[0];
-                InvalidatedRows.RemoveAt(0);
-
-
-
-                if (InvalidatedRows.Count > ra) {
-                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
-                    ra = InvalidatedRows.Count;
-                }
-
-                if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
-                    DidRows.Add(r);
-                    if (masterRow?.Database != null) {
-                        r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
-                    } else {
-                        r.UpdateRow(false, true, true, "Normales Update");
-                    }
-                }
-            }
-        } catch { }
-
-        DidRows.Clear();
-        masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Updates abgearbeitet");
-    }
-
-    public (RowItem? newrow, string message) UniqueRow(string value, string comment) {
-
-        if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen"); }
-
-
-        if (Database is not Database db || db.IsDisposed) { return (null, "Datenbank verworfen"); }
-
-        if (db.Column.First() is not ColumnItem co) { return (null, "Spalte nicht vorhanden"); }
-
-        using var fic = new FilterCollection(db, "UnqiueRow");
-
-
-        var fi = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal, value);
-
-        fic.Add(fi);
-
-        return UniqueRow(fic, comment);
-
-
     }
 
     #endregion

@@ -49,12 +49,12 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     private string _directory = string.Empty;
     private string _directoryMin = string.Empty;
     private string _filter = "*";
-    private string _lastcheckcode = string.Empty;
     private string _sort = "Name";
     private string _todel = string.Empty;
     private string _var_directory = string.Empty;
     private string _var_directorymin = string.Empty;
     private FileSystemWatcher? _watcher;
+    private string _workinDir = string.Empty;
 
     #endregion
 
@@ -66,17 +66,19 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
     #endregion
 
+    #region Events
+
+    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
+
+    #endregion
+
     #region Properties
-
-
-    [DefaultValue(true)]
-    public bool DoDefaultHandling { get; set; } = true;
-
-    [DefaultValue(true)]
-    public bool AllowEdit { get; set; } = true;
 
     [DefaultValue(true)]
     public bool AllowDragDrop { get; set; } = true;
+
+    [DefaultValue(true)]
+    public bool AllowEdit { get; set; } = true;
 
     [DefaultValue(true)]
     public bool AllowScreenshots { get; set; } = true;
@@ -118,6 +120,9 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         }
     }
 
+    [DefaultValue(true)]
+    public bool DoDefaultHandling { get; set; } = true;
+
     public new bool Enabled {
         get => base.Enabled; set {
             base.Enabled = value;
@@ -155,7 +160,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         set {
             if (_var_directory == value) { return; }
             _var_directory = value;
-            InvalidateDiretoryAndCheckCode();
+            ReloadDirectory();
         }
     }
 
@@ -164,13 +169,8 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         set {
             if (_var_directorymin == value) { return; }
             _var_directorymin = value;
-            InvalidateDiretoryAndCheckCode();
+            ReloadDirectory();
         }
-    }
-
-    private void InvalidateDiretoryAndCheckCode() {
-        _lastcheckcode = string.Empty;
-        ReloadDirectory();
     }
 
     #endregion
@@ -240,12 +240,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             Directory = tmpDirectory;
             DirectoryMin = tmpDirectoryMin;
         }
-
     }
+
+    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
-        InvalidateDiretoryAndCheckCode();
+        ReloadDirectory();
     }
 
     private static bool AddThis(FileInfo fi) {
@@ -303,7 +304,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         if (string.IsNullOrEmpty(DirectoryMin)) {
             btnZurück.Enabled = Enabled && pfadexists;
         } else {
-
             if (Directory.Equals(DirectoryMin, StringComparison.OrdinalIgnoreCase)) {
                 btnZurück.Enabled = false;
             } else {
@@ -328,7 +328,9 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         if (ThumbGenerator.IsBusy || !this.Visible) { return; }
 
-        if (_lastcheckcode == CheckCode()) { return; }
+        if (ThumbGenerator.CancellationPending) { return; }
+
+        if (_workinDir == CheckCode()) { return; }
 
         ThumbGenerator.RunWorkerAsync();
     }
@@ -368,39 +370,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) { return DragDropEffects.Move; }
 
         return e.AllowedEffect.HasFlag(DragDropEffects.Copy) ? DragDropEffects.Copy : DragDropEffects.None;
-    }
-
-    private void ReloadDirectory() {
-        if (InvokeRequired) {
-            try {
-                _ = Invoke(new Action(ReloadDirectory));
-                return;
-            } catch {
-                // Kann dank Multitasking disposed sein
-                Develop.CheckStackForOverflow();
-                ReloadDirectory();
-                return;
-            }
-        }
-
-        try {
-            if (_watcher != null) {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Changed -= Watcher_Changed;
-                _watcher.Created -= Watcher_Created;
-                _watcher.Deleted -= Watcher_Deleted;
-                _watcher.Renamed -= Watcher_Renamed;
-                _watcher.Error -= Watcher_Error;
-                //_watcher?.Dispose();
-                _watcher = null;
-            }
-        } catch { }
-
-        if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
-        lsbFiles.ItemClear();
-
-        //_lastcheckcode = string.Empty;
-        Invalidate();
     }
 
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -478,7 +447,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private void lsbFiles_DragDrop(object sender, DragEventArgs e) {
-
         if (!AllowDragDrop) { return; }
 
         var tmp = CurrentState(e);
@@ -518,7 +486,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     private void lsbFiles_DragEnter(object sender, DragEventArgs e) {
         if (!AllowDragDrop) { e.Effect = DragDropEffects.None; return; }
 
-
         var tmp = CurrentState(e);
 
         if (e.AllowedEffect.HasFlag(tmp)) {
@@ -529,17 +496,10 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         e.Effect = DragDropEffects.None;
     }
 
-    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
-
-    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
     private void lsbFiles_ItemClicked(object sender, AbstractListItemEventArgs e) {
-
         OnItemClicked(e);
 
-
         if (!DoDefaultHandling) { return; }
-
 
         if (File.Exists(e.Item.KeyName)) {
             switch (e.Item.KeyName.FileType()) {
@@ -593,12 +553,45 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         Directory = e.Item.KeyName;
     }
 
+    private void ReloadDirectory() {
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(ReloadDirectory));
+                return;
+            } catch {
+                // Kann dank Multitasking disposed sein
+                Develop.CheckStackForOverflow();
+                ReloadDirectory();
+                return;
+            }
+        }
+
+        try {
+            if (_watcher != null) {
+                _watcher.EnableRaisingEvents = false;
+                _watcher.Changed -= Watcher_Changed;
+                _watcher.Created -= Watcher_Created;
+                _watcher.Deleted -= Watcher_Deleted;
+                _watcher.Renamed -= Watcher_Renamed;
+                _watcher.Error -= Watcher_Error;
+                //_watcher?.Dispose();
+                _watcher = null;
+            }
+        } catch { }
+
+        if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
+        lsbFiles.ItemClear();
+
+        _workinDir = string.Empty;
+        Invalidate();
+    }
+
     private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
         var newCheckCode = CheckCode();
 
-        if (newCheckCode == _lastcheckcode) { return; }
+        if (newCheckCode == _workinDir) { return; }
 
-        _lastcheckcode = newCheckCode;
+        _workinDir = newCheckCode;
 
         var dir = _directory;
 
@@ -647,7 +640,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         var allF = System.IO.Directory.GetFiles(dir, _filter, SearchOption.TopDirectoryOnly);
 
-        if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
+        if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
         #region  Buttons und Watcher einschalten
 
@@ -662,7 +655,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             var fi = new FileInfo(fileName);
 
             if (AddThis(fi)) {
-                if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
+                if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
                 var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
                     Padding = 6
@@ -715,11 +708,11 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         #region  Vorschau Bilder erstellen
 
         foreach (var thisString in allF) {
-            if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
+            if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
             var fi = new FileInfo(thisString);
             if (AddThis(fi)) {
                 feedBack = ["Image", thisString, WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk)];
-                if (ThumbGenerator.CancellationPending || _lastcheckcode != CheckCode()) { return; }
+                if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
                 ThumbGenerator.ReportProgress(2, feedBack);
             }
         }
@@ -746,7 +739,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
             case "add":
                 var ob = (BitmapListItem)gb[1];
-                if (_lastcheckcode != CheckCode()) { return; }
+                if (_workinDir != CheckCode()) { return; }
                 lsbFiles.ItemAdd(ob);
                 return;
 
@@ -781,9 +774,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
     private void Watcher_Created(object sender, FileSystemEventArgs e) => ReloadDirectory();
 
-
     private void Watcher_Deleted(object sender, FileSystemEventArgs e) => ReloadDirectory();
-
 
     /// <summary>
     /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
@@ -791,7 +782,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void Watcher_Error(object sender, ErrorEventArgs e) => ReloadDirectory();
-
 
     private void Watcher_Renamed(object sender, RenamedEventArgs e) => ReloadDirectory();
 

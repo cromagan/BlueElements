@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -125,6 +126,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                 unused.Add(c);
             }
         }
+
+        unused.Remove(btnScript);
 
         #endregion
 
@@ -335,6 +338,14 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
         if (this.RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));
+
+            btnScript.Visible = r.Database is Database db && !string.IsNullOrEmpty(db.ScriptNeedFix);
+            
+
+            if(btnScript.Visible) {btnScript.BringToFront(); }
+
+
+
         } else {
             FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
         }
@@ -391,6 +402,22 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
 
         if (undone.Count > 0) { DoAutoX(undone); }
+    }
+
+    private void btnSkript_Click(object sender, System.EventArgs e) {
+        if (Generic.IsAdministrator()) {
+            if (IsDisposed || RowSingleOrNull()?.Database is not Database db || db.IsDisposed) { return; }
+
+            var se = new DatabaseScriptEditor(db);
+            _ = se.ShowDialog();
+
+
+        } else {
+            BlueControls.Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+
+        }
+        Invalidate_FilterInput();
+
     }
 
     #endregion

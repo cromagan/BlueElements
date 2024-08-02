@@ -201,7 +201,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return new DateTime(originalTicks, DateTimeKind.Utc);
     }
 
-
     /// <summary>
     /// Reverse: TimeCodeToUTCDateTime
     /// </summary>
@@ -341,10 +340,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (!string.IsNullOrEmpty(Database.ScriptNeedFix)) {
-            LastCheckedMessage = "Skripte fehlerhaft";
+            LastCheckedMessage = "Skripte fehlerhaft und müssen repariert werden.";
             return;
         }
 
+        if (RowCollection.FailedRows.Contains(this )) {
+            LastCheckedMessage = "Das Skript konnte die Zeile nicht durchrechnen.";
+            return;
+        }
         if (LastCheckedEventArgs != null) { return; }
 
         //_ = Database.RefreshRowData(this, false);
@@ -354,6 +357,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null, true, false);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
+
+
+        if (!sef.AllOk) {
+            LastCheckedMessage += "Das Skript enthält Fehler und muss repariert werden..";
+            return;
+        }
+        if (!sef.Successful) {
+            LastCheckedMessage += "Das Skript konnte die Zeile nicht durchrechnen.";
+            return;
+        }
+
+
 
         List<string> cols = [];
 
@@ -369,12 +384,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        if (cols.Count == 0) {
             LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
-        }
+        
 
-        if (db?.Column.SysCorrect != null) {
-            if (IsNullOrEmpty(db.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(db.Column.SysCorrect)) {
+        if (db?.Column.SysCorrect is ColumnItem sc ) {
+            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(db.Column.SysCorrect)) {
                 CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
             }
         }
@@ -577,7 +591,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns></returns>
     public bool NeedsRowUpdate(bool ignoreFailed) {
         if (Database?.Column.SysRowState is not ColumnItem srs) { return false; }
-       if( CellGetLong(srs) >= Database.EventScriptVersion) { return false; }
+        if (CellGetLong(srs) >= Database.EventScriptVersion) { return false; }
         return ignoreFailed || !RowCollection.FailedRows.Contains(this);
     }
 
@@ -693,36 +707,35 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
-    public bool UpdateRow(bool onlyIfQuick, bool mustDoFullCheck, bool wichtig, string reason) {
+    public bool UpdateRow(bool onlyIfQuick, bool extended, bool important, string reason) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
-        if (!wichtig && Database.ExecutingScriptAnyDatabase > 0) { return false; }
+        if (!important && Database.ExecutingScriptAnyDatabase > 0) { return false; }
 
-        if (wichtig) {
+        if (important) {
             var tim = Stopwatch.StartNew();
 
             while (db.ExecutingScript > 0) {
-                if (tim.ElapsedMilliseconds > 10000) {
+                if (tim.Elapsed.TotalSeconds > 10) {
                     break;
                 }
             }
         }
 
-        //if (db.ExecutingScript > 0) { return false; }
         if (db.Column.SysRowState is not ColumnItem srs) { return RepairAllLinks(); }
 
-        var large = db.EventScript.Get(ScriptEventTypes.value_changed).Count;
-        if (large > 1) { return false; }
+        var hasScript = db.EventScript.Get(ScriptEventTypes.value_changed).Count;
+        if (hasScript > 1) { return false; }
 
-        mustDoFullCheck = mustDoFullCheck || (large == 1 && string.IsNullOrEmpty(CellGetString(srs)));
+        extended = extended || string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
-        if (onlyIfQuick && mustDoFullCheck) { return false; }
+        if (onlyIfQuick && extended) { return false; }
 
         try {
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
             OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
-            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustDoFullCheck);
+            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, extended);
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
