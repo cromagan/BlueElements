@@ -84,7 +84,14 @@ public class Method_If : Method {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var scpt = new ScriptProperties(scp, scp.AllowedMethods & ~MethodType.SpecialVariables, scp.Stufe +1);
+        var m = new List<Method>();
+        foreach (var thism in scp.AllowedMethods) {
+            if (!thism.MethodType.HasFlag(MethodType.SpecialVariables)) {
+                m.Add(thism);
+            }
+        }
+
+        var scpt = new ScriptProperties(scp, m, scp.Stufe + 1);
 
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.LogData, "Fehler innerhalb der runden Klammern des If-Befehls"); }
@@ -105,7 +112,6 @@ public class Method_If : Method {
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();
     }
-
 
     #endregion
 }
