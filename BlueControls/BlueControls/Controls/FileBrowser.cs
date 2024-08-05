@@ -299,7 +299,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
         lsbFiles.Enabled = Enabled && pfadexists;
         btnAddScreenShot.Enabled = AllowScreenshots & Enabled && pfadexists;
 
-        btnExplorerÖffnen.Enabled = pfadexists && Enabled && (IsAdministrator() || AllowEdit);
+        btnExplorerÖffnen.Enabled = pfadexists && Enabled; //&& (IsAdministrator() || AllowEdit);
 
         if (string.IsNullOrEmpty(DirectoryMin)) {
             btnZurück.Enabled = Enabled && pfadexists;

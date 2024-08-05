@@ -45,7 +45,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static int WaitDelay = 0;
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static bool _executingchangedrows;
-    private static object _executingchangedrowsx = new();
+    private static object _executingchangedrowslock = new();
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
     private Database? _database;
 
@@ -220,7 +220,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         } catch { return; }
 
-        lock (_executingchangedrowsx) {
+        lock (_executingchangedrowslock) {
             if (_executingchangedrows) { return; }
             _executingchangedrows = true;
         }
@@ -251,7 +251,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (tim.ElapsedMilliseconds > 30000) { break; }
         }
 
-        lock (_executingchangedrowsx) {
+        lock (_executingchangedrowslock) {
             _executingchangedrows = false;
         }
     }
@@ -767,12 +767,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-        if (!oldestTo) { return null; }
-
         if (db.AmITemporaryMaster(5, 55)) {
             rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false));
             if (rowToCheck != null) { return rowToCheck; }
         }
+
+        if (!oldestTo) { return null; }
 
         if (db.Column.SysRowState is not ColumnItem srs) { return null; }
         var l = long.MaxValue;

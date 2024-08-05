@@ -79,7 +79,27 @@ public class Method_Filter : Method_Database {
         return f;
     }
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static FilterType StringToFilterType(string type) {
+        switch (type.ToLowerInvariant()) {
+            case "is":
+                return FilterType.Istgleich_GroßKleinEgal;
+
+            case "isnot":
+                return FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal;
+
+            case "instr":
+                return FilterType.Instr_GroßKleinEgal;
+
+            case "startswith":
+
+                return FilterType.BeginntMit_GroßKleinEgal;
+
+            default:
+                return FilterType.AlwaysFalse;
+        }
+    }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
@@ -92,27 +112,10 @@ public class Method_Filter : Method_Database {
 
         #region Typ ermitteln
 
-        FilterType filtertype;
-        switch (attvar.ValueStringGet(2).ToLowerInvariant()) {
-            case "is":
-                filtertype = FilterType.Istgleich_GroßKleinEgal;
-                break;
+        FilterType filtertype = StringToFilterType(attvar.ValueStringGet(2));
 
-            case "isnot":
-                filtertype = FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal;
-                break;
-
-            case "instr":
-                filtertype = FilterType.Instr_GroßKleinEgal;
-                break;
-
-            case "startswith":
-
-                filtertype = FilterType.BeginntMit_GroßKleinEgal;
-                break;
-
-            default:
-                return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
+        if (filtertype == FilterType.AlwaysFalse) {
+            return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
         }
 
         #endregion

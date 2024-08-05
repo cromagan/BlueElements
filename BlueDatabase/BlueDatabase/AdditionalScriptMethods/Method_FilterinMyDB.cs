@@ -57,22 +57,12 @@ public class Method_FilterInMyDB : Method_Database {
 
         #region Typ ermitteln
 
-        FilterType filtertype;
-        switch (attvar.ValueStringGet(1).ToLowerInvariant()) {
-            case "is":
-                filtertype = FilterType.Istgleich_GroßKleinEgal;
-                break;
 
-            case "isnot":
-                filtertype = FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal;
-                break;
+        FilterType filtertype = Method_Filter.StringToFilterType(attvar.ValueStringGet(1));
 
-            case "instr":
-                filtertype = FilterType.Instr_GroßKleinEgal;
-                break;
 
-            default:
-                return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
+        if (filtertype == FilterType.AlwaysFalse) {
+            return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(1));
         }
 
         #endregion

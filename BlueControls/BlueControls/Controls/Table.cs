@@ -3216,6 +3216,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
                 if (View_NextRow(newRow) != null) { newRow = View_NextRow(newRow); }
             }
         }
+       
     }
 
     /// <summary>
