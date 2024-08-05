@@ -35,6 +35,7 @@ internal class Method_AutoCorrect : Method_Database {
 
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "autocorrect";
+    public override List<string> Constants => [];
 
     public override string Description => "Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.\r\n" +
         "Z.B: Autosort und Ersetzungen\r\n" +
@@ -54,7 +55,7 @@ internal class Method_AutoCorrect : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var n = 0; n < attvar.Attributes.Count; n++) {
             var column = Column(scp, attvar, n);
             if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden."); }

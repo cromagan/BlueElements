@@ -105,7 +105,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _eventScriptTmp = string.Empty;
-    private long _eventScriptVersion = 1;
+    private DateTime _eventScriptVersion = DateTime.MinValue;
     private double _globalScale = 1f;
     private string _globalShowPass = string.Empty;
     private bool _isInSave;
@@ -314,11 +314,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public long EventScriptVersion {
+    public DateTime EventScriptVersion {
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString(), value.ToString(), UserName, DateTime.UtcNow, string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString5(), value.ToString5(), UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -1438,15 +1438,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             var scp = new ScriptProperties(s.KeyName, m, produktivphase, s.Attributes(), addinfo, 0);
 
-            Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
+            vars.Add(new VariableString("AdditionalFilesPfad", (AdditionalFilesPfadWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+
+            var sc = new Script(vars, scp) {
                 ScriptText = s.ScriptText
             };
 
-                     var scf = sc.Parse(0, s.KeyName, attributes);
+            var scf = sc.Parse(0, s.KeyName, attributes);
 
             #endregion
 
             #region Fehlerprüfungen
+
             if (!scf.AllOk) {
                 ExecutingScript--;
                 ExecutingScriptAnyDatabase--;
@@ -2239,7 +2242,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
-        if (EventScriptVersion < 1) { EventScriptVersion = 1; }
+        //if (EventScriptVersion < Date) { EventScriptVersion = 1; }
     }
 
     public virtual bool Save() {
@@ -2716,7 +2719,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //    break;
 
             case DatabaseDataType.EventScriptVersion:
-                _eventScriptVersion = LongParse(value);
+                _eventScriptVersion = DateTimeParse(value);
                 break;
 
             case DatabaseDataType.ScriptNeedFix:

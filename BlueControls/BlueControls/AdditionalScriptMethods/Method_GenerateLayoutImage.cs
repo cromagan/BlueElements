@@ -33,6 +33,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "generatelayoutimage";
+    public override List<string> Constants => [];
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Meine Zeile ermitteln (r)
 

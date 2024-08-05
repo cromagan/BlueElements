@@ -34,6 +34,7 @@ public class Method_RowIsNull : Method {
 
     public override List<List<string>> Args => [RowVar];
     public override string Command => "rowisnull";
+    public override List<string> Constants => [];
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ public class Method_RowIsNull : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(ld, "Kein Zeilenobjekt übergeben."); }
 
         return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();

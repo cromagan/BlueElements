@@ -545,9 +545,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 if (column.Function == ColumnFunction.Schlüsselspalte) {
                     SetValueInternal(srs, row, string.Empty, reason);
                 } else {
-                    if (row.CellGetLong(srs) > 0) {
+                    if (!string.IsNullOrEmpty(row.CellGetString(srs))) {
                         // wichitg, nur wenn >0, weil leere ZEilen dann nicht mehr kompett durchgerechnet werden
-                        SetValueInternal(srs, row, "0", reason);
+                        SetValueInternal(srs, row, "01.01.1900", reason);
                     }
                 }
             }

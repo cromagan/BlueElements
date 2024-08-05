@@ -34,6 +34,7 @@ internal class Method_MatchColumnFormat : Method_Database {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "matchcolumnformat";
+    public override List<string> Constants => [];
     public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ internal class Method_MatchColumnFormat : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 1);
         if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden"); }
 

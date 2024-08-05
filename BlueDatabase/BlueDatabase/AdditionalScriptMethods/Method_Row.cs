@@ -34,6 +34,7 @@ public class Method_Row : Method {
 
     public override List<List<string>> Args => [FilterVar];
     public override string Command => "row";
+    public override List<string> Constants => [];
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
@@ -57,7 +58,7 @@ public class Method_Row : Method {
 
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
 

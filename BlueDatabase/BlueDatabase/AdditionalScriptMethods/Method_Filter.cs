@@ -35,8 +35,10 @@ public class Method_Filter : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, StringVal];
     public override string Command => "filter";
 
+    public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
+
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                         "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith' und 'instr' unterstützt.\r\n" +
+                                             "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith' und 'instr' unterstützt.\r\n" +
                                          "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
                                          "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Datanbank und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
 

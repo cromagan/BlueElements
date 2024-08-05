@@ -32,15 +32,30 @@ public class Script {
 
     #region Constructors
 
-    public Script(VariableCollection? variablen, string additionalFilesPath, ScriptProperties scp) {
+    public Script(VariableCollection? variablen, ScriptProperties scp) {
         ReducedScriptText = string.Empty;
 
         Variables = variablen ?? [];
-        Properties = scp;
 
-        if (!string.IsNullOrEmpty(additionalFilesPath)) {
-            Variables.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        foreach (var thism in scp.AllowedMethods) {
+            if (thism.Constants.Count > 0) {
+                foreach (var thisValue in thism.Constants) {
+                    var varname = thisValue.ToUpper().Replace(".", "_").Replace(" ", "_").Replace(":", "_").Replace("/", "_").Replace("\\", "_");
+
+                    var comment = string.Empty;
+                    if (Variables.Get(varname) is Variable tmpvar) {
+                        comment = tmpvar.Comment;
+                        Variables.Remove(tmpvar);
+                    }
+                    if (!string.IsNullOrEmpty(comment)) { comment = comment + "\r\n"; }
+                    comment = comment + "Konstante aus " + thism.KeyName.ToUpper();
+
+                    Variables.Add(new VariableString(varname, thisValue, true, comment));
+                }
+            }
         }
+
+        Properties = scp;
     }
 
     #endregion

@@ -32,6 +32,7 @@ public class Method_RowNext : Method_Database {
 
     public override List<List<string>> Args => [[Variable.Any_Variable], BoolVal, FilterVar];
     public override string Command => "rownext";
+    public override List<string> Constants => [];
 
     public override string Description => "Sucht eine Zeilen mittels dem gegebenen Filter und sortiert diese.\r\n" +
                                           "Sucht in dieser Zeilen die eigene Zeile und gibt die darauffolgende zurück.\r\n" +

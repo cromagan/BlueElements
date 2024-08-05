@@ -35,8 +35,10 @@ public class Method_FilterInMyDB : Method_Database {
     public override List<List<string>> Args => [[Variable.Any_Variable], StringVal, StringVal];
     public override string Command => "filterinmydb";
 
+    public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
+
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                            "Aktuell werden nur die FilterTypen 'is', 'isnot' und 'instr' unterstützt.\r\n" +
+                                                "Aktuell werden nur die FilterTypen 'is', 'isnot' und 'instr' unterstützt.\r\n" +
                                             "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
 
     public override bool GetCodeBlockAfter => false;
@@ -51,15 +53,13 @@ public class Method_FilterInMyDB : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 0);
         if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         #region Typ ermitteln
 
-
         FilterType filtertype = Method_Filter.StringToFilterType(attvar.ValueStringGet(1));
-
 
         if (filtertype == FilterType.AlwaysFalse) {
             return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(1));

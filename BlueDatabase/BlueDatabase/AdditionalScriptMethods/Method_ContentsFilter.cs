@@ -33,6 +33,7 @@ public class Method_ContentsFilter : Method {
 
     public override List<List<string>> Args => [StringVal, FilterVar];
     public override string Command => "contentsfilter";
+    public override List<string> Constants => [];
     public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -48,7 +49,7 @@ public class Method_ContentsFilter : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
         if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }

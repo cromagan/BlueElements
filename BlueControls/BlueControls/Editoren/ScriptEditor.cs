@@ -119,7 +119,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
             var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard);
 
             var scp = new ScriptProperties("Skript-Editor: " + scriptname, m, false, [], null, 0);
-            var s = new Script(null, string.Empty, scp);
+            var s = new Script(null, scp);
             ex.Feedback = s.Parse(0, "Main", null);
         }
 

@@ -33,6 +33,7 @@ internal class Method_IsDropDownItem : Method_Database {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "isdropdownitem";
+    public override List<string> Constants => [];
     public override string Description => "Prüft, ob der Inhalt oder die Inhalte der Variable im Dropdownmenu der Spalte vorkommt.\r\nEs werden nur fest eingegebene Dropdown-Werte berücksichtigt - keine 'Werte anderer Zellen'.\r\nEs wird streng auf die Groß/Kleinschreibung geachtet.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ internal class Method_IsDropDownItem : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 1);
         if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden"); }
 

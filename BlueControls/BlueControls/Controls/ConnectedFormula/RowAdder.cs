@@ -117,7 +117,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
 
-        var sc = new BlueScript.Script(vars, string.Empty, scp);
+        var sc = new BlueScript.Script(vars, scp);
         sc.ScriptText = scripttext;
         return sc.Parse(0, "Main", null);
     }

@@ -35,11 +35,10 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
-
     public List<string> ArgsForButtonDescription => ["Datenbank", "Auszuführendes Skript", "Zusätzliches Attribut"];
-
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "calldatabase";
+    public override List<string> Constants => [];
 
     public override string Description => "Führt das Skript in der angegebenen Datenabank aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszühenden Skript zur Verfügung.\r\n" +
@@ -58,14 +57,14 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         if (db == MyDatabase(scp)) { return new DoItFeedback(ld, "Befehl Call benutzen!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol);  return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(ld, "Stapelspeicherüberlauf"); }

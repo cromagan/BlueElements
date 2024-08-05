@@ -34,6 +34,7 @@ public class Method_AddRows : Method_Database {
 
     public override List<List<string>> Args => [StringVal, ListStringVar];
     public override string Command => "addrows";
+    public override List<string> Constants => [];
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
@@ -51,7 +52,7 @@ public class Method_AddRows : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
 
@@ -59,7 +60,7 @@ public class Method_AddRows : Method_Database {
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol);  return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
         var keys = attvar.ValueListStringGet(1);
         keys = keys.SortedDistinctList();

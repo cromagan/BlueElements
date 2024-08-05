@@ -33,24 +33,14 @@ namespace BlueDatabase.AdditionalScriptMethods;
 // ReSharper disable once UnusedMember.Global
 public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
-    #region Fields
-
-
-
-    #endregion
-
     #region Properties
 
     public override List<List<string>> Args => [RowVar];
-
     public List<List<string>> ArgsForButton => [];
-
     public List<string> ArgsForButtonDescription => [];
-
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
-
     public override string Command => "rowinvalidate";
-
+    public override List<string> Constants => [];
     public override string Description => "Stoßt an, dass die Zeile komplett neu durchgerechnet wird.";
 
     public override bool GetCodeBlockAfter => false;
@@ -74,14 +64,9 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
     #region Methods
 
-
-
-
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
         var myRow = Method_Row.ObjectToRow(attvar.Attributes[0]);
         if (myRow?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
-
 
         if (db.Column.SysRowState is not ColumnItem srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
 
@@ -92,9 +77,6 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         if (myRow == MyRow(scp)) {
             return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden.");
         }
-
-
-
 
         //var v = myRow.CellGetLong(srs);
 
@@ -111,21 +93,16 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         //        return new DoItFeedback(ld, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
         //}
 
-
-
         //		    if (myRow.Database is not Database db) { return new DoItFeedback(ld, "Interner Fehler"); }
 
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
-
-
 
         myRow.CellSet(srs, string.Empty, $"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
         RowCollection.InvalidatedRows.Add(myRow);
 
         return DoItFeedback.Null();
-
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;

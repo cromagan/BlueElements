@@ -34,6 +34,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
+using System;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -330,7 +331,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         btnVersionErhöhen.Enabled = false;
 
-        Database.EventScriptVersion = RowItem.TimeCodeUTCNow();
+        Database.EventScriptVersion = DateTime.UtcNow;
     }
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) {

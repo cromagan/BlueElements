@@ -32,6 +32,7 @@ public class Method_Lookup : Method_Database {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, StringVal, StringVal];
     public override string Command => "lookup";
+    public override List<string> Constants => [];
     public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -45,7 +46,7 @@ public class Method_Lookup : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) {
             return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");

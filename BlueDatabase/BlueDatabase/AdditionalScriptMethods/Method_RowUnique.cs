@@ -44,8 +44,10 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override string Command => "rowunique";
 
+    public override List<string> Constants => [];
+
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                          "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
+                                              "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
@@ -62,7 +64,6 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";
-
     public override string Syntax => "RowUnique(Filter, ...)";
 
     #endregion

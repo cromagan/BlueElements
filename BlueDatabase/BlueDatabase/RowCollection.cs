@@ -379,7 +379,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
         }
 
-        return row1.CellGetLong(srs1) < row2.CellGetLong(srs2) ? row1 : row2;
+        return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
     }
 
     public static string UniqueKeyValue() {
@@ -775,18 +775,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!oldestTo) { return null; }
 
         if (db.Column.SysRowState is not ColumnItem srs) { return null; }
-        var l = long.MaxValue;
-        RowItem? r = null;
+        var datefoundmax = new DateTime(2100,1,1);
+        RowItem? foundrow = null;
 
         foreach (var thisRow in db.Row) {
-            var t = thisRow.CellGetLong(srs);
-            if (t < l && !FailedRows.Contains(thisRow)) {
-                l = t;
-                r = thisRow;
+            var dateofmyrow = thisRow.CellGetDateTime(srs);
+            if (dateofmyrow < datefoundmax && !FailedRows.Contains(thisRow)) {
+                datefoundmax = dateofmyrow;
+                foundrow = thisRow;
             }
         }
 
-        return r;
+        return foundrow;
     }
 
     public bool Remove(string key, string comment) {

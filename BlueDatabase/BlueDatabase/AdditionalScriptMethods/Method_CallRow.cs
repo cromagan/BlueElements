@@ -32,14 +32,11 @@ public class Method_CallRow : Method_Database, IUseableForButton {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
-
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
-
     public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Zusätzliches Attribut"];
-
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
-
     public override string Command => "callrow";
+    public override List<string> Constants => [];
 
     public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
             "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
@@ -66,7 +63,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);

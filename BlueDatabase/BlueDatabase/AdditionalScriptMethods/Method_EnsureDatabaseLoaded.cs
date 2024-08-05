@@ -36,6 +36,7 @@ internal class Method_EnsureDatabaseLoaded : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "ensuredatabaseloaded";
+    public override List<string> Constants => [];
     public override string Description => "Versucht die Datenbank in den Speicher zu holen.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -49,7 +50,7 @@ internal class Method_EnsureDatabaseLoaded : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }

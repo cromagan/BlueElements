@@ -32,6 +32,7 @@ public class Method_CellGetRow : BlueScript.Methods.Method {
 
     public override List<List<string>> Args => [StringVal, RowVar];
     public override string Command => "cellgetrow";
+    public override List<string> Constants => [];
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -45,7 +46,7 @@ public class Method_CellGetRow : BlueScript.Methods.Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
         if (row?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
 

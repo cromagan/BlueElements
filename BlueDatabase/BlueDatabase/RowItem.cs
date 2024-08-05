@@ -191,24 +191,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    /// <summary>
-    /// Reverse: TimeCodeUTCNow
-    /// </summary>
-    /// <param name="timeCode"></param>
-    /// <returns></returns>
-    public static DateTime TimeCodeToUTCDateTime(long timeCode) {
-        long originalTicks = (timeCode * 5000) + new DateTime(2024, 1, 1).Ticks;
-        return new DateTime(originalTicks, DateTimeKind.Utc);
-    }
+    ///// <summary>
+    ///// Reverse: TimeCodeUTCNow
+    ///// </summary>
+    ///// <param name="timeCode"></param>
+    ///// <returns></returns>
+    //public static DateTime TimeCodeToUTCDateTime(long timeCode) {
+    //    long originalTicks = (timeCode * 5000) + new DateTime(2024, 1, 1).Ticks;
+    //    return new DateTime(originalTicks, DateTimeKind.Utc);
+    //}
 
-    /// <summary>
-    /// Reverse: TimeCodeToUTCDateTime
-    /// </summary>
-    /// <returns></returns>
-    public static long TimeCodeUTCNow() {
-        var t = DateTime.UtcNow.Ticks - new DateTime(2024, 1, 1).Ticks;
-        return t / 5000;
-    }
+    ///// <summary>
+    ///// Reverse: TimeCodeToUTCDateTime
+    ///// </summary>
+    ///// <returns></returns>
+    //public static long TimeCodeUTCNow() {
+    //    var t = DateTime.UtcNow.Ticks - new DateTime(2024, 1, 1).Ticks;
+    //    return t / 5000;
+    //}
 
     public string CellFirstString() => Database?.Column.First() is not ColumnItem fc ? string.Empty : CellGetString(fc);
 
@@ -591,7 +591,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns></returns>
     public bool NeedsRowUpdate(bool ignoreFailed) {
         if (Database?.Column.SysRowState is not ColumnItem srs) { return false; }
-        if (CellGetLong(srs) >= Database.EventScriptVersion) { return false; }
+        if (CellGetDateTime(srs) >= Database.EventScriptVersion) { return false; }
         return ignoreFailed || !RowCollection.FailedRows.Contains(this);
     }
 
@@ -748,7 +748,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!RepairAllLinks()) { return false; }
 
-            CellSet(srs, TimeCodeUTCNow(), "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
+            CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
 
             RowCollection.FailedRows.Remove(this);
 

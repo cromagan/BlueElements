@@ -1677,7 +1677,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
-                this.GetStyleFrom(FormatHolder.LongPositive); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLenght = MaxTextLenght;
                 if (setOpticalToo) {
                     Caption = "Zeilen-Status";
@@ -1685,7 +1685,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDispo
                     BackColor = Color.FromArgb(255, 185, 185);
                     //LineLeft = ColumnLineStyle.Dick;
                 }
-                _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
 
                 break;
 

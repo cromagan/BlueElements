@@ -34,6 +34,7 @@ public class Method_AddRow : Method_Database {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "addrow";
+    public override List<string> Constants => [];
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\n" +
                                           "Es wird immer eine neue Zeile erstellt!\r\n" +
@@ -51,7 +52,7 @@ public class Method_AddRow : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
 

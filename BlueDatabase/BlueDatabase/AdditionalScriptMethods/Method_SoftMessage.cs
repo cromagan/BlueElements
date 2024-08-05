@@ -41,6 +41,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
 
     public override string Command => "softmessage";
 
+    public override List<string> Constants => [];
     public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
 
     public override bool GetCodeBlockAfter => false;
@@ -54,7 +55,6 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
     public string NiceTextForUser => "Text in der unteren Statusleiste ausgeben";
 
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
     public override string Syntax => "SoftMessage(Text);";
 
@@ -62,7 +62,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = MyDatabase(scp);
         if (db == null) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 

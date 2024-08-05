@@ -43,8 +43,10 @@ internal class Method_Execte : Method, IUseableForButton {
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "execute";
 
+    public override List<string> Constants => [];
+
     public override string Description => "Gibt den Befehl an Windows ab.\r\n" +
-                                              "Versucht das Beste daraus zu machen,\r\n";
+                                                  "Versucht das Beste daraus zu machen,\r\n";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -60,7 +62,7 @@ internal class Method_Execte : Method, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         _ = IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
 
         return DoItFeedback.Null();

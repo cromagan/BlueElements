@@ -35,14 +35,11 @@ internal class Method_Call : Method_Database, IUseableForButton {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
-
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
-
     public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Zusätzliches Attribut"];
-
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
-
     public override string Command => "call";
+    public override List<string> Constants => [];
 
     public override string Description => "Ruft eine Subroutine auf.\r\n" +
             "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
@@ -68,7 +65,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
 
         var db = MyDatabase(scp);

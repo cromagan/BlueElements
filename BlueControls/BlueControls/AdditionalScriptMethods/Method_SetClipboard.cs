@@ -35,14 +35,11 @@ internal class Method_SetClipboard : BlueScript.Methods.Method, BlueDatabase.Int
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-
     public List<List<string>> ArgsForButton => [StringVal];
-
     public List<string> ArgsForButtonDescription => ["Text"];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
-
     public override string Command => "setclipboard";
-
+    public override List<string> Constants => [];
     public override string Description => "Speichert den Text im Clipboard.";
 
     public override bool GetCodeBlockAfter => false;
@@ -64,7 +61,7 @@ internal class Method_SetClipboard : BlueScript.Methods.Method, BlueDatabase.Int
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
         _ = CopytoClipboard(vs);
 

@@ -33,6 +33,7 @@ public class Method_ImportLinked : Method_Database {
 
     public override List<List<string>> Args => [];
     public override string Command => "importlinked";
+    public override List<string> Constants => [];
     public override string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variabeln, die über den Befehl geladen wurden, werden gelöscht.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ public class Method_ImportLinked : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var t = "Befehl: ImportLinked";
 
         varCol.RemoveWithComment(t);

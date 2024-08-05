@@ -41,11 +41,13 @@ internal class Method_ImportCsv : Method_Database {
     public override string StartSequence => "(";
     public override string Syntax => "ImportCSV(CSVText, Separator);";
 
+    public override List<string> Constants => [];
+
     #endregion
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 

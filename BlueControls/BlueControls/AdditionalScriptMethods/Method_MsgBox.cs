@@ -35,6 +35,7 @@ public class Method_MsgBox : Method_Database {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "msgbox";
+    public override List<string> Constants => [];
     public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer einen Knopf drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
@@ -48,7 +49,7 @@ public class Method_MsgBox : Method_Database {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
 
         var img = attvar.ValueStringGet(1);

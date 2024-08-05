@@ -43,6 +43,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
     public override string Command => "export";
 
+    public override List<string> Constants => ["CSV", "BDB"];
     public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
 
     public override bool GetCodeBlockAfter => false;
@@ -65,7 +66,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Filter ermitteln (allfi)
 
@@ -135,7 +136,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                 case "CSV":
                     var t = db.Export_CSV(FirstRow.ColumnInternalName, cu, r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
-                    if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
+                    if (!IO.WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
                     break;
 
                 //case "HTML":

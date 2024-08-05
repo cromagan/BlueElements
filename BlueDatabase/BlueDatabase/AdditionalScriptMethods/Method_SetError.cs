@@ -27,11 +27,18 @@ namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
 public class Method_SetError : Method_Database {
+
+    #region Fields
+
     public static Method Method = new Method_SetError();
+
+    #endregion
+
     #region Properties
 
     public override List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
     public override string Command => "seterror";
+    public override List<string> Constants => [];
 
     public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Die hier angegebenen Variablen müssen einer Spalte der Datenbank entsprechen.\r\n" +

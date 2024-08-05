@@ -33,14 +33,11 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
-
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
-
     public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
-
     public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
-
     public override string Command => "callfilter";
+    public override List<string> Constants => [];
 
     public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
                                                 "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
@@ -67,7 +64,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
