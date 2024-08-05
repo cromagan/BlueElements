@@ -34,9 +34,10 @@ internal class Method_StringAsciiToHTML : Method {
 
     public override List<List<string>> Args => [StringVal, BoolVal];
     public override string Command => "stringasciitohtml";
+    public override List<string> Constants => [];
     public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;

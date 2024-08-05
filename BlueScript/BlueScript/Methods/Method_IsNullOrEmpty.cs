@@ -34,9 +34,10 @@ internal class Method_IsNullOrEmpty : Method {
 
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "isnullorempty";
+    public override List<string> Constants => [];
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;

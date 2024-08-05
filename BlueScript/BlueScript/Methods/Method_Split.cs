@@ -34,6 +34,7 @@ internal class Method_Split : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "split";
+    public override List<string> Constants => [];
     public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

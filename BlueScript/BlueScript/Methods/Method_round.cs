@@ -34,6 +34,7 @@ internal class Method_Round : Method {
 
     public override List<List<string>> Args => [FloatVal, FloatVal];
     public override string Command => "round";
+    public override List<string> Constants => [];
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ internal class Method_Round : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var n = (int)attvar.ValueNumGet(1);
         if (n < 0) { n = 0; }
         if (n > 10) { n = 10; }

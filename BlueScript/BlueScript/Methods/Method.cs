@@ -31,6 +31,8 @@ namespace BlueScript.Methods;
 
 public abstract class Method : IReadableTextWithKey, IReadableText {
 
+
+
     #region Fields
 
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
@@ -52,6 +54,8 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
             return _allMethods;
         }
     }
+    public abstract List<string> Constants { get; }
+
 
     public abstract List<List<string>> Args { get; }
 

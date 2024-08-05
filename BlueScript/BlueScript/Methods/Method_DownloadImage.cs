@@ -41,6 +41,7 @@ internal class Method_DownloadImage : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadimage";
+    public override List<string> Constants => [];
     public override string Description => "Lädt das angegebene Bild aus dem Internet.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -54,12 +55,12 @@ internal class Method_DownloadImage : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Da es keine Möglichkeit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
 
         var url = attvar.ValueStringGet(0);
-        var varn = "X" + url.ReduceToChars(Constants.AllowedCharsVariableName);
+        var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
 
         if (Last.Get(varn) is VariableBitmap vb) {
             return new DoItFeedback(vb.ValueBitmap);

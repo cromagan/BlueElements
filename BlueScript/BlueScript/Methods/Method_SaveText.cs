@@ -35,6 +35,7 @@ internal class Method_SaveText : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "savetext";
+    public override List<string> Constants => ["UTF8", "WIN1252"];
     public override string Description => "Speichert den Text auf die Festplatte";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -48,7 +49,7 @@ internal class Method_SaveText : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Dateinamen ermitteln (filn)
 
@@ -77,7 +78,7 @@ internal class Method_SaveText : Method {
                 break;
 
             case "WIN1252":
-                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), Constants.Win1252, false)) {
+                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.Constants.Win1252, false)) {
                     return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei.");
                 }
                 break;

@@ -34,9 +34,8 @@ internal class Method_DeleteDirectory : Method {
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-
     public override string Command => "deletedirectory";
-
+    public override List<string> Constants => [];
     public override string Description => "Löscht die Verzeichniss und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichniss nicht (mehr) existiert.";
 
     public override bool GetCodeBlockAfter => false;
@@ -57,7 +56,7 @@ internal class Method_DeleteDirectory : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }

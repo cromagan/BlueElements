@@ -28,6 +28,7 @@ namespace BlueScript.Methods;
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ToUpper : Method {
+    public override List<string> Constants => [];
 
     #region Properties
 

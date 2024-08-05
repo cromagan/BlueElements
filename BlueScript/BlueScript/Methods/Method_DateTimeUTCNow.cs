@@ -35,6 +35,7 @@ internal class Method_DateTimeNowUTC : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "datetimeutcnow";
+    public override List<string> Constants => [.. BlueBasics.Constants.DateTimeFormats];
     public override string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. dd.MM.yyyy HH:mm:ss.fff) zurück. ";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -48,7 +49,7 @@ internal class Method_DateTimeNowUTC : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         try {
             return new DoItFeedback(DateTime.UtcNow.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {

@@ -34,6 +34,7 @@ internal class Method_ChangeDateTimeFormat : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "changedatetimeformat";
+    public override List<string> Constants => [.. BlueBasics.Constants.DateTimeFormats];
     public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ internal class Method_ChangeDateTimeFormat : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d = attvar.ValueDateGet(0);
 
         if (d == null) {

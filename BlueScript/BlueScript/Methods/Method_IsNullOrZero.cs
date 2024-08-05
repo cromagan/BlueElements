@@ -34,9 +34,10 @@ internal class Method_IsNullOrZero : Method {
 
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "isnullorzero";
+    public override List<string> Constants => [];
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
@@ -71,6 +72,7 @@ internal class Method_IsNullOrZero : Method {
 
         return new DoItFeedback(infos.LogData, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
     }
+
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
@@ -78,5 +80,6 @@ internal class Method_IsNullOrZero : Method {
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();
     }
+
     #endregion
 }

@@ -34,6 +34,7 @@ internal class Method_Encrypt : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "encrypt";
+    public override List<string> Constants => [];
     public override string Description => "Verschlüsselt einen Text.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ internal class Method_Encrypt : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var wert = attvar.ValueStringGet(0).Encrypt(attvar.ValueStringGet(1));
 
         if (wert == null) { return new DoItFeedback(ld, "Verschlüsselung fehlgeschlagen."); }

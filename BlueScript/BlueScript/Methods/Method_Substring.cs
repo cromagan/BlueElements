@@ -33,6 +33,7 @@ internal class Method_Substring : Method {
 
     public override List<List<string>> Args => [StringVal, FloatVal, FloatVal];
     public override string Command => "substring";
+    public override List<string> Constants => [];
     public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ internal class Method_Substring : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var st = attvar.ValueIntGet(1);
         var en = attvar.ValueIntGet(2);
         if (st < 0) {

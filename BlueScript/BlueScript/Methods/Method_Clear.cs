@@ -33,6 +33,7 @@ internal class Method_Clear : Method {
 
     public override List<List<string>> Args => [ListStringVar];
     public override string Command => "clear";
+    public override List<string> Constants => [];
     public override string Description => "Entfernt alle Einträge einer Liste";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ internal class Method_Clear : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.ValueListStringSet(0, [], ld) is DoItFeedback dif) { return dif; }

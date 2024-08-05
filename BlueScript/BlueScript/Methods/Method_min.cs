@@ -33,6 +33,7 @@ internal class Method_Min : Method {
 
     public override List<List<string>> Args => [[VariableFloat.ShortName_Variable, VariableString.ShortName_Variable, VariableListString.ShortName_Variable]];
     public override string Command => "min";
+    public override List<string> Constants => [];
 
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.\r\n" +
                                             "Ein Text wird wenn möglich als Zahl interpretiert.\r\n" +
@@ -50,7 +51,7 @@ internal class Method_Min : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {

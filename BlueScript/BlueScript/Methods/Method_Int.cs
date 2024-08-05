@@ -32,8 +32,12 @@ internal class Method_Int : Method {
     #region Properties
 
     public override List<List<string>> Args => [FloatVal];
+
     public override string Command => "int";
+
+    public override List<string> Constants => [];
     public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
+
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;

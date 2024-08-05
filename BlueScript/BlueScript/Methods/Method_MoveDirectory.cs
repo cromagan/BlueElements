@@ -33,11 +33,9 @@ internal class Method_MoveDirectory : Method {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
-
     public List<List<string>> ArgsForButton => Args;
-
     public override string Command => "movedirectory";
-
+    public override List<string> Constants => [];
     public override string Description => "Verschiebt einen Ordner.";
 
     public override bool GetCodeBlockAfter => false;
@@ -58,7 +56,7 @@ internal class Method_MoveDirectory : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var sop = attvar.ValueStringGet(0);
         if (!DirectoryExists(sop)) { return new DoItFeedback(ld, "Quell-Verzeichnis existiert nicht."); }
         var dep = attvar.ValueStringGet(1);

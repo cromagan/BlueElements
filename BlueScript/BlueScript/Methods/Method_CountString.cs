@@ -35,6 +35,7 @@ internal class Method_CountString : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], StringVal];
     public override string Command => "countstring";
+    public override List<string> Constants => [];
 
     public override string Description => "Ist das erste Argument ein Text, wird gezählt, wie oft der Suchstring im Text vorkommt.\r\n" +
         "Ist es eine Liste, wird gezählt, wie oft ein Listeneintrag dem Text entspricht.\r\n" +
@@ -52,7 +53,7 @@ internal class Method_CountString : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         switch (attvar.Attributes[0]) {
             case VariableString vs:
                 return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));

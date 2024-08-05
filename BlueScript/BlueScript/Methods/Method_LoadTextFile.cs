@@ -37,6 +37,7 @@ internal class Method_LoadTextFile : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "loadtextfile";
+    public override List<string> Constants => ["UTF8", "WIN1252"];
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -50,7 +51,7 @@ internal class Method_LoadTextFile : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ft = attvar.ValueStringGet(0).FileType();
 
         if (ft is not FileFormat.Textdocument and not FileFormat.CSV) {
@@ -69,7 +70,7 @@ internal class Method_LoadTextFile : Method {
                     break;
 
                 case "WIN1252":
-                    importText = File.ReadAllText(attvar.ValueStringGet(0), Constants.Win1252);
+                    importText = File.ReadAllText(attvar.ValueStringGet(0), BlueBasics.Constants.Win1252);
                     break;
 
                 default:

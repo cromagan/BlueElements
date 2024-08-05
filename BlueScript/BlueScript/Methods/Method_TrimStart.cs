@@ -34,6 +34,7 @@ internal class Method_TrimStart : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "trimstart";
+    public override List<string> Constants => [];
     public override string Description => "Entfernt die angegebenen Texte am Anfang des Strings. Groß und Kleinschreibung wird ignoriert.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -47,7 +48,7 @@ internal class Method_TrimStart : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
         string txt;

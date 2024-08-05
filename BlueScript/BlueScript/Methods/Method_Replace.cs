@@ -33,6 +33,7 @@ internal class Method_Replace : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "replace";
+    public override List<string> Constants => [];
     public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

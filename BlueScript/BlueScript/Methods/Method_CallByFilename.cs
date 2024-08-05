@@ -34,8 +34,8 @@ public class Method_CallByFilename : Method {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
-
     public override string Command => "callbyfilename";
+    public override List<string> Constants => [];
 
     public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
                                                 "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +

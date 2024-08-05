@@ -48,6 +48,8 @@ internal class Method_Try : Method {
     public override string StartSequence => string.Empty;
     public override string Syntax => "Try { }";
 
+    public override List<string> Constants => [];
+
     #endregion
 
     #region Methods

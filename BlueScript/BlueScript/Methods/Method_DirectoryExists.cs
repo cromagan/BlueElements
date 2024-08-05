@@ -35,6 +35,7 @@ internal class Method_DirectoryExists : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "directoryexists";
+    public override List<string> Constants => [];
     public override string Description => "Prüft, ob ein Verzeichnis existiert";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -48,7 +49,7 @@ internal class Method_DirectoryExists : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
         if (!pf.IsFormat(FormatHolder.Filepath)) {

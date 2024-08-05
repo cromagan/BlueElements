@@ -34,6 +34,7 @@ internal class Method_ClipboardText : Method {
 
     public override List<List<string>> Args => [];
     public override string Command => "clipboardtext";
+    public override List<string> Constants => [];
     public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ internal class Method_ClipboardText : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (Clipboard.ContainsText()) {
             return new DoItFeedback(Clipboard.GetText());
         }

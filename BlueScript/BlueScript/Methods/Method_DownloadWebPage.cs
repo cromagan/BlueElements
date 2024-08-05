@@ -40,6 +40,7 @@ internal class Method_DownloadWebPage : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadwebpage";
+    public override List<string> Constants => [];
     public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -53,9 +54,9 @@ internal class Method_DownloadWebPage : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var url = attvar.ValueStringGet(0);
-        var varn = "X" + url.ReduceToChars(Constants.AllowedCharsVariableName);
+        var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
 
         if (Last.Get(varn) is VariableString vb) {
             return new DoItFeedback(vb.ValueString);

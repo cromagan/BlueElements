@@ -33,6 +33,7 @@ internal class Method_SetIfExists : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable], [Variable.Any_Plain]];
     public override string Command => "setifexists";
+    public override List<string> Constants => [];
     public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -46,7 +47,7 @@ internal class Method_SetIfExists : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {

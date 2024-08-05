@@ -44,10 +44,10 @@ internal class Method_IsDateTime : Method {
     public override string Syntax => "IsDateTime(Value)";
 
     #endregion
-
+    public override List<string> Constants => [..BlueBasics.Constants.DateTimeFormats];
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ok = DateTimeTryParse(attvar.ValueStringGet(0), out _);
         return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

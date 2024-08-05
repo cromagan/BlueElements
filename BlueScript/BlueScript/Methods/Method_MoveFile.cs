@@ -33,20 +33,17 @@ internal class Method_MoveFile : Method {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
-
-
     public override string Command => "movefile";
-
+    public override List<string> Constants => [];
     public override string Description => "Verschiebt eine Datei.";
 
     public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO ;
+    public override MethodType MethodType => MethodType.IO;
 
     public override bool MustUseReturnValue => false;
-
 
     public override string Returns => string.Empty;
 
@@ -58,8 +55,7 @@ internal class Method_MoveFile : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var sop = attvar.ValueStringGet(0);
         var dep = attvar.ValueStringGet(1);
 
@@ -79,7 +75,6 @@ internal class Method_MoveFile : Method {
 
         return DoItFeedback.Null();
     }
-
 
     #endregion
 }

@@ -33,8 +33,8 @@ internal class Method_ExtractTags : Method {
     #region Properties
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], StringVal];
-
     public override string Command => "extracttags";
+    public override List<string> Constants => [];
 
     public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
                                               "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
@@ -52,7 +52,7 @@ internal class Method_ExtractTags : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         const string comment = "Mit dem Befehl 'ExtractTags' erstellt";
         varCol.RemoveWithComment(comment);
 
@@ -64,7 +64,7 @@ internal class Method_ExtractTags : Method {
             var x = thisw.SplitBy(attvar.ValueStringGet(1));
 
             if (x.Length == 2) {
-                var vn = x[0].ToLowerInvariant().ReduceToChars(Constants.AllowedCharsVariableName);
+                var vn = x[0].ToLowerInvariant().ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
                     varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));

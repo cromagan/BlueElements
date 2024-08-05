@@ -34,6 +34,7 @@ internal class Method_ForEach : Method {
 
     public override List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
     public override string Command => "foreach";
+    public override List<string> Constants => [];
     public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool GetCodeBlockAfter => true;
     public override int LastArgMinCount => -1;
@@ -65,7 +66,7 @@ internal class Method_ForEach : Method {
         }
 
         var scx = new DoItFeedback(false, false);
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe+1);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1);
 
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
@@ -78,7 +79,6 @@ internal class Method_ForEach : Method {
 
         return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
-
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.

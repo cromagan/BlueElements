@@ -34,6 +34,7 @@ internal class Method_Remove : Method {
 
     public override List<List<string>> Args => [ListStringVar, BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "remove";
+    public override List<string> Constants => [];
     public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -47,7 +48,7 @@ internal class Method_Remove : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);
@@ -59,7 +60,7 @@ internal class Method_Remove : Method {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));
             }
         }
-        if (attvar.ValueListStringSet(0, tmpList,ld) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
         return DoItFeedback.Null();
     }
 

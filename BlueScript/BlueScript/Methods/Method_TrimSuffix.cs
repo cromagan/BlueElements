@@ -29,7 +29,7 @@ namespace BlueScript.Methods;
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_TrimSuffix : Method {
-
+    public override List<string> Constants => [];
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
@@ -50,7 +50,7 @@ internal class Method_TrimSuffix : Method {
    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
-        const string tmp = Constants.Char_Numerals + " ";
+        const string tmp = BlueBasics.Constants.Char_Numerals + " ";
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var suf = attvar.ValueStringGet(z).ToLowerInvariant();

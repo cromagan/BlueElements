@@ -34,6 +34,7 @@ internal class Method_RemoveXmlTags : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "removexmltags";
+    public override List<string> Constants => [];
     public override string Description => "Entfernt aus dem Text < > Tags.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

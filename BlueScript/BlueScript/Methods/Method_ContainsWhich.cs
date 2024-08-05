@@ -35,6 +35,7 @@ internal class Method_ContainsWhitch : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "containswhich";
+    public override List<string> Constants => [];
     public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann alle gefundenen Strings als Liste a zurück.\r\nWort bedeutet, dass es als ganzes Wort vorkommen muss: 'Dach' gilt z.B. nicht als 'Hausdach'";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -50,7 +51,7 @@ internal class Method_ContainsWhitch : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var found = new List<string>();
 
         #region Wortliste erzeugen

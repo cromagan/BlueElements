@@ -34,6 +34,7 @@ internal class Method_Do : Method {
 
     public override List<List<string>> Args => [];
     public override string Command => "do";
+    public override List<string> Constants => [];
     public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool GetCodeBlockAfter => true;
     public override int LastArgMinCount => -1;
@@ -53,7 +54,7 @@ internal class Method_Do : Method {
 
         var du = 0;
 
-        var scp2 = new ScriptProperties(scp, [..scp.AllowedMethods , Method_Break.Method   ] , scp.Stufe);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe);
 
         DoItFeedback scx;
         do {
@@ -76,8 +77,6 @@ internal class Method_Do : Method {
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();
     }
-
-
 
     #endregion
 }

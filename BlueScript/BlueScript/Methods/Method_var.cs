@@ -34,6 +34,7 @@ internal class Method_Var : Method {
 
     public override List<List<string>> Args => [[Variable.Any_Plain]];
     public override string Command => "var";
+    public override List<string> Constants => [];
     public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -50,15 +51,13 @@ internal class Method_Var : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.LogData, "Kein Text angekommen."); }
 
-        var vbe =  VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
+        var vbe = VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
 
-
-        if (vbe.AllOk) {  return vbe; }
-
+        if (vbe.AllOk) { return vbe; }
 
         return vbe;
-
     }
+
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
@@ -66,5 +65,6 @@ internal class Method_Var : Method {
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();
     }
+
     #endregion
 }

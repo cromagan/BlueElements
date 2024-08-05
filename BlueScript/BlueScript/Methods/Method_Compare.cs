@@ -33,6 +33,7 @@ internal class Method_Compare : Method {
 
     public override List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableFloat.ShortName_Plain, VariableBool.ShortName_Plain]];
     public override string Command => "compare";
+    public override List<string> Constants => [];
 
     public override string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
                                            "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
@@ -49,7 +50,7 @@ internal class Method_Compare : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ignorenull = attvar.ValueBoolGet(0);
         var cases = attvar.ValueBoolGet(1);
 

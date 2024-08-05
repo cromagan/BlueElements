@@ -41,12 +41,12 @@ internal class Method_DateTimeDifferenceInDays : Method {
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
-
+    public override List<string> Constants => [];
     #endregion
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d1 = attvar.ValueDateGet(0);
 
         if (d1 == null) {

@@ -34,11 +34,9 @@ internal class Method_DeleteFile : Method {
     #region Properties
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-
     public List<List<string>> ArgsForButton => Args;
-
     public override string Command => "deletefile";
-
+    public override List<string> Constants => [];
     public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
 
     public override bool GetCodeBlockAfter => false;
@@ -59,7 +57,7 @@ internal class Method_DeleteFile : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var files = new List<string>();
 
         for (var z = 0; z < attvar.Attributes.Count; z++) {

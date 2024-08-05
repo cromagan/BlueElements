@@ -33,6 +33,7 @@ internal class Method_RemoveDoubleSpaces : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "removedoublespaces";
+    public override List<string> Constants => [];
     public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ internal class Method_RemoveDoubleSpaces : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var t = attvar.ValueStringGet(0);
         string ot;
         do {

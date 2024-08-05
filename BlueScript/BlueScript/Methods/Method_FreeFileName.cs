@@ -35,6 +35,7 @@ internal class Method_FreeFileName : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "freefilename";
+    public override List<string> Constants => [];
     public override string Description => "Gibt einen zufälligen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -48,20 +49,20 @@ internal class Method_FreeFileName : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
             return new DoItFeedback(ld, "Verzeichnis existiert nicht");
         }
 
-        var zeichen = Constants.Char_AZ.ToLowerInvariant() + Constants.Char_Numerals + Constants.Char_AZ.ToUpperInvariant();
+        var zeichen = BlueBasics.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.Constants.Char_Numerals + BlueBasics.Constants.Char_AZ.ToUpperInvariant();
         // Ja, lower und upper macht keinen sinn, sieht aber verrückter aus
 
         do {
             var p = string.Empty;
             while (p.Length < 20) {
-                var pos = Constants.GlobalRnd.Next(zeichen.Length);
+                var pos = BlueBasics.Constants.GlobalRnd.Next(zeichen.Length);
                 p += zeichen.Substring(pos, 1);
             }
 

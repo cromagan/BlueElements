@@ -34,6 +34,7 @@ internal class Method_IsNumeral : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableFloat.ShortName_Plain]];
     public override string Command => "isnumeral";
+    public override List<string> Constants => [];
     public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +48,7 @@ internal class Method_IsNumeral : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
         if (attvar.Attributes[0] is VariableString vs) {
             if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }

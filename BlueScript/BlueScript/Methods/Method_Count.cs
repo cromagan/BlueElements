@@ -33,6 +33,7 @@ internal class Method_Count : Method {
 
     public override List<List<string>> Args => [ListStringVar];
     public override string Command => "count";
+    public override List<string> Constants => [];
     public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

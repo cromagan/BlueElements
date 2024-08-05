@@ -35,6 +35,7 @@ internal class Method_BitmapToBase64 : Method {
 
     public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], StringVal];
     public override string Command => "bitmaptobase64";
+    public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -42,13 +43,13 @@ internal class Method_BitmapToBase64 : Method {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "BitmapToBase64(Bitmap, JPG / PNG)";
+    public override string Syntax => "BitmapToBase64(Bitmap, JPG/PNG/BMP)";
 
     #endregion
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         string x;
 
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
@@ -60,8 +61,12 @@ internal class Method_BitmapToBase64 : Method {
                 x = Converter.BitmapToBase64(attvar.ValueBitmapGet(0), ImageFormat.Png);
                 break;
 
+            case "BMP":
+                x = Converter.BitmapToBase64(attvar.ValueBitmapGet(0), ImageFormat.Bmp);
+                break;
+
             default:
-                return new DoItFeedback(ld, "Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
+                return new DoItFeedback(ld, "Es wir als zweites Attribut ein String mit dem Inhalt bmp, jpg oder png erwartet.");
         }
 
         return new DoItFeedback(x);

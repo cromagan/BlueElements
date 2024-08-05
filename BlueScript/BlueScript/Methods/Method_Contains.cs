@@ -33,6 +33,7 @@ internal class Method_Contains : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "contains";
+    public override List<string> Constants => [];
     public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -47,7 +48,7 @@ internal class Method_Contains : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region Wortliste erzeugen
 

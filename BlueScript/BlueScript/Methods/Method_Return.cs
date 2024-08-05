@@ -33,9 +33,10 @@ internal class Method_Return : Method {
 
     public override List<List<string>> Args => [];
     public override string Command => "return";
+    public override List<string> Constants => [];
     public override string Description => "Beendet das Skript oder Unterskript ohne Fehler.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -46,7 +47,7 @@ internal class Method_Return : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(false, true);
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(false, true);
 
     #endregion
 }

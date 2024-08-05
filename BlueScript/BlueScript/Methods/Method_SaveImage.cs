@@ -46,9 +46,12 @@ internal class Method_SaveImage : Method {
 
     #endregion
 
+
+    public override List<string> Constants => ["PNG", "JPG", "BMP"];
+
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Bild ermitteln (img)
 
