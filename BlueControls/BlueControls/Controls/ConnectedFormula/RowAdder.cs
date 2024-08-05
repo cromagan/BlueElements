@@ -111,7 +111,11 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
         vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
 
-        var scp = new ScriptProperties("Row-Adder", MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow, true, [], rowIn, 0);
+
+
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow);
+
+        var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
 
         var sc = new BlueScript.Script(vars, string.Empty, scp);
         sc.ScriptText = scripttext;
@@ -160,12 +164,12 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _ignoreCheckedChanged = true;
 
         if (string.IsNullOrEmpty(EntityID)) {
-            Fehler("Interner Fehler: EnitiyID", BlueBasics.Enums.ImageCode.Kritisch);
+            Fehler("Interner Fehler: EnitiyID", ImageCode.Kritisch);
             return;
         }
 
         if (OriginIDColumn == null) {
-            Fehler("Interner Fehler: OriginIDColumn", BlueBasics.Enums.ImageCode.Kritisch);
+            Fehler("Interner Fehler: OriginIDColumn", ImageCode.Kritisch);
             return;
         }
 
@@ -180,7 +184,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         }
 
         if (rowIn == null) {
-            Fehler("Keine Wahl getroffen", BlueBasics.Enums.ImageCode.Information);
+            Fehler("Keine Wahl getroffen", ImageCode.Information);
             return;
         }
 
@@ -189,7 +193,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         if (!string.IsNullOrEmpty(nowGeneratedId.msg)) { Fehler(nowGeneratedId.msg, ImageCode.Kritisch); return; }
 
         if (string.IsNullOrEmpty(Script)) {
-            Fehler("Interner Fehler: Kein Skript vorhanden", BlueBasics.Enums.ImageCode.Kritisch);
+            Fehler("Interner Fehler: Kein Skript vorhanden", ImageCode.Kritisch);
             return;
         }
 

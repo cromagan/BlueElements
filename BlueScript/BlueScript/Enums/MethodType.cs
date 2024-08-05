@@ -67,7 +67,10 @@ public enum MethodType {
     /// </summary>
     SpecialVariables = 128,
 
-    Break = 256,
+    /// <summary>
+    ///  Sehr spezialle Befehle, die nur an einer einzigen Position erlaubt sind
+    /// </summary>
+    Special = 256,
 
     AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | ManipulatesUser | SpecialVariables
 }

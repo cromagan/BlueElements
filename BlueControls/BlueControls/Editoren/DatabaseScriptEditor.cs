@@ -222,12 +222,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
 
                 var it = ItemOf(thisSet);
-                it.UserDefCompareKey = cap + Constants.SecondSortChar;
+                it.UserDefCompareKey = cap + SecondSortChar;
 
                 lstEventScripts.ItemAdd(it);
 
                 if (lstEventScripts[cap] == null) {
-                    lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));
+                    lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
                 }
 
                 if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {

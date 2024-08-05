@@ -361,7 +361,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
 
-        if (base.ContainsMouse()) { return; }
+        if (ContainsMouse()) { return; }
 
         btnEdit.Visible = false;
     }

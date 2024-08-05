@@ -831,7 +831,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return RepairUserGroups(l);
     }
 
-
     /// <summary>
     /// Standardisiert Benutzeruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
     /// </summary>
@@ -1211,7 +1210,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled, bool dbVariables, bool virtualcolumns, bool? extendedVariable) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool? extendedVariable) {
 
         #region Variablen für Skript erstellen
 
@@ -1233,13 +1232,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
         vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
         vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
         vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
         vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
-        vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+        //vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
         vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
 
         if (extendedVariable is bool e) {
@@ -1348,7 +1347,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
 
-        foreach (var thisCom in Script.Commands) {
+        foreach (var thisCom in BlueScript.Methods.Method.AllMethods) {
             if (thisCom.Verwendung.Count < 3) {
                 if (ev.ScriptText.ContainsWord(thisCom.Command + thisCom.StartSequence, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
                     thisCom.Verwendung.AddIfNotExists($"Datenbank: {Caption} / {ev.KeyName}");
@@ -1395,7 +1394,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region  Erlaubte Methoden ermitteln und maxtime
 
             var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.IO;
-            float maxtime = 60 * 60;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
 
@@ -1403,12 +1401,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.export) ||
                 (s.EventTypes.HasFlag(ScriptEventTypes.value_changed) && !extended)) {
-                maxtime = 10;
             }
 
             if (s.EventTypes.HasFlag(ScriptEventTypes.loaded) ||
                 s.EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
-                maxtime = 20;
             }
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
@@ -1432,30 +1428,25 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             bool? extv = null;
             if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) { extv = extended; }
 
-            var vars = CreateVariableCollection(row, !s.ChangeValues, prepf, dbVariables, prepf, extv);
+            var vars = CreateVariableCollection(row, !s.ChangeValues, dbVariables, prepf, extv);
+
+            var m = BlueScript.Methods.Method.GetMethods(allowedMethods);
+
+            if (prepf) { m.Add(Method_SetError.Method); }
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(s.KeyName, allowedMethods, produktivphase, s.Attributes(), addinfo, 0);
+            var scp = new ScriptProperties(s.KeyName, m, produktivphase, s.Attributes(), addinfo, 0);
 
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
             };
 
-            var tim = Stopwatch.StartNew();
-
-            var scf = sc.Parse(0, s.KeyName, attributes);
+                     var scf = sc.Parse(0, s.KeyName, attributes);
 
             #endregion
 
             #region Fehlerprüfungen
-
-            if (tim.ElapsedMilliseconds > maxtime * 1000) {
-                ExecutingScript--;
-                ExecutingScriptAnyDatabase--;
-                return new ScriptEndedFeedback("Das Skript hat eine zu lange Laufzeit.", false, true, s.KeyName);
-            }
-
             if (!scf.AllOk) {
                 ExecutingScript--;
                 ExecutingScriptAnyDatabase--;
@@ -1522,7 +1513,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-      /// <summary>
+    /// <summary>
     ///
     /// </summary>
     /// <param name="eventname"></param>
@@ -1532,7 +1523,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="attributes"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    /// <returns></returns>  
+    /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
@@ -1559,7 +1550,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (l.Count == 1) { scriptname = l[0].KeyName; }
                 if (string.IsNullOrEmpty(scriptname)) {
                     // Script nicht definiert. Macht nix. ist eben keines gewünscht
-                    var vars = CreateVariableCollection(row, false, false, dbVariables, true, false);
+                    var vars = CreateVariableCollection(row, false, dbVariables, true, false);
 
                     if (eventname == ScriptEventTypes.export) {
                         return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true, vars.GetBoolean("Successful") ?? false);
@@ -2686,7 +2677,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 foreach (var t in ai) {
                     EventScript_Add(new DatabaseScriptDescription(this, t), true);
                 }
-
+                Row.InvalidateAllCheckData();
                 //CheckScriptError();
                 break;
 
@@ -2730,6 +2721,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             case DatabaseDataType.ScriptNeedFix:
                 _scriptNeedFix = value;
+                Row.InvalidateAllCheckData();
                 break;
 
             case DatabaseDataType.UndoInOne:

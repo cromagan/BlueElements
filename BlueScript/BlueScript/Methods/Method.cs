@@ -31,12 +31,6 @@ namespace BlueScript.Methods;
 
 public abstract class Method : IReadableTextWithKey, IReadableText {
 
-    protected void SetNotSuccesful(VariableCollection varCol) {
-        var b = varCol.Get("successful");
-
-        if (b is VariableBool vb) { vb.ValueBool = false; }
-    }
-
     #region Fields
 
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
@@ -46,13 +40,23 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     public static readonly List<string> ListStringVar = [VariableListString.ShortName_Variable];
     public static readonly List<string> StringVal = [VariableString.ShortName_Plain];
     public static readonly List<string> StringVar = [VariableString.ShortName_Variable];
+    private static List<Method>? _allMethods;
 
     #endregion
 
     #region Properties
 
+    public static List<Method> AllMethods {
+        get {
+            _allMethods ??= Generic.GetInstaceOfType<Method>();
+            return _allMethods;
+        }
+    }
+
     public abstract List<List<string>> Args { get; }
+
     public abstract string Command { get; }
+
     public abstract string Description { get; }
 
     public string EndSequence {
@@ -69,6 +73,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     }
 
     public abstract bool GetCodeBlockAfter { get; }
+
     public string KeyName => Command;
 
     /// <summary>
@@ -86,9 +91,13 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     public abstract bool MustUseReturnValue { get; }
 
     public string QuickInfo => HintText();
+
     public abstract string Returns { get; }
+
     public abstract string StartSequence { get; }
+
     public abstract string Syntax { get; }
+
     public List<string> Verwendung { get; } = new List<string>();
 
     #endregion
@@ -139,12 +148,24 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
+    public static List<Method> GetMethods(MethodType allowedMethods) {
+        var m = new List<Method>();
+
+        foreach (var thism in AllMethods) {
+            if (allowedMethods.HasFlag(thism.MethodType)) {
+                m.Add(thism);
+            }
+        }
+
+        return m;
+    }
+
     public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection? varCol, LogData ld, ScriptProperties scp) {
         List<string> toSearch = [];
 
         #region Mögliche Methoden
 
-        foreach (var thisc in Script.Commands) {
+        foreach (var thisc in scp.AllowedMethods) {
             if (!string.IsNullOrEmpty(thisc.Returns)) {
                 toSearch.Add(thisc.Command + thisc.StartSequence);
             }
@@ -211,15 +232,15 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback([])
-                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.",-1);
+                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.", -1);
         }
 
         var attributes = SplitAttributeToString(attributText);
-        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.",-1); }
-        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.",-1); }
-        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.",-1); }
-        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.",-1); }
-        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.",-1); }
+        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", -1); }
+        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", -1); }
+        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", -1); }
+        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.", -1); }
+        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", -1); }
 
         //  Variablen und Routinen ersetzen
         VariableCollection feedbackVariables = [];
@@ -297,7 +318,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         var attvar = SplitAttributeToVars(varCol, value, sargs, 0, ld, scp);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(ld, "Der Wert nach dem '=' konnte nicht berechnet werden: " +  attvar.ErrorMessage); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(ld, "Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.ErrorMessage); }
 
         if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback(ld, "Variable unbekannt"); }
 
@@ -319,9 +340,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         // attvar.Attributes[0] müsste immer eine Variable sein...
         return new DoItFeedback(ld, "Interner Fehler");
     }
-
-
-
 
     public CanDoFeedback CanDo(ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
@@ -349,9 +367,9 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
                     cont = cont + codebltxt.Length + 2;
                 }
 
-                if (!scp.AllowedMethods.HasFlag(MethodType)) {
-                    return new CanDoFeedback(pos, "Befehl '" + Syntax + "' kann in diesem Skript an der aktuellen Position nicht benutzt werden.", true, ld);
-                }
+                //if (!scp.AllowedMethods.HasFlag(MethodType)) {
+                //    return new CanDoFeedback(pos, "Befehl '" + Syntax + "' kann in diesem Skript an der aktuellen Position nicht benutzt werden.", true, ld);
+                //}
 
                 return new CanDoFeedback(cont, f.AttributeText, codebltxt, ld);
             }
@@ -360,16 +378,12 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         return new CanDoFeedback(pos, "Kann nicht geparst werden", false, ld);
     }
 
-
     public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-
-
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         return DoIt(varCol, attvar, scp, infos.LogData);
     }
-  
 
     public abstract DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld);
 
@@ -448,6 +462,12 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
     public QuickImage? SymbolForReadableText() => null;
 
+    protected void SetNotSuccesful(VariableCollection varCol) {
+        var b = varCol.Get("successful");
+
+        if (b is VariableBool vb) { vb.ValueBool = false; }
+    }
+
     private static List<string>? SplitAttributeToString(string attributtext) {
         if (string.IsNullOrEmpty(attributtext)) { return null; }
         List<string> attributes = [];
@@ -471,5 +491,4 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
     }
 
     #endregion
-
 }

@@ -25,19 +25,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static BlueBasics.Generic;
 
 namespace BlueScript;
 
 public class Script {
-
-    #region Fields
-
-    private static List<Method>? _commands;
-
-    private static List<Variable>? _varTypes;
-
-    #endregion
 
     #region Constructors
 
@@ -56,23 +47,6 @@ public class Script {
 
     #region Properties
 
-    public static List<Method> Commands {
-        get {
-            _commands ??= GetInstaceOfType<Method>();
-            return _commands;
-        }
-    }
-
-    public static List<Variable> VarTypes {
-        get {
-            if (_varTypes == null) {
-                _varTypes = GetInstaceOfType<Variable>("NAME");
-                _varTypes.Sort();
-            }
-            return _varTypes;
-        }
-    }
-
     public ScriptProperties Properties { get; }
     public string ReducedScriptText { get; private set; }
     public string ScriptText { get; set; } = string.Empty;
@@ -83,8 +57,8 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection? varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
-        if (Commands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
+    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+        //if (MethodsAll == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
@@ -96,7 +70,7 @@ public class Script {
 
         #region Befehle prüfen
 
-        foreach (var thisC in Commands) {
+        foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scp, scriptText, pos, expectedvariablefeedback, ld);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
@@ -134,7 +108,7 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var thisC in Commands) {
+        foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scp, scriptText, pos, !expectedvariablefeedback, ld);
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);

@@ -25,13 +25,13 @@ using BlueControls.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.EventArgs;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -116,7 +116,9 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var scp = new ScriptProperties("Skript-Editor: " + scriptname, MethodType.Standard, false, [], null, 0);
+            var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard);
+
+            var scp = new ScriptProperties("Skript-Editor: " + scriptname, m, false, [], null, 0);
             var s = new Script(null, string.Empty, scp);
             ex.Feedback = s.Parse(0, "Main", null);
         }
@@ -151,12 +153,12 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
     private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => OnPropertyChanged();
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
-        if (Script.Commands == null) { return; }
+        if (Method.AllMethods == null) { return; }
 
         try {
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
-            foreach (var thisc in Script.Commands) {
+            foreach (var thisc in Method.AllMethods) {
                 if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText();
@@ -197,8 +199,8 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
                 AllowTabKey = true
             };
             List<AutocompleteItem> items = [];
-            if (Script.Commands != null) {
-                foreach (var thisc in Script.Commands) {
+            if (Method.AllMethods != null) {
+                foreach (var thisc in Method.AllMethods) {
                     items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
                     items.Add(new AutocompleteItem(thisc.Command));
                     if (!string.IsNullOrEmpty(thisc.Returns)) {

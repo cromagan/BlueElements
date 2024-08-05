@@ -27,6 +27,7 @@ using BlueScript.Variables;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using BlueScript.Methods;
 
 namespace BlueControls.Controls;
 
@@ -243,12 +244,12 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
     private void F_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button != MouseButtons.Left) { return; }
 
-        if (Script.Commands == null) {
+        if (Method.AllMethods == null) {
             ButtonError("Befehle konnten nicht initialisiert werden.");
             return;
         }
 
-        var m = Script.Commands.Get(_action);
+        var m = Method.AllMethods.Get(_action);
 
         if (m is not IUseableForButton ufb) {
             ButtonError("Aktion '" + _action + "' nicht gefunden.");
@@ -270,7 +271,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         var row = this.RowSingleOrNull();
 
         if (row?.Database is Database db && !db.IsDisposed) {
-            vars = db.CreateVariableCollection(row, true, false, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = new VariableCollection();
         }

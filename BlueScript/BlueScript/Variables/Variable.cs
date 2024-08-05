@@ -35,7 +35,10 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     #region Fields
 
     private static long _dummyCount;
+    private static List<Variable>? _varTypes;
+
     private string _comment = string.Empty;
+
     private bool _readOnly;
 
     #endregion
@@ -54,6 +57,16 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     public static string Any_Plain => "any";
 
     public static string Any_Variable => "*any";
+
+    public static List<Variable> VarTypes {
+        get {
+            if (_varTypes == null) {
+                _varTypes = Generic.GetInstaceOfType<Variable>("NAME");
+                _varTypes.Sort();
+            }
+            return _varTypes;
+        }
+    }
 
     public abstract int CheckOrder { get; }
 
@@ -119,7 +132,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection varCol, ScriptProperties scp) {
+    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection? varCol, ScriptProperties scp) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
@@ -190,11 +203,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             }
         }
 
-        if (Script.VarTypes == null) {
+        if (VarTypes == null) {
             return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
         }
 
-        foreach (var thisVt in Script.VarTypes) {
+        foreach (var thisVt in VarTypes) {
             if (thisVt.GetFromStringPossible) {
                 if (thisVt.TryParse(txt, out var v, varCol, scp) && v != null) {
                     return new DoItFeedback(v);
@@ -211,7 +224,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         v = v.ReduceToChars(AllowedCharsVariableName);
         if (v != vo || string.IsNullOrEmpty(v)) { return false; }
 
-        foreach (var thisc in Script.Commands) {
+        foreach (var thisc in BlueScript.Methods.Method.AllMethods) {
             if (thisc.Command.Equals(v)) { return false; }
         }
         return true;

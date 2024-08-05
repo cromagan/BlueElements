@@ -89,14 +89,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     public void Bildschirmbereich_wählen() {
         if (Bitmap != null) {
-            if (BlueControls.Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).CloneOfBitmap();
     }
 
     public void Datei_laden() {
         if (Bitmap != null) {
-            if (BlueControls.Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         OpenFileDialog e = new() {
             CheckFileExists = true,
@@ -170,7 +170,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         if (variable is VariableBitmap vbmp) {
             ot = vbmp.ValueBitmap;
         } else if (variable is VariableString filn) {
-            if (BlueBasics.IO.FileExists(filn.ValueString)) {
+            if (FileExists(filn.ValueString)) {
                 ot = (Bitmap)Image_FromFile(filn.ValueString);
             } else {
                 return false;

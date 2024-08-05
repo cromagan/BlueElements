@@ -413,7 +413,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
 
         } else {
-            BlueControls.Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
 
         }
         Invalidate_FilterInput();

@@ -70,9 +70,8 @@ public static class UseableForButton {
         var ld = new LogData("Knopfdruck", 0);
         var cdw = new CanDoFeedback(0, t.reducedText, string.Empty, ld);
 
-        var scp = new ScriptProperties("Knopfdruck im Formular", BlueScript.Enums.MethodType.AllDefault, true, [], additionalInfo, 0);
-
-        var erg = ufb.DoIt(varCol, cdw, scp);
+        var scp = new ScriptProperties("Knopfdruck im Formular", BlueScript.Methods.Method.AllMethods, true, [], additionalInfo, 0);
+        ufb.DoIt(varCol, cdw, scp);
 
         return cdw.LogData.Protocol.JoinWithCr();
     }

@@ -17,7 +17,7 @@
 
 #nullable enable
 
-using BlueScript.Enums;
+using BlueScript.Methods;
 using System.Collections.Generic;
 
 namespace BlueScript.Structures;
@@ -26,9 +26,7 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties() : this(string.Empty, MethodType.Standard, false, [], null,0) { }
-
-    public ScriptProperties(string scriptname, MethodType allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, int stufe) {
+    public ScriptProperties(string scriptname, List<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, int stufe) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
@@ -37,13 +35,11 @@ public class ScriptProperties {
         Stufe = stufe;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods, int stufe) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, stufe) { }
+    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, stufe) { }
 
     #endregion
 
     #region Properties
-
-    public int Stufe { get; }
 
     public object? AdditionalInfo { get; }
     public bool ProduktivPhase { get; }
@@ -54,8 +50,8 @@ public class ScriptProperties {
     public List<string> ScriptAttributes { get; }
 
     public string ScriptName { get; }
-
-    internal MethodType AllowedMethods { get; }
+    public int Stufe { get; }
+    internal List<Method> AllowedMethods { get; }
 
     #endregion
 }

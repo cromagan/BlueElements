@@ -50,11 +50,7 @@ public abstract class Method_Database : Method {
         return null;
     }
 
-    protected static bool SetErrorAllowed(VariableCollection varCol) {
-        var see = varCol.Get("SetErrorEnabled");
-        if (see is VariableBool seet) { return seet.ValueBool; }
-        return false;
-    }
+
 
     protected ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
         var c = attvar.Attributes[no];

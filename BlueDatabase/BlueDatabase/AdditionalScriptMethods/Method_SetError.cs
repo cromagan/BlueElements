@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
 public class Method_SetError : Method_Database {
-
+    public static Method Method = new Method_SetError();
     #region Properties
 
     public override List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
@@ -39,7 +40,7 @@ public class Method_SetError : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow;
+    public override MethodType MethodType => MethodType.Special;
 
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -52,7 +53,7 @@ public class Method_SetError : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
+        //if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         var r = MyRow(scp);
         if (r == null || r.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }

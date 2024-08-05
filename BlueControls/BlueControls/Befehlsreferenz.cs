@@ -56,7 +56,7 @@ public partial class Befehlsreferenz : Forms.Form {
     private void WriteCommandsToList() {
         lstCommands.ItemClear();
 
-        foreach (var thisc in Script.Commands) {
+        foreach (var thisc in Method.AllMethods) {
             lstCommands.ItemAdd(ItemOf(thisc));
         }
     }

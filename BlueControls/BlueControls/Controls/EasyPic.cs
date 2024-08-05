@@ -120,7 +120,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         if (string.IsNullOrEmpty(_filename)) { return true; }
         if (!FileExists(_filename)) { return true; }
 
-        if (BlueControls.Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
+        if (Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
         if (DeleteFile(_filename, false)) {
             _bitmap = null;

@@ -222,7 +222,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
             if (IsDisposed) { return; }
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
-            if (!PossibleFor(Script.Commands.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
+            if (!PossibleFor(Method.AllMethods.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
             OnPropertyChanged();
             UpdateSideOptionMenu();
         }
@@ -393,8 +393,8 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
 
         var co = new List<AbstractListItem>();
 
-        if (Script.Commands != null) {
-            foreach (var cmd in Script.Commands) {
+        if (Method.AllMethods != null) {
+            foreach (var cmd in Method.AllMethods) {
                 if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
                     co.Add(ItemOf(ufb2.NiceTextForUser, ufb2.Command));
                 }
@@ -405,7 +405,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
 
         l.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
-        var m = Script.Commands.Get(_action);
+        var m = Method.AllMethods.Get(_action);
 
         if (m is IUseableForButton ufb) {
             if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0])); }

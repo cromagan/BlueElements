@@ -29,14 +29,20 @@ namespace BlueScript.Methods;
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Break : Method {
 
+    #region Fields
+
+    public static Method Method = new Method_Break();
+
+    #endregion
+
     #region Properties
 
     public override List<List<string>> Args => [];
     public override string Command => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
-    public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard | MethodType.Break;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.Special;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
