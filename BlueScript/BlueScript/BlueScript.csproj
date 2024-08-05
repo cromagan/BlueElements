@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />
+    <Compile Include="Methods\Method_If.cs" />
+    <Compile Include="Methods\Method_IsType.cs" />
     <Compile Include="Methods\Method_MaxDate.cs" />
     <Compile Include="Methods\Method_Ping.cs" />
     <Compile Include="Methods\Method_Encrypt.cs" />
