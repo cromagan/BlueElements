@@ -30,7 +30,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Constructors
 
-    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap) : base(doubleBuffer, useBackgroundBitmap) {   }
+    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap) : base(doubleBuffer, useBackgroundBitmap) { }
 
     #endregion
 
@@ -99,6 +99,8 @@ public class GenericControlReciverSender : GenericControlReciver {
     }
 
     protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+
         if (Disposing) {
             Parent.Controls.Remove(this);
             FilterOutput.Dispose();
@@ -109,8 +111,6 @@ public class GenericControlReciverSender : GenericControlReciver {
 
             Childs.Clear();
         }
-
-        base.Dispose(disposing);
     }
 
     protected override void OnCreateControl() {

@@ -45,7 +45,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
     private string _modus = string.Empty;
 
-    private Timer _timer;
 
     #endregion
 
@@ -59,10 +58,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         Page = page;
         InitFormula(null, null);
 
-        _timer = new Timer();
-        _timer.Enabled = true;
-        _timer.Interval = 1000;
-        _timer.Tick += Checker_Tick;
+        SetNotFocusable();
+        MouseHighlight = false;
+
+        updater.Enabled = true;
     }
 
     #endregion
@@ -114,9 +113,15 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         if (IsDisposed) { return; }
         if (_generated) { return; }
         if (!Visible) { return; }
-        if (ConnectedFormula == null || ConnectedFormula.IsEditing()) { return; }
+        if (ConnectedFormula == null || Width < 30 || Height < 10) {
+            _generated = true;
+            return;
+        }
 
-        if (Width < 30 || Height < 10) { return; }
+
+        if (ConnectedFormula.IsEditing()) { return; }
+
+
 
         #region Zuerst alle Controls als unused markieren
 
@@ -304,9 +309,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         if (disposing) {
             InitFormula(null, null);
             components?.Dispose();
-            _timer.Enabled = false;
-            _timer.Tick -= Checker_Tick;
-            _timer.Dispose();
+            updater.Enabled = false;
+            updater.Tick -= updater_Tick;
+            updater.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -320,7 +325,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         GenerateView();
 
         if (!_generated) {
-            _timer.Enabled = true;
+            updater.Enabled = true;
             return;
         }
 
@@ -340,9 +345,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             FilterOutput.ChangeTo(new FilterItem(r));
 
             btnScript.Visible = r.Database is Database db && !string.IsNullOrEmpty(db.ScriptNeedFix);
-            
 
-            if(btnScript.Visible) {btnScript.BringToFront(); }
+
+            if (btnScript.Visible) { btnScript.BringToFront(); }
 
 
 
@@ -357,7 +362,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
         if (_generated) {
             InvalidateView();
-            _timer.Enabled = false;
+            updater.Enabled = false;
         }
     }
 
@@ -367,12 +372,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     private void _database_Disposing(object sender, System.EventArgs e) => InitFormula(null, null);
 
-    private void Checker_Tick(object sender, System.EventArgs e) {
-        if (!_generated) {
-            Invalidate();
-            _timer.Stop();
-        }
-    }
 
     private void DoAutoX(List<FlexiControlForCell> autoc) {
         if (autoc.Count == 0) { return; }
@@ -418,6 +417,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
         Invalidate_FilterInput();
 
+    }
+
+    private void updater_Tick(object sender, System.EventArgs e) {
+        if (!_generated) {
+            Invalidate();
+            updater.Stop();
+        }
     }
 
     #endregion

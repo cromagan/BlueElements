@@ -140,12 +140,12 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
     }
 
     protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+
         if (disposing) {
             f.Dispose();
             f = null;
         }
-
-        base.Dispose(disposing);
     }
 
     protected override void HandleChangesNow() {
@@ -382,7 +382,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         if (filterSingle != null) {
             nvalue = filterSingle.SearchValue.JoinWithCr();
         }
-
 
         if (IsDisposed || f is null) { return; } // Kommt vor!
 

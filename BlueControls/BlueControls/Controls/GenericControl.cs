@@ -307,9 +307,11 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+
         OnDisposingEvent();
 
-        base.Dispose(disposing);
+
         if (disposing) {
             _bitmapOfControl?.Dispose();
             _bitmapOfControl = null;
@@ -528,7 +530,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     private void Control_GotFocus(object sender, System.EventArgs e) {
-        if(sender is not Control c) { return; }
+        if (sender is not Control c) { return; }
         OnChildGotFocus(new ControlEventArgs(c));
     }
 

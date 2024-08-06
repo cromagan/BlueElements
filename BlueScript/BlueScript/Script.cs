@@ -40,7 +40,7 @@ public class Script {
         foreach (var thism in scp.AllowedMethods) {
             if (thism.Constants.Count > 0) {
                 foreach (var thisValue in thism.Constants) {
-                    var varname = thisValue.ToUpper().Replace(".", "_").Replace(" ", "_").Replace(":", "_").Replace("/", "_").Replace("\\", "_");
+                    var varname = "c_" + thisValue.ToUpper().Replace(".", "_").Replace(" ", "_").Replace(":", "_").Replace("/", "_").Replace("\\", "_");
 
                     var comment = string.Empty;
                     if (Variables.Get(varname) is Variable tmpvar) {

@@ -343,6 +343,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected virtual void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) { }
 
     protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+
         if (disposing) {
             UnRegisterFilterInputAndDispose();
             Invalidate_RowsInput();
@@ -356,7 +358,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Parents.Clear();
         }
 
-        base.Dispose(disposing);
+      
     }
 
     protected void DoRows() {
