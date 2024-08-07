@@ -26,10 +26,10 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             this.SuspendLayout();
             // 
-            // InputBoxAbstractEditor
+            // InputBoxEditor
             // 
-            this.ClientSize = new System.Drawing.Size(455, 244);
-            this.Name = "InputBoxAbstractEditor";
+            this.ClientSize = new System.Drawing.Size(182, 56);
+            this.Name = "InputBoxEditor";
             this.ResumeLayout(false);
 
         }

@@ -48,7 +48,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
 
     public override void Clear() => formular.InitFormula(null, Database);
 
-    public override bool Init(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(IEditable? toEdit) {
         RowItem? row = null;
         if (ToEdit is RowItem r) { row = r; }
 
@@ -61,19 +61,6 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
         }
 
         return true;
-    }
-
-    protected override void InitializeComponentDefaultValues() {
-        //RowItem? row = null;
-        //if(ToEdit is RowItem r) { row = r; }
-
-        //formular.InitFormula(null, row?.Database);
-
-        //if (row != null && !row.IsDisposed) {
-        //    formular.GetConnectedFormulaFromDatabase(row.Database);
-
-        //    formular.SetToRow(row);
-        //}
     }
 
     #endregion

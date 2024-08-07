@@ -21,7 +21,7 @@ using System;
 
 namespace BlueBasics.Interfaces;
 
-public interface IEditable {
+public interface IEditable  {
 
     #region Properties
 

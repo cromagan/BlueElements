@@ -24,8 +24,6 @@ using System.Windows.Forms;
 
 namespace BlueControls.Editoren;
 
-#nullable enable
-
 public partial class EditorEasy : UserControl, IIsEditor {
 
     #region Fields
@@ -49,26 +47,38 @@ public partial class EditorEasy : UserControl, IIsEditor {
     public string Error { get; private set; } = "Nicht Initialisiert.";
 
     public IEditable? ToEdit {
-        protected get => _toEdit;
+        get => _toEdit;
 
         set {
             if (_toEdit == value) { return; }
-            _toEdit = value;
-            if (!DefaultGenerated) { return; }
+
+            if (!Visible || Disposing || IsDisposed) {
+                _toEdit = value;
+                return;
+            }
+
+            _toEdit = null; // Keine Steuerelement Änderungen auffangen
+
+            if (!ObjectSeted) {
+                ObjectSeted = true;
+                InitializeComponentDefaultValues();
+            }
 
             Clear();
 
             Error = string.Empty;
-            if (!Init(_toEdit)) {
+            if (!SetValuesToFormula(value)) {
                 Error = "Objekt konnte nicht initialisiert werden.";
             }
+
+            _toEdit = value;
         }
     }
 
     /// <summary>
-    /// Ob die Standardwerte der Elemente erstell wurden. Z.B. Komboboxen befüllt
+    /// Ob die Standardwerte der Elemente erstellt wurden. Z.B. Komboboxen befüllt
     /// </summary>
-    protected bool DefaultGenerated { get; private set; }
+    protected bool ObjectSeted { get; private set; }
 
     #endregion
 
@@ -87,16 +97,6 @@ public partial class EditorEasy : UserControl, IIsEditor {
     }
 
     /// <summary>
-    /// Schreibt die Werte des Objekts in die Steuerelemente
-    /// </summary>
-    /// <param name="toEdit"></param>
-    /// <returns></returns>
-    public virtual bool Init(IEditable? toEdit) {
-        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-        return false;
-    }
-
-    /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
     protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
@@ -104,18 +104,23 @@ public partial class EditorEasy : UserControl, IIsEditor {
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
 
-        if (DefaultGenerated || !Visible || Disposing) { return; }
+        if (!Visible || Disposing || IsDisposed) { return; }
 
-        DefaultGenerated = true;
+        if (ObjectSeted) { return; }
 
-        InitializeComponentDefaultValues();
+        var merk = _toEdit;
+        _toEdit = null; // Keine Steuerelement Änderungen auffangen
+        ToEdit = merk;
+    }
 
-        Clear();
-
-        Error = string.Empty;
-        if (!Init(_toEdit)) {
-            Error = "Objekt konnte nicht initialisiert werden.";
-        }
+    /// <summary>
+    /// Schreibt die Werte des Objekts in die Steuerelemente
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <returns></returns>
+    protected virtual bool SetValuesToFormula(IEditable? toEdit) {
+        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+        return false;
     }
 
     #endregion

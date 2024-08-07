@@ -54,7 +54,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         capDatabase.Text = "Datenbank: ?";
     }
 
-    public override bool Init(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(IEditable? toEdit) {
         if (toEdit is not FilterCollection fc || fc.IsDisposed) { return false; }
 
         if (fc.Database is not Database db || db.IsDisposed) { return false; }

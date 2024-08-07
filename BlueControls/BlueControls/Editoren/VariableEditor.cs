@@ -59,30 +59,6 @@ public partial class VariableEditor : EditorEasy {
         return list;
     }
 
-    public override bool Init(IEditable? variables) {
-        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return false; }
-        if (variables is not VariableCollection vc) { return false; }
-
-        foreach (var thisv in vc) {
-            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, null, "Neue Variable");
-
-            if (ro != null) {
-                ro.CellSet("typ", thisv.MyClassId, string.Empty);
-                ro.CellSet("RO", thisv.ReadOnly, string.Empty);
-
-                var tmpi = thisv.ReadableText;
-                if (!Editabe && tmpi.Length > 3990) {
-                    tmpi = tmpi.Substring(0, 3990) + "...";
-                }
-
-                ro.CellSet("Inhalt", tmpi, string.Empty);
-                ro.CellSet("Kommentar", thisv.Comment, string.Empty);
-            }
-        }
-
-        return true;
-    }
-
     public RowItem? RowOfVariable(string variable) {
         if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
         return db.Row[variable];
@@ -149,6 +125,30 @@ public partial class VariableEditor : EditorEasy {
         filterVariablen.Table = tableVariablen;
 
         db.Cell.CellValueChanged += TableVariablen_CellValueChanged;
+    }
+
+    protected override bool SetValuesToFormula(IEditable? variables) {
+        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return false; }
+        if (variables is not VariableCollection vc) { return false; }
+
+        foreach (var thisv in vc) {
+            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, null, "Neue Variable");
+
+            if (ro != null) {
+                ro.CellSet("typ", thisv.MyClassId, string.Empty);
+                ro.CellSet("RO", thisv.ReadOnly, string.Empty);
+
+                var tmpi = thisv.ReadableText;
+                if (!Editabe && tmpi.Length > 3990) {
+                    tmpi = tmpi.Substring(0, 3990) + "...";
+                }
+
+                ro.CellSet("Inhalt", tmpi, string.Empty);
+                ro.CellSet("Kommentar", thisv.Comment, string.Empty);
+            }
+        }
+
+        return true;
     }
 
     private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {

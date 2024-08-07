@@ -136,6 +136,7 @@ public partial class MessageBox : Form {
                         w = 4;
                         break;
 
+                    case "beheben":
                     case "bearbeiten":
                         b.ImageCode = "Stift|16";
                         w = 4;

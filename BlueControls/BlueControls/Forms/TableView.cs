@@ -418,9 +418,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     protected void AddTabPage(ConnectionInfo? ci, string settings) {
         if (ci is null) { return; }
 
- 
-
-
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName.ToTitleCase(),
@@ -775,7 +772,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
     }
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Database, typeof(DatabaseHeadEditor));
+    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Database, typeof(DatabaseHeadEditor), false);
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);

@@ -73,7 +73,10 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         return mb._giveBack;
     }
 
-    protected override void SetValue(bool canceled) => _giveBack = canceled ? null : [.. txbText.Checked];
+    protected override bool SetValue() {
+        _giveBack = Canceled ? null : [.. txbText.Checked];
+        return true;
+    }
 
     private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 

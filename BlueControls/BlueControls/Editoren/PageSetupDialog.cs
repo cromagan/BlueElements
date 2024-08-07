@@ -87,8 +87,9 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         return mb._giveBack;
     }
 
-    protected override void SetValue(bool canceled) {
-        if (canceled) { _giveBack = null; return; }
+    protected override bool SetValue() {
+
+        if (Canceled) { _giveBack = null; return true; }
         _giveBack = new PrintDocument();
         _giveBack.DefaultPageSettings.Landscape = Querformat.Checked;
         _giveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(FloatParse(Breite.Text) / 0.254), (int)(FloatParse(Höhe.Text) / 0.254));
@@ -96,6 +97,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         _giveBack.DefaultPageSettings.Margins.Bottom = (int)(FloatParse(Unten.Text) / 0.254);
         _giveBack.DefaultPageSettings.Margins.Left = (int)(FloatParse(Links.Text) / 0.254);
         _giveBack.DefaultPageSettings.Margins.Right = (int)(FloatParse(Rechts.Text) / 0.254);
+        return true;
     }
 
     private static double Inch1000ToMm(double inch) => inch switch {

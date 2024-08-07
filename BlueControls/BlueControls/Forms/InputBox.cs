@@ -66,7 +66,10 @@ public partial class InputBox : DialogWithOkAndCancel {
         return mb._giveBack;
     }
 
-    protected override void SetValue(bool canceled) => _giveBack = canceled ? string.Empty : txbText.Text;
+    protected override bool SetValue() {
+        _giveBack = Canceled ? string.Empty : txbText.Text;
+        return true;
+    }
 
     private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 

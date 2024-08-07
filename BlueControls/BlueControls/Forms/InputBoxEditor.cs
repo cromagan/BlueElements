@@ -29,9 +29,9 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxEditor() : this(null) { }
+    private InputBoxEditor() : this(null, false) { }
 
-    private InputBoxEditor(Control? centerControl) : base(false, true) {
+    private InputBoxEditor(Control? centerControl, bool supportsCancel) : base(supportsCancel, true) {
         InitializeComponent();
 
         //if (toEdit == null) { return; }
@@ -46,11 +46,16 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Methods
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <param name="isDialog"></param>
     public static void Show(ISimpleEditor? toEdit, bool isDialog) {
         if (toEdit == null) { return; }
         if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
 
-        Form mb = new InputBoxEditor(toEdit.GetControl(400));
+        var mb = new InputBoxEditor(toEdit.GetControl(400), false);
 
         if (isDialog) {
             _ = mb.ShowDialog();
@@ -60,15 +65,36 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         }
     }
 
-    public static void Show(IEditable? toEdit, bool isDialog) => Show(toEdit, toEdit?.Editor, isDialog);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <param name="isDialog"></param>
+    /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
+    public static bool Show(IEditable? toEdit, bool isDialog, bool supportsCancel) => Show(toEdit, toEdit?.Editor, isDialog, supportsCancel);
 
-    public static void Show(IEditable? toEdit, Type? editortype) => Show(toEdit, editortype, true);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <param name="editortype"></param>
+    /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
+    public static bool Show(IEditable? toEdit, Type? editortype, bool supportsCancel) => Show(toEdit, editortype, supportsCancel);
 
-    public static void Show(IEditable? toEdit, Type? editortype, bool isDialog) {
-        if (toEdit == null) { return; }
-        if (editortype == null) { return; }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <param name="editortype"></param>
+    /// <param name="isDialog"></param>
+    /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
+    public static bool Show(IEditable? toEdit, Type? editortype, bool isDialog, bool supportsCancel) {
+        if (toEdit == null) { return false; }
+        if (editortype == null) { return false; }
 
-        if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
+        if (toEdit is IDisposableExtended id && id.IsDisposed) { return false; }
+
+        if (!isDialog) { supportsCancel = false; }
 
         toEdit.Editor = editortype;
 
@@ -80,30 +106,51 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             if (myObject is IIsEditor ie) {
                 ie.ToEdit = toEdit;
                 if (ie is EditorEasy ea) {
-                    ea.Init(toEdit);
-
-                    mb = new InputBoxEditor(ea);
+                    ea.ToEdit = toEdit;
+                    mb = new InputBoxEditor(ea, supportsCancel);
                 } else if (ie is Form frm) {
                     mb = frm;
                 }
             }
         } catch { }
 
-        if (mb == null) { return; }
+        if (mb == null) { return false; }
+
+        var ok = true;
 
         if (isDialog) {
             _ = mb.ShowDialog();
+
+            if (toEdit is IErrorCheckable iec && !iec.IsOk()) { ok = false; }
+
+            if (mb is DialogWithOkAndCancel dwoac && dwoac.Canceled) { ok = false; }
+
             mb.Dispose();
+            return ok;
         } else {
             mb.Show();
+            return true;
         }
     }
 
-    protected override void SetValue(bool canceled) { }
+    protected override bool SetValue() {
+        if (Canceled) { return true; }
+
+        foreach (var thisc in Controls) {
+            if (thisc is EditorEasy ee && ee.ToEdit is IErrorCheckable ec) {
+                if (ec.IsOk()) { return true; }
+
+                var b = MessageBox.Show($"<b><u>{ee.ToEdit.CaptionForEditor} enthält noch Fehler:</u></b>\r\n\r\n{ec.ErrorReason()}\r\n\r\nMöchten sie diese beheben?", BlueBasics.Enums.ImageCode.Warnung, "Beheben", "Verwerfen");
+
+                if (b == 0) { return false; }
+                Canceled = true;
+            }
+        }
+
+        return true;
+    }
 
     #endregion
-
-    // Nix zu tun
 }
 
 public static class InputBoxEditorExtension {
@@ -117,7 +164,18 @@ public static class InputBoxEditorExtension {
     public static void Edit(this IEditable? toEdit) {
         if (toEdit == null) { return; }
 
-        InputBoxEditor.Show(toEdit, true);
+        InputBoxEditor.Show(toEdit, true, false);
+    }
+
+    /// <summary>
+    /// Routine für allgemeine Elemente, wenn nicht bekannt ist, welcher Form zuständig ist
+    /// </summary>
+    /// <param name="toEdit"></param>
+    /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
+    public static bool Edit(this IEditable? toEdit, bool isDialog, bool supportsCancel) {
+        if (toEdit == null) { return false; }
+
+        return InputBoxEditor.Show(toEdit, isDialog, supportsCancel);
     }
 
     /// <summary>
@@ -125,10 +183,11 @@ public static class InputBoxEditorExtension {
     /// </summary>
     /// <param name="toEdit"></param>
     /// <param name="type"></param>
-    public static void Edit(this IEditable? toEdit, Type? type) {
-        if (toEdit == null || type == null) { return; }
+    ///     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
+    public static bool Edit(this IEditable? toEdit, Type? type) {
+        if (toEdit == null || type == null) { return false; }
 
-        InputBoxEditor.Show(toEdit, type, true);
+        return InputBoxEditor.Show(toEdit, type, true);
     }
 
     /// <summary>

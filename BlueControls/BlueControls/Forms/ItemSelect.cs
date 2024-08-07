@@ -83,14 +83,19 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         return x._giveBack;
     }
 
-    protected override void SetValue(bool canceled) {
+    protected override bool SetValue() {
         _giveBack = null;
-        if (canceled) { return; }
+        if (Canceled) { return true; }
 
         var l = List.Checked;
-        if (l.Count != 1) { return; }
+        if (l.Count != 1) {
+            Canceled = true;
+            return true;
+        }
 
         _giveBack = List[l[0]];
+
+        return true;
     }
 
     #endregion

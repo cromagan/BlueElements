@@ -110,6 +110,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public Type? Editor { get; set; }
+
     public bool IsDisposed { get; private set; }
 
     public DateTime? IsInCache {
@@ -190,25 +191,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return null;
         }
     }
-
-    ///// <summary>
-    ///// Reverse: TimeCodeUTCNow
-    ///// </summary>
-    ///// <param name="timeCode"></param>
-    ///// <returns></returns>
-    //public static DateTime TimeCodeToUTCDateTime(long timeCode) {
-    //    long originalTicks = (timeCode * 5000) + new DateTime(2024, 1, 1).Ticks;
-    //    return new DateTime(originalTicks, DateTimeKind.Utc);
-    //}
-
-    ///// <summary>
-    ///// Reverse: TimeCodeToUTCDateTime
-    ///// </summary>
-    ///// <returns></returns>
-    //public static long TimeCodeUTCNow() {
-    //    var t = DateTime.UtcNow.Ticks - new DateTime(2024, 1, 1).Ticks;
-    //    return t / 5000;
-    //}
 
     public string CellFirstString() => Database?.Column.First() is not ColumnItem fc ? string.Empty : CellGetString(fc);
 
@@ -344,7 +326,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        if (RowCollection.FailedRows.Contains(this )) {
+        if (RowCollection.FailedRows.Contains(this)) {
             LastCheckedMessage = "Das Skript konnte die Zeile nicht durchrechnen.";
             return;
         }
@@ -358,7 +340,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
-
         if (!sef.AllOk) {
             LastCheckedMessage += "Das Skript enthält Fehler und muss repariert werden..";
             return;
@@ -367,8 +348,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             LastCheckedMessage += "Das Skript konnte die Zeile nicht durchrechnen.";
             return;
         }
-
-
 
         List<string> cols = [];
 
@@ -384,10 +363,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-            LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
-        
+        LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
 
-        if (db?.Column.SysCorrect is ColumnItem sc ) {
+        if (db?.Column.SysCorrect is ColumnItem sc) {
             if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(db.Column.SysCorrect)) {
                 CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
             }

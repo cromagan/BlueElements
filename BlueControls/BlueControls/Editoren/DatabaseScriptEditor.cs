@@ -263,7 +263,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         eventScriptEditor.TesteScript(txbName.Text);
     }
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor));
+    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }

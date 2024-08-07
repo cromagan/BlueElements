@@ -29,21 +29,21 @@ public partial class DialogWithOkAndCancel : Form {
 
     #region Fields
 
-    private readonly bool _cancelPossible;
-
+    private readonly bool _supportsCancel;
+    public bool Canceled { get; protected set; } = false;
     #endregion
 
     #region Constructors
 
     public DialogWithOkAndCancel() : this(Design.Form_MsgBox, true, false) { }
 
-    public DialogWithOkAndCancel(bool cancelPossible, bool sizeable) : this(Design.Form_MsgBox, cancelPossible, sizeable) { }
+    public DialogWithOkAndCancel(bool supportsCancel, bool sizeable) : this(Design.Form_MsgBox, supportsCancel, sizeable) { }
 
-    public DialogWithOkAndCancel(Design design, bool cancelPossible, bool sizeable) : base(design) {
+    public DialogWithOkAndCancel(Design design, bool supportsCancel, bool sizeable) : base(design) {
         InitializeComponent();
         SetTopLevel(true);
 
-        _cancelPossible = cancelPossible;
+        _supportsCancel = supportsCancel;
 
         if (Owner == null) {
             StartPosition = FormStartPosition.CenterScreen;
@@ -72,7 +72,7 @@ public partial class DialogWithOkAndCancel : Form {
 
         minWidth = Math.Max(Width, minWidth);
         Size = new Size(minWidth, bottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
-        if (_cancelPossible) {
+        if (_supportsCancel) {
             butAbbrechen.Left = minWidth - Skin.Padding - butAbbrechen.Width - BorderWidth;
             butOK.Left = butAbbrechen.Left - Skin.Padding - butOK.Width;
         } else {
@@ -80,7 +80,7 @@ public partial class DialogWithOkAndCancel : Form {
             butAbbrechen.Enabled = false;
             butOK.Left = minWidth - Skin.Padding - butOK.Width - BorderWidth;
         }
-        butAbbrechen.Visible = _cancelPossible;
+        butAbbrechen.Visible = _supportsCancel;
         butOK.Top = bottomOfLowestControl;
         butAbbrechen.Top = bottomOfLowestControl;
     }
@@ -116,13 +116,14 @@ public partial class DialogWithOkAndCancel : Form {
     }
 
     protected void Cancel() {
-        SetValue(true);
-        Close();
+        Canceled = true;
+      if(  SetValue()) { Close(); }
+  
     }
 
     protected void Ok() {
-        SetValue(false);
-        Close();
+        Canceled = false;
+        if (SetValue()) { Close(); }
     }
 
     /// <summary>
@@ -134,7 +135,7 @@ public partial class DialogWithOkAndCancel : Form {
         base.OnResize(e);
         // https://stackoverflow.com/questions/4971768/incorrect-behavior-of-panel-on-inherited-windows-form
         if (butOK != null) {
-            if (_cancelPossible) {
+            if (_supportsCancel) {
                 butOK.Top = Height - 87;
                 butOK.Left = Width - 193;
                 butAbbrechen.Top = butOK.Top;
@@ -150,7 +151,13 @@ public partial class DialogWithOkAndCancel : Form {
     /// <summary>
     /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
     /// </summary>
-    protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden(false);
+    /// <returns>True, wenn die Form geschlossen werden soll</returns>
+    protected virtual bool SetValue() {
+        DebugPrint_RoutineMussUeberschriebenWerden(false);
+        return false;
+    }
+
+ 
 
     private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
 

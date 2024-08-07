@@ -59,7 +59,10 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         return Show(txt, string.Empty, Suggest, texteingabeErlaubt);
     }
 
-    protected override void SetValue(bool canceled) => _giveBack = canceled ? string.Empty : cbxText.Text;
+    protected override bool SetValue() {
+        _giveBack = Canceled ? string.Empty : cbxText.Text;
+        return true;
+    }
 
     /// <summary>
     ///
