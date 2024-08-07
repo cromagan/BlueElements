@@ -40,6 +40,7 @@ internal class Method_WebPageScreenShot : Method_WebPage {
 
     public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagescreenshot";
+    public override List<string> Constants => [];
     public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

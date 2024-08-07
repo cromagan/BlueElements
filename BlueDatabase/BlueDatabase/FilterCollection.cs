@@ -476,7 +476,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
     public void RemoveOtherAndAdd(FilterItem? fi) {
-        if(fi == null) { return; }
+        if (fi == null) { return; }
         if (IsDisposed) { return; }
         if (Exists(fi)) { return; }
         if (!fi.IsOk()) {
@@ -551,7 +551,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    public QuickImage? SymbolForReadableText() {
+    public QuickImage SymbolForReadableText() {
         switch (Count) {
             case 0:
                 return QuickImage.Get(ImageCode.Kreuz, 16);
@@ -566,8 +566,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public List<FilterItem> ToList() => _internal;
 
-    public override string ToString() => ToParseableString();
-
     public string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
@@ -579,6 +577,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
         return result.Parseable();
     }
+
+    public override string ToString() => ToParseableString();
 
     private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
         if (_rows == null) { return; }

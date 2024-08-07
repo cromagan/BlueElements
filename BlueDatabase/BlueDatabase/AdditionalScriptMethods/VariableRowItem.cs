@@ -105,7 +105,7 @@ public class VariableRowItem : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object? x) {
+    protected override Variable NewWithThisValue(object? x) {
         var v = new VariableRowItem(string.Empty);
         v.SetValue(x);
         return v;

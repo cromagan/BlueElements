@@ -18,7 +18,6 @@
 using BlueControls.EventArgs;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-using BlueScript;
 using BlueScript.Methods;
 
 #nullable enable

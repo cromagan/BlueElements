@@ -17,23 +17,11 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueScript.Variables;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
-using static BlueBasics.Extensions;
-using static BlueBasics.IO;
 using BlueDatabase;
 using BlueBasics.EventArgs;
 using BlueBasics;
@@ -43,7 +31,13 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //UserControl
     {
+    #region Fields
 
+    private RowItem? _lastRow = null;
+
+    private int n = 99999;
+
+    #endregion
 
     #region Constructors
 
@@ -56,24 +50,15 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
 
     #endregion
 
-
-
     #region Properties
-
-
-    int n = 99999;
-
-    RowItem? _lastRow = null;
 
     public RowItem? LastRow {
         get => _lastRow;
 
         set {
-
             if (value?.Database == null || value.IsDisposed) { value = null; }
 
-            if(_lastRow == value ) { return; }
-
+            if (_lastRow == value) { return; }
 
             if (_lastRow != null) {
                 _lastRow.DropMessage -= _lastRow_DropMessage;
@@ -87,15 +72,25 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
                 capInfo.Text = "Überwache: " + _lastRow.CellFirstString();
                 _lastRow.DropMessage += _lastRow_DropMessage;
             }
-
-
         }
+    }
 
+    #endregion
 
+    #region Methods
+
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        DoInputFilter(null, false);
+        DoRows();
+
+        LastRow = RowSingleOrNull();
     }
 
     private void _lastRow_DropMessage(object sender, MessageEventArgs e) {
-
         if (Disposing || IsDisposed) { return; }
 
         if (InvokeRequired) {
@@ -108,45 +103,14 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
         }
 
         n--;
-        if(n<0) { n = 99999; }
+        if (n < 0) { n = 99999; }
 
         if (!string.IsNullOrWhiteSpace(capInfo.Text)) {
-            lstDone.ItemAdd(ItemOf(e, n.ToStringInt7()));  
+            lstDone.ItemAdd(ItemOf(e, n.ToStringInt7()));
         }
 
         //capInfo.Text = e.Message;
-
     }
-
-
-
-
-    #endregion
-
-    #region Methods
-
-
-
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
-        DoInputFilter(null, false);
-        DoRows();
-
-        LastRow = RowSingleOrNull();
-
-
-    }
-
-
-
-
-
-
-
-
 
     #endregion
 }

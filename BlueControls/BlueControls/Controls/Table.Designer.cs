@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Enums;
+using BlueDatabase.EventArgs;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls
@@ -36,6 +37,7 @@ namespace BlueControls.Controls
             this.BCB.Esc += new System.EventHandler(this.BB_ESC);
             this.BCB.Tab += new System.EventHandler(this.BB_TAB);
             this.BCB.LostFocus += new System.EventHandler(this.BB_LostFocus);
+            this.BCB.NeedDatabaseOfAdditinalSpecialChars += new System.EventHandler<DatabaseFileGiveBackEventArgs>(this.BB_NeedDatabaseOfAdditinalSpecialChars);
             // 
             // BTB
             // 
@@ -50,6 +52,7 @@ namespace BlueControls.Controls
             this.BTB.Esc += new System.EventHandler(this.BB_ESC);
             this.BTB.Tab += new System.EventHandler(this.BB_TAB);
             this.BTB.LostFocus += new System.EventHandler(this.BB_LostFocus);
+            this.BTB.NeedDatabaseOfAdditinalSpecialChars += new System.EventHandler<DatabaseFileGiveBackEventArgs>(this.BB_NeedDatabaseOfAdditinalSpecialChars);
             // 
             // SliderX
             // 

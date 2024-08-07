@@ -83,7 +83,7 @@ public class VariableWebpage : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x) => null;
+    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 

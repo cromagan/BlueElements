@@ -31,7 +31,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;

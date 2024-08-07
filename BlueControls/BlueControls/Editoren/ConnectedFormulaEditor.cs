@@ -33,7 +33,6 @@ using System.ComponentModel;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using BlueBasics.Interfaces;
-using BlueDatabase;
 using BlueBasics.EventArgs;
 
 #nullable enable
@@ -339,7 +338,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (_cFormula != null) {
             _cFormula.Editing += _cFormula_Editing;
-            editable= _cFormula.LockEditing();
+            editable = _cFormula.LockEditing();
         }
 
         if (notAllowedchilds != null && CFormula != null && editable) {

@@ -20,9 +20,7 @@
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
-using BlueBasics;
 using static BlueDatabase.Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
@@ -50,17 +48,13 @@ public abstract class Method_Database : Method {
         return null;
     }
 
-
-
     protected ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
         var c = attvar.Attributes[no];
         if (c == null) { return null; }
 
-        if(c.KeyName.StartsWith("ID_")) {
+        if (c.KeyName.StartsWith("ID_")) {
             return MyDatabase(scp)?.Column[c.SearchValue];
         }
-
-
 
         return MyDatabase(scp)?.Column[c.KeyName];
     }

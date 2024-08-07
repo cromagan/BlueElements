@@ -30,7 +30,7 @@ public class Method_SetError : Method_Database {
 
     #region Fields
 
-    public static Method Method = new Method_SetError();
+    public static readonly Method Method = new Method_SetError();
 
     #endregion
 

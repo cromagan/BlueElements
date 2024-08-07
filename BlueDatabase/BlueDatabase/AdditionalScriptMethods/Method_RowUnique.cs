@@ -24,8 +24,6 @@ using BlueDatabase.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using BlueBasics;
-using System;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 

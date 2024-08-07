@@ -29,7 +29,6 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript;
 using BlueScript.Methods;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

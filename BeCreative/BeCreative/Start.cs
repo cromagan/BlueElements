@@ -85,7 +85,7 @@ namespace BeCreative {
         }
 
         private void btnFormularAnsicht_Click(object sender, EventArgs e) {
-            DoForm(new FormulaView());
+            DoForm(new ConnectedFormulaView());
         }
 
         private void btnHierachie_Click(object sender, EventArgs e) {

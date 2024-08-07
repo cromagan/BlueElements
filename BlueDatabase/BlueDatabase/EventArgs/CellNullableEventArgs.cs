@@ -23,9 +23,7 @@ public class CellNullableEventArgs : RowNullableEventArgs {
 
     #region Constructors
 
-    public CellNullableEventArgs(ColumnItem? column, RowItem? row) : base(row) {
-        Column = column;
-    }
+    public CellNullableEventArgs(ColumnItem? column, RowItem? row) : base(row) => Column = column;
 
     #endregion
 

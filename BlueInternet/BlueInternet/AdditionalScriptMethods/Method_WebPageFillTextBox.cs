@@ -35,6 +35,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
     public override List<List<string>> Args => [WebPageVal, StringVal, StringVal];
     public override string Command => "webpagefilltextbox";
+    public override List<string> Constants => [];
     public override string Description => "Füllt ein Textfeld in der Webpage aus.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

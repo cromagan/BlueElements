@@ -52,7 +52,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     /// Dadurch können verschiedene Datensätze gespeichert werden.
     /// Beispiele: Rezepetname, Personenname, Beleg-Nummer
     /// </summary>
-    private string _entityID = string.Empty;
+    private string _entityId = string.Empty;
 
     /// <summary>
     /// Eine Spalte in der Ziel-Datenbank.
@@ -60,7 +60,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
-    private string _originIDColumnName = string.Empty;
+    private string _originIdColumnName = string.Empty;
 
     private string _script = string.Empty;
 
@@ -89,7 +89,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         get {
             if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
 
-            var c = dbout?.Column[_additinalInfoColumnName];
+            var c = dbout.Column[_additinalInfoColumnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
@@ -133,11 +133,11 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     /// </summary>
     [Description("Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.\r\nDadurch können verschiedene Datensätze gespeichert werden.\r\nBeispiele: Rezepetname, Personenname, Beleg-Nummer")]
     public string EntityID {
-        get => _entityID;
+        get => _entityId;
         set {
             if (IsDisposed) { return; }
-            if (_entityID == value) { return; }
-            _entityID = value;
+            if (_entityId == value) { return; }
+            _entityId = value;
             OnPropertyChanged();
         }
     }
@@ -157,7 +157,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         get {
             if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
 
-            var c = dbout?.Column[_originIDColumnName];
+            var c = dbout.Column[_originIdColumnName];
             return c == null || c.IsDisposed ? null : c;
         }
     }
@@ -170,11 +170,11 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     /// </summary>
     [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string OriginIDColumnName {
-        get => _originIDColumnName;
+        get => _originIdColumnName;
         set {
             if (IsDisposed) { return; }
-            if (_originIDColumnName == value) { return; }
-            _originIDColumnName = value;
+            if (_originIdColumnName == value) { return; }
+            _originIdColumnName = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -195,7 +195,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     }
 
     public string Script {
-        get { return _script; }
+        get => _script;
 
         set {
             if (value == _script) { return; }
@@ -242,8 +242,8 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (string.IsNullOrEmpty(_entityID)) { return "Id-Generierung fehlt"; }
-        if (!_entityID.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
+        if (string.IsNullOrEmpty(_entityId)) { return "Id-Generierung fehlt"; }
+        if (!_entityId.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
         if (OriginIDColumn is not ColumnItem oic || oic.IsDisposed) {
             return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";
@@ -306,7 +306,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
 
         switch (key) {
             case "entityid":
-                _entityID = value.FromNonCritical();
+                _entityId = value.FromNonCritical();
                 return true;
 
             case "entityidcolumnname":
@@ -316,7 +316,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
                 return true;
 
             case "originidcolumnname":
-                _originIDColumnName = value;
+                _originIdColumnName = value;
                 return true;
 
             case "additionalinfocolumnname":
@@ -348,14 +348,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
 
     public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
-    public void Skript_Bearbeiten() {
-        var x = new AdderScriptEditor();
-        x.Item = this;
-        x.Database = this.DatabaseInput;
-        x.ShowDialog();
-    }
-
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
@@ -368,8 +361,8 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
-        result.ParseableAdd("EntityID", _entityID);
-        result.ParseableAdd("OriginIDColumnName", _originIDColumnName);
+        result.ParseableAdd("EntityID", _entityId);
+        result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
         result.ParseableAdd("Script", Script);
         return result.Parseable(base.ToParseableString());
@@ -395,6 +388,13 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+    }
+
+    private void Skript_Bearbeiten() {
+        var x = new AdderScriptEditor();
+        x.Item = this;
+        x.Database = this.DatabaseInput;
+        x.ShowDialog();
     }
 
     #endregion

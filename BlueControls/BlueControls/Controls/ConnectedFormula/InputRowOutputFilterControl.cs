@@ -52,7 +52,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
     #region Properties
 
-    public string ErrorText { get; set; }
+    public string ErrorText { get; set; } = string.Empty;
 
     #endregion
 
@@ -82,7 +82,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         } else if (!FilterOutput.IsOk()) {
             txt = FilterOutput.ErrorReason();
 
-            qi = QuickImage.Get("Warnung|16"); ;
+            qi = QuickImage.Get("Warnung|16");
         } else {
             if (!string.IsNullOrEmpty(ErrorText) && FilterOutput.HasAlwaysFalse()) {
                 txt = ErrorText;

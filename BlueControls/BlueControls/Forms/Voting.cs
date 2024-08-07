@@ -58,7 +58,7 @@ public partial class Voting : System.Windows.Forms.Form {
 
     private void Add(RowItem fr1, RowItem fr2, bool xxx) {
         string key;
-        if (fr1.KeyName.CompareTo(fr2.KeyName) > 0) {
+        if (string.Compare(fr1.KeyName, fr2.KeyName, StringComparison.Ordinal) > 0) {
             key = fr1.KeyName + "|" + fr2.KeyName;
         } else {
             key = fr2.KeyName + "|" + fr1.KeyName;
@@ -156,7 +156,7 @@ public partial class Voting : System.Windows.Forms.Form {
         }
 
         string key;
-        if (_fr1.KeyName.CompareTo(_fr2.KeyName) > 0) {
+        if (string.Compare(_fr1.KeyName, _fr2.KeyName, StringComparison.Ordinal) > 0) {
             key = _fr1.KeyName + "|" + _fr2.KeyName;
         } else {
             key = _fr2.KeyName + "|" + _fr1.KeyName;

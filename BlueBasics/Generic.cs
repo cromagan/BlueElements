@@ -42,13 +42,12 @@ public static class Generic {
 
     #region Fields
 
-
-    public static bool IsAdministrator() => string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
-
     public static string UserGroup = Constants.Everybody;
 
-    private static int _GetUniqueKeyCount;
-    private static string _GetUniqueKeyLastTime = "InitialDummy";
+    private static int _getUniqueKeyCount;
+
+    private static string _getUniqueKeyLastTime = "InitialDummy";
+
     private static string _gotUserName = string.Empty;
 
     #endregion
@@ -220,14 +219,16 @@ public static class Generic {
     public static string GetUniqueKey() {
         // Hashtag: UniqueInternal
         var neueZeit = DateTime.UtcNow.ToString7().ReduceToChars(Constants.Char_Numerals);
-        if (neueZeit == _GetUniqueKeyLastTime) {
-            _GetUniqueKeyCount++;
+        if (neueZeit == _getUniqueKeyLastTime) {
+            _getUniqueKeyCount++;
         } else {
-            _GetUniqueKeyCount = 0;
-            _GetUniqueKeyLastTime = neueZeit;
+            _getUniqueKeyCount = 0;
+            _getUniqueKeyLastTime = neueZeit;
         }
-        return "ID_" + neueZeit + "_" + _GetUniqueKeyCount.ToStringInt3();
+        return "ID_" + neueZeit + "_" + _getUniqueKeyCount.ToStringInt3();
     }
+
+    public static bool IsAdministrator() => string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
 
     public static void LaunchBrowser(string url) {
         var browserName = "iexplore.exe";
@@ -329,7 +330,7 @@ public static class Generic {
         return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
     }
 
-    private static bool HasMatchingConstructor(Type type, object[] constructorArgs) {
+    private static bool HasMatchingConstructor(Type type, object?[] constructorArgs) {
         // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
         if (constructorArgs.Length == 0) {
             return type.GetConstructor(Type.EmptyTypes) != null;

@@ -39,9 +39,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Fields
 
-    public static List<RowItem> DidRows = new();
-    public static List<RowItem> FailedRows = new();
-    public static List<RowItem> InvalidatedRows = new();
+    public static readonly List<RowItem> DidRows = new();
+    public static readonly List<RowItem> FailedRows = new();
+    public static readonly List<RowItem> InvalidatedRows = new();
     public static int WaitDelay = 0;
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static bool _executingchangedrows;
@@ -775,7 +775,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!oldestTo) { return null; }
 
         if (db.Column.SysRowState is not ColumnItem srs) { return null; }
-        var datefoundmax = new DateTime(2100,1,1);
+        var datefoundmax = new DateTime(2100, 1, 1);
         RowItem? foundrow = null;
 
         foreach (var thisRow in db.Row) {

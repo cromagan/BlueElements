@@ -89,12 +89,12 @@ public partial class EditorEasy : UserControl, IIsEditor {
     /// </summary>
     public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
-    public virtual IEditable? GetCloneOfCurrent() {
-        if (!string.IsNullOrEmpty(Error)) { return null; }
+    //public virtual IEditable? GetCloneOfCurrent() {
+    //    if (!string.IsNullOrEmpty(Error)) { return null; }
 
-        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-        return null;
-    }
+    //    Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    //    return null;
+    //}
 
     /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen

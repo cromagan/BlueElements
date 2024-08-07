@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -268,7 +267,6 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
         _isFilling = false;
     }
-
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

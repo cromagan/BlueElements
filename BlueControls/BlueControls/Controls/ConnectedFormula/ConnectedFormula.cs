@@ -27,7 +27,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -61,7 +60,6 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     private ConnectedFormula(string filename) : base() {
         AllFiles.Add(this);
 
-  
         if (FileExists(filename)) {
             Load(filename, true);
         }
@@ -77,8 +75,6 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     #endregion
 
     #region Properties
-
-    public override string Type => "ConnectedFormula";
 
     public string CaptionForEditor => "Formular";
 
@@ -114,7 +110,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     }
 
     public string QuickInfo => string.Empty;
-
+    public override string Type => "ConnectedFormula";
     public override string Version => "0.50";
 
     #endregion
@@ -384,7 +380,8 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; };
+        if (base.ParseThis(key, value)) { return true; }
+
         switch (key.ToLowerInvariant()) {
             case "notallowedchilds":
                 _notAllowedChilds.Clear();
@@ -455,7 +452,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
         }
     }
 
-    public QuickImage? SymbolForReadableText() {
+    public QuickImage SymbolForReadableText() {
         if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
         return QuickImage.Get(ImageCode.Warnung, 16);

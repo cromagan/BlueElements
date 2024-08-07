@@ -88,7 +88,6 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
     }
 
     protected override bool SetValue() {
-
         if (Canceled) { _giveBack = null; return true; }
         _giveBack = new PrintDocument();
         _giveBack.DefaultPageSettings.Landscape = Querformat.Checked;

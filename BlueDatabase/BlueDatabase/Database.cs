@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -53,7 +52,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #region Fields
 
-    public const string DatabaseVersion = "4.02";
     public static readonly ObservableCollection<Database> AllFiles = [];
 
     /// <summary>
@@ -66,6 +64,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Bestimmt die Reihenfolge der Reparaturen
     /// </summary>
     public DateTime LastUsedDate = DateTime.UtcNow;
+
+    protected const string DatabaseVersion = "4.02";
 
     /// <summary>
     ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
@@ -217,6 +217,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     #region Properties
 
     public static string DatabaseId => nameof(Database);
+
     public static int ExecutingScriptAnyDatabase { get; set; } = 0;
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
@@ -251,7 +252,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public string CaptionForEditor => "Datenbank";
+
     public CellCollection Cell { get; }
+
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -323,6 +326,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public int ExecutingScript { get; private set; } = 0;
+
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
@@ -924,7 +928,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
 
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
-            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString());
+            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
             SaveToByteList(l, DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
@@ -1641,7 +1645,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
         }
 
-        var (_, errormessage) = RefreshRowData(sortedRows);
+        var errormessage = RefreshRowData(sortedRows);
         if (!string.IsNullOrEmpty(errormessage)) {
             OnDropMessage(FehlerArt.Fehler, errormessage);
         }
@@ -2212,15 +2216,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public virtual (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> row) {
+    public string RefreshRowData(IEnumerable<RowItem> row) {
         var rowItems = row.ToList();
-        if (!rowItems.Any()) { return (false, string.Empty); }
+        if (!rowItems.Any()) { return string.Empty; }
 
         foreach (var thisrow in rowItems) {
             thisrow.IsInCache = DateTime.UtcNow;
         }
         //var x = Row.DoLinkedDatabase(row);
-        return (false, string.Empty);
+        return string.Empty;
     }
 
     public virtual void RepairAfterParse() {
@@ -2322,7 +2326,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (column.IsInCache != null || row.IsInCache != null) { return; }
 
-        var (_, errormessage) = RefreshRowData(row, false);
+        var errormessage = RefreshRowData(row, false);
         if (!string.IsNullOrEmpty(errormessage)) {
             OnDropMessage(FehlerArt.Fehler, errormessage);
         }
@@ -2496,7 +2500,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (FileExists(Filename)) {
             // Paralleler Prozess hat gespeichert?!?
             _ = DeleteFile(tmpFileName, false);
-            _completing = false; return false;
+            _completing = false;
+            return false;
         }
 
         // --- TmpFile wird zum Haupt ---
@@ -3453,8 +3458,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         } catch { }
     }
 
-    private (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways) {
-        if (!refreshAlways && row.IsInCache != null) { return (false, string.Empty); }
+    private string RefreshRowData(RowItem row, bool refreshAlways) {
+        if (!refreshAlways && row.IsInCache != null) { return string.Empty; }
 
         return RefreshRowData(new List<RowItem> { row });
     }

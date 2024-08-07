@@ -25,13 +25,11 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueScript.Variables;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
@@ -153,8 +151,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
 
         OnContextMenuItemClicked(e);
     }
-
-    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         e.HotItem = null;
@@ -294,6 +290,8 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         if (!HasFileName()) { return; }
         _ = OpenDia.ShowDialog();
     }
+
+    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     private void OpenDia_FileOk(object sender, CancelEventArgs e) {
         if (!HasFileName()) { return; }

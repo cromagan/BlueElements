@@ -35,6 +35,7 @@ internal class Method_WebPageClick : Method_WebPage {
 
     public override List<List<string>> Args => [WebPageVal, StringVal];
     public override string Command => "webpageclick";
+    public override List<string> Constants => [];
     public override string Description => "Drückt einen Button, Klasse oder Link in der Webpage und wartet, bis die Seite geladen ist.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

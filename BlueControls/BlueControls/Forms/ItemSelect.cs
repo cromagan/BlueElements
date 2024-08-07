@@ -52,7 +52,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     public static RowItem? Show(List<RowItem> rows, string layoutId) {
         try {
-            var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<AbstractListItem?>().ToList();
+            var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<AbstractListItem>().ToList();
 
             var x = Show(items);
             return (x as RowFormulaListItem)?.Row;
@@ -63,7 +63,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
     }
 
     public static string Show(List<string> files) {
-        var items = new List<AbstractListItem?>();
+        var items = new List<AbstractListItem>();
 
         foreach (var thisString in files) {
             if (thisString.FileType() == FileFormat.Image) {

@@ -33,6 +33,7 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
 
     public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagegetalllinks";
+    public override List<string> Constants => [];
     public override string Description => "Gibt eine Liste aller Links zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

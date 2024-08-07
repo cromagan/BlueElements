@@ -33,6 +33,7 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
 
     public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagegetallids";
+    public override List<string> Constants => [];
     public override string Description => "Gibt eine Liste aller IDS zurück, mit denen interagiert werden kann.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

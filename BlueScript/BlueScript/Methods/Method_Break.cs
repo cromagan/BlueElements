@@ -31,7 +31,7 @@ internal class Method_Break : Method {
 
     #region Fields
 
-    public static Method Method = new Method_Break();
+    public static readonly Method Method = new Method_Break();
 
     #endregion
 

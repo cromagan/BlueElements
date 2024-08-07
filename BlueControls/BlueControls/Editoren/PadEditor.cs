@@ -34,14 +34,14 @@ public partial class PadEditor : PadEditorReadOnly {
 
     #region Constructors
 
-    public PadEditor() : base() {
+    protected PadEditor() : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         PadDesign.ItemClear();
         PadDesign.ItemAddRange(ItemsOf(Skin.AllStyles()));
-        PadDesign.Text = PadDesign[0].KeyName;
+        PadDesign.Text = PadDesign[0]?.KeyName ?? string.Empty;
 
         if (Pad?.Item != null && Skin.StyleDb != null) {
             Pad.Item.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];

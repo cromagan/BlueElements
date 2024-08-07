@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using System;
 using System.Windows.Forms;
 
@@ -26,7 +24,9 @@ namespace BlueControls.Interfaces;
 
 public interface ISendsFocusedChild {
 
+    #region Events
 
     public event EventHandler<ControlEventArgs>? ChildGotFocus;
 
+    #endregion
 }

@@ -38,7 +38,7 @@ public class DatabaseMu : Database {
 
     #region Fields
 
-    public static int MaxMasterCount = 3;
+    public static readonly int MaxMasterCount = 3;
 
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt

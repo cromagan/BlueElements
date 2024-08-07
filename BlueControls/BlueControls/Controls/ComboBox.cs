@@ -60,7 +60,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     private string _initialtext = string.Empty;
 
     private List<AbstractListItem> _item = new();
-    private Design _itemDesign;
     private bool _itemEditAllowed = false;
 
     private string? _lastClickedText;
@@ -304,7 +303,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.Pos;
             var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
-            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(_itemDesign).Height));
+            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
             i.SetCoordinates(r);
         }

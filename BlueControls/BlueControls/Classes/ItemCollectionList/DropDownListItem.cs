@@ -30,8 +30,7 @@ public class DropDownListItem : AbstractListItem {
 
     #region Fields
 
-    public List<AbstractListItem> DDItems = new();
-
+    public readonly List<AbstractListItem> DDItems = new();
     public AbstractListItem? Selected;
 
     #endregion

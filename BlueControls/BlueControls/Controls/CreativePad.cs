@@ -38,7 +38,6 @@ using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
-using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Controls;
 
@@ -223,8 +222,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         OnContextMenuItemClicked(e);
     }
-
-    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void DoKeyUp(KeyEventArgs e, bool hasbase) {
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
@@ -659,6 +656,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnClickedItemChanging() => ClickedItemChanging?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     private void OnDrawModeChanged() => DrawModeChanged?.Invoke(this, System.EventArgs.Empty);
 

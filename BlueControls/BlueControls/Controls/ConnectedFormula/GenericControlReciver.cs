@@ -87,7 +87,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     public AbstractPadItem? Item { get; set; } = null;
-    public virtual string Mode { get; set; }
+    public virtual string Mode { get; set; } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -357,8 +357,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Parent?.Controls.Remove(this);
             Parents.Clear();
         }
-
-      
     }
 
     protected void DoRows() {

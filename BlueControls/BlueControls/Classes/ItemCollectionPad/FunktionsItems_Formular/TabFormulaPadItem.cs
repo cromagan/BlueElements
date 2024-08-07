@@ -33,7 +33,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Security;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -305,7 +304,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty );
+        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Childs", _childs, false);
         return result.Parseable(base.ToParseableString());
     }

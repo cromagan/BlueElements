@@ -39,8 +39,8 @@ public partial class VariableEditor : EditorEasy {
 
     public override void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
 
-    public override IEditable? GetCloneOfCurrent() {
-        if (ToEdit is null or ISimpleEditor) { return null; }
+    public VariableCollection? GetCloneOfCurrent() {
+        if (ToEdit is null) { return null; }
         if (!string.IsNullOrEmpty(Error)) { return null; }
 
         if (!Editabe || IsDisposed) {

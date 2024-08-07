@@ -640,7 +640,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         CursorPosColumn = column;
         CursorPosRow = row;
 
-
         //if (CursorPosColumn != column) { return; }
 
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
@@ -655,17 +654,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         OnSelectedCellChanged(new CellExtEventArgs(CursorPosColumn, CursorPosRow));
 
         if (!sameRow) {
-
             OnSelectedRowChanged(new RowNullableEventArgs(row?.Row));
 
             if (FilterOutputType == Filterausgabe.Gewähle_Zeile) {
-
                 if (row?.Row is RowItem setedrow) {
                     FilterOutput.ChangeTo(new FilterItem(setedrow));
                 } else {
                     FilterOutput.ChangeTo(new FilterItem(db, "Dummy"));
                 }
-
             }
         }
     }
@@ -2379,9 +2375,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
         CloseAllComponents();
     }
 
-    private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
+    private void BB_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseFileGiveBackEventArgs e) => e.File = Database;
 
-    private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseFileGiveBackEventArgs e) => e.File = Database;
+    private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
@@ -3216,7 +3212,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
                 if (View_NextRow(newRow) != null) { newRow = View_NextRow(newRow); }
             }
         }
-       
     }
 
     /// <summary>

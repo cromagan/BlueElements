@@ -17,16 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Specialized;
 using System.Windows.Forms;
-using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -62,7 +58,6 @@ public static class Allgemein {
     //    if (par == null) { return null; }
 
     //    List<AbstractListItem> thisContextMenu = [];
-
 
     //    var cancel = false;
     //    par.GetContextMenuItems(null, thisContextMenu, out var hotItem);
