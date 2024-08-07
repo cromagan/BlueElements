@@ -69,11 +69,11 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
     #region Methods
 
     public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {
-        var f = RowCollection.UniqueRow(allFi, coment);
+        var (newrow, message) = RowCollection.UniqueRow(allFi, coment);
 
-        if (!string.IsNullOrEmpty(f.message)) { return new DoItFeedback(ld, f.message); }
+        if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
 
-        return Method_Row.RowToObjectFeedback(f.newrow);
+        return Method_Row.RowToObjectFeedback(newrow);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -90,7 +90,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
                 return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
             }
 
-            if (thisFi.FilterType is not Enums.FilterType.Istgleich and not Enums.FilterType.Istgleich_GroßKleinEgal) {
+            if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
                 return new DoItFeedback(ld, "Fehler im Filter, nur 'is' ist erlaubt");
             }
 

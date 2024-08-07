@@ -116,7 +116,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard);
+            var m = Method.GetMethods(MethodType.Standard);
 
             var scp = new ScriptProperties("Skript-Editor: " + scriptname, m, false, [], null, 0);
             var s = new Script(null, scp);
@@ -140,7 +140,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
         base.Dispose(disposing);
     }
 
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     private void OnExecuteScript(ScriptEventArgs scriptEventArgs) => ExecuteScript?.Invoke(this, scriptEventArgs);
 

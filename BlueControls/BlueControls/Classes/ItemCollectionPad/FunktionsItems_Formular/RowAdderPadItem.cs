@@ -393,7 +393,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     private void Skript_Bearbeiten() {
         var x = new AdderScriptEditor();
         x.Item = this;
-        x.Database = this.DatabaseInput;
+        x.Database = DatabaseInput;
         x.ShowDialog();
     }
 

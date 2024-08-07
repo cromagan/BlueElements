@@ -72,6 +72,14 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
 
     #region Methods
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            Tag = null;
+        }
+
+        base.Dispose(disposing);
+    }
+
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
@@ -81,7 +89,6 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
 
         DoInputFilter(FilterOutput.Database, true);
         DoRows();
-
 
         #region Combobox suchen
 
@@ -125,7 +132,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
         if (cb.ItemCount == 1) {
             f.ValueSet(cb[0].KeyName, true);
         } else {
-            var fh = this.GetSettings(this.FilterHash());
+            var fh = this.GetSettings(FilterHash());
 
             if (!string.IsNullOrEmpty(fh) && cb.Items().Get(fh) is AbstractListItem ali) {
                 f.ValueSet(ali.KeyName, true);
@@ -151,21 +158,13 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
         #endregion
     }
 
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            Tag = null;
-        }
-
-        base.Dispose(disposing);
-    }
-
     private void F_ValueChanged(object sender, System.EventArgs e) {
-        var fh = this.FilterHash();
+        var fh = FilterHash();
         var row = RowsInput?.Get(f.Value);
         this.SetSetting(fh, row?.KeyName ?? string.Empty);
 
         if (row == null) {
-            this.Invalidate_FilterOutput();
+            Invalidate_FilterOutput();
             return;
         }
 

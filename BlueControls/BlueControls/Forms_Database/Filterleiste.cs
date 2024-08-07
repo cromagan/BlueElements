@@ -225,7 +225,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
-                            this.ChildIsBorn(flx);
+                            ChildIsBorn(flx);
                             //flx.DoOutputSettings(this);
                             //flx.DoInputSettings(parent, this);
                             flx.FilterOutput.PropertyChanging += FlexSingeFilter_FilterOutput_PropertyChanging;

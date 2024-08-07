@@ -59,7 +59,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IItemToControl, IReadable
 
     #region Constructors
 
-    public OutputFilterPadItem(string keyName) : this(keyName, null as Database, null as ConnectedFormula.ConnectedFormula) { }
+    public OutputFilterPadItem(string keyName) : this(keyName, null, null) { }
 
     public OutputFilterPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         _itemAccepts = new();

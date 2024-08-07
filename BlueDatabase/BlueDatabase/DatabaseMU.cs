@@ -412,7 +412,7 @@ public class DatabaseMu : Database {
         if (DateTime.UtcNow.Subtract(FileStateUTCDate).TotalDays > 3) { return true; } // Letze Komplettierung
 
         var masters = 0;
-        foreach (var thisDb in Database.AllFiles) {
+        foreach (var thisDb in AllFiles) {
             if (thisDb is DatabaseMu && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
                 masters++;
                 if (masters >= MaxMasterCount) { return false; }

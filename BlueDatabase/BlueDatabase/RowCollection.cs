@@ -193,7 +193,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 InvalidatedRows.RemoveAt(0);
 
                 if (InvalidatedRows.Count > ra) {
-                    masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
+                    masterRow?.OnDropMessage(FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
                     ra = InvalidatedRows.Count;
                 }
 
@@ -201,7 +201,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                     DidRows.Add(r);
                     if (masterRow?.Database != null) {
                         r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                        masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
                     } else {
                         r.UpdateRow(false, true, true, "Normales Update");
                     }
@@ -210,7 +210,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } catch { }
 
         DidRows.Clear();
-        masterRow?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Updates abgearbeitet");
+        masterRow?.OnDropMessage(FehlerArt.Info, "Updates abgearbeitet");
     }
 
     public static void ExecuteValueChangedEvent() {
@@ -359,7 +359,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 if (oldestTo) {
                     var tmpo = db.Row.NextRowToCheck(true);
-                    oldrow = RowCollection.OlderState(tmpo, oldrow);
+                    oldrow = OlderState(tmpo, oldrow);
                 }
             }
         }
@@ -424,10 +424,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message) = RowCollection.GenerateAndAdd(filter, coment);
+            var (newrow, message) = GenerateAndAdd(filter, coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
             myRow = newrow;
-            RowCollection.InvalidatedRows.AddIfNotExists(newrow);
+            InvalidatedRows.AddIfNotExists(newrow);
         } else {
             myRow = r[0];
         }
@@ -996,7 +996,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         OnRowAdded(new RowChangedEventArgs(row, reason));
 
         if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-            RowCollection.InvalidatedRows.Add(row);
+            InvalidatedRows.Add(row);
         }
 
         return string.Empty;

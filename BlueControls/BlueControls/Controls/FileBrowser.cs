@@ -226,7 +226,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             var tmpDirectory = string.Empty;
             var tmpDirectoryMin = string.Empty;
 
-            var r = this.RowSingleOrNull();
+            var r = RowSingleOrNull();
 
             if (r != null) {
                 r.CheckRowDataIfNeeded();
@@ -326,7 +326,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             return;
         }
 
-        if (ThumbGenerator.IsBusy || !this.Visible) { return; }
+        if (ThumbGenerator.IsBusy || !Visible) { return; }
 
         if (ThumbGenerator.CancellationPending) { return; }
 

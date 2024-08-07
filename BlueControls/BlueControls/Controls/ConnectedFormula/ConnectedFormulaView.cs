@@ -45,7 +45,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
     private string _modus = string.Empty;
 
-
     #endregion
 
     #region Constructors
@@ -101,7 +100,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     public RowItem? ShowingRow {
         get {
             HandleChangesNow();
-            return this.RowSingleOrNull();
+            return RowSingleOrNull();
         }
     }
 
@@ -118,10 +117,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             return;
         }
 
-
         if (ConnectedFormula.IsEditing()) { return; }
-
-
 
         #region Zuerst alle Controls als unused markieren
 
@@ -232,8 +228,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
         SuspendLayout();
 
-        this.Invalidate_FilterOutput();
-        this.Invalidate_RowsInput();
+        Invalidate_FilterOutput();
+        Invalidate_RowsInput();
 
         if (oldf != cf) {
             if (oldf != null) {
@@ -341,16 +337,12 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         DoInputFilter(FilterOutput.Database, false);
         DoRows();
 
-        if (this.RowSingleOrNull() is RowItem r) {
+        if (RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));
 
             btnScript.Visible = r.Database is Database db && !string.IsNullOrEmpty(db.ScriptNeedFix);
 
-
             if (btnScript.Visible) { btnScript.BringToFront(); }
-
-
-
         } else {
             FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
         }
@@ -372,6 +364,17 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     private void _database_Disposing(object sender, System.EventArgs e) => InitFormula(null, null);
 
+    private void btnSkript_Click(object sender, System.EventArgs e) {
+        if (Generic.IsAdministrator()) {
+            if (IsDisposed || RowSingleOrNull()?.Database is not Database db || db.IsDisposed) { return; }
+
+            var se = new DatabaseScriptEditor(db);
+            _ = se.ShowDialog();
+        } else {
+            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+        }
+        Invalidate_FilterInput();
+    }
 
     private void DoAutoX(List<FlexiControlForCell> autoc) {
         if (autoc.Count == 0) { return; }
@@ -401,22 +404,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
 
         if (undone.Count > 0) { DoAutoX(undone); }
-    }
-
-    private void btnSkript_Click(object sender, System.EventArgs e) {
-        if (Generic.IsAdministrator()) {
-            if (IsDisposed || RowSingleOrNull()?.Database is not Database db || db.IsDisposed) { return; }
-
-            var se = new DatabaseScriptEditor(db);
-            _ = se.ShowDialog();
-
-
-        } else {
-            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
-
-        }
-        Invalidate_FilterInput();
-
     }
 
     private void updater_Tick(object sender, System.EventArgs e) {

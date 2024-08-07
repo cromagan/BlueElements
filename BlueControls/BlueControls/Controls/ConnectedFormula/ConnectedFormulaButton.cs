@@ -268,7 +268,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         VariableCollection vars;
         object? ai = null;
-        var row = this.RowSingleOrNull();
+        var row = RowSingleOrNull();
 
         if (row?.Database is Database db && !db.IsDisposed) {
             vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
@@ -305,8 +305,8 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         }
 
         #endregion
+
         List<string> args = [_arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8];
-        
 
         var f = ufb.DoIt(vars, args, fis, rn, ai);
 

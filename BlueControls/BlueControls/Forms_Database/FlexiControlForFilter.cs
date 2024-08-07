@@ -66,7 +66,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         Size = new Size(204, 24);
         //AlwaysInstantChange = true;
         FilterSingleColumn = column;
-        this.Invalidate_FilterInput();
+        Invalidate_FilterInput();
         f.ShowInfoWhenDisabled = true;
         _origin = string.Empty;
         _fromInputFilter = false;
@@ -125,7 +125,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
             this.LoadSettingsFromDisk(false);
             if (FilterOutput.Count == 1) {
                 if (FilterOutput.Rows.Count == 1) {
-                    var toAdd = this.FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
+                    var toAdd = FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
                     this.SettingsAdd(toAdd);
                 }
             }
@@ -184,7 +184,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
 
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
         if (e.Command != "Filter") {
-            this.Invalidate_FilterOutput();
+            Invalidate_FilterOutput();
             UpdateFilterData(null, false);
         } else {
             FilterOutput.ChangeTo(e.Filter);
@@ -205,7 +205,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
             if (SavesSettings) {
                 this.LoadSettingsFromDisk(false);
                 var nr = -1;
-                var f = this.FilterHash();
+                var f = FilterHash();
 
                 for (var z = Settings.Count - 1; z >= 0; z--) {
                     var x = Settings[z].SplitAndCutBy("|");
@@ -252,13 +252,13 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (filterSingle == null) {
-            this.Invalidate_FilterOutput();
+            Invalidate_FilterOutput();
             f.ValueSet(string.Empty, true);
             return;
         }
 
         if (f.CaptionPosition == CaptionPosition.ohne) {
-            this.Invalidate_FilterOutput();
+            Invalidate_FilterOutput();
             return;
         }
 
@@ -373,7 +373,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         if (IsDisposed || f is null) { return; }
 
         if (FilterSingleColumn == null) {
-            this.Invalidate_FilterOutput();
+            Invalidate_FilterOutput();
         } else {
             FilterOutput.ChangeTo((FilterItem?)filterSingle?.Clone());
         }

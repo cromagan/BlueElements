@@ -114,11 +114,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return "\"" + MyClassId + ";" + KeyName + "\"";
         }
         set {
-            var x = TryParse(value, null, null);
-            if (!x.cando) {
+            var (cando, result) = TryParse(value, null, null);
+            if (!cando) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler");
             }
-            SetValue(x.result);
+            SetValue(result);
         }
     }
 
@@ -224,7 +224,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         v = v.ReduceToChars(AllowedCharsVariableName);
         if (v != vo || string.IsNullOrEmpty(v)) { return false; }
 
-        foreach (var thisc in BlueScript.Methods.Method.AllMethods) {
+        foreach (var thisc in Method.AllMethods) {
             if (thisc.Command.Equals(v)) { return false; }
         }
         return true;
@@ -299,13 +299,13 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     protected abstract (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
 
     protected bool TryParse(string txt, out Variable? succesVar, VariableCollection varCol, ScriptProperties scp) {
-        var x = TryParse(txt, varCol, scp);
-        if (!x.cando) {
+        var (cando, result) = TryParse(txt, varCol, scp);
+        if (!cando) {
             succesVar = null;
             return false;
         }
 
-        succesVar = NewWithThisValue(x.result);
+        succesVar = NewWithThisValue(result);
         return succesVar != null;
     }
 

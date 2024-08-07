@@ -584,7 +584,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                         if (mustDoIt) {
                             Develop.CheckStackForOverflow();
-                            Generic.Pause(1, false);
+                            Pause(1, false);
                             CheckSysUndoNow(offDatabases, mustDoIt);
                         }
 
