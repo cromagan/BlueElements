@@ -55,7 +55,7 @@ public class Method_CellSetRow : Method_Database {
         if (columnToSet == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
-        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
         if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zellen setzen Testmodus deaktiviert."); }
 
         if (row == MyRow(scp)) {

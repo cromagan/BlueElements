@@ -79,7 +79,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// <param name="toEdit"></param>
     /// <param name="editortype"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Show(IEditable? toEdit, Type? editortype, bool supportsCancel) => Show(toEdit, editortype, supportsCancel);
+    public static bool Show(IEditable? toEdit, Type? editortype, bool supportsCancel) => Show(toEdit, editortype, true, supportsCancel);
 
     /// <summary>
     ///

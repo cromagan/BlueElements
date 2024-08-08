@@ -65,7 +65,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     public DateTime LastUsedDate = DateTime.UtcNow;
 
-    protected const string DatabaseVersion = "4.02";
+    public const string DatabaseVersion = "4.02";
 
     /// <summary>
     ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
