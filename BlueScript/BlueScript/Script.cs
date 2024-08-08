@@ -142,6 +142,19 @@ public class Script {
 
         #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
+        #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
+
+        foreach (var thisC in Method.AllMethods) {
+            var f = thisC.CanDo(scp, scriptText, pos, expectedvariablefeedback, ld);
+            //if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
+
+            if (string.IsNullOrEmpty(f.ErrorMessage)) {
+                return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", ld);
+            }
+        }
+
+        #endregion
+
         var bef = (scriptText.Substring(pos) + "¶").SplitBy("¶");
 
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], ld);
