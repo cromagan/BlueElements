@@ -40,7 +40,6 @@ namespace BlueControls {
             this.lstCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstCommands.CheckBehavior = BlueControls.Enums.CheckBehavior.SingleSelection;
             this.lstCommands.Location = new System.Drawing.Point(8, 56);
             this.lstCommands.Name = "lstCommands";
             this.lstCommands.Size = new System.Drawing.Size(288, 384);
@@ -59,6 +58,7 @@ namespace BlueControls {
             // 
             // grpBefehle
             // 
+            this.grpBefehle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpBefehle.Controls.Add(this.btnFilterDel);
             this.grpBefehle.Controls.Add(this.txbFilter);
             this.grpBefehle.Controls.Add(this.lstCommands);
@@ -102,6 +102,7 @@ namespace BlueControls {
             this.Controls.Add(this.grpBefehle);
             this.Name = "Befehlsreferenz";
             this.Text = "Befehlsübersicht";
+            this.TopMost = true;
             this.grpBefehle.ResumeLayout(false);
             this.ResumeLayout(false);
 

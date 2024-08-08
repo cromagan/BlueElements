@@ -19,12 +19,47 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
-using System.Windows.Forms;
+using System.ComponentModel;
+using BlueControls.Controls;
 
 namespace BlueControls.Editoren;
 
-public partial class EditorEasy : UserControl, IIsEditor {
+public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
+    private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Nothing;
+    [DefaultValue(GroupBoxStyle.Nothing)]
+    public GroupBoxStyle GroupBoxStyle {
+        get => _groupBoxStyle;
+        set {
+            if (_groupBoxStyle == value) { return; }
+            _groupBoxStyle = value;
+            Invalidate();
+        }
+    }
+
+
+
+    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+        if (IsDisposed) { return; }
+
+        base.OnPaint(e);
+
+        if(_groupBoxStyle == GroupBoxStyle.Nothing  ) {return;}
+
+        var t = "[?]";
+
+        if(_toEdit is IEditable ea) { t = ea.CaptionForEditor; }
+
+
+
+
+        var s = States.Standard;
+
+        if (!Enabled) { s = States.Standard_Disabled; }
+        GroupBox.DrawGroupBox(this, e.Graphics, s, _groupBoxStyle, t);
+
+    }
 
     #region Fields
 
@@ -72,6 +107,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
             }
 
             _toEdit = value;
+            Invalidate(); // Überschriften aktualisieren
         }
     }
 

@@ -96,6 +96,7 @@ namespace BlueControls {
             this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -118,11 +119,13 @@ namespace BlueControls {
             // 
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpVariablen.Editabe = false;
+            this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
             this.grpVariablen.Size = new System.Drawing.Size(192, 237);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
+            this.grpVariablen.ToEdit = null;
             // 
             // grpAusgabeFenster
             // 
