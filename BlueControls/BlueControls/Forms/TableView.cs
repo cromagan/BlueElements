@@ -1224,4 +1224,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     #endregion
+
+    private void btnUserInfo_Click(object sender, System.EventArgs e) {
+        var t = new UserInfo();
+       t.Show();
+    }
 }

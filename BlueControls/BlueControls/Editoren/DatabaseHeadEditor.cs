@@ -100,6 +100,140 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     #region Methods
 
+    public static void AddUndosToTable(Table tblUndo, Database? database, float maxAgeInDays) {
+        if (database is Database db && !db.IsDisposed) {
+            UpdateStatusBar(FehlerArt.Info, $"Erstelle Tabellen Ansicht des Undo-Speichers der Datenbank '{db.Caption}'", true);
+
+            foreach (var thisUndo in db.Undo) {
+                AddUndoToTable(tblUndo, thisUndo, db, maxAgeInDays);
+            }
+        }
+    }
+
+    public static void AddUndoToTable(Table tblUndo, UndoItem work, Database db, float maxAgeInDays) {
+
+        if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
+        var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToParseableString(), null, "New Undo Item");
+        if (r == null) { return; }
+
+
+
+        r.CellSet("ColumnName", work.ColName, string.Empty);
+        r.CellSet("RowKey", work.RowKey, string.Empty);
+        if (db.Column[work.ColName] is ColumnItem col && !col.IsDisposed) {
+            r.CellSet("columnCaption", col.Caption, string.Empty);
+        }
+        if (db.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
+            r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
+        } else if (!string.IsNullOrEmpty(work.RowKey)) {
+            r.CellSet("RowFirst", "[gelöscht]", string.Empty);
+        }
+        r.CellSet("Aenderer", work.User, string.Empty);
+        r.CellSet("AenderZeit", work.DateTimeUtc, string.Empty);
+        r.CellSet("Kommentar", work.Comment, string.Empty);
+
+        r.CellSet("Database", db.Caption, string.Empty);
+
+        if (work.Container.IsFormat(FormatHolder.FilepathAndName)) {
+            r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix(), string.Empty);
+        }
+
+        var symb = ImageCode.Fragezeichen;
+        var alt = work.PreviousValue;
+        var neu = work.ChangedTo;
+
+        switch (work.Command) {
+            case DatabaseDataType.Value_withoutSizeData:
+                symb = ImageCode.Stift;
+                break;
+
+            case DatabaseDataType.DatabaseVariables:
+                alt = "[Variablen alt]";
+                neu = "[Variablen neu]";
+                symb = ImageCode.Variable;
+                break;
+
+            case DatabaseDataType.EventScript:
+                alt = "[Skript alt (" + alt.Length + " Zeichen)]";
+                neu = "[Skript neu (" + neu.Length + " Zeichen)]";
+                symb = ImageCode.Skript;
+                break;
+
+            case DatabaseDataType.Command_AddRow:
+                symb = ImageCode.PlusZeichen;
+                break;
+
+            case DatabaseDataType.ColumnArrangement:
+                symb = ImageCode.Spalte;
+                alt = "[Spaltenanordnung alt]";
+                neu = "[Spaltenanordnung neu]";
+                break;
+
+            case DatabaseDataType.Command_RemoveRow:
+                symb = ImageCode.MinusZeichen;
+                break;
+
+            case DatabaseDataType.Command_NewStart:
+                symb = ImageCode.Abspielen;
+                break;
+
+            case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
+                symb = ImageCode.Uhr;
+                break;
+
+            case DatabaseDataType.TemporaryDatabaseMasterUser:
+                symb = ImageCode.Person;
+                break;
+        }
+        r.CellSet("Aenderung", work.Command.ToString(), string.Empty);
+        r.CellSet("symbol", symb + "|24", string.Empty);
+        r.CellSet("Wertalt", alt, string.Empty);
+        r.CellSet("Wertneu", neu, string.Empty);
+    }
+
+    public static void GenerateUndoTabelle(Table tblUndo) {
+        Database x = new(Database.UniqueKeyValue());
+        x.LogUndo = false;
+        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Database", "Datenbank", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
+        _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
+        var az = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
+        _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
+        foreach (var thisColumn in x.Column) {
+            if (!thisColumn.IsSystemColumn()) {
+                thisColumn.MultiLine = true;
+                thisColumn.TextBearbeitungErlaubt = false;
+                thisColumn.DropdownBearbeitungErlaubt = false;
+                thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
+            }
+        }
+
+        if (x.Column["Symbol"] is ColumnItem c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
+
+        x.RepairAfterParse();
+
+        var car = x.ColumnArrangements.CloneWithClones();
+        car[1].ShowColumns("Database", "ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
+
+        x.ColumnArrangements = new(car);
+
+        //x.SortDefinition = new RowSortDefinition(x, "Index", true);
+
+        tblUndo.DatabaseSet(x, string.Empty);
+        tblUndo.Arrangement = string.Empty;
+        tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, az, true);
+    }
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
@@ -163,83 +297,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         Close();
     }
 
-    private void AddUndoToTable(UndoItem work) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-
-        var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToParseableString(), null, "New Undo Item");
-        if (r == null) { return; }
-
-        r.CellSet("ColumnName", work.ColName, string.Empty);
-        r.CellSet("RowKey", work.RowKey, string.Empty);
-        if (db.Column[work.ColName] is ColumnItem col && !col.IsDisposed) {
-            r.CellSet("columnCaption", col.Caption, string.Empty);
-        }
-        if (db.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
-            r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
-        } else if (!string.IsNullOrEmpty(work.RowKey)) {
-            r.CellSet("RowFirst", "[gelöscht]", string.Empty);
-        }
-        r.CellSet("Aenderer", work.User, string.Empty);
-        r.CellSet("AenderZeit", work.DateTimeUtc, string.Empty);
-        r.CellSet("Kommentar", work.Comment, string.Empty);
-
-        if (work.Container.IsFormat(FormatHolder.FilepathAndName)) {
-            r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix(), string.Empty);
-        }
-
-        var symb = ImageCode.Fragezeichen;
-        var alt = work.PreviousValue;
-        var neu = work.ChangedTo;
-
-        switch (work.Command) {
-            case DatabaseDataType.Value_withoutSizeData:
-                symb = ImageCode.Stift;
-                break;
-
-            case DatabaseDataType.DatabaseVariables:
-                alt = "[Variablen alt]";
-                neu = "[Variablen neu]";
-                symb = ImageCode.Variable;
-                break;
-
-            case DatabaseDataType.EventScript:
-                alt = "[Skript alt (" + alt.Length + " Zeichen)]";
-                neu = "[Skript neu (" + neu.Length + " Zeichen)]";
-                symb = ImageCode.Skript;
-                break;
-
-            case DatabaseDataType.Command_AddRow:
-                symb = ImageCode.PlusZeichen;
-                break;
-
-            case DatabaseDataType.ColumnArrangement:
-                symb = ImageCode.Spalte;
-                alt = "[Spaltenanordnung alt]";
-                neu = "[Spaltenanordnung neu]";
-                break;
-
-            case DatabaseDataType.Command_RemoveRow:
-                symb = ImageCode.MinusZeichen;
-                break;
-
-            case DatabaseDataType.Command_NewStart:
-                symb = ImageCode.Abspielen;
-                break;
-
-            case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
-                symb = ImageCode.Uhr;
-                break;
-
-            case DatabaseDataType.TemporaryDatabaseMasterUser:
-                symb = ImageCode.Person;
-                break;
-        }
-        r.CellSet("Aenderung", work.Command.ToString(), string.Empty);
-        r.CellSet("symbol", symb + "|24", string.Empty);
-        r.CellSet("Wertalt", alt, string.Empty);
-        r.CellSet("Wertneu", neu, string.Empty);
-    }
-
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
 
     private void btnOptimize_Click(object sender, System.EventArgs e) => Database?.Optimize();
@@ -287,64 +344,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         capInfo.Text = t.TrimEnd("<br>");
     }
 
-    private void GenerateUndoTabelle() {
-        Database x = new(Database.UniqueKeyValue());
-        x.LogUndo = false;
-        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
-        //_ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
-        _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
-        _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        var az = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
-        _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
-        foreach (var thisColumn in x.Column) {
-            if (!thisColumn.IsSystemColumn()) {
-                thisColumn.MultiLine = true;
-                thisColumn.TextBearbeitungErlaubt = false;
-                thisColumn.DropdownBearbeitungErlaubt = false;
-                thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
-            }
-        }
-
-        if (x.Column["Symbol"] is ColumnItem c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
-
-        x.RepairAfterParse();
-
-        var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowColumns("ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
-
-        x.ColumnArrangements = new(car);
-
-        //x.SortDefinition = new RowSortDefinition(x, "Index", true);
-
-        tblUndo.DatabaseSet(x, string.Empty);
-        tblUndo.Arrangement = string.Empty;
-
-        if (Database is Database db && !db.IsDisposed) {
-            //if (!db.UndoLoaded) {
-            //    UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
-
-            //    db.GetUndoCache();
-            //}
-            UpdateStatusBar(FehlerArt.Info, "Erstelle Tabellen Ansicht des Undo-Speichers", true);
-
-            foreach (var thisUndo in db.Undo) {
-                AddUndoToTable(thisUndo);
-            }
-        }
-
-        tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, az, true);
-
-        x.Freeze("Nur Ansicht");
-    }
-
     //private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
     //    if (e.TabPage == tabUndo) {
     //        if (tblUndo.Database is null) { GenerateUndoTabelle(); }
@@ -354,7 +353,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) {
         if (GlobalTab.SelectedTab == tabUndo && !UndoDone) {
             UndoDone = true;
-            GenerateUndoTabelle();
+            GenerateUndoTabelle(tblUndo);
+            AddUndosToTable(tblUndo, Database, -1);
+            tblUndo.Database?.Freeze("Nur Ansicht");
         }
     }
 

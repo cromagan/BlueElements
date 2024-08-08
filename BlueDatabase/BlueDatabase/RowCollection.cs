@@ -419,7 +419,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (r.Count != 1) {
                 return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
             }
-            InvalidatedRows.AddIfNotExists(r[0]);
+            if (db.Column.SysRowState != null) {
+                InvalidatedRows.AddIfNotExists(r[0]);
+            }
         }
 
         RowItem? myRow;
@@ -428,7 +430,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var (newrow, message) = GenerateAndAdd(filter, coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
             myRow = newrow;
-            InvalidatedRows.AddIfNotExists(newrow);
+
+            if (db.Column.SysRowState != null) {
+                InvalidatedRows.AddIfNotExists(newrow);
+            }
         } else {
             myRow = r[0];
         }
@@ -997,7 +1002,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         OnRowAdded(new RowChangedEventArgs(row, reason));
 
         if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-            InvalidatedRows.Add(row);
+            if (Database?.Column.SysRowState != null) {
+                InvalidatedRows.Add(row);
+            }
         }
 
         return string.Empty;

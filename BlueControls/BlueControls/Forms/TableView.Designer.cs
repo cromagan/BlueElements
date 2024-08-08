@@ -93,6 +93,7 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.grpAufräumen = new BlueControls.Controls.Button();
+            this.btnUserInfo = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -225,6 +226,7 @@ namespace BlueControls.Forms {
             this.btnLetzteDateien.ImageCode = "Ordner";
             this.btnLetzteDateien.Location = new System.Drawing.Point(128, 2);
             this.btnLetzteDateien.Name = "btnLetzteDateien";
+            this.btnLetzteDateien.SettingsLoaded = false;
             this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteDateien.TabIndex = 1;
             this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
@@ -458,7 +460,7 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(520, 0);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(584, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
             this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
@@ -504,6 +506,7 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminAllgemein.CausesValidation = false;
+            this.grpAdminAllgemein.Controls.Add(this.btnUserInfo);
             this.grpAdminAllgemein.Controls.Add(this.btnSaveLoad);
             this.grpAdminAllgemein.Controls.Add(this.btnPowerBearbeitung);
             this.grpAdminAllgemein.Controls.Add(this.btnSpaltenUebersicht);
@@ -511,7 +514,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(312, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(208, 81);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(272, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -767,7 +770,9 @@ namespace BlueControls.Forms {
             this.FilterLeiste.CausesValidation = false;
             this.FilterLeiste.Dock = System.Windows.Forms.DockStyle.Top;
             this.FilterLeiste.Filtertypes = BlueControls.Enums.FilterTypesToShow.AktuelleAnsicht_AktiveFilter;
+            this.FilterLeiste.Item = null;
             this.FilterLeiste.Location = new System.Drawing.Point(0, 0);
+            this.FilterLeiste.Mode = "";
             this.FilterLeiste.Name = "FilterLeiste";
             this.FilterLeiste.Size = new System.Drawing.Size(972, 40);
             this.FilterLeiste.TabIndex = 22;
@@ -777,8 +782,9 @@ namespace BlueControls.Forms {
             // 
             this.Table.Arrangement = "";
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Im_Element_Gewählte_Filter;
+            this.Table.Item = null;
             this.Table.Location = new System.Drawing.Point(0, 64);
+            this.Table.Mode = "";
             this.Table.Name = "Table";
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
@@ -838,8 +844,10 @@ namespace BlueControls.Forms {
             // 
             // CFO
             // 
+            this.CFO.CausesValidation = false;
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFO.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
+            this.CFO.Item = null;
             this.CFO.Location = new System.Drawing.Point(0, 0);
             this.CFO.Mode = null;
             this.CFO.Name = "CFO";
@@ -877,6 +885,18 @@ namespace BlueControls.Forms {
             this.grpAufräumen.Size = new System.Drawing.Size(72, 66);
             this.grpAufräumen.TabIndex = 45;
             this.grpAufräumen.Text = "Zeilen löschen";
+            // 
+            // btnUserInfo
+            // 
+            this.btnUserInfo.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnUserInfo.ImageCode = "Person|16|||||200";
+            this.btnUserInfo.Location = new System.Drawing.Point(208, 2);
+            this.btnUserInfo.Name = "btnUserInfo";
+            this.btnUserInfo.QuickInfo = "A";
+            this.btnUserInfo.Size = new System.Drawing.Size(56, 66);
+            this.btnUserInfo.TabIndex = 44;
+            this.btnUserInfo.Text = "Benutzer Info";
+            this.btnUserInfo.Click += new System.EventHandler(this.btnUserInfo_Click);
             // 
             // TableView
             // 
@@ -982,5 +1002,6 @@ namespace BlueControls.Forms {
         private Button btnMDBImport;
         private Button btnAufräumen;
         private Button grpAufräumen;
+        private Button btnUserInfo;
     }
 }
