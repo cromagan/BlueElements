@@ -24,6 +24,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using BlueBasics.Enums;
+using System;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -32,13 +33,13 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [RowVar];
+    public override List<List<string>> Args => [RowVar, FloatVal];
     public List<List<string>> ArgsForButton => [];
     public List<string> ArgsForButtonDescription => [];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
     public override string Command => "rowinvalidate";
     public override List<string> Constants => [];
-    public override string Description => "Stoßt an, dass die Zeile komplett neu durchgerechnet wird.";
+    public override string Description => "Stoßt an, dass die Zeile komplett neu durchgerechnet wird.\r\nAber nur, wenn das Letzte Durchrechnen länger her ist, als die angegebenen Tage.";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -55,7 +56,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "RowInvalidate(Row);";
+    public override string Syntax => "RowInvalidate(Row, AgeInDays);";
 
     #endregion
 
@@ -94,6 +95,14 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
+
+        var d = attvar.ValueNumGet(1);
+
+        if (d < 0.1) { return new DoItFeedback(ld, "Intervall zu kurz."); }
+
+        var v = myRow.CellGetDateTime(srs);
+
+        if (DateTime.UtcNow.Subtract(v).TotalDays < d) { return DoItFeedback.Null(); }
 
         myRow.CellSet(srs, string.Empty, $"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 

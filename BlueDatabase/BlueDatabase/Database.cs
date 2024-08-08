@@ -1771,9 +1771,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public string ImportCsv(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        if (!Row.IsNewRowPossible()) {
-            OnDropMessage(FehlerArt.Warnung, "Abbruch, Datenbank unterstützt keine neuen Zeilen.");
-            return "Abbruch, Datenbank unterstützt keine neuen Zeilen.";
+        var f = EditableErrorReason(EditableErrorReasonType.EditNormaly);
+
+
+        if (!string.IsNullOrEmpty(f)) {
+            OnDropMessage(FehlerArt.Warnung, "Abbruch, " + f);
+            return "Abbruch, " + f;
         }
 
         #region Text vorbereiten
@@ -1886,9 +1889,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (zeileZuordnen) {
             foreach (var thisR in Row) {
-                var f = thisR.CellFirstString().ToUpperInvariant();
-                if (!string.IsNullOrEmpty(f) && !dictVorhanden.ContainsKey(f)) {
-                    dictVorhanden.Add(f, thisR);
+                var cv = thisR.CellFirstString().ToUpperInvariant();
+                if (!string.IsNullOrEmpty(cv) && !dictVorhanden.ContainsKey(cv)) {
+                    dictVorhanden.Add(cv, thisR);
                 } else {
                     OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
@@ -2295,13 +2298,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
-    //    _variables.Clear();
-    //    if (!isLoading) { Variables = new VariableCollection(); }
-    //}
-    internal bool IsNewRowPossible() => string.IsNullOrWhiteSpace(EditableErrorReason(EditableErrorReasonType.EditNormaly));
 
-    //    //    _variables.RemoveAt(_variables.Count - 1);
-    //    //}
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }

@@ -288,7 +288,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (db2 == null || db2.IsDisposed) { return (null, "Datenbanken verworfen"); }
 
-        if (!db2.Row.IsNewRowPossible()) { return (null, "In der Datenbank sind keine neuen Zeilen möglich"); }
+        var f = db2.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f); }
 
         if (first == null) { return (null, "Der Wert für die erste Spalte fehlt"); }
 
@@ -639,7 +640,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, FilterCollection? fc, string comment) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
-        if (!Database.Row.IsNewRowPossible()) { return null; }
+        if (!string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditNormaly))) { return null; }
 
         var s = Database.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return null; }
@@ -665,8 +666,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             throw new Exception();
         }
 
-        if (!IsNewRowPossible()) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich");
+        var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+
+        if (!string.IsNullOrEmpty(f)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
             throw new Exception();
         }
 
@@ -742,12 +745,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisRow in this) {
             thisRow.InvalidateCheckData();
         }
-    }
-
-    public bool IsNewRowPossible() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
-
-        return Database.IsNewRowPossible();
     }
 
     /// <summary>
@@ -914,8 +911,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void CloneFrom(Database sourceDatabase) {
-        if (IsNewRowPossible()) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht erlaubt");
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
+        var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        if (!string.IsNullOrEmpty(f)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
+            throw new Exception();
         }
 
         // Zeilen, die zu viel sind, löschen
