@@ -58,9 +58,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public OutputFilterPadItem(string keyName) : this(keyName, null, null) { }
 
-    public OutputFilterPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        DatabaseOutput = db;
-    }
+    public OutputFilterPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 

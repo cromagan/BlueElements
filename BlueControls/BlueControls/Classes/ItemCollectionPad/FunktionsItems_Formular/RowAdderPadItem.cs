@@ -69,9 +69,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
     public RowAdderPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        DatabaseOutput = db;
-    }
+    public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 

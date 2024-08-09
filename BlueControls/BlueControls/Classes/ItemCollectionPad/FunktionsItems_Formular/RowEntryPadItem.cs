@@ -42,9 +42,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     public RowEntryPadItem(Database? db) : this(string.Empty, db, null) { }
 
-    public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        DatabaseOutput = db;
-    }
+    public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     public RowEntryPadItem(string keyName) : this(keyName, null, null) { }
 

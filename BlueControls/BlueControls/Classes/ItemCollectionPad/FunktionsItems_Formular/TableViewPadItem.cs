@@ -55,9 +55,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
 
     public TableViewPadItem(Database? db) : this(string.Empty, db, null) { }
 
-    public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        DatabaseOutput = db;
-    }
+    public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     public TableViewPadItem(string keyName) : this(keyName, null, null) { }
 

@@ -76,13 +76,9 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     public Database? DatabaseOutput {
         get {
-            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) {
-                return DatabaseInput;
-            }
+            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return DatabaseInput; }
 
-            if (_databaseOutputLoaded) {
-                return _databaseOutput;
-            }
+            if (_databaseOutputLoaded) { return _databaseOutput; }
 
             _databaseOutput = GetById(new ConnectionInfo(_databaseOutputName, null, string.Empty), false, null, true);
 
@@ -90,18 +86,12 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
             return _databaseOutput;
         }
-        set {
-            if (IsDisposed) {
-                return;
-            }
+        private set {
+            if (IsDisposed) { return; }
 
-            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) {
-                return;
-            }
+            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return; }
 
-            if (value == DatabaseOutput) {
-                return;
-            }
+            if (value == DatabaseOutput) { return; }
 
             _databaseOutput = value;
             _databaseOutputName = value?.KeyName ?? string.Empty;
@@ -115,7 +105,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
     public int OutputColorId {
         get => _outputColorId;
 
-        set {
+        private set {
             if (IsDisposed) { return; }
 
             if (_outputColorId == value) { return; }
