@@ -184,6 +184,12 @@
     <Compile Include="Editoren\ColumnArrangementPadEditor.Designer.cs">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms_Database\SearchAndReplaceInDBScripts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms_Database\SearchAndReplaceInDBScripts.designer.cs">
+      <DependentUpon>SearchAndReplaceInDBScripts.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms_Database\UserInfo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -541,11 +547,11 @@
     <Compile Include="Forms_Database\ImportCsv.designer.cs">
       <DependentUpon>ImportCsv.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\SearchAndReplace.cs">
+    <Compile Include="Forms_Database\SearchAndReplaceInCells.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\SearchAndReplace.designer.cs">
-      <DependentUpon>SearchAndReplace.cs</DependentUpon>
+    <Compile Include="Forms_Database\SearchAndReplaceInCells.designer.cs">
+      <DependentUpon>SearchAndReplaceInCells.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\Dictionary.cs" />
     <Compile Include="Controls\EasyPic.cs">
@@ -740,6 +746,10 @@
     <EmbeddedResource Include="Editoren\ColumnArrangementPadEditor.resx">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms_Database\SearchAndReplaceInDBScripts.resx">
+      <DependentUpon>SearchAndReplaceInDBScripts.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms_Database\UserInfo.resx">
       <DependentUpon>UserInfo.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -776,8 +786,8 @@
       <DependentUpon>ImportCsv.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\SearchAndReplace.resx">
-      <DependentUpon>SearchAndReplace.cs</DependentUpon>
+    <EmbeddedResource Include="Forms_Database\SearchAndReplaceInCells.resx">
+      <DependentUpon>SearchAndReplaceInCells.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\EasyPic.resx">

@@ -63,10 +63,12 @@ namespace BlueControls.Forms {
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
+            this.btnUserInfo = new BlueControls.Controls.Button();
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.btnSpaltenUebersicht = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
+            this.btnSuchInScript = new BlueControls.Controls.Button();
             this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
             this.btnFormular = new BlueControls.Controls.Button();
             this.btnSpaltenanordnung = new BlueControls.Controls.Button();
@@ -93,7 +95,6 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.grpAufräumen = new BlueControls.Controls.Button();
-            this.btnUserInfo = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -460,7 +461,7 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(584, 0);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(648, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
             this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
@@ -512,12 +513,24 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.Controls.Add(this.btnSpaltenUebersicht);
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminAllgemein.Location = new System.Drawing.Point(312, 0);
+            this.grpAdminAllgemein.Location = new System.Drawing.Point(376, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
             this.grpAdminAllgemein.Size = new System.Drawing.Size(272, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
+            // 
+            // btnUserInfo
+            // 
+            this.btnUserInfo.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnUserInfo.ImageCode = "Person|16|||||200";
+            this.btnUserInfo.Location = new System.Drawing.Point(208, 2);
+            this.btnUserInfo.Name = "btnUserInfo";
+            this.btnUserInfo.QuickInfo = "A";
+            this.btnUserInfo.Size = new System.Drawing.Size(56, 66);
+            this.btnUserInfo.TabIndex = 44;
+            this.btnUserInfo.Text = "Benutzer Info";
+            this.btnUserInfo.Click += new System.EventHandler(this.btnUserInfo_Click);
             // 
             // btnSaveLoad
             // 
@@ -558,6 +571,7 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminBearbeiten.CausesValidation = false;
+            this.grpAdminBearbeiten.Controls.Add(this.btnSuchInScript);
             this.grpAdminBearbeiten.Controls.Add(this.btnSkripteBearbeiten);
             this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
             this.grpAdminBearbeiten.Controls.Add(this.btnSpaltenanordnung);
@@ -567,10 +581,21 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(312, 81);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(376, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
+            // 
+            // btnSuchInScript
+            // 
+            this.btnSuchInScript.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnSuchInScript.ImageCode = "Skript||||||||||Stift";
+            this.btnSuchInScript.Location = new System.Drawing.Point(304, 2);
+            this.btnSuchInScript.Name = "btnSuchInScript";
+            this.btnSuchInScript.Size = new System.Drawing.Size(64, 66);
+            this.btnSuchInScript.TabIndex = 46;
+            this.btnSuchInScript.Text = "in Skripten suchen";
+            this.btnSuchInScript.Click += new System.EventHandler(this.btnSuchInScript_Click);
             // 
             // btnSkripteBearbeiten
             // 
@@ -886,18 +911,6 @@ namespace BlueControls.Forms {
             this.grpAufräumen.TabIndex = 45;
             this.grpAufräumen.Text = "Zeilen löschen";
             // 
-            // btnUserInfo
-            // 
-            this.btnUserInfo.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnUserInfo.ImageCode = "Person|16|||||200";
-            this.btnUserInfo.Location = new System.Drawing.Point(208, 2);
-            this.btnUserInfo.Name = "btnUserInfo";
-            this.btnUserInfo.QuickInfo = "A";
-            this.btnUserInfo.Size = new System.Drawing.Size(56, 66);
-            this.btnUserInfo.TabIndex = 44;
-            this.btnUserInfo.Text = "Benutzer Info";
-            this.btnUserInfo.Click += new System.EventHandler(this.btnUserInfo_Click);
-            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1003,5 +1016,6 @@ namespace BlueControls.Forms {
         private Button btnAufräumen;
         private Button grpAufräumen;
         private Button btnUserInfo;
+        private Button btnSuchInScript;
     }
 }

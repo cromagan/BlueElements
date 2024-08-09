@@ -241,7 +241,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "SuchenUndErsetzen":
                 if (!db.IsAdministrator()) { return; }
 
-                tbl?.OpenSearchAndReplace();
+                tbl?.OpenSearchAndReplaceInCells();
                 break;
 
             case "Summe":
@@ -887,7 +887,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database?.Column.GenerateOverView();
 
-    private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplace();
+    private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInCells();
 
     private void btnSuchFenster_Click(object sender, System.EventArgs e) {
         var x = new Search(Table);
@@ -1229,4 +1229,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var t = new UserInfo();
        t.Show();
     }
+
+    private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInDBScripts();
 }

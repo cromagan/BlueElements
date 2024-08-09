@@ -29,7 +29,7 @@ using System.Linq;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-internal sealed partial class SearchAndReplace : Form {
+internal sealed partial class SearchAndReplaceInCells : Form {
 
     #region Fields
 
@@ -40,7 +40,7 @@ internal sealed partial class SearchAndReplace : Form {
 
     #region Constructors
 
-    public SearchAndReplace(Table table) {
+    public SearchAndReplaceInCells(Table table) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

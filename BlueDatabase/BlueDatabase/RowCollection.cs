@@ -700,9 +700,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (fullprocessing) {
-            if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src, u, "Initialwert neuer Zeile"); }
-            if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString5(), "Initialwert neuer Zeile"); }
-
             // Dann die Inital-Werte reinschreiben
             if (fc != null) {
                 foreach (var thisColum in db.Column) {
@@ -941,15 +938,23 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason) {
+    internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);
             if (row != null && !row.IsDisposed) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
 
-            var c = new RowItem(db, rowkey);
-            var f = Add(c, reason);
+            row = new RowItem(db, rowkey);
+            var f = Add(row, reason);
+
+            if (string.IsNullOrEmpty(f) && user != null && datetimeutc is DateTime dt) {
+                if (db.Column.SysRowCreator is ColumnItem src) { row.SetValueInternal(src, user, reason); }
+                if (db.Column.SysRowCreateDate is ColumnItem scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
+                if (db.Column.SysLocked is ColumnItem sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
+                if (db.Column.SysCorrect is ColumnItem sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
+            }
+
             if (reason == Reason.SetCommand && db.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
@@ -968,7 +973,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
-                    db.Cell.SetValueInternal(thisColumn, row, string.Empty, Reason.AdditionalWorkAfterCommand);
+                    row.SetValueInternal(thisColumn, string.Empty, Reason.AdditionalWorkAfterCommand);
                 }
             }
 

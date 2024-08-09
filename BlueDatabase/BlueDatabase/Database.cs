@@ -610,7 +610,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public static string EditableErrorReason(Database? database, EditableErrorReasonType mode) {
-        if (database is null || database.IsDisposed) { return "Keine Datenbank zum bearbeiten."; }
+        if (database is null) { return "Keine Datenbank zum Bearbeiten."; }
         return database.EditableErrorReason(mode);
     }
 
@@ -1241,7 +1241,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
         vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
-        vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
+
+        if (Column.First() is ColumnItem fc) {
+            vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
+
+            if (fc.ScriptType != ScriptType.Nicht_vorhanden && row != null) {
+                vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
+            }
+
+
+        }
+
+
+
         //vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
         vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
 
@@ -2545,7 +2557,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();
 
-            var f = Cell.SetValueInternal(column, row, value, reason);
+            var f = row.SetValueInternal(column, value, reason);
 
             if (!string.IsNullOrEmpty(f)) { return (f, null, null); }
             Cell.DoSystemColumns(db, column, row, user, datetimeutc, reason);
@@ -2582,10 +2594,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 case DatabaseDataType.Command_RemoveRow:
                     var r = Row.SearchByKey(value);
                     if (r == null) { return (string.Empty, null, null); }
-                    return (Row.ExecuteCommand(type, r.KeyName, reason), null, r);
+                    return (Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc), null, r);
 
                 case DatabaseDataType.Command_AddRow:
-                    var f1 = Row.ExecuteCommand(type, value, reason);
+                    var f1 = Row.ExecuteCommand(type, value, reason, user, datetimeutc);
                     if (!string.IsNullOrEmpty(f1)) { return (f1, null, null); }
                     var thisRow = Row.SearchByKey(value);
                     return (string.Empty, null, thisRow);
@@ -3320,7 +3332,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.SearchByKey(rowKey);
                         if (row == null || row.IsDisposed) {
-                            _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate);
+                            _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
                             row = Row.SearchByKey(rowKey);
                         }
 

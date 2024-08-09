@@ -157,6 +157,9 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         _mustUpdate = false;
 
+        DoInputFilter(null, true);
+        DoRows();
+
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
             return;
@@ -173,8 +176,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return;
         }
 
-        DoInputFilter(null, true);
-        DoRows();
         var rowIn = RowSingleOrNull();
 
         if (rowIn != _lastRow) {

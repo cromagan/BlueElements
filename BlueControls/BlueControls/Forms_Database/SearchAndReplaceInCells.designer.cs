@@ -10,7 +10,7 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    internal sealed partial class SearchAndReplace
+    internal sealed partial class SearchAndReplaceInCells
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]

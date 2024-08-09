@@ -125,7 +125,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     private List<RowData>? _rowsFilteredAndPinned;
 
-    private SearchAndReplace? _searchAndReplace;
+    private SearchAndReplaceInCells? _searchAndReplaceInCells;
+
+    private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
 
     private bool _showNumber;
 
@@ -1087,17 +1089,25 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public void OpenSearchAndReplace() {
+    public void OpenSearchAndReplaceInCells() {
         if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditCurrently) || Database == null) { return; }
 
         if (!Database.IsAdministrator()) { return; }
 
-        if (_searchAndReplace == null || _searchAndReplace.IsDisposed || !_searchAndReplace.Visible) {
-            _searchAndReplace = new SearchAndReplace(this);
-            _searchAndReplace.Show();
+        if (_searchAndReplaceInCells == null || _searchAndReplaceInCells.IsDisposed || !_searchAndReplaceInCells.Visible) {
+            _searchAndReplaceInCells = new SearchAndReplaceInCells(this);
+            _searchAndReplaceInCells.Show();
         }
     }
+    public void OpenSearchAndReplaceInDBScripts() {
+      
+        if (!Generic.IsAdministrator()) { return; }
 
+        if (_searchAndReplaceInDBScripts == null || _searchAndReplaceInDBScripts.IsDisposed || !_searchAndReplaceInDBScripts.Visible) {
+            _searchAndReplaceInDBScripts = new SearchAndReplaceInDBScripts();
+            _searchAndReplaceInDBScripts.Show();
+        }
+    }
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 

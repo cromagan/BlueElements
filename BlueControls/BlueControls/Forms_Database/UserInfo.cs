@@ -17,15 +17,9 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
