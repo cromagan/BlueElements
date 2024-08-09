@@ -41,11 +41,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IAutosizable {
+public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadableText, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private string _columnName = string.Empty;
@@ -57,14 +56,14 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
 
     public EditFieldPadItem(string keyName) : this(keyName, null) { }
 
-    public EditFieldPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => _itemAccepts = new();
+    public EditFieldPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 
     #region Properties
 
     public static string ClassId => "FI-EditField";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
     public bool AutoSizeableHeight {
         get {
@@ -119,8 +118,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -133,19 +131,9 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         }
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => true;
+    public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
 
     #endregion
 
@@ -166,15 +154,6 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         return l;
     }
 
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
-    }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
-
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         //var ff = parent.SearchOrGenerate(rfw2);
 
@@ -193,7 +172,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         //b = _itemSends.ErrorReason(this);
@@ -207,7 +186,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result = [.. _itemAccepts.GetProperties(this, widthOfControl)];
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return result; }
 
@@ -236,15 +215,8 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         return result;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
             case "column":
@@ -292,7 +264,7 @@ public class EditFieldPadItem : FakeControlPadItem, IItemToControl, IReadableTex
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags()];
+        List<string> result = [];
 
         result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);

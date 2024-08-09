@@ -730,7 +730,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         var l = new List<string>();
 
         foreach (var thisIt in this) {
-            if (thisIt is FakeControlPadItem csi) {
+            if (thisIt is ReciverControlPadItem csi) {
                 l.AddRange(csi.VisibleFor);
             }
         }

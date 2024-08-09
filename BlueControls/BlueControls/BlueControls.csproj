@@ -111,6 +111,7 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\AdderItem.cs" />
     <Compile Include="Classes\ItemCollectionList\DropDownListItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\Abstract\ReciverSenderControlPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\MonitorPadItem.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.Designer.cs">
       <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
@@ -270,7 +271,6 @@
     <Compile Include="Interfaces\IIsEditor.cs" />
     <Compile Include="Interfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\IHasVersion.cs" />
-    <Compile Include="Interfaces\IItemAcceptFilter.cs" />
     <Compile Include="Interfaces\IItemSendFilter.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaView.cs">
@@ -465,7 +465,7 @@
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\FilterConverterElementPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\OutputFilterPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
-    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\Abstract\ReciverControlPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />

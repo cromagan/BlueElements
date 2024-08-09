@@ -39,11 +39,10 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IAutosizable {
+public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableText, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private string _action = string.Empty;
     private string _anzeige = string.Empty;
     private string _arg1 = string.Empty;
@@ -65,7 +64,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
 
     public ButtonPadItem(string keyName) : this(keyName, null) { }
 
-    public ButtonPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => _itemAccepts = new();
+    public ButtonPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 
@@ -85,7 +84,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
 
     [Description("Muss befüllt werden!\r\nZahlenwerte normal angeben. Beispiel: 0\r\nTexte mit \". Beispiel: \"Hallo\"\r\nOder Variablennamen: Beispiel: HAUPT")]
     public string Arg1 {
@@ -210,8 +209,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Knopf, den der Benutzer drücken kann und eine Aktion startet.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
@@ -227,15 +225,9 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         }
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => false;
+    public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
-
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
 
     protected override int SaveOrder => 1;
 
@@ -308,15 +300,6 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         return true;
     }
 
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
-    }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
-
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedFormulaButton() {
             Text = _anzeige,
@@ -343,7 +326,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         //b = _itemSends.ErrorReason(this);
@@ -353,7 +336,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [.. _itemAccepts.GetProperties(this, widthOfControl)];
+        List<GenericControl> l = [.. base.GetProperties(widthOfControl)];
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
@@ -424,16 +407,8 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
             case "caption":
@@ -518,7 +493,7 @@ public class ButtonPadItem : FakeControlPadItem, IItemToControl, IReadableText, 
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags()];
+        List<string> result = [];
 
         result.ParseableAdd("Caption", _anzeige);
         result.ParseableAdd("Image", _image);

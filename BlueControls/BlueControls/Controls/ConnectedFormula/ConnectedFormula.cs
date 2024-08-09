@@ -424,7 +424,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
                 thisIt.Page = "Head";
             }
 
-            if (thisIt is FakeControlPadItem itcf) {
+            if (thisIt is ReciverControlPadItem itcf) {
                 itcf.ParentFormula = this;
             }
         }
@@ -517,7 +517,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
             if (string.IsNullOrEmpty(page) ||
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
-                if (thisItem is FakeControlPadItem cspi) {
+                if (thisItem is ReciverControlPadItem cspi) {
                     if (cspi.MustBeInDrawingArea && cspi.IsVisibleForMe(mode, false)) { return true; }
                 }
             }

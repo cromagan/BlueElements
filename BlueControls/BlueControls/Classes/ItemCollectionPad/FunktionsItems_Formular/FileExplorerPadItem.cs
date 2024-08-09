@@ -35,11 +35,10 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
+public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private bool _bei_Bedarf_Erzeugen;
     private string _filter = string.Empty;
     private bool _leere_Ordner_Löschen;
@@ -53,7 +52,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     public FileExplorerPadItem(string keyName) : this(keyName, null) { }
 
     public FileExplorerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }
 
@@ -62,7 +60,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     #region Properties
 
     public static string ClassId => "FI-FileExplorer";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.One;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
     [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
@@ -77,8 +75,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         }
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
 
     public string Filter {
@@ -92,8 +89,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         }
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => true;
+    public override bool InputMustBeOneRow => true;
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
@@ -122,15 +118,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
-
     [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Pfad {
         get => _pfad;
@@ -149,15 +136,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
 
     #region Methods
 
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
-    }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
-
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FileBrowser {
             Var_Directory = Pfad,
@@ -175,7 +153,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         //b = _itemSends.ErrorReason(this);
@@ -187,7 +165,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetProperties(this, widthOfControl),
+            .. base.GetProperties(widthOfControl),
             new FlexiControlForProperty<string>(() => Pfad),
             new FlexiControlForProperty<string>(() => Mindest_Pfad),
             new FlexiControlForProperty<string>(() => Filter),
@@ -199,15 +177,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
             case "path":
@@ -254,7 +225,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemToControl, IItemAcce
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags()];
+        List<string> result = [];
 
         result.ParseableAdd("Path", _pfad);
         result.ParseableAdd("PathMin", _mindest_pfad);

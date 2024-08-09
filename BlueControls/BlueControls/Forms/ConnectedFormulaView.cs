@@ -70,7 +70,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     }
 
     private void btnEingehendeDatenbank_Click(object sender, System.EventArgs e) {
-        if (_lastItem is IItemAcceptFilter iaf && iaf.DatabaseInput is Database db && !db.IsDisposed) {
+        if (_lastItem is ReciverControlPadItem iaf && iaf.DatabaseInput is Database db && !db.IsDisposed) {
             var c = new TableView(db, false, true);
             c.ShowDialog();
         }
@@ -85,7 +85,6 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
-
         if (!CFormula.ConnectedFormula.LockEditing()) { return; }
         InputBoxEditor.Show(api, true);
 
@@ -97,7 +96,6 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
-
 
         if (!CFormula.ConnectedFormula.LockEditing()) { return; }
 
@@ -138,8 +136,6 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         if (tmpFormula == null) { return; }
         FormulaSet(tmpFormula);
     }
-
-
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? cf) {
         if (IsDisposed) { return; }
@@ -219,10 +215,10 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
             _lastItem = null;
         }
 
-        btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is IItemAcceptFilter;
+        btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is ReciverControlPadItem;
         btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is IItemSendFilter;
 
-        if (_lastItem is FakeControlPadItem fcpi) {
+        if (_lastItem is ReciverControlPadItem fcpi) {
             capClicked.Text = "<imagecode=Information|16> " + fcpi.MyClassId;
             capClicked.QuickInfo = fcpi.Description;
             btnElementBearbeiten.Enabled = Generic.IsAdministrator();

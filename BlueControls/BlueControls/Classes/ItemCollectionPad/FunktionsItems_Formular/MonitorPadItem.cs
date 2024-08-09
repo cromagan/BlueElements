@@ -34,20 +34,13 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
-
-    #region Fields
-
-    private readonly ItemAcceptFilter _itemAccepts;
-
-    #endregion
+public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
 
     public MonitorPadItem(string keyName) : this(keyName, null) { }
 
     public MonitorPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         SetCoordinates(new RectangleF(0, 0, 50, 30), true);
     }
 
@@ -56,39 +49,21 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     #region Properties
 
     public static string ClassId => "FI-Monitor";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Zeigt Änderungen einer Zeile an.";
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => true;
+
+    public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
 
     protected override int SaveOrder => 5;
 
     #endregion
 
     #region Methods
-
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
-    }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new Monitor();
@@ -101,7 +76,7 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         return string.Empty;
@@ -110,7 +85,7 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetProperties(this, widthOfControl),
+            .. base.GetProperties(widthOfControl),
             //new FlexiControlForProperty<string>(() => Pfad),
             //new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
             //new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
@@ -120,15 +95,8 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
             //case "pfad":
@@ -166,7 +134,7 @@ public class MonitorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags()];
+        List<string> result = [];
 
         //result.ParseableAdd("Pfad", _pfad);
         //result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);

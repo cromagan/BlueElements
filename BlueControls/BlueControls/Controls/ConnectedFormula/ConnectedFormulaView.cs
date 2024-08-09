@@ -155,7 +155,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                     if (con != null) {
                         _ = unused.Remove(con);
 
-                        if (thisit is FakeControlPadItem cspi) {
+                        if (thisit is ReciverControlPadItem cspi) {
                             con.Visible = cspi.IsVisibleForMe(Mode, true);
                         } else {
                             con.Visible = true;

@@ -37,11 +37,10 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
@@ -55,7 +54,6 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     public DropDownSelectRowPadItem(string keyName) : this(keyName, null, null) { }
 
     public DropDownSelectRowPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
@@ -66,7 +64,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     #region Properties
 
     public static string ClassId => "FI-SelectRowWithDropDownMenu";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
 
     [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
     public string Anzeige {
@@ -96,8 +94,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet(this);
@@ -105,19 +102,13 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     }
 
     public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => false;
+    public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
-    }
-
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public string Überschrift {
@@ -141,11 +132,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     public override void AddedToCollection() {
         base.AddedToCollection();
         _itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FlexiControlRowSelector(DatabaseOutput, _überschrift, _anzeige) {
@@ -162,7 +149,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         b = _itemSends.ErrorReason(this);
@@ -174,7 +161,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetProperties(this, widthOfControl),
+            .. base.GetProperties(widthOfControl),
             .. _itemSends.GetProperties(this, widthOfControl),
             new FlexiControl("Einstellungen:", -1, true),
             new FlexiControlForProperty<string>(() => Überschrift),
@@ -193,12 +180,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
         if (_itemSends.ParseThis(key, value)) { return true; }
 
         switch (key) {
@@ -235,7 +220,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -247,7 +232,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IItemToControl, IRea
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
+        List<string> result = [.. _itemSends.ParsableTags(this)];
 
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);

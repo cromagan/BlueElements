@@ -122,11 +122,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         Pad.AddCentered(x);
 
-        //if (l is IItemSendFilter isr && x is IItemAcceptFilter iar) {
+        //if (l is IItemSendFilter isr && x is ReciverControlPadItem iar) {
         //    iar.GetRowFrom = isr;
         //}
 
-        if (l is IItemSendFilter && x is IItemAcceptFilter iaf) {
+        if (l is IItemSendFilter && x is ReciverControlPadItem iaf) {
             iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
@@ -138,7 +138,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //    isf2.Datenbank_wählen();
         //}
 
-        //if (x is IItemAcceptFilter iaf2 && iaf2.Parents.Count == 0) {
+        //if (x is ReciverControlPadItem iaf2 && iaf2.Parents.Count == 0) {
         //    iaf2.Datenquellen_bearbeiten();
         //}
     }
@@ -354,7 +354,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         CheckButtons();
     }
 
-    private void GenQuickInfo(Controls.Button b, FakeControlPadItem from) {
+    private void GenQuickInfo(Controls.Button b, ReciverControlPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt += "<br><br><b><u>Beschreibung:</b></u>";
@@ -362,7 +362,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         txt += "<br><br><b><u>Eigenschaften:</b></u>";
 
-        if (from is IItemAcceptFilter ias) {
+        if (from is ReciverControlPadItem ias) {
             if (ias.InputMustBeOneRow) {
                 txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
                     "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Datenbank ergeben,<br>" +

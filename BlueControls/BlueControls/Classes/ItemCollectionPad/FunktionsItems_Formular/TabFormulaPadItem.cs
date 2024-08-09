@@ -41,12 +41,11 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
+public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 
     private readonly List<string> _childs = [];
-    private readonly ItemAcceptFilter _itemAccepts;
 
     #endregion
 
@@ -56,8 +55,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     }
 
     public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
-
         if (ParentFormula != null) {
             ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
         }
@@ -70,39 +67,20 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     #region Properties
 
     public static string ClassId => "FI-ChildFormula";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => true;
+    public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
 
     protected override int SaveOrder => 1000;
 
     #endregion
 
     #region Methods
-
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        //_itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
-    }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
         var con = new Controls.TabControl();
@@ -222,7 +200,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         //b = _itemSends.ErrorReason(this);
@@ -238,7 +216,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
-            .. _itemAccepts.GetProperties(this, widthOfControl),
+            .. base.GetProperties(widthOfControl),
             new FlexiControl("Eigenschaften:", widthOfControl, true),
             new FlexiControl("Formulare:", -1, false),
             Childs(),
@@ -247,15 +225,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
             case "parent":
@@ -302,7 +273,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IItemToControl, IItemAccept
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags()];
+        List<string> result = [];
 
         result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Childs", _childs, false);

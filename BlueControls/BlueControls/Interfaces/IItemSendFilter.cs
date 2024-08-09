@@ -27,10 +27,11 @@ using static BlueDatabase.Database;
 using BlueControls.ItemCollectionList;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.BlueDatabaseDialogs;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IErrorCheckable, IItemAcceptFilter {
+public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPropertyChangingAndKey, IHasVersion, IHasKeyName, IErrorCheckable {
 
     #region Properties
 
@@ -44,7 +45,7 @@ public interface IItemSendFilter : IPropertyChangedFeedback, IReadableTextWithPr
 
     public void AddChild(IHasKeyName add);
 
-    public void RemoveChild(IItemAcceptFilter remove);
+    public void RemoveChild(ReciverControlPadItem remove);
 
     #endregion
 }
@@ -61,7 +62,7 @@ public static class ItemSendFilterExtension {
         foreach (var thisChild in item.ChildIds) {
             var item2 = item.Parent[thisChild];
 
-            if (item2 is IItemAcceptFilter ias) {
+            if (item2 is ReciverControlPadItem ias) {
                 ias.CalculateInputColorIds();
             }
         }
@@ -120,7 +121,7 @@ public sealed class ItemSendFilter {
     }
 
     public Database? DatabaseOutputGet(IItemSendFilter item) {
-        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase && !ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) {
+        if (item is ReciverControlPadItem ias && ias.DatabaseInputMustMatchOutputDatabase && !ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) {
             return ias.DatabaseInput;
         }
 
@@ -135,7 +136,7 @@ public sealed class ItemSendFilter {
     public void DatabaseOutputSet(Database? value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
 
-        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase && !ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return; }
+        if (item is ReciverControlPadItem ias && ias.DatabaseInputMustMatchOutputDatabase && !ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return; }
 
         if (value == DatabaseOutputGet(item)) { return; }
 
@@ -165,7 +166,7 @@ public sealed class ItemSendFilter {
         var enableOutput = true;
         Database? outp = null;
 
-        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase) {
+        if (item is ReciverControlPadItem ias && ias.DatabaseInputMustMatchOutputDatabase) {
             enableOutput = ias.AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None);
 
             outp = ias.DatabaseInput;
@@ -229,7 +230,7 @@ public sealed class ItemSendFilter {
         return false;
     }
 
-    public void RemoveChild(IItemAcceptFilter remove, IItemSendFilter item) {
+    public void RemoveChild(ReciverControlPadItem remove, IItemSendFilter item) {
         var l = new List<string>();
         l.AddRange(_childIds);
         _ = l.Remove(remove.KeyName);

@@ -36,11 +36,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
 /// Unsichtbares Element, wird nicht angezeigt.
 /// </summary>
-public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFilter, IItemSendFilter {
+public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText, IItemSendFilter {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
 
     #endregion
@@ -52,7 +51,6 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
     public RowEntryPadItem(Database? db) : this(string.Empty, db, null) { }
 
     public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
@@ -65,15 +63,14 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
     #region Properties
 
     public static string ClassId => "FI-RowEntryElement";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One | AllowedInputFilter.None;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One | AllowedInputFilter.None;
 
     public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet(this);
@@ -82,18 +79,13 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
 
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
     public List<int> InputColorId => [OutputColorId];
-    public bool InputMustBeOneRow => false;
+    public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
     public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
-    }
-
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     protected override int SaveOrder => 1;
@@ -107,17 +99,13 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
     public override void AddedToCollection() {
         base.AddedToCollection();
         _itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override string ErrorReason() {
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         b = _itemSends.ErrorReason(this);
@@ -147,12 +135,10 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
         if (_itemSends.ParseThis(key, value)) { return true; }
 
         switch (key) {
@@ -173,7 +159,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -185,7 +171,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemAcceptFil
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
+        List<string> result = [.. _itemSends.ParsableTags(this)];
         return result.Parseable(base.ToParseableString());
     }
 

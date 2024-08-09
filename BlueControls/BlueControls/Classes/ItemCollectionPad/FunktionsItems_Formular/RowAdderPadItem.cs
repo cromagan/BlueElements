@@ -39,11 +39,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
-public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable, ISimpleEditor {
+public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable, ISimpleEditor {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
     private string _additinalInfoColumnName = string.Empty;
 
@@ -73,7 +72,6 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     public RowAdderPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
     public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
@@ -106,7 +104,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         }
     }
 
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
     public ReadOnlyCollection<string> ChildIds {
@@ -114,8 +112,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet(this);
@@ -142,8 +139,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         }
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => true;
+    public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
 
@@ -185,15 +181,6 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         set => _itemSends.OutputColorIdSet(value, this);
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
-
     public string Script {
         get => _script;
 
@@ -213,11 +200,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     public override void AddedToCollection() {
         base.AddedToCollection();
         _itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new RowAdder {
@@ -236,7 +219,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         b = _itemSends.ErrorReason(this);
@@ -269,12 +252,12 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
 
         l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
-        var inr = _itemAccepts.GetFilterFromGet(this);
+        var inr = GetFilterFromGet();
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
             l.Add(new FlexiControlForProperty<string>(() => EntityID));
             l.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
@@ -296,13 +279,11 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
         if (_itemSends.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
 
         switch (key) {
             case "entityid":
@@ -346,7 +327,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -360,7 +341,7 @@ public class RowAdderPadItem : FakeControlPadItem, IItemToControl, IReadableText
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
+        List<string> result = [.. _itemSends.ParsableTags(this)];
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);

@@ -29,6 +29,7 @@ using BlueDatabase.EventArgs;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.Controls;
 
@@ -143,12 +144,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #region Methods
 
     /// <summary>
-    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptFilter übernommen.
+    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom ReciverControlPadItem übernommen.
     /// </summary>
     /// <param name="dest"></param>
     /// <param name="parentFormula"></param>
     /// <param name="source"></param>
-    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemAcceptFilter source, string mode) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverControlPadItem source, string mode) {
         Name = source.DefaultItemToControlName();
         Mode = mode;
         if (source is AbstractPadItem ali) { Item = ali; }

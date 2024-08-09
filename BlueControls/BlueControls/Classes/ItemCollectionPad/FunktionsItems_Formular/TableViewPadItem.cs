@@ -41,11 +41,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
     private string _defaultArrangement = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
@@ -59,7 +58,6 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     public TableViewPadItem(Database? db) : this(string.Empty, db, null) { }
 
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
@@ -72,7 +70,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     #region Properties
 
     public static string ClassId => "FI-TableView";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
 
     public ReadOnlyCollection<string> ChildIds {
@@ -80,8 +78,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet(this);
@@ -100,19 +97,13 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         }
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => false;
+    public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
-    }
-
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     [DefaultValue("")]
@@ -137,11 +128,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     public override void AddedToCollection() {
         base.AddedToCollection();
         _itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
-
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new Table();
@@ -156,7 +143,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         b = _itemSends.ErrorReason(this);
@@ -168,7 +155,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [];
 
-        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
 
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
 
@@ -197,13 +184,11 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
         if (_itemSends.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
         switch (key) {
             case "id":
                 return true;
@@ -225,7 +210,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -239,7 +224,7 @@ public class TableViewPadItem : FakeControlPadItem, IItemToControl, IReadableTex
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
+        List<string> result = [.. _itemSends.ParsableTags(this)];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         return result.Parseable(base.ToParseableString());
     }

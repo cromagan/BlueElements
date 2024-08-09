@@ -35,11 +35,10 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl, IReadableText, IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendFilter _itemSends;
     private string _fehler_text = string.Empty;
     private string _filterSpalte = string.Empty;
@@ -54,7 +53,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
     //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     public FilterConverterElementPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
@@ -65,7 +63,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
     #region Properties
 
     public static string ClassId => "FI-FilterConverterElement";
-    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
 
     public ReadOnlyCollection<string> ChildIds {
@@ -73,8 +71,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public Database? DatabaseInput => _itemAccepts.DatabaseInputGet(this);
-    public bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool DatabaseInputMustMatchOutputDatabase => false;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet(this);
@@ -146,19 +143,13 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         }
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public bool InputMustBeOneRow => false;
+    public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
     public override string MyClassId => ClassId;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
-    }
-
-    public ReadOnlyCollection<string> Parents {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     //public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
@@ -182,14 +173,9 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
     public override void AddedToCollection() {
         base.AddedToCollection();
         _itemSends.DoCreativePadAddedToCollection(this);
-        _itemAccepts.DoCreativePadAddedToCollection(this);
-        //RepairConnections();
     }
 
-    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
-
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
-        //var i = _itemAccepts.DatabaseInputGet(this)?.Column[_eingangsWertSpalte];
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
         con.ErrorText = _fehler_text;
@@ -202,7 +188,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        b = _itemAccepts.ErrorReason(this);
+        b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         b = _itemSends.ErrorReason(this);
@@ -222,7 +208,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.AddRange(_itemAccepts.GetProperties(this, widthOfControl));
+        l.AddRange(base.GetProperties(widthOfControl));
 
         //if (DatabaseInput is Database dbin && !dbin.IsDisposed) {
         //    var u2 = new List<AbstractListItem>();
@@ -232,7 +218,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
         l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
-        var inr = _itemAccepts.GetFilterFromGet(this);
+        //var inr = GetFilterFromGet();
         if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbout.Column, true));
@@ -255,13 +241,11 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string key, string value) {
         if (base.ParseThis(key, value)) { return true; }
         if (_itemSends.ParseThis(key, value)) { return true; }
-        if (_itemAccepts.ParseThis(key, value)) { return true; }
         switch (key) {
             case "id":
                 //ColorId = IntParse(value);
@@ -304,7 +288,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -318,7 +302,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IItemToControl,
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags(this)];
+        List<string> result = [.. _itemSends.ParsableTags(this)];
 
         result.ParseableAdd("Value", _filterwert);
         //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
