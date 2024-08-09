@@ -1252,9 +1252,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         }
 
-
-
-        //vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
         vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
 
         if (extendedVariable is bool e) {
