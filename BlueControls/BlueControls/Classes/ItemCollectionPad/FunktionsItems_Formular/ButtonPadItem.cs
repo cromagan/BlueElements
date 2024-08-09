@@ -321,19 +321,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
         return con;
     }
 
-    public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        //b = _itemSends.ErrorReason(this);
-        //if (!string.IsNullOrEmpty(b)) { return b; }
-
-        return string.Empty;
-    }
-
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l = [.. base.GetProperties(widthOfControl)];
 
@@ -374,11 +361,9 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
 
         var co = new List<AbstractListItem>();
 
-        if (Method.AllMethods != null) {
-            foreach (var cmd in Method.AllMethods) {
-                if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
-                    co.Add(ItemOf(ufb2.NiceTextForUser, ufb2.Command));
-                }
+        foreach (var cmd in Method.AllMethods) {
+            if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
+                co.Add(ItemOf(ufb2.NiceTextForUser, ufb2.Command));
             }
         }
 
@@ -407,8 +392,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "caption":
                 _anzeige = value.FromNonCritical();
@@ -463,13 +446,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
                 return true;
         }
 
-        //result.ParseableAdd("Caption", _anzeige);
-        //result.ParseableAdd("Image", _image);
-
-        //result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
-        //result.ParseableAdd("ScriptName", _scriptname);
-
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {

@@ -81,7 +81,6 @@ public class SymbolPadItem : RectanglePadItem {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "symbol":
                 Symbol = (Symbol)IntParse(value);
@@ -104,7 +103,7 @@ public class SymbolPadItem : RectanglePadItem {
             case "whiteback": // alt: 28.11.2019
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ToParseableString() {
@@ -153,7 +152,7 @@ public class SymbolPadItem : RectanglePadItem {
                 break;
         }
 
-        if (p != null) {
+        if (p != null && Parent != null) {
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
             gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * Parent.SheetStyleScale), p);
         }

@@ -163,8 +163,6 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "path":
             case "pfad":
@@ -187,7 +185,8 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
                 _leere_Ordner_Löschen = value.FromPlusMinus();
                 return true;
         }
-        return false;
+
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {

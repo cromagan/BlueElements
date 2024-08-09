@@ -138,8 +138,6 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "id":
                 //ColorId = IntParse(value);
@@ -161,7 +159,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
                 _anzeige = value.FromNonCritical();
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {

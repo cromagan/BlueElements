@@ -132,7 +132,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "stretchallowed": // ALT
                 return true;
@@ -157,7 +156,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
                 Platzhalter_Für_Layout = value.FromNonCritical();
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public bool ReplaceVariable(Variable variable) {

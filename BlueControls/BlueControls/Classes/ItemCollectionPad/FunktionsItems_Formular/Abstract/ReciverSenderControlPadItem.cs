@@ -53,7 +53,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     #region Constructors
 
-    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula) : base(keyName, parentFormula) { }
+    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula, Database? databaseOutput) : base(keyName, parentFormula) => DatabaseOutput = databaseOutput;
 
     #endregion
 

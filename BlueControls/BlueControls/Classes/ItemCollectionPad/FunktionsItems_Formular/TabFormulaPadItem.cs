@@ -194,20 +194,11 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        //b = _itemSends.ErrorReason(this);
-        //if (!string.IsNullOrEmpty(b)) { return b; }
-
         if (_childs.Count == 0) {
             return "Keine Formulare gewählt.";
         }
 
-        return string.Empty;
+        return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -223,8 +214,6 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "parent":
                 ParentFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
@@ -247,7 +236,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
             case "notallowedchilds":
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {

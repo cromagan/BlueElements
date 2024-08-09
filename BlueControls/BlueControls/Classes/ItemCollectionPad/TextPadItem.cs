@@ -144,7 +144,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "readabletext":
                 _textReplaced = value.FromNonCritical();
@@ -163,7 +162,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
                 Skalierung = FloatParse(value.FromNonCritical());
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override void ProcessStyleChange() => InvalidateText();

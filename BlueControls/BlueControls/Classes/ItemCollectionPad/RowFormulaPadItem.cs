@@ -141,7 +141,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "layoutfilename":
             case "layoutid":
@@ -174,7 +173,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
                 }
                 return true; // Alles beim Alten
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override void ProcessStyleChange() => RemovePic();

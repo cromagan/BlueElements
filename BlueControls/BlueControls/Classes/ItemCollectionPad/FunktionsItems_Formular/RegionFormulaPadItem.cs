@@ -20,11 +20,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
@@ -128,14 +125,11 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     }
 
     public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
         if (string.IsNullOrEmpty(_child)) {
             return "Keine Formular gewählt.";
         }
 
-        return string.Empty;
+        return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -159,8 +153,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "parent":
                 ParentFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
@@ -177,7 +169,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
                 _rahmenStil = (GroupBoxStyle)IntParse(value);
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {
@@ -255,20 +247,20 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     //    return null;
     //}
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
+    //private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
 
-    private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not AbstractListItem it) { return; }
+    //private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+    //    if (e.HotItem is not AbstractListItem it) { return; }
 
-        if (e.Item.KeyName.ToLowerInvariant() == "bearbeiten") {
-            MultiUserFile.SaveAll(false);
+    //    if (e.Item.KeyName.ToLowerInvariant() == "bearbeiten") {
+    //        MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(it.KeyName, ParentFormula?.NotAllowedChilds);
-            _ = x.ShowDialog();
-            MultiUserFile.SaveAll(false);
-            x.Dispose();
-        }
-    }
+    //        var x = new ConnectedFormulaEditor(it.KeyName, ParentFormula?.NotAllowedChilds);
+    //        _ = x.ShowDialog();
+    //        MultiUserFile.SaveAll(false);
+    //        x.Dispose();
+    //    }
+    //}
 
     private void ParentFormula_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

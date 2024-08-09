@@ -101,14 +101,13 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "imagename":
                 _bild_Dateiname = value.FromNonCritical();
                 return true;
         }
-        return false;
+
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {

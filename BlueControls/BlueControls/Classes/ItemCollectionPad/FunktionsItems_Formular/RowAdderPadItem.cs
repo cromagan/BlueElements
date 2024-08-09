@@ -190,9 +190,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     }
 
     public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
         if (string.IsNullOrEmpty(_entityId)) { return "Id-Generierung fehlt"; }
         if (!_entityId.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
@@ -214,7 +211,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
             return "Kein Skript definiert.";
         }
 
-        return string.Empty;
+        return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

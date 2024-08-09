@@ -319,8 +319,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public virtual void ParseFinished(string parsed) { }
 
     public virtual bool ParseThis(string key, string value) {
-        //if (base.ParseThis(key, value)) { return true};
-
         switch (key.ToLowerInvariant()) {
             case "type":
                 return true;
@@ -369,7 +367,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         tim.Stop();
         _isInSaveingLoop = false;
-        return;
     }
 
     public virtual string ToParseableString() {

@@ -69,16 +69,6 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return con;
     }
 
-    public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        return string.Empty;
-    }
-
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> l =
         [
@@ -90,25 +80,6 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
             .. base.GetProperties(widthOfControl),
         ];
         return l;
-    }
-
-    public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
-        switch (key) {
-            //case "pfad":
-            //    _pfad = value.FromNonCritical();
-            //    return true;
-
-            //case "createdir":
-            //    _bei_Bedarf_Erzeugen = value.FromPlusMinus();
-            //    return true;
-
-            //case "deletedir":
-            //    _leere_Ordner_Löschen = value.FromPlusMinus();
-            //    return true;
-        }
-        return false;
     }
 
     public override string ReadableText() {

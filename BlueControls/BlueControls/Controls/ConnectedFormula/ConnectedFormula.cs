@@ -380,8 +380,6 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key.ToLowerInvariant()) {
             case "notallowedchilds":
                 _notAllowedChilds.Clear();
@@ -401,7 +399,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
             case "variables":
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public string ReadableText() {

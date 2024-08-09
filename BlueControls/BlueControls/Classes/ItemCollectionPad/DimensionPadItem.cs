@@ -194,7 +194,6 @@ public class DimensionPadItem : AbstractPadItem {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "text": // TODO: Alt 06.09.2019
 
@@ -234,7 +233,7 @@ public class DimensionPadItem : AbstractPadItem {
                 Skalierung = FloatParse(value.FromNonCritical());
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) => CalculateOtherPoints();

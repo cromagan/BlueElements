@@ -128,13 +128,12 @@ public class LinePadItem : AbstractPadItem {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "connection":
                 Linien_Verhalten = (ConectorStyle)IntParse(value);
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();

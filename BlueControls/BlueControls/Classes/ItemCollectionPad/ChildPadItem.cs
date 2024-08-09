@@ -155,7 +155,6 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             //
             case "readabletext":
@@ -200,7 +199,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 Textlage = (Alignment)IntParse(value);
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override void ProcessStyleChange() {

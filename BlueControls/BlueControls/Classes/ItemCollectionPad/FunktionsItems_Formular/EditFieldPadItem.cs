@@ -168,14 +168,9 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     }
 
     public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
+        if (Column == null || Column.IsDisposed) { return "Spalte fehlt"; }
 
-        if (Column == null || Column.IsDisposed) {
-            return "Spalte fehlt";
-        }
-
-        return string.Empty;
+        return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -209,8 +204,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "column":
                 //Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
@@ -232,7 +225,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
                 _autoX = value.FromPlusMinus();
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {

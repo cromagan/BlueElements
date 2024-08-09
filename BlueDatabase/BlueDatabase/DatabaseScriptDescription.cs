@@ -149,10 +149,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
     public override string ErrorReason() {
         if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
-        var b = base.ErrorReason();
-
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             if (ChangeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
@@ -199,12 +195,10 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
         if (_eventTypes.ToString() == ((int)_eventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
 
-        return string.Empty;
+        return base.ErrorReason();
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "needrow":
                 _needRow = value.FromPlusMinus();
@@ -219,7 +213,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
                 return true;
         }
 
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override QuickImage SymbolForReadableText() {
