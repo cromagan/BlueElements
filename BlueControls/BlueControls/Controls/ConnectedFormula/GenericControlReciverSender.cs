@@ -23,6 +23,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.Controls;
 
@@ -50,7 +51,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Methods
 
-    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, IItemSendFilter source, string mode) {
+    public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverSenderControlPadItem source, string mode) {
         FilterOutput.Database = source.DatabaseOutput;
         base.DoDefaultSettings(parentFormula, source, mode);
 

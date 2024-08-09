@@ -122,19 +122,19 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         Pad.AddCentered(x);
 
-        //if (l is IItemSendFilter isr && x is ReciverControlPadItem iar) {
+        //if (l is ReciverSenderControlPadItem isr && x is ReciverControlPadItem iar) {
         //    iar.GetRowFrom = isr;
         //}
 
-        if (l is IItemSendFilter && x is ReciverControlPadItem iaf) {
+        if (l is ReciverSenderControlPadItem && x is ReciverControlPadItem iaf) {
             iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
-        //if (x is IItemSendFilter isr2) {
+        //if (x is ReciverSenderControlPadItem isr2) {
         //    isr2.Datenbank_wählen();
         //}
 
-        //if (x is IItemSendFilter isf2) {
+        //if (x is ReciverSenderControlPadItem isf2) {
         //    isf2.Datenbank_wählen();
         //}
 
@@ -372,7 +372,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             }
         }
 
-        if (from is IItemSendFilter) {
+        if (from is ReciverSenderControlPadItem) {
             txt += "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
         }
 

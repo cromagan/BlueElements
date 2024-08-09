@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -63,7 +62,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     }
 
     private void btnAusgehendeDatenbank_Click(object sender, System.EventArgs e) {
-        if (_lastItem is IItemSendFilter sif && sif.DatabaseOutput is Database db && !db.IsDisposed) {
+        if (_lastItem is ReciverSenderControlPadItem sif && sif.DatabaseOutput is Database db && !db.IsDisposed) {
             var c = new TableView(db, false, true);
             c.ShowDialog();
         }
@@ -216,7 +215,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         }
 
         btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is ReciverControlPadItem;
-        btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is IItemSendFilter;
+        btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is ReciverSenderControlPadItem;
 
         if (_lastItem is ReciverControlPadItem fcpi) {
             capClicked.Text = "<imagecode=Information|16> " + fcpi.MyClassId;

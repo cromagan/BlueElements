@@ -29,7 +29,6 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using static BlueBasics.Converter;
 
@@ -41,11 +40,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable {
+public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable {
 
     #region Fields
 
-    private readonly ItemSendFilter _itemSends;
     private string _columnName = string.Empty;
     private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
@@ -61,8 +59,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public OutputFilterPadItem(string keyName) : this(keyName, null, null) { }
 
     public OutputFilterPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemSends = new();
-
         DatabaseOutput = db;
     }
 
@@ -82,11 +78,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             _überschriftanordung = value;
             OnPropertyChanged();
         }
-    }
-
-    public ReadOnlyCollection<string> ChildIds {
-        get => _itemSends.ChildIdsGet();
-        set => _itemSends.ChildIdsSet(value, this);
     }
 
     public ColumnItem? Column {
@@ -109,11 +100,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public override bool DatabaseInputMustMatchOutputDatabase => true;
 
-    public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet(this);
-        set => _itemSends.DatabaseOutputSet(value, this);
-    }
-
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.";
 
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
@@ -129,11 +115,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
-
-    public int OutputColorId {
-        get => _itemSends.OutputColorIdGet();
-        set => _itemSends.OutputColorIdSet(value, this);
-    }
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
         get => _standard_Bei_Keiner_Eingabe;
@@ -151,13 +132,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
-
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        _itemSends.DoCreativePadAddedToCollection(this);
-    }
-
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FlexiControlForFilter(Column, _überschriftanordung) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
@@ -171,20 +145,11 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = _itemSends.ErrorReason(this);
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
         if (Column == null || Column.IsDisposed) {
             return "Spalte fehlt";
         }
 
-        return string.Empty;
+        return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -198,8 +163,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
             l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }
-
-        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
@@ -219,15 +182,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-        if (_itemSends.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "id":
                 //Id = IntParse(value);
@@ -257,7 +212,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
                 //    _anzeige = value.FromNonCritical();
                 //    return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {
@@ -270,8 +225,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
-
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
@@ -283,7 +236,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemSends.ParsableTags(this)];
+        List<string> result = [];
 
         result.ParseableAdd("ColumnName", _columnName);
         //result.ParseableAdd("CaptionText", _überschrift);

@@ -29,7 +29,6 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System;
@@ -41,11 +40,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable {
+public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable {
 
     #region Fields
 
-    private readonly ItemSendFilter _itemSends;
     private string _defaultArrangement = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
 
@@ -58,8 +56,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
     public TableViewPadItem(Database? db) : this(string.Empty, db, null) { }
 
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemSends = new();
-
         DatabaseOutput = db;
     }
 
@@ -73,17 +69,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
 
-    public ReadOnlyCollection<string> ChildIds {
-        get => _itemSends.ChildIdsGet();
-        set => _itemSends.ChildIdsSet(value, this);
-    }
-
     public override bool DatabaseInputMustMatchOutputDatabase => true;
-
-    public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet(this);
-        set => _itemSends.DatabaseOutputSet(value, this);
-    }
 
     public override string Description => "Darstellung einer Datenbank in Tabellen-Form.";
 
@@ -100,11 +86,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
     public override string MyClassId => ClassId;
-
-    public int OutputColorId {
-        get => _itemSends.OutputColorIdGet();
-        set => _itemSends.OutputColorIdSet(value, this);
-    }
 
     [DefaultValue("")]
     public string Standard_Ansicht {
@@ -123,13 +104,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
-
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        _itemSends.DoCreativePadAddedToCollection(this);
-    }
-
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new Table();
         con.DatabaseSet(DatabaseOutput, string.Empty);
@@ -137,19 +111,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         return con;
-    }
-
-    public override string ErrorReason() {
-        var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = _itemSends.ErrorReason(this);
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        return string.Empty;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -167,8 +128,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
             l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
         }
 
-        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
-
         if (DatabaseOutput is Database db2 && !db2.IsDisposed) {
             var u = new List<AbstractListItem>();
             u.AddRange(ItemsOf(typeof(Filterausgabe)));
@@ -181,14 +140,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-        if (_itemSends.ParseThis(key, value)) { return true; }
         switch (key) {
             case "id":
                 return true;
@@ -197,7 +149,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
                 _defaultArrangement = value.FromNonCritical();
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {
@@ -209,8 +161,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
 
         return txt + ErrorReason();
     }
-
-    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -224,7 +174,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemSends.ParsableTags(this)];
+        List<string> result = [];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         return result.Parseable(base.ToParseableString());
     }

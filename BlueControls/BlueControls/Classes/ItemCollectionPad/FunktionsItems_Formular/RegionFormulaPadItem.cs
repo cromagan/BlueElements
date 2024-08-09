@@ -29,10 +29,8 @@ using BlueControls.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -132,12 +130,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override string ErrorReason() {
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        //b = _itemSends.ErrorReason(this);
-        //if (!string.IsNullOrEmpty(b)) { return b; }
 
         if (string.IsNullOrEmpty(_child)) {
             return "Keine Formular gewählt.";

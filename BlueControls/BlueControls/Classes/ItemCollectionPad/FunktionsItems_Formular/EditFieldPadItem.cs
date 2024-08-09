@@ -30,7 +30,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.Converter;
@@ -171,12 +170,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     public override string ErrorReason() {
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        //b = _itemSends.ErrorReason(this);
-        //if (!string.IsNullOrEmpty(b)) { return b; }
 
         if (Column == null || Column.IsDisposed) {
             return "Spalte fehlt";

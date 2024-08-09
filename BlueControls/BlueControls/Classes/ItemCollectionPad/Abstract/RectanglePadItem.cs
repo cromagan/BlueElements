@@ -103,7 +103,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "fixsize": // TODO: Entfernt am 24.05.2021
                 //_größe_fixiert = value.FromPlusMinus();
@@ -113,7 +112,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
                 _drehwinkel = Converter.IntParse(value);
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {

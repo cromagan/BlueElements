@@ -271,7 +271,6 @@
     <Compile Include="Interfaces\IIsEditor.cs" />
     <Compile Include="Interfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\IHasVersion.cs" />
-    <Compile Include="Interfaces\IItemSendFilter.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaView.cs">
       <SubType>Component</SubType>

@@ -28,7 +28,6 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using BlueDatabase.Enums;
@@ -39,11 +38,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
-public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IItemSendFilter, IAutosizable, ISimpleEditor {
+public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable, ISimpleEditor {
 
     #region Fields
 
-    private readonly ItemSendFilter _itemSends;
     private string _additinalInfoColumnName = string.Empty;
 
     /// <summary>
@@ -72,8 +70,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     public RowAdderPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
     public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        _itemSends = new();
-
         DatabaseOutput = db;
     }
 
@@ -85,7 +81,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
     public ColumnItem? AdditionalInfoColumn {
         get {
-            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
+            if (DatabaseOutput is not Database dbout || dbout.IsDisposed) { return null; }
 
             var c = dbout.Column[_additinalInfoColumnName];
             return c == null || c.IsDisposed ? null : c;
@@ -107,17 +103,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public ReadOnlyCollection<string> ChildIds {
-        get => _itemSends.ChildIdsGet();
-        set => _itemSends.ChildIdsSet(value, this);
-    }
-
     public override bool DatabaseInputMustMatchOutputDatabase => false;
-
-    public Database? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet(this);
-        set => _itemSends.DatabaseOutputSet(value, this);
-    }
 
     public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
                                           "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
@@ -151,7 +137,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
-            if (_itemSends.DatabaseOutputGet(this) is not Database dbout || dbout.IsDisposed) { return null; }
+            if (DatabaseOutput is not Database dbout || dbout.IsDisposed) { return null; }
 
             var c = dbout.Column[_originIdColumnName];
             return c == null || c.IsDisposed ? null : c;
@@ -176,11 +162,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
         }
     }
 
-    public int OutputColorId {
-        get => _itemSends.OutputColorIdGet();
-        set => _itemSends.OutputColorIdSet(value, this);
-    }
-
     public string Script {
         get => _script;
 
@@ -194,13 +175,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     #endregion
 
     #region Methods
-
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
-
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        _itemSends.DoCreativePadAddedToCollection(this);
-    }
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new RowAdder {
@@ -217,12 +191,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
     public override string ErrorReason() {
         var b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = base.ErrorReason();
-        if (!string.IsNullOrEmpty(b)) { return b; }
-
-        b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         if (string.IsNullOrEmpty(_entityId)) { return "Id-Generierung fehlt"; }
@@ -254,8 +222,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
         l.AddRange(base.GetProperties(widthOfControl));
 
-        l.AddRange(_itemSends.GetProperties(this, widthOfControl));
-
         l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
         var inr = GetFilterFromGet();
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
@@ -263,7 +229,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
             l.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
-        if (_itemSends.DatabaseOutputGet(this) is Database dbout && !dbout.IsDisposed) {
+        if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
@@ -276,15 +242,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
         return l;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-    }
-
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
-        if (_itemSends.ParseThis(key, value)) { return true; }
-
         switch (key) {
             case "entityid":
                 _entityId = value.FromNonCritical();
@@ -314,7 +272,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
                 Script = value.FromNonCritical();
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() {
@@ -326,8 +284,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
         return txt + ErrorReason();
     }
-
-    public void RemoveChild(ReciverControlPadItem remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
@@ -341,7 +297,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = [.. _itemSends.ParsableTags(this)];
+        List<string> result = [];
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);

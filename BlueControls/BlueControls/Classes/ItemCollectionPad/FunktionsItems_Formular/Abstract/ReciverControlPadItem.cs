@@ -34,8 +34,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Windows.Media.Converters;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.Polygons;
@@ -57,7 +55,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     public static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
     private readonly List<string> _getFilterFromKeys = [];
-    private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
+    private ReadOnlyCollection<ReciverSenderControlPadItem>? _getFilterFrom;
     private List<int> _inputColorId = [];
     private ReadOnlyCollection<string> _visibleFor = new([]);
 
@@ -84,7 +82,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     public Database? DatabaseInput {
         get {
             //if (item.DatabaseInputMustMatchOutputDatabase) {
-            //    return item is IItemSendFilter iiss ? iiss.DatabaseOutput : null;
+            //    return item is ReciverSenderControlPadItem iiss ? iiss.DatabaseOutput : null;
             //}
 
             var g = GetFilterFromGet();
@@ -130,9 +128,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             _getFilterFromKeys.Clear();
 
             // Die Collection befüllen
-            if (value != null) {
-                _getFilterFromKeys.AddRange(value);
-            }
+            _getFilterFromKeys.AddRange(value);
 
             // Und den Eltern bescheid geben, dass ein neues Kind da ist
             g = GetFilterFromGet();
@@ -201,7 +197,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         var l = new List<int>();
 
         foreach (var thisId in Parents) {
-            if (Parent?[thisId] is IItemSendFilter i) {
+            if (Parent?[thisId] is ReciverSenderControlPadItem i) {
                 l.Add(i.OutputColorId);
             }
         }
@@ -222,9 +218,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public virtual string ErrorReason() {
-        if (Parent == null) {
-            return "Keiner Ansicht zugeordnet.";
-        }
+        if (Parent == null) { return "Keiner Ansicht zugeordnet."; }
 
         if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, Parent.SheetSizeInPix.ToSize())) {
             return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
@@ -233,17 +227,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         return string.Empty;
     }
 
-    public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet() {
+    public ReadOnlyCollection<ReciverSenderControlPadItem> GetFilterFromGet() {
         if (Parent == null) {
             Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");
-            return new ReadOnlyCollection<IItemSendFilter>(new List<IItemSendFilter>());
+            return new ReadOnlyCollection<ReciverSenderControlPadItem>(new List<ReciverSenderControlPadItem>());
         }
 
         if (_getFilterFrom == null || _getFilterFrom.Count != _getFilterFromKeys.Count) {
-            var l = new List<IItemSendFilter>();
+            var l = new List<ReciverSenderControlPadItem>();
 
             foreach (var thisk in _getFilterFromKeys) {
-                if (Parent[thisk] is IItemSendFilter isf) {
+                if (Parent[thisk] is ReciverSenderControlPadItem isf) {
                     l.Add(isf);
                 }
             }
@@ -263,7 +257,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
         Database? outp = null;
 
-        if (this is IItemSendFilter iiss) {
+        if (this is ReciverSenderControlPadItem iiss) {
             outp = iiss.DatabaseOutput;
         }
 
@@ -276,7 +270,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
             // Die Items, die man noch wählen könnte
             foreach (var thisR in Parent) {
-                if (thisR.IsOnPage(Page) && thisR is IItemSendFilter rfp) {
+                if (thisR.IsOnPage(Page) && thisR is ReciverSenderControlPadItem rfp) {
                     //if (outp == null || outp == rfp.DatabaseOutput) {
                     if (rfp != this) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
@@ -365,7 +359,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public override bool ParseThis(string key, string value) {
-        if (base.ParseThis(key, value)) { return true; }
         switch (key) {
             case "version":
                 Version = IntParse(value);
@@ -389,7 +382,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
                 _getFilterFrom = null;
                 return true;
         }
-        return false;
+        return base.ParseThis(key, value);
     }
 
     public abstract string ReadableText();
