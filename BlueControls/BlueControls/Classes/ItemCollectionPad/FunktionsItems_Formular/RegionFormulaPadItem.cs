@@ -100,7 +100,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     #region Methods
 
-    public Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
         var txt = "?";
@@ -110,7 +110,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             txt = _child.FileNameWithoutSuffix();
         }
 
-        var con = new Controls.ConnectedFormulaView(mode, "Head") {
+        var con = new ConnectedFormulaView(mode, "Head") {
             GroupBoxStyle = _rahmenStil
         };
 

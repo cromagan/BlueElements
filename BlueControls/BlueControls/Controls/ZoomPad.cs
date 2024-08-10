@@ -29,7 +29,7 @@ using static BlueBasics.Constants;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ZoomPad : GenericControl {
+public partial class ZoomPad : GenericControlReciver {
 
     #region Fields
 
@@ -82,7 +82,6 @@ public partial class ZoomPad : GenericControl {
             Invalidate();
         }
     }
-
 
     [DefaultValue(1)]
     public float Zoom {

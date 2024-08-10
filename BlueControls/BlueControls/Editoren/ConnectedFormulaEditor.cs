@@ -72,7 +72,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem(string.Empty));
 
-        FormulaSet(filename, notAllowedchilds);
+        if (!FormulaSet(filename, notAllowedchilds)) {
+            Close();
+        }
 
         //MultiUserFile.SaveAll(false);
         //Database.ForceSaveAll();
@@ -310,19 +312,24 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void CheckButtons() { }
 
-    private void FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
+    private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
         if (filename == null || !FileExists(filename)) {
             //CheckButtons();
-            return;
+            return false;
         }
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
         var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
-        if (tmpFormula == null) { return; }
+        if (tmpFormula == null) { return false; }
+
+        if (!tmpFormula.LockEditing()) { return false; }
+
         FormulaSet(tmpFormula, notAllowedchilds);
+
+        return true;
     }
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {

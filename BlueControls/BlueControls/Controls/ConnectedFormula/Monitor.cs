@@ -33,9 +33,9 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
     {
     #region Fields
 
-    private RowItem? _lastRow = null;
+    private RowItem? _lastRow;
 
-    private int n = 99999;
+    private int _n = 99999;
 
     #endregion
 
@@ -63,7 +63,7 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
             if (_lastRow != null) {
                 _lastRow.DropMessage -= _lastRow_DropMessage;
             }
-            n = 99999;
+            _n = 99999;
             _lastRow = value;
             capInfo.Text = string.Empty;
             lstDone.ItemClear();
@@ -102,11 +102,11 @@ public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //U
             }
         }
 
-        n--;
-        if (n < 0) { n = 99999; }
+        _n--;
+        if (_n < 0) { _n = 99999; }
 
         if (!string.IsNullOrWhiteSpace(capInfo.Text)) {
-            lstDone.ItemAdd(ItemOf(e, n.ToStringInt7()));
+            lstDone.ItemAdd(ItemOf(e, _n.ToStringInt7()));
         }
 
         //capInfo.Text = e.Message;

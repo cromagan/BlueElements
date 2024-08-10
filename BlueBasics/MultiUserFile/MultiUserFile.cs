@@ -38,7 +38,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private static readonly List<MultiUserFile> AllFiles = [];
     private readonly System.Threading.Timer _checker;
     private string _canWriteError = string.Empty;
-    private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _checkedAndReloadNeed;
     private int _checkerTickCount = -5;
     private string _filename = string.Empty;
@@ -48,12 +47,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <summary>
     /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet
     /// </summary>
-    private bool _isInSaveingLoop = false;
+    private bool _isInSaveingLoop;
 
-    private bool _isLoading = false;
+    private bool _isLoading;
     private bool _isSaved = true;
-    private bool _isSaving = false;
+    private bool _isSaving;
     private string _lastSaveCode;
+    private string _loadedVersion = "0.00";
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -105,7 +105,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     public bool IsDisposed { get; private set; }
     public string KeyName => Filename;
-    public string LoadedVersion { get; private set; } = "0.00";
 
     public bool ReloadNeeded {
         get {
@@ -324,7 +323,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 return true;
 
             case "version":
-                LoadedVersion = value;
+                _loadedVersion = value;
                 return true;
 
             case "createdate":
@@ -441,17 +440,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (!mustReload && _isSaved) {
             _checkerTickCount = 0;
-            return;
-        }
-
-        if (!_isSaved) {
+        } else if (!_isSaved) {
             if (_checkerTickCount > saveDelaySecond) { Save(false); }
-            return;
-        }
-
-        if (mustReload) {
+        } else if (mustReload) {
             if (_checkerTickCount > reloadDelaySecond) { Load_Reload(); }
-            return;
         }
     }
 
@@ -564,7 +556,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
         var (data, fileinfo) = LoadFromDisk(EditableErrorReasonType.LoadForCheckingOnly);
-        if (data == null || dataUncompressed != data) {
+        if (dataUncompressed != data) {
             // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichtert und ungeladen.
             _checkedAndReloadNeed = true;
             _lastSaveCode = "Fehler";
@@ -640,7 +632,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
             dataUncompressed = ToParseableString();
 
-            if (dataUncompressed != null && dataUncompressed.Length > 0) {
+            if (dataUncompressed.Length > 0) {
                 tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
                 try {
                     File.WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252);

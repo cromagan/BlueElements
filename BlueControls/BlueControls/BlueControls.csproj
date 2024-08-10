@@ -113,6 +113,7 @@
     <Compile Include="Classes\ItemCollectionList\DropDownListItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\Abstract\ReciverSenderControlPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\MonitorPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\CreativePadItem.cs" />
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.Designer.cs">
       <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
     </Compile>

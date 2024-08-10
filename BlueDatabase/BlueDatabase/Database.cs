@@ -52,6 +52,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #region Fields
 
+    public const string DatabaseVersion = "4.02";
     public static readonly ObservableCollection<Database> AllFiles = [];
 
     /// <summary>
@@ -64,8 +65,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Bestimmt die Reihenfolge der Reparaturen
     /// </summary>
     public DateTime LastUsedDate = DateTime.UtcNow;
-
-    public const string DatabaseVersion = "4.02";
 
     /// <summary>
     ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
@@ -752,19 +751,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 switch (x) {
                     case 0:
                         // BeCreative, At Home, 31.11.2021
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 1:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 2:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 3:
-                        pf = Application.StartupPath + "\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 4:
@@ -776,21 +775,21 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         break;
 
                     case 6:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 7:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 8:
                         // warscheinlich BeCreative, Firma
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 9:
                         // Bildzeichen-Liste, Firma, 25.10.2021
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
                 }
                 if (FileExists(pf)) {
@@ -1248,8 +1247,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (fc.ScriptType != ScriptType.Nicht_vorhanden && row != null) {
                 vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
             }
-
-
         }
 
         vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
@@ -1782,7 +1779,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public string ImportCsv(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
         var f = EditableErrorReason(EditableErrorReasonType.EditNormaly);
 
-
         if (!string.IsNullOrEmpty(f)) {
             OnDropMessage(FehlerArt.Warnung, "Abbruch, " + f);
             return "Abbruch, " + f;
@@ -2306,7 +2302,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         } catch { }
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
-
 
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }

@@ -37,12 +37,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Fields
 
+    public readonly List<GenericControlReciverSender> Parents = [];
     private Database? _databaseInput;
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     private FilterCollection? _filterInput;
+
+    private bool _rowsInputChangedHandling;
 
     #endregion
 
@@ -87,18 +87,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
-    public AbstractPadItem? Item { get; set; } = null;
+    public AbstractPadItem? Item { get; set; }
     public virtual string Mode { get; set; } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<GenericControlReciverSender> Parents { get; } = [];
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; private set; } = false;
+    public bool RowsInputManualSeted { get; private set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -106,7 +101,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected FilterCollection? FilterInput {
         get => _filterInput;
-        set {
+        private set {
             if (_filterInput == value) { return; }
             UnRegisterFilterInputAndDispose();
             _filterInput = value;
@@ -117,27 +112,19 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool FilterInputChangedHandled { get; set; } = false;
+    protected bool FilterInputChangedHandled { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool FilterInputChangedHandling { get; private set; } = false;
+    protected List<RowItem>? RowsInput { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected List<RowItem>? RowsInput { get; set; }
+    protected bool RowsInputChangedHandled { get; private set; }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool RowsInputChangedHandled { get; private set; } = false;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool RowsInputChangedHandling { get; private set; } = false;
+    private bool _filterInputChangedHandling { get; set; }
 
     #endregion
 
@@ -168,95 +155,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 if (parentCon is GenericControlReciverSender parentConSender) {
                     parentConSender.ChildIsBorn(this);
                 }
-            } else if (it is RowEntryPadItem repi) {
+            } else if (it is RowEntryPadItem) {
                 parentFormula.ChildIsBorn(this);
             }
         }
-    }
-
-    /// <summary>
-    /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="mustbeDatabase"></param>
-    /// <param name="doEmptyFilterToo"></param>
-    public void DoInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
-        if (IsDisposed || FilterInputChangedHandled) { return; }
-
-        FilterInputChangedHandling = true;
-
-        FilterInputChangedHandled = true;
-
-        FilterInput = GetInputFilter(mustbeDatabase, doEmptyFilterToo);
-
-        if (FilterInput != null && FilterInput.Database == null) {
-            FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
-            FilterInput.Add(new FilterItem(mustbeDatabase, string.Empty));
-            //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
-        }
-        Invalidate_RowsInput();
-
-        FilterInputChangedHandling = false;
-    }
-
-    public string FilterHash() {
-        if (FilterInput is not FilterCollection fc) { return "NoFilter"; }
-
-        if (fc.Count == 0) { return "NoFilter"; }
-
-        if (!fc.IsOk()) { return string.Empty; }
-
-        if (fc.HasAlwaysFalse()) { return "FALSE"; }
-        var fn = (FilterCollection)fc.Clone("Normalize");
-        fn.Normalize();
-
-        var n = "F" + Generic.GetHashString(fn.ToParseableString());
-        fn.Dispose();
-
-        return n;
-    }
-
-    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
-
-    public FilterCollection? GetInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
-        if (Parents.Count == 0) {
-            if (doEmptyFilterToo && mustbeDatabase != null) {
-                return new FilterCollection(mustbeDatabase, "Empty Input Filter");
-            }
-            return null;
-        }
-
-        if (Parents.Count == 1) {
-            var fc2 = Parents[0].FilterOutput;
-            if (fc2.Count == 0) { return null; }
-
-            if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
-                return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 1"), "Datenbanken inkonsistent");
-            }
-
-            return fc2;
-        }
-
-        FilterCollection? fc = null;
-
-        foreach (var thiss in Parents) {
-            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
-                if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
-                    fc?.Dispose();
-                    return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 2"), "Datenbanken inkonsistent");
-                }
-
-                fc ??= new FilterCollection(fi.Database, "filterofsender");
-
-                foreach (var thifi in fi) {
-                    if (thifi.Clone() is FilterItem fic) {
-                        fc.AddIfNotExists(fic);
-                    }
-                }
-            }
-        }
-
-        return fc;
     }
 
     /// <summary>
@@ -266,7 +168,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (IsDisposed) { return; }
 
         if (FilterInputChangedHandled) {
-            if (FilterInputChangedHandling) {
+            if (_filterInputChangedHandling) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Filter wird gerade berechnet");
             }
 
@@ -275,35 +177,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         Invalidate();
-    }
-
-    public virtual void Invalidate_RowsInput() {
-        if (IsDisposed) { return; }
-
-        if (RowsInputChangedHandled) {
-            if (RowsInputChangedHandling) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Rows werden gerade berechnet");
-            }
-
-            if (!RowsInputManualSeted) { RowsInput = null; }
-            RowsInputChangedHandled = false;
-        }
-
-        Invalidate();
-    }
-
-    public RowItem? RowSingleOrNull() {
-        if (IsDisposed) { return null; }
-        if (DesignMode) { return null; }
-
-        if (!RowsInputManualSeted) {
-            if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
-            if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
-        }
-
-        if (RowsInput == null || RowsInput.Count != 1) { return null; }
-        RowsInput[0].CheckRowDataIfNeeded();
-        return RowsInput[0];
     }
 
     public void SetToRow(RowItem? row) {
@@ -360,6 +233,31 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
+    /// <summary>
+    /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="mustbeDatabase"></param>
+    /// <param name="doEmptyFilterToo"></param>
+    protected void DoInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
+        if (IsDisposed || FilterInputChangedHandled) { return; }
+
+        _filterInputChangedHandling = true;
+
+        FilterInputChangedHandled = true;
+
+        FilterInput = GetInputFilter(mustbeDatabase, doEmptyFilterToo);
+
+        if (FilterInput != null && FilterInput.Database == null) {
+            FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
+            FilterInput.Add(new FilterItem(mustbeDatabase, string.Empty));
+            //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
+        }
+        Invalidate_RowsInput();
+
+        _filterInputChangedHandling = false;
+    }
+
     protected void DoRows() {
         if (RowsInputChangedHandled) { return; }
 
@@ -367,13 +265,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (RowsInputManualSeted) { return; }
 
-        RowsInputChangedHandling = true;
+        _rowsInputChangedHandling = true;
 
         if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "Filter unbehandelt!"); }
 
         if (FilterInput == null) {
             RowsInput = new List<RowItem>();
-            RowsInputChangedHandling = false;
+            _rowsInputChangedHandling = false;
             return;
         }
 
@@ -383,12 +281,29 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             r.CheckRowDataIfNeeded();
         }
 
-        RowsInputChangedHandling = false;
+        _rowsInputChangedHandling = false;
     }
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         HandleChangesNow();
+    }
+
+    protected string FilterHash() {
+        if (FilterInput is not FilterCollection fc) { return "NoFilter"; }
+
+        if (fc.Count == 0) { return "NoFilter"; }
+
+        if (!fc.IsOk()) { return string.Empty; }
+
+        if (fc.HasAlwaysFalse()) { return "FALSE"; }
+        var fn = (FilterCollection)fc.Clone("Normalize");
+        fn.Normalize();
+
+        var n = "F" + fn.ToParseableString().GetHashString();
+        fn.Dispose();
+
+        return n;
     }
 
     protected virtual void HandleChangesNow() {
@@ -403,6 +318,21 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
+    protected void Invalidate_RowsInput() {
+        if (IsDisposed) { return; }
+
+        if (RowsInputChangedHandled) {
+            if (_rowsInputChangedHandling) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Rows werden gerade berechnet");
+            }
+
+            if (!RowsInputManualSeted) { RowsInput = null; }
+            RowsInputChangedHandled = false;
+        }
+
+        Invalidate();
+    }
+
     protected override void OnCreateControl() {
         base.OnCreateControl();
         RegisterEvents();
@@ -413,7 +343,64 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_FilterInput();
     }
 
+    protected RowItem? RowSingleOrNull() {
+        if (IsDisposed) { return null; }
+        if (DesignMode) { return null; }
+
+        if (!RowsInputManualSeted) {
+            if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
+            if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
+        }
+
+        if (RowsInput == null || RowsInput.Count != 1) { return null; }
+        RowsInput[0].CheckRowDataIfNeeded();
+        return RowsInput[0];
+    }
+
+    private void FilterInput_DispodingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
+
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) => Invalidate_RowsInput();
+
+    private FilterCollection? GetInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
+        if (Parents.Count == 0) {
+            if (doEmptyFilterToo && mustbeDatabase != null) {
+                return new FilterCollection(mustbeDatabase, "Empty Input Filter");
+            }
+            return null;
+        }
+
+        if (Parents.Count == 1) {
+            var fc2 = Parents[0].FilterOutput;
+            if (fc2.Count == 0) { return null; }
+
+            if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
+                return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 1"), "Datenbanken inkonsistent");
+            }
+
+            return fc2;
+        }
+
+        FilterCollection? fc = null;
+
+        foreach (var thiss in Parents) {
+            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
+                if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
+                    fc?.Dispose();
+                    return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 2"), "Datenbanken inkonsistent");
+                }
+
+                fc ??= new FilterCollection(fi.Database, "filterofsender");
+
+                foreach (var thifi in fi) {
+                    if (thifi.Clone() is FilterItem fic) {
+                        fc.AddIfNotExists(fic);
+                    }
+                }
+            }
+        }
+
+        return fc;
+    }
 
     private void RegisterEvents() {
         if (FilterInput == null || FilterInput.IsDisposed) { return; }

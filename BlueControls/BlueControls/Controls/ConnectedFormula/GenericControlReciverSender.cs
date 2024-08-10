@@ -69,16 +69,6 @@ public class GenericControlReciverSender : GenericControlReciver {
         }
     }
 
-    public virtual void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-
-        foreach (var thisChild in Childs) {
-            thisChild.Invalidate_FilterInput();
-        }
-    }
-
-    public void Invalidate_FilterOutput() => FilterOutput.Clear();
-
     internal void ChildIsBorn(GenericControlReciver child) {
         if (child.RowsInputManualSeted) {
             Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
@@ -113,6 +103,16 @@ public class GenericControlReciverSender : GenericControlReciver {
             Childs.Clear();
         }
     }
+
+    protected virtual void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+
+        foreach (var thisChild in Childs) {
+            thisChild.Invalidate_FilterInput();
+        }
+    }
+
+    protected void Invalidate_FilterOutput() => FilterOutput.Clear();
 
     protected override void OnCreateControl() {
         FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;

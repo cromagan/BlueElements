@@ -41,7 +41,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     {
     #region Fields
 
-    private bool _ignoreCheckedChanged = false;
+    private bool _ignoreCheckedChanged;
 
     private List<string>? _infos;
 
@@ -110,8 +110,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
         vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
-
-
 
         var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow);
 

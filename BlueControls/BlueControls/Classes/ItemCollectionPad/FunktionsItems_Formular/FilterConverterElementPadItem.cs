@@ -96,7 +96,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filtertype) { return; }
             _filtertype = value;
-            this.DoChilds();
+            DoChilds();
             OnPropertyChanged();
         }
     }
@@ -109,7 +109,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filterSpalte) { return; }
             _filterSpalte = value;
-            this.DoChilds();
+            DoChilds();
             OnPropertyChanged();
         }
     }
@@ -122,7 +122,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filterwert) { return; }
             _filterwert = value;
-            this.DoChilds();
+            DoChilds();
             OnPropertyChanged();
         }
     }

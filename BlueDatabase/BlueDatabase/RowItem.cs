@@ -42,64 +42,6 @@ namespace BlueDatabase;
 
 public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable, ICanDropMessages {
 
-
-    /// <summary>
-    /// Setzt den Wert ohne Undo Logging
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="value"></param>
-    /// <param name="reason"></param>
-    internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
-        var tries = 0;
-
-        while (true) {
-            if (IsDisposed || column.Database is not Database db || db.IsDisposed) { return "Datenbank ungültig"; }
-            if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
-
-            db.RefreshCellData(column, this, reason);
-
-            var cellKey = CellCollection.KeyOfCell(column, this);
-
-            if (db.Cell.ContainsKey(cellKey)) {
-                var c = db.Cell[cellKey];
-                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-                if (string.IsNullOrEmpty(value)) {
-                    if (!db.Cell.TryRemove(cellKey, out _)) {
-                        tries++;
-                        continue;
-                    }
-                }
-            } else {
-                if (!string.IsNullOrEmpty(value)) {
-                    if (!db.Cell.TryAdd(cellKey, new CellItem(value))) {
-                        tries++;
-                        continue;
-                    }
-                }
-            }
-
-            if (reason == Reason.SetCommand) {
-                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (column.Function == ColumnFunction.Schlüsselspalte) {
-                        if (db.Column.SysRowState is ColumnItem srs) {
-                            SetValueInternal(srs, string.Empty, reason);
-                        }
-                    }
-                }
-            }
-
-            if (reason is Reason.SetCommand) {
-                column.Invalidate_ContentWidth();
-                InvalidateCheckData();
-                db.Cell.OnCellValueChanged(new CellChangedEventArgs(column, this, reason));
-            }
-
-            return string.Empty;
-        }
-    }
-
-
     #region Fields
 
     public RowCheckedEventArgs? LastCheckedEventArgs;
@@ -325,7 +267,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public long CellGetLong(ColumnItem? column) => LongParse(Database?.Cell.GetString(column, this));
 
     public Point CellGetPoint(ColumnItem? column) // Main Method
-    {
+        {
         var value = Database?.Cell.GetString(column, this);
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
@@ -530,7 +472,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             thisss = thisss + thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
         }
 
-        return Generic.GetHashString(thisss);
+        return thisss.GetHashString();
     }
 
     public void InvalidateCheckData() {
@@ -887,6 +829,62 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(_database?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
+
+    /// <summary>
+    /// Setzt den Wert ohne Undo Logging
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="value"></param>
+    /// <param name="reason"></param>
+    internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
+        var tries = 0;
+
+        while (true) {
+            if (IsDisposed || column.Database is not Database db || db.IsDisposed) { return "Datenbank ungültig"; }
+            if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
+
+            db.RefreshCellData(column, this, reason);
+
+            var cellKey = CellCollection.KeyOfCell(column, this);
+
+            if (db.Cell.ContainsKey(cellKey)) {
+                var c = db.Cell[cellKey];
+                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+                if (string.IsNullOrEmpty(value)) {
+                    if (!db.Cell.TryRemove(cellKey, out _)) {
+                        tries++;
+                        continue;
+                    }
+                }
+            } else {
+                if (!string.IsNullOrEmpty(value)) {
+                    if (!db.Cell.TryAdd(cellKey, new CellItem(value))) {
+                        tries++;
+                        continue;
+                    }
+                }
+            }
+
+            if (reason == Reason.SetCommand) {
+                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+                    if (column.Function == ColumnFunction.Schlüsselspalte) {
+                        if (db.Column.SysRowState is ColumnItem srs) {
+                            SetValueInternal(srs, string.Empty, reason);
+                        }
+                    }
+                }
+            }
+
+            if (reason is Reason.SetCommand) {
+                column.Invalidate_ContentWidth();
+                InvalidateCheckData();
+                db.Cell.OnCellValueChanged(new CellChangedEventArgs(column, this, reason));
+            }
+
+            return string.Empty;
+        }
+    }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

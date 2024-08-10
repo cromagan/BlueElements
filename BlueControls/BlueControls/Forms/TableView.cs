@@ -780,9 +780,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        var x = new ConnectedFormulaEditor(db.FormulaFileName(), null);
-        x.Show();
-        //x?.Dispose();
+        using var x = new ConnectedFormulaEditor(db.FormulaFileName(), null);
+        x.ShowDialog();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
@@ -894,6 +893,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         x.Show();
     }
 
+    private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInDBScripts();
+
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
@@ -902,6 +903,11 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) =>
         Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow?.Row : null;
+
+    private void btnUserInfo_Click(object sender, System.EventArgs e) {
+        var t = new UserInfo();
+        t.Show();
+    }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table.Database is not Database db || db.IsDisposed) { return; }
@@ -1224,11 +1230,4 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     #endregion
-
-    private void btnUserInfo_Click(object sender, System.EventArgs e) {
-        var t = new UserInfo();
-       t.Show();
-    }
-
-    private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInDBScripts();
 }

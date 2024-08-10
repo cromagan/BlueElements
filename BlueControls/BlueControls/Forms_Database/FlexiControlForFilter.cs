@@ -120,20 +120,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
 
     #region Methods
 
-    public override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
-        if (SavesSettings) {
-            this.LoadSettingsFromDisk(false);
-            if (FilterOutput.Count == 1) {
-                if (FilterOutput.Rows.Count == 1) {
-                    var toAdd = FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
-                    this.SettingsAdd(toAdd);
-                }
-            }
-        }
-
-        base.FilterOutput_PropertyChanged(this, System.EventArgs.Empty);
-    }
-
     public override void Invalidate_FilterInput() {
         base.Invalidate_FilterInput();
         HandleChangesNow();
@@ -146,6 +132,20 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
             f.Dispose();
             f = null;
         }
+    }
+
+    protected override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+        if (SavesSettings) {
+            this.LoadSettingsFromDisk(false);
+            if (FilterOutput.Count == 1) {
+                if (FilterOutput.Rows.Count == 1) {
+                    var toAdd = FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
+                    this.SettingsAdd(toAdd);
+                }
+            }
+        }
+
+        base.FilterOutput_PropertyChanged(this, System.EventArgs.Empty);
     }
 
     protected override void HandleChangesNow() {

@@ -470,7 +470,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     }
 
     /// <summary>
-    /// Leert die eingehende List und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds
+    /// Leert die eingehende Liste und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds
     /// </summary>
     /// <param name="list"></param>
     /// <param name="notAllowedChilds"></param>

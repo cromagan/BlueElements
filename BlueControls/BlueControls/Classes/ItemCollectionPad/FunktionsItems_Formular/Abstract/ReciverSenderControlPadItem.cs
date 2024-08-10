@@ -23,7 +23,11 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueControls.BlueDatabaseDialogs;
+using BlueControls.Controls;
+using BlueControls.ItemCollectionList;
 using static BlueDatabase.Database;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 #nullable enable
 
@@ -43,7 +47,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     private Database? _databaseOutput;
 
-    private bool _databaseOutputLoaded = false;
+    private bool _databaseOutputLoaded;
 
     private string _databaseOutputName = string.Empty;
 
@@ -86,7 +90,8 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
             return _databaseOutput;
         }
-        private set {
+        // ReSharper disable once MemberCanBePrivate.Global -> FlexiCOntrolForProperty!
+        set {
             if (IsDisposed) { return; }
 
             if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return; }
@@ -118,6 +123,16 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
     #endregion
 
     #region Methods
+
+    public static List<AbstractListItem> AllAvailableTables() {
+        var ld = Database.AllAvailableTables(string.Empty);
+        var ld2 = new List<AbstractListItem>();
+        foreach (var thisd in ld) {
+            thisd.Editor = typeof(DatabaseHeadEditor);
+            ld2.Add(ItemOf(thisd));
+        }
+        return ld2;
+    }
 
     public void AddChild(IHasKeyName add) {
         var l = new List<string>();
@@ -158,6 +173,32 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         }
 
         return base.ErrorReason();
+    }
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        var l = new List<GenericControl>();
+
+        l.AddRange(base.GetProperties(widthOfControl));
+
+        l.Add(new FlexiControl("Ausgang:", widthOfControl, true));
+        var enableOutput = true;
+        Database? outp = null;
+
+        if (DatabaseInputMustMatchOutputDatabase) {
+            enableOutput = AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None);
+
+            outp = DatabaseInput;
+            if (outp is not null) { enableOutput = false; }
+        }
+        if (!enableOutput) {
+            if (outp != null) {
+                l.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
+            }
+        } else {
+            l.Add(new FlexiControlForProperty<Database?>(() => DatabaseOutput, AllAvailableTables()));
+        }
+
+        return l;
     }
 
     public override bool ParseThis(string key, string value) {
