@@ -24,6 +24,8 @@ using BlueDatabase.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Diagnostics;
+using BlueBasics;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -69,7 +71,22 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
     #region Methods
 
     public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {
-        var (newrow, message) = RowCollection.UniqueRow(allFi, coment);
+
+        RowItem? newrow;
+        string message;
+        var t = Stopwatch.StartNew();
+
+        do {
+            (newrow, message) = RowCollection.UniqueRow(allFi, coment);
+            
+            if(newrow != null && string.IsNullOrEmpty(message)) { break; }
+            if(t.Elapsed.TotalMinutes > 5) { break; }
+            Generic.Pause(5, false);
+
+        } while (true);
+
+        
+      
 
         if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
 

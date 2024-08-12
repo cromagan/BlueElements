@@ -76,6 +76,12 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
             return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden.");
         }
 
+        if (RowCollection.InvalidatedRows.Contains(myRow) || 
+            RowCollection.DidRows.Contains(myRow) ||
+            RowCollection.FailedRows.Contains(myRow)) {
+            return DoItFeedback.Null();
+        }
+
         //var v = myRow.CellGetLong(srs);
 
         //if (v > 0) {
