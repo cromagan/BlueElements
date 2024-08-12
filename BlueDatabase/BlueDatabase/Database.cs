@@ -43,7 +43,6 @@ using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
 
@@ -78,7 +77,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
     /// </summary>
-    private static Timer? _pendingChangesTimer;
+    private static System.Threading.Timer? _pendingChangesTimer;
 
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _pendingChangesTimer
@@ -96,7 +95,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _caption = string.Empty;
-    private Timer? _checker;
+    private System.Threading.Timer? _checker;
     private int _checkerTickCount = -5;
     private bool _completing = false;
     private string _createDate;
@@ -492,11 +491,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected string LoadedVersion { get; private set; }
 
-    /// <summary>
-    ///  Wann die Datei zuletzt geladen wurde. Einzige funktion, zu viele Ladezyklen hintereinander verhinden.
-    /// </summary>
-    private static DateTime LastLoadUtc { get; } = DateTime.UtcNow;
-
     #endregion
 
     #region Methods
@@ -620,6 +614,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (x != AllFiles.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 ForceSaveAll();
+                return;
+            }
+        }
+    }
+
+    public static void FreezeAll(string reason) {
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
+            thisFile.Freeze(reason);
+            if (x != AllFiles.Count) {
+                // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                FreezeAll(reason);
                 return;
             }
         }
@@ -2404,7 +2410,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
-            _checker = new Timer(Checker_Tick);
+            _checker = new System.Threading.Timer(Checker_Tick);
             _ = _checker.Change(2000, 2000);
         }
     }
@@ -2771,7 +2777,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 240) { return; }
-        if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 180) { return; }
+        //if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 180) { return; }
 
         if (CriticalState()) { return; }
         CheckSysUndoNow(AllFiles, false);
@@ -3243,7 +3249,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private void GenerateTimer() {
         if (_pendingChangesTimer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _pendingChangesTimer = new Timer(CheckSysUndo);
+        _pendingChangesTimer = new System.Threading.Timer(CheckSysUndo);
         _ = _pendingChangesTimer.Change(10000, 10000);
     }
 

@@ -103,7 +103,18 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
+    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten.
+    /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
+    /// </summary>
+    public string FreezedReason { get; private set; } = string.Empty;
+
     public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Entspricht dem Dateinamen
+    /// </summary>
     public string KeyName => Filename;
 
     public bool ReloadNeeded {
@@ -137,6 +148,18 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     #endregion
 
     #region Methods
+
+    public static void FreezeAll(string reason) {
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
+            thisFile.Freeze(reason);
+            if (x != AllFiles.Count) {
+                // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                FreezeAll(reason);
+                return;
+            }
+        }
+    }
 
     /// <summary>
     ///
@@ -185,6 +208,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datei eingefroren: " + FreezedReason; }
+
         //----------Load ------------------------------------------------------------------------
         if (mode is EditableErrorReasonType.Load or EditableErrorReasonType.LoadForCheckingOnly) {
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
@@ -219,6 +244,16 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             }
         }
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Friert die Datenbank komplett ein, nur noch Ansicht möglich.
+    /// Setzt auch ReadOnly.
+    /// </summary>
+    /// <param name="reason"></param>
+    public void Freeze(string reason) {
+        if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
+        FreezedReason = reason;
     }
 
     public bool IsFileAllowedToLoad(string fileName) {

@@ -276,7 +276,7 @@ public class DatabaseMu : Database {
             var tbn = new List<string>();
             var frgu = new List<string>();
             foreach (var thisdb in db) {
-                if (thisdb is DatabaseMu dbmu) {
+                if (thisdb is DatabaseMu dbmu && string.IsNullOrEmpty(dbmu.FreezedReason)) {
                     tbn.AddIfNotExists(dbmu.TableName.ToUpperInvariant());
                     if (!string.IsNullOrEmpty(dbmu._myFragmentsFilename)) {
                         frgu.Add(dbmu._myFragmentsFilename);
