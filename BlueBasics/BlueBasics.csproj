@@ -97,19 +97,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessor.cs" />
-    <Compile Include="BackupVerwalter.cs" />
-    <Compile Include="BitmapExt\BitmapExt.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Intensify.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Ausdünnen.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_AllePixelZuSchwarz.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Grayscale.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Median.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Blur.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Brightness.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Contrast.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Gamma.cs" />
-    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Invert.cs" />
+    <Compile Include="Classes\BackupVerwalter.cs" />
+    <Compile Include="Classes\BitmapExt.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Intensify.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Ausdünnen.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_AllePixelZuSchwarz.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Grayscale.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Median.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Blur.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Brightness.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Contrast.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Gamma.cs" />
+    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Invert.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\ScriptEventTypes.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
@@ -120,11 +120,11 @@
     <Compile Include="Extensions\FloatExtensions.cs" />
     <Compile Include="Extensions\IntExtensions.cs" />
     <Compile Include="Extensions\FontExtensions.cs" />
-    <Compile Include="FormatHolder.cs" />
+    <Compile Include="Classes\FormatHolder.cs" />
     <Compile Include="Enums\EditableErrorReasonType.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
-    <Compile Include="HTML.cs" />
+    <Compile Include="Classes_Static\HTML.cs" />
     <Compile Include="Interfaces\IEditable.cs" />
     <Compile Include="Interfaces\ICanDropMessages.cs" />
     <Compile Include="Interfaces\IDisposableExtendedWithEvent.cs" />
@@ -136,19 +136,19 @@
     <Compile Include="Interfaces\IReadableTextWithPropertyChangingAndKey.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
-    <Compile Include="MultiUserFile\MultiUserFile.cs" />
+    <Compile Include="Classes\MultiUserFile.cs" />
     <Compile Include="Enums\SW.cs" />
     <Compile Include="Enums\FehlerArt.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
-    <Compile Include="ParsebleItem.cs" />
-    <Compile Include="Polygons.cs" />
-    <Compile Include="QuickImage.cs" />
+    <Compile Include="Classes\ParsebleItem.cs" />
+    <Compile Include="Classes_Static\Polygons.cs" />
+    <Compile Include="Classes\QuickImage.cs" />
     <Compile Include="EventArgs\ListEventArgs.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\ByteArrayExtension.cs" />
     <Compile Include="Extensions\ConcurrentDictionaryExtension.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Develop.cs" />
+    <Compile Include="Classes_Static\Constants.cs" />
+    <Compile Include="Classes_Static\Develop.cs" />
     <Compile Include="Enums\Alignment.cs" />
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="Enums\FileFormat.cs" />
@@ -156,13 +156,13 @@
     <Compile Include="Enums\ImageCodeEffect.cs" />
     <Compile Include="Enums\Orientation.cs" />
     <Compile Include="Enums\KeyCode.cs" />
-    <Compile Include="IO.cs" />
+    <Compile Include="Classes_Static\IO.cs" />
     <Compile Include="Interfaces\IPropertyChangedFeedback.cs" />
     <Compile Include="Extensions\CollectionExtension.cs" />
     <Compile Include="Interfaces\IParseable.cs" />
     <Compile Include="Interfaces\IReadableTextWithPropertyChanging.cs" />
     <Compile Include="Extensions\ListOfExtension.cs" />
-    <Compile Include="Geometry.cs" />
+    <Compile Include="Classes_Static\Geometry.cs" />
     <Compile Include="Extensions\PaddingExtension.cs" />
     <Compile Include="Extensions\PointExtension.cs" />
     <Compile Include="Extensions\PointFExtension.cs" />
@@ -170,24 +170,24 @@
     <Compile Include="Extensions\SizeFExtension.cs" />
     <Compile Include="Extensions\SortExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="MathFormulaParser.cs" />
+    <Compile Include="Classes_Static\MathFormulaParser.cs" />
     <Compile Include="Extensions\BooleanExtensions.cs" />
     <Compile Include="Interfaces\ICanBeEmpty.cs" />
-    <Compile Include="Generic.cs" />
+    <Compile Include="Classes_Static\Generic.cs" />
     <Compile Include="Enums\ThumbnailOptions.cs" />
-    <Compile Include="WindowsRemoteControl.cs" />
+    <Compile Include="Classes_Static\WindowsRemoteControl.cs" />
     <Compile Include="Enums\SizeModes.cs" />
     <Compile Include="Extensions\ColorExtension.cs" />
-    <Compile Include="Converter.cs" />
+    <Compile Include="Classes_Static\Converter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Application.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
-    <Compile Include="WindowsThumbnailProvider.cs" />
+    <Compile Include="Classes\WindowsThumbnailProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MultiUserFile\MultiUserFile.resx">
+    <EmbeddedResource Include="Classes\MultiUserFile.resx">
       <DependentUpon>MultiUserFile.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -421,6 +421,7 @@
     <EmbeddedResource Include="Ressourcen\Image\Icons\Registersammlung.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Textfeld2.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

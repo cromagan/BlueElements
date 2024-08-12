@@ -937,7 +937,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!script.AllOk) {
             //db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));
             if (script.ScriptNeedFix) {
-                db.ScriptNeedFix = "Zeile: " + CellFirstString() + "\r\n\r\n" + script.ProtocolText;
+                db.ScriptNeedFix = "Benutzer:" + Generic.UserGroup + "\r\n" +
+                                   "Zeit:" + DateTime.UtcNow.ToString5() + "\r\n" +
+                                   "Extended:" + extended.ToString() + "\r\n" +
+                                   "Zeile: " + CellFirstString() + "\r\n\r\n\r\n" +
+                                   script.ProtocolText;
             }
 
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\nZeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);

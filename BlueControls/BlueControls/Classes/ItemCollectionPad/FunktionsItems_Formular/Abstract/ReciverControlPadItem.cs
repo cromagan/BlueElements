@@ -106,6 +106,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     public abstract bool InputMustBeOneRow { get; }
     public abstract bool MustBeInDrawingArea { get; }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ConnectedFormula.ConnectedFormula? ParentFormula { get; set; }
 
     [DefaultValue(null)]
@@ -142,8 +146,16 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Version { get; set; }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<string> VisibleFor {
         get => _visibleFor;
         set {
