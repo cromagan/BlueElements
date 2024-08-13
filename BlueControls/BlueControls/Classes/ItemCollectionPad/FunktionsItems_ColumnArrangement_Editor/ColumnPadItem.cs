@@ -85,19 +85,18 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result = [];
-        if (Column?.Database is not Database db || Column.IsDisposed) { return result; }
+        if (Column?.Database is not Database db || Column.IsDisposed) { return []; }
 
         db.Editor = typeof(DatabaseHeadEditor);
         Column.Editor = typeof(ColumnEditor);
 
+        List<GenericControl> result = [];
+
         result.Add(new FlexiControlForDelegate(Column.Database.Edit, "Tabelle: " + Datenbank, ImageCode.Datenbank));
-        //result.Add(new FlexiControlForProperty<string>(() => Datenbank));
         result.Add(new FlexiControlForDelegate(Column.Edit, "Spalte: " + Column.Caption, ImageCode.Spalte));
         result.Add(new FlexiControl());
         result.Add(new FlexiControlForProperty<bool>(() => Permanent));
         result.Add(new FlexiControl());
-        //result.Add(new FlexiControlForProperty<string>(() => Column.Caption));
 
         result.Add(new FlexiControl());
         result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
@@ -107,18 +106,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
         result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
-        //if (AdditionalStyleOptions != null) {
-        //    result.Add(new FlexiControl());
-        //    result.AddRange(AdditionalStyleOptions);
-        //}
 
-        //var layouts =  new List<AbstractListItem>();
-        //foreach (var thisLayouts in Row.Database.Layouts) {
-        //    ItemCollectionPad p = new(thisLayouts, string.Empty);
-        //    layouts.GenerateAndAdd(p.Caption, p.Id, ImageCode.Stern);
-        //}
-        //result.GenerateAndAdd(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
-        //result.AddRange(base.GetProperties(widthOfControl));
         return result;
     }
 

@@ -90,14 +90,14 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        List<GenericControl> result =
         [
             .. base.GetProperties(widthOfControl),
+            new FlexiControl("Einstellungen:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Bild_Dateiname),
-            new FlexiControl(),
-            .. base.GetProperties(widthOfControl),
+       
         ];
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

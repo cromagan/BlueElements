@@ -38,8 +38,9 @@ public class Method_Filter : Method_Database {
     public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
 
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                             "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith' und 'instr' unterstützt.\r\n" +
+                                             "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.\r\n" +
                                          "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
+        "Bei Between müssen die Werte so Angegeben werden: 50|100\r\n\r\n" +
                                          "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Datanbank und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
 
     public override bool GetCodeBlockAfter => false;
@@ -93,8 +94,10 @@ public class Method_Filter : Method_Database {
                 return FilterType.Instr_GroßKleinEgal;
 
             case "startswith":
-
                 return FilterType.BeginntMit_GroßKleinEgal;
+
+            case "between":
+                return FilterType.Between;
 
             default:
                 return FilterType.AlwaysFalse;

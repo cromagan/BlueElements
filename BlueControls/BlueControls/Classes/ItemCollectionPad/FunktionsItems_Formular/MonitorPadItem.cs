@@ -69,18 +69,6 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return con;
     }
 
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
-        [
-            .. base.GetProperties(widthOfControl),
-            //new FlexiControlForProperty<string>(() => Pfad),
-            //new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
-            //new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
-            //new FlexiControl(),
-            .. base.GetProperties(widthOfControl),
-        ];
-        return l;
-    }
 
     public override string ReadableText() {
         const string txt = "Monitor: ";

@@ -118,7 +118,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        List<GenericControl> result =
         [
             .. base.GetProperties(widthOfControl),
             new FlexiControl("Einstellungen:", -1, true),
@@ -128,11 +128,9 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
-        //l.Add(new FlexiControl());
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

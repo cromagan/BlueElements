@@ -202,15 +202,14 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        List<GenericControl> result =
         [
             .. base.GetProperties(widthOfControl),
-            new FlexiControl("Eigenschaften:", widthOfControl, true),
+            new FlexiControl("Einstellungen:", widthOfControl, true),
             new FlexiControl("Formulare:", -1, false),
-            Childs(),
-            .. base.GetProperties(widthOfControl),
+            Childs()
         ];
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

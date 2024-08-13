@@ -261,11 +261,13 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var l = new List<GenericControl> {
-            new FlexiControl("Eingang:", widthOfControl, true)
-        };
 
-        if (Parent is null) { return l; }
+        if (Parent is null) { return []; }
+
+
+        List<GenericControl> result = [
+            new FlexiControl("Eingang:", widthOfControl, true)
+        ];
 
         Database? outp = null;
 
@@ -274,10 +276,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
 
         if (DatabaseInputMustMatchOutputDatabase && outp == null) {
-            l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl, false));
+            result.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl, false));
         } else {
-            //l.Add(new FlexiControlForProperty<>(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
-
             var x = new List<AbstractListItem>();
 
             // Die Items, die man noch wählen könnte
@@ -287,26 +287,24 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
                     if (rfp != this) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                     }
-
-                    //}
                 }
             }
 
             switch (AllowedInputFilter) {
                 case AllowedInputFilter.One:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.More:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.More | AllowedInputFilter.None:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None));
                     break;
 
                 case AllowedInputFilter.One | AllowedInputFilter.None:
-                    l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None));
                     break;
 
                 default:
@@ -317,20 +315,18 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
 
         if (Bei_Export_sichtbar) {
-            l.Add(new FlexiControl("Sichtbarkeit:", widthOfControl, true));
-            l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
-            l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
+            result.Add(new FlexiControl("Sichtbarkeit:", widthOfControl, true));
+            result.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
+            result.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
                 vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
-                l.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text));
             }
         }
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        return result;
     }
 
     public bool IsVisibleForMe(string mode, bool nowDrawing) {

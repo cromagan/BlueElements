@@ -213,28 +213,25 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var l = new List<GenericControl>();
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        l.AddRange(base.GetProperties(widthOfControl));
-
-        l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
+        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         var inr = GetFilterFromGet();
         if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
-            l.Add(new FlexiControlForProperty<string>(() => EntityID));
-            l.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+            result.Add(new FlexiControlForProperty<string>(() => EntityID));
+            result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
         if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
-            l.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
-            l.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));
+            result.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
+            result.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));
         }
 
-        l.AddRange(base.GetProperties(widthOfControl));
-
-        return l;
+ 
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

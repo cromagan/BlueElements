@@ -151,33 +151,31 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var l = new List<GenericControl>();
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        l.AddRange(base.GetProperties(widthOfControl));
+        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(db.Column, true));
 
-            l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
+            result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         var u2 = new List<AbstractListItem>();
         u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
+        result.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
         var u3 = new List<AbstractListItem>();
         u3.AddRange(ItemsOf(typeof(FlexiFilterDefaultFilter)));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
+        result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetProperties(widthOfControl));
 
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

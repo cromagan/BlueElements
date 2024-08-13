@@ -140,16 +140,15 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(GroupBoxStyle)));
 
-        List<GenericControl> l =
+        List<GenericControl> result =
             [.. base.GetProperties(widthOfControl),
-                new FlexiControl("Eigenschaften:", widthOfControl, true),
+                new FlexiControl("Einstellungen:", widthOfControl, true),
                 new FlexiControlForProperty<string>(() => Child, cl),
 
-                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u),
-                .. base.GetProperties(widthOfControl),
+                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u)
             ];
 
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

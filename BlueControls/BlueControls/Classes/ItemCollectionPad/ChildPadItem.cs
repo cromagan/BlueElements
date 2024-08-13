@@ -107,18 +107,23 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        var lage = new List<AbstractListItem>();
+        lage.Add(ItemOf("ohne", "-1"));
+        lage.Add(ItemOf("Links oben", ((int)Alignment.Top_Left).ToString()));
+
+        List<GenericControl> result =
         [
             new FlexiControlForProperty<string>(() => Name),
             new FlexiControlForProperty<Color>(() => Randfarbe)
         ];
-        var lage = new List<AbstractListItem>();
-        lage.Add(ItemOf("ohne", "-1"));
-        lage.Add(ItemOf("Links oben", ((int)Alignment.Top_Left).ToString()));
-        l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
-        l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+
+        result.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
+        result.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
+
+        result.Add(new FlexiControl());
+        result.AddRange(base.GetProperties(widthOfControl));
+
+        return result;
     }
 
     public List<AbstractPadItem> HotItems(MouseEventArgs e, float zoom, float shiftX, float shiftY) {

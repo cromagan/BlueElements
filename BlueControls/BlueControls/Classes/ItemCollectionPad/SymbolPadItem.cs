@@ -69,7 +69,7 @@ public class SymbolPadItem : RectanglePadItem {
         comms.Add(ItemOf("Rechteck gerundet", ((int)Symbol.Rechteck_gerundet).ToString()));
         comms.Add(ItemOf("Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32")));
         comms.Add(ItemOf("Bruchlinie", ((int)Symbol.Bruchlinie).ToString()));
-        List<GenericControl> l =
+        List<GenericControl> result =
         [
             new FlexiControlForProperty<Symbol>(() => Symbol, comms),
             new FlexiControlForProperty<float>(() => Randdicke),
@@ -77,7 +77,7 @@ public class SymbolPadItem : RectanglePadItem {
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe),
             .. base.GetProperties(widthOfControl),
         ];
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

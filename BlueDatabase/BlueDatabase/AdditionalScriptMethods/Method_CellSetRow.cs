@@ -37,7 +37,10 @@ public class Method_CellSetRow : Method_Database {
     public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow;
+
+
+    // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";

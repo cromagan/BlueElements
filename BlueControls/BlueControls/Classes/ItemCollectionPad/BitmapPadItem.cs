@@ -111,7 +111,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        var comms = new List<AbstractListItem>();
+        comms.Add(ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32")));
+        comms.Add(ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
+        comms.Add(ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
+
+
+
+        List<GenericControl> result =
         [
             new FlexiControlForDelegate(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
             new FlexiControlForDelegate(Datei_laden, "Bild laden", ImageCode.Ordner),
@@ -119,16 +126,16 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
             new FlexiControl()
         ];
-        var comms = new List<AbstractListItem>();
-        comms.Add(ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32")));
-        comms.Add(ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
-        comms.Add(ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
-        l.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
-        l.Add(new FlexiControl());
-        AddLineStyleOption(l, widthOfControl);
-        l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen));
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        result.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
+        result.Add(new FlexiControl());
+        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true)));
+
+        result.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen));
+
+        result.Add(new FlexiControl());
+        result.AddRange(base.GetProperties(widthOfControl));
+
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

@@ -178,6 +178,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return result; }
 
+        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
+
         var lst = new List<AbstractListItem>();
         lst.AddRange(ItemsOf(db.Column, true));
 
@@ -194,12 +196,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
         b.AddRange(GetAllowedEditTypes(Column));
         result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
-        //result.Add(new FlexiControl());
-        //result.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
-        //result.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
-
-        result.Add(new FlexiControl());
-        result.AddRange(base.GetProperties(widthOfControl));
         return result;
     }
 

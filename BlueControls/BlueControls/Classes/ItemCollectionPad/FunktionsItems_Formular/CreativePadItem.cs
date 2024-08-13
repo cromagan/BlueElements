@@ -116,15 +116,13 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             }
         }
 
-        List<GenericControl> l =
+        List<GenericControl> result =
             [.. base.GetProperties(widthOfControl),
-                new FlexiControl("Eigenschaften:", widthOfControl, true),
+                new FlexiControl("Einstellungen:", widthOfControl, true),
                 new FlexiControlForProperty<string>(() => Formular, cl),
-
-                .. base.GetProperties(widthOfControl),
             ];
 
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

@@ -67,16 +67,6 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     #region Methods
 
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
-        [
-            //.. _itemSends.GetProperties(this, widthOfControl),
-            //new FlexiControl(),
-            .. base.GetProperties(widthOfControl),
-        ];
-
-        return l;
-    }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {

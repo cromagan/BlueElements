@@ -42,7 +42,9 @@ public class Method_AddRow : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow;
+
+    // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";

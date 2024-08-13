@@ -110,16 +110,19 @@ public class LinePadItem : AbstractPadItem {
     //}
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [];
-
         var verhalt = new List<AbstractListItem>();
         verhalt.Add(ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie)));
         verhalt.Add(ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie)));
         verhalt.Add(ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie)));
-        l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
-        AddLineStyleOption(l, widthOfControl);
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+
+
+        List<GenericControl> result = [];
+
+        result.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
+        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true)));
+
+        result.AddRange(base.GetProperties(widthOfControl));
+        return result;
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {

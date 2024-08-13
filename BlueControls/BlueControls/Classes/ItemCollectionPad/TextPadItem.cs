@@ -122,20 +122,22 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
-        [
-            new FlexiControlForProperty<string>(() => Text, 5)
-        ];
         var aursicht = new List<AbstractListItem>();
         aursicht.Add(ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig));
         aursicht.Add(ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren));
         aursicht.Add(ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig));
-        //aursicht.Sort();
-        l.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
-        l.Add(new FlexiControlForProperty<float>(() => Skalierung));
-        AddStyleOption(l, widthOfControl);
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+
+
+
+        List<GenericControl> result =
+        [
+            new FlexiControlForProperty<string>(() => Text, 5)
+        ];
+        result.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
+        result.Add(new FlexiControlForProperty<float>(() => Skalierung));
+        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true)));
+        result.AddRange(base.GetProperties(widthOfControl));
+        return result;
     }
 
     public override void ParseFinished(string parsed) {

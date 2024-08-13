@@ -55,7 +55,9 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.IO;
+
+    // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
+    public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.ManipulatesUser ;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 

@@ -50,6 +50,7 @@
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />
     <Compile Include="Methods\Method_If.cs" />
+    <Compile Include="Methods\Method_Sqrt.cs" />
     <Compile Include="Methods\Method_IsType.cs" />
     <Compile Include="Methods\Method_MaxDate.cs" />
     <Compile Include="Methods\Method_Ping.cs" />

@@ -176,11 +176,11 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var l = new List<GenericControl>();
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl),
+                                new FlexiControl("Ausgang:", widthOfControl, true)
+        ];
 
-        l.AddRange(base.GetProperties(widthOfControl));
 
-        l.Add(new FlexiControl("Ausgang:", widthOfControl, true));
         var enableOutput = true;
         Database? outp = null;
 
@@ -192,13 +192,13 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         }
         if (!enableOutput) {
             if (outp != null) {
-                l.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
+                result.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
             }
         } else {
-            l.Add(new FlexiControlForProperty<Database?>(() => DatabaseOutput, AllAvailableTables()));
+            result.Add(new FlexiControlForProperty<Database?>(() => DatabaseOutput, AllAvailableTables()));
         }
 
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

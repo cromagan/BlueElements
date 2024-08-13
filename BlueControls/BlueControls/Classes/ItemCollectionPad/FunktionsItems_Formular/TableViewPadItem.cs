@@ -112,30 +112,26 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [];
+        List<GenericControl> result = [..base.GetProperties(widthOfControl)];
 
-        l.AddRange(base.GetProperties(widthOfControl));
+  
 
-        l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
+        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
             var u2 = new List<AbstractListItem>();
             foreach (var thisC in db.ColumnArrangements) {
                 u2.Add(ItemOf(thisC));
             }
-            l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
+            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
         }
 
         if (DatabaseOutput is Database db2 && !db2.IsDisposed) {
             var u = new List<AbstractListItem>();
             u.AddRange(ItemsOf(typeof(Filterausgabe)));
-            l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
+            result.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
         }
-
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetProperties(widthOfControl));
-
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

@@ -86,13 +86,13 @@ public abstract class RectanglePadItem : AbstractPadItem {
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
-        [
+        List<GenericControl> result =
+        [   .. base.GetProperties(widthOfControl),
             new FlexiControl(),
             new FlexiControlForProperty<int>(() => Drehwinkel),
-            .. base.GetProperties(widthOfControl),
+
         ];
-        return l;
+        return result;
     }
 
     public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height), true);

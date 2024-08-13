@@ -168,7 +168,7 @@ public class DimensionPadItem : AbstractPadItem {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        List<GenericControl> result =
         [
             new FlexiControlForProperty<float>(() => Länge_In_Mm),
             new FlexiControlForProperty<string>(() => Text_Oben),
@@ -176,10 +176,10 @@ public class DimensionPadItem : AbstractPadItem {
             new FlexiControlForProperty<string>(() => Text_Unten),
             new FlexiControlForProperty<string>(() => Präfix)
         ];
-        AddStyleOption(l, widthOfControl);
-        l.Add(new FlexiControlForProperty<float>(() => Skalierung));
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(Parent?.SheetStyle)));
+        result.Add(new FlexiControlForProperty<float>(() => Skalierung));
+        result.AddRange(base.GetProperties(widthOfControl));
+        return result;
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {

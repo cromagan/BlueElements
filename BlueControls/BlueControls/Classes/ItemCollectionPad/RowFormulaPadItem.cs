@@ -126,7 +126,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [];
+        List<GenericControl> result = [];
 
         if (Row?.Database is Database db && !db.IsDisposed) {
             var layouts = new List<AbstractListItem>();
@@ -134,10 +134,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
                 ItemCollectionPad p = new(thisLayouts);
                 layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }
-            l.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
+            result.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
         }
-        l.AddRange(base.GetProperties(widthOfControl));
-        return l;
+        result.AddRange(base.GetProperties(widthOfControl));
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

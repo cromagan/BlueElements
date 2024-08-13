@@ -148,18 +148,17 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l =
+        List<GenericControl> result =
         [
             .. base.GetProperties(widthOfControl),
+            new FlexiControl("Einstellungen:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Pfad),
             new FlexiControlForProperty<string>(() => Mindest_Pfad),
             new FlexiControlForProperty<string>(() => Filter),
             new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen),
             new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen),
-            new FlexiControl(),
-            .. base.GetProperties(widthOfControl),
         ];
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

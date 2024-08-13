@@ -322,15 +322,14 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> l = [.. base.GetProperties(widthOfControl)];
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
+        if (DatabaseInput is not Database db || db.IsDisposed) { return result; }
 
-        //l.Add(new FlexiControl());
 
-        l.Add(new FlexiControl("Eigenschaften:", widthOfControl, true));
+        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => Beschriftung));
+        result.Add(new FlexiControlForProperty<string>(() => Beschriftung));
 
         var im = QuickImage.Images();
 
@@ -339,17 +338,8 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
             c.Add(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
-        l.Add(new FlexiControlForProperty<string>(() => Bild, c));
+        result.Add(new FlexiControlForProperty<string>(() => Bild, c));
 
-        //var sn = new  List<AbstractListItem>(true) {
-        //    "#Neue Zeile in der Datenbank anlegen"
-        //};
-
-        //foreach (var thisScript in db.EventScript) {
-        //    sn.Add(thisScript.KeyName);
-        //}
-
-        //l.Add(new FlexiControlForProperty<string>(() => SkriptName, sn));
 
         var za = new List<AbstractListItem>();
         za.Add(ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()));
@@ -357,7 +347,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
         za.Add(ItemOf("...genau eine oder mehr Zeilen gefunden wurden", ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()));
         za.Add(ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString()));
 
-        l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
+        result.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 
         var co = new List<AbstractListItem>();
 
@@ -367,28 +357,27 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
             }
         }
 
-        l.Add(new FlexiControl("Aktion bei Drücken:", widthOfControl, true));
+        result.Add(new FlexiControl("Aktion bei Drücken:", widthOfControl, true));
 
-        l.Add(new FlexiControlForProperty<string>(() => Aktion, co));
+        result.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
         var m = Method.AllMethods.Get(_action);
 
         if (m is IUseableForButton ufb) {
-            if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0])); }
-            if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2, ufb.ArgsForButtonDescription[1])); }
-            if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3, ufb.ArgsForButtonDescription[2])); }
-            if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
-            if (ufb.ArgsForButton.Count > 4) { l.Add(new FlexiControlForProperty<string>(() => Arg5, ufb.ArgsForButtonDescription[4])); }
-            if (ufb.ArgsForButton.Count > 5) { l.Add(new FlexiControlForProperty<string>(() => Arg6, ufb.ArgsForButtonDescription[5])); }
-            if (ufb.ArgsForButton.Count > 6) { l.Add(new FlexiControlForProperty<string>(() => Arg7, ufb.ArgsForButtonDescription[6])); }
-            if (ufb.ArgsForButton.Count > 7) { l.Add(new FlexiControlForProperty<string>(() => Arg8, ufb.ArgsForButtonDescription[7])); }
+            if (ufb.ArgsForButton.Count > 0) { result.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0])); }
+            if (ufb.ArgsForButton.Count > 1) { result.Add(new FlexiControlForProperty<string>(() => Arg2, ufb.ArgsForButtonDescription[1])); }
+            if (ufb.ArgsForButton.Count > 2) { result.Add(new FlexiControlForProperty<string>(() => Arg3, ufb.ArgsForButtonDescription[2])); }
+            if (ufb.ArgsForButton.Count > 3) { result.Add(new FlexiControlForProperty<string>(() => Arg4, ufb.ArgsForButtonDescription[3])); }
+            if (ufb.ArgsForButton.Count > 4) { result.Add(new FlexiControlForProperty<string>(() => Arg5, ufb.ArgsForButtonDescription[4])); }
+            if (ufb.ArgsForButton.Count > 5) { result.Add(new FlexiControlForProperty<string>(() => Arg6, ufb.ArgsForButtonDescription[5])); }
+            if (ufb.ArgsForButton.Count > 6) { result.Add(new FlexiControlForProperty<string>(() => Arg7, ufb.ArgsForButtonDescription[6])); }
+            if (ufb.ArgsForButton.Count > 7) { result.Add(new FlexiControlForProperty<string>(() => Arg8, ufb.ArgsForButtonDescription[7])); }
         }
 
-        l.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
+        result.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
 
-        l.AddRange(base.GetProperties(widthOfControl));
-
-        return l;
+     
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {

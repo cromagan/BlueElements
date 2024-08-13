@@ -165,9 +165,9 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var l = new List<GenericControl>();
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        l.AddRange(base.GetProperties(widthOfControl));
+        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
         //if (DatabaseInput is Database dbin && !dbin.IsDisposed) {
         //    var u2 = new List<AbstractListItem>();
@@ -179,20 +179,19 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbout.Column, true));
-            l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
+            result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
 
             var ic2 = new List<AbstractListItem>();
             ic2.AddRange(ItemsOf(typeof(FilterTypeRowInputItem)));
-            l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
+            result.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
 
-            l.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));
+            result.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));
 
-            l.Add(new FlexiControlForProperty<string>(() => Fehler_Text));
+            result.Add(new FlexiControlForProperty<string>(() => Fehler_Text));
         }
 
-        l.AddRange(base.GetProperties(widthOfControl));
 
-        return l;
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {
