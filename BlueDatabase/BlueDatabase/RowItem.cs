@@ -830,6 +830,23 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(_database?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
 
+    internal void Repair() {
+        if (Database is not Database db || db.IsDisposed) { return; }
+
+        if (db.Column.SysCorrect is ColumnItem sc) {
+            if (string.IsNullOrEmpty(db.Cell.GetStringCore(sc, this))) {
+                SetValueInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+            }
+        }
+
+        if (db.Column.SysLocked is ColumnItem sl) {
+            if (string.IsNullOrEmpty(db.Cell.GetStringCore(sl, this))) {
+                SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+            }
+        }
+
+    }
+
     /// <summary>
     /// Setzt den Wert ohne Undo Logging
     /// </summary>
@@ -874,9 +891,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         }
                     }
                 }
-            }
 
-            if (reason is Reason.SetCommand) {
                 column.Invalidate_ContentWidth();
                 InvalidateCheckData();
                 db.Cell.OnCellValueChanged(new CellChangedEventArgs(column, this, reason));

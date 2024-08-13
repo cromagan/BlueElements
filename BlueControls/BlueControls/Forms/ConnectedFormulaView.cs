@@ -89,6 +89,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
 
         MultiUserFile.SaveAll(true);
         CFormula.ConnectedFormula.UnlockEditing();
+        Database.ForceSaveAll();
         CFormula.InvalidateView();
     }
 

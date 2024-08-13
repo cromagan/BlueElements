@@ -4,7 +4,6 @@ using BlueControls.Controls;
 using BlueControls.Forms;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
-using TabControl = BlueControls.Controls.TabControl;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -202,6 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.MinimizeBox = false;
             this.Name = "AdderScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
+            this.TopMost = true;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);

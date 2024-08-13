@@ -1047,5 +1047,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowRemoving?.Invoke(this, e);
     }
 
+    internal void Repair() {
+
+        foreach (var thisR in _internal) {
+            thisR.Value.Repair();
+        }
+    }
     #endregion
 }

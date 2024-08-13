@@ -2255,6 +2255,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
+        Row.Repair();
+
         SortDefinition?.Repair();
 
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
