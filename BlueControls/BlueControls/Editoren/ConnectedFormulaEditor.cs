@@ -116,6 +116,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void _cFormula_Editing(object sender, EditingEventArgs e) {
         if (IsDisposed) { return; }
+        if(!Visible) { return; }
         e.Editing = true;
     }
 
