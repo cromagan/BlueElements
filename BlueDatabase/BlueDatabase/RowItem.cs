@@ -33,6 +33,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -134,6 +135,55 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #endregion
 
     #region Methods
+
+
+
+
+
+
+    internal void DoSystemColumns(Database db, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
+        if (reason == Reason.NoUndo_NoInvalidate) { return; }
+
+        // Die unterschiedlichen Reasons in der Routine beachten!
+        if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
+        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
+
+
+
+        if (db.Column.SysRowState is ColumnItem srs && srs != column) {
+
+            RowCollection.FailedRows.Remove(this);
+
+            if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+
+                if (reason != Reason.UpdateChanges) {
+                    RowCollection.InvalidatedRows.AddIfNotExists(this);
+                }
+
+
+                RowCollection.WaitDelay = 0;
+
+                if (column.Function == ColumnFunction.Schlüsselspalte) {
+                    SetValueInternal(srs, string.Empty, reason);
+                } else {
+                    if (!string.IsNullOrEmpty(CellGetString(srs))) {
+                        SetValueInternal(srs, "01.01.1900", reason);
+                    }
+                }
+            }
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
 
     public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly, bool virtualcolumns) {
         if (column == null) { return null; }
@@ -543,23 +593,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Gibt True zurück, wenn eine eigene Zeile initialisiert werden muss.
-    /// Alter kleiner 60 Minuten.
+    /// Alter kleiner 5 Minuten.
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowInitialization() {
         if (Database is not Database db || db.IsDisposed) { return false; }
         if (db.Column.SysRowState is not ColumnItem srs) { return false; }
-        if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
         if (db.Column.SysRowChanger is not ColumnItem src) { return false; }
-
         if (db.Column.SysRowChangeDate is not ColumnItem srcd) { return false; }
 
-        if (DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes > 60 ||
-        DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds < 3) { return false; }
+
+        if (RowCollection.FailedRows.Contains(this)) { return false; }
+
+        if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
-        return !RowCollection.FailedRows.Contains(this);
+        var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
+        return t.TotalMinutes < 5;
     }
 
     /// <summary>
@@ -567,23 +618,36 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Benutzer und Alter egal.
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRowUpdate(bool ignoreFailed) {
-        if (Database?.Column.SysRowState is not ColumnItem srs) { return false; }
+    public bool NeedsRowUpdate(bool ignoreFailed, bool extendedAllowed) {
+        if (Database is not Database db || db.IsDisposed) { return false; }
+        if (db.Column.SysRowState is not ColumnItem srs) { return false; }
+
+        if (!extendedAllowed && string.IsNullOrEmpty(CellGetString(srs))) { return false; }
+
         if (CellGetDateTime(srs) >= Database.EventScriptVersion) { return false; }
         return ignoreFailed || !RowCollection.FailedRows.Contains(this);
+
     }
 
     /// <summary>
-    /// Gibt true zurück, wenn eine eigene Zeile aktualisiert werden.
-    /// Diese muss jünger als 5 Minuten sein und älter als 3 sekunden.
+    /// Gibt true zurück, wenn eine eigene Zeile aktualisiert werden muss.
+    /// Diese muss jünger als 20 Minuten sein und älter als 3 sekunden.
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRowUpdateAfterChange() => NeedsRowUpdate(false) &&
-                                           Database?.Column.SysRowChanger is ColumnItem srcr &&
-                                           Database?.Column.SysRowChangeDate is ColumnItem srcd &&
-                                           string.Equals(CellGetString(srcr), Generic.UserName, StringComparison.OrdinalIgnoreCase) &&
-                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalMinutes < 15 &&
-                                           DateTime.UtcNow.Subtract(CellGetDateTime(srcd)).TotalSeconds > 3;
+    public bool NeedsRowUpdateAfterChange() {
+        if (Database is not Database db || db.IsDisposed) { return false; }
+        //if (db.Column.SysRowState is not ColumnItem srs) { return false; }
+        if (db.Column.SysRowChanger is not ColumnItem src) { return false; }
+        if (db.Column.SysRowChangeDate is not ColumnItem srcd) { return false; }
+
+        //if (string.IsNullOrEmpty(CellGetString(srs))) { return false; }  // Zu krass! Die muss komplett initialisiert werden! Wird vorher schon abgefragt
+
+        if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
+
+        var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
+        return NeedsRowUpdate(false, false) && t.TotalMinutes < 20 && t.TotalSeconds > 3;
+
+    }
 
     public void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
@@ -685,7 +749,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
-    public bool UpdateRow(bool onlyIfQuick, bool extended, bool important, string reason) {
+    public bool UpdateRow(bool extendedAllowed, bool important, string reason) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
         if (!important && Database.ExecutingScriptAnyDatabase > 0) { return false; }
@@ -705,15 +769,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var hasScript = db.EventScript.Get(ScriptEventTypes.value_changed).Count;
         if (hasScript > 1) { return false; }
 
-        extended = extended || string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
+        var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
-        if (onlyIfQuick && extended) { return false; }
+        if (!extendedAllowed && mustBeExtended) { return false; }
 
         try {
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
             OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
-            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, extended);
+            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustBeExtended);
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
@@ -952,45 +1016,46 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!script.AllOk) {
             //db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));
             if (script.ScriptNeedFix) {
-                db.ScriptNeedFix = "Benutzer: " + Generic.UserName + "\r\n" +
-                                   "Zeit: " + DateTime.UtcNow.ToString5() + "\r\n" +
-                                   "Extended: " + extended.ToString() + "\r\n" +
-                                   "Zeile: " + CellFirstString() + "\r\n\r\n\r\n" +
-                                   script.ProtocolText;
+                db.ScriptNeedFix = "Datenbank: " + db.Caption + "\r\n" +
+                                    "Benutzer: " + Generic.UserName + "\r\n" +
+                                    "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
+                                    "Extended: " + extended.ToString() + "\r\n" +
+                                    "Zeile: " + CellFirstString() + "\r\n\r\n\r\n" +
+                                     script.ProtocolText;
             }
 
-            return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\nZeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+            //return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\nZeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
-        // Nicht ganz optimal, da ein Script ebenfalls den Flag changevalues hat. Aber hier wird nur auf den Flag eingenangen, ob es eine Testroutine ist oder nicht
-        if (eventname is ScriptEventTypes.prepare_formula
-            or ScriptEventTypes.value_changed_extra_thread
-            or ScriptEventTypes.export
-            or ScriptEventTypes.row_deleting) { return script; }
+        //// Nicht ganz optimal, da ein Script ebenfalls den Flag changevalues hat. Aber hier wird nur auf den Flag eingenangen, ob es eine Testroutine ist oder nicht
+        //if (eventname is ScriptEventTypes.prepare_formula
+        //    or ScriptEventTypes.value_changed_extra_thread
+        //    or ScriptEventTypes.export
+        //    or ScriptEventTypes.row_deleting) { return script; }
 
-        if (!produktivphase) { return script; }
+        //if (!produktivphase) { return script; }
 
-        // Dann die abschließenden Korrekturen vornehmen
-        foreach (var thisColum in db.Column) {
-            if (thisColum != null) {
-                if (fullCheck) {
-                    var x = CellGetString(thisColum);
-                    var x2 = thisColum.AutoCorrect(x, true);
-                    if (thisColum.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 && x != x2) {
-                        db.Cell.Set(thisColum, this, x2, "Nach Skript-Korrekturen");
-                    } else {
-                        if (!thisColum.IsFirst()) {
-                            db.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
-                        }
-                    }
-                    doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
-                }
+        //// Dann die abschließenden Korrekturen vornehmen
+        //foreach (var thisColum in db.Column) {
+        //    if (thisColum != null) {
+        //        if (fullCheck) {
+        //            var x = CellGetString(thisColum);
+        //            var x2 = thisColum.AutoCorrect(x, true);
+        //            //if (thisColum.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 && x != x2) {
+        //                db.Cell.Set(thisColum, this, x2, "Nach Skript-Korrekturen");
+        //            //} else {
+        //            //    if (!thisColum.IsFirst() && !thisColum.IsSystemColumn()) {
+        //            //        db.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
+        //            //    }
+        //            //}
+        //            doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
+        //        }
 
-                if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
-                    thisColum.Invalidate_ContentWidth();
-                }
-            }
-        }
+        //        if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
+        //            thisColum.Invalidate_ContentWidth();
+        //        }
+        //    }
+        //}
 
         return script;
     }
@@ -1116,6 +1181,28 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
         return false;
+    }
+
+    public void InvalidateRowState(string comment) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
+        if (db.Column.SysRowState is ColumnItem srs) {
+            CellSet(srs, string.Empty, comment);
+        }
+
+
+        if (db.Column.SysRowChangeDate is ColumnItem scd) {
+            CellSet(scd, DateTime.UtcNow, comment);
+        }
+        RowCollection.InvalidatedRows.AddIfNotExists(this);
+
+
+        //DoSystemColumns(db, null, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
+
+        //q
+        //CellSet(srs, string.Empty,comment);
+
+
     }
 
     #endregion

@@ -1219,7 +1219,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool? extendedVariable) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable) {
 
         #region Variablen für Skript erstellen
 
@@ -1256,10 +1256,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
-
-        if (extendedVariable is bool e) {
-            vars.Add(new VariableBool("Extended", e, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
-        }
+        vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
 
         #endregion
 
@@ -1407,44 +1404,21 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            #region  Erlaubte Methoden ermitteln und maxtime
+            #region  Erlaubte Methoden ermitteln
 
-            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.IO;
+            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
 
-            if (s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) ||
-                s.EventTypes.HasFlag(ScriptEventTypes.InitialValues) ||
-                s.EventTypes.HasFlag(ScriptEventTypes.export) ||
-                (s.EventTypes.HasFlag(ScriptEventTypes.value_changed) && !extended)) {
-            }
-
-            if (s.EventTypes.HasFlag(ScriptEventTypes.loaded) ||
-                s.EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
-            }
-
-            if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
-                 !s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
+            if (s.EventTypes == ScriptEventTypes.Ohne_Auslöser || extended) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
-
-            if (extended) {
-                allowedMethods |= MethodType.ManipulatesUser;
-                allowedMethods |= MethodType.ChangeAnyDatabaseOrRow;
-            }
-
-            if (s.ChangeValues && produktivphase) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }
 
             #endregion
 
             var prepf = s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
 
-            bool? extv = null;
-            if (s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) { extv = extended; }
-
-            var vars = CreateVariableCollection(row, !s.ChangeValues, dbVariables, prepf, extv);
+            var vars = CreateVariableCollection(row, !s.ChangeValues, dbVariables, prepf, extended);
 
             var m = BlueScript.Methods.Method.GetMethods(allowedMethods);
 
@@ -1520,7 +1494,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ExecutingScriptAnyDatabase--;
 
             if (produktivphase && ExecutingScript == 0 && ExecutingScriptAnyDatabase == 0) {
-                RowCollection.DoAllInvalidatedRows(row);
+                RowCollection.DoAllInvalidatedRows(row, extended);
             }
 
             return scf;
@@ -2545,14 +2519,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         LastChange = DateTime.UtcNow;
 
         if (type.IsCellValue()) {
-            if (column?.Database is not Database db || db.IsDisposed) {
-                //Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
-                return (string.Empty, column, row);
-            }
-
-            if (row == null) {
-                return (string.Empty, column, row);
-            }
+            if (column?.Database is not Database db || db.IsDisposed) { return (string.Empty, column, row); }
+            if (row == null) { return (string.Empty, column, row); }
 
             column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();
@@ -2560,7 +2528,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var f = row.SetValueInternal(column, value, reason);
 
             if (!string.IsNullOrEmpty(f)) { return (f, null, null); }
-            Cell.DoSystemColumns(db, column, row, user, datetimeutc, reason);
+            row.DoSystemColumns(db, column, user, datetimeutc, reason);
 
             return (string.Empty, column, row);
         }

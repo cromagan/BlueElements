@@ -104,7 +104,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (database is Database db && !db.IsDisposed) {
             UpdateStatusBar(FehlerArt.Info, $"Erstelle Tabellen Ansicht des Undo-Speichers der Datenbank '{db.Caption}'", true);
 
-            foreach (var thisUndo in db.Undo) {
+            List<UndoItem> un = [.. db.Undo]; // Kann und wird verändert!
+
+            foreach (var thisUndo in un) {
                 AddUndoToTable(tblUndo, thisUndo, db, maxAgeInDays);
             }
         }

@@ -47,7 +47,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.Database | MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 

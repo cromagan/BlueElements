@@ -111,7 +111,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
         vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.IO | MethodType.Database | MethodType.MyDatabaseRow);
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard |  MethodType.Database | MethodType.MyDatabaseRow);
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
 
@@ -158,6 +158,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         DoInputFilter(null, true);
         DoRows();
 
+
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
             return;
@@ -186,6 +187,8 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             Fehler("Keine Wahl getroffen", ImageCode.Information);
             return;
         }
+
+        RowCollection.DoAllInvalidatedRows(_lastRow, true);
 
         var nowGeneratedId = GenerateEntityID(rowIn);
 
@@ -415,7 +418,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return "Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText;
         }
 
-        RowCollection.DoAllInvalidatedRows(null);
 
         var menu = scf.Variables?.GetList("Menu");
 

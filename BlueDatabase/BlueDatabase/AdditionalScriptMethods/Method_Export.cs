@@ -50,7 +50,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.IO;
+    public override MethodType MethodType => MethodType.Database;
 
     public override bool MustUseReturnValue => false;
 

@@ -23,12 +23,16 @@ public enum Reason {
     SetCommand = 0,
 
     /// <summary>
-    /// Es werden keine Werte invalidiert. Kein undo geloggt. und auch keine Repairs oder Skripte ausgeführt.
+    /// Es werden keine Werte invalidiert. Kein Undo geloggt. und auch keine Repairs oder Skripte ausgeführt.
     /// Allerdings wird der Freeze-State umgangen. Z.B. um eine Datenbank laden zu können
     /// Wird benutzt beim Laden einer Datenbank, beim Systemspalten befüllen, oder virtuelle Spalten zu befüllen
     /// </summary>
     NoUndo_NoInvalidate = 1,
 
+    /// <summary>
+    /// Wenn Daten von der Festplatte nachgeladen und nur verbucht werden sollen.
+    /// </summary>
     UpdateChanges = 2,
+
     AdditionalWorkAfterCommand = 3
 }

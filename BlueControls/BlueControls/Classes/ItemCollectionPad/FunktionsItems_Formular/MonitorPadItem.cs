@@ -82,10 +82,9 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
+            return QuickImage.Get(ImageCode.Textdatei, 16);
         }
-
-        return QuickImage.Get(ImageCode.Textdatei, 16);
+        return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
     public override string ToParseableString() {

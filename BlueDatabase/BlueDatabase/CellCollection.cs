@@ -471,89 +471,38 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="previewsValue"></param>
-    /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
 
-    public void DoSpecialFormats(ColumnItem? column, RowItem? row, string previewsValue, bool doAlways) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (row == null || row.IsDisposed) { return; }
+    private void DoSpecialFormats(ColumnItem column, RowItem row, string previewsValue, string currentValue) {
 
-        if (column == null || column.IsDisposed) {
-            db.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + db.TableName);
-            return;
-        }
+        if (currentValue == previewsValue) { return; }
 
-        var currentValue = GetString(column, row);
+        if (column.Database is not Database db || db.IsDisposed) { return; }
 
-        switch (column.Function) {
-            case ColumnFunction.RelationText:
-                if (doAlways || currentValue != previewsValue) {
-                    RepairRelationText(column, row, previewsValue);
-                    //SetSameValueOfKey(column, row, currentValue);
-                }
-                break;
-
-            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
-            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-                if (doAlways) {
-                    _ = LinkedCellData(column, row, true, false); // Repariert auch Cellbezüge
-                }
-                break;
-        }
-
-        if (!doAlways && currentValue == previewsValue) { return; }
+        if (column.Function == ColumnFunction.RelationText) { RepairRelationText(column, row, previewsValue); }
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
-            foreach (var thisC in db.Column) {
-                if (thisC.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
-                    _ = LinkedCellData(thisC, row, true, false);
+            foreach (var thisColumn in db.Column) {
+                if (thisColumn.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or
+                                           ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+                    _ = LinkedCellData(thisColumn, row, true, false);
                 }
             }
         }
 
         if (column.IsFirst()) {
-            foreach (var thisColumnItem in db.Column) {
-                if (thisColumnItem != null) {
-                    switch (thisColumnItem.Function) {
-                        //case DataFormat.Relation:
-                        //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
-                        //    break;
-                        case ColumnFunction.RelationText:
-                            RelationTextNameChanged(thisColumnItem, row.KeyName, previewsValue, currentValue);
-                            break;
-                    }
+            foreach (var thisColumn in db.Column) {
+                if (column.Function == ColumnFunction.RelationText) {
+                    RelationTextNameChanged(thisColumn, row.KeyName, previewsValue, currentValue);
                 }
             }
         }
-        //if (column.KeyColumnKey > -1) {
-        //    ChangeValueOfKey(currentValue, column, row.KeyName);
-        //}
+
+
+
+
     }
 
-    public void DoSystemColumns(Database db, ColumnItem column, RowItem row, string user, DateTime datetimeutc, Reason reason) {
-        if (reason == Reason.NoUndo_NoInvalidate) { return; }
-
-        // Die unterschiedlichen Reasons in der Routine beachten!
-        if (db.Column.SysRowChanger is ColumnItem src && src != column) { row.SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
-        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { row.SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
-
-        RowCollection.FailedRows.Remove(row);
-
-        if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-            if (db.Column.SysRowState is ColumnItem srs && srs != column) {
-                RowCollection.WaitDelay = 0;
-                if (column.Function == ColumnFunction.Schlüsselspalte) {
-                    row.SetValueInternal(srs, string.Empty, reason);
-                } else {
-                    if (!string.IsNullOrEmpty(row.CellGetString(srs))) {
-                        // wichitg, nur wenn >0, weil leere ZEilen dann nicht mehr kompett durchgerechnet werden
-                        row.SetValueInternal(srs, "01.01.1900", reason);
-                    }
-                }
-            }
-        }
-    }
-
+  
     public Size? GetSizeOfCellContent(ColumnItem column, RowItem row) {
         var txt = GetString(column, row);
         if (string.IsNullOrEmpty(txt)) { return null; }
@@ -581,6 +530,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + Database?.TableName);
                 return string.Empty;
             }
+
             if (row == null || row.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database.TableName);
                 return string.Empty;
@@ -647,9 +597,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (value != GetStringCore(column, row)) { return "Nachprüfung fehlgeschlagen"; }
 
-        DoSpecialFormats(column, row, oldValue, false);
-
-        //DoSystemColumns(db, column, row, UserName, DateTime.UtcNow, Reason.SystemSet);
+        DoSpecialFormats(column, row, oldValue, value);
 
         return string.Empty;
     }

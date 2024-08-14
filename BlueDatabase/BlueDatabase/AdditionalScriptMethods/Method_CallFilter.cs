@@ -48,7 +48,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.SpecialVariables;
+    public override MethodType MethodType =>  MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 

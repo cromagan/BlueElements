@@ -310,7 +310,13 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         var f = ufb.DoIt(vars, args, fis, rn, ai);
 
-        RowCollection.DoAllInvalidatedRows(row);
+        if(RowCollection.DidRows.Count >0) {
+            f = "Ein anderer Prozess ist noch aktiv.";
+        } else {
+            RowCollection.DoAllInvalidatedRows(row, true);
+        }
+
+       
 
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");

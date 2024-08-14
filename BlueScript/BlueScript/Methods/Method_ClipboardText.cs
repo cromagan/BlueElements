@@ -38,7 +38,7 @@ internal class Method_ClipboardText : Method {
     public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";

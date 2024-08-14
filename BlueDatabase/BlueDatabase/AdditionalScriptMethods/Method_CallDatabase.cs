@@ -46,7 +46,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.SpecialVariables;
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";
     public override string Returns => string.Empty;

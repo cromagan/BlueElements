@@ -38,7 +38,7 @@ public class Method_CellSetFilter : Method_Database {
     public override int LastArgMinCount => 1;
 
     // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
-    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.Database | MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";

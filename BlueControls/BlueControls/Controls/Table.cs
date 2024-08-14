@@ -2114,7 +2114,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
-            contentHolderCellRow.UpdateRow(true, false, true, "Nach Benutzereingabe");
+            contentHolderCellRow.UpdateRow(true, true, "Nach Benutzereingabe");
 
             if (table.Database == cellInThisDatabaseColumn.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
@@ -2784,7 +2784,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, IBackgro
 
                 if (isAdmin) {
                     if (rowScript) {
-                        if (cellInThisDatabaseRow.NeedsRowUpdate(true)) {
+                        if (cellInThisDatabaseRow.NeedsRowUpdate(true, true)) {
                             gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             if (RowCollection.FailedRows.Contains(cellInThisDatabaseRow)) {
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);

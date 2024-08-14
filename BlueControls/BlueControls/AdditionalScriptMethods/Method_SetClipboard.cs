@@ -46,7 +46,7 @@ internal class Method_SetClipboard : BlueScript.Methods.Method, BlueDatabase.Int
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
+    public override MethodType MethodType =>  MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Text in die Zwischenablage kopieren";

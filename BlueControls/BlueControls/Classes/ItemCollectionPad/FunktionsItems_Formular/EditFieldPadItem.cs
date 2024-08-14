@@ -225,7 +225,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     }
 
     public override string ReadableText() {
-        const string txt = "Wert aus: ";
+        const string txt = "Zelle: ";
 
         if (this.IsOk() && Column != null) {
             return txt + Column.Caption;

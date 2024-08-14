@@ -46,7 +46,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
     public override int LastArgMinCount => -1;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
-    public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.Database |  MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
 
@@ -77,28 +77,13 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
             return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden.");
         }
 
-        if (RowCollection.InvalidatedRows.Contains(myRow) || 
-            RowCollection.DidRows.Contains(myRow) ||
-            RowCollection.FailedRows.Contains(myRow)) {
-            return DoItFeedback.Null();
-        }
-
-        //var v = myRow.CellGetLong(srs);
-
-        //if (v > 0) {
-        //    var lastchange = RowItem.TimeCodeToUTCDateTime(v);
-
-        //if (DateTime.UtcNow.Subtract(lastchange).TotalMinutes > 15) {
-        //    return new DoItFeedback(ld, $"Fehlgeschlagen, da eine Zeile {myRow.CellFirstString()} erst durchgerechnet wurde und der Intervall zu kurz ist (15 Minuten)");
-        //    myRow.CellSet(srs, string.Empty, coment);
-
-        //} }
-        //}
-        //} else {
-        //        return new DoItFeedback(ld, $"Der Tabelle {db.Caption} fehlt die Spalte Zeilenstatus");
+        //if (RowCollection.InvalidatedRows.Contains(myRow) || 
+        //    RowCollection.DidRows.Contains(myRow) ||
+        //    RowCollection.FailedRows.Contains(myRow)) {
+        //    return DoItFeedback.Null();
         //}
 
-        //		    if (myRow.Database is not Database db) { return new DoItFeedback(ld, "Interner Fehler"); }
+
 
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
@@ -108,13 +93,10 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         if (d < 0.1) { return new DoItFeedback(ld, "Intervall zu kurz."); }
 
         var v = myRow.CellGetDateTime(srs);
-
         if (DateTime.UtcNow.Subtract(v).TotalDays < d) { return DoItFeedback.Null(); }
 
-        myRow.CellSet(srs, string.Empty, $"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
-
-        RowCollection.InvalidatedRows.Add(myRow);
-
+        myRow.InvalidateRowState($"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+   
         return DoItFeedback.Null();
     }
 

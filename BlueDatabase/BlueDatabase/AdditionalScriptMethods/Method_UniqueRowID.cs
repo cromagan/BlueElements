@@ -35,7 +35,7 @@ public class Method_UniqueRowId : BlueScript.Methods.Method {
     public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";

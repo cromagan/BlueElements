@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace BlueDatabase;
@@ -179,31 +180,40 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         db.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
     }
 
-    public static void DoAllInvalidatedRows(RowItem? masterRow) {
-        if (Database.ExecutingScriptAnyDatabase != 0 || DidRows.Count > 0) { return; }
+    public static void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
+
+
+        do {
+            if (DidRows.Count > 0) { return; }
+            if (InvalidatedRows.Count == 0) { return; }
+            Generic.Pause(1, true);
+
+        } while (Database.ExecutingScriptAnyDatabase != 0);
+
+
 
         var ra = 0;
         var n = 0;
 
-        DidRows.Clear();
+        //DidRows.Clear();
         try {
             while (InvalidatedRows.Count > 0) {
-                n++;
-                var r = InvalidatedRows[0];
-                InvalidatedRows.RemoveAt(0);
-
                 if (InvalidatedRows.Count > ra) {
                     masterRow?.OnDropMessage(FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
                     ra = InvalidatedRows.Count;
                 }
 
+                n++;
+                var r = InvalidatedRows[0];
+                InvalidatedRows.RemoveAt(0);
+
                 if (r != null && !r.IsDisposed && r.Database != null && !r.Database.IsDisposed && !DidRows.Contains(r)) {
                     DidRows.Add(r);
                     if (masterRow?.Database != null) {
-                        r.UpdateRow(false, true, true, "Update von " + masterRow.CellFirstString());
+                        r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
                         masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
                     } else {
-                        r.UpdateRow(false, true, true, "Normales Update");
+                        r.UpdateRow(extendedAllowed, true, "Normales Update");
                     }
                 }
             }
@@ -246,7 +256,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (e.Cancel) { break; }
 
             Develop.SetUserDidSomething();
-            row.UpdateRow(false, false, false, "Allgemeines Updates");
+            row.UpdateRow(true, false, "Allgemeines Updates");
             Develop.SetUserDidSomething();
             if (tim.ElapsedMilliseconds > 30000) { break; }
         }
@@ -419,8 +429,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (r.Count != 1) {
                 return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
             }
-            if (db.Column.SysRowState != null) {
-                InvalidatedRows.AddIfNotExists(r[0]);
+            if (db.Column.SysRowState is ColumnItem srs) {
+                r[0].CellSet(srs, string.Empty, $"'UniqueRow' Aufräumen mehrerer Zeilen.");
             }
         }
 
@@ -430,10 +440,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var (newrow, message) = GenerateAndAdd(filter, coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
             myRow = newrow;
-
-            if (db.Column.SysRowState != null) {
-                InvalidatedRows.AddIfNotExists(newrow);
-            }
         } else {
             myRow = r[0];
         }
@@ -767,7 +773,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (rowToCheck != null) { return rowToCheck; }
 
         if (db.AmITemporaryMaster(5, 55)) {
-            rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false));
+            rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo));
             if (rowToCheck != null) { return rowToCheck; }
         }
 
@@ -987,6 +993,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
+    internal void Repair() {
+        foreach (var thisR in _internal) {
+            thisR.Value.Repair();
+        }
+    }
+
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem r || r.IsDisposed) { return; }
         _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null, true, false);
@@ -1008,7 +1020,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
             if (Database?.Column.SysRowState != null) {
-                InvalidatedRows.Add(row);
+                InvalidatedRows.AddIfNotExists(row);
             }
         }
 
@@ -1047,11 +1059,5 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowRemoving?.Invoke(this, e);
     }
 
-    internal void Repair() {
-
-        foreach (var thisR in _internal) {
-            thisR.Value.Repair();
-        }
-    }
     #endregion
 }

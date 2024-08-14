@@ -42,7 +42,7 @@ internal class Method_MoveDirectory : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.Standard;
 
     public override bool MustUseReturnValue => false;
 

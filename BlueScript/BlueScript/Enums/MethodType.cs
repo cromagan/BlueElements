@@ -30,11 +30,6 @@ public enum MethodType {
     Standard = 1,
 
     /// <summary>
-    /// Methoden, die in irgend einer Weiße auf das System zugreifen. z.B. Dateisystem, Andere Datenbank oder Clipboard
-    /// </summary>
-    IO = 2,
-
-    /// <summary>
     /// Methoden, die über einer Datenbank aufgerufen werden müssen.
     /// Z.B. weil sie die eigene Datenbank brauchen, um andere Datenbanken finden zu können.
     /// </summary>
@@ -44,16 +39,6 @@ public enum MethodType {
     /// Methoden, die sich innerhalb der aktuellen Zeile der Datenbank bewegen. Muss immer gemeinsam mit dem Attribut 'Database' verwendet werden.
     /// </summary>
     MyDatabaseRow = 8,
-
-    /// <summary>
-    /// Methoden, die andere Zeilen - egal in welcher Datenbank - ändern können.
-    /// </summary>
-    ChangeAnyDatabaseOrRow = 16,
-
-    ///// <summary>
-    ///// Methoden, die an sich harmlos sind, aber eine lange Zeit zum Ausführen benötigen. Unpassend für z.B. RowCheck
-    ///// </summary>
-    //NeedLongTime = 32,
 
     /// <summary>
     /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipbard verändert der ein Programm gestartet.
@@ -68,9 +53,9 @@ public enum MethodType {
     SpecialVariables = 128,
 
     /// <summary>
-    ///  Sehr spezialle Befehle, die nur an einer einzigen Position erlaubt sind
+    ///  Sehr spezielle Befehle, die nur an einer einzigen Position erlaubt sind
     /// </summary>
     Special = 256,
 
-    AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | ManipulatesUser | SpecialVariables
+    AllDefault = Standard | Database | MyDatabaseRow | ManipulatesUser | SpecialVariables
 }

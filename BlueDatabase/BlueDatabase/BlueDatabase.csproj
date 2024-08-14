@@ -78,10 +78,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdditionalScriptMethods\Method_AddRowsUnique.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
