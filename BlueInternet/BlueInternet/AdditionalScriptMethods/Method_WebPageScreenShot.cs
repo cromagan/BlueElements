@@ -44,7 +44,7 @@ internal class Method_WebPageScreenShot : Method_WebPage {
     public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";

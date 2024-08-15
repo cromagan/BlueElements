@@ -181,6 +181,26 @@
       <DependentUpon>Start.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CefSharp.Common">
+      <Version>126.2.180</Version>
+    </PackageReference>
+    <PackageReference Include="CefSharp.OffScreen">
+      <Version>126.2.180</Version>
+    </PackageReference>
+    <PackageReference Include="CefSharp.WinForms">
+      <Version>126.2.180</Version>
+    </PackageReference>
+    <PackageReference Include="chromiumembeddedframework.runtime.win-x64">
+      <Version>126.2.18</Version>
+    </PackageReference>
+    <PackageReference Include="chromiumembeddedframework.runtime.win-x86">
+      <Version>126.2.18</Version>
+    </PackageReference>
+    <PackageReference Include="FCTB">
+      <Version>2.16.24</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

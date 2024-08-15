@@ -39,7 +39,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
     public override string Description => "Füllt ein Textfeld in der Webpage aus.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

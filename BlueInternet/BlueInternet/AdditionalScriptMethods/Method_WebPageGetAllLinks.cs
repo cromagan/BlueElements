@@ -37,7 +37,7 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
     public override string Description => "Gibt eine Liste aller Links zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
