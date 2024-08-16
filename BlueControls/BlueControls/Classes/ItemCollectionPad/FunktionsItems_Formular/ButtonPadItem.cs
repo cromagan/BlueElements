@@ -26,7 +26,6 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Methods;
@@ -38,7 +37,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableText, IAutosizable {
+public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 

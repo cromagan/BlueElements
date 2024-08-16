@@ -27,7 +27,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das PadItem zu einem ConnectedFormula-Control übersetzt werden kann.
 /// </summary>
-public interface IItemToControl : IHasKeyName, IHasVersion, ICloneable, IReadableText, IReadableTextWithKey {
+public interface IItemToControl : IHasVersion, ICloneable, IReadableTextWithKey {
 
     #region Methods
 

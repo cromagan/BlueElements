@@ -52,7 +52,7 @@ public static class EventScriptExtension {
     #endregion
 }
 
-public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IPropertyChangedFeedback {
+public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, IHasDatabase {
 
     #region Fields
 

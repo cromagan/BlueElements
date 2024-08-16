@@ -38,7 +38,7 @@ using static BlueDatabase.Database;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtendedWithEvent, IEditable {
+public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtendedWithEvent, IEditable {
 
     #region Fields
 

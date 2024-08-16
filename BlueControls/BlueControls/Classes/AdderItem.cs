@@ -66,36 +66,36 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Methods
 
-    public static void AddRowsToDatabase(ColumnItem? OriginIDColumn, List<string> KeysAndInfo, string GeneratedEntityID, ColumnItem? AdditionalInfoColumn) {
-        if (OriginIDColumn?.Database is not { IsDisposed: false } db) { return; }
+    public static void AddRowsToDatabase(ColumnItem? originIdColumn, List<string> keysAndInfo, string generatedEntityId, ColumnItem? additionalInfoColumn) {
+        if (originIdColumn?.Database is not { IsDisposed: false } db) { return; }
 
-        for (var z = 0; z < KeysAndInfo.Count; z++) {
-            var key = OriginId(KeysAndInfo[z], OriginIDColumn, GeneratedEntityID);
+        foreach (var thisKeyAndInfo in keysAndInfo) {
+            var key = OriginId(thisKeyAndInfo, originIdColumn, generatedEntityId);
 
-            var KeyName = key.TrimStart(GeneratedEntityID + "\\");
+            var keyName = key.TrimStart(generatedEntityId + "\\");
 
-            if (!string.IsNullOrEmpty(KeyName)) {
+            if (!string.IsNullOrEmpty(keyName)) {
                 var r = db.Row.GenerateAndAdd(key, null, "Zeilengenerator im Formular");
 
                 if (r != null) {
-                    OriginIDColumn.MaxCellLenght = Math.Max(OriginIDColumn.MaxCellLenght, key.Length);
-                    OriginIDColumn.MultiLine = false;
-                    OriginIDColumn.AfterEditAutoCorrect = false;
-                    OriginIDColumn.AfterEditQuickSortRemoveDouble = false;
-                    OriginIDColumn.ScriptType = ScriptType.String_Readonly;
-                    OriginIDColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.";
-                    r.CellSet(OriginIDColumn, key, "Zeilengenerator im Formular");
+                    originIdColumn.MaxCellLenght = Math.Max(originIdColumn.MaxCellLenght, key.Length);
+                    originIdColumn.MultiLine = false;
+                    originIdColumn.AfterEditAutoCorrect = false;
+                    originIdColumn.AfterEditQuickSortRemoveDouble = false;
+                    originIdColumn.ScriptType = ScriptType.String_Readonly;
+                    originIdColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.";
+                    r.CellSet(originIdColumn, key, "Zeilengenerator im Formular");
 
-                    if (AdditionalInfoColumn != null) {
-                        var info = KeysAndInfo[z].SplitBy("#")[1];
+                    if (additionalInfoColumn != null) {
+                        var info = thisKeyAndInfo.SplitBy("#")[1];
 
-                        AdditionalInfoColumn.MaxCellLenght = Math.Max(AdditionalInfoColumn.MaxCellLenght, info.Length);
-                        AdditionalInfoColumn.MultiLine = false;
-                        AdditionalInfoColumn.AfterEditAutoCorrect = false;
-                        AdditionalInfoColumn.AfterEditQuickSortRemoveDouble = false;
-                        AdditionalInfoColumn.ScriptType = ScriptType.String_Readonly;
-                        AdditionalInfoColumn.AdminInfo = "Diese Spalte wird für Zusatzinfos de Textgenerators benutzt.";
-                        r.CellSet(AdditionalInfoColumn, info, "Zeilengenerator im Formular");
+                        additionalInfoColumn.MaxCellLenght = Math.Max(additionalInfoColumn.MaxCellLenght, info.Length);
+                        additionalInfoColumn.MultiLine = false;
+                        additionalInfoColumn.AfterEditAutoCorrect = false;
+                        additionalInfoColumn.AfterEditQuickSortRemoveDouble = false;
+                        additionalInfoColumn.ScriptType = ScriptType.String_Readonly;
+                        additionalInfoColumn.AdminInfo = "Diese Spalte wird für Zusatzinfos de Textgenerators benutzt.";
+                        r.CellSet(additionalInfoColumn, info, "Zeilengenerator im Formular");
                     }
                     r.UpdateRow(true, true, "Zeile erstellt");
                 }
@@ -103,12 +103,12 @@ internal class AdderItem : IReadableTextWithKey {
         }
     }
 
-    public static void RemoveRowsFromDatabase(ColumnItem? OriginIDColumn, string GeneratedEntityId, string KeyName) {
-        if (OriginIDColumn?.Database is not { IsDisposed: false } db) { return; }
+    public static void RemoveRowsFromDatabase(ColumnItem? originIdColumn, string generatedEntityId, string keyName) {
+        if (originIdColumn?.Database is not { IsDisposed: false } db) { return; }
 
         var fi = new FilterCollection(db, "Zeilengenerator im Formular");
-        var key = OriginId(KeyName + "#", OriginIDColumn, GeneratedEntityId);
-        fi.Add(new FilterItem(OriginIDColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
+        var key = OriginId(keyName + "#", originIdColumn, generatedEntityId);
+        fi.Add(new FilterItem(originIdColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
         db.Row.Remove(fi, null, "Zeilengenerator im Formular");
         fi.Dispose();
 
@@ -123,9 +123,9 @@ internal class AdderItem : IReadableTextWithKey {
 
     public QuickImage? SymbolForReadableText() => null;
 
-    private static string OriginId(string keyAndInfos, ColumnItem OriginIDColumn, string GeneratedEntityID) {
-        if (OriginIDColumn?.Database is not { IsDisposed: false }) { return string.Empty; }
-        return GeneratedEntityID + "\\" + keyAndInfos.SplitBy("#")[0];
+    private static string OriginId(string keyAndInfos, ColumnItem? originIdColumn, string generatedEntityId) {
+        if (originIdColumn?.Database is not { IsDisposed: false }) { return string.Empty; }
+        return generatedEntityId + "\\" + keyAndInfos.SplitBy("#")[0];
     }
 
     #endregion

@@ -30,7 +30,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, IReadableTextWithPropertyChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IPropertyChangedFeedback, ICloneable, IEditable {
+public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase, IDisposableExtended, ICloneable, IEditable {
 
     #region Fields
 

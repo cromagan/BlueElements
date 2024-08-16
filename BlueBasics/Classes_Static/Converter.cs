@@ -25,8 +25,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-#nullable enable
-
 namespace BlueBasics;
 
 public static class Converter {

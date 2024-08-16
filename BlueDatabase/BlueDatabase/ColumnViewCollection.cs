@@ -31,7 +31,7 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName, IReadableTextWithKey {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey {
 
     #region Fields
 

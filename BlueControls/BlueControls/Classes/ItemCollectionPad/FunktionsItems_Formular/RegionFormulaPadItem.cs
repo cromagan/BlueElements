@@ -33,8 +33,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 
-#nullable enable
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>

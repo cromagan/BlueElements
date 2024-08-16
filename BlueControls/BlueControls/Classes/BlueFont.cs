@@ -466,7 +466,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _symbolOfLineSym;
     }
 
-    public new string ToParseableString() => ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
+    public string ToParseableString() => ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
 
     internal SizeF CharSize(char c) {
         if (c <= _charSize.GetUpperBound(0)) {

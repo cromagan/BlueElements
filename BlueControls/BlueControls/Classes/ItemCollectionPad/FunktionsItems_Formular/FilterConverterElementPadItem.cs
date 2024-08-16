@@ -34,11 +34,11 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable {
+public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 
-    private string _fehler_text = string.Empty;
+    private string _fehlerText = string.Empty;
     private string _filterSpalte = string.Empty;
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_schreibungsneutral;
     private string _filterwert = string.Empty;
@@ -67,11 +67,11 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     [Description("Text, der angezeigt wird, wenn kein Filter generiert werden kann")]
     [DefaultValue("")]
     public string Fehler_Text {
-        get => _fehler_text;
+        get => _fehlerText;
         set {
             if (IsDisposed) { return; }
-            if (value == _fehler_text) { return; }
-            _fehler_text = value;
+            if (value == _fehlerText) { return; }
+            _fehlerText = value;
             OnPropertyChanged();
         }
     }
@@ -150,7 +150,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
-        con.ErrorText = _fehler_text;
+        con.ErrorText = _fehlerText;
         con.DoDefaultSettings(parent, this, mode);
 
         return con;
@@ -200,7 +200,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
                 return true;
 
             case "errortext":
-                _fehler_text = value.FromNonCritical();
+                _fehlerText = value.FromNonCritical();
                 return true;
 
             case "value":
@@ -254,7 +254,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);
         result.ParseableAdd("Filter", _filtertype);
-        result.ParseableAdd("errortext", _fehler_text);
+        result.ParseableAdd("errortext", _fehlerText);
 
         //if (DatabaseInput is not Database dbin || dbin.IsDisposed) {
         //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;

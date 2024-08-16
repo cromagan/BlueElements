@@ -34,8 +34,6 @@ using System.Windows.Forms;
 using static BlueBasics.Converter;
 using Orientation = BlueBasics.Enums.Orientation;
 
-#nullable enable
-
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]

@@ -29,8 +29,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
-#nullable enable
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {

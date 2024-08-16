@@ -51,7 +51,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private AddType _addAlloweds = AddType.Text;
 
-    private ListBoxAppearance _appearance = ListBoxAppearance.Listbox;
+    private ListBoxAppearance _appearance;
 
     private bool _autoSort = true;
 
@@ -1056,7 +1056,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         var showAdd = AddAllowed != AddType.None && isInForm;
 
-        showAdd = (showAdd && (SliderY.Value == SliderY.Maximum || _mousemoved));
+        showAdd = (showAdd && (Math.Abs(SliderY.Value - SliderY.Maximum) < Constants.IntTolerance || _mousemoved));
 
         if (showAdd) {
             btnPlus.Left = 2;

@@ -35,14 +35,12 @@ using static BlueBasics.Converter;
 using BlueControls.Forms;
 using BlueControls.BlueDatabaseDialogs;
 
-#nullable enable
-
 namespace BlueControls.Controls;
 
 // https://stackoverflow.com/questions/724143/how-do-i-create-a-delegate-for-a-net-property
 // http://peisker.net/dotnet/propertydelegates.htm
 // http://geekswithblogs.net/akraus1/archive/2006/02/10/69047.aspx
-public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
+public class FlexiControlForProperty<T> : FlexiControl {
 
     #region Fields
 

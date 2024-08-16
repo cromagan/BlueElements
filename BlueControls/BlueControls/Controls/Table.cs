@@ -58,7 +58,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControlReciverSender, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase {
+public partial class Table : GenericControlReciverSender, IContextMenu, ITranslateable, IHasDatabase {
 
     #region Fields
 

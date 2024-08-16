@@ -27,8 +27,6 @@ using System.Linq;
 
 namespace BlueDatabase;
 
-#nullable enable
-
 public static class RowDrawDataExtensions {
 
     #region Methods

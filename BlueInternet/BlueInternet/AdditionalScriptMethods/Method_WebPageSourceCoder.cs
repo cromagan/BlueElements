@@ -20,7 +20,6 @@ using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using CefSharp.OffScreen;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

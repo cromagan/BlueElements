@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
@@ -33,7 +32,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone //  System.Windows.Forms.UserControl //
+public partial class Filterleiste : GenericControlReciverSender //  System.Windows.Forms.UserControl //
 {
     #region Fields
 

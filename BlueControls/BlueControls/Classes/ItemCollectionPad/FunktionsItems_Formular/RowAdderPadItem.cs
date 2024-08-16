@@ -38,7 +38,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeugt eine liste mit Zeile, die eine andere Tabelle befüllen können
 /// </summary>
-public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable, ISimpleEditor {
+public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable, ISimpleEditor {
 
     #region Fields
 

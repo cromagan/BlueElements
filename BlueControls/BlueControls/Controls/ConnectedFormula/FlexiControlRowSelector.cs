@@ -21,14 +21,11 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
-#nullable enable
 
 namespace BlueControls.ConnectedFormula;
 

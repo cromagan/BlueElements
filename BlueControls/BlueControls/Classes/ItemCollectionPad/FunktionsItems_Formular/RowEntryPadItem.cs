@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -66,7 +65,6 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     #endregion
 
     #region Methods
-
 
     public override bool ParseThis(string key, string value) {
         switch (key) {

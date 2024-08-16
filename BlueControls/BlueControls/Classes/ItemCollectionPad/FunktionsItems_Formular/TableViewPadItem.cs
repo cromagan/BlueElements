@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable {
+public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 

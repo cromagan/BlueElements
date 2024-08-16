@@ -36,7 +36,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable {
+public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 

@@ -38,8 +38,6 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-#nullable enable
-
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("TextChanged")]
 public partial class ComboBox : TextBox, ITranslateable {
@@ -423,12 +421,12 @@ public partial class ComboBox : TextBox, ITranslateable {
         _ = Focus();
     }
 
-    private void Item_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        if (_btnDropDownIsIn) { return; }
-        FloatingForm.Close(this);
-        //Invalidate();
-    }
+    //private void Item_PropertyChanged(object sender, System.EventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    if (_btnDropDownIsIn) { return; }
+    //    FloatingForm.Close(this);
+    //    //Invalidate();
+    //}
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 

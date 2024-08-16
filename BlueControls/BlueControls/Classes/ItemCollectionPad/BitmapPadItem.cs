@@ -175,7 +175,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             ot = vbmp.ValueBitmap;
         } else if (variable is VariableString filn) {
             if (FileExists(filn.ValueString)) {
-                ot = (Bitmap)Image_FromFile(filn.ValueString);
+                ot = Image_FromFile(filn.ValueString) as Bitmap;
             } else {
                 return false;
             }

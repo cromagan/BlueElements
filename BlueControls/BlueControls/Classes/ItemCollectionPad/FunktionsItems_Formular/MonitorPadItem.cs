@@ -27,8 +27,6 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
 
-#nullable enable
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
@@ -68,7 +66,6 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
         return con;
     }
-
 
     public override string ReadableText() {
         const string txt = "Monitor: ";

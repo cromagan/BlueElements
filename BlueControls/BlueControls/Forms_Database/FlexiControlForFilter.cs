@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -34,12 +33,10 @@ using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
-#nullable enable
-
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : GenericControlReciverSender, IDisposableExtended, IHasSettings {
+public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSettings {
 
     #region Fields
 

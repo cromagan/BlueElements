@@ -32,15 +32,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
 
-#nullable enable
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IReadableText, IAutosizable {
+public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 

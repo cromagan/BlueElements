@@ -688,7 +688,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return I;
     }
 
-    public new string ToParseableString() {
+    public string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
         //result.ParseableAdd("ID", KeyName);

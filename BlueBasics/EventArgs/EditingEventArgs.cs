@@ -21,12 +21,6 @@ namespace BlueBasics.EventArgs;
 
 public class EditingEventArgs : System.EventArgs {
 
-    #region Constructors
-
-    public EditingEventArgs() : base() { }
-
-    #endregion
-
     #region Properties
 
     public bool Editing { get; set; }

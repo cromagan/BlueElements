@@ -30,10 +30,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
-#nullable enable
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 

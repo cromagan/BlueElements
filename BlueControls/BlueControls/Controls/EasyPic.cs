@@ -23,7 +23,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueScript.Variables;
 using System;
 using System.ComponentModel;
 using System.Drawing;

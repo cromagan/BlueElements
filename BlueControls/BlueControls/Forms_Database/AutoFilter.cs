@@ -32,8 +32,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 
-#nullable enable
-
 namespace BlueControls.BlueDatabaseDialogs;
 
 public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserControl //

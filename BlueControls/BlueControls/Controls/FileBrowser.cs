@@ -25,7 +25,6 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-using BlueScript.Variables;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

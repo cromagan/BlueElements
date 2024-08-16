@@ -35,8 +35,6 @@ using static BlueBasics.IO;
 using BlueBasics.Interfaces;
 using BlueBasics.EventArgs;
 
-#nullable enable
-
 namespace BlueControls.Forms;
 
 public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {

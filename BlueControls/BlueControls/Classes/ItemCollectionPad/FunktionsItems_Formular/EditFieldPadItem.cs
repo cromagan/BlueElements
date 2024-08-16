@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadableText, IAutosizable {
+public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
 

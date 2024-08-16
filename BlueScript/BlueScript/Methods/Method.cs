@@ -29,7 +29,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
-public abstract class Method : IReadableTextWithKey, IReadableText {
+public abstract class Method : IReadableTextWithKey {
 
     #region Fields
 

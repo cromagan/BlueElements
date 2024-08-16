@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace BlueScript;
 
-public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IErrorCheckable, IHasKeyName, IPropertyChangedFeedback, IComparable {
+public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IErrorCheckable, IComparable {
 
     #region Fields
 
@@ -244,8 +244,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         return null;
     }
 
-    public override string ToString() => ToParseableString();
-
     public virtual string ToParseableString() {
         try {
             if (IsDisposed) { return string.Empty; }
@@ -266,6 +264,8 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             return ToParseableString();
         }
     }
+
+    public override string ToString() => ToParseableString();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
