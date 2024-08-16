@@ -40,7 +40,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ValueChanged")]
-public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IDisposableExtended {
+public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable {
 
     #region Fields
 
@@ -83,6 +83,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     /// <param name="captionText"></param>
     /// <param name="width"></param>
+    /// <param name="isCaption"></param>
     public FlexiControl(string captionText, int width, bool isCaption) : base(false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
@@ -129,8 +130,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             UpdateControls();
         }
     }
-    public bool Initializing { get; private set; } = false;
-    public bool Allinitialized { get; private set; } = false;
+
+    public bool Allinitialized { get; private set; }
 
     [DefaultValue("")]
     public string AllowedChars {
@@ -243,6 +244,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Invalidate();
         }
     }
+
+    public bool Initializing { get; private set; }
 
     ///// <summary>
     ///// Wenn True, wird ValueChanged NICHT ausgelöst
@@ -369,26 +372,25 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
-    
         switch (_editType) {
             case EditTypeFormula.Line:
-                 Control_Create_Line();
+                Control_Create_Line();
                 break;
 
             case EditTypeFormula.Textfeld:
-                 Control_Create_TextBox();
+                Control_Create_TextBox();
                 break;
 
             case EditTypeFormula.Listbox:
-                 Control_Create_ListBox();
+                Control_Create_ListBox();
                 break;
 
             case EditTypeFormula.Textfeld_mit_Auswahlknopf:
-                 Control_Create_ComboBox();
+                Control_Create_ComboBox();
                 break;
 
             case EditTypeFormula.Ja_Nein_Knopf:
-                 Control_Create_ButtonYesNo();
+                Control_Create_ButtonYesNo();
                 break;
 
             case EditTypeFormula.None:
@@ -405,15 +407,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case EditTypeFormula.Farb_Auswahl_Dialog:
-                 Control_Create_ButtonColor();
+                Control_Create_ButtonColor();
                 break;
 
             case EditTypeFormula.Button:
-                 Control_Create_ButtonCommand();
+                Control_Create_ButtonCommand();
                 break;
 
             case EditTypeFormula.SwapListBox:
-                 Control_Create_SwapListBox();
+                Control_Create_SwapListBox();
                 break;
 
                 //default:
@@ -469,7 +471,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public void StyleTextBox(TextBox? control) {
-        if(control == null) { return; } 
+        if (control == null) { return; }
         //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.Verhalten = _multiLine || Height > 20
@@ -993,9 +995,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
     }
 
-
     private void UpdateControls() {
-        if (_captionObject is Caption c) { c.Translate = _translateCaption; }
+        if (_captionObject is { IsDisposed: false } c) { c.Translate = _translateCaption; }
 
         foreach (Control control in Controls) {
             if (control != _infoCaption) {
@@ -1125,7 +1126,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (IsFilling) { return; }
         ValueSet(((TextBox)sender).Text, false);
     }
-
 
     private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
 

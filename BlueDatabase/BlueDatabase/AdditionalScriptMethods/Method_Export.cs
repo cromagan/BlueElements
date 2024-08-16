@@ -122,7 +122,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
-                        var bytes = Database.ToListOfByte(db, 100, db.FileStateUTCDate);
+                        var bytes = Database.ToListOfByte(db, 100, db.FileStateUtcDate);
 
                         if (bytes == null) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
 

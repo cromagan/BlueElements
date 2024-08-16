@@ -218,15 +218,15 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
                 break;
 
             case ButtonArgs.Keine_Zeile:
-                enabled = RowsInput != null && RowsInput.Count == 0;
+                enabled = RowsInput is { Count: 0 };
                 break;
 
             case ButtonArgs.Genau_eine_Zeile:
-                enabled = RowsInput != null && RowsInput.Count == 1;
+                enabled = RowsInput is { Count: 1 };
                 break;
 
             case ButtonArgs.Eine_oder_mehr_Zeilen:
-                enabled = RowsInput != null && RowsInput.Count > 0;
+                enabled = RowsInput is { Count: > 0 };
                 break;
 
             default:
@@ -270,7 +270,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         object? ai = null;
         var row = RowSingleOrNull();
 
-        if (row?.Database is Database db && !db.IsDisposed) {
+        if (row?.Database is { IsDisposed: false } db) {
             vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = new VariableCollection();
@@ -280,9 +280,9 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         var fis = string.Empty;
 
-        if (FilterInput is FilterCollection fi) {
+        if (FilterInput is { IsDisposed: false } fi) {
             for (var fz = 0; fz < fi.Count; fz++) {
-                if (fi[fz] is FilterItem thisf) {
+                if (fi[fz] is { IsDisposed: false } thisf) {
                     var nam = "Filter" + fz;
                     vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
                     fis = fis + nam + ",";
@@ -310,13 +310,11 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         var f = ufb.DoIt(vars, args, fis, rn, ai);
 
-        if(RowCollection.DidRows.Count >0) {
+        if (RowCollection.DidRows.Count > 0) {
             f = "Ein anderer Prozess ist noch aktiv.";
         } else {
             RowCollection.DoAllInvalidatedRows(row, true);
         }
-
-       
 
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");

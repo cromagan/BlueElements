@@ -137,11 +137,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
     protected override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
-            if (FilterOutput.Count == 1) {
-                if (FilterOutput.Rows.Count == 1) {
-                    var toAdd = FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
-                    this.SettingsAdd(toAdd);
-                }
+            if (FilterOutput is { Count: 1, Rows.Count: 1 }) {
+                var toAdd = FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
+                this.SettingsAdd(toAdd);
             }
         }
 
@@ -160,7 +158,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         if (filterSingle != null) {
             _doFilterDeleteButton = filterSingle.FilterType != FilterType.Instr_GroßKleinEgal;
             if (filterSingle.SearchValue.Count > 1) { _doFilterDeleteButton = true; }
-            if (f.GetComboBox() is ComboBox cb && cb.WasThisValueClicked()) { _doFilterDeleteButton = true; }
+            if (f.GetComboBox() is { IsDisposed: false } cb && cb.WasThisValueClicked()) { _doFilterDeleteButton = true; }
             _fromInputFilter = true;
             _origin = filterSingle.Origin;
         } else {
@@ -234,7 +232,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
             btn.ImageCode = "Trichter|16||1";
             btn.Text = filterSingle.ReadableText();
         } else {
-            if (filterSingle != null && filterSingle.SearchValue.Count > 0 && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
+            if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
                 btn.ImageCode = "Trichter|16";
                 btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString());
             } else {
@@ -262,7 +260,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
             return;
         }
 
-        if (FilterSingleColumn is not ColumnItem c) { return; }
+        if (FilterSingleColumn is not { IsDisposed: false } c) { return; }
 
         AutoFilter autofilter = new(c, FilterInput, null, Width);
         var p = PointToScreen(Point.Empty);
@@ -316,7 +314,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
                         filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _origin);
                     }
                 } else {
-                    if (f.GetComboBox() is ComboBox cmb && cmb.WasThisValueClicked()) {
+                    if (f.GetComboBox() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
                         _doFilterDeleteButton = true;
                         filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _origin);
                     } else if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Textteil) {
@@ -331,7 +329,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
     }
 
     private void GenerateQickInfoText(FilterItem? filterSingle) {
-        if (FilterSingleColumn == null || FilterSingleColumn.IsDisposed) {
+        if (FilterSingleColumn is not { IsDisposed: not true }) {
             QuickInfo = string.Empty;
             return;
         }
@@ -391,7 +389,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
 
         #region Wenn keine Spalte vorhanden, Fehler machen
 
-        if (FilterSingleColumn == null || FilterSingleColumn.IsDisposed) {
+        if (FilterSingleColumn is not { IsDisposed: not true }) {
             f.DisabledReason = "Bezug zum Filter verloren.";
             f.Caption = "?";
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
@@ -410,7 +408,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
             f.CaptionPosition = DefaultCaptionPosition;
             f.Caption = FilterSingleColumn.ReadableText() + ":";
             f.EditType = EditTypeFormula.Button;
-            if (f.GetButton() is Button b) { DoButtonStyle(b); }
+            if (f.GetButton() is { IsDisposed: false } b) { DoButtonStyle(b); }
             return;
         }
 
@@ -421,14 +419,14 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IDispo
         if (showDelFilterButton) {
             f.CaptionPosition = CaptionPosition.ohne;
             f.EditType = EditTypeFormula.Button;
-            if (f.GetButton() is Button b) { DoButtonStyle(b); }
+            if (f.GetButton() is { IsDisposed: false } b) { DoButtonStyle(b); }
             return;
         }
 
         #endregion
 
         if (filterSingle != null) {
-            if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
+            if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 }) {
                 //texteingabe = true;
                 //showWählen = false;
                 nvalue = filterSingle.SearchValue[0];

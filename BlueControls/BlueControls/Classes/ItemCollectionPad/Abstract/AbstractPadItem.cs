@@ -58,8 +58,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     private int _zoomPadding;
 
-    public abstract string MyClassId { get; }
-
     #endregion
 
     #region Constructors
@@ -97,8 +95,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
-
     public ObservableCollection<PointM> MovablePoint { get; } = [];
+    public abstract string MyClassId { get; }
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {
@@ -469,7 +467,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return x;
     }
 
-
     protected abstract RectangleF CalculateUsedArea();
 
     protected virtual void Dispose(bool disposing) {
@@ -490,10 +487,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         try {
             if (!forPrinting) {
-                if (positionModified.Width > 1 && positionModified.Height > 1) {
+                if (positionModified is { Width: > 1, Height: > 1 }) {
                     gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionModified);
                 }
-                if (positionModified.Width < 1 && positionModified.Height < 1) {
+                if (positionModified is { Width: < 1, Height: < 1 }) {
                     gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
                     gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
                 }

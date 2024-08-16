@@ -121,7 +121,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             return f?.SearchValue[0] ?? string.Empty;
         }
         set {
-            if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+            if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
             var f = this[null];
             if (f != null) {
@@ -137,7 +137,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public ReadOnlyCollection<RowItem> Rows {
         get {
-            if (IsDisposed || Database is not Database db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
+            if (IsDisposed || Database is not { IsDisposed: false }) { return new List<RowItem>().AsReadOnly(); }
             _rows ??= CalculateFilteredRows();
             return _rows.AsReadOnly();
         }
@@ -145,7 +145,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public RowItem? RowSingleOrNull {
         get {
-            if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+            if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
             _rows ??= CalculateFilteredRows();
             return _rows.Count != 1 ? null : _rows[0];
         }
@@ -335,8 +335,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <returns></returns>
     public string InitValue(ColumnItem column, bool firstToo) {
         if (Count == 0) { return string.Empty; }
-        if (column == null || column.IsDisposed) { return string.Empty; }
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (column is not { IsDisposed: not true }) { return string.Empty; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return string.Empty; }
 
         if (column.Function is not ColumnFunction.Normal
                            and not ColumnFunction.Schl¸sselspalte
@@ -354,15 +354,15 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == db.Column.SysRowState) { return string.Empty; }
 
         var fi = this[column];
-        if (fi == null) { return string.Empty; }
-
-        if (fi.FilterType is not FilterType.Istgleich
-                         and not FilterType.Istgleich_GroﬂKleinEgal
-                         and not FilterType.Istgleich_ODER_GroﬂKleinEgal
-                         and not FilterType.Istgleich_UND_GroﬂKleinEgal
-                         and not FilterType.Instr
-                         and not FilterType.Instr_GroﬂKleinEgal
-                         and not FilterType.Instr_UND_GroﬂKleinEgal) { return string.Empty; }
+        if (fi is not {
+            FilterType: not (not FilterType.Istgleich
+                and not FilterType.Istgleich_GroﬂKleinEgal
+                and not FilterType.Istgleich_ODER_GroﬂKleinEgal
+                and not FilterType.Istgleich_UND_GroﬂKleinEgal
+                and not FilterType.Instr
+                and not FilterType.Instr_GroﬂKleinEgal
+                and not FilterType.Instr_UND_GroﬂKleinEgal)
+        }) { return string.Empty; }
 
         return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
     }
@@ -371,7 +371,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return false; }
         if (fc == this) { return false; }
 
-        if (fc != null && fc.IsDisposed) { fc = null; }
+        if (fc is { IsDisposed: true }) { fc = null; }
 
         if (fc == null) { return true; }
 
@@ -391,10 +391,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public bool IsRowFilterActiv() {
         var fi = this[null];
 
-        return fi != null && fi.FilterType is FilterType.Instr or FilterType.Instr_UND_GroﬂKleinEgal or FilterType.Instr_GroﬂKleinEgal;
+        return fi is { FilterType: FilterType.Instr or FilterType.Instr_UND_GroﬂKleinEgal or FilterType.Instr_GroﬂKleinEgal };
     }
 
-    public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
+    public bool MayHaveRowFilter(ColumnItem? column) => column is { IgnoreAtRowFilter: false } && IsRowFilterActiv();
 
     public void Normalize() {
         foreach (var thisf in this) {
@@ -571,7 +571,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         List<string> result = [];
 
         foreach (var thisFilterItem in _internal) {
-            if (thisFilterItem != null && !thisFilterItem.IsDisposed && thisFilterItem.IsOk()) {
+            if (thisFilterItem is { IsDisposed: false } && thisFilterItem.IsOk()) {
                 result.ParseableAdd("Filter", thisFilterItem as IStringable);
             }
         }
@@ -630,7 +630,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private List<RowItem> CalculateFilteredRows() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return []; }
 
         var fi2 = _internal.ToArray();
 
@@ -719,13 +719,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void Row_Added(object sender, RowChangedEventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (_rows == null) { return; }
         if (e.Row.MatchesTo(_internal.ToArray())) { Invalidate_FilteredRows(); }
     }
 
     private void Row_RowRemoved(object sender, RowEventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { Invalidate_FilteredRows(); }
     }

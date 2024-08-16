@@ -88,7 +88,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 db = Database.GetById(ci, false, null, true);
             }
 
-            if (db != null && !db.IsDisposed) {
+            if (db is { IsDisposed: false }) {
                 Database = db;
             } else {
                 Database = null;
@@ -101,7 +101,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     #region Methods
 
     public static void AddUndosToTable(Table tblUndo, Database? database, float maxAgeInDays) {
-        if (database is Database db && !db.IsDisposed) {
+        if (database is { IsDisposed: false } db) {
             UpdateStatusBar(FehlerArt.Info, $"Erstelle Tabellen Ansicht des Undo-Speichers der Datenbank '{db.Caption}'", true);
 
             List<UndoItem> un = [.. db.Undo]; // Kann und wird verändert!
@@ -113,19 +113,16 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     public static void AddUndoToTable(Table tblUndo, UndoItem work, Database db, float maxAgeInDays) {
-
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
         var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToParseableString(), null, "New Undo Item");
         if (r == null) { return; }
 
-
-
         r.CellSet("ColumnName", work.ColName, string.Empty);
         r.CellSet("RowKey", work.RowKey, string.Empty);
-        if (db.Column[work.ColName] is ColumnItem col && !col.IsDisposed) {
+        if (db.Column[work.ColName] is { IsDisposed: false } col) {
             r.CellSet("columnCaption", col.Caption, string.Empty);
         }
-        if (db.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
+        if (db.Row.SearchByKey(work.RowKey) is { IsDisposed: false } row) {
             r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
         } else if (!string.IsNullOrEmpty(work.RowKey)) {
             r.CellSet("RowFirst", "[gelöscht]", string.Empty);
@@ -220,7 +217,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             }
         }
 
-        if (x.Column["Symbol"] is ColumnItem c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
+        if (x.Column["Symbol"] is { IsDisposed: false } c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
 
         x.RepairAfterParse();
 
@@ -241,7 +238,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         _frmHeadEditorFormClosingIsin = true;
         base.OnFormClosing(e);
 
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
         WriteInfosBack();
         Database = null;
@@ -250,7 +247,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
 
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         PermissionGroups_NewRow.ItemClear();
         PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
@@ -267,7 +264,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             btnSortRichtung.Checked = db.SortDefinition.Reverse;
             if (db.SortDefinition?.Columns != null) {
                 foreach (var thisColumn in db.SortDefinition.Columns) {
-                    if (thisColumn != null && !thisColumn.IsDisposed) {
+                    if (thisColumn is { IsDisposed: false }) {
                         lbxSortierSpalten.AddAndCheck(ItemOf(thisColumn));
                     }
                 }
@@ -304,14 +301,14 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnOptimize_Click(object sender, System.EventArgs e) => Database?.Optimize();
 
     private void btnSkripte_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         var se = new DatabaseScriptEditor(db);
         _ = se.ShowDialog();
     }
 
     private void btnSpaltenAnordnungen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         var x = new ColumnArrangementPadEditor(db);
         _ = x.ShowDialog();
@@ -320,20 +317,20 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void btnTabellenAnsicht_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         var c = new TableView(db, false, true);
         c.ShowDialog();
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         db.Column.GenerateAndAddSystem();
     }
 
     private void GenerateInfoText() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || Database is not { IsDisposed: false }) {
             capInfo.Text = "Datenbank-Fehler";
             return;
         }
@@ -341,7 +338,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         var t = "<b>Tabelle:</b> <tab>" + Database.TableName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
         t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser + "<br>";
-        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUTCDate.ToString7() + "<br>";
+        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUtcDate.ToString7() + "<br>";
         t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueId + "<br>";
         capInfo.Text = t.TrimEnd("<br>");
     }
@@ -364,7 +361,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (IsDisposed || sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || sender is not Table { Database: { IsDisposed: false } db }) { return; }
         ColumnItem? column = null;
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
@@ -375,7 +372,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (IsDisposed || sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || sender is not Table { Database: { IsDisposed: false } db } tbl) { return; }
         //RowItem? row = null;
         ColumnItem? column = null;
         //if (e.HotItem is RowItem r) { row = r; }
@@ -396,7 +393,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database == null || Database.IsDisposed) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database is not { IsDisposed: not true }) { return; }
 
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;
@@ -430,7 +427,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         // Identisch in DatabaseHeadEditor und DatabaseScriptEditor
         var l = variableEditor.GetCloneOfCurrent();
 
-        if (l is VariableCollection vl) {
+        if (l is { } vl) {
             var l2 = new List<VariableString>();
             foreach (var thisv in vl) {
                 if (thisv is VariableString vs) {

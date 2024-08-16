@@ -43,7 +43,7 @@ public class Script {
                     var varname = "c_" + thisValue.ToUpper().Replace(".", "_").Replace(" ", "_").Replace(":", "_").Replace("/", "_").Replace("\\", "_");
 
                     var comment = string.Empty;
-                    if (Variables.Get(varname) is Variable tmpvar) {
+                    if (Variables.Get(varname) is { } tmpvar) {
                         comment = tmpvar.Comment;
                         Variables.Remove(tmpvar);
                     }
@@ -111,7 +111,7 @@ public class Script {
                         if (!f.AllOk) {
                             return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
                         }
-                        var infos = new CanDoFeedback(f.ContinuePosition, f.AttributeText, string.Empty, ld);
+
                         var fn = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
                         return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript);
                     }

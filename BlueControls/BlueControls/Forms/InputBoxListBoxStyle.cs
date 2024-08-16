@@ -56,7 +56,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
     #region Methods
 
     public static string Show(string txt, List<string>? items) {
-        if (items == null || items.Count == 0) {
+        if (items is not { Count: not 0 }) {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
 

@@ -104,7 +104,7 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasDatabase {
         }
         var m = "Datenbank-Fehler";
 
-        if (Database != null && !Database.IsDisposed) {
+        if (Database is { IsDisposed: false }) {
             m = Database.ImportCsv(_originalImportText, optSpalteZuordnen.Checked, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
         }
 

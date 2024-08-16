@@ -50,7 +50,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
         f.Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
+        if (string.IsNullOrEmpty(_showformat) && database is { Column.Count: > 0 } && database.Column.First() is { IsDisposed: false } fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
     }
@@ -134,7 +134,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
         } else {
             var fh = this.GetSettings(FilterHash());
 
-            if (!string.IsNullOrEmpty(fh) && cb.Items().Get(fh) is AbstractListItem ali) {
+            if (!string.IsNullOrEmpty(fh) && cb.Items().Get(fh) is { } ali) {
                 f.ValueSet(ali.KeyName, true);
             }
         }

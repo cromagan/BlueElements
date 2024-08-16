@@ -112,7 +112,7 @@ public class BackupVerwalter {
             for (var els = von; els < bis; els++) {
                 var dt = DateTime.UtcNow.AddDays(-els);
 
-                if (FileOf(dt) is string f) {
+                if (FileOf(dt) is { } f) {
                     if (filc > maxfiles || IsThereALaterVersion(els, bis)) {
                         _deletable.Add(f);
                     } else {

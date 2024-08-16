@@ -112,13 +112,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result = [..base.GetProperties(widthOfControl)];
-
-  
+        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
-        if (DatabaseOutput is Database db && !db.IsDisposed) {
+        if (DatabaseOutput is { IsDisposed: false } db) {
             var u2 = new List<AbstractListItem>();
             foreach (var thisC in db.ColumnArrangements) {
                 u2.Add(ItemOf(thisC));
@@ -126,7 +124,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IRe
             result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
         }
 
-        if (DatabaseOutput is Database db2 && !db2.IsDisposed) {
+        if (DatabaseOutput is { IsDisposed: false }) {
             var u = new List<AbstractListItem>();
             u.AddRange(ItemsOf(typeof(Filterausgabe)));
             result.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));

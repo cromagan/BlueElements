@@ -251,7 +251,7 @@ public static class AbstractListItemExtension {
                 break;
         }
 
-        if (checkedItemsAtRow?.Database is Database db && !db.IsDisposed) {
+        if (checkedItemsAtRow?.Database is { IsDisposed: false }) {
             l.AddRange(checkedItemsAtRow.CellGetList(column));
             l = l.SortedDistinctList();
         }
@@ -295,7 +295,7 @@ public static class AbstractListItemExtension {
         if (list == null) { return l; }
 
         foreach (var thisRow in list) {
-            if (thisRow != null && !thisRow.IsDisposed) {
+            if (thisRow is { IsDisposed: false }) {
                 l.Add(ItemOf(thisRow, layoutId));
             }
         }

@@ -63,7 +63,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         Database = database;
 
-        if (database is Database db && !db.IsDisposed) {
+        if (database is { IsDisposed: false } db) {
             if (db.ColumnArrangements.Count > 1) {
                 _arrangement = db.ColumnArrangements[1].KeyName;
             } else if (db.ColumnArrangements.Count > 0) {
@@ -111,7 +111,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     public ColumnViewCollection? CloneOfCurrentArrangement() {
         // Überprüfen, ob die Datenbank oder das aktuelle Objekt verworfen wurde
-        if (IsDisposed || Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) {
             return null;
         }
         // Versuchen, die aktuelle Anordnung zu klonen
@@ -121,7 +121,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     public int IndexOfCurrentArr() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return -1; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return -1; }
         return db.ColumnArrangements.IndexOf(_arrangement);
     }
 
@@ -141,9 +141,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         var arn = IndexOfCurrentArr();
 
@@ -159,7 +159,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         ca.ShowAllColumns();
@@ -169,7 +169,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         var n = InputBox.Show("Umbenennen:", ca.KeyName, FormatHolder.Text);
         if (string.IsNullOrEmpty(n)) { return; }
@@ -180,8 +180,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         List<AbstractListItem> aa = [];
         aa.AddRange(ItemsOf(Database.Permission_AllUsed(false)));
@@ -194,7 +194,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         var ca = CloneOfCurrentArrangement();
 
@@ -229,7 +229,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed || TableView.ErrorMessage(db, EditableErrorReasonType.EditAcut)) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db || TableView.ErrorMessage(db, EditableErrorReasonType.EditAcut)) { return; }
 
         ColumnItem? vorlage = null;
         if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column?.Database == db) {
@@ -287,9 +287,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         var ic = ItemsOf(db.Column, true);
 
@@ -300,14 +300,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         }
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
-        if (r == null || r.Count == 0) { return; }
+        if (r is not { Count: not 0 }) { return; }
         ca.Add(db.Column[r[0]], false);
         ChangeCurrentArrangementto(ca);
         ShowOrder();
     }
 
     private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         ca.HideSystemColumns();
         ChangeCurrentArrangementto(ca);
@@ -328,7 +328,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void ChangeCurrentArrangementto(ColumnViewCollection cv) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         var no = IndexOfCurrentArr();
         if (no < 0 || no >= db.ColumnArrangements.Count) { return; }
 
@@ -345,9 +345,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void chkShowCaptions_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         ca.ShowHead = chkShowCaptions.Checked;
 
@@ -356,11 +356,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void FixColumnArrangement() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (Generating || Sorting) { return; }
         if (db.ColumnArrangements.Count == 0) { return; }
 
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) { return; }
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
         var did = false;
 
         Fixing++;
@@ -400,7 +400,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
             #region Permanent
 
-            if (ca[itemsdone.Count] is ColumnViewItem cvi) {
+            if (ca[itemsdone.Count] is { } cvi) {
                 if (permanentPossible) {
                     if (leftestItem.Permanent) {
                         cvi.ViewType = ViewType.PermanentColumn;
@@ -464,7 +464,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
 
     private ColumnPadItem? LeftestItem(IEnumerable<AbstractPadItem> ignore) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
         if (Pad?.Item == null) { return null; }
 
         ColumnPadItem? found = null;
@@ -489,7 +489,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void ShowOrder() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (Pad?.Item == null) { return; }
 
         if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
@@ -499,7 +499,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         ColumnPadItem? anyitem = null;
 
-        if (CloneOfCurrentArrangement() is not ColumnViewCollection ca) {
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) {
             Generating = false;
             return;
         }
@@ -508,7 +508,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         var x = 0f;
         foreach (var thisc in ca) {
-            if (thisc?.Column is ColumnItem c) {
+            if (thisc?.Column is { IsDisposed: false } c) {
                 var it = new ColumnPadItem(c, thisc.ViewType == ViewType.PermanentColumn);
                 Pad.Item.Add(it);
                 it.SetLeftTopPoint(x, 0);
@@ -536,7 +536,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var kx = 0f;
         foreach (var thisCombi in dbColumnCombi) {
             foreach (var thisc in ca) {
-                if (thisc?.Column is ColumnItem c) {
+                if (thisc?.Column is { IsDisposed: false } c) {
                     var it = Pad.Item[c.Database?.TableName + "|" + c.KeyName] as ColumnPadItem;
 
                     if (c.LinkedDatabase != null) {
@@ -557,10 +557,10 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                             foreach (var thisitem in c.LinkedCellFilter) {
                                 var tmp = thisitem.SplitBy("|");
 
-                                if (c.Database is Database db2 && !db2.IsDisposed)
+                                if (c.Database is { IsDisposed: false } db2)
                                     foreach (var thisc2 in db2.Column) {
                                         if (tmp[2].Contains("~" + thisc2.KeyName + "~")) {
-                                            if (thisc2.Database is Database db3 && !db3.IsDisposed) {
+                                            if (thisc2.Database is { IsDisposed: false } db3) {
                                                 var rkcolit = (ColumnPadItem?)Pad.Item[db3.TableName + "|" + thisc2.KeyName];
                                                 if (rkcolit != null) {
                                                     _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));

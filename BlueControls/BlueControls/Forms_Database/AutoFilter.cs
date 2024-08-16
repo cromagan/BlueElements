@@ -71,9 +71,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     #region Methods
 
     public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
-        if (column == null || column.IsDisposed) { return []; }
+        if (column is not { IsDisposed: not true }) { return []; }
 
-        if (fc == null || fc.Count < 0) { return column.Contents(); }
+        if (fc is not { Count: >= 0 }) { return column.Contents(); }
         var fc2 = (FilterCollection)fc.Clone("autofilter");
         fc2.Remove(column);
 
@@ -165,7 +165,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         #region Wenn ein Filter übergeben wurde, die Einträge markieren
 
-        if (fc?[_column] is FilterItem myFilter) {
+        if (fc?[_column] is { IsDisposed: false } myFilter) {
             if (myFilter.FilterType.HasFlag(FilterType.Istgleich)) {
                 if (myFilter.SearchValue.Count == 0 || (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]))) {
                     // Filter Leere anzeigen
@@ -347,9 +347,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         BringToFront();
         if (Timer1x.Interval < 5000) {
             Timer1x.Interval = 5000;
-            if (txbEingabe.Enabled && txbEingabe.Visible) {
-                if (!txbEingabe.Focused) { _ = txbEingabe.Focus(); }
-            }
+            if (txbEingabe.Enabled && txbEingabe is { Visible: true, Focused: false }) { _ = txbEingabe.Focus(); }
         }
     }
 

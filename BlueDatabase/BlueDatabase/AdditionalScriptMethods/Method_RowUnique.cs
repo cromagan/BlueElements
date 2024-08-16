@@ -55,9 +55,8 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
-    public override MethodType MethodType => MethodType.Database |  MethodType.ManipulatesUser ;
+    public override MethodType MethodType => MethodType.Database | MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
@@ -73,22 +72,17 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
     #region Methods
 
     public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {
-
         RowItem? newrow;
         string message;
         var t = Stopwatch.StartNew();
 
         do {
             (newrow, message) = RowCollection.UniqueRow(allFi, coment);
-            
-            if(newrow != null && string.IsNullOrEmpty(message)) { break; }
-            if(t.Elapsed.TotalMinutes > 5) { break; }
+
+            if (newrow != null && string.IsNullOrEmpty(message)) { break; }
+            if (t.Elapsed.TotalMinutes > 5) { break; }
             Generic.Pause(5, false);
-
         } while (true);
-
-        
-      
 
         if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
 
@@ -105,7 +99,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         }
 
         foreach (var thisFi in allFi) {
-            if (thisFi.Column is not ColumnItem c) {
+            if (thisFi.Column is not { IsDisposed: false } c) {
                 return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
             }
 

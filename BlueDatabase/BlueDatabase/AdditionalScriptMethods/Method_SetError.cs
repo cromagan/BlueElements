@@ -63,13 +63,13 @@ public class Method_SetError : Method_Database {
         //if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         var r = MyRow(scp);
-        if (r == null || r.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
+        if (r is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
 
         r.LastCheckedRowFeedback ??= [];
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(scp, attvar, z);
-            if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(z)); }
+            if (column is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(z)); }
             r.LastCheckedRowFeedback.Add(column.KeyName.ToUpperInvariant() + "|" + attvar.ValueStringGet(0));
         }
 

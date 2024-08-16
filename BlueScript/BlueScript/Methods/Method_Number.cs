@@ -57,7 +57,7 @@ internal class Method_Number : Method {
             }
         }
 
-        if (attvar.Attributes[1] is Variable v) { return new DoItFeedback(v); }
+        if (attvar.Attributes[1] is { } v) { return new DoItFeedback(v); }
 
         return new DoItFeedback(attvar.ValueNumGet(1));
     }

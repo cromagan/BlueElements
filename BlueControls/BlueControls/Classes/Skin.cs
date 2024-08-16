@@ -900,8 +900,8 @@ public static class Skin {
                 if (!needTransparenz) { design.Need = false; }
                 if (design.Kontur != Enums.Kontur.Ohne) {
                     if (design.HintergrundArt != HintergrundArt.Ohne) {
-                        if (design.Kontur == Enums.Kontur.Rechteck && design.X1 >= 0 && design.X2 >= 0 && design.Y1 >= 0 && design.Y2 >= 0) { design.Need = false; }
-                        if (design.Kontur == Enums.Kontur.Rechteck_R4 && design.X1 >= 1 && design.X2 >= 1 && design.Y1 >= 1 && design.Y2 >= 1) { design.Need = false; }
+                        if (design.Kontur == Enums.Kontur.Rechteck && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) { design.Need = false; }
+                        if (design.Kontur == Enums.Kontur.Rechteck_R4 && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) { design.Need = false; }
                     }
                 }
             }
@@ -1239,7 +1239,7 @@ public static class Skin {
         return rahms;
     }
 
-    public static Color IdColor(List<int>? id) => id == null || id.Count == 0 ? IdColor(-1) : IdColor(id[0]);
+    public static Color IdColor(List<int>? id) => id is not { Count: not 0 } ? IdColor(-1) : IdColor(id[0]);
 
     public static Color IdColor(int id) {
         if (id < 0) { return Color.White; }

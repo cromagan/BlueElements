@@ -49,7 +49,7 @@ public partial class VariableEditor : EditorEasy {
         }
         var list = new VariableCollection();
 
-        if (filterVariablen?.Table?.Database is not Database db || db.IsDisposed) { return list; }
+        if (filterVariablen?.Table?.Database is not { IsDisposed: false } db) { return list; }
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
@@ -60,12 +60,12 @@ public partial class VariableEditor : EditorEasy {
     }
 
     public RowItem? RowOfVariable(string variable) {
-        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
+        if (tableVariablen?.Database is not { IsDisposed: false } db) { return null; }
         return db.Row[variable];
     }
 
     public RowItem? RowOfVariable(Variable variable) {
-        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || tableVariablen?.Database is not { IsDisposed: false } db) { return null; }
         return db.Row[variable.KeyName];
     }
 
@@ -128,7 +128,7 @@ public partial class VariableEditor : EditorEasy {
     }
 
     protected override bool SetValuesToFormula(IEditable? variables) {
-        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return false; }
+        if (IsDisposed || tableVariablen?.Database is not { IsDisposed: false } db) { return false; }
         if (variables is not VariableCollection vc) { return false; }
 
         foreach (var thisv in vc) {

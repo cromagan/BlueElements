@@ -128,7 +128,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
         FilterOutput.ChangeTo(_table?.Filter);
 
-        btnPinZurück.Enabled = _table?.Database != null && _table.PinnedRows.Count > 0;
+        btnPinZurück.Enabled = _table is { Database: not null, PinnedRows.Count: > 0 };
 
         #region ZeilenFilter befüllen
 
@@ -175,13 +175,13 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
             if (orderArrangement != null) {
                 foreach (var thisclsVitem in orderArrangement) {
-                    if (thisclsVitem?.Column is ColumnItem ci) { _ = columSort.AddIfNotExists(ci); }
+                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { _ = columSort.AddIfNotExists(ci); }
                 }
             }
 
             if (cu != null) {
                 foreach (var thisclsVitem in cu) {
-                    if (thisclsVitem?.Column is ColumnItem ci) { _ = columSort.AddIfNotExists(ci); }
+                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { _ = columSort.AddIfNotExists(ci); }
                 }
             }
 
@@ -195,7 +195,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
             foreach (var thisColumn in columSort) {
                 var showMe = false;
-                if (thisColumn.Database is Database db && !db.IsDisposed) {
+                if (thisColumn.Database is { IsDisposed: false }) {
                     var viewItemOrder = orderArrangement?[thisColumn];
                     var viewItemCurrent = cu?[thisColumn];
                     var filterItem = _table?.Filter[thisColumn];
@@ -295,16 +295,16 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
     private void _table_ViewChanged(object sender, System.EventArgs e) => FillFilters();
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _table?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table?.Database is not { IsDisposed: false } db) { return; }
 
-        if (db.Column.First() is not ColumnItem co) { return; }
+        if (db.Column.First() is not { IsDisposed: false } co) { return; }
 
         var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
         using var fc = new FilterCollection(fl, "ähnliche");
 
         var r = fc.Rows;
-        if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
+        if (r.Count != 1 || _ähnliche is not { Count: not 0 }) {
             MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
         }
@@ -349,7 +349,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void DoÄhnlich() {
-        if (IsDisposed || _table?.Database is not Database db || db.Column.Count == 0) { return; }
+        if (IsDisposed || _table?.Database is not { IsDisposed: false } db || db.Column.Count == 0) { return; }
 
         var col = db.Column.First();
 
@@ -379,7 +379,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (IsDisposed || _table == null || _table.Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || _table is not { Database: { IsDisposed: false } db }) {
             DoÄhnlich();
             return;
         }
@@ -394,7 +394,7 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
         var l = new List<ColumnItem>();
         foreach (var thisCo in db.Column) {
-            if (thisCo != null && thisCo.IsInCache == null && !thisCo.IgnoreAtRowFilter) { l.Add(thisCo); }
+            if (thisCo is { IsInCache: null, IgnoreAtRowFilter: false }) { l.Add(thisCo); }
         }
 
         db.RefreshColumnsData(l.ToArray());
@@ -416,16 +416,16 @@ public partial class Filterleiste : GenericControlReciverSender, IBackgroundNone
 
     private void FlexSingeFilter_FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (sender is not FilterCollection fo) { return; }
-        if (IsDisposed || _table?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table?.Database is not { IsDisposed: false }) { return; }
 
         if (fo.Count == 0) {
-            if (_prevFilter != null && _prevFilter.Count == 1) {
-                if (_prevFilter[0] is FilterItem fi) {
+            if (_prevFilter is { Count: 1 }) {
+                if (_prevFilter[0] is { IsDisposed: false } fi) {
                     _table.Filter.Remove(fi.Column);
                 }
             }
         } else {
-            if (fo[0] is FilterItem fi) {
+            if (fo[0] is { IsDisposed: false } fi) {
                 _table.Filter.RemoveOtherAndAdd(fi);
             }
         }

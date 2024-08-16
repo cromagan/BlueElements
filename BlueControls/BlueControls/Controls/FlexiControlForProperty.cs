@@ -124,7 +124,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                     CaptionPosition = CaptionPosition.Über_dem_Feld;
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
-  
+
                     StyleListBox(GetListBox(), list, checkBehavior, addallowed);
 
                     break;
@@ -146,7 +146,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
                         Size = new Size(s1.Width + 30, 22);
 
-                        if (GetButton() is Button b) {
+                        if (GetButton() is { IsDisposed: false } b) {
                             b.ImageCode = "Stift|16";
                             b.Text = "bearbeiten";
                         }
@@ -354,7 +354,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
     }
 
     private void Checker_Tick(object sender, System.EventArgs e) {
-        if (Parent == null || !Parent.Visible || !Visible || IsDisposed || Parent.IsDisposed) { return; }
+        if (Parent is not { Visible: true } || !Visible || IsDisposed || Parent.IsDisposed) { return; }
         //if (_IsFilling) { return; }
         if (!Allinitialized) { return; }
         SetValueFromProperty();
@@ -367,7 +367,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         if (!Allinitialized) { return; }
         if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
-        if (_accessor == null || !_accessor.CanRead || !_accessor.CanWrite) { return; }
+        if (_accessor is not { CanRead: true } || !_accessor.CanWrite) { return; }
 
         switch (_accessor) {
             case Accessor<string> al:
@@ -462,7 +462,7 @@ public class FlexiControlForProperty<T> : FlexiControl, IDisposableExtended {
         InfoText = string.Empty;
 
     private void SetValueFromProperty() {
-        if (_accessor == null || !_accessor.CanRead) {
+        if (_accessor is not { CanRead: true }) {
             ValueSet(string.Empty, true);
             InfoText = string.Empty;
             return;

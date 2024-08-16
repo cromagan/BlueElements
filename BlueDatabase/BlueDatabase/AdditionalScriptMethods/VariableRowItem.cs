@@ -78,7 +78,7 @@ public class VariableRowItem : Variable {
 
     public override string ValueForReplace {
         get {
-            if (_row is null || _row.Database is not Database db) {
+            if (_row is null || _row.Database is not { IsDisposed: false } db) {
                 return "{ROW:?}";
             }
 

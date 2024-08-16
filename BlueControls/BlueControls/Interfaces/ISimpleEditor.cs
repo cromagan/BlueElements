@@ -79,7 +79,7 @@ public static class SimpleEditorExtension {
 
         var top = Skin.Padding;
         foreach (var thisFlexi in flexis) {
-            if (thisFlexi != null && !thisFlexi.IsDisposed) {
+            if (thisFlexi is { IsDisposed: false }) {
                 controls.Add(thisFlexi);
                 thisFlexi.Left = Skin.Padding;
                 thisFlexi.Top = top;

@@ -43,7 +43,7 @@ internal static class CommonDialogs {
 
         var x = InputBoxListBoxStyle.Show(caption, l2, CheckBehavior.SingleSelection, null, AddType.None);
 
-        if (x == null || x.Count != 1) { return null; }
+        if (x is not { Count: 1 }) { return null; }
 
         var db = Database.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword, true);
         if (db != null) {

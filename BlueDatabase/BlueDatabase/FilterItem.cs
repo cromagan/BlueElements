@@ -95,7 +95,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
         _column?.RefreshColumnsData();
 
-        if (searchValue != null && searchValue.Count > 0) {
+        if (searchValue is { Count: > 0 }) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
         } else {
             SearchValue = new List<string>().AsReadOnly();
@@ -116,7 +116,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         KeyName = Generic.GetUniqueKey();
 
         _filterType = filterType;
-        if (searchValue != null && searchValue.Count > 0) {
+        if (searchValue is { Count: > 0 }) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
         } else {
             SearchValue = new List<string>().AsReadOnly();
@@ -458,8 +458,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public override string ToString() => ToParseableString();
-
     public string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
 
@@ -481,6 +479,8 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             return ToParseableString();
         }
     }
+
+    public override string ToString() => ToParseableString();
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

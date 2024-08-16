@@ -75,7 +75,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
     }
 
     public static AbstractListItem? Show(List<AbstractListItem>? items) {
-        if (items == null || items.Count == 0) { return null; }
+        if (items is not { Count: not 0 }) { return null; }
 
         var x = new ItemSelect(items);
         _ = x.ShowDialog();

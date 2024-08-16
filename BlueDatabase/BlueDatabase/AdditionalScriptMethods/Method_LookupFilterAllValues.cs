@@ -53,7 +53,7 @@ public class Method_LookupFilterAllValues : Method {
 
         if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
-        if (allFi.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         var returncolumn = db.Column[attvar.ValueStringGet(0)];
         if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }

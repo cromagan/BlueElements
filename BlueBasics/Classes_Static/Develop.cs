@@ -110,7 +110,7 @@ public static class Develop {
     public static void DebugPrint(string warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
     public static void DebugPrint(FehlerArt art, string message, Exception ex) {
-        if (art != FehlerArt.Info && art != FehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
+        if (art is not FehlerArt.Info and not FehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
         DebugPrint(art, message + "\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace);
     }
 

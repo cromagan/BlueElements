@@ -57,19 +57,19 @@ internal class Method_SetIfExists : Method {
 
             switch (attvar.Attributes[z]) {
                 case VariableString vs:
-                    if (attvar.ValueStringSet(0, vs.ValueString, ld) is DoItFeedback dif) { return dif; }
+                    if (attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif) { return dif; }
                     return DoItFeedback.Null();
 
                 case VariableBool vb:
-                    if (attvar.ValueBoolSet(0, vb.ValueBool, ld) is DoItFeedback dif2) { return dif2; }
+                    if (attvar.ValueBoolSet(0, vb.ValueBool, ld) is { } dif2) { return dif2; }
                     return DoItFeedback.Null();
 
                 case VariableFloat vf:
-                    if (attvar.ValueNumSet(0, vf.ValueNum, ld) is DoItFeedback dif3) { return dif3; }
+                    if (attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif3) { return dif3; }
                     return DoItFeedback.Null();
 
                 case VariableListString vl:
-                    if (attvar.ValueListStringSet(0, vl.ValueList, ld) is DoItFeedback dif4) { return dif4; }
+                    if (attvar.ValueListStringSet(0, vl.ValueList, ld) is { } dif4) { return dif4; }
                     return DoItFeedback.Null();
             }
         }

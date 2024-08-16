@@ -27,43 +27,11 @@ using BlueControls.Controls;
 namespace BlueControls.Editoren;
 
 public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
-    private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Nothing;
-    [DefaultValue(GroupBoxStyle.Nothing)]
-    public GroupBoxStyle GroupBoxStyle {
-        get => _groupBoxStyle;
-        set {
-            if (_groupBoxStyle == value) { return; }
-            _groupBoxStyle = value;
-            Invalidate();
-        }
-    }
-
-
-
-    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
-        if (IsDisposed) { return; }
-
-        base.OnPaint(e);
-
-        if(_groupBoxStyle == GroupBoxStyle.Nothing  ) {return;}
-
-        var t = "[?]";
-
-        if(_toEdit is IEditable ea) { t = ea.CaptionForEditor; }
-
-
-
-
-        var s = States.Standard;
-
-        if (!Enabled) { s = States.Standard_Disabled; }
-        GroupBox.DrawGroupBox(this, e.Graphics, s, _groupBoxStyle, t);
-
-    }
 
     #region Fields
 
-    private IEditable? _toEdit = null;
+    private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Nothing;
+    private IEditable? _toEdit;
 
     #endregion
 
@@ -80,6 +48,16 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     public bool Editabe { get; set; }
 
     public string Error { get; private set; } = "Nicht Initialisiert.";
+
+    [DefaultValue(GroupBoxStyle.Nothing)]
+    public GroupBoxStyle GroupBoxStyle {
+        get => _groupBoxStyle;
+        set {
+            if (_groupBoxStyle == value) { return; }
+            _groupBoxStyle = value;
+            Invalidate();
+        }
+    }
 
     public IEditable? ToEdit {
         get => _toEdit;
@@ -125,18 +103,34 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     /// </summary>
     public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
+    /// <summary>
+    /// Bereitet das Formular vor. ZB. Dropdown Boxen
+    /// </summary>
+    protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+
+    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+        if (IsDisposed) { return; }
+
+        base.OnPaint(e);
+
+        if (_groupBoxStyle == GroupBoxStyle.Nothing) { return; }
+
+        var t = "[?]";
+
+        if (_toEdit is { } ea) { t = ea.CaptionForEditor; }
+
+        var s = States.Standard;
+
+        if (!Enabled) { s = States.Standard_Disabled; }
+        GroupBox.DrawGroupBox(this, e.Graphics, s, _groupBoxStyle, t);
+    }
+
     //public virtual IEditable? GetCloneOfCurrent() {
     //    if (!string.IsNullOrEmpty(Error)) { return null; }
 
     //    Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
     //    return null;
     //}
-
-    /// <summary>
-    /// Bereitet das Formular vor. ZB. Dropdown Boxen
-    /// </summary>
-    protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
 

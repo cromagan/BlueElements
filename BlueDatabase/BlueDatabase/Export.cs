@@ -512,7 +512,7 @@ public static class Export {
 
         foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
         {
-            if (thisRow != null && !thisRow.IsDisposed) {
+            if (thisRow is { IsDisposed: false }) {
                 var tmpBody = body;
 
                 thisRow.CheckRowDataIfNeeded(); // Virtuelle Spalten

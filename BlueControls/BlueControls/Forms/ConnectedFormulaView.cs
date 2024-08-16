@@ -35,7 +35,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
 
     #region Fields
 
-    private AbstractPadItem? _lastItem = null;
+    private AbstractPadItem? _lastItem;
 
     #endregion
 
@@ -62,14 +62,14 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     }
 
     private void btnAusgehendeDatenbank_Click(object sender, System.EventArgs e) {
-        if (_lastItem is ReciverSenderControlPadItem sif && sif.DatabaseOutput is Database db && !db.IsDisposed) {
+        if (_lastItem is ReciverSenderControlPadItem { DatabaseOutput: { IsDisposed: false } db }) {
             var c = new TableView(db, false, true);
             c.ShowDialog();
         }
     }
 
     private void btnEingehendeDatenbank_Click(object sender, System.EventArgs e) {
-        if (_lastItem is ReciverControlPadItem iaf && iaf.DatabaseInput is Database db && !db.IsDisposed) {
+        if (_lastItem is ReciverControlPadItem { DatabaseInput: { IsDisposed: false } db }) {
             var c = new TableView(db, false, true);
             c.ShowDialog();
         }
@@ -79,7 +79,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
 
-        if (_lastItem is not AbstractPadItem api) { return; }
+        if (_lastItem is not { IsDisposed: false } api) { return; }
 
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
@@ -140,7 +140,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     private void FormulaSet(ConnectedFormula.ConnectedFormula? cf) {
         if (IsDisposed) { return; }
 
-        if (cf != null && !cf.IsDisposed) {
+        if (cf is { IsDisposed: false }) {
             DropMessages = Generic.IsAdministrator();
         }
 

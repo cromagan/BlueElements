@@ -102,7 +102,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     public ColumnItem? Column {
         get {
             var c = DatabaseInput?.Column[_columnName];
-            return c == null || c.IsDisposed ? null : c;
+            return c is not { IsDisposed: not true } ? null : c;
         }
     }
 
@@ -142,7 +142,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     //public enSizeModes Bild_Modus { get; set; }
     public static List<AbstractListItem> GetAllowedEditTypes(ColumnItem? column) {
         var l = new List<AbstractListItem>();
-        if (column == null || column.IsDisposed) { return l; }
+        if (column is not { IsDisposed: not true }) { return l; }
         var t = typeof(EditTypeFormula);
 
         foreach (int z1 in Enum.GetValues(t)) {
@@ -168,7 +168,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     }
 
     public override string ErrorReason() {
-        if (Column == null || Column.IsDisposed) { return "Spalte fehlt"; }
+        if (Column is not { IsDisposed: not true }) { return "Spalte fehlt"; }
 
         return base.ErrorReason();
     }
@@ -176,7 +176,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        if (DatabaseInput is not Database db || db.IsDisposed) { return result; }
+        if (DatabaseInput is not { IsDisposed: false } db) { return result; }
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
@@ -185,7 +185,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IReadable
 
         result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
-        if (Column == null || Column.IsDisposed) { return result; }
+        if (Column is not { IsDisposed: not true }) { return result; }
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));

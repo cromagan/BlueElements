@@ -46,7 +46,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
     public override int LastArgMinCount => -1;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
-    public override MethodType MethodType => MethodType.Database |  MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.Database | MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
 
@@ -65,9 +65,9 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var myRow = Method_Row.ObjectToRow(attvar.Attributes[0]);
-        if (myRow?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
+        if (myRow?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
 
-        if (db.Column.SysRowState is not ColumnItem srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
 
         var m = CellCollection.EditableErrorReason(srs, myRow, EditableErrorReasonType.EditAcut, false, false, true, false);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
@@ -77,13 +77,11 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
             return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden.");
         }
 
-        //if (RowCollection.InvalidatedRows.Contains(myRow) || 
+        //if (RowCollection.InvalidatedRows.Contains(myRow) ||
         //    RowCollection.DidRows.Contains(myRow) ||
         //    RowCollection.FailedRows.Contains(myRow)) {
         //    return DoItFeedback.Null();
         //}
-
-
 
         var mydb = MyDatabase(scp);
         if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
@@ -96,7 +94,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         if (DateTime.UtcNow.Subtract(v).TotalDays < d) { return DoItFeedback.Null(); }
 
         myRow.InvalidateRowState($"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
-   
+
         return DoItFeedback.Null();
     }
 

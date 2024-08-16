@@ -130,7 +130,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         pad.Item.Clear();
         Generic.CollectGarbage();
 
-        if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
+        if (rowsForExport is not { Count: >= 1 }) { return -1; }
 
         ItemCollectionPad.ItemCollectionPad tmp = new(layoutFileName);
         tmp.ResetVariables();
@@ -151,7 +151,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                     PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layoutFileName))
                 };
 
-                if (it.PadInternal.Item is ItemCollectionPad.ItemCollectionPad icp) {
+                if (it.PadInternal.Item is { IsDisposed: false } icp) {
                     icp.ResetVariables();
                     icp.ReplaceVariables(rowsForExport[startNr]);
                 }
@@ -266,7 +266,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         }
     }
 
-    private void EintragsText() => capAnzahlInfo.Text = _rowsForExport == null || _rowsForExport.Count == 0
+    private void EintragsText() => capAnzahlInfo.Text = _rowsForExport is not { Count: not 0 }
         ? "Bitte wählen sie die Einträge für den Export."
         : _rowsForExport.Count == 1
             ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
@@ -275,8 +275,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
-        if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
+        if (_rowsForExport is not { Count: not 0 }) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
         //TODO: Schachteln implementieren
         if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
@@ -287,7 +287,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e) => Close();
 
     private void LayoutEditor_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         Enabled = false;
         var n = cbxLayoutWahl.Text;

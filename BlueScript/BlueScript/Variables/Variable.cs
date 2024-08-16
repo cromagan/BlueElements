@@ -152,7 +152,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
         if (uu > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
-            if (!txt1.AllOk || txt1.Variable == null || txt1.Variable is VariableUnknown) {
+            if (!txt1.AllOk || txt1.Variable is null or VariableUnknown) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor &&");
             }
 
@@ -165,7 +165,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, varCol, scp);
-            if (!txt1.AllOk || txt1.Variable == null || txt1.Variable is VariableUnknown) {
+            if (!txt1.AllOk || txt1.Variable is null or VariableUnknown) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor ||");
             }
 

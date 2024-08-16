@@ -172,7 +172,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
             var r = grpVariablen.RowOfVariable(hoveredWordnew);
 
             //foreach (var r in tableVariablen.Database.Row) {
-            if (r != null && !r.IsDisposed) {
+            if (r is { IsDisposed: false }) {
                 //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.OrdinalIgnoreCase)) {
                 var inh = r.CellGetString("Inhalt");
                 _lastVariableContent = inh;

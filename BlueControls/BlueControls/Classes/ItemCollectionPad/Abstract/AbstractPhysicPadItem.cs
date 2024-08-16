@@ -132,7 +132,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
             var intervalDistance = IntervalDistance(minA, maxA, minB, maxB);
             if (intervalDistance > 0) { result.WillIntersect = false; }
             // If the polygons are not intersecting and won't intersect, exit the loop
-            if (!result.Intersect && !result.WillIntersect) { break; }
+            if (result is { Intersect: false, WillIntersect: false }) { break; }
             // Check if the current interval distance is the minimum one. If so store
             // the interval distance and the current distance.
             // This will be used to calculate the minimum translation vector
@@ -459,7 +459,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         // Find the point of intersection.
         intersection = new PointF(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
         // The segments intersect if t1 and t2 are between 0 and 1.
-        segmentsIntersect = t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1;
+        segmentsIntersect = t1 is >= 0 and <= 1 && t2 is >= 0 and <= 1;
         // Find the closest points on the segments.
         if (t1 < 0) {
             t1 = 0;

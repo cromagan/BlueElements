@@ -64,7 +64,7 @@ public partial class Notification : FloatingForm {
         //Below müsste in Allboxes ja die letzte sein - außer sich selbst
         foreach (var thisParent in AllBoxes) {
             if (thisParent is Notification nf) {
-                if (nf != this && nf.Visible && !nf.IsDisposed) {
+                if (nf != this && nf is { Visible: true, IsDisposed: false }) {
                     NoteBelow = nf;
                 }
             }

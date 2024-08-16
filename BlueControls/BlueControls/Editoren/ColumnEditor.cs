@@ -69,7 +69,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             if (value == _column) { return; }
             if (IsDisposed) { return; }
 
-            if (_column != null && !_column.IsDisposed) { AllOk(); }
+            if (_column is { IsDisposed: false }) { AllOk(); }
 
             if (value is ColumnItem c) {
                 _column = c;
@@ -95,7 +95,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         var feh = string.Empty;
 
         //// Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
-        if (_column == null || _column.IsDisposed) {
+        if (_column is not { IsDisposed: not true }) {
             feh = "Spalte verworfen!";
         } else {
             if (!txbName.Text.StartsWith("SYS_")) {
@@ -202,20 +202,20 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void btnSchnellText_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
         _column.GetStyleFrom(ColumnFormatHolder.Text);
         Column_DatenAuslesen();
     }
 
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false } db) { return; }
 
         db.Edit(typeof(DatabaseHeadEditor));
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
         _column.ResetSystemToDefault(true);
         Column_DatenAuslesen();
@@ -230,7 +230,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column?.Useage() ?? "Fehler");
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
 
         _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column;
@@ -238,7 +238,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
         _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column;
         Column_DatenAuslesen();
@@ -283,7 +283,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// <param name="e"></param>
 
     private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
-        if (_column == null || _column.IsDisposed) { return; }
+        if (_column is not { IsDisposed: not true }) { return; }
 
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
@@ -319,7 +319,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
     private void Column_DatenAuslesen() {
-        if (_column == null || _column.IsDisposed) { return; }
+        if (_column is not { IsDisposed: not true }) { return; }
 
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
@@ -560,7 +560,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void GeneratFilterListe() {
-        if (IsDisposed || _column?.Database is not Database db2 || db2.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false } db2) { return; }
 
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
@@ -582,14 +582,14 @@ internal sealed partial class ColumnEditor : IIsEditor {
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
-            if (vis == null || vis.IsDisposed) { return; }
+            if (vis is not { IsDisposed: not true }) { return; }
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
-            if (sp == null || sp.IsDisposed) { return; }
+            if (sp is not { IsDisposed: not true }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
-            if (b == null || b.IsDisposed) { return; }
+            if (b is not { IsDisposed: not true }) { return; }
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
@@ -660,8 +660,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void GetLinkedCellFilter() {
-        if (IsDisposed || tblFilterliste.Database is not Database db || db.IsDisposed) { return; }
-        if (_column?.Database is not Database db2 || db2.IsDisposed) { return; }
+        if (IsDisposed || tblFilterliste.Database is not { IsDisposed: false } db) { return; }
+        if (_column?.Database is not { IsDisposed: false }) { return; }
 
         var nf = new List<string>();
         foreach (var thisr in db.Row) {
@@ -679,14 +679,14 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void SetLinkedCellFilter() {
-        if (IsDisposed || tblFilterliste.Database is not Database db || db.IsDisposed) { return; }
-        if (_column == null || _column.IsDisposed) { return; }
+        if (IsDisposed || tblFilterliste.Database is not { IsDisposed: false } db) { return; }
+        if (_column is not { IsDisposed: not true }) { return; }
 
         foreach (var thisr in db.Row) {
             thisr.CellSet("Such", string.Empty, string.Empty);
         }
 
-        if (db.Column["SpalteName"] is not ColumnItem c) { return; }
+        if (db.Column["SpalteName"] is not { IsDisposed: false } c) { return; }
 
         foreach (var thisFi in _column.LinkedCellFilter) {
             var x = thisFi.SplitBy("|");
@@ -702,7 +702,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _column?.Database is not { IsDisposed: false } db) { return; }
 
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.ItemCount == 0) {
             var l = Database.AllAvailableTables(db.FreezedReason);

@@ -600,7 +600,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     }
 
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
-        if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
+        if (row is not { IsDisposed: not true }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
         var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null, true, false);
         if (!script.AllOk) { return script; }
@@ -700,7 +700,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             result.ParseableAdd("FontScale", SheetStyleScale);
         }
 
-        if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
+        if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
             result.ParseableAdd("SheetSize", SheetSizeInMm);
             result.ParseableAdd("PrintArea", RandinMm.ToString());
         }
@@ -785,7 +785,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     internal RectangleF MaxBounds(List<AbstractPadItem>? zoomItems) {
         var r = MaximumBounds(zoomItems);
-        if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
+        if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
             var x1 = Math.Min(r.Left, 0);
             var y1 = Math.Min(r.Top, 0);
             var x2 = Math.Max(r.Right, MmToPixel(SheetSizeInMm.Width, Dpi));

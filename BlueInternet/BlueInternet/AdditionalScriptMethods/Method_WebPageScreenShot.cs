@@ -60,7 +60,7 @@ internal class Method_WebPageScreenShot : Method_WebPage {
 
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
 
-        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
         if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
 
         try {

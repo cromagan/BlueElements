@@ -51,10 +51,10 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = database;
 
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumnItem in db.Column) {
-            if (thisColumnItem != null && thisColumnItem.Function == ColumnFunction.RelationText) {
+            if (thisColumnItem is { Function: ColumnFunction.RelationText }) {
                 _column = thisColumnItem;
                 break;
             }
@@ -89,11 +89,11 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Item?[what] != null) { return null; }
         var r = db.Row[what];
-        if (r == null || r.IsDisposed) {
+        if (r is not { IsDisposed: not true }) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
@@ -130,8 +130,8 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void BezPlus(RowFormulaPadItem initialItem) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (_column == null || initialItem.Row == null || db.Column.First() is not ColumnItem cf) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (_column == null || initialItem.Row == null || db.Column.First() is not { IsDisposed: false } cf) { return; }
 
         // Den Beziehungstext holen
         var t = initialItem.Row.CellGetString(_column).ToUpperInvariant();
@@ -312,7 +312,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //}
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
-        if (Pad.Item == null || Pad.Item.IsDisposed) { return; }
+        if (Pad.Item is not { IsDisposed: not true }) { return; }
         if (_column == null) { return; }
 
         FolderBrowserDialog fl = new();
@@ -320,7 +320,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
         List<string> l = [];
         foreach (var thisR in Pad.Item) {
-            if (thisR is RowFormulaPadItem rfi && rfi.Row is RowItem r) {
+            if (thisR is RowFormulaPadItem { Row: { IsDisposed: false } r }) {
                 //_ = r.Row.ExecuteScript(true, true, "to be sure");
                 l.Add("#######################################################################");
                 l.Add(" ");
@@ -346,15 +346,15 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
-        if (Database?.Column.First() is not ColumnItem c) { return; }
+        if (Database?.Column.First() is not { IsDisposed: false } c) { return; }
 
         var il = new List<AbstractListItem>();
         il.AddRange(ItemsOf(c.Contents()));
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, CheckBehavior.SingleSelection, null, AddType.None);
-        if (i == null || i.Count != 1) { return; }
+        if (i is not { Count: 1 }) { return; }
 
         _ = AddOne(i[0], 0, 0, string.Empty);
-        if (Pad.Item != null && Pad.Item.Count < 10) {
+        if (Pad.Item is { Count: < 10 }) {
             Pad.ZoomFit();
         }
         //RepairLinesAndFullProcessing();

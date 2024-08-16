@@ -47,9 +47,9 @@ public partial class ZoomPad : GenericControlReciver {
 
     protected bool Fitting = true;
 
-    private float _shiftX = 0;
+    private float _shiftX;
 
-    private float _shiftY = 0;
+    private float _shiftY;
     private float _zoom = 1;
     private float _zoomFit = 1;
 

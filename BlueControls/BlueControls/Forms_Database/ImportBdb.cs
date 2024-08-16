@@ -106,7 +106,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
             return;
         }
 
-        if (_files == null || _files.Count == 0) {
+        if (_files is not { Count: not 0 }) {
             txtInfo.Text = "Keine Datei(en) zum Importieren gewählt.";
             btnImport.Enabled = false;
             return;
@@ -146,12 +146,12 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
         //    return;
         //}
 
-        if (_files == null || _files.Count == 0) { return; }
+        if (_files is not { Count: not 0 }) { return; }
         if (_database == null) { return; }
 
         var m = "Datenbank-Fehler";
 
-        if (Database != null && !Database.IsDisposed) {
+        if (Database is { IsDisposed: false }) {
             m = Database.ImportBdb(_files, _database.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
         }
 

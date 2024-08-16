@@ -322,7 +322,6 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
 
     public QuickImage SymbolForReadableText() => this;
 
-
     public string ToParseableString() => Code;
 
     /// <summary>
@@ -442,7 +441,7 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
                     c = Color.FromArgb(0, 0, 0, 0);
                 } else {
                     if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
-                    if (colfärb is Color cf && cf.A > 0) {
+                    if (colfärb is { A: > 0 } cf) {
                         c = cf.GetHue().FromHsb(cf.GetSaturation(), c.GetBrightness(), c.A);
                     }
                     if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHsb(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
@@ -465,7 +464,7 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
                         }
                     }
                 }
-                if (!c.IsMagentaOrTransparent() && Transparenz > 0 && Transparenz < 100) {
+                if (!c.IsMagentaOrTransparent() && Transparenz is > 0 and < 100) {
                     c = Color.FromArgb((int)(c.A * (100 - Transparenz) / 100.0), c.R, c.G, c.B);
                 }
                 if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {

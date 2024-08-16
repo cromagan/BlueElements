@@ -62,7 +62,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
 
     private void Checkbuttons() {
         var canDo = true;
-        if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table.Database is not { IsDisposed: false } db) { return; }
         if (!db.IsAdministrator()) { canDo = false; }
         if (optSucheNach.Checked) {
             if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
@@ -111,18 +111,18 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         var ersetzText = txbNeu.Text.Replace("\\r", "\r").Replace("\\t", "\t");
         //db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-        if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table.Database is not { IsDisposed: false } db) { return; }
 
         List<ColumnItem> sp = [];
         List<RowItem> ro = [];
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
+            if (_table.CursorPosColumn is { IsDisposed: false } c) { sp.Add(c); }
         } else {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
             if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray()) || _table.PinnedRows.Contains(thisRow)) {
-                if (db.Column.SysLocked is ColumnItem sl) {
+                if (db.Column.SysLocked is { IsDisposed: false } sl) {
                     if (!chkAbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
                 }
             }

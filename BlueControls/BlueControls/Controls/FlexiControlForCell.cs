@@ -44,7 +44,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Fields
 
-    private ColumnItem? _column = null;
+    private ColumnItem? _column;
     private string _columnName = string.Empty;
 
     private RowItem? _row;
@@ -244,7 +244,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         _row?.CheckRowDataIfNeeded();
 
-        if (_row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
+        if (_row?.LastCheckedEventArgs is { } rce) {
             DatabaseInput_RowChecked(this, rce);
         }
     }
@@ -269,7 +269,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (IsDisposed || !Visible || !Enabled) { return; }
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
-        if (_column == null || _column.IsDisposed) { return; }
+        if (_column is not { IsDisposed: not true }) { return; }
         if (_column.Function != ColumnFunction.RelationText) { return; }
         Marker.RunWorkerAsync();
     }
@@ -380,7 +380,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         try {
             ColumnItem? tmpColumn;
 
-            if (DatabaseInput is Database db && !db.IsDisposed) {
+            if (DatabaseInput is { IsDisposed: false } db) {
                 tmpColumn = db.Column[_columnName];
             } else {
                 tmpColumn = null;
@@ -416,7 +416,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        if (IsDisposed || DatabaseInput is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
 
         #region  in Frage kommende Textbox ermitteln txb
 
@@ -433,7 +433,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if (_row is not RowItem row || row.IsDisposed) { return; }
+        if (_row is not { IsDisposed: false } row) { return; }
         if (Marker.CancellationPending) { return; }
 
         var col = db.Column.First();
@@ -514,7 +514,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void RestartMarker() {
-        if (Marker.IsBusy && !Marker.CancellationPending) {
+        if (Marker is { IsBusy: true, CancellationPending: false }) {
             Marker.CancelAsync();
         } else {
             ActivateMarker();
@@ -572,7 +572,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                         item2.AddRange(ItemsOf(realColumn, null, ShortenStyle.Replaced, 10000));
                     }
 
-                    if (realColumn != null && realColumn.TextBearbeitungErlaubt) {
+                    if (realColumn is { TextBearbeitungErlaubt: true }) {
                         f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                     } else {
                         f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
@@ -609,7 +609,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         //control.Enabled = Enabled;
         //control.ItemClear();
         control.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column == null || column.IsDisposed) { return; }
+        if (column is not { IsDisposed: not true }) { return; }
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
@@ -662,7 +662,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         //control.Enabled = Enabled;
         //control.UnCheck();
         control.SuggestionsClear();
-        if (column == null || column.IsDisposed) { return; }
+        if (column is not { IsDisposed: not true }) { return; }
         var item = new List<AbstractListItem>();
         item.AddRange(ItemsOf(column, null, ShortenStyle.Replaced, 10000));
         control.SuggestionsAdd(item);
@@ -689,11 +689,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (f.IsFilling) { return; }
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
-        if (_column == null || _column.IsDisposed) { return; }
+        if (_column is not { IsDisposed: not true }) { return; }
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if (_row is not RowItem row || row.IsDisposed) { return; }
+        if (_row is not { IsDisposed: false } row) { return; }
 
         var oldVal = row.CellGetString(_column);
         var newValue = f.Value;

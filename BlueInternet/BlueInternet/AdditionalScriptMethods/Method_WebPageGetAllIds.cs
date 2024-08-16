@@ -50,7 +50,7 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
 
-        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
         if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
 
         try {
@@ -77,7 +77,7 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
 
             var l = new List<string>();
 
-            if (!task.IsFaulted && task.Result.Success && task.Result.Result is List<object> ids) {
+            if (task is { IsFaulted: false, Result: { Success: true, Result: List<object> ids } }) {
                 foreach (var id in ids) {
                     l.Add(id.ToString());
                 }

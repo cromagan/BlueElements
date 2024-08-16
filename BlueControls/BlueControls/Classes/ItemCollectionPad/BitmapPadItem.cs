@@ -116,8 +116,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         comms.Add(ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")));
         comms.Add(ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32")));
 
-
-
         List<GenericControl> result =
         [
             new FlexiControlForDelegate(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
@@ -291,7 +289,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             Generic.CollectGarbage();
         }
         if (Stil != PadStyles.Undefiniert) {
-            if (Parent?.SheetStyle != null && Parent.SheetStyleScale > 0) {
+            if (Parent is { SheetStyle: not null, SheetStyleScale: > 0 }) {
                 gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
             }
         }

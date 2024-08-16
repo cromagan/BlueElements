@@ -63,7 +63,7 @@ internal class Method_Add : Method {
             }
         }
 
-        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is { } dif) { return dif; }
 
         return DoItFeedback.Null();
     }

@@ -123,7 +123,7 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
-        if (DatabaseScriptEditor._befehlsReferenz != null && DatabaseScriptEditor._befehlsReferenz.Visible) {
+        if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
             DatabaseScriptEditor._befehlsReferenz.Close();
             DatabaseScriptEditor._befehlsReferenz?.Dispose();
             DatabaseScriptEditor._befehlsReferenz = null;
@@ -155,7 +155,7 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
     }
 
     private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || Database is not { IsDisposed: false }) {
             e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
             return;
         }
@@ -181,7 +181,7 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
         }
 
         RowItem? r = Database?.Row[txbTestZeile.Text];
-        if (r == null || r.IsDisposed) {
+        if (r is not { IsDisposed: not true }) {
             e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             return;
         }

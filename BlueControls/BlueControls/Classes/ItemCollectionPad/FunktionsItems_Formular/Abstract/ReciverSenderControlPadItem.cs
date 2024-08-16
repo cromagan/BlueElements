@@ -168,7 +168,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
     }
 
     public override string ErrorReason() {
-        if (DatabaseOutput is not Database db || db.IsDisposed) {
+        if (DatabaseOutput is not { IsDisposed: false }) {
             return "Ausgehende Datenbank nicht angegeben.";
         }
 
@@ -179,7 +179,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         List<GenericControl> result = [.. base.GetProperties(widthOfControl),
                                 new FlexiControl("Ausgang:", widthOfControl, true)
         ];
-
 
         var enableOutput = true;
         Database? outp = null;

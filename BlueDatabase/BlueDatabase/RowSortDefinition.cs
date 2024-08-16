@@ -50,7 +50,7 @@ public sealed class RowSortDefinition : IParseable {
 
         Columns.Clear();
 
-        if (colum != null && !colum.IsDisposed) { Columns.Add(colum); }
+        if (colum is { IsDisposed: false }) { Columns.Add(colum); }
     }
 
     public RowSortDefinition(Database database, List<ColumnItem?>? column, bool reverse) {
@@ -61,7 +61,7 @@ public sealed class RowSortDefinition : IParseable {
 
         if (column != null) {
             foreach (var thisColumn in column) {
-                if (thisColumn is ColumnItem c && !c.IsDisposed) { Columns.Add(c); }
+                if (thisColumn is ColumnItem { IsDisposed: false } c) { Columns.Add(c); }
             }
         }
     }
@@ -116,7 +116,7 @@ public sealed class RowSortDefinition : IParseable {
         if (Columns.Count == 0) { return; }
 
         for (var i = 0; i < Columns.Count; i++) {
-            if (Columns[i] is not ColumnItem c || c.IsDisposed) {
+            if (Columns[i] is not ColumnItem { IsDisposed: not true }) {
                 Columns.RemoveAt(i);
                 //OnPropertyChanged();
                 Repair();
@@ -125,14 +125,14 @@ public sealed class RowSortDefinition : IParseable {
         }
     }
 
-    public override string ToString() => ToParseableString();
-
     public string ToParseableString() {
         var result = new List<string>();
         result.ParseableAdd("Reverse", Reverse);
         result.ParseableAdd("Columns", Columns, true);
         return result.Parseable();
     }
+
+    public override string ToString() => ToParseableString();
 
     public bool UsedForRowSort(ColumnItem? vcolumn) {
         if (Columns.Count == 0) { return false; }

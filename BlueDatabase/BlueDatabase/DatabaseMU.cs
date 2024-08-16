@@ -143,7 +143,7 @@ public class DatabaseMu : Database {
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is Database db && !db.IsDisposed) {
+                if (thisa is { IsDisposed: false and false } db) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }
@@ -187,7 +187,7 @@ public class DatabaseMu : Database {
     protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime startTimeUtc, DateTime endTimeUtc) {
         base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
         if (ReadOnly) { return; }
-        if (files == null || files.Count < 1) { return; }
+        if (files is not { Count: >= 1 }) { return; }
 
         _hasManyFragments = files.Count > 8 || ChangesNotIncluded.Count > 40;
 
@@ -207,7 +207,7 @@ public class DatabaseMu : Database {
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
         if (ChangesNotIncluded.Any() && AmITemporaryMaster(5, 55)) {
-            if (files.Count > 10 || ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUTCDate).TotalHours > 12) {
+            if (files.Count > 10 || ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
                 //var tmp = _fileStateUTCDate;
 
                 //_fileStateUTCDate = IsInCache;
@@ -409,7 +409,7 @@ public class DatabaseMu : Database {
         if (RowCollection.WaitDelay > 90) { return true; }
 
         if (_hasManyFragments) { return true; }
-        if (DateTime.UtcNow.Subtract(FileStateUTCDate).TotalDays > 3) { return true; } // Letze Komplettierung
+        if (DateTime.UtcNow.Subtract(FileStateUtcDate).TotalDays > 3) { return true; } // Letze Komplettierung
 
         var masters = 0;
         foreach (var thisDb in AllFiles) {

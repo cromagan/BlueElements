@@ -52,8 +52,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// <param name="toEdit"></param>
     /// <param name="isDialog"></param>
     public static void Show(ISimpleEditor? toEdit, bool isDialog) {
-        if (toEdit == null) { return; }
-        if (toEdit is IDisposableExtended id && id.IsDisposed) { return; }
+        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return; }
 
         var mb = new InputBoxEditor(toEdit.GetControl(400), false);
 
@@ -92,7 +91,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         if (toEdit == null) { return false; }
         if (editortype == null) { return false; }
 
-        if (toEdit is IDisposableExtended id && id.IsDisposed) { return false; }
+        if (toEdit is IDisposableExtended { IsDisposed: true }) { return false; }
 
         if (!isDialog) { supportsCancel = false; }
 
@@ -123,7 +122,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
             if (toEdit is IErrorCheckable iec && !iec.IsOk()) { ok = false; }
 
-            if (mb is DialogWithOkAndCancel dwoac && dwoac.Canceled) { ok = false; }
+            if (mb is DialogWithOkAndCancel { Canceled: true }) { ok = false; }
 
             mb.Dispose();
             return ok;
@@ -137,7 +136,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         if (Canceled) { return true; }
 
         foreach (var thisc in Controls) {
-            if (thisc is EditorEasy ee && ee.ToEdit is IErrorCheckable ec) {
+            if (thisc is EditorEasy { ToEdit: IErrorCheckable ec } ee) {
                 if (ec.IsOk()) { return true; }
 
                 var b = MessageBox.Show($"<b><u>{ee.ToEdit.CaptionForEditor} enthält noch Fehler:</u></b>\r\n\r\n{ec.ErrorReason()}\r\n\r\nMöchten sie diese beheben?", BlueBasics.Enums.ImageCode.Warnung, "Beheben", "Verwerfen");

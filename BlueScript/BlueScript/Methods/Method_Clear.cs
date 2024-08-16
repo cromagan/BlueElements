@@ -50,7 +50,7 @@ internal class Method_Clear : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
-        if (attvar.ValueListStringSet(0, [], ld) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, [], ld) is { } dif) { return dif; }
 
         return DoItFeedback.Null();
     }

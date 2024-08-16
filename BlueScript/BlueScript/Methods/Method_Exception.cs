@@ -51,7 +51,7 @@ internal class Method_Exception : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.LogData, "Die Ausführung wurde absichtlich abgebrochen."); }
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.LogData, "Die Ausführung wurde absichtlich abgebrochen.")
+        return attvar.Attributes is not { Count: 1 } ? new DoItFeedback(infos.LogData, "Die Ausführung wurde absichtlich abgebrochen.")
             : new DoItFeedback(infos.LogData, "Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0));
     }
 

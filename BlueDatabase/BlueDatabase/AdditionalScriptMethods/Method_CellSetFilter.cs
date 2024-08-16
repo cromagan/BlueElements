@@ -39,6 +39,7 @@ public class Method_CellSetFilter : Method_Database {
 
     // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
     public override MethodType MethodType => MethodType.Database | MethodType.ManipulatesUser;
+
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
@@ -53,9 +54,9 @@ public class Method_CellSetFilter : Method_Database {
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         var db = allFi.Database;
-        if (db == null || db.IsDisposed) { return new DoItFeedback(ld, "Datenbank verworfen."); }
+        if (db is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Datenbank verworfen."); }
 
-        if (db.Column[attvar.ValueStringGet(1)] is not ColumnItem columnToSet) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
+        if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
 
         var r = allFi.Rows;
         if (r.Count is 0 or > 1) {

@@ -30,7 +30,7 @@ public partial class DialogWithOkAndCancel : Form {
     #region Fields
 
     private readonly bool _supportsCancel;
-    public bool Canceled { get; protected set; } = false;
+
     #endregion
 
     #region Constructors
@@ -57,6 +57,8 @@ public partial class DialogWithOkAndCancel : Form {
     #endregion
 
     #region Properties
+
+    public bool Canceled { get; protected set; }
 
     protected bool OK_Enabled {
         get => butOK.Enabled;
@@ -109,7 +111,6 @@ public partial class DialogWithOkAndCancel : Form {
         wi = Math.Max(wi + BorderWidth, minWidth);
         Setup(wi, he);
 
-
         if (centerControl != null) {
             centerControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         }
@@ -117,8 +118,7 @@ public partial class DialogWithOkAndCancel : Form {
 
     protected void Cancel() {
         Canceled = true;
-      if(  SetValue()) { Close(); }
-  
+        if (SetValue()) { Close(); }
     }
 
     protected void Ok() {
@@ -156,8 +156,6 @@ public partial class DialogWithOkAndCancel : Form {
         DebugPrint_RoutineMussUeberschriebenWerden(false);
         return false;
     }
-
- 
 
     private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
 

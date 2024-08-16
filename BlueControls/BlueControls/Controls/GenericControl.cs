@@ -127,7 +127,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     #region Methods
 
     public static Form? ParentForm(Control? o) {
-        if (o == null || o.IsDisposed) { return null; }
+        if (o is not { IsDisposed: not true }) { return null; }
 
         do {
             switch (o) {
@@ -249,8 +249,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     public bool DoDrawings() {
         if (IsDisposed || Disposing) { return false; }
         if (DesignMode) { return true; }
-        if (_pform == null || _pform.IsDisposed || !_pform.Visible) { return false; }
-        if (_pform is Forms.Form bf && bf.isClosing) { return false; }
+        if (_pform is not { IsDisposed: not true } || !_pform.Visible) { return false; }
+        if (_pform is Forms.Form { isClosing: true }) { return false; }
         return Visible;
     }
 
@@ -310,7 +310,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         base.Dispose(disposing);
 
         OnDisposingEvent();
-
 
         if (disposing) {
             _bitmapOfControl?.Dispose();

@@ -24,7 +24,6 @@ using BlueControls.EventArgs;
 using BlueDatabase;
 using BlueControls.Forms;
 
-
 namespace BlueControls.BlueDatabaseDialogs;
 
 public sealed partial class Search : Form {
@@ -78,7 +77,7 @@ public sealed partial class Search : Form {
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;
 
-        if (_table.CurrentArrangement is not ColumnViewCollection ca) {
+        if (_table.CurrentArrangement is not { IsDisposed: false } ca) {
             MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
             return;
         }

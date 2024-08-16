@@ -120,7 +120,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public static BlueFont Get(string toParse) {
         if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) { return DefaultFont; }
 
-        if (FontsAll.Get(toParse.Replace(" ", string.Empty).ToUpperInvariant()) is BlueFont found) { return found; }
+        if (FontsAll.Get(toParse.Replace(" ", string.Empty).ToUpperInvariant()) is { } found) { return found; }
 
         var f = new BlueFont();
 

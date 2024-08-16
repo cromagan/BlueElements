@@ -40,7 +40,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
 
     public Database? Database {
         get {
-            if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return null; }
+            if (ToEdit is not FilterCollection { IsDisposed: not true } fc) { return null; }
             return fc.Database;
         }
     }
@@ -54,10 +54,19 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         capDatabase.Text = "Datenbank: ?";
     }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
-        if (toEdit is not FilterCollection fc || fc.IsDisposed) { return false; }
+    public AbstractListItem? NewChild() {
+        if (ToEdit is not FilterCollection { IsDisposed: not true, Database: { IsDisposed: false } db } fc) { return null; }
 
-        if (fc.Database is not Database db || db.IsDisposed) { return false; }
+        var l = new FilterItem(db, FilterType.Istgleich_GroßKleinEgal, "?");
+        l.Editor = typeof(FilterEditor);
+        fc.Add(l);
+        return ItemOf(l);
+    }
+
+    protected override void InitializeComponentDefaultValues() => lstFilter.AddMethod = NewChild;
+
+    protected override bool SetValuesToFormula(IEditable? toEdit) {
+        if (toEdit is not FilterCollection { IsDisposed: not true, Database: { IsDisposed: false } db } fc) { return false; }
 
         capDatabase.Text = "Datenbank: " + db.Caption;
 
@@ -69,22 +78,9 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         return true;
     }
 
-    public AbstractListItem? NewChild() {
-        if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return null; }
-
-        if (fc.Database is not Database db || db.IsDisposed) { return null; }
-
-        var l = new FilterItem(db, FilterType.Istgleich_GroßKleinEgal, "?");
-        l.Editor = typeof(FilterEditor);
-        fc.Add(l);
-        return ItemOf(l);
-    }
-
-    protected override void InitializeComponentDefaultValues() => lstFilter.AddMethod = NewChild;
-
     private void lstFilter_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (ToEdit is not FilterCollection fc || fc.IsDisposed) { return; }
-        if (e.Item is ReadableListItem rli && rli.Item is FilterItem fi) {
+        if (ToEdit is not FilterCollection { IsDisposed: not true } fc) { return; }
+        if (e.Item is ReadableListItem { Item: FilterItem fi }) {
             fc.Remove(fi);
         }
     }

@@ -139,7 +139,7 @@ public partial class MainWindow {
 
     private void btnCopy_Click(object sender, System.EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
-        if (P.Bmp is Bitmap pic && pic.IsValid()) {
+        if (P.Bmp is { } pic && pic.IsValid()) {
             Clipboard.SetImage(pic);
             //System.Windows.Clipboard.SetDataObject(P.Bmp, false);
             Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
@@ -282,7 +282,7 @@ public partial class MainWindow {
 
     private void P_ImageMouseMove(object sender, MouseEventArgs1_1DownAndCurrent e) {
         _currentTool?.MouseMove(e, P.Bmp);
-        if (e.Current.IsInPic && P.Bmp is Bitmap bmp && bmp.IsValid()) {
+        if (e.Current.IsInPic && P.Bmp is { } bmp && bmp.IsValid()) {
             var c = bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
             InfoText.Text = "X: " + e.Current.TrimmedX +
                             "<br>Y: " + e.Current.TrimmedY +
@@ -324,7 +324,7 @@ public partial class MainWindow {
             return;
         }
 
-        if (P.Bmp is not Bitmap bmp || !bmp.IsValid()) { return; }
+        if (P.Bmp is not { } bmp || !bmp.IsValid()) { return; }
 
         try {
             switch (_filename.FileSuffix().ToUpperInvariant()) {

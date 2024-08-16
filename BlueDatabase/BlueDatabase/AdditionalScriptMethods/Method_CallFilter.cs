@@ -48,7 +48,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType =>  MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 
@@ -68,7 +68,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
-        if (allFi.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        if (allFi.Database is not { IsDisposed: false }) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         var r = allFi.Rows;
         if (r.Count == 0) { return DoItFeedback.Null(); }
@@ -77,7 +77,7 @@ public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
         var vs = attvar.ValueStringGet(0);
 
         foreach (var thisR in r) {
-            if (thisR != null && !thisR.IsDisposed) {
+            if (thisR is { IsDisposed: false }) {
                 //s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs, false, true, scp.ProduktivPhase, 0, a, false, true);
                 if (!s2.AllOk) {

@@ -56,7 +56,7 @@ internal class Method_AddPrefix : Method {
             tmpList[z] = attvar.ReadableText(1) + tmpList[z];
         }
 
-        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is { } dif) { return dif; }
 
         return DoItFeedback.Null();
     }

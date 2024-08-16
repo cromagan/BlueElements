@@ -79,10 +79,10 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
     public ColumnItem? AdditionalInfoColumn {
         get {
-            if (DatabaseOutput is not Database dbout || dbout.IsDisposed) { return null; }
+            if (DatabaseOutput is not { IsDisposed: false } dbout) { return null; }
 
             var c = dbout.Column[_additinalInfoColumnName];
-            return c == null || c.IsDisposed ? null : c;
+            return c is not { IsDisposed: not true } ? null : c;
         }
     }
 
@@ -135,10 +135,10 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
-            if (DatabaseOutput is not Database dbout || dbout.IsDisposed) { return null; }
+            if (DatabaseOutput is not { IsDisposed: false } dbout) { return null; }
 
             var c = dbout.Column[_originIdColumnName];
-            return c == null || c.IsDisposed ? null : c;
+            return c is not { IsDisposed: not true } ? null : c;
         }
     }
 
@@ -191,7 +191,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
         if (string.IsNullOrEmpty(_entityId)) { return "Id-Generierung fehlt"; }
         if (!_entityId.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
-        if (OriginIDColumn is not ColumnItem oic || oic.IsDisposed) {
+        if (OriginIDColumn is not { IsDisposed: false } oic) {
             return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";
         }
 
@@ -199,10 +199,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
             return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
         }
 
-        if (AdditionalInfoColumn is ColumnItem aic && !aic.IsDisposed) {
-            if (aic.Function != ColumnFunction.Schlüsselspalte) {
-                return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
-            }
+        if (AdditionalInfoColumn is { IsDisposed: false, Function: not ColumnFunction.Schlüsselspalte }) {
+            return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
         }
 
         if (string.IsNullOrEmpty(Script)) {
@@ -217,12 +215,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         var inr = GetFilterFromGet();
-        if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
+        if (inr.Count > 0 && inr[0].DatabaseOutput is { IsDisposed: false }) {
             result.Add(new FlexiControlForProperty<string>(() => EntityID));
             result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
-        if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
+        if (DatabaseOutput is { IsDisposed: false } dbout) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
@@ -230,7 +228,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
             result.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));
         }
 
- 
         return result;
     }
 
@@ -270,7 +267,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IRea
     public override string ReadableText() {
         const string txt = "Zeilengenerator: ";
 
-        if (this.IsOk() && DatabaseOutput is Database dbout && !dbout.IsDisposed) {
+        if (this.IsOk() && DatabaseOutput is { IsDisposed: false } dbout) {
             return txt + dbout.Caption;
         }
 

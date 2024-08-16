@@ -95,7 +95,7 @@ public class ConnectionInfo : IReadableTextWithKey, IEditable {
         foreach (var thisDb in alf) {
             //var d = thisDB.ConnectionData;
 
-            if (thisDb.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
+            if (thisDb.ConnectionDataOfOtherTable(x[0], true) is { } nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
                 DatabaseId = nci.DatabaseId;

@@ -127,12 +127,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? this[string columnName] {
         get {
-            if (IsDisposed || Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+            if (IsDisposed || Database is not { IsDisposed: false } || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
 
             try {
                 columnName = columnName.ToUpperInvariant();
                 var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;
-                if (col != null && col.IsDisposed) {
+                if (col is { IsDisposed: true }) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
                     return null;
                 }
@@ -152,17 +152,17 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? First() {
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
         if (db.ColumnArrangements.Count < 1 || db.ColumnArrangements[0].Count != db.Column.Count()) {
             //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
             return null;
         }
 
-        var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
+        var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false } && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
         if (l != null) { return l; }
 
-        return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed)?.Column;
+        return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false })?.Column;
     }
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(keyName, caption, string.Empty, format, quickinfo);
@@ -179,7 +179,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
 
         //var item = SearchByKey(key);
         //if (item != null) {
@@ -225,7 +225,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GenerateOverView() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         Html da = new(Database.TableName);
         da.AddCaption("Spaltenliste von: " + Database.Caption);
         da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
@@ -394,7 +394,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    }
     internal string ChangeName(string oldName, string newName) {
         if (oldName == newName) { return string.Empty; }
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
 
         var ok = _internal.TryRemove(oldName.ToUpperInvariant(), out var vcol);
         if (!ok) { return "Entfernen fehlgeschlagen"; }
@@ -447,11 +447,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string name, Reason reason) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen!"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen!"; }
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = this[name];
-            if (c != null && !c.IsDisposed) { return string.Empty; }//"Spalte " + name + " bereits vorhanden!"
+            if (c is { IsDisposed: false }) { return string.Empty; }//"Spalte " + name + " bereits vorhanden!"
 
             c = new ColumnItem(Database, name);
             var f = Add(c);
@@ -597,7 +597,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (sysname == "SYS_DATECHANGED" && c == null) { c = this["SYS_CHANGEDATE"]; }
         if (sysname == "SYS_DATECREATED" && c == null) { c = this["SYS_CREATEDATE"]; }
 
-        if (c != null && !c.IsDisposed) {
+        if (c is { IsDisposed: false }) {
             c.KeyName = sysname; // Wegen der Namensverbiegung oben...
             c.ResetSystemToDefault(false);
             return;

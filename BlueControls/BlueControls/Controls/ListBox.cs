@@ -71,15 +71,16 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private SizeF _lastCheckedMaxSize = Size.Empty;
     private Size _maxNeededItemSize;
 
+    private bool _mousemoved;
+
+    //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
+    private AbstractListItem? _mouseOverItem;
+
     /// <summary>
     /// Einfaches Flag, dass die Buttons nur einblendet, wenn eine Mausbewegung stattgefunden hat.
     /// Bei einem MouseWheel wird nichts eingeblendet
     /// </summary>
     private Point _mousepos = Point.Empty;
-    private bool _mousemoved = false;
-
-    //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
-    private AbstractListItem? _mouseOverItem;
 
     private bool _moveAllowed;
     private bool _removeAllowed;
@@ -374,7 +375,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None);
 
-        if (rück == null || rück.Count == 0) { return null; }
+        if (rück is not { Count: not 0 }) { return null; }
 
         return Suggestions.Get(rück[0]);
     }
@@ -480,7 +481,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     public void ItemAddRange(List<AbstractListItem>? items) {
-        if (items == null || items.Count == 0) { return; }
+        if (items is not { Count: not 0 }) { return; }
 
         foreach (var thisIt in items) {
             AddAndRegister(thisIt);
@@ -491,7 +492,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     public void ItemAddRange(List<string>? list) {
-        if (list == null || list.Count == 0) { return; }
+        if (list is not { Count: not 0 }) { return; }
 
         foreach (var thisstring in list) {
             if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
@@ -845,12 +846,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         DoMouseMovement();
     }
 
-
-
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
-        if(e.X != _mousepos.X || e.Y != _mousepos.Y) { _mousemoved = true; }
-        _mousepos = new Point(e.X, e.Y);    
+        if (e.X != _mousepos.X || e.Y != _mousepos.Y) { _mousemoved = true; }
+        _mousepos = new Point(e.X, e.Y);
         DoMouseMovement();
     }
 
@@ -858,7 +857,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         base.OnMouseUp(e);
         if (!Enabled) { return; }
         var nd = MouseOverNode(e.X, e.Y);
-        if (nd != null && !nd.Enabled) { return; }
+        if (nd is { Enabled: false }) { return; }
         switch (e.Button) {
             case MouseButtons.Left:
                 if (nd != null) {
@@ -921,7 +920,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie) {
+        if (_itemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
             ie.Edit();
         }
     }
@@ -969,10 +968,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 break;
         }
 
-        if (toAdd is AbstractListItem ali) {
+        if (toAdd is { } ali) {
             AddAndCheck(ali);
 
-            if (_itemEditAllowed && ali is ReadableListItem rli && rli.Item is IEditable ie) {
+            if (_itemEditAllowed && ali is ReadableListItem { Item: IEditable ie }) {
                 ie.Edit();
             }
 
@@ -1050,16 +1049,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (MousePos().X < 0 || MousePos().Y < 0 || MousePos().X > Width || MousePos().Y > Height) { isInForm = false; }
 
         var nd = MouseOverNode(MousePos().X, MousePos().Y);
-        if (!Enabled || Parent == null || !Parent.Enabled || !Visible) {
+        if (!Enabled || Parent is not { Enabled: true } || !Visible) {
             nd = null;
             isInForm = false;
         }
 
         var showAdd = AddAllowed != AddType.None && isInForm;
 
-
         showAdd = (showAdd && (SliderY.Value == SliderY.Maximum || _mousemoved));
-
 
         if (showAdd) {
             btnPlus.Left = 2;
@@ -1138,7 +1135,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             var editok = false;
 
             if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli) {
-                if (rli.Item is IEditable ie && ie.Editor != null) { editok = true; }
+                if (rli.Item is IEditable { Editor: not null }) { editok = true; }
                 if (rli.Item is ISimpleEditor) { editok = true; }
             }
 

@@ -60,7 +60,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     private string _initialtext = string.Empty;
 
     private List<AbstractListItem> _item = new();
-    private bool _itemEditAllowed = false;
+    private bool _itemEditAllowed;
 
     private string? _lastClickedText;
 
@@ -287,8 +287,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         if (_dropDownStyle == ComboBoxStyle.DropDown) {
-            if (i is TextListItem tempVar2) {
-                if (tempVar2.Symbol == null && tempVar2.IsClickable()) {
+            if (i is TextListItem { Symbol: null } tempVar2) {
+                if (tempVar2.IsClickable()) {
                     base.DrawControl(gr, state);
                     btnDropDown.Invalidate();
                     btnEdit.Invalidate();
@@ -350,7 +350,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         var editok = false;
 
         if (_mouseOverItem is ReadableListItem rli) {
-            if (rli.Item is IEditable ie && ie.Editor != null) { editok = true; }
+            if (rli.Item is IEditable { Editor: not null }) { editok = true; }
             if (rli.Item is ISimpleEditor) { editok = true; }
         }
 
@@ -391,7 +391,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         var _mouseOverItem = _item.Get(Text);
 
-        if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli && rli.Item is IEditable ie) {
+        if (_itemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
             ie.Edit();
         }
     }
@@ -415,7 +415,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
 
-        if (e.Item is AbstractListItem bli) {
+        if (e.Item is { } bli) {
             _lastClickedText = bli.KeyName;
             Text = bli.KeyName;
             OnItemClicked(new AbstractListItemEventArgs(bli));

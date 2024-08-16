@@ -108,7 +108,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var cl = new List<AbstractListItem>();
 
-        if (DatabaseInput is Database db && !db.IsDisposed) {
+        if (DatabaseInput is { IsDisposed: false } db) {
             if (Directory.Exists(db.AdditionalFilesPfad)) {
                 var f = Directory.GetFiles(db.AdditionalFilesPfad, "*.bcr");
 

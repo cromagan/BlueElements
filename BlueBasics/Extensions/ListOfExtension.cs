@@ -41,7 +41,7 @@ public static partial class Extensions {
     #region Methods
 
     public static bool AddIfNotExists<T>(this ICollection<T> l, ICollection<T>? values) {
-        if (values == null || values.Count == 0) { return false; }
+        if (values is not { Count: not 0 }) { return false; }
         var ok1 = values.Count(l.AddIfNotExists) > 0;
         return ok1;
     }
@@ -141,9 +141,7 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {
-        if (value == null) { return; }
-
-        if (value is IDisposableExtended d && d.IsDisposed) { return; }
+        if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
         if (value is IStringable) {
             Develop.DebugPrint(FehlerArt.Fehler, "Stringable Collection nicht möglich!");
@@ -190,9 +188,7 @@ public static partial class Extensions {
     public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add(tagname + "=" + value.ToStringFloat5().ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
-        if (value == null) { return; }
-
-        if (value is IDisposableExtended d && d.IsDisposed) { return; }
+        if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
         var v = value.KeyName;
         if (string.IsNullOrEmpty(v)) { return; }
@@ -218,7 +214,7 @@ public static partial class Extensions {
     /// <param name="tagname"></param>
     /// <param name="value"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value, bool ignoreEmpty) {
-        if (value == null || value.Count == 0) {
+        if (value is not { Count: not 0 }) {
             if (ignoreEmpty) { return; }
             col.Add(tagname + "=");
             return;
@@ -255,9 +251,7 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
-        if (value == null) { return; }
-
-        if (value is IDisposableExtended d && d.IsDisposed) { return; }
+        if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
         col.Add(tagname + "=" + value.ToParseableString().ToNonCritical());
     }
@@ -287,7 +281,7 @@ public static partial class Extensions {
     }
 
     public static bool RemoveNull<T>(this IList<T>? l) {
-        if (l == null || l.Count == 0) { return false; }
+        if (l is not { Count: not 0 }) { return false; }
         var did = false;
         var z = 0;
         while (z < l.Count) {
@@ -303,7 +297,7 @@ public static partial class Extensions {
     }
 
     public static bool RemoveNullOrEmpty<T>(this IList<T>? l) where T : ICanBeEmpty {
-        if (l == null || l.Count == 0) { return false; }
+        if (l is not { Count: not 0 }) { return false; }
         var did = false;
         var z = 0;
         while (z < l.Count) {
@@ -331,7 +325,7 @@ public static partial class Extensions {
     }
 
     public static void RemoveString(this IList<string>? l, string value, bool caseSensitive) {
-        if (l == null || l.Count == 0) { return; }
+        if (l is not { Count: not 0 }) { return; }
 
         var cas = StringComparison.OrdinalIgnoreCase;
         if (!caseSensitive) { cas = StringComparison.Ordinal; }

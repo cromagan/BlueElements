@@ -147,7 +147,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
     }
 
     public override string ErrorReason() {
-        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             if (ChangeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }

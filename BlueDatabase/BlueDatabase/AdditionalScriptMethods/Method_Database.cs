@@ -38,7 +38,7 @@ public abstract class Method_Database : Method {
     #region Methods
 
     protected static Database? MyDatabase(ScriptProperties scp) {
-        if (scp.AdditionalInfo is Database db && !db.IsDisposed) { return db; }
+        if (scp.AdditionalInfo is Database { IsDisposed: false } db) { return db; }
         if (scp.AdditionalInfo is RowItem r) { return r.Database; }
         return null;
     }

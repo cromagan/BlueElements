@@ -39,7 +39,7 @@ public class Method_FilterInMyDB : Method_Database {
 
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
                                                 "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between'  unterstützt.\r\n" +
-                                            "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +  
+                                            "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
                                             "Bei Between müssen die Werte so Angegeben werden: 50|100";
 
     public override bool GetCodeBlockAfter => false;
@@ -56,7 +56,7 @@ public class Method_FilterInMyDB : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 0);
-        if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         #region Typ ermitteln
 

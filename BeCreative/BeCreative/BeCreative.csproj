@@ -3,45 +3,19 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <LangVersion>latest</LangVersion>
     <ProjectGuid>{14EC995D-9366-4481-AF41-90395E4421D3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <StartupObject>BeCreative.Program</StartupObject>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BeCreative</RootNamespace>
     <AssemblyName>BeCreative</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <ApplicationIcon>
-    </ApplicationIcon>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,8 +26,6 @@
     <WarningLevel>1</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,50 +34,31 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>BeCreative.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>latest</LangVersion>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;TRACE;WINDOWSFORMSWITHCUSTOMSUBMAIN</DefineConstants>
     <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWSFORMSWITHCUSTOMSUBMAIN</DefineConstants>
     <DocumentationFile>BeCreative.xml</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-    <Optimize>false</Optimize>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DefineConstants>TRACE;WINDOWSFORMSWITHCUSTOMSUBMAIN</DefineConstants>
     <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWSFORMSWITHCUSTOMSUBMAIN</DefineConstants>
     <DocumentationFile>BeCreative.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <Import Include="System" />
-    <Import Include="System.Collections" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Drawing" />
-    <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -129,28 +82,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4 %28x86 und x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
@@ -163,17 +94,9 @@
       <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
       <Name>BlueDatabase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\BlueInternet\BlueInternet\BlueInternet.csproj">
-      <Project>{7f05b524-a65b-46f7-a798-e5bb27938f6e}</Project>
-      <Name>BlueInternet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\BluePaint\BluePaint\BluePaint.csproj">
       <Project>{f357f648-987a-4442-93a9-bfc421561dd2}</Project>
       <Name>BluePaint</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj">
-      <Project>{3acc6ee6-b919-4952-8502-f62baeeefc60}</Project>
-      <Name>BlueScript</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -181,32 +104,5 @@
       <DependentUpon>Start.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CefSharp.Common">
-      <Version>126.2.180</Version>
-    </PackageReference>
-    <PackageReference Include="CefSharp.OffScreen">
-      <Version>126.2.180</Version>
-    </PackageReference>
-    <PackageReference Include="CefSharp.WinForms">
-      <Version>126.2.180</Version>
-    </PackageReference>
-    <PackageReference Include="chromiumembeddedframework.runtime.win-x64">
-      <Version>126.2.18</Version>
-    </PackageReference>
-    <PackageReference Include="chromiumembeddedframework.runtime.win-x86">
-      <Version>126.2.18</Version>
-    </PackageReference>
-    <PackageReference Include="FCTB">
-      <Version>2.16.24</Version>
-    </PackageReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

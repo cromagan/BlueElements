@@ -47,10 +47,8 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Properties
 
-    public int AttWithError { get; }
-
     public VariableCollection Attributes { get; }
-
+    public int AttWithError { get; }
     public string ErrorMessage { get; }
 
     public ScriptIssueType FehlerTyp { get; }
@@ -62,25 +60,25 @@ public readonly struct SplittedAttributesFeedback {
     public string MyClassId(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        return Attributes[varno] is Variable vs ? vs.MyClassId : string.Empty;
+        return Attributes[varno] is { } vs ? vs.MyClassId : string.Empty;
     }
 
     public string Name(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        return Attributes[varno] is Variable vs ? vs.KeyName : string.Empty;
+        return Attributes[varno] is { } vs ? vs.KeyName : string.Empty;
     }
 
     public string ReadableText(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        return Attributes[varno] is Variable vs ? vs.ReadableText : string.Empty;
+        return Attributes[varno] is { } vs ? vs.ReadableText : string.Empty;
     }
 
     public bool ReadOnly(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return true; }
 
-        return Attributes[varno] is not Variable vs || vs.ReadOnly;
+        return Attributes[varno] is not { ReadOnly: not true };
     }
 
     public Bitmap? ValueBitmapGet(int varno) {
@@ -92,7 +90,7 @@ public readonly struct SplittedAttributesFeedback {
     public bool ValueBoolGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return false; }
 
-        return Attributes[varno] is VariableBool vs && vs.ValueBool;
+        return Attributes[varno] is VariableBool { ValueBool: true };
     }
 
     public DateTime? ValueDateGet(int varno) {

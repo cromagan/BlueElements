@@ -133,7 +133,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool KeyUp(KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
+        if (PadInternal?.Item is not { Count: not 0 }) { return false; }
         PadInternal.DoKeyUp(e, false);
         return true;
     }
@@ -338,12 +338,12 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     private MouseEventArgs? ZoomMouse(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return null; }
+        if (PadInternal?.Item is not { Count: not 0 }) { return null; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
         if (l1.Width <= 0 || l2.Height <= 0) { return null; }
         float tZo = 1;
-        if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
+        if (l2 is { Width: > 0, Height: > 0 }) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
         PadInternal.Zoom = 1f;
 
         // Coordinaten auf Maßstab 1/1 scalieren

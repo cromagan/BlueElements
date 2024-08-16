@@ -55,7 +55,7 @@ public class Method_ImportLinked : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Zeilenfehler!"); }
+        if (r?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Zeilenfehler!"); }
 
         #endregion
 
@@ -65,7 +65,7 @@ public class Method_ImportLinked : Method_Database {
             if (thisColumn.Function is not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
-            if (linkedDatabase == null || linkedDatabase.IsDisposed) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
+            if (linkedDatabase is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
 
             var targetColumn = linkedDatabase.Column[thisColumn.LinkedCell_ColumnNameOfLinkedDatabase];
             if (targetColumn == null) { return new DoItFeedback(ld, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }

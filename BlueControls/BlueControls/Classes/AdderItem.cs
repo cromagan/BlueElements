@@ -67,7 +67,7 @@ internal class AdderItem : IReadableTextWithKey {
     #region Methods
 
     public static void AddRowsToDatabase(ColumnItem? OriginIDColumn, List<string> KeysAndInfo, string GeneratedEntityID, ColumnItem? AdditionalInfoColumn) {
-        if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
+        if (OriginIDColumn?.Database is not { IsDisposed: false } db) { return; }
 
         for (var z = 0; z < KeysAndInfo.Count; z++) {
             var key = OriginId(KeysAndInfo[z], OriginIDColumn, GeneratedEntityID);
@@ -104,7 +104,7 @@ internal class AdderItem : IReadableTextWithKey {
     }
 
     public static void RemoveRowsFromDatabase(ColumnItem? OriginIDColumn, string GeneratedEntityId, string KeyName) {
-        if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return; }
+        if (OriginIDColumn?.Database is not { IsDisposed: false } db) { return; }
 
         var fi = new FilterCollection(db, "Zeilengenerator im Formular");
         var key = OriginId(KeyName + "#", OriginIDColumn, GeneratedEntityId);
@@ -124,7 +124,7 @@ internal class AdderItem : IReadableTextWithKey {
     public QuickImage? SymbolForReadableText() => null;
 
     private static string OriginId(string keyAndInfos, ColumnItem OriginIDColumn, string GeneratedEntityID) {
-        if (OriginIDColumn?.Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (OriginIDColumn?.Database is not { IsDisposed: false }) { return string.Empty; }
         return GeneratedEntityID + "\\" + keyAndInfos.SplitBy("#")[0];
     }
 

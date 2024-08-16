@@ -56,7 +56,7 @@ internal class Method_ExtractFirstText : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        if (tags == null || tags.Count == 0) {
+        if (tags is not { Count: not 0 }) {
             return new DoItFeedback(attvar.ValueStringGet(2));
         }
 

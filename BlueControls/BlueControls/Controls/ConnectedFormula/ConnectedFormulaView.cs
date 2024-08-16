@@ -181,9 +181,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
                         }
 
                         if (con.Visible && con is FlexiControlForCell fo &&
-                           thisit is EditFieldPadItem efpi && efpi.AutoX &&
-                           efpi.CaptionPosition is CaptionPosition.Links_neben_dem_Feld or
-                                                   CaptionPosition.Links_neben_dem_Feld_unsichtbar) { autoc.Add(fo); }
+                            thisit is EditFieldPadItem {
+                                AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
+                                CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                            }) { autoc.Add(fo); }
                     }
                 }
             }
@@ -204,7 +205,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     }
 
     public void GetConnectedFormulaFromDatabase(Database? database) {
-        if (database != null && !database.IsDisposed) {
+        if (database is { IsDisposed: false }) {
             var f = database.FormulaFileName();
 
             if (f != null) {
@@ -247,13 +248,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         }
 
         if (FilterOutput.Database != database) {
-            if (FilterOutput.Database is Database db1 && !db1.IsDisposed) {
+            if (FilterOutput.Database is { IsDisposed: false } db1) {
                 db1.DisposingEvent -= _database_Disposing;
             }
             InvalidateView();
             FilterOutput.Database = database;
 
-            if (FilterOutput.Database is Database db2 && !db2.IsDisposed) {
+            if (FilterOutput.Database is { IsDisposed: false } db2) {
                 db2.DisposingEvent += _database_Disposing;
             }
         }
@@ -273,13 +274,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
         try {
             foreach (var thisC in base.Controls) {
-                if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
+                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
             }
 
             if (onlySerach) { return null; }
 
             var c = thisit.CreateControl(this, mode);
-            if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
+            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName()) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;
             }
@@ -337,10 +338,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         DoInputFilter(FilterOutput.Database, false);
         DoRows();
 
-        if (RowSingleOrNull() is RowItem r) {
+        if (RowSingleOrNull() is { IsDisposed: false } r) {
             FilterOutput.ChangeTo(new FilterItem(r));
 
-            btnScript.Visible = r.Database is Database db && !string.IsNullOrEmpty(db.ScriptNeedFix);
+            btnScript.Visible = r.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.ScriptNeedFix);
 
             if (btnScript.Visible) { btnScript.BringToFront(); }
         } else {
@@ -366,7 +367,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
-            if (IsDisposed || RowSingleOrNull()?.Database is not Database db || db.IsDisposed) { return; }
+            if (IsDisposed || RowSingleOrNull()?.Database is not { IsDisposed: false } db) { return; }
 
             var se = new DatabaseScriptEditor(db);
             _ = se.ShowDialog();

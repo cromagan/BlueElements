@@ -371,7 +371,7 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
         var l = new List<string>();
 
         foreach (var thisCf in AllFiles) {
-            if (!thisCf.IsDisposed && thisCf.PadData is ItemCollectionPad.ItemCollectionPad icp) {
+            if (thisCf is { IsDisposed: false, PadData: { IsDisposed: false } icp }) {
                 l.AddRange(icp.VisibleFor_AllUsed());
             }
         }
@@ -515,8 +515,8 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
             if (string.IsNullOrEmpty(page) ||
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
-                if (thisItem is ReciverControlPadItem cspi) {
-                    if (cspi.MustBeInDrawingArea && cspi.IsVisibleForMe(mode, false)) { return true; }
+                if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
+                    if (cspi.IsVisibleForMe(mode, false)) { return true; }
                 }
             }
         }

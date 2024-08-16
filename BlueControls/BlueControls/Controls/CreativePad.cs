@@ -178,7 +178,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     #region Methods
 
     public void CopyPrinterSettingsToWorkingArea() {
-        if (_item == null || _item.IsDisposed) { return; }
+        if (_item is not { IsDisposed: not true }) { return; }
         if (DruckerDokument.DefaultPageSettings.Landscape) {
             _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
             _item.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
@@ -529,7 +529,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
-            if (_givesMouseCommandsTo is AbstractPadItem pa && !pa.IsDisposed) {
+            if (_givesMouseCommandsTo is AbstractPadItem { IsDisposed: false } pa) {
                 var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
                 gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
             }
@@ -558,7 +558,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     private void _Item_ItemAdded(object sender, ListEventArgs e) {
         if (IsDisposed) { return; }
-        if (_item == null || _item.Count == 0 || Fitting) { ZoomFit(); }
+        if (_item is not { Count: not 0 } || Fitting) { ZoomFit(); }
         Invalidate();
 
         var it = (AbstractPadItem)e.Item;
@@ -629,7 +629,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
         if (pointToMove == null) {
             foreach (var thisIt in _itemsToMove) {
-                if (thisIt is AbstractPadItem bpi && bpi.PointsForSuccesfullyMove.Count > 0) {
+                if (thisIt is AbstractPadItem { PointsForSuccesfullyMove.Count: > 0 } bpi) {
                     pointToMove = bpi.PointsForSuccesfullyMove[0];
                     break;
                 }
@@ -693,7 +693,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {
-        if (_item == null || _item.SnapMode != SnapMode.SnapToGrid || Math.Abs(_item.GridSnap) < 0.001) { return mouseMovedTo; }
+        if (_item is not { SnapMode: SnapMode.SnapToGrid } || Math.Abs(_item.GridSnap) < 0.001) { return mouseMovedTo; }
         if (movedPoint is null) { return 0f; }
 
         var multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);

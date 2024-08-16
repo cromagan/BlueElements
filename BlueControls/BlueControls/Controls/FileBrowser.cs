@@ -231,7 +231,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             if (r != null) {
                 r.CheckRowDataIfNeeded();
 
-                if (r.LastCheckedEventArgs?.Variables is VariableCollection list) {
+                if (r.LastCheckedEventArgs?.Variables is { } list) {
                     tmpDirectory = list.ReplaceInText(_var_directory);
                     tmpDirectoryMin = list.ReplaceInText(_var_directorymin);
                 }
@@ -579,7 +579,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             }
         } catch { }
 
-        if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
+        if (ThumbGenerator is { IsBusy: true, CancellationPending: false }) { ThumbGenerator.CancelAsync(); }
         lsbFiles.ItemClear();
 
         _workinDir = string.Empty;

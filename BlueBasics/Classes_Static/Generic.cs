@@ -175,7 +175,7 @@ public static class Generic {
         foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
             try {
                 foreach (var thist in thisas.GetTypes()) {
-                    if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
+                    if (thist is { IsClass: true, IsAbstract: false } && thist.IsSubclassOf(typeof(T))) {
                         l.Add(thist);
                     }
                 }
@@ -199,7 +199,7 @@ public static class Generic {
             try {
                 foreach (var thist in thisas.GetTypes()) {
                     try {
-                        if (thist.IsClass && !thist.IsAbstract && typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
+                        if (thist is { IsClass: true, IsAbstract: false } && typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
                             l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                         }
                     } catch { }

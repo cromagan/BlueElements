@@ -85,9 +85,9 @@ public sealed class ColumnViewItem : IParseable {
 
     public static int CalculateColumnContentWidth(ColumnItem column, Font cellFont, int pix16) {
         if (column.IsDisposed) { return 16; }
-        if (column.Database is not Database db || db.IsDisposed) { return 16; }
+        if (column.Database is not { IsDisposed: false } db) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
-        if (column.Contentwidth is int v) { return v; }
+        if (column.Contentwidth is { } v) { return v; }
 
         column.RefreshColumnsData();
 
@@ -112,7 +112,7 @@ public sealed class ColumnViewItem : IParseable {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
         if (Column == null) { return 0; }
-        if (TmpDrawWidth is int v) { return v; }
+        if (TmpDrawWidth is { } v) { return v; }
 
         if (Parent.Count == 1) {
             TmpDrawWidth = displayRectangleWoSlider.Width;
@@ -140,7 +140,7 @@ public sealed class ColumnViewItem : IParseable {
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
-        if (Parent.Database is not Database db) {
+        if (Parent.Database is not { IsDisposed: false } db) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank unbekannt");
             return false;
         }

@@ -97,7 +97,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _caption = string.Empty;
     private System.Threading.Timer? _checker;
     private int _checkerTickCount = -5;
-    private bool _completing = false;
+    private bool _completing;
     private string _createDate;
     private string _creator;
     private string _editNormalyError = string.Empty;
@@ -154,7 +154,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //_globalShowPass = string.Empty;
         _creator = UserName;
         _createDate = DateTime.UtcNow.ToString9();
-        FileStateUTCDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
+        FileStateUtcDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
         //_caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         //_globalScale = 1f;
@@ -216,7 +216,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string DatabaseId => nameof(Database);
 
-    public static int ExecutingScriptAnyDatabase { get; set; } = 0;
+    public static int ExecutingScriptAnyDatabase { get; set; }
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
@@ -294,7 +294,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemachte werden.
     /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
     /// </summary>
-    public int DoingChanges { get; private set; } = 0;
+    public int DoingChanges { get; private set; }
 
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
@@ -323,7 +323,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public int ExecutingScript { get; private set; } = 0;
+    public int ExecutingScript { get; private set; }
 
     public string Filename { get; protected set; } = string.Empty;
 
@@ -333,11 +333,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Kann hier nur gelesen werden! Da eine Änderung über die Property  die Datei wieder auf ungespeichert setzen würde, würde hier eine
     /// Kettenreaktion ausgelöst werden.
     /// </summary>
-    public DateTime FileStateUTCDate { get; protected set; }
+    public DateTime FileStateUtcDate { get; protected set; }
 
     /// <summary>
-    /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
-    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten.
+    /// Der FreezedReason kann niemals wieder rückgängig gemacht werden.
+    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehen.
     /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
@@ -831,9 +831,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public static List<string> Permission_AllUsed(bool cellLevel) {
         var l = new List<string>();
 
-        foreach (var thisDB in AllFiles) {
-            if (!thisDB.IsDisposed) {
-                l.AddRange(thisDB.Permission_AllUsedInThisDB(cellLevel));
+        foreach (var thisDb in AllFiles) {
+            if (!thisDb.IsDisposed) {
+                l.AddRange(thisDb.Permission_AllUsedInThisDB(cellLevel));
             }
         }
 
@@ -868,7 +868,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public static bool SaveToFile(Database db, int minLen, string filn) {
-        var bytes = ToListOfByte(db, minLen, db.FileStateUTCDate);
+        var bytes = ToListOfByte(db, minLen, db.FileStateUtcDate);
 
         if (bytes == null) { return false; }
 
@@ -976,7 +976,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public static string UndoText(ColumnItem? column, RowItem? row) {
-        if (column?.Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (column?.Database is not { IsDisposed: false } db) { return string.Empty; }
 
         if (db.Undo.Count == 0) { return string.Empty; }
 
@@ -1225,7 +1225,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         VariableCollection vars = [];
 
-        if (row != null && !row.IsDisposed) {
+        if (row is { IsDisposed: false }) {
             foreach (var thisCol in Column) {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
                 if (v != null) { vars.Add(v); }
@@ -1247,7 +1247,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
 
-        if (Column.First() is ColumnItem fc) {
+        if (Column.First() is { IsDisposed: false } fc) {
             vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
             if (fc.ScriptType != ScriptType.Nicht_vorhanden && row != null) {
@@ -1399,7 +1399,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var rowstamp = string.Empty;
 
             object addinfo = this;
-            if (row != null && !row.IsDisposed) {
+            if (row is { IsDisposed: false }) {
                 rowstamp = row.RowStamp();
                 addinfo = row;
             }
@@ -1408,7 +1408,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
 
-            if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
+            if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
 
             if (s.EventTypes == ScriptEventTypes.Ohne_Auslöser || extended) {
                 allowedMethods |= MethodType.ManipulatesUser;
@@ -1478,7 +1478,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region Variablen zurückschreiben
 
             if (s.ChangeValues) {
-                if (row != null && !row.IsDisposed) {
+                if (row is { IsDisposed: false }) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars, s.KeyName);
                     }
@@ -1637,7 +1637,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         foreach (var thisRow in sortedRows) {
-            if (thisRow != null && !thisRow.IsDisposed) {
+            if (thisRow is { IsDisposed: false }) {
                 for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
                     if (columnListtmp[colNr] != null) {
                         var tmp = Cell.GetString(columnListtmp[colNr], thisRow);
@@ -2006,10 +2006,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Parse(bLoaded, needPassword);
 
-        if (FileStateUTCDate.Year < 2000) {
-            FileStateUTCDate = new DateTime(2000, 1, 1);
+        if (FileStateUtcDate.Year < 2000) {
+            FileStateUtcDate = new DateTime(2000, 1, 1);
         }
-        IsInCache = FileStateUTCDate;
+        IsInCache = FileStateUtcDate;
 
         CheckSysUndoNow(new List<Database> { this }, true);
 
@@ -2097,7 +2097,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Column.GetSystems();
 
-        if (Column.SysChapter is ColumnItem c) {
+        if (Column.SysChapter is { IsDisposed: false } c) {
             var x = c.Contents();
             if (x.Count < 2) {
                 Column.Remove(c, "Automatische Optimierung");
@@ -2143,7 +2143,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         try {
             if (IsAdministrator()) { return true; }
             if (PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
-            if (allowed == null || allowed.Count == 0) { return false; }
+            if (allowed is not { Count: not 0 }) { return false; }
             if (allowed.Any(thisString => PermissionCheckWithoutAdmin(thisString, row))) {
                 return true;
             }
@@ -2164,7 +2164,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return true;
         }
 
-        if (Column.SysRowCreator is ColumnItem src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
+        if (Column.SysRowCreator is { IsDisposed: false } src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
             if (row != null && Cell.GetString(src, row).ToUpperInvariant() == tmpName) { return true; }
         } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
             return true;
@@ -2183,8 +2183,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (thiscol != null) {
                 thiscol.IsInCache = DateTime.UtcNow;
 
-                if (thiscol.LinkedDatabase is Database db && !db.IsDisposed &&
-                    db.Column[thiscol.LinkedCell_ColumnNameOfLinkedDatabase] is ColumnItem col) {
+                if (thiscol.LinkedDatabase is { IsDisposed: false and false } db &&
+                    db.Column[thiscol.LinkedCell_ColumnNameOfLinkedDatabase] is { IsDisposed: false } col) {
                     db.RefreshColumnsData(col);
                 }
             }
@@ -2196,7 +2196,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var c = new List<ColumnItem>();
 
             foreach (var thisF in filter) {
-                if (thisF.Column is ColumnItem ci && ci.IsInCache == null) {
+                if (thisF.Column is { IsDisposed: false, IsInCache: null } ci) {
                     _ = c.AddIfNotExists(ci);
                 }
             }
@@ -2245,7 +2245,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!HasPendingChanges) { return false; }
 
         _isInSave = true;
-        var v = SaveInternal(FileStateUTCDate);
+        var v = SaveInternal(FileStateUtcDate);
         _isInSave = false;
         OnInvalidateView();
         return v;
@@ -2259,7 +2259,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Filename = newFileName;
 
-        var l = ToListOfByte(this, 100, FileStateUTCDate);
+        var l = ToListOfByte(this, 100, FileStateUtcDate);
 
         if (l == null) { return; }
 
@@ -2363,7 +2363,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is Database db && !db.IsDisposed) {
+                if (thisa is { IsDisposed: false and false } db) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }
@@ -2430,7 +2430,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
-            if (thisFile is Database db && !db.IsDisposed) {
+            if (thisFile is { IsDisposed: false and false } db) {
                 if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                     _ = thisFile.Save();
                     Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
@@ -2491,7 +2491,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _ = MoveFile(tmpFileName, Filename, true);
         Develop.SetUserDidSomething();
         HasPendingChanges = false;
-        FileStateUTCDate = setfileStateUtcDateTo;
+        FileStateUtcDate = setfileStateUtcDateTo;
 
         _completing = false;
         return true;
@@ -2519,7 +2519,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         LastChange = DateTime.UtcNow;
 
         if (type.IsCellValue()) {
-            if (column?.Database is not Database db || db.IsDisposed) { return (string.Empty, column, row); }
+            if (column?.Database is not { IsDisposed: false } db) { return (string.Empty, column, row); }
             if (row == null) { return (string.Empty, column, row); }
 
             column.Invalidate_ContentWidth();
@@ -2534,7 +2534,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (type.IsColumnTag()) {
-            if (column == null || column.IsDisposed || Column.IsDisposed) {
+            if (column is not { IsDisposed: not true } || Column.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
                 return (string.Empty, null, null);
@@ -2608,7 +2608,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.FileStateUTCDate:
-                FileStateUTCDate = DateTimeParse(value);
+                FileStateUtcDate = DateTimeParse(value);
                 break;
 
             case DatabaseDataType.CreateDateUTC:
@@ -2755,9 +2755,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private static bool CriticalState() {
         foreach (var thisDb in AllFiles) {
-            if (!thisDb.IsDisposed) {
+            if (thisDb is { IsDisposed: false, IsInCache.Year: < 2000 }) {
                 //if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (thisDb.IsInCache.Year < 2000 && !string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Datenbank wird aktuell geladen
+                if (!string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Datenbank wird aktuell geladen
             }
         }
 
@@ -2949,7 +2949,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private static void SaveToByteList(ColumnItem c, ref List<byte> l) {
-        if (c.Database is not Database db || db.IsDisposed) { return; }
+        if (c.Database is not { IsDisposed: false } db) { return; }
 
         var name = c.KeyName;
 
@@ -3020,7 +3020,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
-        if (column.Database is not Database db || db.IsDisposed) { return; }
+        if (column.Database is not { IsDisposed: false } db) { return; }
 
         var cellContent = db.Cell.GetStringCore(column, row);
         if (string.IsNullOrEmpty(cellContent)) { return; }
@@ -3262,7 +3262,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
-        if (bLoaded != null && bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
+        if (bLoaded is { Length: > 4 } && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
             // Gezipte Daten-Kennung gefunden
             bLoaded = bLoaded.UnzipIt();
         }
@@ -3299,12 +3299,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.SearchByKey(rowKey);
-                        if (row == null || row.IsDisposed) {
+                        if (row is not { IsDisposed: not true }) {
                             _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
                             row = Row.SearchByKey(rowKey);
                         }
 
-                        if (row == null || row.IsDisposed) {
+                        if (row is not { IsDisposed: not true }) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
                             Freeze("Zeile hinzufügen Fehler");
                             return;
@@ -3335,7 +3335,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     if (!string.IsNullOrEmpty(columname)) {
                         column = Column[columname];
-                        if (column == null || column.IsDisposed) {
+                        if (column is not { IsDisposed: not true }) {
                             if (command != DatabaseDataType.ColumnName) {
                                 Develop.DebugPrint(command + " an erster Stelle!");
                             }
@@ -3344,7 +3344,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                             column = Column[columname];
                         }
 
-                        if (column == null || column.IsDisposed) {
+                        if (column is not { IsDisposed: not true }) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
                             Freeze("Spalte hinzufügen Fehler");
                             return;

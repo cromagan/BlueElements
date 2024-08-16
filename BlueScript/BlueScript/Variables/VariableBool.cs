@@ -118,7 +118,7 @@ public class VariableBool : Variable {
     }
 
     protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
-        if (Method_If.GetBool(txt) is bool b) { return (true, b); }
+        if (Method_If.GetBool(txt) is { } b) { return (true, b); }
 
         if (scp == null) { return (false, null); }
 

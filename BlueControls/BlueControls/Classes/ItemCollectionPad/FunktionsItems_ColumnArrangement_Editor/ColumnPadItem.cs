@@ -45,7 +45,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         Column = c;
         Permanent = permanent;
 
-        if (Column != null && !Column.IsDisposed) {
+        if (Column is { IsDisposed: false }) {
             Column.PropertyChanged += Column_PropertyChanged;
         }
     }
@@ -56,7 +56,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public static string ClassId => "FI-Column";
     public ColumnItem? Column { get; }
-    public string Datenbank => IsDisposed || Column?.Database is not Database db || db.IsDisposed ? "?" : db.TableName;
+    public string Datenbank => IsDisposed || Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
     public override string Description => string.Empty;
     public override string MyClassId => ClassId;
     /// <summary>
@@ -85,7 +85,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        if (Column?.Database is not Database db || Column.IsDisposed) { return []; }
+        if (Column?.Database is not { IsDisposed: false } db || Column.IsDisposed) { return []; }
 
         db.Editor = typeof(DatabaseHeadEditor);
         Column.Editor = typeof(ColumnEditor);
@@ -106,12 +106,11 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
         result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
-
         return result;
     }
 
     public void Spalte_bearbeiten() {
-        if (Column == null || Column.IsDisposed) { return; }
+        if (Column is not { IsDisposed: not true }) { return; }
         TableView.OpenColumnEditor(Column, null, null);
     }
 
@@ -128,7 +127,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {
-            if (Column != null && !Column.IsDisposed) {
+            if (Column is { IsDisposed: false }) {
                 Column.PropertyChanged -= Column_PropertyChanged;
             }
             //Column = null;
@@ -136,7 +135,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     }
 
     protected override void GeneratePic() {
-        if (Column == null || Column.IsDisposed) {
+        if (Column is not { IsDisposed: not true }) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
@@ -167,7 +166,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
 
         var r = Column.Database?.Row.First();
-        if (r != null && !r.IsDisposed) {
+        if (r is { IsDisposed: false }) {
             Table.Draw_FormatedText(gr, r.CellGetString(Column), ShortenStyle.Replaced, Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, Column.BehaviorOfImageAndText, 1);
         }
 

@@ -50,7 +50,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private string _allowedChars = string.Empty;
 
-    private int _blinkCount = 0;
+    private int _blinkCount;
     private int _cursorCharPos = -1;
     private bool _cursorVisible;
     private bool _formatierungErlaubt;
@@ -62,7 +62,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private int _mouseValue;
     private bool _multiline;
     private bool _mustCheck = true;
-    private int _raiseChangeDelay = 0;
+    private int _raiseChangeDelay;
     private string _regex = string.Empty;
 
     private Slider? _sliderY;
@@ -370,13 +370,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-
         e.HotItem = null;
         AbortSpellChecking();
 
         if (e.Mouse != null) {
-
-           var tmp = Cursor_PosAt(e.Mouse.X, e.Mouse.Y);
+            var tmp = Cursor_PosAt(e.Mouse.X, e.Mouse.Y);
             var tmpWord = _eTxt.Word(tmp);
 
             var tags = new List<string>();
@@ -408,7 +406,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     e.ContextMenu.Add(Separator());
                 }
             }
-            if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
+            if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled));
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Kopieren, _markStart >= 0));
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled));
@@ -423,11 +421,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     }
                 }
             }
-
         }
 
         OnContextMenuInit(e);
-
     }
 
     public void InsertText(string? nt) {
@@ -647,7 +643,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
         }
         Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
-        if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
+        if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }
 
     protected virtual Design GetDesign() => Design.TextBox;
@@ -821,7 +817,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
-        if (_sliderY == null || !_sliderY.Visible) { return; }
+        if (_sliderY is not { Visible: true }) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         _sliderY.DoMouseWheel(e);
     }
@@ -870,7 +866,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
         _cursorCharPos = x;
-        if (r == null || r.Count != 1) { return; }
+        if (r is not { Count: 1 }) { return; }
         Char_DelBereich(-1, -1);
         if (_eTxt.InsertImage(r[0], _cursorCharPos)) { _cursorCharPos++; }
         RaiseEventIfTextChanged(false);

@@ -52,7 +52,7 @@ public class Method_GenerateLayoutImage : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Zeilenfehler!"); }
+        if (r?.Database is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeilenfehler!"); }
 
         #endregion
 

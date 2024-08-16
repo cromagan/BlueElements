@@ -120,7 +120,7 @@ public abstract class ExtChar {
     /// <param name="zoom"></param>
     /// <param name="drawingPos">Muss bereits Skaliert sein</param>
     /// <returns></returns>
-    public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => (drawingArea.Width < 1 && drawingArea.Height < 1) ||
+    public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => drawingArea is { Width: < 1, Height: < 1 } ||
         ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
          && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
          && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left

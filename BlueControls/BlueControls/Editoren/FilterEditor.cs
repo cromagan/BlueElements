@@ -42,7 +42,7 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
 
     public Database? Database {
         get {
-            if (ToEdit is not FilterItem f || f.IsDisposed) { return null; }
+            if (ToEdit is not FilterItem { IsDisposed: not true } f) { return null; }
             return f.Database;
         }
     }
@@ -57,23 +57,11 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
         txbFilterText.Text = string.Empty;
     }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
-        if (toEdit is not FilterItem fi || fi.IsDisposed) { return false; }
-
-        cbxFilterType.Text = ((int)fi.FilterType).ToString();
-
-        cbxColumn.Text = fi.Column?.KeyName ?? string.Empty;
-
-        txbFilterText.Text = fi.SearchValue.JoinWithCr();
-
-        return true;
-    }
-
     protected override void InitializeComponentDefaultValues() {
         cbxFilterType.ItemClear();
         cbxColumn.ItemClear();
 
-        if (Database is not Database db) { return; }
+        if (Database is not { IsDisposed: false } db) { return; }
 
         cbxFilterType.ItemAdd(ItemOf("Ohne Filter", "0"));
         cbxFilterType.ItemAdd(ItemOf("Ist (schreibungsneutral)", ((int)FilterType.Istgleich_GroßKleinEgal).ToString()));
@@ -89,20 +77,32 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
         }
     }
 
+    protected override bool SetValuesToFormula(IEditable? toEdit) {
+        if (toEdit is not FilterItem { IsDisposed: not true } fi) { return false; }
+
+        cbxFilterType.Text = ((int)fi.FilterType).ToString();
+
+        cbxColumn.Text = fi.Column?.KeyName ?? string.Empty;
+
+        txbFilterText.Text = fi.SearchValue.JoinWithCr();
+
+        return true;
+    }
+
     private void cbxColumn_TextChanged(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem fi || fi.IsDisposed) { return; }
+        if (ToEdit is not FilterItem { IsDisposed: not true } fi) { return; }
 
         fi.Column = fi.Database?.Column[cbxColumn.Text];
     }
 
     private void cbxFilterType_TextChanged(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem fi || fi.IsDisposed) { return; }
+        if (ToEdit is not FilterItem { IsDisposed: not true } fi) { return; }
 
         fi.FilterType = (FilterType)(IntParse(cbxFilterType.Text));
     }
 
     private void txbFilterText_TextChanged(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem fi || fi.IsDisposed) { return; }
+        if (ToEdit is not FilterItem { IsDisposed: not true } fi) { return; }
 
         fi.SearchValue = (new List<string>() { txbFilterText.Text }).AsReadOnly();
     }

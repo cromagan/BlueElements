@@ -324,8 +324,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        if (DatabaseInput is not Database db || db.IsDisposed) { return result; }
-
+        if (DatabaseInput is not { IsDisposed: false }) { return result; }
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
@@ -339,7 +338,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
         }
 
         result.Add(new FlexiControlForProperty<string>(() => Bild, c));
-
 
         var za = new List<AbstractListItem>();
         za.Add(ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()));
@@ -376,7 +374,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IReadableTex
 
         result.Add(new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3));
 
-     
         return result;
     }
 

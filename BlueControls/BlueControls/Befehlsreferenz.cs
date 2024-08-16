@@ -41,7 +41,7 @@ public partial class Befehlsreferenz : Forms.Form {
 
     private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
-        if (e.Item is ReadableListItem r && r.Item is Method thisc) {
+        if (e.Item is ReadableListItem { Item: Method thisc }) {
             co += thisc.HintText();
         }
         txbComms.Text = co;

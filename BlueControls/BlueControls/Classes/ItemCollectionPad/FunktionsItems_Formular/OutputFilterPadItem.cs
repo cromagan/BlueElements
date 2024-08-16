@@ -81,7 +81,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public ColumnItem? Column {
         get {
             var c = DatabaseOutput?.Column[_columnName];
-            return c == null || c.IsDisposed ? null : c;
+            return c is not { IsDisposed: not true } ? null : c;
         }
     }
 
@@ -143,7 +143,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public override string ErrorReason() {
-        if (Column == null || Column.IsDisposed) {
+        if (Column is not { IsDisposed: not true }) {
             return "Spalte fehlt";
         }
 
@@ -155,7 +155,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
-        if (DatabaseOutput is Database db && !db.IsDisposed) {
+        if (DatabaseOutput is { IsDisposed: false } db) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(db.Column, true));
 
@@ -173,7 +173,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         var u3 = new List<AbstractListItem>();
         u3.AddRange(ItemsOf(typeof(FlexiFilterDefaultFilter)));
         result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
-
 
         return result;
     }

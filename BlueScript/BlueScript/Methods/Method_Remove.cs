@@ -60,7 +60,7 @@ internal class Method_Remove : Method {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));
             }
         }
-        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is { } dif) { return dif; }
         return DoItFeedback.Null();
     }
 

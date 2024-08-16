@@ -31,8 +31,6 @@ namespace BlueScript.Methods;
 
 public abstract class Method : IReadableTextWithKey, IReadableText {
 
-
-
     #region Fields
 
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
@@ -54,13 +52,10 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
             return _allMethods;
         }
     }
-    public abstract List<string> Constants { get; }
-
 
     public abstract List<List<string>> Args { get; }
-
     public abstract string Command { get; }
-
+    public abstract List<string> Constants { get; }
     public abstract string Description { get; }
 
     public string EndSequence {
@@ -240,7 +235,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         }
 
         var attributes = SplitAttributeToString(attributText);
-        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", -1); }
+        if (attributes is not { Count: not 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", -1); }
         if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", -1); }
         if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", -1); }
         if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.", -1); }
@@ -326,7 +321,7 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
 
         if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback(ld, "Variable unbekannt"); }
 
-        if (attvar.Attributes[0] is Variable v) {
+        if (attvar.Attributes[0] is { } v) {
             if (generateVariable) {
                 v.KeyName = varnam.ToLowerInvariant();
                 v.ReadOnly = false;
@@ -445,7 +440,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         co += "~~~~~~~~~~~\r\n";
         co = co + Description + "\r\n";
 
-
         if (Constants.Count > 0) {
             co += "\r\n";
             co += "Konstanten:\r\n";
@@ -459,9 +453,6 @@ public abstract class Method : IReadableTextWithKey, IReadableText {
         //    co += "~~~~~~~~~~~~\r\n";
         //    co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
         //}
-
-
-
 
         if (Verwendung.Count > 0) {
             co += "\r\n";

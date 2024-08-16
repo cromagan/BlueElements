@@ -88,7 +88,7 @@ public static class Allgemein {
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is Database db && !db.IsDisposed) {
+                if (thisit is Database { IsDisposed: false } db) {
                     db.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
             }

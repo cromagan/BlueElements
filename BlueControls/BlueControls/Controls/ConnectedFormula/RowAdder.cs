@@ -111,7 +111,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
         vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard |  MethodType.Database | MethodType.MyDatabaseRow);
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow);
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
 
@@ -157,7 +157,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
         DoInputFilter(null, true);
         DoRows();
-
 
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
@@ -217,7 +216,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         List<string> olditems = f.Items.ToListOfString().Select(s => s.Trim(_lastGeneratedEntityId + "\\")).ToList();
 
         foreach (var thisIT in f.Items) {
-            if (thisIT is ReadableListItem rli && rli.Item is AdderItem ai) {
+            if (thisIT is ReadableListItem { Item: AdderItem ai }) {
                 ai.KeysAndInfo.Clear();
             }
             if (thisIT is DropDownListItem dli) {
@@ -341,7 +340,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
 
-        if (e.Item is ReadableListItem rli && rli.Item is AdderItem ai) {
+        if (e.Item is ReadableListItem { Item: AdderItem ai }) {
             AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
         }
 
@@ -353,7 +352,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     private void F_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
-        if (e.Item is ReadableListItem rli && rli.Item is AdderItem ai) {
+        if (e.Item is ReadableListItem { Item: AdderItem ai } rli) {
             if (f.Checked.Contains(rli.KeyName)) {
                 AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
             } else {
@@ -418,10 +417,9 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return "Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText;
         }
 
-
         var menu = scf.Variables?.GetList("Menu");
 
-        if (menu == null || menu.Count < 1) {
+        if (menu is not { Count: >= 1 }) {
             return "Interner Fehler: Skript gab kein Menu zurück";
         }
 

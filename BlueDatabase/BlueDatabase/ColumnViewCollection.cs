@@ -116,7 +116,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <param name="ca"></param>
     /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
-        if (ca.Database is not Database db || db.IsDisposed) { return; }
+        if (ca.Database is not { IsDisposed: false } db) { return; }
 
         #region Ungültige Spalten entfernen
 
@@ -152,7 +152,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public void Add(ColumnItem? column, bool permanent) {
-        if (column == null || column.IsDisposed) { return; }
+        if (column is not { IsDisposed: not true }) { return; }
 
         Add(permanent
             ? new ColumnViewItem(column, ViewType.PermanentColumn, this)
@@ -162,7 +162,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public object Clone() => new ColumnViewCollection(Database, ToParseableString());
 
     public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
@@ -250,7 +250,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         var found = false;
         do {
             if (viewItemNo >= _internal.Count) { return null; }
-            if (_internal[viewItemNo]?.Column is ColumnItem c) {
+            if (_internal[viewItemNo]?.Column is { IsDisposed: false } c) {
                 if (found) { return c; }
                 if (c == column) { found = true; }
             }
@@ -312,7 +312,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         var found = false;
         do {
             if (viewItemNo < 0) { return null; }
-            if (_internal[viewItemNo]?.Column is ColumnItem c) {
+            if (_internal[viewItemNo]?.Column is { IsDisposed: false } c) {
                 if (found) { return c; }
                 if (c == column) { found = true; }
             }
@@ -338,7 +338,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <param name="columns"></param>
     public void Reduce(string[] columns) {
         foreach (var thiscv in _internal) {
-            if (thiscv?.Column is ColumnItem ci) {
+            if (thiscv?.Column is { IsDisposed: false } ci) {
                 thiscv.TmpReduced = columns.Contains(ci.KeyName);
             }
         }
@@ -347,7 +347,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public List<ColumnItem> ReducedColumns() {
         var x = new List<ColumnItem>();
         foreach (var thiscol in _internal) {
-            if (thiscol?.Column != null && thiscol.TmpReduced) { x.Add(thiscol.Column); }
+            if (thiscol is { Column: not null, TmpReduced: true }) { x.Add(thiscol.Column); }
         }
         return x;
     }
@@ -355,7 +355,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
@@ -365,7 +365,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public void ShowColumns(params string[] columnnames) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
         foreach (var thisColumn in columnnames) {
             var c = Database?.Column[thisColumn];

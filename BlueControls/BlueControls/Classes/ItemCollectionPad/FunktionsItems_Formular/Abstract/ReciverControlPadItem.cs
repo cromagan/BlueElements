@@ -195,7 +195,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
         var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, CheckBehavior.SingleSelection, null, AddType.None);
 
-        if (x2 == null || x2.Count != 1) { return; }
+        if (x2 is not { Count: 1 }) { return; }
 
         var doit = x2[0].SplitBy(";");
 
@@ -261,9 +261,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-
         if (Parent is null) { return []; }
-
 
         List<GenericControl> result = [
             new FlexiControl("Eingang:", widthOfControl, true)
@@ -563,7 +561,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(zoom), true);
         }
 
-        if (uc.Width > 0 && uc.Height > 0) {
+        if (uc is { Width: > 0, Height: > 0 }) {
             Skin.Draw_Back(gr, Design.TextBox, States.Standard, uc, null, false);
             Skin.Draw_Border(gr, Design.TextBox, States.Standard, uc);
 

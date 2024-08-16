@@ -58,10 +58,10 @@ internal class Method_AutoCorrect : Method_Database {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var n = 0; n < attvar.Attributes.Count; n++) {
             var column = Column(scp, attvar, n);
-            if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden."); }
+            if (column is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden."); }
             var columnVar = attvar.Attributes[n];
 
-            if (columnVar == null || columnVar.ReadOnly) { return new DoItFeedback(ld, "Variable Schreibgeschützt."); }
+            if (columnVar is not { ReadOnly: not true }) { return new DoItFeedback(ld, "Variable Schreibgeschützt."); }
             if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback(ld, "Spalte nicht veränderbar."); }
 
             var s = string.Empty;

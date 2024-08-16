@@ -57,7 +57,7 @@ public class Method_Lookup : Method_Database {
             return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
         }
 
-        if (db.Column.First() is not ColumnItem cf) {
+        if (db.Column.First() is not { IsDisposed: false } cf) {
             return new DoItFeedback(ld, "Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }
 

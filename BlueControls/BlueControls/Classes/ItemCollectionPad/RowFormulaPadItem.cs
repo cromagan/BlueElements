@@ -103,7 +103,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override string QuickInfo {
         get {
             var r = Row;
-            if (r == null || r.IsDisposed) { return string.Empty; }
+            if (r is not { IsDisposed: not true }) { return string.Empty; }
             if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
             _lastQuickInfo = r.QuickInfo;
             _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + r.CellFirstString() + "]</b>");
@@ -128,7 +128,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
 
-        if (Row?.Database is Database db && !db.IsDisposed) {
+        if (Row?.Database is { IsDisposed: false } db) {
             var layouts = new List<AbstractListItem>();
             foreach (var thisLayouts in db.GetAllLayoutsFileNames()) {
                 ItemCollectionPad p = new(thisLayouts);
@@ -158,14 +158,14 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
             case "firstvalue":
                 var n = value.FromNonCritical();
-                if (Row != null && !Row.IsDisposed) {
+                if (Row is { IsDisposed: false }) {
                     if (!string.Equals(Row.CellFirstString(), n, StringComparison.OrdinalIgnoreCase)) {
                         MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), ImageCode.Information, "OK");
                     }
                     return true; // Alles beim Alten
                 }
 
-                if (Database?.Row[n] is RowItem rowtmp) {
+                if (Database?.Row[n] is { IsDisposed: false } rowtmp) {
                     _rowKey = rowtmp.KeyName;
                     MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, ImageCode.Warnung, "OK");
                 } else {
@@ -184,18 +184,18 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         result.ParseableAdd("LayoutFileName", _layoutFileName);
         result.ParseableAdd("Database", Database);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
-        if (Row is RowItem r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
+        if (Row is { IsDisposed: false } r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
         return result.Parseable(base.ToParseableString());
     }
 
     protected override void GeneratePic() {
-        if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Database is not { IsDisposed: false } db) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
 
         CreativePad pad = new(new ItemCollectionPad(_layoutFileName));
-        if (pad.Item is ItemCollectionPad icp) {
+        if (pad.Item is { IsDisposed: false } icp) {
             icp.ResetVariables();
             icp.ReplaceVariables(db, _rowKey);
 

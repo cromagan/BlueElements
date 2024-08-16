@@ -176,7 +176,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         //}
 
         //var inr = GetFilterFromGet();
-        if (DatabaseOutput is Database dbout && !dbout.IsDisposed) {
+        if (DatabaseOutput is { IsDisposed: false } dbout) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbout.Column, true));
             result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
@@ -189,7 +189,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
             result.Add(new FlexiControlForProperty<string>(() => Fehler_Text));
         }
-
 
         return result;
     }

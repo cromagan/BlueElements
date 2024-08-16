@@ -63,7 +63,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             // Wichtig! Darf nur von HandelChangesNow befültg werden!
             // Grund: Es wird hier nichts invalidiert!
 
-            if (value != null && value.IsDisposed) { value = null; }
+            if (value is { IsDisposed: true }) { value = null; }
 
             if (value == _databaseInput) { return; }
 
@@ -77,7 +77,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
             _databaseInput = value;
 
-            if (_databaseInput != null && !_databaseInput.IsDisposed) {
+            if (_databaseInput is { IsDisposed: false }) {
                 _databaseInput.Cell.CellValueChanged += DatabaseInput_CellValueChanged;
                 _databaseInput.Column.ColumnPropertyChanged += DatabaseInput_ColumnPropertyChanged;
                 _databaseInput.Row.RowChecked += DatabaseInput_RowChecked;
@@ -196,7 +196,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (row == RowSingleOrNull()) { return; }
         RowsInput = [];
 
-        if (row?.Database is Database db && !db.IsDisposed) {
+        if (row?.Database is { IsDisposed: false }) {
             RowsInput.Add(row);
             row.CheckRowDataIfNeeded();
 
@@ -248,7 +248,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         FilterInput = GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
-        if (FilterInput != null && FilterInput.Database == null) {
+        if (FilterInput is { Database: null }) {
             FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
             FilterInput.Add(new FilterItem(mustbeDatabase, string.Empty));
             //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
@@ -277,7 +277,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         RowsInput = [.. FilterInput.Rows];
 
-        if (RowSingleOrNull() is RowItem r) {
+        if (RowSingleOrNull() is { IsDisposed: false } r) {
             r.CheckRowDataIfNeeded();
         }
 
@@ -290,9 +290,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected string FilterHash() {
-        if (FilterInput is not FilterCollection fc) { return "NoFilter"; }
-
-        if (fc.Count == 0) { return "NoFilter"; }
+        if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) { return "NoFilter"; }
 
         if (!fc.IsOk()) { return string.Empty; }
 
@@ -309,9 +307,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected virtual void HandleChangesNow() {
         if (IsDisposed) {
             DatabaseInput = null;
-        } else if (RowsInput != null && RowsInput.Count > 0) {
+        } else if (RowsInput is { Count: > 0 }) {
             DatabaseInput = RowsInput[0].Database;
-        } else if (FilterInput is FilterCollection fc) {
+        } else if (FilterInput is { IsDisposed: false } fc) {
             DatabaseInput = fc.Database;
         } else {
             DatabaseInput = null;
@@ -352,7 +350,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
         }
 
-        if (RowsInput == null || RowsInput.Count != 1) { return null; }
+        if (RowsInput is not { Count: 1 }) { return null; }
         RowsInput[0].CheckRowDataIfNeeded();
         return RowsInput[0];
     }
@@ -383,7 +381,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         FilterCollection? fc = null;
 
         foreach (var thiss in Parents) {
-            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
+            if (thiss is { IsDisposed: false, FilterOutput: { IsDisposed: false } fi }) {
                 if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
                     fc?.Dispose();
                     return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 2"), "Datenbanken inkonsistent");
@@ -403,13 +401,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     private void RegisterEvents() {
-        if (FilterInput == null || FilterInput.IsDisposed) { return; }
+        if (FilterInput is not { IsDisposed: not true }) { return; }
         FilterInput.RowsChanged += FilterInput_RowsChanged;
         FilterInput.DisposingEvent += FilterInput_DispodingEvent;
     }
 
     private void UnRegisterFilterInputAndDispose() {
-        if (FilterInput == null || FilterInput.IsDisposed) { return; }
+        if (FilterInput is not { IsDisposed: not true }) { return; }
         FilterInput.RowsChanged -= FilterInput_RowsChanged;
         FilterInput.DisposingEvent -= FilterInput_DispodingEvent;
 

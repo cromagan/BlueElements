@@ -56,7 +56,7 @@ internal class Method_AddSuffix : Method {
             tmpList[z] += attvar.ValueStringGet(1);
         }
 
-        if (attvar.ValueListStringSet(0, tmpList, ld) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, tmpList, ld) is { } dif) { return dif; }
 
         return DoItFeedback.Null();
     }

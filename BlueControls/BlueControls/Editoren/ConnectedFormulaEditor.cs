@@ -116,7 +116,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void _cFormula_Editing(object sender, EditingEventArgs e) {
         if (IsDisposed) { return; }
-        if(!Visible) { return; }
+        if (!Visible) { return; }
         e.Editing = true;
     }
 
@@ -296,13 +296,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
 
-        if (x == null || x.Count != 1) { return; }
+        if (x is not { Count: 1 }) { return; }
 
         var toadd = i.Get(x[0]);
 
-        if (toadd is not ReadableListItem rli) { return; }
-
-        if (rli.Item is not AbstractPadItem api) { return; }
+        if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
 
         //if (toadd is not AbstractPadItem api) {  return; }
 
@@ -370,7 +368,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         txt += "<br><br><b><u>Eigenschaften:</b></u>";
 
-        if (from is ReciverControlPadItem ias) {
+        if (from is { IsDisposed: false } ias) {
             if (ias.InputMustBeOneRow) {
                 txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
                     "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Datenbank ergeben,<br>" +

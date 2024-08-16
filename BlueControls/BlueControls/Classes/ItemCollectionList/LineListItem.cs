@@ -45,7 +45,7 @@ public class LineListItem : AbstractListItem {
 
     public override bool IsClickable() => false;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Pos.X == 0 && Pos.Y == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Pos is { X: 0, Y: 0 } and { Width: 0, Height: 0 } ? new Size(4, 4) : Pos.Size;
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
 

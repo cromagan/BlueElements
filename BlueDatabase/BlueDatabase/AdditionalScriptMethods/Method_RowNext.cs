@@ -54,14 +54,14 @@ public class Method_RowNext : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mr = MyRow(scp);
-        if (mr == null || mr.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
+        if (mr is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
 
         var column = Column(scp, attvar, 0);
-        if (column == null || column.IsDisposed) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         if (mr.Database != column.Database) { return new DoItFeedback(ld, "Interner Fehler, Datenbanken stimmen nicht überein"); }
 
-        if (mr.Database is not Database db || db.IsDisposed) { return new DoItFeedback(ld, "Interner Fehler, Datenbanken verworfen"); }
+        if (mr.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Interner Fehler, Datenbanken verworfen"); }
 
         List<RowItem> r = [];
         if (attvar.Attributes.Count > 2) {

@@ -88,8 +88,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void CheckSave() {
         if (string.IsNullOrWhiteSpace(_lastFileName)) { return; }
-        if (Pad?.Item == null) { return; }
-        if (Pad.Item.IsSaved) { return; }
+        if (Pad?.Item is not { IsSaved: not true }) { return; }
 
         Pad.Item.IsSaved = true;
 

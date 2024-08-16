@@ -29,7 +29,7 @@ public static partial class Extensions {
     #region Methods
 
     public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<string, T>? l) where T : ICanBeEmpty? {
-        if (l == null || l.Count == 0) { return false; }
+        if (l is not { Count: not 0 }) { return false; }
         var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
         if (remo.Count == 0) { return false; }
 

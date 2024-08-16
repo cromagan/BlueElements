@@ -53,7 +53,7 @@ internal static class Dictionary {
     /// <param name="word"></param>
     /// <returns></returns>
     public static bool IsWordOk(string word) {
-        if (!DictionaryRunning(false) || _dictWords?.Column.First() is not ColumnItem fc) { return true; }
+        if (!DictionaryRunning(false) || _dictWords?.Column.First() is not { IsDisposed: false } fc) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
         if (word.IsNumeral()) { return true; }
@@ -71,7 +71,7 @@ internal static class Dictionary {
         return _dictWords.Row[word] != null;
     }
 
-    public static bool IsWriteable() => _dictWords is Database db && !db.IsDisposed && !string.IsNullOrEmpty(db.Filename);
+    public static bool IsWriteable() => _dictWords is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename);
 
     public static List<string>? SimilarTo(string word) {
         if (IsWordOk(word) || _dictWords == null) { return null; }
@@ -150,7 +150,7 @@ internal static class Dictionary {
 
     private static void Init() {
         var tmp = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
-        if (tmp is Database db && !db.IsDisposed) { _dictWords = db; }
+        if (tmp is { IsDisposed: false } db) { _dictWords = db; }
     }
 
     #endregion

@@ -57,7 +57,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
         //Database = database;
 
-        if (_database is Database db && !db.IsDisposed) {
+        if (_database is { IsDisposed: false } db) {
             //var lst =  List<AbstractListItem>();
             lstColumns.ItemAddRange(ItemsOf(db.Column, false));
             //cbxColDateiname.Item = lst;
@@ -162,15 +162,15 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
     private void Fertig_Click(object sender, System.EventArgs e) {
         var r = _table?.RowsVisibleUnique();
 
-        if (r == null || r.Count == 0) {
+        if (r is not { Count: not 0 }) {
             MessageBox.Show("Keine Zeilen gewählt.", ImageCode.Information, "OK");
             return;
         }
 
-        if (_database is not Database db || db.IsDisposed) { return; }
+        if (_database is not { IsDisposed: false } db) { return; }
         var columns = new List<ColumnItem>();
         foreach (var column in lstColumns.Checked) {
-            if (db.Column[column] is ColumnItem c) {
+            if (db.Column[column] is { IsDisposed: false } c) {
                 columns.Add(c);
             }
         }
