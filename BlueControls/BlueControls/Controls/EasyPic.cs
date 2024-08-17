@@ -162,8 +162,8 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    protected override void DrawControl(Graphics gr, States state) {
-        base.DrawControl(gr, state);
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
 
         if (state.HasFlag(States.Standard_MouseOver)) { state ^= States.Standard_MouseOver; }
         if (state.HasFlag(States.Standard_MousePressed)) { state ^= States.Standard_MousePressed; }

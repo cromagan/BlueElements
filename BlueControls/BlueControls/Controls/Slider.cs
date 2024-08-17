@@ -170,7 +170,7 @@ public partial class Slider : IBackgroundNone {
 
     internal void DoMouseWheel(MouseEventArgs e) => OnMouseWheel(e);
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         var vStateBack = state;
         var vStateSlider = state;
         _clickAreaContainsMouse = _clickArea.Contains(MousePos().X, MousePos().Y);

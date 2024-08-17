@@ -90,7 +90,7 @@ public class Line : GenericControl, IBackgroundNone {
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         CheckSize();
         Pen dp = new(SystemColors.ControlDark);
         Pen lp = new(SystemColors.ControlLight);

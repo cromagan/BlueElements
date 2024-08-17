@@ -63,9 +63,9 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         HandleChangesNow();
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         if (IsDisposed) { return; }
-        base.DrawControl(gr, state);
+        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
 
         string txt;
 

@@ -1343,12 +1343,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => DrawControl(gr, state)));
+            _ = Invoke(new Action(() => DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight)));
             return;
         }
-        base.DrawControl(gr, state);
+        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
 
         if (IsDisposed) { return; }
 
@@ -2973,7 +2973,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 if (viewItem is { Column: not null, ViewType: ViewType.PermanentColumn }) {
                     if (viewItem.TmpDrawWidth == null) {
                         // Veränderte Werte!
-                        DrawControl(gr, state);
+                        //DrawControl(gr, state, );
                         return;
                     }
 

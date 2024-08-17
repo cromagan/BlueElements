@@ -41,7 +41,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     #region Fields
 
     protected bool MouseHighlight = true;
-
     private Bitmap? _bitmapOfControl;
     private bool _generatingBitmapOfControl;
     private bool _mousePressing;
@@ -87,13 +86,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     #region Properties
 
-    [DefaultValue(false)]
-    public override bool AutoSize {
-        get => false; //MyBase.AutoSize
-        // ReSharper disable once ValueParameterNotUsed
-        set => base.AutoSize = false;
-    }
-
     [Category("Darstellung")]
     [DefaultValue("")]
     [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
@@ -110,8 +102,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     protected virtual string QuickInfoText => _quickInfo;
-
-    protected override bool ScaleChildren => false;
 
     protected bool UseBackgroundBitmap {
         get => _useBackBitmap;
@@ -250,7 +240,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         if (IsDisposed || Disposing) { return false; }
         if (DesignMode) { return true; }
         if (_pform is not { IsDisposed: not true } || !_pform.Visible) { return false; }
-        if (_pform is Forms.Form { isClosing: true }) { return false; }
+        if (_pform is Forms.Form { IsClosing: true }) { return false; }
         return Visible;
     }
 
@@ -278,11 +268,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         return !DoDrawings() ? default : PointToClient(Cursor.Position);
     }
 
-    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-    public void PerformAutoScale() {
-        // NIX TUN!!!!
-    }
-
     /// <summary>
     /// Veranlaßt, das das Control neu gezeichnet wird.
     /// </summary>
@@ -290,10 +275,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     public override void Refresh() {
         if (!DoDrawings()) { return; }
         DoDraw(CreateGraphics());
-    }
-
-    public void Scale() {
-        // NIX TUN!!!!
     }
 
     internal static bool AllEnabled(Control control) {
@@ -318,7 +299,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         }
     }
 
-    protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    protected virtual void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     protected ParentType GetParentType() {
         if (Parent == null) { return ParentType.Unbekannt; }
@@ -326,9 +307,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         _myParentType = Typ(Parent);
         return _myParentType;
     }
-
-    //MyBase.ScaleChildren
-    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     protected bool MousePressing() => _mousePressing;
 
@@ -497,8 +475,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     protected Form? ParentForm() => ParentForm(Parent);
 
-    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
-
     protected void SetDoubleBuffering() {
         DoubleBuffered = true;
         SetStyle(ControlStyles.DoubleBuffer, true);
@@ -519,7 +495,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
     }
 
-    //MyBase.GetScaledBounds(bounds, factor, specified)
     protected override void WndProc(ref Message m) {
         try {
             //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
@@ -553,18 +528,25 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
                     return;
                 }
             }
-            if (Width < 1 || Height < 1) { return; }
+
+            var scaleX = gr.DpiX / 96f;
+            var scaleY = gr.DpiY / 96f;
+
+            var scaledWidth = (int)(ClientSize.Width * scaleX + 0.9999);
+            var scaledHeight = (int)(ClientSize.Height * scaleY + 0.9999);
+
+            if (scaledWidth < 2 || scaledHeight < 2) { return; }
+
             try {
                 if (_useBackBitmap) {
                     _bitmapOfControl ??= new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
-                    var tmpgr = Graphics.FromImage(_bitmapOfControl);
-                    DrawControl(tmpgr, IsStatus());
+                    using var tmpgr = Graphics.FromImage(_bitmapOfControl);
+                    DrawControl(tmpgr, IsStatus(), scaleX, scaleY, scaledWidth, scaledHeight);
                     if (_bitmapOfControl != null) {
                         gr.DrawImage(_bitmapOfControl, 0, 0);
                     }
-                    tmpgr.Dispose();
                 } else {
-                    DrawControl(gr, IsStatus());
+                    DrawControl(gr, IsStatus(), scaleX, scaleY, scaledWidth, scaledHeight);
                 }
             } catch {
                 return;

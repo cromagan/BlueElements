@@ -98,7 +98,7 @@ namespace BlueControls.Forms {
             // 
             // RelationDiagram
             // 
-            this.AutoScaleMode = AutoScaleMode.None;
+            this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1290, 638);
             this.Name = "RelationDiagram";
             this.Text = "Beziehungs-Editor";

@@ -32,7 +32,7 @@ namespace BlueControls.Forms {
             // 
             // Form
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(263, 224);
             this.Name = "Form";

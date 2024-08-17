@@ -91,7 +91,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) { }
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) { }
 
     protected void MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove) {
         var sourceItem = source[@internal];

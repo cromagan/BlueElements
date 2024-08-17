@@ -538,7 +538,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         //if (state == enStates.Checked_Disabled) {
         //    Develop.DebugPrint("Checked Disabled");
         //    state = enStates.Checked_Disabled;

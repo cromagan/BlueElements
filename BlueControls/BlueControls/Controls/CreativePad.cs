@@ -501,10 +501,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         if (IsDisposed) { return; }
 
-        base.DrawControl(gr, state);
+        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
 
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);

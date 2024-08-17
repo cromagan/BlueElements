@@ -80,7 +80,7 @@ namespace BlueControls.Forms {
             // 
             // Voting
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(1082, 500);
             this.Controls.Add(this.cbxStil);

@@ -91,8 +91,8 @@ public partial class ZoomPic : ZoomPad {
         return new Point(x, y);
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-        base.DrawControl(gr, state);
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
 
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
             LinearGradientMode.Vertical);

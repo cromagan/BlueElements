@@ -523,7 +523,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         // Enabled wurde verdeckt!
         if (!Enabled) { state = States.Standard_Disabled; }
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);

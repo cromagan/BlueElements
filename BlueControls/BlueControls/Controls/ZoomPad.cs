@@ -151,7 +151,7 @@ public partial class ZoomPad : GenericControlReciver {
     //    }
     //}
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         //base.DrawControl(gr, state);
 
         var maxBounds = MaxBounds();

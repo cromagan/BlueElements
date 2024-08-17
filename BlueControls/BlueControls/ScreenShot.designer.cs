@@ -25,7 +25,7 @@ namespace BlueControls
             //
             //frmScreenShot
             //
-            this.AutoScaleMode = AutoScaleMode.None;
+            this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(292, 272);
             this.DoubleBuffered = true;
             this.FormBorderStyle = FormBorderStyle.None;

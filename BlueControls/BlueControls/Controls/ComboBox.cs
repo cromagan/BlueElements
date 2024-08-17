@@ -243,7 +243,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
             if (_item.Count == 0) {
                 state = States.Standard_Disabled;
@@ -269,7 +269,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         var i = _item.Get(Text);
         if (i == null) {
-            base.DrawControl(gr, state);
+            base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
             btnDropDown.Invalidate();
             btnEdit.Invalidate();
             return;
@@ -278,7 +278,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         //i.Parent = Item; // Um den Stil zu wissen
         if (Focused && _dropDownStyle == ComboBoxStyle.DropDown) {
             // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
-            base.DrawControl(gr, state);
+            base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
             btnDropDown.Invalidate();
             btnEdit.Invalidate();
             return;
@@ -287,7 +287,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (_dropDownStyle == ComboBoxStyle.DropDown) {
             if (i is TextListItem { Symbol: null } tempVar2) {
                 if (tempVar2.IsClickable()) {
-                    base.DrawControl(gr, state);
+                    base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
                     btnDropDown.Invalidate();
                     btnEdit.Invalidate();
                     return;

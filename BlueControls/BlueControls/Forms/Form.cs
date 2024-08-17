@@ -17,12 +17,14 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueDatabase;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -46,6 +48,10 @@ public partial class Form : System.Windows.Forms.Form {
     /// </summary>
     public static readonly int BorderTop = 31;
 
+    private const int LOGPIXELSX = 88;
+    private float _currentScaleFactor = 1.0f;
+    private float _userscale = 1.0f;
+
     #endregion
 
     #region Constructors
@@ -58,18 +64,12 @@ public partial class Form : System.Windows.Forms.Form {
         BackColor = Skin.Color_Back(Design, States.Standard);
         InitializeComponent();
         BackColor = Skin.Color_Back(Design, States.Standard);
+        AutoScaleMode = AutoScaleMode.Font;
     }
 
     #endregion
 
     #region Properties
-
-    [DefaultValue(false)]
-    public override bool AutoSize {
-        get => false; //MyBase.AutoSize
-        // ReSharper disable once ValueParameterNotUsed
-        set => base.AutoSize = false;
-    }
 
     public override sealed Color BackColor {
         get => base.BackColor;
@@ -80,13 +80,36 @@ public partial class Form : System.Windows.Forms.Form {
     [DefaultValue(true)]
     public bool CloseButtonEnabled { get; set; } = true;
 
-    [DefaultValue(Design.Form_Standard)]
-    public Design Design {
-        get;
+    public float CurrentScaleFactor {
+        get => _currentScaleFactor;
+        private set {
+            value = Math.Max(0.1f, value);
+
+            if (Math.Abs(value - _currentScaleFactor) < 0.01f) { return; }
+
+            SuspendLayout();
+            try {
+                var tmp = value / _currentScaleFactor;
+                ScaleControl(new SizeF(tmp, tmp), BoundsSpecified.All);
+
+                foreach (Control control in Controls) {
+                    ScaleControlAndFont(control, tmp);
+                }
+            } finally {
+                ResumeLayout();
+                PerformLayout();
+            }
+
+            _currentScaleFactor = value;
+        }
     }
 
+    [DefaultValue(Design.Form_Standard)]
+    public Design Design { get; }
+
     public bool IsClosed { get; private set; }
-    public bool isClosing { get; private set; }
+
+    public bool IsClosing { get; private set; }
 
     protected override CreateParams CreateParams {
         get {
@@ -94,11 +117,10 @@ public partial class Form : System.Windows.Forms.Form {
             if (!CloseButtonEnabled) {
                 oParam.ClassStyle |= (int)Cs.NOCLOSE;
             }
+            oParam.ExStyle |= 0x02000000;  // WS_EX_COMPOSITED
             return oParam;
         }
     }
-
-    protected override bool ScaleChildren => false;
 
     #endregion
 
@@ -106,30 +128,22 @@ public partial class Form : System.Windows.Forms.Form {
 
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
 
-    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-    // ReSharper disable once UnusedMember.Global
-    public new void PerformAutoScale() {
-        // NIX TUN!!!!
-    }
-
-    public void Scale() {
-        // NIX TUN!!!!
-    }
-
-    //MyBase.ScaleChildren
-    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
-
     protected override void OnCreateControl() {
         Develop.StartService();
         Allgemein.StartGlobalService();
         base.OnCreateControl();
     }
 
+    protected override void OnDpiChanged(DpiChangedEventArgs e) {
+        base.OnDpiChanged(e);
+        CurrentScaleFactor = GetWindowsDpiScale() * _userscale;
+    }
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
 
-        isClosing = true;
+        IsClosing = true;
 
         if (this is not FloatingForm and not MessageBox) {
             Database.ForceSaveAll();
@@ -139,7 +153,7 @@ public partial class Form : System.Windows.Forms.Form {
 
         base.OnFormClosing(e);
         if (!e.Cancel) { IsClosed = true; }
-        isClosing = IsClosed;
+        IsClosing = IsClosed;
     }
 
     protected override void OnInvalidated(InvalidateEventArgs e) {
@@ -149,6 +163,8 @@ public partial class Form : System.Windows.Forms.Form {
     protected override void OnLoad(System.EventArgs e) {
         BackColor = Skin.Color_Back(Design, States.Standard);
         base.OnLoad(e);
+
+        CurrentScaleFactor = GetWindowsDpiScale() * _userscale;
     }
 
     protected override void OnPaint(PaintEventArgs e) {
@@ -164,14 +180,40 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     protected override void OnResizeEnd(System.EventArgs e) {
-        if (!IsClosed) { base.OnResizeEnd(e); }
+        if (!IsClosed) {
+            base.OnResizeEnd(e);
+        }
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
         if (!IsClosed) { base.OnSizeChanged(e); }
     }
 
-    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
+    // Windows API für DPI-Abfrage
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("gdi32.dll")]
+    private static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+    private float GetWindowsDpiScale() {
+        var desktopDc = GetDC(IntPtr.Zero);
+        var dpiX = GetDeviceCaps(desktopDc, LOGPIXELSX);
+        ReleaseDC(IntPtr.Zero, desktopDc);
+        return 1; //dpiX / 96f;
+    }
+
+    private void ScaleControlAndFont(Control control, float scalingRatio) {
+        control.Scale(new SizeF(scalingRatio, scalingRatio));
+        control.Font = new Font(control.Font.FontFamily, control.Font.Size * scalingRatio, control.Font.Style);
+
+        foreach (Control childControl in control.Controls) {
+            ScaleControlAndFont(childControl, scalingRatio);
+        }
+    }
 
     #endregion
 }

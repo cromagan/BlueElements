@@ -32,7 +32,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
@@ -180,7 +179,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (!QuickModePossible(_text, _textAnzeigeverhalten) && _eText == null) {
             if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
-            DrawControl(null, States.Standard);
+            //DrawControl(null, States.Standard);
         }
 
         return RequiredTextSize(_text, _textAnzeigeverhalten, _design, _eText, Translate, -1);
@@ -193,7 +192,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    protected override void DrawControl(Graphics? gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         try {
             if (_design == Design.Undefiniert) {
                 GetDesign();
@@ -207,7 +206,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
             if (!string.IsNullOrEmpty(_text)) {
                 if (QuickModePossible(_text, _textAnzeigeverhalten)) {
-                    if (gr == null) { return; }
                     Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
                     Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
                     return;
@@ -241,7 +239,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
                 _eText.DrawingArea = ClientRectangle;
             }
-            if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
+
             Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
             if (!string.IsNullOrEmpty(_text)) { _eText?.Draw(gr, 1); }
         } catch { }

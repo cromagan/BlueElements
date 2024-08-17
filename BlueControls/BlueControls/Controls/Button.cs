@@ -188,7 +188,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         try {
             QuickImage? qi;
             if ((ButtonStyle)((int)_buttonStyle % 1000) == ButtonStyle.Yes_or_No) {

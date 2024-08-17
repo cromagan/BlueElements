@@ -284,7 +284,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         _rowsInputChangedHandling = false;
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
         if (IsDisposed) { return; }
         HandleChangesNow();
     }
