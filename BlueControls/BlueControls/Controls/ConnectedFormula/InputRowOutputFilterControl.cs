@@ -63,9 +63,9 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         HandleChangesNow();
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
-        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
+        base.DrawControl(gr, state);
 
         string txt;
 
@@ -92,8 +92,8 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
             }
         }
 
-        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        Skin.Draw_FormatedText(gr, txt, Design.Caption, States.Standard, qi, Alignment.Top_Left, DisplayRectangle, null, false, false);
+        Skin.Draw_Back_Transparent(gr, ScaledDisplayRectangle, this);
+        Skin.Draw_FormatedText(gr, txt, Design.Caption, States.Standard, qi, Alignment.Top_Left, Rectangle.Empty, null, false, false);
     }
 
     protected override void HandleChangesNow() {

@@ -522,7 +522,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         //if (state == enStates.Checked_Disabled) {
         //    Develop.DebugPrint("Checked Disabled");
         //    state = enStates.Checked_Disabled;
@@ -535,6 +535,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         // Erst den Typ richtig stellen, dann den State ändern!
         _eTxt.Design = GetDesign();
         _eTxt.State = state;
+
+
 
         var effectWidth = Width;
         var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
@@ -587,7 +589,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = Skin.PaddingSmal };
         }
 
+        gr.ScaleTransform(1, 1);
         Skin.Draw_Back(gr, _eTxt.Design, state, DisplayRectangle, this, true);
+
+        gr.ScaleTransform(ScaleX, ScaleY);
         Cursor_Show(gr);
         MarkAndGenerateZone(gr);
         _eTxt.Draw(gr, 1);
@@ -600,6 +605,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, States.Standard_Disabled, null, Alignment.Top_Left, r, this, false, true);
             }
         }
+        gr.ScaleTransform(1, 1);
         Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
         if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }

@@ -313,7 +313,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         var s = States.Standard;
 
@@ -326,7 +326,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             return;
         }
 
-        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
+        base.DrawControl(gr, state);
     }
 
     protected override void HandleChangesNow() {

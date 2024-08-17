@@ -104,9 +104,9 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         GenerateMenu();
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         SetLastFilesStyle();
-        base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
+        base.DrawControl(gr, state);
     }
 
     protected override void OnCreateControl() {

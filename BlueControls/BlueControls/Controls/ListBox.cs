@@ -772,7 +772,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         var tmpDesign = _appearance is ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.Listbox_Boxes
             ? Design.ListBox
             : (Design)_appearance;
@@ -793,11 +793,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData(_item, _itemDesign);
-        _ = ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
+        _ = ComputeAllItemPositions(new Size(ScaledDisplayRectangle.Width, ScaledDisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
 
-        var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - tmpSliderWidth, DisplayRectangle.Height);
+        var borderCoords = new Rectangle(ScaledDisplayRectangle.Left, ScaledDisplayRectangle.Top, ScaledDisplayRectangle.Width - tmpSliderWidth, ScaledDisplayRectangle.Height);
         var visArea = borderCoords with { Y = borderCoords.Y + (int)SliderY.Value };
 
         if (borderCoords.Height > 0) {

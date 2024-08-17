@@ -101,6 +101,9 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         }
     }
 
+    public Rectangle ScaledDisplayRectangle { get; private set; } = Rectangle.Empty;
+    public float ScaleX { get; private set; } = 1;
+    public float ScaleY { get; private set; } = 1;
     protected virtual string QuickInfoText => _quickInfo;
 
     protected bool UseBackgroundBitmap {
@@ -299,7 +302,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         }
     }
 
-    protected virtual void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     protected ParentType GetParentType() {
         if (Parent == null) { return ParentType.Unbekannt; }
@@ -529,24 +532,24 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
                 }
             }
 
-            var scaleX = gr.DpiX / 96f;
-            var scaleY = gr.DpiY / 96f;
+            ScaleX = gr.DpiX / 96f;
+            ScaleY = gr.DpiY / 96f;
 
-            var scaledWidth = (int)(ClientSize.Width * scaleX + 0.9999);
-            var scaledHeight = (int)(ClientSize.Height * scaleY + 0.9999);
+            ScaledDisplayRectangle = new Rectangle(0, 0, (int)(ClientSize.Width / ScaleX + 0.9999), (int)(ClientSize.Height / ScaleX + 0.9999));
 
-            if (scaledWidth < 2 || scaledHeight < 2) { return; }
+            if (ScaledDisplayRectangle.Width < 2 || ScaledDisplayRectangle.Height < 2) { return; }
 
             try {
                 if (_useBackBitmap) {
-                    _bitmapOfControl ??= new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
+                    _bitmapOfControl ??= new Bitmap(DisplayRectangle.Width,DisplayRectangle.Height, PixelFormat.Format32bppPArgb);
                     using var tmpgr = Graphics.FromImage(_bitmapOfControl);
-                    DrawControl(tmpgr, IsStatus(), scaleX, scaleY, scaledWidth, scaledHeight);
+                    DrawControl(tmpgr, IsStatus());
                     if (_bitmapOfControl != null) {
+                        gr.ScaleTransform(1, 1);
                         gr.DrawImage(_bitmapOfControl, 0, 0);
                     }
                 } else {
-                    DrawControl(gr, IsStatus(), scaleX, scaleY, scaledWidth, scaledHeight);
+                    DrawControl(gr, IsStatus());
                 }
             } catch {
                 return;

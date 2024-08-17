@@ -149,7 +149,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         try {
             if (_design == Design.Undefiniert) {
                 GetDesign();
@@ -162,9 +162,11 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             }
 
             if (!string.IsNullOrEmpty(_text)) {
+                gr.ScaleTransform(ScaleX, ScaleY);
+
                 if (QuickModePossible(_text)) {
-                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-                    Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
+                    Skin.Draw_Back_Transparent(gr, ScaledDisplayRectangle, this);
+                    Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, Rectangle.Empty, null, false, Translate);
                     return;
                 }
 
@@ -181,7 +183,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 _eText.DrawingArea = ClientRectangle;
             }
 
-            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+            Skin.Draw_Back_Transparent(gr, ScaledDisplayRectangle, this);
             if (!string.IsNullOrEmpty(_text)) { _eText?.Draw(gr, 1); }
         } catch { }
     }

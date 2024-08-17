@@ -243,7 +243,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) {
+    protected override void DrawControl(Graphics gr, States state) {
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
             if (_item.Count == 0) {
                 state = States.Standard_Disabled;
@@ -256,7 +256,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
             _eTxt ??= new ExtText((Design)_drawStyle, state);
 
-            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, base.DisplayRectangle, Translate);
+            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, ScaledDisplayRectangle, Translate);
             btnDropDown.Invalidate();
             return;
         }
@@ -269,7 +269,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         var i = _item.Get(Text);
         if (i == null) {
-            base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
+            base.DrawControl(gr, state);
             btnDropDown.Invalidate();
             btnEdit.Invalidate();
             return;
@@ -278,7 +278,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         //i.Parent = Item; // Um den Stil zu wissen
         if (Focused && _dropDownStyle == ComboBoxStyle.DropDown) {
             // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
-            base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
+            base.DrawControl(gr, state);
             btnDropDown.Invalidate();
             btnEdit.Invalidate();
             return;
@@ -287,7 +287,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (_dropDownStyle == ComboBoxStyle.DropDown) {
             if (i is TextListItem { Symbol: null } tempVar2) {
                 if (tempVar2.IsClickable()) {
-                    base.DrawControl(gr, state, scaleX, scaleY, scaledWidth, scaledHeight);
+                    base.DrawControl(gr, state);
                     btnDropDown.Invalidate();
                     btnEdit.Invalidate();
                     return;
@@ -295,17 +295,17 @@ public partial class ComboBox : TextBox, ITranslateable {
             }
         }
 
-        Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
+        Skin.Draw_Back(gr, vType, state, ScaledDisplayRectangle, this, true);
 
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.Pos;
-            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
+            var ymod = -(int)((ScaledDisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
             i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
             i.SetCoordinates(r);
         }
-        Skin.Draw_Border(gr, vType, state, DisplayRectangle);
+        Skin.Draw_Border(gr, vType, state, ScaledDisplayRectangle);
         btnDropDown.Invalidate();
     }
 

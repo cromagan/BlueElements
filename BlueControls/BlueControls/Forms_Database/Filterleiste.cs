@@ -274,7 +274,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States state, float scaleX, float scaleY, int scaledWidth, int scaledHeight) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
+    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
 
     private void _table_DatabaseChanged(object sender, System.EventArgs e) {
         GetÄhnlich();
