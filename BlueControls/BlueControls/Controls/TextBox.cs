@@ -69,8 +69,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private string _suffix = string.Empty;
 
-    private SteuerelementVerhalten _verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-
     #endregion
 
     #region Constructors
@@ -234,20 +232,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             Invalidate();
             RaiseEventIfTextChanged(true);  // Wichtig, z.B: für ComboBox
-        }
-    }
-
-    [DefaultValue(SteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
-    public SteuerelementVerhalten Verhalten {
-        get => _verhalten;
-        set {
-            if (_verhalten == value) { return; }
-            _verhalten = value;
-            if (_sliderY != null) {
-                _sliderY.Visible = false;
-                _sliderY.Value = 0;
-            }
-            Invalidate();
         }
     }
 
@@ -556,57 +540,33 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
 
-        switch (_verhalten) {
-            case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
-                _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
-                break;
+        _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
+        _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
 
-            case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
-                var hp = HotPosition();
-                _eTxt.TextDimensions = Size.Empty;
-                _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
-                var pos = _eTxt.DrawingPos;
+        //case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
+        //    var hp = HotPosition();
+        //    _eTxt.TextDimensions = Size.Empty;
+        //    _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
+        //    var pos = _eTxt.DrawingPos;
 
-                if (hp < 0) {
-                    // Mach nix
-                } else if (hp == 0) {
-                    pos.X = Skin.PaddingSmal;
-                } else if (hp > _eTxt.Count - 1) {
-                    pos.X = _eTxt.Width() > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.Width() - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
-                } else {
-                    var r = _eTxt.CursorPixelPosX(hp);
-                    if (r.X > Width - (Skin.PaddingSmal * 4) - pos.X) {
-                        pos.X = Width - (Skin.PaddingSmal * 4) - r.X + 1;
-                    } else if (r.X + pos.X < Skin.PaddingSmal * 2) {
-                        pos.X = (Skin.PaddingSmal * 2) - r.X + 1;
-                    }
-                }
-                if (pos.X > Skin.PaddingSmal) { pos.X = Skin.PaddingSmal; }
+        //    if (hp < 0) {
+        //        // Mach nix
+        //    } else if (hp == 0) {
+        //        pos.X = Skin.PaddingSmal;
+        //    } else if (hp > _eTxt.Count - 1) {
+        //        pos.X = _eTxt.Width() > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.Width() - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
+        //    } else {
+        //        var r = _eTxt.CursorPixelPosX(hp);
+        //        if (r.X > Width - (Skin.PaddingSmal * 4) - pos.X) {
+        //            pos.X = Width - (Skin.PaddingSmal * 4) - r.X + 1;
+        //        } else if (r.X + pos.X < Skin.PaddingSmal * 2) {
+        //            pos.X = (Skin.PaddingSmal * 2) - r.X + 1;
+        //        }
+        //    }
+        //    if (pos.X > Skin.PaddingSmal) { pos.X = Skin.PaddingSmal; }
 
-                _eTxt.DrawingPos = pos;
-                break;
-
-            case SteuerelementVerhalten.Steuerelement_Anpassen:
-                sliderVisible = false;
-                _eTxt.TextDimensions = Size.Empty;
-                Width = this is ComboBox
-                    ? Math.Max(_eTxt.Width() + (Skin.PaddingSmal * 3) + 20, Width)
-                    : Math.Max(_eTxt.Width() + (Skin.PaddingSmal * 3), Width);
-                Height = Math.Max(_eTxt.Height() + (Skin.PaddingSmal * 2), Height);
-                _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
-                break;
-
-            case SteuerelementVerhalten.Text_Abschneiden:
-                sliderVisible = false;
-                _eTxt.TextDimensions = Size.Empty;
-                _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
-                break;
-
-            default:
-                Develop.DebugPrint(_verhalten);
-                break;
-        }
+        //    _eTxt.DrawingPos = pos;
+        //    break;
 
         if (sliderVisible) {
             GenerateSlider();
@@ -1024,9 +984,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _sliderY.ValueChanged += SliderY_ValueChange;
         Controls.Add(_sliderY);
     }
-
-    private int HotPosition() => _cursorCharPos > -1 ? _cursorCharPos
-        : _markStart > -1 && _markEnd < 0 ? _markEnd : _markStart > -1 && _markEnd > -1 ? _markEnd : -1;
 
     private void MarkAll() {
         if (_eTxt.Count > 0) {

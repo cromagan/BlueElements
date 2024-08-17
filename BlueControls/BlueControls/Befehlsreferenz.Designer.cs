@@ -54,7 +54,6 @@ namespace BlueControls {
             this.txbComms.Name = "txbComms";
             this.txbComms.Size = new System.Drawing.Size(496, 450);
             this.txbComms.TabIndex = 2;
-            this.txbComms.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpBefehle
             // 

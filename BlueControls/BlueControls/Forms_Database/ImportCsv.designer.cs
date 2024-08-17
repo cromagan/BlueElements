@@ -158,7 +158,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capEinträge.Location = new System.Drawing.Point(8, 8);
             this.capEinträge.Name = "capEinträge";
             this.capEinträge.Size = new System.Drawing.Size(721, 24);
-            this.capEinträge.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // chkTrennzeichenAmAnfang
             // 

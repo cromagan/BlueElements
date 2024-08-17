@@ -158,7 +158,6 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
         foreach (Control thisControl in Controls) {
             switch (thisControl) {
                 case Caption caption:
-                    if (caption.TextAnzeigeVerhalten == SteuerelementVerhalten.Steuerelement_Anpassen) { caption.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; }
                     thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                     thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                     break;

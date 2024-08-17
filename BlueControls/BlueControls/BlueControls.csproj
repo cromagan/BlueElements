@@ -500,7 +500,6 @@
     <Compile Include="Enums\ButtonStyle.cs" />
     <Compile Include="Enums\CheckBehavior.cs" />
     <Compile Include="Enums\HintergrundArt.cs" />
-    <Compile Include="Enums\SteuerelementVerhalten.cs" />
     <Compile Include="Classes\Extended Text\ExtCharASCII.cs" />
     <Compile Include="Classes\Extended Text\ExtText.cs" />
     <Compile Include="Classes\Skin.cs" />

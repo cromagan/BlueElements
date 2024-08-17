@@ -117,7 +117,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capSonderzeichen.Name = "capSonderzeichen";
             this.capSonderzeichen.Size = new System.Drawing.Size(128, 32);
             this.capSonderzeichen.Text = "\\r = Zeilenumbruch<br>\\t = Tabulator";
-            this.capSonderzeichen.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // SearchAndReplaceInDBScripts
             // 

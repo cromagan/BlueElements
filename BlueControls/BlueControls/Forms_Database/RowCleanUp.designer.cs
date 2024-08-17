@@ -67,7 +67,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtInfo.Location = new System.Drawing.Point(288, 8);
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.Size = new System.Drawing.Size(432, 40);
-            this.txtInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnCancel
             // 
@@ -99,7 +98,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capSpalten.Size = new System.Drawing.Size(272, 56);
             this.capSpalten.Text = "<b><u>Spalten</b></u>,<br>die verwendet werden, um Zeilen, die mehrfach vorkommen" +
     ", zu identifizieren:";
-            this.capSpalten.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpVerhalten
             // 

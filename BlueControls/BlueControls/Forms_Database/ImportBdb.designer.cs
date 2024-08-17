@@ -66,7 +66,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtInfo.Location = new System.Drawing.Point(200, 8);
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.Size = new System.Drawing.Size(528, 40);
-            this.txtInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnCancel
             // 
@@ -115,7 +114,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capColumn.Name = "capColumn";
             this.capColumn.Size = new System.Drawing.Size(192, 24);
             this.capColumn.Text = "Spalte für Dateinamen:";
-            this.capColumn.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnDateienlöschen
             // 

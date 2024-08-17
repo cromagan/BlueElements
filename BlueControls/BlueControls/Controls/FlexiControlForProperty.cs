@@ -111,7 +111,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         switch (_accessor) {
             case Accessor<bool>: {
                     EditType = EditTypeFormula.Ja_Nein_Knopf;
-                    var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                    var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, null, Translate, -1);
 
                     Size = new Size(s1.Width + 30, 22);
                     break;
@@ -132,7 +132,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             {
                     if (list != null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                        var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, null, Translate, -1);
 
                         var (biggestItemX, biggestItemY, _, _) = ListBox.ItemData(list, Design.ComboBox_Textbox);
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
@@ -141,7 +141,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         StyleComboBox(GetComboBox(), list, ComboBoxStyle.DropDownList, true);
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
-                        var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                        var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, null, Translate, -1);
                         Size = new Size(s1.Width + 30, 22);
 
                         if (GetButton() is { IsDisposed: false } b) {
