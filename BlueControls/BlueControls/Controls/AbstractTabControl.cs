@@ -70,6 +70,12 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
     public TabPage? HotTab { get; private set; }
 
+    public Rectangle ScaledDisplayRectangle { get; private set; } = Rectangle.Empty;
+
+    public float ScaleX { get; private set; } = 1;
+
+    public float ScaleY { get; private set; } = 1;
+
     [Category("Verhalten")]
     public TabPage? TabDefault { get; set; }
 
@@ -84,6 +90,13 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
     //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
     protected void DrawControl(PaintEventArgs e, Design design) {
+        ScaleX = e.Graphics.DpiX / 96f;
+        ScaleY = e.Graphics.DpiY / 96f;
+
+        ScaledDisplayRectangle = new Rectangle(0, 0, (int)(ClientSize.Width / ScaleX + 0.9999), (int)(ClientSize.Height / ScaleX + 0.9999));
+
+        if (ScaledDisplayRectangle.Width < 2 || ScaledDisplayRectangle.Height < 2) { return; }
+
         Skin.Draw_Back(e.Graphics, design, States.Standard, new Rectangle(0, 0, Width, Height), this, true);
 
         if (TabCount == 0 && DesignMode) {
@@ -114,7 +127,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         HotTab = TestTab(new Point(e.X, e.Y));
         base.OnMouseMove(e);
     }
-
 
     protected override void OnPaintBackground(PaintEventArgs pevent) {
         // do not allow the background to be painted

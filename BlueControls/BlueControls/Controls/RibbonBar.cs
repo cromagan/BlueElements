@@ -27,7 +27,6 @@ public sealed class RibbonBar : AbstractTabControl {
     #region Constructors
 
     public RibbonBar() : base() {
-        Height = 110;
         SendToBack();
         Dock = DockStyle.Top;
         BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
@@ -47,7 +46,26 @@ public sealed class RibbonBar : AbstractTabControl {
         Invalidate();
     }
 
-    protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.RibbonBar_Back);
+    protected override void OnPaint(PaintEventArgs e) {
+        DrawControl(e, Design.RibbonBar_Back);
+        CheckSize();
+    }
+
+    protected override void OnParentChanged(System.EventArgs e) {
+        base.OnParentChanged(e);
+
+        CheckSize();
+    }
+
+    private void CheckSize() {
+        var t = GenericControl.ParentForm(this);
+
+        if (t is BlueControls.Forms.Form f) {
+            Height = (int)(110 * f.ScaleY);
+        } else {
+            Height = (int)(110 * ScaleY);
+        }
+    }
 
     #endregion
 }

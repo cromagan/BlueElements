@@ -108,8 +108,9 @@ public partial class Form : System.Windows.Forms.Form {
     public Design Design { get; }
 
     public bool IsClosed { get; private set; }
-
     public bool IsClosing { get; private set; }
+    public float ScaleX { get; private set; } = 1;
+    public float ScaleY { get; private set; } = 1;
 
     protected override CreateParams CreateParams {
         get {
@@ -168,7 +169,11 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     protected override void OnPaint(PaintEventArgs e) {
-        if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
+        if (!IsClosed && !IsDisposed) {
+            ScaleX = e.Graphics.DpiX / 96f;
+            ScaleY = e.Graphics.DpiY / 96f;
+            base.OnPaint(e);
+        }
     }
 
     protected override void OnResize(System.EventArgs e) {
