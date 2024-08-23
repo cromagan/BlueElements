@@ -46,10 +46,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     private bool _mousePressing;
     private ParentType _myParentType = ParentType.Unbekannt;
     private Form? _pform;
-
-    // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
     private string _quickInfo = string.Empty;
-
     private bool _useBackBitmap;
 
     #endregion
@@ -120,21 +117,11 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     #region Methods
 
     public static Form? ParentForm(Control? o) {
-        if (o is not { IsDisposed: not true }) { return null; }
-
-        do {
-            switch (o) {
-                case Form frm:
-                    return frm;
-
-                case null:
-                    return null;
-
-                default:
-                    o = o.Parent; //Manchmal ist o null. MultiThreading?
-                    break;
-            }
-        } while (true);
+        while (o is { IsDisposed: false }) {
+            if (o is Form frm) { return frm; }
+            o = o.Parent;
+        }
+        return null;
     }
 
     public static ParentType Typ(Control control) {
@@ -227,12 +214,18 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     public Bitmap? BitmapOfControl() {
-        UseBackgroundBitmap = true;
         if (_generatingBitmapOfControl) { return null; }
+
         _generatingBitmapOfControl = true;
-        if (_bitmapOfControl == null) { Refresh(); }
-        _generatingBitmapOfControl = false;
-        return _bitmapOfControl;
+
+        UseBackgroundBitmap = true;
+
+        try {
+            if (_bitmapOfControl == null) { Refresh(); }
+            return _bitmapOfControl;
+        } finally {
+            _generatingBitmapOfControl = false;
+        }
     }
 
     public void CheckBack() => _pform = ParentForm();
@@ -242,7 +235,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     public bool DoDrawings() {
         if (IsDisposed || Disposing) { return false; }
         if (DesignMode) { return true; }
-        if (_pform is not { IsDisposed: not true } || !_pform.Visible) { return false; }
+        if (_pform is not { IsDisposed: false, Visible: true }) { return false; }
         if (_pform is Forms.Form { IsClosing: true }) { return false; }
         return Visible;
     }
@@ -268,26 +261,21 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         if (InvokeRequired) {
             return (Point)Invoke(new Func<Point>(MousePos));
         }
-        return !DoDrawings() ? default : PointToClient(Cursor.Position);
+        return DoDrawings() ? PointToClient(Cursor.Position) : default;
     }
 
-    /// <summary>
-    /// Veranlaßt, das das Control neu gezeichnet wird.
-    /// </summary>
-    /// <remarks></remarks>
     public override void Refresh() {
-        if (!DoDrawings()) { return; }
-        DoDraw(CreateGraphics());
+        if (DoDrawings()) {
+            DoDraw(CreateGraphics());
+        }
     }
 
     internal static bool AllEnabled(Control control) {
-        if (control.IsDisposed) { return false; }
-        do {
-            if (control == null) { return true; }
-            if (control.IsDisposed) { return false; }
+        while (control is { IsDisposed: false }) {
             if (!control.Enabled) { return false; }
             control = control.Parent;
-        } while (true);
+        }
+        return true;
     }
 
     protected override void Dispose(bool disposing) {
@@ -326,7 +314,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         base.OnControlRemoved(e);
 
         if (e.Control is ISendsFocusedChild sfc) {
-            sfc.ChildGotFocus += Sfc_ChildGotFocus;
+            sfc.ChildGotFocus -= Sfc_ChildGotFocus;
         }
         e.Control.GotFocus -= Control_GotFocus;
     }
@@ -519,9 +507,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             return;
         }
 
-        //gr.Clear(Skin.RandomColor);
-        //return;
-
         if (Develop.Exited || IsDisposed || !Visible) { return; }
         lock (this) {
             if (!Skin.Inited) {
@@ -541,7 +526,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
             try {
                 if (_useBackBitmap) {
-                    _bitmapOfControl ??= new Bitmap(DisplayRectangle.Width,DisplayRectangle.Height, PixelFormat.Format32bppPArgb);
+                    _bitmapOfControl ??= new Bitmap(DisplayRectangle.Width, DisplayRectangle.Height, PixelFormat.Format32bppPArgb);
                     using var tmpgr = Graphics.FromImage(_bitmapOfControl);
                     DrawControl(tmpgr, IsStatus());
                     if (_bitmapOfControl != null) {
@@ -551,27 +536,30 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
                 } else {
                     DrawControl(gr, IsStatus());
                 }
+
+                if (DesignMode) {
+                    using var p = new Pen(Color.FromArgb(128, 255, 0, 0));
+                    gr.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
+                }
             } catch {
-                return;
-            }
-            // UmRandung für DesignMode ------------
-            if (DesignMode) {
-                using Pen p = new(Color.FromArgb(128, 255, 0, 0));
-                gr.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
+                // Consider logging the exception
             }
         }
     }
 
     private States IsStatus() {
         if (!Enabled) { return States.Standard_Disabled; }
+
         var s = States.Standard;
         if (MouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
+
         if (_mousePressing) {
             if (MouseHighlight) { s |= States.Standard_MousePressed; }
             if (GetStyle(ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
-        } else {
-            if (GetStyle(ControlStyles.Selectable) && CanFocus && Focused) { s |= States.Standard_HasFocus; }
+        } else if (GetStyle(ControlStyles.Selectable) && CanFocus && Focused) {
+            s |= States.Standard_HasFocus;
         }
+
         return s;
     }
 
