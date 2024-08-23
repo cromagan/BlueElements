@@ -171,6 +171,7 @@
     <Compile Include="Editoren\FilterEditor.Designer.cs">
       <DependentUpon>FilterEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\SteuerelementVerhalten.cs" />
     <Compile Include="Forms_Database\FlexiControlForFilter.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -99,7 +99,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
         //  Size = new Size(s.Width + 2, s.Height + 2);
 
-        Size = BlueControls.Controls.Caption.RequiredTextSize(_caption, Design.Caption, null, Translate, width);
+        Size = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Scrollen_mit_Textumbruch, Design.Caption, null, Translate, width);
     }
 
     #endregion
@@ -470,7 +470,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void StyleTextBox(TextBox? control) {
         if (control == null) { return; }
+        //control.Enabled = Enabled;
         control.GetStyleFrom(this);
+        control.Verhalten = _multiLine || Height > 20
+            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
     }
 
     /// <summary>
@@ -795,8 +799,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
             // Kann alles sein, Beschriftung und was weiß ich.
-            _captionObject.Size = BlueControls.Controls.Caption.RequiredTextSize(_captionObject.Text, Design.Caption, null, false, Width);
+            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            _captionObject.Size = BlueControls.Controls.Caption.RequiredTextSize(_captionObject.Text, _captionObject.TextAnzeigeVerhalten, Design.Caption, null, false, Width);
         } else {
+            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
             _captionObject.Size = _captionObject.RequiredTextSize();
         }
 
@@ -957,7 +963,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
             case CaptionPosition.Links_neben_dem_Feld:
-                var s1 = BlueControls.Controls.Caption.RequiredTextSize(_caption, Design.Caption, null, Translate, -1);
+                var s1 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
                 control.Left = Math.Max(_controlX, s1.Width);
                 control.Top = 0;
@@ -966,7 +972,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             default:
-                var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, Design.Caption, null, Translate, -1);
+                var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
                 //var s = MeasureStringOfCaption(_caption).ToSize();
                 control.Left = 0;

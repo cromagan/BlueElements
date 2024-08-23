@@ -168,12 +168,10 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         if (state.HasFlag(States.Standard_MouseOver)) { state ^= States.Standard_MouseOver; }
         if (state.HasFlag(States.Standard_MousePressed)) { state ^= States.Standard_MousePressed; }
 
-        gr.ScaleTransform(1, 1);
-
         Skin.Draw_Back(gr, Design.EasyPic, state, DisplayRectangle, this, true);
 
         if (_bitmap != null) {
-            gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, DisplayRectangle.Width - 2, DisplayRectangle.Height - 2);
+            gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
         }
 
         Skin.Draw_Border(gr, Design.EasyPic, state, DisplayRectangle);

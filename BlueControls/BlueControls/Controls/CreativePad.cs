@@ -537,7 +537,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             #endregion
         }
 
-        Skin.Draw_Border(gr, Design.Table_And_Pad, state, ScaledDisplayRectangle);
+        Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
 
     protected override bool IsInputKey(Keys keyData) =>

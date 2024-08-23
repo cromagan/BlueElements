@@ -83,8 +83,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     #region Methods
 
     protected void DrawControl(PaintEventArgs e, Design design) {
-        if (DisplayRectangle.Width < 2 || DisplayRectangle.Height < 2) { return; }
-
         Skin.Draw_Back(e.Graphics, design, States.Standard, new Rectangle(0, 0, Width, Height), this, true);
 
         if (TabCount == 0 && DesignMode) {

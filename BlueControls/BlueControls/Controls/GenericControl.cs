@@ -83,6 +83,13 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     #region Properties
 
+    [DefaultValue(false)]
+    public override bool AutoSize {
+        get => false; //MyBase.AutoSize
+        // ReSharper disable once ValueParameterNotUsed
+        set => base.AutoSize = false;
+    }
+
     [Category("Darstellung")]
     [DefaultValue("")]
     [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
@@ -99,6 +106,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     protected virtual string QuickInfoText => _quickInfo;
+
+    protected override bool ScaleChildren => false;
 
     protected bool UseBackgroundBitmap {
         get => _useBackBitmap;
@@ -261,10 +270,23 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         return DoDrawings() ? PointToClient(Cursor.Position) : default;
     }
 
+    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+    public void PerformAutoScale() {
+        // NIX TUN!!!!
+    }
+
+    /// <summary>
+    /// Veranlaßt, das das Control neu gezeichnet wird.
+    /// </summary>
+    /// <remarks></remarks>
     public override void Refresh() {
         if (DoDrawings()) {
             DoDraw(CreateGraphics());
         }
+    }
+
+    public void Scale() {
+        // NIX TUN!!!!
     }
 
     internal static bool AllEnabled(Control control) {
@@ -295,6 +317,9 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         _myParentType = Typ(Parent);
         return _myParentType;
     }
+
+    //MyBase.ScaleChildren
+    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     protected bool MousePressing() => _mousePressing;
 
@@ -462,6 +487,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     protected Form? ParentForm() => ParentForm(Parent);
+
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
     protected void SetDoubleBuffering() {
         DoubleBuffered = true;

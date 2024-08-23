@@ -1348,7 +1348,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             _ = Invoke(new Action(() => DrawControl(gr, state)));
             return;
         }
-
         base.DrawControl(gr, state);
 
         if (IsDisposed) { return; }
@@ -1469,7 +1468,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #endregion
 
-        Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement, DisplayRectangle);
+        Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
     }
 
     protected override void HandleChangesNow() {
@@ -2562,18 +2561,16 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return false;
         }
 
-        var w = viewItem.TmpDrawWidth ?? 16 + addWith;
-
         if (contentHolderCellRow != null) {
             var h = cellInThisDatabaseRow?.DrawHeight ?? _pix16;// Row_DrawHeight(cellInThisDatabaseRow, DisplayRectangle);
             if (isHeight > 0) { h = isHeight; }
             box.Location = new Point(viewItem.X_WithSlider ?? 0, DrawY(ca, cellInThisDatabaseRow));
-            box.Size = new Size(w, h);
+            box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, _pix16, _cellFont) + addWith, h);
             box.Text = contentHolderCellRow.CellGetString(contentHolderCellColumn);
         } else {
             // Neue Zeile...
             box.Location = new Point(viewItem.X_WithSlider ?? 0, ca.HeadSize(_columnFont));
-            box.Size = new Size(w, _pix18);
+            box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, _pix16, _cellFont) + addWith, _pix18);
             box.Text = string.Empty;
         }
 
@@ -2965,10 +2962,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca, Rectangle scaledDisplayRectangle) {
+    private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
             if (IsDisposed || Database is not { IsDisposed: false } db || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
-            Skin.Draw_Back(gr, Design.Table_And_Pad, state, scaledDisplayRectangle, this, true);
+            Skin.Draw_Back(gr, Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
             // Maximale Rechten Pixel der Permanenten Columns ermitteln
             var permaX = 0;
@@ -2976,7 +2973,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 if (viewItem is { Column: not null, ViewType: ViewType.PermanentColumn }) {
                     if (viewItem.TmpDrawWidth == null) {
                         // Veränderte Werte!
-                        //DrawControl(gr, state, );
+                        DrawControl(gr, state);
                         return;
                     }
 
@@ -3061,14 +3058,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (SliderX != null) { SliderX.Enabled = false; }
         if (SliderY != null) { SliderY.Enabled = false; }
 
-        Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, DisplayRectangle, this, true);
+        Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
         var i = QuickImage.Get(ImageCode.Uhr, 64);
         gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
 
         BlueFont.DrawString(gr, info, _columnFont, Brushes.Blue, 12, 12);
 
-        Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, DisplayRectangle);
+        Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 
     private int DrawY(ColumnViewCollection ca, RowData? r) => r == null ? 0 : r.Y + ca.HeadSize(_columnFont) - (int)SliderY.Value;

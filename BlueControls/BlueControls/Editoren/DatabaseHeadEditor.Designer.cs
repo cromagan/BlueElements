@@ -84,6 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1244, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -140,6 +141,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capNeueZeilenInfo.Name = "capNeueZeilenInfo";
             this.capNeueZeilenInfo.Size = new System.Drawing.Size(176, 40);
             this.capNeueZeilenInfo.Text = "<i>Die erste Spalte muss eine Bearbeitung zulassen";
+            this.capNeueZeilenInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // Caption22
             // 
@@ -148,6 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption22.Name = "Caption22";
             this.Caption22.Size = new System.Drawing.Size(176, 22);
             this.Caption22.Text = "Datenbank-Administratoren:";
+            this.Caption22.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // DatenbankAdmin
             // 
@@ -170,6 +173,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capNeueZeilen.Name = "capNeueZeilen";
             this.capNeueZeilen.Size = new System.Drawing.Size(176, 24);
             this.capNeueZeilen.Text = "Neue Zeilen anlegen:";
+            this.capNeueZeilen.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpKennwort
             // 
@@ -191,6 +195,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capKennwort.Name = "capKennwort";
             this.capKennwort.Size = new System.Drawing.Size(216, 22);
             this.capKennwort.Text = "Zum Öffnen der Datenbank:";
+            this.capKennwort.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbKennwort
             // 
@@ -220,6 +225,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capSortierspalten.Name = "capSortierspalten";
             this.capSortierspalten.Size = new System.Drawing.Size(160, 24);
             this.capSortierspalten.Text = "Sortier-Spalten:";
+            this.capSortierspalten.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnSortRichtung
             // 
@@ -252,6 +258,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTags.Name = "txbTags";
             this.txbTags.Size = new System.Drawing.Size(601, 639);
             this.txbTags.TabIndex = 26;
+            this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbCaption
             // 
@@ -268,6 +275,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capCaption.Name = "capCaption";
             this.capCaption.Size = new System.Drawing.Size(137, 16);
             this.capCaption.Text = "Überschrift bzw. Titel:";
+            this.capCaption.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capTags
             // 
@@ -277,6 +285,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capTags.QuickInfo = "Tags / Eigenschaften, die von einem ";
             this.capTags.Size = new System.Drawing.Size(152, 16);
             this.capTags.Text = "Tags:";
+            this.capTags.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capInfo
             // 
@@ -284,6 +293,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(608, 144);
+            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // GlobalTab
             // 
@@ -377,6 +387,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
             this.txbZeilenQuickInfo.Size = new System.Drawing.Size(608, 186);
             this.txbZeilenQuickInfo.TabIndex = 43;
+            this.txbZeilenQuickInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // butSystemspaltenErstellen
             // 
@@ -409,6 +420,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
             this.txbStandardFormulaFile.Size = new System.Drawing.Size(608, 24);
             this.txbStandardFormulaFile.TabIndex = 47;
+            this.txbStandardFormulaFile.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capStandardFormulaFile
             // 
@@ -427,6 +439,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAdditionalFiles.Name = "txbAdditionalFiles";
             this.txbAdditionalFiles.Size = new System.Drawing.Size(608, 24);
             this.txbAdditionalFiles.TabIndex = 45;
+            this.txbAdditionalFiles.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capAdditional
             // 

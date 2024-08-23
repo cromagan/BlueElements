@@ -84,6 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1060, 24);
             this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -158,6 +159,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capFehler.Location = new System.Drawing.Point(712, 80);
             this.capFehler.Name = "capFehler";
             this.capFehler.Size = new System.Drawing.Size(336, 192);
+            this.capFehler.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbQuickInfo
             // 

@@ -17,14 +17,12 @@
 
 #nullable enable
 
-using System;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueDatabase;
 using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -60,12 +58,18 @@ public partial class Form : System.Windows.Forms.Form {
         BackColor = Skin.Color_Back(Design, States.Standard);
         InitializeComponent();
         BackColor = Skin.Color_Back(Design, States.Standard);
-        AutoScaleMode = AutoScaleMode.Font;
     }
 
     #endregion
 
     #region Properties
+
+    [DefaultValue(false)]
+    public override bool AutoSize {
+        get => false; //MyBase.AutoSize
+        // ReSharper disable once ValueParameterNotUsed
+        set => base.AutoSize = false;
+    }
 
     public override sealed Color BackColor {
         get => base.BackColor;
@@ -88,16 +92,30 @@ public partial class Form : System.Windows.Forms.Form {
             if (!CloseButtonEnabled) {
                 oParam.ClassStyle |= (int)Cs.NOCLOSE;
             }
-            oParam.ExStyle |= 0x02000000;  // WS_EX_COMPOSITED
             return oParam;
         }
     }
+
+    protected override bool ScaleChildren => false;
 
     #endregion
 
     #region Methods
 
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
+
+    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+    // ReSharper disable once UnusedMember.Global
+    public new void PerformAutoScale() {
+        // NIX TUN!!!!
+    }
+
+    public void Scale() {
+        // NIX TUN!!!!
+    }
+
+    //MyBase.ScaleChildren
+    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     protected override void OnCreateControl() {
         Develop.StartService();
@@ -144,23 +162,14 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     protected override void OnResizeEnd(System.EventArgs e) {
-        if (!IsClosed) {
-            base.OnResizeEnd(e);
-        }
+        if (!IsClosed) { base.OnResizeEnd(e); }
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
         if (!IsClosed) { base.OnSizeChanged(e); }
     }
 
-    private void ScaleControlAndFont(Control control, float scalingRatio) {
-        control.Scale(new SizeF(scalingRatio, scalingRatio));
-        control.Font = new Font(control.Font.FontFamily, control.Font.Size * scalingRatio, control.Font.Style);
-
-        foreach (Control childControl in control.Controls) {
-            ScaleControlAndFont(childControl, scalingRatio);
-        }
-    }
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
     #endregion
 }

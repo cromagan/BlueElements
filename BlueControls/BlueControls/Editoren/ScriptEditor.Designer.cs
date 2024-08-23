@@ -150,6 +150,7 @@ namespace BlueControls {
             this.txbSkriptInfo.Name = "txbSkriptInfo";
             this.txbSkriptInfo.Size = new System.Drawing.Size(396, 208);
             this.txbSkriptInfo.TabIndex = 1;
+            this.txbSkriptInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // ScriptEditor
             // 
