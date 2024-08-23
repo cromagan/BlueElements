@@ -48,10 +48,6 @@ public partial class Form : System.Windows.Forms.Form {
     /// </summary>
     public static readonly int BorderTop = 31;
 
-    private const int LOGPIXELSX = 88;
-    private float _currentScaleFactor = 1.0f;
-    private float _userscale = 1.0f;
-
     #endregion
 
     #region Constructors
@@ -80,37 +76,11 @@ public partial class Form : System.Windows.Forms.Form {
     [DefaultValue(true)]
     public bool CloseButtonEnabled { get; set; } = true;
 
-    public float CurrentScaleFactor {
-        get => _currentScaleFactor;
-        private set {
-            value = Math.Max(0.1f, value);
-
-            if (Math.Abs(value - _currentScaleFactor) < 0.01f) { return; }
-
-            SuspendLayout();
-            try {
-                var tmp = value / _currentScaleFactor;
-                ScaleControl(new SizeF(tmp, tmp), BoundsSpecified.All);
-
-                foreach (Control control in Controls) {
-                    ScaleControlAndFont(control, tmp);
-                }
-            } finally {
-                ResumeLayout();
-                PerformLayout();
-            }
-
-            _currentScaleFactor = value;
-        }
-    }
-
     [DefaultValue(Design.Form_Standard)]
     public Design Design { get; }
 
     public bool IsClosed { get; private set; }
     public bool IsClosing { get; private set; }
-    public float ScaleX { get; private set; } = 1;
-    public float ScaleY { get; private set; } = 1;
 
     protected override CreateParams CreateParams {
         get {
@@ -133,11 +103,6 @@ public partial class Form : System.Windows.Forms.Form {
         Develop.StartService();
         Allgemein.StartGlobalService();
         base.OnCreateControl();
-    }
-
-    protected override void OnDpiChanged(DpiChangedEventArgs e) {
-        base.OnDpiChanged(e);
-        CurrentScaleFactor = GetWindowsDpiScale() * _userscale;
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
@@ -164,16 +129,10 @@ public partial class Form : System.Windows.Forms.Form {
     protected override void OnLoad(System.EventArgs e) {
         BackColor = Skin.Color_Back(Design, States.Standard);
         base.OnLoad(e);
-
-        CurrentScaleFactor = GetWindowsDpiScale() * _userscale;
     }
 
     protected override void OnPaint(PaintEventArgs e) {
-        if (!IsClosed && !IsDisposed) {
-            ScaleX = e.Graphics.DpiX / 96f;
-            ScaleY = e.Graphics.DpiY / 96f;
-            base.OnPaint(e);
-        }
+        if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
     }
 
     protected override void OnResize(System.EventArgs e) {
@@ -192,23 +151,6 @@ public partial class Form : System.Windows.Forms.Form {
 
     protected override void OnSizeChanged(System.EventArgs e) {
         if (!IsClosed) { base.OnSizeChanged(e); }
-    }
-
-    // Windows API für DPI-Abfrage
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetDC(IntPtr hWnd);
-
-    [DllImport("gdi32.dll")]
-    private static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
-
-    [DllImport("user32.dll")]
-    private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-    private float GetWindowsDpiScale() {
-        var desktopDc = GetDC(IntPtr.Zero);
-        var dpiX = GetDeviceCaps(desktopDc, LOGPIXELSX);
-        ReleaseDC(IntPtr.Zero, desktopDc);
-        return 1; //dpiX / 96f;
     }
 
     private void ScaleControlAndFont(Control control, float scalingRatio) {

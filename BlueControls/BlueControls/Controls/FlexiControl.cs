@@ -449,7 +449,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         return null;
     }
 
-    public void StyleComboBox(ComboBox? control, IEnumerable<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+    public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
         if (control == null) { return; }
 
         //control.Enabled = Enabled;

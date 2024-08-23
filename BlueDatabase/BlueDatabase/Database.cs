@@ -104,7 +104,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _eventScriptTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
-    private double _globalScale = 1f;
+    private float _globalScale = 1f;
     private string _globalShowPass = string.Empty;
     private bool _isInSave;
     private bool _readOnly;
@@ -342,7 +342,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
 
-    public double GlobalScale {
+    public float GlobalScale {
         get => _globalScale;
         set {
             if (Math.Abs(_globalScale - value) < DefaultTolerance) { return; }
@@ -2636,7 +2636,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.GlobalScale:
-                _globalScale = DoubleParse(value);
+                _globalScale = FloatParse(value);
                 break;
 
             case DatabaseDataType.AdditionalFilesPath:

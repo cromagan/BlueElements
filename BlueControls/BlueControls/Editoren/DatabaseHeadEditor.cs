@@ -400,8 +400,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         Database.Caption = txbCaption.Text;
         //Database.UndoCount = txbUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(txbUndoAnzahl.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {
-            Database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
-            Database.GlobalScale = Math.Max(0.5, Database.GlobalScale);
+            Database.GlobalScale = Math.Min(FloatParse(txbGlobalScale.Text), 5);
+            Database.GlobalScale = Math.Max(0.5f, Database.GlobalScale);
         }
         Database.AdditionalFilesPfad = txbAdditionalFiles.Text;
         Database.StandardFormulaFile = txbStandardFormulaFile.Text;

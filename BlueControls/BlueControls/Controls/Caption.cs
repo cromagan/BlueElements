@@ -162,10 +162,9 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             }
 
             if (!string.IsNullOrEmpty(_text)) {
-                gr.ScaleTransform(ScaleX, ScaleY);
-
                 if (QuickModePossible(_text)) {
-                    Skin.Draw_Back_Transparent(gr, ScaledDisplayRectangle, this);
+                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+                    gr.ScaleTransform(scaleY);
                     Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, Rectangle.Empty, null, false, Translate);
                     return;
                 }
@@ -183,8 +182,11 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 _eText.DrawingArea = ClientRectangle;
             }
 
-            Skin.Draw_Back_Transparent(gr, ScaledDisplayRectangle, this);
-            if (!string.IsNullOrEmpty(_text)) { _eText?.Draw(gr, 1); }
+            gr.ScaleTransform(1, 1);
+            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+            if (!string.IsNullOrEmpty(_text)) {
+                _eText?.Draw(gr, 1);
+            }
         } catch { }
     }
 

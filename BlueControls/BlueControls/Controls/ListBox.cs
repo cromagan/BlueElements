@@ -316,7 +316,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
     /// </summary>
     /// <returns></returns>
-    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData(List<AbstractListItem> item, Design itemDesign) {
+    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData(
+        List<AbstractListItem> item, Design itemDesign) {
         try {
             var w = 16;
             var h = 0;
@@ -784,7 +785,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         var addy = 0;
 
-        if (_addAlloweds != AddType.None) { addy = 32; }
+        if (_addAlloweds != AddType.None) { addy = 33; }
 
         if (_item.Count == 0) {
             SliderY.Visible = false;
@@ -793,20 +794,22 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData(_item, _itemDesign);
-        _ = ComputeAllItemPositions(new Size(ScaledDisplayRectangle.Width, ScaledDisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
+        _ = ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
 
-        var borderCoords = new Rectangle(ScaledDisplayRectangle.Left, ScaledDisplayRectangle.Top, ScaledDisplayRectangle.Width - tmpSliderWidth, ScaledDisplayRectangle.Height);
+        var borderCoords = new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top, DisplayRectangle.Width - tmpSliderWidth, DisplayRectangle.Height);
         var visArea = borderCoords with { Y = borderCoords.Y + (int)SliderY.Value };
 
         if (borderCoords.Height > 0) {
+            gr.ScaleTransform(1, 1);
             Skin.Draw_Back(gr, tmpDesign, tmpState, borderCoords, this, true);
         }
 
         //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
         DoItemOrder();
+
         Parallel.ForEach(_item, thisItem => {
             var currentItem = thisItem;
             if (currentItem.Pos.IntersectsWith(visArea)) {

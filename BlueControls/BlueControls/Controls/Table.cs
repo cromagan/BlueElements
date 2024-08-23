@@ -1349,8 +1349,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        gr.ScaleTransform(ScaleX, ScaleY);
-
         base.DrawControl(gr, state);
 
         if (IsDisposed) { return; }
@@ -1471,7 +1469,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #endregion
 
-        Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement, ScaledDisplayRectangle);
+        Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement, DisplayRectangle);
     }
 
     protected override void HandleChangesNow() {
@@ -1921,7 +1919,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private static void Draw_CellTransparentDirect(Graphics gr, string txt, ShortenStyle style, Rectangle drawarea, BlueFont font, ColumnItem? contentHolderCellColumn, int pix16, BildTextVerhalten bildTextverhalten, States state, double scale) {
+    private static void Draw_CellTransparentDirect(Graphics gr, string txt, ShortenStyle style, Rectangle drawarea, BlueFont font, ColumnItem? contentHolderCellColumn, int pix16, BildTextVerhalten bildTextverhalten, States state, float scale) {
         if (contentHolderCellColumn == null) { return; }
 
         if (!ShowMultiLine(txt, contentHolderCellColumn.MultiLine)) {
@@ -1955,7 +1953,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state, double scale) {
+    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state, float scale) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
         if (r.Bottom + pix16 > drawarea.Bottom) {
@@ -3063,14 +3061,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (SliderX != null) { SliderX.Enabled = false; }
         if (SliderY != null) { SliderY.Enabled = false; }
 
-        Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, ScaledDisplayRectangle, this, true);
+        Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, DisplayRectangle, this, true);
 
         var i = QuickImage.Get(ImageCode.Uhr, 64);
         gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
 
         BlueFont.DrawString(gr, info, _columnFont, Brushes.Blue, 12, 12);
 
-        Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, ScaledDisplayRectangle);
+        Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, DisplayRectangle);
     }
 
     private int DrawY(ColumnViewCollection ca, RowData? r) => r == null ? 0 : r.Y + ca.HeadSize(_columnFont) - (int)SliderY.Value;

@@ -33,7 +33,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -224,8 +223,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         _btnDropDownIsIn = false;
     }
 
-    internal void ItemAddRange(IEnumerable<AbstractListItem>? items) {
-        if (items == null || !items.Any()) { return; }
+    internal void ItemAddRange(List<AbstractListItem>? items) {
+        if (items == null) { return; }
 
         foreach (var thisIt in items) {
             _item.Remove(thisIt.KeyName);
@@ -256,7 +255,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
             _eTxt ??= new ExtText((Design)_drawStyle, state);
 
-            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, ScaledDisplayRectangle, Translate);
+            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, DisplayRectangle, Translate);
             btnDropDown.Invalidate();
             return;
         }
@@ -295,17 +294,17 @@ public partial class ComboBox : TextBox, ITranslateable {
             }
         }
 
-        Skin.Draw_Back(gr, vType, state, ScaledDisplayRectangle, this, true);
+        Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
 
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.Pos;
-            var ymod = -(int)((ScaledDisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
+            var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
             i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
             i.SetCoordinates(r);
         }
-        Skin.Draw_Border(gr, vType, state, ScaledDisplayRectangle);
+        Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();
     }
 

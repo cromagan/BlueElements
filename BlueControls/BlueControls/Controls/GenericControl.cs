@@ -98,9 +98,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         }
     }
 
-    public Rectangle ScaledDisplayRectangle { get; private set; } = Rectangle.Empty;
-    public float ScaleX { get; private set; } = 1;
-    public float ScaleY { get; private set; } = 1;
     protected virtual string QuickInfoText => _quickInfo;
 
     protected bool UseBackgroundBitmap {
@@ -517,12 +514,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
                 }
             }
 
-            ScaleX = gr.DpiX / 96f;
-            ScaleY = gr.DpiY / 96f;
-
-            ScaledDisplayRectangle = new Rectangle(0, 0, (int)(ClientSize.Width / ScaleX + 0.9999), (int)(ClientSize.Height / ScaleX + 0.9999));
-
-            if (ScaledDisplayRectangle.Width < 2 || ScaledDisplayRectangle.Height < 2) { return; }
+            if (DisplayRectangle.Width < 2 || DisplayRectangle.Height < 2) { return; }
 
             try {
                 if (_useBackBitmap) {

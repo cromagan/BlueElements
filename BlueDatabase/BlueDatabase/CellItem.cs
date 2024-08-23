@@ -53,7 +53,7 @@ public class CellItem {
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
-    public static Size ContentSize(string keyName, string originalText, Font cellfont, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
+    public static Size ContentSize(string keyName, string originalText, Font cellfont, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode) {
         var (s, qi) = GetDrawingData(keyName, originalText, style, bildTextverhalten, prefix, suffix, doOpticalTranslation, opticalReplace, scale, constantHeightOfImageCode);
         return cellfont.FormatedText_NeededSize(s, qi, minSize);
     }
@@ -108,7 +108,7 @@ public class CellItem {
         return contentSize;
     }
 
-    public static (string text, QuickImage? qi) GetDrawingData(string additionalname, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, double scale, string constantHeightOfImageCode) {
+    public static (string text, QuickImage? qi) GetDrawingData(string additionalname, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode) {
         var tmpText = ValueReadable(originalText, style, bildTextverhalten, true, prefix, suffix, doOpticalTranslation, opticalReplace);
 
         #region  tmpImageCode

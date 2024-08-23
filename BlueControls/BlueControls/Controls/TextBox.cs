@@ -536,8 +536,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _eTxt.Design = GetDesign();
         _eTxt.State = state;
 
-
-
         var effectWidth = Width;
         var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
@@ -589,10 +587,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = Skin.PaddingSmal };
         }
 
-        gr.ScaleTransform(1, 1);
         Skin.Draw_Back(gr, _eTxt.Design, state, DisplayRectangle, this, true);
 
-        gr.ScaleTransform(ScaleX, ScaleY);
         Cursor_Show(gr);
         MarkAndGenerateZone(gr);
         _eTxt.Draw(gr, 1);
@@ -605,7 +601,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, States.Standard_Disabled, null, Alignment.Top_Left, r, this, false, true);
             }
         }
-        gr.ScaleTransform(1, 1);
+
         Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
         if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }
