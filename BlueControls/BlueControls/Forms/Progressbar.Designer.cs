@@ -40,6 +40,7 @@ namespace BlueControls.Forms
             this.capTXT.Name = "capTXT";
             this.capTXT.Size = new System.Drawing.Size(1, 1);
             this.capTXT.Translate = false;
+            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
             // 
             // Progressbar
             // 
