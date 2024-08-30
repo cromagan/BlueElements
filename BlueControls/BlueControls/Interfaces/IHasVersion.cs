@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
+using static BlueBasics.Generic;
 
 namespace BlueControls.Interfaces;
 
@@ -34,7 +35,7 @@ public static class HasVersionExtensions {
 
     #region Methods
 
-    public static string DefaultItemToControlName(this IHasVersion item) => item.KeyName + "-" + item.Version;
+    public static string DefaultItemToControlName(this IHasVersion item, string? parentName) => item.KeyName + "-" + item.Version + "-" + parentName.GetHashString();
 
     public static void RaiseVersion(this IHasVersion item) {
         if (item.Version == int.MaxValue) { item.Version = 0; }

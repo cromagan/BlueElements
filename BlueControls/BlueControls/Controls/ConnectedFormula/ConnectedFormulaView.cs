@@ -36,14 +36,14 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgroundNone, IDisposable {
+public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     #region Fields
 
+    private ConnectedFormula.ConnectedFormula? _connectedFormula;
     private bool _generated;
 
     private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
-    private string _modus = string.Empty;
 
     #endregion
 
@@ -67,7 +67,28 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
     #region Properties
 
-    public ConnectedFormula.ConnectedFormula? ConnectedFormula { get; private set; }
+    public ConnectedFormula.ConnectedFormula? ConnectedFormula {
+        get => _connectedFormula;
+        private set {
+            if (value == _connectedFormula) { return; }
+
+            if (_connectedFormula != null) {
+                _connectedFormula.Loaded -= _cf_Loaded;
+                _connectedFormula.PropertyChanged -= _cf_PropertyChanged;
+            }
+
+            _connectedFormula = value;
+
+            if (_connectedFormula != null) {
+                _connectedFormula.Loaded += _cf_Loaded;
+                _connectedFormula.PropertyChanged += _cf_PropertyChanged;
+            }
+
+            InvalidateView();
+            Invalidate_FilterOutput();
+            Invalidate_RowsInput();
+        }
+    }
 
     public new ControlCollection Controls {
         get {
@@ -223,35 +244,20 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
     public void InitFormula(ConnectedFormula.ConnectedFormula? cf, Database? database) {
         if (IsDisposed) { return; }
 
-        var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
-
-        if (oldf == cf && FilterOutput.Database == database) { return; }
+        if (ConnectedFormula == cf && FilterOutput.Database == database) { return; }
 
         SuspendLayout();
 
         Invalidate_FilterOutput();
         Invalidate_RowsInput();
 
-        if (oldf != cf) {
-            if (oldf != null) {
-                oldf.Loaded -= _cf_Loaded;
-                oldf.PropertyChanged -= _cf_PropertyChanged;
-            }
-
-            InvalidateView();
-            ConnectedFormula = cf;
-
-            if (cf != null) {
-                cf.Loaded += _cf_Loaded;
-                cf.PropertyChanged += _cf_PropertyChanged;
-            }
-        }
+        ConnectedFormula = cf;
 
         if (FilterOutput.Database != database) {
             if (FilterOutput.Database is { IsDisposed: false } db1) {
                 db1.DisposingEvent -= _database_Disposing;
             }
-            InvalidateView();
+
             FilterOutput.Database = database;
 
             if (FilterOutput.Database is { IsDisposed: false } db2) {
@@ -259,6 +265,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
             }
         }
 
+        InvalidateView();
         ResumeLayout();
         Invalidate();
     }
@@ -274,13 +281,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IBackgr
 
         try {
             foreach (var thisC in base.Controls) {
-                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
+                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(ConnectedFormula?.Filename) && !cx.IsDisposed) { return cx; }
             }
 
             if (onlySerach) { return null; }
 
             var c = thisit.CreateControl(this, mode);
-            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName()) {
+            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(ConnectedFormula?.Filename)) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;
             }

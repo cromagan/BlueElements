@@ -48,8 +48,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     #region Constructors
 
-    public TabFormulaPadItem() : this(Generic.GetUniqueKey(), null) {
-    }
+    public TabFormulaPadItem() : this(Generic.GetUniqueKey(), null) { }
 
     public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         if (ParentFormula != null) {
@@ -81,7 +80,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     public Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
         var con = new Controls.TabControl();
-        con.Name = this.DefaultItemToControlName();
+        con.Name = this.DefaultItemToControlName(ParentFormula?.Filename);
         // Die Input-Settings werden direkt auf das erzeugte
         //con.DoInputSettings(parent, this);
         //con.DoOutputSettings(parent, this);

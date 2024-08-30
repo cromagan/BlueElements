@@ -576,7 +576,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         if (CFO is null) { return; }
 
         CFO.GetConnectedFormulaFromDatabase(r?.Database);
-        CFO.InitFormula(CFO.ConnectedFormula, r?.Database);
         CFO.SetToRow(r);
     }
 

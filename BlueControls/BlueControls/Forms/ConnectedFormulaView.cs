@@ -45,7 +45,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
 
     public ConnectedFormulaView(string filename, string mode) : this() {
         btnEingehendeDatenbank.Enabled = false;
-        btnAusgehendeDatenbank.Enabled |= false;
+        btnAusgehendeDatenbank.Enabled = false;
 
         CFormula.Mode = mode;
 

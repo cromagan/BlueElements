@@ -133,11 +133,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <summary>
     /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom ReciverControlPadItem übernommen.
     /// </summary>
-    /// <param name="dest"></param>
     /// <param name="parentFormula"></param>
     /// <param name="source"></param>
+    /// <param name="mode"></param>
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverControlPadItem source, string mode) {
-        Name = source.DefaultItemToControlName();
+        Name = source.DefaultItemToControlName(parentFormula?.ConnectedFormula?.Filename);
         Mode = mode;
         if (source is AbstractPadItem ali) { Item = ali; }
 
@@ -193,6 +193,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             RowsInputManualSeted = true;
         }
 
+        if (row != null && DatabaseInput is { IsDisposed: false } dbi) {
+            if (row.Database != dbi) {
+                row = null;
+            }
+        }
+
         if (row == RowSingleOrNull()) { return; }
         RowsInput = [];
 
@@ -236,7 +242,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <summary>
     /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
     /// </summary>
-    /// <param name="item"></param>
     /// <param name="mustbeDatabase"></param>
     /// <param name="doEmptyFilterToo"></param>
     protected void DoInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {

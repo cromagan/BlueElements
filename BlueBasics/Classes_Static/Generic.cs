@@ -184,13 +184,16 @@ public static class Generic {
         return l;
     }
 
-    public static string GetHashString(this string inputString) {
-        var sb = new StringBuilder();
-        foreach (var b in GetHash(inputString)) {
-            _ = sb.Append(b.ToString("X2"));
-        }
+    public static string GetHashString(this string? inputString) {
+        if (inputString is { }) {
+            var sb = new StringBuilder();
+            foreach (var b in GetHash(inputString)) {
+                _ = sb.Append(b.ToString("X2"));
+            }
 
-        return sb.ToString();
+            return sb.ToString();
+        }
+        return string.Empty;
     }
 
     public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
