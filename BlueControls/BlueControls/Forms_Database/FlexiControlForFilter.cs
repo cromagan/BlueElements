@@ -41,21 +41,21 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     #region Fields
 
     private const int MaxCount = 20;
+    private readonly string _renderer;
     private bool _doFilterDeleteButton;
-
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
 
     private bool _fromInputFilter;
 
     private string _origin;
 
-    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+    private FlexiFilterDefaultOutput _standard_bei_keiner_eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition) : base(false, false) {
+    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, string renderer) : base(false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -63,10 +63,11 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Size = new Size(204, 24);
         //AlwaysInstantChange = true;
         FilterSingleColumn = column;
-        Invalidate_FilterInput();
+        //Invalidate_FilterInput();
         f.ShowInfoWhenDisabled = true;
         _origin = string.Empty;
         _fromInputFilter = false;
+        _renderer = renderer;
         DefaultCaptionPosition = defaultCaptionPosition;
     }
 
@@ -80,7 +81,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// </summary>
     public CaptionPosition DefaultCaptionPosition { get; private set; }
 
-    public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
+    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe {
         get => _filterart_bei_texteingabe;
         set {
             if (IsDisposed) { return; }
@@ -104,11 +105,11 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     public string SettingsManualFilename { get; set; } = string.Empty;
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-        get => _standard_bei_keiner_Eingabe;
+        get => _standard_bei_keiner_eingabe;
         set {
             if (IsDisposed) { return; }
-            if (_standard_bei_keiner_Eingabe == value) { return; }
-            _standard_bei_keiner_Eingabe = value;
+            if (_standard_bei_keiner_eingabe == value) { return; }
+            _standard_bei_keiner_eingabe = value;
             F_ValueChanged(null, System.EventArgs.Empty);
         }
     }
@@ -134,8 +135,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     protected override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
-            if (FilterOutput is { Count: 1, Rows.Count: 1 }) {
-                var toAdd = FilterHash() + "|" + FilterOutput[0].SearchValue.JoinWithCr();
+            if (FilterOutput is { Count: 1, Rows.Count: 1 } fio && fio[0] is { } fi) {
+                var toAdd = $"{FilterHash()}|{fi.SearchValue.JoinWithCr()}";
                 this.SettingsAdd(toAdd);
             }
         }
@@ -190,21 +191,21 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.ItemClear();
-        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
+        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, _renderer);
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {
-            if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, FilterSingleColumn.BehaviorOfImageAndText)); }
+            if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, _renderer)); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             if (SavesSettings) {
                 this.LoadSettingsFromDisk(false);
                 var nr = -1;
-                var f = FilterHash();
+                var f2 = FilterHash();
 
                 for (var z = Settings.Count - 1; z >= 0; z--) {
                     var x = Settings[z].SplitAndCutBy("|");
-                    if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f == x[0]) {
+                    if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
                         nr++;
                         if (nr < MaxCount) {
                             var show = (nr + 1).ToStringInt3() + ": " + x[1];
@@ -259,7 +260,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (FilterSingleColumn is not { IsDisposed: false } c) { return; }
 
-        AutoFilter autofilter = new(c, FilterInput, null, Width);
+        AutoFilter autofilter = new(c, FilterInput, null, Width, _renderer);
         var p = PointToScreen(Point.Empty);
         autofilter.Position_LocateToPosition(p with { Y = p.Y + Height });
         autofilter.Show();
@@ -298,7 +299,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void F_ValueChanged(object sender, System.EventArgs e) {
+    private void F_ValueChanged(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (!_doFilterDeleteButton) {
@@ -307,7 +308,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
             if (FilterSingleColumn != null && filterSingle == null) {
                 if (string.IsNullOrEmpty(f.Value)) {
-                    if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+                    if (_standard_bei_keiner_eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
                         filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _origin);
                     }
                 } else {

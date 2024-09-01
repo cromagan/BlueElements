@@ -2956,6 +2956,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.ColumnName, c.KeyName, name);
         SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
         SaveToByteList(l, DatabaseDataType.ColumnFunction, ((int)c.Function).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.DefaultRenderer, c.DefaultRenderer, name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);

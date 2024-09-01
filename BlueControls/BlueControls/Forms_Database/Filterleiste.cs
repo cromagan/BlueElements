@@ -220,10 +220,10 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld);
+                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, thisColumn.DefaultRenderer);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-                            flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
+                            flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
                             ChildIsBorn(flx);
                             //flx.DoOutputSettings(this);
                             //flx.DoInputSettings(parent, this);

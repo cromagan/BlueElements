@@ -63,7 +63,9 @@ internal sealed partial class SearchAndReplaceInCells : Form {
     private void Checkbuttons() {
         var canDo = true;
         if (IsDisposed || _table.Database is not { IsDisposed: false } db) { return; }
+
         if (!db.IsAdministrator()) { canDo = false; }
+
         if (optSucheNach.Checked) {
             if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
             txbAlt.Enabled = true;
@@ -83,6 +85,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         } else {
             canDo = false;
         }
+
         if (optErsetzeMit.Checked) { } else if (optErsetzeKomplett.Checked) {
             chkNurinAktuellerSpalte.Enabled = false; // Zu Riskant
             if (!chkNurinAktuellerSpalte.Checked) { canDo = false; }// Zu Riskant
@@ -91,17 +94,19 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         } else {
             canDo = true;
         }
+
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_table.CursorPosColumn == null) {
+            if (_table.CursorPosColumn?.Column is not { } c) {
                 canDo = false;
             } else {
-                if (!_table.CursorPosColumn.Function.CanBeCheckedByRules()) { canDo = false; }
+                if (!c.Function.CanBeCheckedByRules()) { canDo = false; }
             }
         }
         if (txbAlt.Text == txbNeu.Text) {
             if (!optInhaltEgal.Checked) { canDo = false; }
             if (!optErsetzeKomplett.Checked) { canDo = false; }
         }
+
         btnAusfuehren.Enabled = canDo;
     }
 
@@ -116,7 +121,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         List<ColumnItem> sp = [];
         List<RowItem> ro = [];
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_table.CursorPosColumn is { IsDisposed: false } c) { sp.Add(c); }
+            if (_table.CursorPosColumn?.Column is { } c) { sp.Add(c); }
         } else {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }

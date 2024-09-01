@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -98,7 +97,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
         var txt = "?";

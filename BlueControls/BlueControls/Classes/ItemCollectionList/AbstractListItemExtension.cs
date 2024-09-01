@@ -28,6 +28,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -35,11 +36,11 @@ public static class AbstractListItemExtension {
 
     #region Methods
 
-    public static TextListItem Item(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
+    public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);
 
-    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) => new(value, columnStyle, style, true, bildTextverhalten);
+    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, ShortenStyle style, AbstractCellRenderer? cellRenderer) => new(value, columnStyle, style, true, cellRenderer);
 
     public static TextListItem ItemOf(ContextMenuCommands command, bool enabled = true) {
         var internalName = command.ToString();
@@ -216,7 +217,7 @@ public static class AbstractListItemExtension {
 
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
 
-    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems, string cellRenderer) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -258,7 +259,7 @@ public static class AbstractListItemExtension {
 
         if (maxItems > 0 && l.Count > maxItems) { return []; }
 
-        return ItemsOf(l, column, style, column.BehaviorOfImageAndText);
+        return ItemsOf(l, column, style, cellRenderer);
     }
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
@@ -303,17 +304,27 @@ public static class AbstractListItemExtension {
         return l;
     }
 
+    public static List<AbstractListItem> ItemsOf(IEnumerable<IReadableTextWithKey>? list) {
+        var l = new List<AbstractListItem>();
+        if (list == null) { return l; }
+
+        foreach (var thisitem in list) {
+            if (thisitem != null) { l.Add(ItemOf(thisitem)); }
+        }
+        return l;
+    }
+
     public static List<AbstractListItem> ItemsOf(IEnumerable<string>? list) {
         var l = new List<AbstractListItem>();
         if (list == null) { return l; }
 
         foreach (var thisitem in list) {
-            if (thisitem != null) { l.Add(Item(thisitem)); }
+            if (thisitem != null) { l.Add(ItemOf(thisitem)); }
         }
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, ShortenStyle style, string renderer) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }
@@ -321,8 +332,11 @@ public static class AbstractListItemExtension {
             Develop.DebugPrint(FehlerArt.Fehler, "Values > 100000");
             return l;
         }
+
+        var r = AbstractCellRenderer.AllRenderer.Get(renderer);
+
         foreach (var thisstring in values) {
-            l.Add(ItemOf(thisstring, columnStyle, style, bildTextverhalten));
+            l.Add(ItemOf(thisstring, columnStyle, style, r));
         }
 
         return l;

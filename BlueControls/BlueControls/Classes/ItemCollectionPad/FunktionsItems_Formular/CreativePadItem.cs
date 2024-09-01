@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -80,7 +79,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         CreativePad? con;
 
         if (_formular.EndsWith(".br", StringComparison.OrdinalIgnoreCase)) {

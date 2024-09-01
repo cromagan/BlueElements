@@ -129,9 +129,9 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlForFilter(Column, _überschriftanordung) {
+        var con = new FlexiControlForFilter(Column, _überschriftanordung, Column?.DefaultRenderer) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
-            Filterart_bei_Texteingabe = _filterart_Bei_Texteingabe,
+            Filterart_Bei_Texteingabe = _filterart_Bei_Texteingabe,
             SavesSettings = true
         };
 

@@ -365,7 +365,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (string.IsNullOrEmpty(val)) { return null; }
 
-        return Item(val);
+        return ItemOf(val);
     }
 
     public AbstractListItem? Add_TextBySuggestion() {
@@ -753,7 +753,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                     it = ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
                 }
             } else {
-                it = Item(thisString);
+                it = ItemOf(thisString);
             }
 
             AddAndRegister(it);
@@ -1238,7 +1238,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = _item.Get(thisit) ?? Item(thisit);
+            var it = _item.Get(thisit) ?? ItemOf(thisit);
 
             if (it.IsClickable()) {
                 newList.Add(thisit);

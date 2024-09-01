@@ -149,25 +149,29 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         ca.PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
 
         if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Ansicht " + number; }
+
+        //foreach (var thisView in ca) {
+        //    thisView.Repair();
+        //}
     }
 
     public void Add(ColumnItem? column, bool permanent) {
         if (column is not { IsDisposed: not true }) { return; }
 
         Add(permanent
-            ? new ColumnViewItem(column, ViewType.PermanentColumn, this)
-            : new ColumnViewItem(column, ViewType.Column, this));
+            ? new ColumnViewItem(column, ViewType.PermanentColumn, this, column.DefaultRenderer)
+            : new ColumnViewItem(column, ViewType.Column, this, column.DefaultRenderer));
     }
 
     public object Clone() => new ColumnViewCollection(Database, ToParseableString());
 
-    public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
+    public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
                 if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
-                    return thisViewItem.Column;
+                    return thisViewItem;
                 }
             }
         }
@@ -258,7 +262,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         } while (true);
     }
 
-    public ColumnViewItem? NextVisible(ColumnViewItem viewItem) {
+    public ColumnViewItem? NextVisible(ColumnViewItem? viewItem) {
+        if (viewItem == null) { return null; }
         var viewItemNo = _internal.IndexOf(viewItem);
         if (viewItemNo < 0) { return null; }
         do {
@@ -359,7 +364,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this, thisColumn.DefaultRenderer));
             }
         }
     }
@@ -367,11 +372,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void ShowColumns(params string[] columnnames) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        foreach (var thisColumn in columnnames) {
-            var c = Database?.Column[thisColumn];
+        foreach (var thisColumnName in columnnames) {
+            var thisColumn = Database?.Column[thisColumnName];
 
-            if (c != null && this[c] == null && this[c] == null && !c.IsDisposed) {
-                Add(new ColumnViewItem(c, ViewType.Column, this));
+            if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this, thisColumn.DefaultRenderer));
             }
         }
     }

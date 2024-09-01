@@ -99,7 +99,7 @@ public partial class FontSelectDialog {
             if (FName[value.FontName] == null) { FName.ItemAdd(ItemOf(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
             FName.UncheckAll();
             FName.Check(value.FontName);
-            if (FSize[value.Size.ToStringFloat2()] == null) { FSize.ItemAdd(Item(value.Size.ToStringFloat2())); }
+            if (FSize[value.Size.ToStringFloat2()] == null) { FSize.ItemAdd(ItemOf(value.Size.ToStringFloat2())); }
             FSize.UncheckAll();
             FSize.Check(value.Size.ToStringFloat2());
             fFett.Checked = value.Bold;

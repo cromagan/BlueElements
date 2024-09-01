@@ -29,13 +29,14 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem : IParseable {
+public sealed class ColumnViewItem : IParseable, IReadableText {
 
     #region Constructors
 
-    public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent) : this(parent) {
+    public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent, string renderer) : this(parent) {
         Column = column;
         ViewType = type;
+        Renderer = renderer;
     }
 
     public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) => this.Parse(toParse);
@@ -50,6 +51,7 @@ public sealed class ColumnViewItem : IParseable {
         TmpReduceLocation = Rectangle.Empty;
         TmpDrawWidth = null;
         TmpReduced = false;
+        Renderer = null;
     }
 
     #endregion
@@ -58,6 +60,7 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnItem? Column { get; private set; }
 
+    public string Renderer { get; set; }
     public Rectangle TmpAutoFilterLocation { get; set; }
 
     public int? TmpDrawWidth { get; set; }
@@ -70,6 +73,7 @@ public sealed class ColumnViewItem : IParseable {
 
     /// <summary>
     /// Koordinate der Spalte ohne Slider
+    /// </summary>
     public int? X { get; set; }
 
     /// <summary>
@@ -169,6 +173,10 @@ public sealed class ColumnViewItem : IParseable {
             case "edittype":
                 //    _editType = (EditTypeFormula)IntParse(value);
                 return true;
+
+            case "renderer":
+                Renderer = value;
+                return true;
         }
 
         return false;
@@ -176,10 +184,15 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
 
+    public string ReadableText() => Column?.ReadableText() ?? "?";
+
+    public QuickImage? SymbolForReadableText() => Column?.SymbolForReadableText();
+
     public string ToParseableString() {
         var result = new List<string>();
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
+        result.ParseableAdd("Renderer", Renderer);
         return result.Parseable();
     }
 

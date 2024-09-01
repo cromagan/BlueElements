@@ -92,7 +92,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            e.ContextMenu.Add(Item("Variableninhalt kopieren"));
+            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren"));
         }
 
         e.HotItem = _lastWord;

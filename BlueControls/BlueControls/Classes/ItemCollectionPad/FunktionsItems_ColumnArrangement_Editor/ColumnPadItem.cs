@@ -29,6 +29,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 
@@ -41,9 +42,10 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnPadItem(string keyName) : base(keyName) { }
 
-    public ColumnPadItem(ColumnItem c, bool permanent) : base(c.Database?.TableName + "|" + c.KeyName) {
+    public ColumnPadItem(ColumnItem c, bool permanent, string renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
         Column = c;
         Permanent = permanent;
+        Renderer = AbstractCellRenderer.AllRenderer.Get(renderer);
 
         if (Column is { IsDisposed: false }) {
             Column.PropertyChanged += Column_PropertyChanged;
@@ -56,18 +58,21 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public static string ClassId => "FI-Column";
     public ColumnItem? Column { get; }
+
     public string Datenbank => IsDisposed || Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
     public override string Description => string.Empty;
     public override string MyClassId => ClassId;
-    /// <summary>
-    /// Wird von Flexoptions aufgerufen
-    /// </summary>
 
     //        _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
     //    }
     //}
     public bool Permanent { get; set; }
 
+    public AbstractCellRenderer? Renderer { get; }
+
+    /// <summary>
+    /// Wird von Flexoptions aufgerufen
+    /// </summary>
     protected override int SaveOrder => 999;
 
     #endregion
@@ -167,7 +172,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         var r = Column.Database?.Row.First();
         if (r is { IsDisposed: false }) {
-            Table.Draw_FormatedText(gr, r.CellGetString(Column), ShortenStyle.Replaced, Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, Column.BehaviorOfImageAndText, 1);
+            Renderer?.Draw(gr, r.CellGetString(Column), new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, Column, ShortenStyle.Replaced, 1);
         }
 
         GeneratedBitmap = bmp;

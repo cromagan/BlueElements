@@ -25,7 +25,7 @@ public class CellExtEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public CellExtEventArgs(ColumnItem? column, RowData? row) {
+    public CellExtEventArgs(ColumnViewItem? column, RowData? row) {
         Column = column;
         RowData = row;
     }
@@ -34,7 +34,7 @@ public class CellExtEventArgs : System.EventArgs {
 
     #region Properties
 
-    public ColumnItem? Column { get; }
+    public ColumnViewItem? Column { get; }
     public RowData? RowData { get; }
 
     #endregion

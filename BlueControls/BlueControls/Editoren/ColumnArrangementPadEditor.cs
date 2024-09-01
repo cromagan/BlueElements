@@ -507,9 +507,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
 
         var x = 0f;
-        foreach (var thisc in ca) {
-            if (thisc?.Column is { IsDisposed: false } c) {
-                var it = new ColumnPadItem(c, thisc.ViewType == ViewType.PermanentColumn);
+        foreach (var thisColumnViewItem in ca) {
+            if (thisColumnViewItem?.Column is { IsDisposed: false } c) {
+                var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.Renderer);
                 Pad.Item.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.UsedArea.Right;
@@ -572,7 +572,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                             var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
-                                var it2 = new ColumnPadItem(c2, false);
+                                var it2 = new ColumnPadItem(c2, false, c2.DefaultRenderer);
                                 Pad.Item.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
                                 if (it != null) {

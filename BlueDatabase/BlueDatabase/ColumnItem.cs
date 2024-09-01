@@ -76,6 +76,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     //private string _cellInitValue;
     private Database? _database;
 
+    private string _defaultRenderer = "Default";
     private TranslationType _doOpticalTranslation;
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
@@ -459,6 +460,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_database != null) {
                 _database.DisposingEvent += _database_Disposing;
             }
+        }
+    }
+
+    public string DefaultRenderer {
+        get => _defaultRenderer;
+        set {
+            if (IsDisposed) { return; }
+            if (_defaultRenderer == value) { return; }
+
+            _ = Database?.ChangeData(DatabaseDataType.DefaultRenderer, this, null, _defaultRenderer, value, Generic.UserName, DateTime.UtcNow, string.Empty);
+            OnPropertyChanged();
         }
     }
 
@@ -1095,6 +1107,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         PermissionGroupsChangeCell = source.PermissionGroupsChangeCell;
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
+        DefaultRenderer = source.DefaultRenderer;
         Invalidate_ContentWidth();
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
@@ -2288,6 +2301,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.ColumnAdminInfo:
                 _adminInfo = newvalue;
+                break;
+
+            case DatabaseDataType.DefaultRenderer:
+                _defaultRenderer = newvalue;
                 break;
 
             //case DatabaseDataType.ColumnContentWidth:

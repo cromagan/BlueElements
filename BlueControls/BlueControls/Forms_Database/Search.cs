@@ -31,7 +31,7 @@ public sealed partial class Search : Form {
     #region Fields
 
     private readonly Table _table;
-    private ColumnItem? _col;
+    private ColumnViewItem? _col;
     private RowData? _row;
 
     #endregion
@@ -82,18 +82,18 @@ public sealed partial class Search : Form {
             return;
         }
 
-        found ??= ca.Last()?.Column;
+        found ??= ca.Last();
         var columnStarted = _col;
 
         do {
-            found = ca.NextVisible(found) ?? ca.First()?.Column;
+            found = ca.NextVisible(found) ?? ca.First();
 
-            if (found == null) {
+            if (found?.Column is not { } c) {
                 MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
                 return;
             }
 
-            var ist1 = found.ReadableText().ToLowerInvariant() + " (" + found.KeyName.ToLowerInvariant() + ")";
+            var ist1 = c.ReadableText().ToLowerInvariant() + " (" + c.KeyName.ToLowerInvariant() + ")";
             if (!string.IsNullOrEmpty(ist1)) {
                 // Allgemeine Prüfung
                 if (ist1.Contains(searchT.ToLowerInvariant())) { break; }

@@ -50,12 +50,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, string renderer) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
         _column = column;
-        GenerateAll(fc, pinned, minWidth);
+        GenerateAll(fc, pinned, minWidth, renderer);
     }
 
     #endregion
@@ -68,7 +68,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Methods
 
-    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
+    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned, string renderer) {
         if (column is not { IsDisposed: not true }) { return []; }
 
         if (fc is not { Count: >= 0 }) { return column.Contents(); }
@@ -84,9 +84,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         return column.Contents(fc2, pinned);
     }
 
-    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth) {
+    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, string renderer) {
         var nochOk = true;
-        var listFilterString = Autofilter_ItemList(_column, fc, pinned);
+        var listFilterString = Autofilter_ItemList(_column, fc, pinned, renderer);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
         //ACHUNG:
@@ -102,7 +102,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
         if (listFilterString.Count < 400) {
-            lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, _column, ShortenStyle.Replaced, _column.BehaviorOfImageAndText));
+            lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, _column, ShortenStyle.Replaced, renderer));
             //lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             lsbFilterItems.ItemAdd(ItemOf("Zu viele Einträge", "x", ImageCode.Kreuz, false));

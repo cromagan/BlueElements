@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using BlueControls.CellRenderer;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -331,6 +332,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
+        cbxRenderer.ItemAddRange(ItemsOf(AbstractCellRenderer.AllRenderer));
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
 
@@ -384,6 +386,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxAdditionalCheck.Text = ((int)_column.AdditionalFormatCheck).ToString();
         cbxScriptType.Text = ((int)_column.ScriptType).ToString();
         cbxTranslate.Text = ((int)_column.DoOpticalTranslation).ToString();
+        cbxRenderer.Text = _column.DefaultRenderer;
         cbxSort.Text = ((int)_column.SortType).ToString();
         btnAutoFilterMoeglich.Checked = _column.FilterOptions.HasFlag(FilterOptions.Enabled);
         btnAutoFilterTXTErlaubt.Checked = _column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
@@ -551,6 +554,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
         _column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
+        _column.DefaultRenderer = cbxRenderer.Text;
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
         _column.Invalidate_ColumAndContent();

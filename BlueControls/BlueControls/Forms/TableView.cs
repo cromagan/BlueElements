@@ -683,7 +683,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         if (ckbZeilenclickInsClipboard.Checked) {
-            Table.CopyToClipboard(e.Column, e.RowData?.Row, false);
+            Table.CopyToClipboard(e.Column?.Column, e.RowData?.Row, false);
             Table.Focus();
         }
     }

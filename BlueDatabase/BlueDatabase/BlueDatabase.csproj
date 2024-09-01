@@ -110,6 +110,8 @@
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
+    <Compile Include="ColumnViewCollection.cs" />
+    <Compile Include="ColumnViewItem.cs" />
     <Compile Include="DatabaseMu.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="Database.cs" />
@@ -138,8 +140,6 @@
     <Compile Include="Interfaces\ITranslateAble.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />
-    <Compile Include="ColumnViewCollection.cs" />
-    <Compile Include="ColumnViewItem.cs" />
     <Compile Include="Enums\FilterOptions.cs" />
     <Compile Include="Enums\FilterType.cs" />
     <Compile Include="Enums\ShortenStyle.cs" />
