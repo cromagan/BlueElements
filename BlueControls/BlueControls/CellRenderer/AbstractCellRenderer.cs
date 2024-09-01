@@ -55,7 +55,7 @@ public abstract class AbstractCellRenderer : IReadableTextWithKey {
     public abstract void Draw(Graphics gr, string content, Rectangle drawarea,
         Design design, States state,
         ColumnItem? column,
-        ShortenStyle style, float scale);
+        float scale);
 
     public abstract string ReadableText();
 

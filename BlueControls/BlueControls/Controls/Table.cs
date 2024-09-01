@@ -2665,7 +2665,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (!string.IsNullOrEmpty(txt)) {
                 var pos = new Rectangle(columnX1 + plus, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth - plus, _pix16);
-                renderer?.Draw(gr, txt, pos, Design.Table_Cell_New, state, cellInThisDatabaseColumn, ShortenStyle.Replaced, db.GlobalScale);
+                renderer?.Draw(gr, txt, pos, Design.Table_Cell_New, state, cellInThisDatabaseColumn, db.GlobalScale);
                 gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
             }
         }
@@ -2738,7 +2738,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                         if (contentHolderCellColumn != null && contentHolderCellRow != null) {
                             var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
-                            renderer?.Draw(gr, toDraw, cellrectangle, Design.Table_Cell, state, contentHolderCellColumn, ShortenStyle.Replaced, db.GlobalScale);
+                            renderer?.Draw(gr, toDraw, cellrectangle, Design.Table_Cell, state, contentHolderCellColumn, db.GlobalScale);
                         } else {
                             if (isAdmin) {
                                 gr.DrawImage(errorImg, cellrectangle.Left + 3, cellrectangle.Top + 1);
@@ -2749,12 +2749,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     case ColumnFunction.Virtuelle_Spalte:
                         cellInThisDatabaseRow.CheckRowDataIfNeeded();
                         var toDrawd2 = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        renderer?.Draw(gr, toDrawd2, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn, ShortenStyle.Replaced, db.GlobalScale);
+                        renderer?.Draw(gr, toDrawd2, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn, db.GlobalScale);
                         break;
 
                     default:
                         var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        renderer?.Draw(gr, toDrawd, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn, ShortenStyle.Replaced, db.GlobalScale);
+                        renderer?.Draw(gr, toDrawd, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn, db.GlobalScale);
                         break;
                 }
 

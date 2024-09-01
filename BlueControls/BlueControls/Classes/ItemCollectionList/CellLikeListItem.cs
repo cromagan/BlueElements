@@ -35,7 +35,6 @@ public class CellLikeListItem : AbstractListItem {
     #region Fields
 
     private readonly AbstractCellRenderer? _cellRenderer;
-    private readonly ShortenStyle _style;
 
     /// <summary>
     /// Nach welcher Spalte sich der Stil richten muss.
@@ -48,9 +47,8 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Constructors
 
-    public CellLikeListItem(string keyNameAndReadableText, ColumnItem? columnStyle, ShortenStyle style, bool enabled, AbstractCellRenderer? cellRenderer) : base(keyNameAndReadableText, enabled) {
+    public CellLikeListItem(string keyNameAndReadableText, ColumnItem? columnStyle, bool enabled, AbstractCellRenderer? cellRenderer) : base(keyNameAndReadableText, enabled) {
         _styleLikeThis = columnStyle;
-        _style = style;
         _cellRenderer = cellRenderer;
     }
 
@@ -78,14 +76,14 @@ public class CellLikeListItem : AbstractListItem {
             return new Size(16, 0);
         }
 
-        return CellItem.ContentSize(_styleLikeThis.KeyName, KeyName, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
+        return CellItem.ContentSize(_styleLikeThis.KeyName, KeyName, Skin.GetBlueFont(itemdesign, States.Standard), 16, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _styleLikeThis, _style, 1f);
+        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _styleLikeThis, 1f);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }

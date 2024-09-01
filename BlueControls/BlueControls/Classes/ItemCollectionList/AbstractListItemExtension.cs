@@ -40,7 +40,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);
 
-    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, ShortenStyle style, AbstractCellRenderer? cellRenderer) => new(value, columnStyle, style, true, cellRenderer);
+    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, AbstractCellRenderer? cellRenderer) => new(value, columnStyle, true, cellRenderer);
 
     public static TextListItem ItemOf(ContextMenuCommands command, bool enabled = true) {
         var internalName = command.ToString();
@@ -336,7 +336,7 @@ public static class AbstractListItemExtension {
         var r = AbstractCellRenderer.AllRenderer.Get(renderer);
 
         foreach (var thisstring in values) {
-            l.Add(ItemOf(thisstring, columnStyle, style, r));
+            l.Add(ItemOf(thisstring, columnStyle, r));
         }
 
         return l;

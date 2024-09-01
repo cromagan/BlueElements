@@ -40,7 +40,7 @@ public class DefaultRenderer : AbstractCellRenderer {
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design,
                                 States state,
-                                ColumnItem? column, ShortenStyle style,
+                                ColumnItem? column,
                                 float scale) {
         if (column == null) { return; }
         if (string.IsNullOrEmpty(content)) { return; }
@@ -50,28 +50,28 @@ public class DefaultRenderer : AbstractCellRenderer {
         var pix16 = Table.GetPix(16, font, scale);
 
         if (!ShowMultiLine(content, column.MultiLine)) {
-            DrawOneLine(gr, content, column, drawarea, 0, false, font, pix16, style, column.BehaviorOfImageAndText, state, scale);
+            DrawOneLine(gr, content, column, drawarea, 0, false, font, pix16, column.BehaviorOfImageAndText, state, scale);
         } else {
             var mei = content.SplitAndCutByCrAndBr();
 
             switch (column.BehaviorOfImageAndText) {
                 case BildTextVerhalten.Nur_erste_Zeile_darstellen:
                     if (mei.Length > 1) {
-                        DrawOneLine(gr, mei[0] + "...", column, drawarea, 0, false, font, pix16, style, BildTextVerhalten.Nur_Text, state, scale);
+                        DrawOneLine(gr, mei[0] + "...", column, drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale);
                     } else if (mei.Length == 1) {
-                        DrawOneLine(gr, mei[0], column, drawarea, 0, false, font, pix16, style, BildTextVerhalten.Nur_Text, state, scale);
+                        DrawOneLine(gr, mei[0], column, drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale);
                     }
                     break;
 
                 case BildTextVerhalten.Mehrzeilig_einzeilig_darsellen:
-                    DrawOneLine(gr, mei.JoinWith("; "), column, drawarea, 0, false, font, pix16, style, BildTextVerhalten.Nur_Text, state, scale);
+                    DrawOneLine(gr, mei.JoinWith("; "), column, drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale);
                     break;
 
                 default: {
                         var y = 0;
                         for (var z = 0; z <= mei.GetUpperBound(0); z++) {
-                            DrawOneLine(gr, mei[z], column, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, column.BehaviorOfImageAndText, state, scale);
-                            y += CellItem.ContentSize(column.KeyName, mei[z], font, style, pix16 - 1, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode).Height;
+                            DrawOneLine(gr, mei[z], column, drawarea, y, z != mei.GetUpperBound(0), font, pix16, column.BehaviorOfImageAndText, state, scale);
+                            y += CellItem.ContentSize(column.KeyName, mei[z], font, pix16 - 1, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode).Height;
                         }
 
                         break;
@@ -84,7 +84,7 @@ public class DefaultRenderer : AbstractCellRenderer {
 
     public override QuickImage? SymbolForReadableText() => null;
 
-    private static void DrawOneLine(Graphics gr, string drawString, ColumnItem column, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state, float scale) {
+    private static void DrawOneLine(Graphics gr, string drawString, ColumnItem column, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, BildTextVerhalten bildTextverhalten, States state, float scale) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
         if (r.Bottom + pix16 > drawarea.Bottom) {
@@ -92,7 +92,7 @@ public class DefaultRenderer : AbstractCellRenderer {
             if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
         }
 
-        var (text, qi) = CellItem.GetDrawingData(column.KeyName, drawString, style, bildTextverhalten, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode);
+        var (text, qi) = CellItem.GetDrawingData(column.KeyName, drawString, bildTextverhalten, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode);
         var tmpImageCode = qi;
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
