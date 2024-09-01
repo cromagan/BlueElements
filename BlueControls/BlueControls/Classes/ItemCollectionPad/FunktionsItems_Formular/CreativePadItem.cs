@@ -57,7 +57,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override bool DatabaseInputMustMatchOutputDatabase => false;
 
-    public override string Description => "Ein Steuerelement, das ein generirtes optisches Dokument anzeigt.";
+    public override string Description => "Ein Steuerelement, das ein generiertes optisches Dokument anzeigt.";
 
     public string Formular {
         get => _formular;
@@ -80,12 +80,12 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     #region Methods
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
-        CreativePad? con;
+        ConnectedCreativePad? con;
 
-        if (_formular.EndsWith(".br", StringComparison.OrdinalIgnoreCase)) {
-            con = new CreativePad(new ItemCollectionPad(_formular));
+        if (_formular.EndsWith(".bcr", StringComparison.OrdinalIgnoreCase)) {
+            con = new ConnectedCreativePad(new ItemCollectionPad(_formular));
         } else {
-            con = new CreativePad();
+            con = new ConnectedCreativePad();
         }
 
         con.DoDefaultSettings(parent, this, mode);
@@ -95,7 +95,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override string ErrorReason() {
         if (string.IsNullOrEmpty(_formular)) {
-            return "Kein Formular gewählt.";
+            return "Kein Layout gewählt.";
         }
 
         return base.ErrorReason();
@@ -105,8 +105,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         var cl = new List<AbstractListItem>();
 
         if (DatabaseInput is { IsDisposed: false } db) {
-            if (Directory.Exists(db.AdditionalFilesPfad)) {
-                var f = Directory.GetFiles(db.AdditionalFilesPfad, "*.bcr");
+            if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
+                var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
 
                 cl.AddRange(ItemsOf(f));
             }
@@ -131,7 +131,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     public override string ReadableText() {
-        const string txt = "Formular: ";
+        const string txt = "Layout-Generator: ";
 
         if (this.IsOk()) {
             return txt + _formular;

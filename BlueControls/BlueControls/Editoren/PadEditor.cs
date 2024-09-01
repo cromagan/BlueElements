@@ -178,6 +178,15 @@ public partial class PadEditor : PadEditorReadOnly {
             ckbRaster.Checked = Pad.Item.SnapMode == SnapMode.SnapToGrid;
             txbRasterAnzeige.Text = Pad.Item.GridShow.ToStringFloat2();
             txbRasterFangen.Text = Pad.Item.GridSnap.ToStringFloat2();
+            if (Pad.Item.SheetStyle != null)
+            {
+                PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
+            }
+
+            cbxSchriftGröße.Text =( (int) (Pad.Item.SheetStyleScale*100)).ToStringInt3();
+            
+
+
         }
     }
 

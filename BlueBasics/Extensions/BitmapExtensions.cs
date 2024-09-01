@@ -72,10 +72,9 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
         try {
-            FileStream fs = new(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var fs =  new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             var im = Image.FromStream(fs);
             fs.Close();
-            fs.Dispose();
             return im;
         } catch (Exception) {
             return null;

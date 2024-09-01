@@ -27,6 +27,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Extensions;
@@ -300,8 +301,28 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
     }
 
     private void SaveNewPicToDisc() {
-        if (!HasFileName()) { return; }
-        _bitmap?.Save(_filename, ImageFormat.Png);
+        //if (!HasFileName()) { return; }
+
+        //if (_bitmap == null) { return; }
+        //using var fs = new FileStream(_filename, FileMode.Create, FileAccess.Write);
+        //_bitmap.Save(fs, ImageFormat.Png);
+
+        if (!HasFileName() || _bitmap == null) { return; }
+
+        try
+        {
+
+            using var compatibleBitmap = new Bitmap(_bitmap);
+
+            using var fs = new FileStream(_filename, FileMode.Create, FileAccess.Write);
+            using var memory = new MemoryStream();
+            compatibleBitmap.Save(memory, ImageFormat.Png);
+            byte[] bytes = memory.ToArray();
+            fs.Write(bytes, 0, bytes.Length);
+        } catch (Exception ex) {
+            System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
+        }
+
     }
 
     private void ZoomFitInvalidateAndCheckButtons() {

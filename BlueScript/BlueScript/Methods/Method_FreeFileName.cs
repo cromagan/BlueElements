@@ -35,7 +35,7 @@ internal class Method_FreeFileName : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "freefilename";
     public override List<string> Constants => [];
-    public override string Description => "Gibt einen zufälligen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.";
+    public override string Description => "Gibt einen zufälligen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.\r\n#ID #einzigartig #filename";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;

@@ -116,6 +116,12 @@
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.Designer.cs">
       <DependentUpon>ConnectedFormulaButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ConnectedFormula\ConnectedCreativePad.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\ConnectedCreativePad.Designer.cs">
+      <DependentUpon>ConnectedCreativePad.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ConnectedFormula\Monitor.cs">
       <SubType>Component</SubType>
     </Compile>
