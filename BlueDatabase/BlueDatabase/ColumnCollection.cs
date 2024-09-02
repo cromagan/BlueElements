@@ -155,13 +155,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
 
-        var i = db.ColumnArrangements.IndexOf(@"ColumnName[J]");
+        var i = db.ColumnArrangements.IndexOf(@"ColumnName[J]", StringComparison.Ordinal);
 
         if (i < 5) { return null; }
 
-        var en = db.ColumnArrangements.IndexOf(@"[K]", i);
+        var en = db.ColumnArrangements.IndexOf(@"[", i+12, StringComparison.Ordinal);
 
-        if (en < i) { return null; }
+        if (en <= i) { return null; }
 
         var n = db.ColumnArrangements.Substring(i + 13, en - i - 13);
 

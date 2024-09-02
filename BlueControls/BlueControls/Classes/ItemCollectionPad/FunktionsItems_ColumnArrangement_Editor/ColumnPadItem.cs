@@ -113,10 +113,10 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         return result;
     }
 
-    public void Spalte_bearbeiten() {
-        if (Column is not { IsDisposed: not true }) { return; }
-        TableView.OpenColumnEditor(Column, null, null);
-    }
+    //public void Spalte_bearbeiten() {
+    //    if (Column is not { IsDisposed: not true }) { return; }
+    //    TableView.OpenColumnEditor(Column, null, null);
+    //}
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
@@ -144,7 +144,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        var wi = 50;// Math.Max(Column.Contentwidth ?? 0, 24);
+        var wi = 300;// Math.Max(Column.Contentwidth ?? 0, 24);
 
         var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
         var gr = Graphics.FromImage(bmp);

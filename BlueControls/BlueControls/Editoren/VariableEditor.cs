@@ -107,16 +107,20 @@ public partial class VariableEditor : EditorEasy {
             db.PermissionGroupsNewRow = new(new List<string> { Constants.Everybody });
         }
 
-        db.RepairAfterParse();
+  
         var tcvc = ColumnViewCollection.ParseAll(db);
+
 
         //if (car != null) {
         if (Editabe) {
+            tcvc[0].ShowColumns("Name", "Inhalt", "Kommentar");
             tcvc[1].ShowColumns("Name", "Inhalt", "Kommentar");
         } else {
+            tcvc[0].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
             tcvc[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         }
 
+        db.RepairAfterParse();
         db.ColumnArrangements = tcvc.ToString(false);
 
         db.SortDefinition = new RowSortDefinition(db, na, true);

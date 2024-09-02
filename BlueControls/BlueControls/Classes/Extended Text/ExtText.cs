@@ -93,7 +93,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         _state = state;
     }
 
-    public ExtText(PadStyles design, RowItem? skinRow) : this((Design)design, States.Standard) {
+    public ExtText(PadStyles design, RowItem skinRow) : this((Design)design, States.Standard) {
         _row = skinRow;
 
         if ((int)_design < 10000 || _row == null) {

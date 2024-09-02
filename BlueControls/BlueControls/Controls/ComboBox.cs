@@ -173,7 +173,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     public AbstractListItem? this[int no] {
         get {
             try {
-                if (no < 0 || no > _item.Count) { return null; }
+                if (no < 0 || no >= _item.Count) { return null; }
 
                 return _item[no];
             } catch {

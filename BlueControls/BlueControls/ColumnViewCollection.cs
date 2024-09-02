@@ -123,6 +123,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             tcvc.Add(new ColumnViewCollection(db, t));
         }
 
+        if(tcvc.Count <2) {tcvc.Add(new ColumnViewCollection(db,string.Empty));}
+
+        if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
+
         return tcvc;
     }
 
@@ -379,7 +383,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumn in db.Column) {
-            if (this[thisColumn] == null && !thisColumn.IsDisposed) {
+            if (this[thisColumn] == null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
+            }
+        }
+
+        foreach (var thisColumn in db.Column) {
+            if (this[thisColumn] == null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
                 Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
             }
         }

@@ -528,7 +528,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    public static void Database_Loaded(object sender, System.EventArgs e) {
+    public static void Database_AdditionalRepair(object sender, System.EventArgs e) {
         if (sender is not Database db) { return; }
 
         RepairColumnArrangements(db);

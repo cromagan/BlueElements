@@ -933,7 +933,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     private bool DrawItems(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
         try {
-            if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
+            if ( SheetStyleScale < 0.1d) { return true; }
 
             foreach (var thisItem in items) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;

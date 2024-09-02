@@ -190,6 +190,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #region Events
 
+    public event EventHandler? AdditionalRepair;
+
     public event EventHandler<CancelReasonEventArgs>? CanDoScript;
 
     public event EventHandler? Disposed;
@@ -2176,6 +2178,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
         //if (EventScriptVersion < Date) { EventScriptVersion = 1; }
+
+        OnAdditionalRepair();
     }
 
     public virtual bool Save() {
@@ -2360,6 +2364,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
+
+    protected void OnAdditionalRepair() {
+        if (IsDisposed) { return; }
+        //IsInCache = FileStateUTCDate;
+        AdditionalRepair?.Invoke(this, System.EventArgs.Empty);
+    }
 
     protected void OnLoaded() {
         if (IsDisposed) { return; }

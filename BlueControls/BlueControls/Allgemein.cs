@@ -84,10 +84,8 @@ public static class Allgemein {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
                 if (thisit is Database db) {
-                    db.Loaded += BlueControls.Controls.Table.Database_Loaded;
+                    db.AdditionalRepair += BlueControls.Controls.Table.Database_AdditionalRepair;
                 }
-
-
             }
         }
 
@@ -97,7 +95,7 @@ public static class Allgemein {
                     dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
                 if (thisit is Database db) {
-                    db.Loaded += BlueControls.Controls.Table.Database_Loaded;
+                    db.AdditionalRepair += BlueControls.Controls.Table.Database_AdditionalRepair;
                 }
             }
         }
@@ -106,8 +104,6 @@ public static class Allgemein {
             Develop.DebugPrint_NichtImplementiert(true);
         }
     }
-
-
 
     #endregion
 
