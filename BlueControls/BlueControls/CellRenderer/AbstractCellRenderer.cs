@@ -17,7 +17,9 @@
 
 #nullable enable
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Interfaces;
@@ -31,6 +33,7 @@ public abstract class AbstractCellRenderer : IReadableTextWithKey {
 
     #region Fields
 
+    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private static List<AbstractCellRenderer>? _allrenderer;
 
     #endregion
@@ -52,14 +55,57 @@ public abstract class AbstractCellRenderer : IReadableTextWithKey {
 
     #region Methods
 
-    public abstract void Draw(Graphics gr, string content, Rectangle drawarea,
-        Design design, States state,
-        ColumnItem? column,
-        float scale);
+    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, ColumnItem? column, float scale);
+
+    public Size GetSizeOfCellContent(ColumnItem column, string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode) {
+        if (string.IsNullOrEmpty(content)) { return Size.Empty; }
+
+        var key = TextSizeKey(column, KeyName, content);
+
+        if (key == null) { return Size.Empty; }
+
+        if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
+
+        var contentsize = CalculateContentSize(column, content, design, state, behaviorOfImageAndText, prefix, suffix,
+            doOpticalTranslation, opticalReplace, scale, constantHeightOfImageCode);
+
+        SetSizeOfCellContent(column, key, content, contentsize);
+        return contentsize;
+    }
 
     public abstract string ReadableText();
 
+    public void SetSizeOfCellContent(ColumnItem column, string renderer, string content, Size contentSize) {
+        var key = TextSizeKey(column, renderer, content);
+
+        if (key == null) { return; }
+
+        if (Sizes.ContainsKey(key)) {
+            Sizes[key] = contentSize;
+            return;
+        }
+
+        _ = Sizes.TryAdd(key, contentSize);
+    }
+
     public abstract QuickImage? SymbolForReadableText();
+
+    public abstract string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText,
+                                        bool removeLineBreaks, string prefix, string suffix, TranslationType doOpticalTranslation,
+        ReadOnlyCollection<string> opticalReplace);
+
+    protected abstract Size CalculateContentSize(ColumnItem column, string originalText, Design design, States state, BildTextVerhalten behaviorOfImageAndText, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode);
+
+    /// <summary>
+    /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist, ab.
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="renderer"></param>
+    /// <param name="content"></param>
+    private string? TextSizeKey(ColumnItem? column, string renderer, string content) {
+        if (column?.Database is not { IsDisposed: false } db || column.IsDisposed) { return null; }
+        return renderer + "|" + db.TableName + "|" + column.KeyName + "|" + content;
+    }
 
     #endregion
 }

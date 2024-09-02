@@ -198,14 +198,14 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1f, StringFormat.GenericDefault);
 
-    public void DrawString(Graphics gr, string text, float x, float y, float zoom, StringFormat stringFormat) {
-        var f = FontWithoutLines(zoom);
+    public void DrawString(Graphics gr, string text, float x, float y, float scale, StringFormat stringFormat) {
+        var f = FontWithoutLines(scale);
 
         var isCap = false;
 
         if (Kapitälchen && text != text.ToUpperInvariant()) {
             isCap = true;
-            f = FontWithoutLinesForCapitals(zoom);
+            f = FontWithoutLinesForCapitals(scale);
             text = text.ToUpperInvariant();
         } else if (OnlyUpper) {
             text = text.ToUpperInvariant();
@@ -219,29 +219,29 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
 
         if (Underline) {
-            gr.DrawLine(Pen(zoom), x, (int)(y + Oberlänge(zoom) + ((Pen(1f).Width + 1) * zoom) + 0.5), x + ((1 + si.Width) * zoom), (int)(y + Oberlänge(zoom) + ((Pen(1f).Width + 1) * zoom) + 0.5));
+            gr.DrawLine(Pen(scale), x, (int)(y + Oberlänge(scale) + ((Pen(1f).Width + 1) * scale) + 0.5), x + ((1 + si.Width) * scale), (int)(y + Oberlänge(scale) + ((Pen(1f).Width + 1) * scale) + 0.5));
         }
 
         if (isCap) {
-            y += KapitälchenPlus(zoom);
+            y += KapitälchenPlus(scale);
         }
 
         if (Outline) {
             for (var px = -1; px <= 1; px++) {
                 for (var py = -1; py <= 1; py++) {
-                    DrawString(gr, text, f, BrushColorOutline, x + (px * zoom), y + (py * zoom), stringFormat);
+                    DrawString(gr, text, f, BrushColorOutline, x + (px * scale), y + (py * scale), stringFormat);
                 }
             }
         }
 
         if (isCap) {
-            DrawString(gr, text, f, BrushColorMain, x + (0.3F * zoom), y, stringFormat);
+            DrawString(gr, text, f, BrushColorMain, x + (0.3F * scale), y, stringFormat);
         }
 
         DrawString(gr, text, f, BrushColorMain, x, y, stringFormat);
 
         if (StrikeOut) {
-            gr.DrawLine(Pen(zoom), x - 1, (int)(y + (si.Height * 0.55)), (int)(x + 1 + si.Width), (int)(y + (si.Height * 0.55)));
+            gr.DrawLine(Pen(scale), x - 1, (int)(y + (si.Height * 0.55)), (int)(x + 1 + si.Width), (int)(y + (si.Height * 0.55)));
         }
 
         //if (_Size.Width < 1) {
@@ -249,24 +249,24 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         //}
     }
 
-    public Font Font(float zoom) {
-        if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
+    public Font Font(float scale) {
+        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
 
-        var emSize = _fontOl.Size * zoom / Skin.Scale;
+        var emSize = _fontOl.Size * scale / Skin.Scale;
         return SizeOk(emSize) ? new Font(FontName, emSize, _font.Style, _font.Unit)
             : new Font("Arial", emSize, _font.Style, _font.Unit);
     }
 
-    public Font FontWithoutLines(float zoom) {
-        if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) { return _fontOl; }
-        var gr = _fontOl.Size * zoom / Skin.Scale;
+    public Font FontWithoutLines(float scale) {
+        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) { return _fontOl; }
+        var gr = _fontOl.Size * scale / Skin.Scale;
 
         return SizeOk(gr) ? new Font(FontName, gr, _fontOl.Style, _fontOl.Unit)
             : new Font("Arial", gr, _fontOl.Style, _fontOl.Unit);
     }
 
-    public Font FontWithoutLinesForCapitals(float zoom) =>
-        new(_fontOl.Name, _fontOl.Size * zoom * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
+    public Font FontWithoutLinesForCapitals(float scale) =>
+        new(_fontOl.Name, _fontOl.Size * scale * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
 
     public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
 
@@ -418,7 +418,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return false;
     }
 
-    public Pen Pen(float zoom) => Math.Abs(zoom - 1) < DefaultTolerance ? _pen : GeneratePen(zoom);
+    public Pen Pen(float scale) => Math.Abs(scale - 1) < DefaultTolerance ? _pen : GeneratePen(scale);
 
     public string ReadableText() {
         var t = FontName + ", " + Size + " pt, ";
@@ -500,11 +500,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return new SizeF(s.Width - _widthOf2Points, _zeilenabstand);
     }
 
-    internal float KapitälchenPlus(float zoom) => _kapitälchenPlus * zoom;
+    internal float KapitälchenPlus(float scale) => _kapitälchenPlus * scale;
 
-    internal float Oberlänge(float zoom) => _oberlänge * zoom;
+    internal float Oberlänge(float scale) => _oberlänge * scale;
 
-    internal BlueFont Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(Size * zoom), Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
+    internal BlueFont Scale(float scale) => Math.Abs(1 - scale) < 0.01 ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
 
     private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
         var result = new List<string>();
@@ -526,8 +526,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return result.Parseable();
     }
 
-    private Pen GeneratePen(float zoom) {
-        var linDi = (float)_zeilenabstand / 10 * zoom;
+    private Pen GeneratePen(float scale) {
+        var linDi = (float)_zeilenabstand / 10 * scale;
         if (Bold) { linDi *= 1.5F; }
         return new Pen(ColorMain, linDi);
     }

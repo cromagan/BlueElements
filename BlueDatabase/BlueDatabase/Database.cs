@@ -84,7 +84,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
-    private string _columnArrangements = string.Empty;
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<DatabaseScriptDescription> _eventScript = [];
     private readonly List<string> _permissionGroupsNewRow = [];
@@ -97,6 +96,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _caption = string.Empty;
     private System.Threading.Timer? _checker;
     private int _checkerTickCount = -5;
+    private string _columnArrangements = string.Empty;
     private bool _completing;
     private string _createDate;
     private string _creator;
@@ -828,7 +828,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return tmp;
     }
 
-
     /// <summary>
     /// Standardisiert Benutzergruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
     /// </summary>
@@ -1184,7 +1183,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (tagsToo) {
             Variables = sourceDatabase.Variables;
         }
-
     }
 
     public virtual ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
@@ -1632,8 +1630,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
         return sb.ToString().TrimEnd("\r\n");
     }
-
-
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -2083,8 +2079,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
- 
-
     public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
         try {
             if (IsAdministrator()) { return true; }
@@ -2167,7 +2161,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
 
         Column.Repair();
-    
 
         if (!string.IsNullOrEmpty(Filename)) {
             if (!string.Equals(TableName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
@@ -2260,9 +2253,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             OnDropMessage(FehlerArt.Fehler, errormessage);
         }
     }
-
-
-
 
     /// <summary>
     /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
@@ -2449,7 +2439,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (column?.Database is not { IsDisposed: false } db) { return (string.Empty, column, row); }
             if (row == null) { return (string.Empty, column, row); }
 
-            column.Invalidate_ContentWidth();
+            //column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();
 
             var f = row.SetValueInternal(column, value, reason);
@@ -2466,7 +2456,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 //return ("Wert nicht gesetzt!", null, null);
                 return (string.Empty, null, null);
             }
-            column.Invalidate_ContentWidth();
+
             return (column.SetValueInternal(type, value), column, null);
         }
 

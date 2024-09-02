@@ -99,7 +99,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     #region Methods
 
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string entitiId, RowItem rowIn) {
-        var generatedentityID = rowIn.ReplaceVariables(entitiId, false, true, null);
+        var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         var vars = new VariableCollection();
         vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
@@ -376,7 +376,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     private (string msg, string newid) GenerateEntityID(RowItem rowIn) {
         if (!string.IsNullOrEmpty(_lastGeneratedEntityId)) { return (string.Empty, _lastGeneratedEntityId); }
 
-        var generatedentityID = rowIn.ReplaceVariables(EntityID, false, true, null);
+        var generatedentityID = rowIn.ReplaceVariables(EntityID, true, null);
 
         if (generatedentityID == EntityID || string.IsNullOrEmpty(generatedentityID)) {
             return ("Interner Fehler: EnitiyID", string.Empty);

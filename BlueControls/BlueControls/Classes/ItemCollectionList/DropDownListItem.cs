@@ -23,6 +23,7 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -54,11 +55,11 @@ public class DropDownListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => false;
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) {
         var he = 16;
 
         foreach (var item in DDItems) {
-            var s = item.HeightForListBox(style, columnWidth, itemdesign);
+            var s = item.HeightForListBox(style, columnWidth, itemdesign, renderer);
 
             he = Math.Max(he, s);
         }

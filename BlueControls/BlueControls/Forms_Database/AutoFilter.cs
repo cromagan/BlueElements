@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.CellRenderer;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -50,11 +51,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, string renderer) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, AbstractCellRenderer? renderer) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
         _column = column;
+
         GenerateAll(fc, pinned, minWidth, renderer);
     }
 
@@ -68,7 +70,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Methods
 
-    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned, string renderer) {
+    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
         if (column is not { IsDisposed: not true }) { return []; }
 
         if (fc is not { Count: >= 0 }) { return column.Contents(); }
@@ -84,9 +86,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         return column.Contents(fc2, pinned);
     }
 
-    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, string renderer) {
+    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, AbstractCellRenderer? renderer) {
         var nochOk = true;
-        var listFilterString = Autofilter_ItemList(_column, fc, pinned, renderer);
+        var listFilterString = Autofilter_ItemList(_column, fc, pinned);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
         //ACHUNG:
@@ -109,7 +111,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             nochOk = false;
         }
 
-        var prefSize = lsbFilterItems.CalculateColumnAndSize();
+        var prefSize = lsbFilterItems.CalculateColumnAndSize(renderer);
         lsbFilterItems.Anchor = AnchorStyles.Left | AnchorStyles.Top;
         lsbFilterItems.Width = Math.Min(minWidth, Width - (Skin.PaddingSmal * 2));
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, prefSize.Width);
@@ -135,7 +137,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 lsbStandardFilter.ItemAdd(ItemOf("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01"));
             }
 
-            var tmp = CellItem.ValueReadable(string.Empty, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, _column.Prefix, _column.Suffix, _column.DoOpticalTranslation, _column.OpticalReplace);
+            var tmp = renderer.ValueReadable(string.Empty, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, _column.Prefix, _column.Suffix, _column.DoOpticalTranslation, _column.OpticalReplace);
             if (string.IsNullOrEmpty(tmp)) {
                 leere = ItemOf("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
                 nichtleere = ItemOf("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");

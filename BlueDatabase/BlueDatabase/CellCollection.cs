@@ -27,8 +27,6 @@ using BlueScript.Variables;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Generic;
 
@@ -37,8 +35,6 @@ namespace BlueDatabase;
 public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDisposableExtended, IHasDatabase {
 
     #region Fields
-
-    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
 
     private Database? _database;
 
@@ -223,7 +219,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (row is { IsDisposed: false }) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
                 // und auch diese abgefragt werden
-                value = row.ReplaceVariables(value, false, true, varcol);
+                value = row.ReplaceVariables(value, true, varcol);
             }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
@@ -466,26 +462,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Rechnet Zellbezüge und besondere Spalten neu durch, falls sich der Wert geändert hat.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="previewsValue"></param>
-
-    public Size? GetSizeOfCellContent(ColumnItem column, RowItem row) {
-        var txt = GetString(column, row);
-        if (string.IsNullOrEmpty(txt)) { return null; }
-
-        var key = TextSizeKey(column, txt);
-
-        if (key == null) { return null; }
-
-        if (Sizes.ContainsKey(key)) { return Sizes[key]; }
-
-        return null;
-    }
-
     public string GetString(ColumnItem? column, RowItem? row) // Main Method
     {
         try {
@@ -571,21 +547,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         return string.Empty;
     }
-
-    public void SetSizeOfCellContent(ColumnItem column, RowItem row, Size contentSize) {
-        var key = TextSizeKey(column, row.CellGetString(column));
-
-        if (key == null) { return; }
-
-        if (Sizes.ContainsKey(key)) {
-            Sizes[key] = contentSize;
-            return;
-        }
-
-        _ = Sizes.TryAdd(key, contentSize);
-    }
-
-    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style) ?? [];
 
     internal bool ChangeColumnName(string oldName, string newName) {
         oldName = oldName.ToUpperInvariant() + "|";
@@ -709,15 +670,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //        thisRow.CellSet(column, currentvalue);
     //    }
     //}
-    /// <summary>
-    /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist ab.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="text"></param>
-    private static string? TextSizeKey(ColumnItem? column, string text) {
-        if (column?.Database is not { IsDisposed: false } db || column.IsDisposed) { return null; }
-        return db.TableName + "|" + column.KeyName + "|" + text;
-    }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

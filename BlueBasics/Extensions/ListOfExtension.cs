@@ -87,8 +87,8 @@ public static partial class Extensions {
         return l;
     }
 
-    public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
-        if (string.IsNullOrEmpty(name)) { return default; }
+    public static T? Get<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
+        if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
         if (items != null) {
             return items.FirstOrDefault(thisp =>

@@ -24,7 +24,9 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
+using BlueControls.CellRenderer;
+using BlueControls.Controls;
+using BlueControls.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -34,16 +36,16 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     #region Fields
 
-    private string _renderer = string.Empty;
+    public int? Contentwidth;
 
     #endregion
 
     #region Constructors
 
-    public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent, string renderer) : this(parent) {
+    public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent) : this(parent) {
         Column = column;
         ViewType = type;
-        Renderer = renderer;
+        Renderer = string.Empty;
     }
 
     public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) => this.Parse(toParse);
@@ -58,7 +60,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         TmpReduceLocation = Rectangle.Empty;
         TmpDrawWidth = null;
         TmpReduced = false;
-        Renderer = null;
+        Renderer = string.Empty;
     }
 
     #endregion
@@ -68,12 +70,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
     public ColumnItem? Column { get; private set; }
 
     public string Renderer {
-        get {
-            if (!string.IsNullOrEmpty(_renderer)) { return _renderer; }
-            if (Column is { } co && !string.IsNullOrEmpty(co.DefaultRenderer)) { return co.DefaultRenderer; }
-            return "Default";
-        }
-        set { _renderer = value; }
+        get;
+        set;
     }
 
     public Rectangle TmpAutoFilterLocation { get; set; }
@@ -102,32 +100,39 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     #region Methods
 
-    public static int CalculateColumnContentWidth(ColumnItem column, Font cellFont, int pix16) {
-        if (column.IsDisposed) { return 16; }
-        if (column.Database is not { IsDisposed: false } db) { return 16; }
-        if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
-        if (column.Contentwidth is { } v) { return v; }
+    public int CalculateColumnContentWidth(Design design, States state, float scale) {
+        if (Column is not { IsDisposed: false }) { return 16; }
+        if (Column.Database is not { IsDisposed: false } db) { return 16; }
+        if (Column.FixedColumnWidth > 0) { return Column.FixedColumnWidth; }
+        if (Contentwidth is { } v) { return v; }
 
-        column.RefreshColumnsData();
+        Column.RefreshColumnsData();
 
-        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
+        //var font = Skin.DesignOf(design, state).BFont;
+        //if (font == null) { return 16; }
+
+        var newContentWidth = Table.GetPix(16, scale); // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
+
+        var renderer = GetRenderer();
+
+        if (renderer == null) { return 16; }
 
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
-                var wx = CellItem.ContentSize(column, thisRowItem, cellFont, pix16).Width;
+                var wx = renderer.GetSizeOfCellContent(Column, thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.Prefix, Column.Suffix, Column.DoOpticalTranslation, Column.OpticalReplace, scale, Column.ConstantHeightOfImageCode).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {
             Develop.CheckStackForOverflow();
-            return CalculateColumnContentWidth(column, cellFont, pix16);
+            return CalculateColumnContentWidth(design, state, scale);
         }
 
-        column.Contentwidth = newContentWidth;
+        Contentwidth = newContentWidth;
         return newContentWidth;
     }
 
-    public int DrawWidth(Rectangle displayRectangleWoSlider, int pix16, Font cellFont) {
+    public int DrawWidth(Rectangle displayRectangleWoSlider, float scale) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
         if (Column == null) { return 0; }
@@ -139,17 +144,23 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         }
 
         if (TmpReduced) {
-            TmpDrawWidth = pix16;
+            TmpDrawWidth = Table.GetPix(16, scale);
         } else {
             TmpDrawWidth = ViewType == ViewType.PermanentColumn
-                ? Math.Min(CalculateColumnContentWidth(Column, cellFont, pix16), (int)(displayRectangleWoSlider.Width * 0.3))
-                : Math.Min(CalculateColumnContentWidth(Column, cellFont, pix16), (int)(displayRectangleWoSlider.Width * 0.6));
+                ? Math.Min(CalculateColumnContentWidth(Design.Table_Cell, States.Standard, scale), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(CalculateColumnContentWidth(Design.Table_Cell, States.Standard, scale), (int)(displayRectangleWoSlider.Width * 0.6));
         }
 
         TmpDrawWidth = Math.Max((int)TmpDrawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
 
         //TmpDrawWidth = Math.Max((int)TmpDrawWidth, (int)Column.ColumnCaptionText_Size(columnFont).Width);
         return (int)TmpDrawWidth;
+    }
+
+    public AbstractCellRenderer? GetRenderer() {
+        return AbstractCellRenderer.AllRenderer.Get(Renderer) ??
+               AbstractCellRenderer.AllRenderer.Get(Column?.DefaultRenderer) ??
+               AbstractCellRenderer.AllRenderer.Get("Default");
     }
 
     public void Invalidate_DrawWidth() => TmpDrawWidth = null;
@@ -207,7 +218,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         var result = new List<string>();
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
-        result.ParseableAdd("Renderer", Renderer);
+
+        if (Column is not { } c || c.DefaultRenderer != Renderer) {
+            result.ParseableAdd("Renderer", Renderer);
+        }
+
         return result.Parseable();
     }
 

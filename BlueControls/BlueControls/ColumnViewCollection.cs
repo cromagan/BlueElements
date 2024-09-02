@@ -33,26 +33,18 @@ namespace BlueDatabase;
 
 public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey {
 
-
-    public static List<ColumnViewCollection> ParseAll(Database db) {
-
-        var tcvc = new List<ColumnViewCollection>();
-        List<string> ca = [.. db.ColumnArrangements.SplitAndCutByCr()];
-        foreach (var t in ca) {
-            tcvc.Add(new ColumnViewCollection(db, t));
-        }
-
-        return tcvc;
-
-    }
-
     #region Fields
 
     public int? _wiederHolungsSpaltenWidth;
+
     public bool ShowHead = true;
+
     private readonly List<ColumnViewItem> _internal = [];
+
     private readonly List<string> _permissionGroups_Show = [];
+
     private Database? _database;
+
     private int? _headSize;
 
     #endregion
@@ -91,6 +83,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public bool IsDisposed { get; private set; }
+
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
@@ -122,6 +115,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #endregion
 
     #region Methods
+
+    public static List<ColumnViewCollection> ParseAll(Database db) {
+        var tcvc = new List<ColumnViewCollection>();
+        List<string> ca = [.. db.ColumnArrangements.SplitAndCutByCr()];
+        foreach (var t in ca) {
+            tcvc.Add(new ColumnViewCollection(db, t));
+        }
+
+        return tcvc;
+    }
 
     /// <summary>
     /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
@@ -172,18 +175,18 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (column is not { IsDisposed: not true }) { return; }
 
         Add(permanent
-            ? new ColumnViewItem(column, ViewType.PermanentColumn, this, column.DefaultRenderer)
-            : new ColumnViewItem(column, ViewType.Column, this, column.DefaultRenderer));
+            ? new ColumnViewItem(column, ViewType.PermanentColumn, this)
+            : new ColumnViewItem(column, ViewType.Column, this));
     }
 
     public object Clone() => new ColumnViewCollection(Database, ToParseableString());
 
     public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
+                if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, db.GlobalScale)) {
                     return thisViewItem;
                 }
             }
@@ -377,7 +380,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this, thisColumn.DefaultRenderer));
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
             }
         }
     }
@@ -389,7 +392,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             var thisColumn = Database?.Column[thisColumnName];
 
             if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this, thisColumn.DefaultRenderer));
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
             }
         }
     }

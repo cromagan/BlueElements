@@ -19,6 +19,7 @@
 
 using BlueControls.Enums;
 using System.Drawing;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -41,7 +42,7 @@ public class LineListItem : AbstractListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) => 4;
 
     public override bool IsClickable() => false;
 

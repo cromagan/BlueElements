@@ -23,6 +23,7 @@ using BlueControls.Enums;
 using BlueDatabase;
 using System;
 using System.Drawing;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -93,7 +94,7 @@ public class RowFormulaListItem : AbstractListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) {
         if (_tmpBmp == null) { GeneratePic(); }
         return _tmpBmp?.Height ?? 200;
 

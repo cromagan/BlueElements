@@ -516,7 +516,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
             if (thisColumnViewItem?.Column is { IsDisposed: false } c) {
-                var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.Renderer);
+                var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.GetRenderer());
                 Pad.Item.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.UsedArea.Right;
@@ -579,7 +579,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                             var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
-                                var it2 = new ColumnPadItem(c2, false, c2.DefaultRenderer);
+                                var it2 = new ColumnPadItem(c2, false, thisc.GetRenderer());
                                 Pad.Item.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
                                 if (it != null) {

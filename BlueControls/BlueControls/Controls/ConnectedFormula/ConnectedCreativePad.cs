@@ -17,21 +17,9 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-using static BlueControls.ConnectedFormula.ConnectedFormula;
 
 namespace BlueControls.Controls;
 

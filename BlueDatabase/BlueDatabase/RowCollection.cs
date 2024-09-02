@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BlueDatabase;
 
@@ -440,7 +439,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         return (myRow, string.Empty);
     }
-
 
     public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
 

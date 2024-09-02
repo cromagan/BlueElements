@@ -280,9 +280,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return Database.Cell.GetString(column, this);
     }
 
-    public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? [];
+    //public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? [];
 
-    public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column[columnName], this) ?? true;
+    //public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column[columnName], this) ?? true;
 
     public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? true;
 
@@ -639,11 +639,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     ///
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="readableValue">Wenn true, wird der Wert durch den leserlichen Zelleninhalt ersetzt. Bei False durch den origial Zelleninhalt</param>
     /// <param name="removeLineBreaks"></param>
     /// <param name="varcol">Wir eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
     /// <returns></returns>
-    public string ReplaceVariables(string txt, bool readableValue, bool removeLineBreaks, VariableCollection? varcol) {
+    public string ReplaceVariables(string txt, bool removeLineBreaks, VariableCollection? varcol) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return txt; }
 
         var erg = txt;
@@ -658,7 +657,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                         //if (vari is VariableString vs) { replacewith =  vs.v}
 
-                        if (removeLineBreaks && !readableValue) {
+                        if (removeLineBreaks) {
                             replacewith = replacewith.Replace("\r\n", " ");
                             replacewith = replacewith.Replace("\r", " ");
                         }
@@ -676,13 +675,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (column != null) {
                 if (erg.ToUpperInvariant().Contains("~" + column.KeyName.ToUpperInvariant())) {
                     var replacewith = CellGetString(column);
-                    if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
+                    //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
 
                     //if (varcol != null) {
                     //    if (varcol.Get(column.KeyName) is Variable v) { replacewith = v.SearchValue; }
                     //}
 
-                    if (removeLineBreaks && !readableValue) {
+                    if (removeLineBreaks) {
                         replacewith = replacewith.Replace("\r\n", " ");
                         replacewith = replacewith.Replace("\r", " ");
                     }
@@ -947,7 +946,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     }
                 }
 
-                column.Invalidate_ContentWidth();
+                //column.Invalidate_ContentWidth();
                 InvalidateCheckData();
                 db.Cell.OnCellValueChanged(new CellChangedEventArgs(column, this, reason));
             }
@@ -1055,7 +1054,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false, null);
+        _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, false, null);
     }
 
     private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {

@@ -25,7 +25,6 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -42,10 +41,10 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnPadItem(string keyName) : base(keyName) { }
 
-    public ColumnPadItem(ColumnItem c, bool permanent, string renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
+    public ColumnPadItem(ColumnItem c, bool permanent, AbstractCellRenderer? renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
         Column = c;
         Permanent = permanent;
-        Renderer = AbstractCellRenderer.AllRenderer.Get(renderer);
+        Renderer = renderer;
 
         if (Column is { IsDisposed: false }) {
             Column.PropertyChanged += Column_PropertyChanged;
@@ -145,7 +144,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        var wi = Math.Max(Column.Contentwidth ?? 0, 24);
+        var wi = 50;// Math.Max(Column.Contentwidth ?? 0, 24);
 
         var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
         var gr = Graphics.FromImage(bmp);

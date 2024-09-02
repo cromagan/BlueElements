@@ -34,6 +34,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using BlueControls.CellRenderer;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -569,7 +570,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 case ComboBox comboBox:
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
-                        item2.AddRange(ItemsOf(realColumn, null, 10000, column.DefaultRenderer));
+                        var r = AbstractCellRenderer.AllRenderer.Get(column?.DefaultRenderer);
+                        item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
                     if (realColumn is { TextBearbeitungErlaubt: true }) {
@@ -613,7 +615,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
-            item.AddRange(ItemsOf(column, null, 10000, column.DefaultRenderer));
+            var r = AbstractCellRenderer.AllRenderer.Get(column.DefaultRenderer);
+            item.AddRange(ItemsOf(column, null, 10000, r));
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
                 do {
@@ -663,8 +666,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
         //control.UnCheck();
         control.SuggestionsClear();
         if (column is not { IsDisposed: not true }) { return; }
+
+        var r = AbstractCellRenderer.AllRenderer.Get(column.DefaultRenderer);
+
         var item = new List<AbstractListItem>();
-        item.AddRange(ItemsOf(column, null,  10000, column.DefaultRenderer));
+        item.AddRange(ItemsOf(column, null, 10000, r));
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:

@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -34,7 +33,6 @@ using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -46,8 +44,6 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Forms;
 
 public partial class TableView : FormWithStatusBar, IHasSettings {
-
-
 
     #region Fields
 
@@ -878,9 +874,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         _ = x.ShowDialog();
 
         Table.RepairColumnArrangements(db);
-        
-
-
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database?.Column.GenerateOverView();

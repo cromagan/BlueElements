@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.CellRenderer;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
@@ -41,7 +42,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     #region Fields
 
     private const int MaxCount = 20;
-    private readonly string _renderer;
+    private readonly AbstractCellRenderer? _renderer;
     private bool _doFilterDeleteButton;
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
 
@@ -55,7 +56,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, string renderer) : base(false, false) {
+    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, AbstractCellRenderer? renderer) : base(false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -191,7 +192,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.ItemClear();
-        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, _renderer);
+        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {

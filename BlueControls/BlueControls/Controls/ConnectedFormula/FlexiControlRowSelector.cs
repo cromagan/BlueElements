@@ -106,7 +106,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
 
         foreach (var thisR in RowsInput) {
             if (cb[thisR.KeyName] == null) {
-                var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true, null);
+                var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, null);
                 cb.ItemAdd(ItemOf(tmpQuickInfo, thisR.KeyName));
             } else {
                 ex.Remove(thisR.KeyName);

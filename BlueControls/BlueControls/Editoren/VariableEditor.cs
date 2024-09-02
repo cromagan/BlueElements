@@ -24,7 +24,6 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueControls;
 

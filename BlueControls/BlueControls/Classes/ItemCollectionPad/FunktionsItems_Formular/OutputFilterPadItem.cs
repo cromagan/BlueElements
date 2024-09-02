@@ -30,6 +30,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueControls.CellRenderer;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -129,7 +130,9 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlForFilter(Column, _überschriftanordung, Column?.DefaultRenderer) {
+        var r = AbstractCellRenderer.AllRenderer.Get(Column?.DefaultRenderer);
+
+        var con = new FlexiControlForFilter(Column, _überschriftanordung, r) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
             Filterart_Bei_Texteingabe = _filterart_Bei_Texteingabe,
             SavesSettings = true

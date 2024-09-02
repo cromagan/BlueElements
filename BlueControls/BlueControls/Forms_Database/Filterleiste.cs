@@ -27,8 +27,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
+using BlueControls.CellRenderer;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -168,7 +168,6 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
         #region Neue Flexis erstellen / updaten
 
         if (_table?.Database is { } db) {
-
             var tcvc = ColumnViewCollection.ParseAll(db);
             List<ColumnItem> columSort = [];
             var orderArrangement = tcvc.Get(AnsichtName);
@@ -223,7 +222,8 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, thisColumn.DefaultRenderer);
+                            var r = AbstractCellRenderer.AllRenderer.Get(thisColumn.DefaultRenderer);
+                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, r);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
@@ -454,7 +454,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
     //private void FilterOutput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();
     private void GetÄhnlich() {
-        if (_table?.Database is not { } db) {  return; }
+        if (_table?.Database is not { } db) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(db);
 

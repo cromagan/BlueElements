@@ -42,7 +42,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     #region Fields
 
-    public int? Contentwidth;
     public DateTime? IsInCache = null;
     public QuickImage? TmpCaptionBitmapCode;
     public SizeF TmpCaptionTextSize = new(-1, -1);
@@ -162,7 +161,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _adminInfo = string.Empty;
         _maxTextLenght = 4000;
         _maxCellLenght = 4000;
-        Contentwidth = null;
         //ContentWidthIsValid = false;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
@@ -1108,7 +1106,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
         DefaultRenderer = source.DefaultRenderer;
-        Invalidate_ContentWidth();
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
         DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
@@ -1413,7 +1410,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public void Invalidate_ColumAndContent() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         Invalidate_Head();
-        Invalidate_ContentWidth();
         Invalidate_LinkedDatabase();
         Database.OnViewChanged();
     }
@@ -1963,7 +1959,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     //            break;
     public override string ToString() => IsDisposed ? string.Empty : _name + " -> " + Caption;
 
-  
+    /// <summary>
+    /// CallByFileName Aufrufe werden nicht geprüft
+    /// </summary>
+    /// <returns></returns>
+    public bool UsedInScript() {
+        if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
+
+        foreach (var thiss in Database.EventScript) {
+            if (thiss.ScriptText.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
+        }
+
+        return false;
+    }
 
     //        case FormatHolder.TextMitFormatierung:
     //            SetFormatForTextMitFormatierung();
@@ -2069,11 +2077,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         return string.Empty;
     }
-
-    /// <summary>
-    /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
-    /// </summary>
-    internal void Invalidate_ContentWidth() => Contentwidth = null;
 
     internal void Optimize() {
         if (!IsSystemColumn()) {
@@ -2419,7 +2422,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             foreach (var thisRow in Database.Row) {
                 if (Database.Cell.GetStringCore(this, thisRow) == e.Row.KeyName) {
                     thisRow.InvalidateCheckData();
-                    Invalidate_ContentWidth();
                     Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
                     thisRow.DoSystemColumns(db, this, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
                 }
@@ -2603,20 +2605,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
-    /// <summary>
-    /// CallByFileName Aufrufe werden nicht geprüft
-    /// </summary>
-    /// <returns></returns>
-    public bool UsedInScript() {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
-
-        foreach (var thiss in Database.EventScript) {
-            if (thiss.ScriptText.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
-        }
-
-        return false;
-    }
 
     #endregion
 }

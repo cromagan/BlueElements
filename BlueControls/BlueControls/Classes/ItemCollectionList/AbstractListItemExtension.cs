@@ -217,7 +217,7 @@ public static class AbstractListItemExtension {
 
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
 
-    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, string cellRenderer) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, AbstractCellRenderer? cellRenderer) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -324,7 +324,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, string renderer) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, AbstractCellRenderer renderer) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }
@@ -333,10 +333,8 @@ public static class AbstractListItemExtension {
             return l;
         }
 
-        var r = AbstractCellRenderer.AllRenderer.Get(renderer) ?? AbstractCellRenderer.AllRenderer.Get("Default") ;
-
         foreach (var thisstring in values) {
-            l.Add(ItemOf(thisstring, columnStyle, r));
+            l.Add(ItemOf(thisstring, columnStyle, renderer));
         }
 
         return l;

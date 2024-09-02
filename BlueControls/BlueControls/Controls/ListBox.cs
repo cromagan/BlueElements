@@ -40,6 +40,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
 using BlueControls.ItemCollectionList;
 using BlueBasics.Interfaces;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.Controls;
 
@@ -255,6 +256,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
+    public AbstractCellRenderer? Renderer => AbstractCellRenderer.AllRenderer.Get("Default");
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -381,11 +384,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return Suggestions.Get(rück[0]);
     }
 
-    public Size CalculateColumnAndSize() {
+    public Size CalculateColumnAndSize(AbstractCellRenderer renderer) {
         var (biggestItemX, _, heightAdded, orienation) = ItemData(_item, _itemDesign);
-        if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0); }
+        if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0, renderer); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
-        return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation, 0);
+        return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation, 0, renderer);
     }
 
     public void Check(IEnumerable<string> ali) {
@@ -593,7 +596,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Check(ali);
     }
 
-    internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, int addy) {
+    internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, int addy, AbstractCellRenderer renderer) {
         try {
             if (Math.Abs(_lastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 _lastCheckedMaxSize = controlDrawingArea;
@@ -658,9 +661,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                     itenc++;
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
-                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
+                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign, renderer);
                     } else {
-                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
+                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign, renderer);
                     }
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
@@ -726,7 +729,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             return _maxNeededItemSize;
         } catch {
             Develop.CheckStackForOverflow();
-            return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
+            return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, renderer);
         }
     }
 
@@ -794,7 +797,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
 
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData(_item, _itemDesign);
-        _ = ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy);
+        _ = ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, Renderer);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
 
