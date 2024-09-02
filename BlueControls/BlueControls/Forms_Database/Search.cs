@@ -122,7 +122,7 @@ public sealed partial class Search : Form {
 
     private void SelectedCellChanged(object sender, CellExtEventArgs e) {
         _row = e.RowData;
-        _col = e.Column;
+        _col = e.ColumnView;
     }
 
     private string SuchText() {

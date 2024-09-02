@@ -24,12 +24,19 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
 public sealed class ColumnViewItem : IParseable, IReadableText {
+
+    #region Fields
+
+    private string _renderer = string.Empty;
+
+    #endregion
 
     #region Constructors
 
@@ -60,7 +67,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     public ColumnItem? Column { get; private set; }
 
-    public string Renderer { get; set; }
+    public string Renderer {
+        get {
+            if (!string.IsNullOrEmpty(_renderer)) { return _renderer; }
+            if (Column is { } co && !string.IsNullOrEmpty(co.DefaultRenderer)) { return co.DefaultRenderer; }
+            return "Default";
+        }
+        set { _renderer = value; }
+    }
+
     public Rectangle TmpAutoFilterLocation { get; set; }
 
     public int? TmpDrawWidth { get; set; }

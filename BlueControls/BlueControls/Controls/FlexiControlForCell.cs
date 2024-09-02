@@ -569,7 +569,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 case ComboBox comboBox:
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
-                        item2.AddRange(ItemsOf(realColumn, null, ShortenStyle.Replaced, 10000, column.DefaultRenderer));
+                        item2.AddRange(ItemsOf(realColumn, null, 10000, column.DefaultRenderer));
                     }
 
                     if (realColumn is { TextBearbeitungErlaubt: true }) {
@@ -613,7 +613,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
-            item.AddRange(ItemsOf(column, null, ShortenStyle.Replaced, 10000, column.DefaultRenderer));
+            item.AddRange(ItemsOf(column, null, 10000, column.DefaultRenderer));
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
                 do {
@@ -664,7 +664,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         control.SuggestionsClear();
         if (column is not { IsDisposed: not true }) { return; }
         var item = new List<AbstractListItem>();
-        item.AddRange(ItemsOf(column, null, ShortenStyle.Replaced, 10000, column.DefaultRenderer));
+        item.AddRange(ItemsOf(column, null,  10000, column.DefaultRenderer));
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:

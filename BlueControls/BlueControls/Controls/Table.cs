@@ -1310,7 +1310,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return result.Parseable();
     }
 
-    internal static int GetPix(int pix, Font f, double scale) => f.FormatedText_NeededSize("@|", null, (int)((pix * scale) + 0.5)).Height;
+    public static int GetPix(int pix, Font f, double scale) => f.FormatedText_NeededSize("@|", null, (int)((pix * scale) + 0.5)).Height;
 
     internal void RowCleanUp() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
@@ -2425,7 +2425,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var t = new List<AbstractListItem>();
 
-        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000, contentHolderCellColumn.DefaultRenderer));
+        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, contentHolderCellColumn.DefaultRenderer));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false); } else {
@@ -2486,7 +2486,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (box is ComboBox cbox) {
             cbox.ItemClear();
-            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000, viewItem.Renderer));
+            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, viewItem.Renderer));
             if (cbox.ItemCount == 0) {
                 return Cell_Edit_TextBox(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
             }
@@ -2987,17 +2987,17 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CellExtEventArgs? ck = null;
         if (e.HotItem is CellExtEventArgs tmp) { ck = tmp; }
 
-        if (ck?.Column?.Column is not { } c) { return; }
+        if (ck?.ColumnView?.Column is not { } c) { return; }
 
         var toAdd = e.Item.KeyName;
         var toRemove = string.Empty;
         if (toAdd == "#Erweitert") {
-            Cell_Edit(ca, ck.Column, ck.RowData, false);
+            Cell_Edit(ca, ck.ColumnView, ck.RowData, false);
             return;
         }
         if (ck.RowData?.Row is not { } r) {
             // Neue Zeile!
-            UserEdited(this, toAdd, ck.Column, null, false);
+            UserEdited(this, toAdd, ck.ColumnView, null, false);
             return;
         }
 
@@ -3012,15 +3012,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
             if (!string.IsNullOrEmpty(toRemove)) { li.RemoveString(toRemove, false); }
             if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
-            UserEdited(this, li.JoinWithCr(), ck.Column, ck.RowData, false);
+            UserEdited(this, li.JoinWithCr(), ck.ColumnView, ck.RowData, false);
         } else {
             if (c.DropdownAllesAbwählenErlaubt) {
                 if (toAdd == ck.RowData.Row.CellGetString(c)) {
-                    UserEdited(this, string.Empty, ck.Column, ck.RowData, false);
+                    UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false);
                     return;
                 }
             }
-            UserEdited(this, toAdd, ck.Column, ck.RowData, false);
+            UserEdited(this, toAdd, ck.ColumnView, ck.RowData, false);
         }
     }
 

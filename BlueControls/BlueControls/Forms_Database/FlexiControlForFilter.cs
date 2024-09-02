@@ -195,7 +195,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {
-            if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, ShortenStyle.Replaced, _renderer)); }
+            if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer)); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             if (SavesSettings) {

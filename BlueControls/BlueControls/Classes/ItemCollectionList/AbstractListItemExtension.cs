@@ -217,7 +217,7 @@ public static class AbstractListItemExtension {
 
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
 
-    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems, string cellRenderer) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, string cellRenderer) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -259,7 +259,7 @@ public static class AbstractListItemExtension {
 
         if (maxItems > 0 && l.Count > maxItems) { return []; }
 
-        return ItemsOf(l, column, style, cellRenderer);
+        return ItemsOf(l, column, cellRenderer);
     }
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
@@ -324,7 +324,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, ShortenStyle style, string renderer) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, string renderer) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }
@@ -333,7 +333,7 @@ public static class AbstractListItemExtension {
             return l;
         }
 
-        var r = AbstractCellRenderer.AllRenderer.Get(renderer);
+        var r = AbstractCellRenderer.AllRenderer.Get(renderer) ?? AbstractCellRenderer.AllRenderer.Get("Default") ;
 
         foreach (var thisstring in values) {
             l.Add(ItemOf(thisstring, columnStyle, r));

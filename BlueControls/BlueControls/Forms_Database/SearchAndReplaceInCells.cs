@@ -176,8 +176,8 @@ internal sealed partial class SearchAndReplaceInCells : Form {
     }
 
     private void SelectedCellChanged(object sender, CellExtEventArgs e) {
-        chkNurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
-            : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
+        chkNurinAktuellerSpalte.Text = e.ColumnView == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
+            : "Nur in Spalte <b>'" + e.ColumnView.ReadableText() + "'</b> ersetzen.";
         Checkbuttons();
     }
 
