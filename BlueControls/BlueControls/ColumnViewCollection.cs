@@ -33,6 +33,19 @@ namespace BlueDatabase;
 
 public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey {
 
+
+    public static List<ColumnViewCollection> ParseAll(Database db) {
+
+        var tcvc = new List<ColumnViewCollection>();
+        List<string> ca = [.. db.ColumnArrangements.SplitAndCutByCr()];
+        foreach (var t in ca) {
+            tcvc.Add(new ColumnViewCollection(db, t));
+        }
+
+        return tcvc;
+
+    }
+
     #region Fields
 
     public int? _wiederHolungsSpaltenWidth;

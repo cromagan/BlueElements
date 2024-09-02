@@ -1963,40 +1963,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     //            break;
     public override string ToString() => IsDisposed ? string.Empty : _name + " -> " + Caption;
 
-    public string Useage() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return string.Empty; }
-
-        var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
-        if (IsSystemColumn()) {
-            t += " - Systemspalte<br>";
-        }
-
-        if (db.SortDefinition?.Columns.Contains(this) ?? false) { t += " - Sortierung<br>"; }
-        //var view = false;
-        //foreach (var thisView in OldFormulaViews) {
-        //    if (thisView[column] != null) { view = true; }
-        //}
-        //if (view) { t += " - Formular-Ansichten<br>"; }
-        var cola = false;
-        var first = true;
-        foreach (var thisView in db.ColumnArrangements) {
-            if (!first && thisView[this] != null) { cola = true; }
-            first = false;
-        }
-        if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
-        if (UsedInScript()) { t += " - Regeln-Skript<br>"; }
-        if (db.ZeilenQuickInfo.ToUpperInvariant().Contains(_name.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (_tags.JoinWithCr().ToUpperInvariant().Contains(_name.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
-
-        if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { t += Am_A_Key_For_Other_Column; }
-
-        var l = Contents();
-        if (l.Count > 0) {
-            t += "<br><br><b>Zusatz-Info:</b><br>";
-            t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
-        }
-        return t;
-    }
+  
 
     //        case FormatHolder.TextMitFormatierung:
     //            SetFormatForTextMitFormatierung();
@@ -2641,7 +2608,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     /// CallByFileName Aufrufe werden nicht geprüft
     /// </summary>
     /// <returns></returns>
-    private bool UsedInScript() {
+    public bool UsedInScript() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
 
         foreach (var thiss in Database.EventScript) {

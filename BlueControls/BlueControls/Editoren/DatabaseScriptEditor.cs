@@ -35,6 +35,7 @@ using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
 using System;
+using BlueControls.Controls;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -140,7 +141,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 eventScriptEditor.ScriptText = value.ScriptText;
 
                 lstPermissionExecute.ItemClear();
-                var l = Database.Permission_AllUsed(false).ToList();
+                var l = Table.Permission_AllUsed(false).ToList();
                 l.AddIfNotExists(Administrator);
                 lstPermissionExecute.ItemAddRange(l);
                 lstPermissionExecute.Check(value.UserGroups);

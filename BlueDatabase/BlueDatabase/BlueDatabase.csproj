@@ -79,7 +79,6 @@
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
     <Compile Include="AdditionalScriptMethods\Method_EnsureDatabaseLoaded.cs" />
@@ -87,7 +86,6 @@
     <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterAllValues.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowInvalidate.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
@@ -110,8 +108,6 @@
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
-    <Compile Include="ColumnViewCollection.cs" />
-    <Compile Include="ColumnViewItem.cs" />
     <Compile Include="DatabaseMu.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="Database.cs" />
@@ -161,7 +157,6 @@
     <Compile Include="Interfaces\IUseableForButton.cs" />
     <Compile Include="LanguageTool.cs" />
     <Compile Include="RowCollection.cs" />
-    <Compile Include="RowData.cs" />
     <Compile Include="RowItem.cs" />
     <Compile Include="RowSortDefinition.cs" />
     <Compile Include="UndoItem.cs" />

@@ -92,9 +92,11 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         #region  Ansicht ermitteln (cu)
 
-        var cu = db.ColumnArrangements.Get(attvar.ValueStringGet(2));
+        var tcvc = ColumnViewCollection.ParseAll(db);
+
+        var cu = tcvc.Get(attvar.ValueStringGet(2));
         if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
-            cu = db.ColumnArrangements[0];
+            cu = tcvc[0];
         }
 
         if (cu == null) { return new DoItFeedback(ld, "Ansicht-Fehler!"); }
@@ -134,7 +136,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                     }
 
                 case "CSV":
-                    var t = db.Export_CSV(FirstRow.ColumnInternalName, cu, r);
+                    var t = db.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
                     if (!IO.WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
                     break;

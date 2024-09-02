@@ -228,7 +228,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column?.Useage() ?? "Fehler");
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(Table.ColumnUseage(_column) ?? "Fehler");
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
@@ -356,14 +356,16 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
         lbxCellEditor.Suggestions.Clear();
 
-        lbxCellEditor.ItemAddRange(Database.Permission_AllUsed(true));
-        if (_table?.CurrentArrangement != null) {
-            butAktuellZurueck.Enabled = _table.CurrentArrangement[_column]?.PreviewsVisible() != null;
-            butAktuellVor.Enabled = _table.CurrentArrangement[_column]?.NextVisible() != null;
+        lbxCellEditor.ItemAddRange(Table.Permission_AllUsed(true));
+
+        if (_table?.CurrentArrangement is { } car) {
+            butAktuellZurueck.Enabled = car[_column]?.PreviewsVisible() != null;
+            butAktuellVor.Enabled = car[_column]?.NextVisible() != null;
         } else {
             butAktuellVor.Enabled = false;
             butAktuellZurueck.Enabled = false;
         }
+
         if (!_column.IsSystemColumn()) {
             btnStandard.Enabled = false;
             capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> Normale Spalte";
@@ -371,6 +373,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             btnStandard.Enabled = true;
             capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte";
         }
+
         txbName.Text = _column.KeyName;
         txbName.Enabled = !_column.KeyName.StartsWith("SYS_");
 
@@ -614,16 +617,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
             b.OpticalReplace = or.AsReadOnly();
 
             db.RepairAfterParse();
-            var car = db.ColumnArrangements.CloneWithClones();
+            var tcvc = ColumnViewCollection.ParseAll(db);
 
-            car[1].Add(sp, false);
-            car[1].Add(b, false);
+            tcvc[1].Add(sp, false);
+            tcvc[1].Add(b, false);
 
-            //car[1].ShowAllColumns();
-            //car[1].Hide("visible");
-            //car[1].HideSystemColumns();
-
-            db.ColumnArrangements = car.AsReadOnly();
+            db.ColumnArrangements = tcvc.ToString();
 
             db.SortDefinition = new RowSortDefinition(db, sp, false);
             tblFilterliste.DatabaseSet(db, string.Empty);

@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -166,9 +167,11 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
         #region Neue Flexis erstellen / updaten
 
-        if (_table?.Database != null) {
+        if (_table?.Database is { } db) {
+
+            var tcvc = ColumnViewCollection.ParseAll(db);
             List<ColumnItem> columSort = [];
-            var orderArrangement = _table.Database.ColumnArrangements.Get(AnsichtName);
+            var orderArrangement = tcvc.Get(AnsichtName);
 
             #region Reihenfolge der Spalten bestimmen
 
@@ -451,7 +454,11 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
     //private void FilterOutput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();
     private void GetÄhnlich() {
-        _ähnliche = _table?.Database?.ColumnArrangements.Get(_ähnlicheAnsichtName);
+        if (_table?.Database is not { } db) {  return; }
+
+        var tcvc = ColumnViewCollection.ParseAll(db);
+
+        _ähnliche = tcvc.Get(_ähnlicheAnsichtName);
         DoÄhnlich();
     }
 

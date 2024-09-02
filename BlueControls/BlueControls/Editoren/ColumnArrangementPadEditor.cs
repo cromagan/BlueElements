@@ -64,10 +64,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         Database = database;
 
         if (database is { IsDisposed: false } db) {
-            if (db.ColumnArrangements.Count > 1) {
-                _arrangement = db.ColumnArrangements[1].KeyName;
-            } else if (db.ColumnArrangements.Count > 0) {
-                _arrangement = db.ColumnArrangements[0].KeyName;
+            var tcvc = ColumnViewCollection.ParseAll(db);
+
+            if (tcvc.Count > 1) {
+                _arrangement = tcvc[1].KeyName;
+            } else if (tcvc.Count > 0) {
+                _arrangement = tcvc[0].KeyName;
             }
         }
 
@@ -111,18 +113,19 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     public ColumnViewCollection? CloneOfCurrentArrangement() {
         // Überprüfen, ob die Datenbank oder das aktuelle Objekt verworfen wurde
-        if (IsDisposed || Database is not { IsDisposed: false } db) {
-            return null;
-        }
-        // Versuchen, die aktuelle Anordnung zu klonen
-        var ca = db.ColumnArrangements.Get(_arrangement);
-        // Überprüfen, ob die Anordnung nicht null ist, bevor sie geklont wird
-        return ca?.Clone() as ColumnViewCollection;
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
+
+        var tcvc = ColumnViewCollection.ParseAll(db);
+
+        return tcvc.Get(_arrangement);
     }
 
     public int IndexOfCurrentArr() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return -1; }
-        return db.ColumnArrangements.IndexOf(_arrangement);
+
+        var tcvc = ColumnViewCollection.ParseAll(db);
+
+        return tcvc.IndexOf(_arrangement);
     }
 
     public bool IsAllColumnView() => IndexOfCurrentArr() == 0;
@@ -150,9 +153,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (arn < 2) { return; }
 
         if (MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        var car = db.ColumnArrangements.CloneWithClones();
-        car.RemoveAt(arn);
-        db.ColumnArrangements = car.AsReadOnly();
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        tcvc.RemoveAt(arn);
+        db.ColumnArrangements = tcvc.ToString(false);
         _arrangement = string.Empty;
         UpdateCombobox();
         ShowOrder();
@@ -184,7 +187,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         List<AbstractListItem> aa = [];
-        aa.AddRange(ItemsOf(Database.Permission_AllUsed(false)));
+        aa.AddRange(ItemsOf(Table.Permission_AllUsed(false)));
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text);
         if (b == null) { return; }
 
@@ -203,25 +206,24 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
             mitVorlage = MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
         }
 
-        var car = db.ColumnArrangements.CloneWithClones();
-        //car.RemoveAt(Arrangement);
+        var tcvc = ColumnViewCollection.ParseAll(db);
 
-        if (car.Count < 1) {
-            car.Add(new ColumnViewCollection(db, string.Empty, string.Empty));
+        if (tcvc.Count < 1) {
+            tcvc.Add(new ColumnViewCollection(db, string.Empty, string.Empty));
         }
 
         string newname;
         if (mitVorlage && ca != null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(db, ca.ToParseableString(), newname));
+            tcvc.Add(new ColumnViewCollection(db, ca.ToParseableString(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(db, string.Empty, newname));
+            tcvc.Add(new ColumnViewCollection(db, string.Empty, newname));
         }
 
-        db.ColumnArrangements = car.AsReadOnly();
+        db.ColumnArrangements = tcvc.ToString(false);
         _arrangement = newname;
         UpdateCombobox();
 
@@ -329,12 +331,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private void ChangeCurrentArrangementto(ColumnViewCollection cv) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        var no = IndexOfCurrentArr();
-        if (no < 0 || no >= db.ColumnArrangements.Count) { return; }
 
-        var car = Database.ColumnArrangements.CloneWithClones();
-        car[no] = cv;
-        db.ColumnArrangements = car.AsReadOnly();
+        var tcvc = ColumnViewCollection.ParseAll(db);
+
+        var no = IndexOfCurrentArr();
+        if (no < 0 || no >= tcvc.Count) { return; }
+
+        tcvc[no] = cv;
+        db.ColumnArrangements = tcvc.ToString(false);
     }
 
     /// <summary>
@@ -358,7 +362,10 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void FixColumnArrangement() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (Generating || Sorting) { return; }
-        if (db.ColumnArrangements.Count == 0) { return; }
+
+        //var tcvc = ColumnViewCollection.ParseAll(db);
+
+        //if (tcvc.Count == 0) { return; }
 
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
         var did = false;

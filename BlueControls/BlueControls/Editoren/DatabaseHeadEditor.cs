@@ -191,24 +191,24 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     public static void GenerateUndoTabelle(Table tblUndo) {
-        Database x = new(Database.UniqueKeyValue());
-        x.LogUndo = false;
+        Database db = new(Database.UniqueKeyValue());
+        db.LogUndo = false;
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Database", "Datenbank", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
-        _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        var az = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
-        _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
-        foreach (var thisColumn in x.Column) {
+        _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Database", "Datenbank", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
+        _ = db.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
+        var az = db.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
+        _ = db.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
+        foreach (var thisColumn in db.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
                 thisColumn.TextBearbeitungErlaubt = false;
@@ -217,20 +217,20 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             }
         }
 
-        if (x.Column["Symbol"] is { IsDisposed: false } c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
+        if (db.Column["Symbol"] is { IsDisposed: false } c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
 
-        x.RepairAfterParse();
+        db.RepairAfterParse();
 
-        var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowColumns("Database", "ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        tcvc[1].ShowColumns("Database", "ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
 
-        x.ColumnArrangements = new(car);
+        db.ColumnArrangements = tcvc.ToString(false);
 
-        //x.SortDefinition = new RowSortDefinition(x, "Index", true);
+        //x.SortDefinition = new RowSortDefinition(db, "Index", true);
 
-        tblUndo.DatabaseSet(x, string.Empty);
+        tblUndo.DatabaseSet(db, string.Empty);
         tblUndo.Arrangement = string.Empty;
-        tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, az, true);
+        tblUndo.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
@@ -252,7 +252,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         PermissionGroups_NewRow.ItemClear();
         PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
         PermissionGroups_NewRow.Suggestions.Clear();
-        PermissionGroups_NewRow.ItemAddRange(Database.Permission_AllUsed(false));
+        PermissionGroups_NewRow.ItemAddRange(Table.Permission_AllUsed(false));
 
         DatenbankAdmin.ItemClear();
         DatenbankAdmin.Check(db.DatenbankAdmin);
@@ -279,7 +279,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
 
         DatenbankAdmin.Suggestions.Clear();
-        DatenbankAdmin.ItemAddRange(Database.Permission_AllUsed(false));
+        DatenbankAdmin.ItemAddRange(Table.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, true));

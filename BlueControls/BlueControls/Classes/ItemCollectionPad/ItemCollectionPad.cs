@@ -739,7 +739,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         l.Add(Everybody);
         l.Add("#User: " + UserName);
 
-        l.AddRange(Database.Permission_AllUsed(false));
+        l.AddRange(Table.Permission_AllUsed(false));
 
         return Database.RepairUserGroups(l);
     }

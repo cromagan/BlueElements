@@ -877,15 +877,10 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var x = new ColumnArrangementPadEditor(db);
         _ = x.ShowDialog();
 
-        if (db.ColumnArrangements.Count == 0) { return; }
+        Table.RepairColumnArrangements(db);
+        
 
-        var car = db.ColumnArrangements.CloneWithClones();
-        if (car[0] is { IsDisposed: false } cvc) {
-            cvc.ShowAllColumns();
-            db.ColumnArrangements = new(car);
-        }
 
-        Table.Invalidate_AllColumnArrangements();
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database?.Column.GenerateOverView();

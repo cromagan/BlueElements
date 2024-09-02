@@ -117,8 +117,9 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
         if (DatabaseOutput is { IsDisposed: false } db) {
+            var tcvc = ColumnViewCollection.ParseAll(db);
             var u2 = new List<AbstractListItem>();
-            foreach (var thisC in db.ColumnArrangements) {
+            foreach (var thisC in tcvc) {
                 u2.Add(ItemOf(thisC));
             }
             result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));

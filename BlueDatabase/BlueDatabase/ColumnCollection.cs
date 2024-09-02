@@ -154,15 +154,26 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
-        if (db.ColumnArrangements.Count < 1 || db.ColumnArrangements[0].Count != db.Column.Count()) {
-            //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
-            return null;
-        }
+        if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
 
-        var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false } && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
-        if (l != null) { return l; }
+        var i = db.ColumnArrangements.IndexOf(@"ColumnName[J]");
 
-        return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false })?.Column;
+        if (i < 5) { return null; }
+
+        var en = db.ColumnArrangements.IndexOf(@"[K]", i);
+
+        if (en < i) { return null; }
+
+        var n = db.ColumnArrangements.Substring(i + 13, en - i - 13);
+
+        if (n.StartsWith("SYS_")) { return null; }
+
+        //var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false } && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
+        //if (l != null) { return l; }
+
+        //return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false })?.Column;
+
+        return this[n];
     }
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(keyName, caption, string.Empty, format, quickinfo);
@@ -243,24 +254,24 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("Änderungs-Rechte");
         da.RowEnd();
         var lfdn = 0;
-        foreach (var thisColumnItem in db.ColumnArrangements[0]) {
-            if (thisColumnItem?.Column != null) {
+        foreach (var thisColumnItem in this) {
+            if (thisColumnItem != null) {
                 lfdn++;
                 da.RowBeginn();
                 da.CellAdd(lfdn.ToString());
-                da.CellAdd(thisColumnItem.Column.KeyName);
-                da.CellAdd(thisColumnItem.Column.Caption.Replace("\r", "<br>"));
-                da.CellAdd((thisColumnItem.Column.CaptionGroup1 + "/" + thisColumnItem.Column.CaptionGroup2 + "/" + thisColumnItem.Column.CaptionGroup3 + "/").TrimEnd("/"));
-                var name = "{" + thisColumnItem.Column.Function + "}";
+                da.CellAdd(thisColumnItem.KeyName);
+                da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
+                da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
+                var name = "{" + thisColumnItem.Function + "}";
                 foreach (var thisFormat in FormatHolder.AllFormats) {
-                    if (thisFormat.IsFormatIdenticalSoft(thisColumnItem.Column)) { name = thisFormat.Name; }
+                    if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.Name; }
                 }
-                da.CellAdd(name + " (" + thisColumnItem.Column.MaxCellLenght + " Char)");
-                da.CellAdd(thisColumnItem.Column.Function.ToString());
-                da.CellAdd(thisColumnItem.Column.QuickInfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.Column.AdminInfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.Column.Tags.JoinWith("<br>"));
-                da.CellAdd(thisColumnItem.Column.PermissionGroupsChangeCell.JoinWith("<br>"));
+                da.CellAdd(name + " (" + thisColumnItem.MaxCellLenght + " Char)");
+                da.CellAdd(thisColumnItem.Function.ToString());
+                da.CellAdd(thisColumnItem.QuickInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.Tags.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
                 da.RowEnd();
             }
         }
@@ -404,7 +415,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         ok = Database.Cell.ChangeColumnName(oldName, newName);
         if (!ok) { return "Namensänderung fehlgeschlagen"; }
-        Database?.RepairColumnArrangements(Reason.SetCommand);
+        //Database?.RepairColumnArrangements(Reason.SetCommand);
         return string.Empty;
     }
 
@@ -461,10 +472,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
 
-            if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-                // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
-                Database.RepairColumnArrangements(reason);
-            }
+            //if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
+            //    // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
+            //    Database.RepairColumnArrangements(reason);
+            //}
 
             return string.Empty;
         }
@@ -477,12 +488,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
-            if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-                // Wichtig! Nicht bei LoadReload, da werden evtl. noch weitere Spalten modifiziert
+            //if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
+            //    // Wichtig! Nicht bei LoadReload, da werden evtl. noch weitere Spalten modifiziert
 
-                Database.RepairColumnArrangements(reason);
-                //Database.RepairViews();
-            }
+            //    Database.RepairColumnArrangements(reason);
+            //    //Database.RepairViews();
+            //}
             c.Dispose();
             GetSystems();
 

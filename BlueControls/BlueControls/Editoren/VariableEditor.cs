@@ -24,6 +24,7 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueControls;
 
@@ -108,16 +109,16 @@ public partial class VariableEditor : EditorEasy {
         }
 
         db.RepairAfterParse();
-        var car = db.ColumnArrangements.CloneWithClones();
+        var tcvc = ColumnViewCollection.ParseAll(db);
 
         //if (car != null) {
         if (Editabe) {
-            car[1].ShowColumns("Name", "Inhalt", "Kommentar");
+            tcvc[1].ShowColumns("Name", "Inhalt", "Kommentar");
         } else {
-            car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
+            tcvc[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         }
 
-        db.ColumnArrangements = new(car);
+        db.ColumnArrangements = tcvc.ToString(false);
 
         db.SortDefinition = new RowSortDefinition(db, na, true);
 

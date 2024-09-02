@@ -104,7 +104,7 @@ public sealed partial class AdderScriptEditor : IHasDatabase {
             if (value != null) {
                 eventScriptEditor.Enabled = true;
                 eventScriptEditor.ScriptText = value.Script;
-                var l = Database.Permission_AllUsed(false).ToList();
+                var l = Table.Permission_AllUsed(false).ToList();
                 l.AddIfNotExists(Administrator);
 
                 _item = value;

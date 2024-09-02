@@ -83,13 +83,21 @@ public static class Allgemein {
                 if (thisit is ICanDropMessages dm) {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
+                if (thisit is Database db) {
+                    db.Loaded += BlueControls.Controls.Table.Database_Loaded;
+                }
+
+
             }
         }
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is Database { IsDisposed: false } db) {
-                    db.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
+                if (thisit is ICanDropMessages dm) {
+                    dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
+                }
+                if (thisit is Database db) {
+                    db.Loaded += BlueControls.Controls.Table.Database_Loaded;
                 }
             }
         }
@@ -98,6 +106,8 @@ public static class Allgemein {
             Develop.DebugPrint_NichtImplementiert(true);
         }
     }
+
+
 
     #endregion
 

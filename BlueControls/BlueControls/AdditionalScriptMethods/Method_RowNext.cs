@@ -80,7 +80,7 @@ public class Method_RowNext : Method_Database {
 
         var rsd = new RowSortDefinition(db, column, attvar.ValueBoolGet(1));
 
-        var sr = db.Row.CalculateSortedRows(r, null, rsd);
+        var sr = BlueControls.Controls.Table.CalculateSortedRows(db, r, null, rsd);
 
         var givebackrow = -1;
 

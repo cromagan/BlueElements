@@ -84,7 +84,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
-    private readonly List<ColumnViewCollection> _columnArrangements = [];
+    private string _columnArrangements = string.Empty;
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<DatabaseScriptDescription> _eventScript = [];
     private readonly List<string> _permissionGroupsNewRow = [];
@@ -255,11 +255,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public ColumnCollection Column { get; }
 
-    public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
-        get => new(_columnArrangements);
+    public string ColumnArrangements {
+        get => _columnArrangements;
         set {
-            if (_columnArrangements.ToString(false) == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(false), value.ToString(false), UserName, DateTime.UtcNow, string.Empty);
+            if (_columnArrangements == value) { return; }
+            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements, value, UserName, DateTime.UtcNow, string.Empty);
             OnViewChanged();
         }
     }
@@ -828,20 +828,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return tmp;
     }
 
-    public static List<string> Permission_AllUsed(bool cellLevel) {
-        var l = new List<string>();
-
-        foreach (var thisDb in AllFiles) {
-            if (!thisDb.IsDisposed) {
-                l.AddRange(thisDb.Permission_AllUsedInThisDB(cellLevel));
-            }
-        }
-
-        return RepairUserGroups(l);
-    }
 
     /// <summary>
-    /// Standardisiert Benutzeruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
+    /// Standardisiert Benutzergruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
@@ -928,7 +917,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             // Ganz neue Datenbank
             SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ToParseableString());
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
-            SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
+            SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
             //SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
 
@@ -1190,23 +1179,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
         PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
 
-        var tcvc = new List<ColumnViewCollection>();
-        foreach (var t in sourceDatabase.ColumnArrangements) {
-            tcvc.Add(new ColumnViewCollection(this, t.ToParseableString()));
-        }
-        ColumnArrangements = new(tcvc);
-
-        //Export = sourceDatabase.Export;
-
         EventScript = sourceDatabase.EventScript;
 
         if (tagsToo) {
             Variables = sourceDatabase.Variables;
         }
 
-        //Events = sourceDatabase.Events;
-
-        //UndoCount = sourceDatabase.UndoCount;
     }
 
     public virtual ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
@@ -1655,7 +1633,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return sb.ToString().TrimEnd("\r\n");
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
+
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -2105,39 +2083,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public List<string> Permission_AllUsedInThisDB(bool cellLevel) {
-        List<string> e = [];
-        foreach (var thisColumnItem in Column) {
-            if (thisColumnItem != null) {
-                e.AddRange(thisColumnItem.PermissionGroupsChangeCell);
-            }
-        }
-        e.AddRange(_permissionGroupsNewRow);
-        e.AddRange(_datenbankAdmin);
-        foreach (var thisArrangement in _columnArrangements) {
-            e.AddRange(thisArrangement.PermissionGroups_Show);
-        }
-
-        foreach (var thisEv in EventScript) {
-            e.AddRange(thisEv.UserGroups);
-        }
-
-        //foreach (var thisArrangement in OldFormulaViews) {
-        //    e.AddRange(thisArrangement.PermissionGroups_Show);
-        //}
-        e.Add(Everybody);
-        e.Add("#User: " + UserName);
-        if (cellLevel) {
-            e.Add("#RowCreator");
-        } else {
-            e.RemoveString("#RowCreator", false);
-        }
-        e.RemoveString(Administrator, false);
-        if (!IsAdministrator()) { e.Add(UserGroup); }
-
-        e = RepairUserGroups(e);
-        return e.SortedDistinctList();
-    }
+ 
 
     public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
         try {
@@ -2221,7 +2167,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
 
         Column.Repair();
-        RepairColumnArrangements(Reason.SetCommand);
+    
 
         if (!string.IsNullOrEmpty(Filename)) {
             if (!string.Equals(TableName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
@@ -2315,27 +2261,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    GenerateLayoutInternal?.Invoke(this, e);
-    //}
-    internal void RepairColumnArrangements(Reason reason) {
-        //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
-        var x = _columnArrangements.CloneWithClones();
 
-        for (var z = 0; z < Math.Max(2, x.Count); z++) {
-            if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
-            ColumnViewCollection.Repair(x[z], z);
-        }
-
-        if (reason is Reason.NoUndo_NoInvalidate or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) {
-            if (_columnArrangements.ToString(false) == x.ToString(false)) { return; }
-            SetValueInternal(DatabaseDataType.ColumnArrangement, null, null, x.ToString(false), UserName, DateTime.UtcNow, reason);
-        } else {
-            ColumnArrangements = x.AsReadOnly();
-        }
-    }
 
     /// <summary>
     /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
@@ -2680,11 +2607,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.ColumnArrangement:
-                _columnArrangements.Clear();
-                List<string> ca = [.. value.SplitAndCutByCr()];
-                foreach (var t in ca) {
-                    _columnArrangements.Add(new ColumnViewCollection(this, t));
-                }
+                _columnArrangements = value;
                 break;
 
             case DatabaseDataType.PermissionGroupsNewRow:
@@ -2694,11 +2617,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             case DatabaseDataType.GlobalShowPass:
                 _globalShowPass = value;
                 break;
-
-            //case (DatabaseDataType)67: //.RulesScript:
-            //    //ConvertRules(value);
-            //    //_rulesScript = value;
-            //    break;
 
             case DatabaseDataType.EventScriptVersion:
                 _eventScriptVersion = DateTimeParse(value);
