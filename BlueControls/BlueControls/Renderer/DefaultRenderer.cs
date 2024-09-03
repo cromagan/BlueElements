@@ -21,27 +21,37 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.CellRenderer;
 
 public class DefaultRenderer : AbstractRenderer {
-    public DefaultRenderer(string keyName) : base(keyName) { }
 
-    #region Properties
+    #region Constructors
 
-    public override string Description => "Standard Anzeige";
+    public DefaultRenderer(string keyname) : base(keyname) { }
 
     #endregion
 
+    #region Properties
 
+    public static string ClassId => "Default";
+    public override string Description => "Standard Anzeige";
+    public override string MyClassId => ClassId;
+    public string Präfix { get; set; } = string.Empty;
+
+    public string Suffix { get; set; } = string.Empty;
+
+    #endregion
+
+    #region Methods
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, ColumnItem? column, float scale) {
         if (column == null) { return; }
@@ -124,9 +134,62 @@ public class DefaultRenderer : AbstractRenderer {
         return (tmpText, tmpImageCode);
     }
 
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        var cbxEinheit = new List<AbstractListItem>
+        {
+            ItemOf("µm", ImageCode.Lineal),
+            ItemOf("mm", ImageCode.Lineal),
+            ItemOf("cm", ImageCode.Lineal),
+            ItemOf("dm", ImageCode.Lineal),
+            ItemOf("m", ImageCode.Lineal),
+            ItemOf("km", ImageCode.Lineal),
+            ItemOf("mm²", ImageCode.GrößeÄndern),
+            ItemOf("m²", ImageCode.GrößeÄndern),
+            ItemOf("µg", ImageCode.Gewicht),
+            ItemOf("mg", ImageCode.Gewicht),
+            ItemOf("g", ImageCode.Gewicht),
+            ItemOf("kg", ImageCode.Gewicht),
+            ItemOf("t", ImageCode.Gewicht),
+            ItemOf("h", ImageCode.Uhr),
+            ItemOf("min", ImageCode.Uhr),
+            ItemOf("St.", ImageCode.Eins)
+        };
+
+        List<GenericControl> result =
+        [   new FlexiControlForProperty<string>(() => Präfix,cbxEinheit),
+                    new FlexiControlForProperty<string>(() => Suffix)
+        ];
+        return result;
+    }
+
+    public override void ParseFinished(string parsed) { }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key.ToLower()) {
+            case "prefix":
+                Präfix = value.FromNonCritical();
+                return true;
+
+            case "suffix":
+                Suffix = value.FromNonCritical();
+                return true;
+        }
+        return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
+    }
+
     public override string ReadableText() => "Standard";
 
     public override QuickImage? SymbolForReadableText() => null;
+
+    public override string ToParseableString() {
+        List<string> result = [];
+
+        result.ParseableAdd("Prefix", Präfix);
+
+        result.ParseableAdd("Suffix", Suffix);
+
+        return result.Parseable(base.ToParseableString());
+    }
 
     /// <summary>
     /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
@@ -260,7 +323,6 @@ public class DefaultRenderer : AbstractRenderer {
         }
     }
 
-
     private void DrawOneLine(Graphics gr, string drawString, ColumnItem column, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, BildTextVerhalten bildTextverhalten, States state, float scale) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
@@ -283,46 +345,5 @@ public class DefaultRenderer : AbstractRenderer {
         return txt.Contains("<br>");
     }
 
-
-    public string Suffix { get; set; } = string.Empty;
-    public string Präfix { get; set; } = string.Empty;
-
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-
-        List<GenericControl> result =
-        [   new FlexiControlForProperty<string>(() => Präfix),
-                    new FlexiControlForProperty<string>(() => Suffix)
-        ];
-        return result;
-
-    }
-
-    public override void ParseFinished(string parsed) { }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
-            case "prefix": Präfix = value.FromNonCritical(); return true;
-            case "suffix": Suffix = value.FromNonCritical(); return true;
-
-        }
-        return false;
-
-    }
-
-    public static string ClassId => "Default";
-
-    public override string ToParseableString() {
-
-        List<string> result = [];
-
-        result.ParseableAdd("Prefix", Präfix);
-        result.ParseableAdd("Suffix", Suffix);
-
-
-        return result.Parseable(base.ToParseableString());
-    }
-
-
-
-
+    #endregion
 }

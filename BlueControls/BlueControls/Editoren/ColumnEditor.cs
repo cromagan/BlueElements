@@ -36,7 +36,6 @@ using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 using MessageBox = BlueControls.Forms.MessageBox;
-using BlueControls.ItemCollectionPad.Abstract;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -231,7 +230,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(Table.ColumnUseage(_column) ?? "Fehler");
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(Table.ColumnUseage(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
@@ -320,6 +319,15 @@ internal sealed partial class ColumnEditor : IIsEditor {
         GeneratFilterListe();
     }
 
+    private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
+        _renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(cbxRenderer.Text, "dummy");
+        if (_renderer == null || _column == null) { return; }
+
+        _renderer.Parse(_column.RendererSettings);
+
+        _renderer.DoForm(RendererEditor.Controls, RendererEditor.Width - Skin.PaddingSmal * 2);
+    }
+
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
     private void Column_DatenAuslesen() {
@@ -335,28 +343,17 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
-        cbxRenderer.ItemAddRange(ItemsOf(Generic.GetInstaceOfType<AbstractRenderer>()));
+
+        var l = Generic.GetInstaceOfType<AbstractRenderer>("Dummy");
+        foreach (var thisr in l) {
+            thisr.KeyName = thisr.MyClassId;
+        }
+
+        cbxRenderer.ItemAddRange(ItemsOf(l));
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
 
-        if (cbxEinheit.ItemCount < 1) {
-            cbxEinheit.ItemAdd(ItemOf("µm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(ItemOf("mm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(ItemOf("cm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(ItemOf("dm", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(ItemOf("m", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(ItemOf("km", ImageCode.Lineal));
-            cbxEinheit.ItemAdd(ItemOf("mm²", ImageCode.GrößeÄndern));
-            cbxEinheit.ItemAdd(ItemOf("m²", ImageCode.GrößeÄndern));
-            cbxEinheit.ItemAdd(ItemOf("µg", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(ItemOf("mg", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(ItemOf("g", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(ItemOf("kg", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(ItemOf("t", ImageCode.Gewicht));
-            cbxEinheit.ItemAdd(ItemOf("h", ImageCode.Uhr));
-            cbxEinheit.ItemAdd(ItemOf("min", ImageCode.Uhr));
-            cbxEinheit.ItemAdd(ItemOf("St.", ImageCode.Eins));
-        }
+
         lbxCellEditor.Suggestions.Clear();
 
         lbxCellEditor.ItemAddRange(Table.Permission_AllUsed(true));
@@ -393,6 +390,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxScriptType.Text = ((int)_column.ScriptType).ToString();
         cbxTranslate.Text = ((int)_column.DoOpticalTranslation).ToString();
         cbxRenderer.Text = _column.DefaultRenderer;
+        cbxRenderer_TextChanged(cbxRenderer, System.EventArgs.Empty);
         cbxSort.Text = ((int)_column.SortType).ToString();
         btnAutoFilterMoeglich.Checked = _column.FilterOptions.HasFlag(FilterOptions.Enabled);
         btnAutoFilterTXTErlaubt.Checked = _column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
@@ -721,15 +719,4 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     #endregion
-
-    private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
-        _renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(cbxRenderer.Name, "dummy");
-        if (_renderer == null || _column == null) { return; }
-
-        _renderer.Parse(_column.RendererSettings);
-
-        _renderer.DoForm(RendererEditor.Controls, RendererEditor.Width - Skin.PaddingSmal *2);
-    }
-
-
 }

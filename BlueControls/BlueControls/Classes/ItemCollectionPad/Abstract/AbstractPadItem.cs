@@ -96,7 +96,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     public bool IsDisposed { get; private set; }
     public ObservableCollection<PointM> MovablePoint { get; } = [];
-    public abstract string MyClassId { get; }
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {

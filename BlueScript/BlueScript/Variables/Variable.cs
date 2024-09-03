@@ -84,8 +84,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public abstract bool IsNullOrEmpty { get; }
 
-    public abstract string MyClassId { get; }
-
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
     public bool ReadOnly {
@@ -203,9 +201,9 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             }
         }
 
-        if (VarTypes == null) {
-            return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
-        }
+        //if (VarTypes == null) {
+        //    return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
+        //}
 
         foreach (var thisVt in VarTypes) {
             if (thisVt.GetFromStringPossible) {
