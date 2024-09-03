@@ -62,13 +62,40 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
 
     #region Methods
 
-    public static T? NewByParsing<T>(string toParse) where T : ParsebleItem {
-        var ding = string.Empty;
-        var name = string.Empty;
+    public static T? NewByTypeName<T>(string typname, string name) where T : ParsebleItem {
 
         var types = Generic.GetEnumerableOfType<T>();
 
         if (types.Count == 0) { return default; }
+
+
+        if (string.IsNullOrEmpty(typname)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Typ unbekannt: " + typname);
+            return default;
+        }
+
+        if (string.IsNullOrEmpty(name)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + name);
+            return default;
+        }
+
+        foreach (var thist in types) {
+            var v = (string)thist.GetProperty("ClassId").GetValue(null, null);
+
+            if (v.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
+                var ni = (T)Activator.CreateInstance(thist, name);
+                return ni;
+            }
+        }
+        return default;
+    }
+
+
+    public static T? NewByParsing<T>(string toParse) where T : ParsebleItem {
+        var typeName = string.Empty;
+        var name = string.Empty;
+
+
 
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
@@ -78,7 +105,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
             switch (thisIt.Key) {
                 case "type":
                 case "classid":
-                    ding = thisIt.Value;
+                    typeName = thisIt.Value;
                     break;
 
                 case "key":
@@ -88,43 +115,12 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
                     break;
             }
         }
-        if (string.IsNullOrEmpty(ding)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Type unbekannt: " + toParse);
-            return default;
-        }
-        if (string.IsNullOrEmpty(name)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + toParse);
-            return default;
-        }
 
-        foreach (var thist in types) {
-            //Type[] typesx = { typeof(string) };
-            //Type constructed = thist.MakeGenericType(typesx);
-            //FieldInfo[] fieldInfos = constructed.GetFields(
-            //    BindingFlags.NonPublic |
-            //    BindingFlags.Public |
-            //    BindingFlags.Static);
 
-            //foreach (FieldInfo fi in fieldInfos) {
-            //    Console.WriteLine("Name: {0}  Value: {1}", fi.Name, fi.GetValue(null));
-            //}
-
-            var v = (string)thist.GetProperty("ClassId").GetValue(null, null);
-
-            //var properties = thist.GetProperties();
-
-            //foreach (var property in constructed) {
-            //    if (property.Name == "ClassId") {
-            if (v.Equals(ding, StringComparison.OrdinalIgnoreCase)) {
-                var ni = (T)Activator.CreateInstance(thist, name);
-                ni.Parse(toParse);
-                return ni;
-            }
-            //    }
-            //}
-        }
-
-        return default;
+        var ni = NewByTypeName<T>(typeName, name);
+        if (ni == null) { return default; }
+        ni.Parse(toParse);
+        return ni;
     }
 
     public virtual void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);

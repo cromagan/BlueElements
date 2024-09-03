@@ -42,7 +42,7 @@ public class LineListItem : AbstractListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) => 4;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer) => 4;
 
     public override bool IsClickable() => false;
 

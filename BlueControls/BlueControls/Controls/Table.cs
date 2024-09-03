@@ -499,7 +499,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return t;
     }
 
-    public static Size ContentSize(ColumnItem column, RowItem row, AbstractCellRenderer renderer) {
+    public static Size ContentSize(ColumnItem column, RowItem row, AbstractRenderer renderer) {
         if (column.Database is not { IsDisposed: false } db) { return new Size(16, 16); }
 
         if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
@@ -2860,7 +2860,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWoSlider, false, ca);
     }
 
-    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen, ColumnViewCollection ca, AbstractCellRenderer? renderer) {
+    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen, ColumnViewCollection ca, AbstractRenderer? renderer) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (viewItem.Column is not { IsDisposed: false } cellInThisDatabaseColumn) { return; }
 

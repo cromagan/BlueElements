@@ -108,8 +108,8 @@
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
     <Compile Include="Allgemein.cs" />
-    <Compile Include="CellRenderer\AbstractCellRenderer.cs" />
-    <Compile Include="CellRenderer\DefaultRenderer.cs" />
+    <Compile Include="Renderer\AbstractRenderer.cs" />
+    <Compile Include="Renderer\DefaultRenderer.cs" />
     <Compile Include="Classes\AdderItem.cs" />
     <Compile Include="Classes\ItemCollectionList\DropDownListItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\Abstract\ReciverSenderControlPadItem.cs" />

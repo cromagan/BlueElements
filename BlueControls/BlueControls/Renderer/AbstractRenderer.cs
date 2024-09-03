@@ -17,45 +17,78 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class AbstractCellRenderer : IReadableTextWithKey {
+public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, IParseable, ISimpleEditor {
 
     #region Fields
 
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
-    private static List<AbstractCellRenderer>? _allrenderer;
+
+
+    protected AbstractRenderer(string keyName) : base(keyName) {        KeyName = keyName;    }
 
     #endregion
 
     #region Properties
 
-    public static List<AbstractCellRenderer> AllRenderer {
-        get {
-            _allrenderer ??= Generic.GetInstaceOfType<AbstractCellRenderer>();
-            return _allrenderer;
-        }
+
+
+
+    public string QuickInfo => Description;
+    public abstract string Description { get; }
+
+    public static AbstractRenderer RendererOf(ColumnItem? column) {
+    
+        if(column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return new DefaultRenderer("Null Renderer"); }
+
+
+        var renderer =  ParsebleItem.NewByTypeName<AbstractRenderer>(column.DefaultRenderer, "Renderer of " + column.KeyName);
+        if (renderer == null ) { return new DefaultRenderer("Unknown Renderer"); ; }
+
+        renderer.Parse(column.RendererSettings);
+
+        return renderer;
     }
 
-    public abstract string KeyName { get; }
+    internal static AbstractRenderer? RendererOf(ColumnViewItem columnViewItem) {
 
-    public abstract string QuickInfo { get; }
+        if(!string.IsNullOrEmpty(columnViewItem.Renderer)) {
+            var renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(columnViewItem.Renderer, "Renderer");
+            if (renderer == null) { return RendererOf(columnViewItem.Column); }
+
+            renderer.Parse(columnViewItem.RendererSettings);
+
+            return renderer;
+
+        }
+
+
+        return RendererOf(columnViewItem.Column);
+    }
+
+
+
+
 
     #endregion
 
     #region Methods
 
     public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, ColumnItem? column, float scale);
+    public abstract List<GenericControl> GetProperties(int widthOfControl);
 
     public Size GetSizeOfCellContent(ColumnItem column, string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
@@ -72,6 +105,8 @@ public abstract class AbstractCellRenderer : IReadableTextWithKey {
         SetSizeOfCellContent(column, key, content, contentsize);
         return contentsize;
     }
+
+
 
     public abstract string ReadableText();
 

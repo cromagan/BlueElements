@@ -41,6 +41,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 using BlueControls.ItemCollectionList;
 using BlueBasics.Interfaces;
 using BlueControls.CellRenderer;
+using BlueDatabase;
 
 namespace BlueControls.Controls;
 
@@ -256,7 +257,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    public AbstractCellRenderer? Renderer => AbstractCellRenderer.AllRenderer.Get("Default");
+    public AbstractRenderer? Renderer => AbstractRenderer.RendererOf(null as ColumnItem);
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -384,7 +385,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return Suggestions.Get(rück[0]);
     }
 
-    public Size CalculateColumnAndSize(AbstractCellRenderer renderer) {
+    public Size CalculateColumnAndSize(AbstractRenderer renderer) {
         var (biggestItemX, _, heightAdded, orienation) = ItemData(_item, _itemDesign);
         if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0, renderer); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
@@ -596,7 +597,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Check(ali);
     }
 
-    internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, int addy, AbstractCellRenderer renderer) {
+    internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, int addy, AbstractRenderer renderer) {
         try {
             if (Math.Abs(_lastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 _lastCheckedMaxSize = controlDrawingArea;

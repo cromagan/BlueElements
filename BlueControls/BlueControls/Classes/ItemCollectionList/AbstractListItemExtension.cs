@@ -40,7 +40,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);
 
-    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, AbstractCellRenderer? cellRenderer) => new(value, columnStyle, true, cellRenderer);
+    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, AbstractRenderer cellRenderer) => new(value, columnStyle, true, cellRenderer);
 
     public static TextListItem ItemOf(ContextMenuCommands command, bool enabled = true) {
         var internalName = command.ToString();
@@ -217,7 +217,7 @@ public static class AbstractListItemExtension {
 
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
 
-    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, AbstractCellRenderer? cellRenderer) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, AbstractRenderer cellRenderer) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -324,7 +324,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, AbstractCellRenderer renderer) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, AbstractRenderer renderer) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }

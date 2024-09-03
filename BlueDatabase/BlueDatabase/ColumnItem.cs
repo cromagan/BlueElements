@@ -56,6 +56,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private readonly List<string> _tags = [];
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
+    private string _rendererSettings;
     private bool _afterEditAutoCorrect;
     private bool _afterEditDoUCase;
     private bool _afterEditQuickSortRemoveDouble;
@@ -159,6 +160,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //_keyColumnKey = -1;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
+        _defaultRenderer = string.Empty;
+        _rendererSettings = string.Empty;
         _maxTextLenght = 4000;
         _maxCellLenght = 4000;
         //ContentWidthIsValid = false;
@@ -245,6 +248,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_adminInfo == value) { return; }
 
             _ = Database?.ChangeData(DatabaseDataType.ColumnAdminInfo, this, null, _adminInfo, value, Generic.UserName, DateTime.UtcNow, string.Empty);
+            OnPropertyChanged();
+        }
+    }
+
+    public string RendererSettings
+    {
+        get => _rendererSettings;
+        set
+        {
+            if (IsDisposed) { return; }
+            if (_rendererSettings == value) { return; }
+
+            _ = Database?.ChangeData(DatabaseDataType.RendererSettings, this, null, _rendererSettings, value, Generic.UserName, DateTime.UtcNow, string.Empty);
             OnPropertyChanged();
         }
     }
@@ -1106,6 +1122,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
         DefaultRenderer = source.DefaultRenderer;
+        RendererSettings= source.RendererSettings;
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
         DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
@@ -2271,6 +2288,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.ColumnAdminInfo:
                 _adminInfo = newvalue;
+                break;
+
+            case DatabaseDataType.RendererSettings:
+                _rendererSettings = newvalue;
                 break;
 
             case DatabaseDataType.DefaultRenderer:

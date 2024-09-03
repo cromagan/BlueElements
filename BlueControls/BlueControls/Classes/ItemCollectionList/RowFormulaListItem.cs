@@ -94,7 +94,7 @@ public class RowFormulaListItem : AbstractListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer) {
         if (_tmpBmp == null) { GeneratePic(); }
         return _tmpBmp?.Height ?? 200;
 

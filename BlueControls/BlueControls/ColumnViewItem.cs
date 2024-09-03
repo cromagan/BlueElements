@@ -68,8 +68,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
     #region Properties
 
     public ColumnItem? Column { get; private set; }
-
     public string Renderer {
+        get;
+        set;
+    }
+
+    public string RendererSettings {
         get;
         set;
     }
@@ -157,11 +161,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         return (int)TmpDrawWidth;
     }
 
-    public AbstractCellRenderer? GetRenderer() {
-        return AbstractCellRenderer.AllRenderer.Get(Renderer) ??
-               AbstractCellRenderer.AllRenderer.Get(Column?.DefaultRenderer) ??
-               AbstractCellRenderer.AllRenderer.Get("Default");
-    }
+    public AbstractRenderer? GetRenderer() => AbstractRenderer.RendererOf(this);
+
+
 
     public void Invalidate_DrawWidth() => TmpDrawWidth = null;
 
@@ -203,6 +205,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
             case "renderer":
                 Renderer = value;
                 return true;
+            case "renderersettings":
+                RendererSettings = value.FromNonCritical();
+                return true;
+
         }
 
         return false;
@@ -219,8 +225,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
 
-        if (Column is not { } c || c.DefaultRenderer != Renderer) {
+        if (Column is not { } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
             result.ParseableAdd("Renderer", Renderer);
+            result.ParseableAdd("RendererSettings", RendererSettings);
         }
 
         return result.Parseable();

@@ -185,7 +185,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public virtual bool FilterMatch(string filterText) => KeyName.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer);
+    public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer);
 
     public virtual bool IsClickable() => !IsCaption;
 

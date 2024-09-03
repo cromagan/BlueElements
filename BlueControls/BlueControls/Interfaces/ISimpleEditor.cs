@@ -26,6 +26,12 @@ using static System.Windows.Forms.Control;
 
 namespace BlueBasics.Interfaces;
 
+
+/// <summary>
+/// Wird verwendet, wenn eine Klasse bearbeitbar ist, es sie selbst die Properties ausgeben kann.
+/// Ein allgemeiner Dialog, eingeschränkte Design-Möglichkeiten.
+/// Mit der Extension kann mit DoForm die Properties in ein Steuerelement generiert werden.
+/// </summary>
 public interface ISimpleEditor {
 
     #region Properties

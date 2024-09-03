@@ -21,14 +21,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabAnzeige = new System.Windows.Forms.TabPage();
-            this.txbFixedColumnWidth = new BlueControls.Controls.TextBox();
-            this.capFixedColumnWidth = new BlueControls.Controls.Caption();
+            this.RendererEditor = new GroupBox();
+            this.cbxRenderer = new BlueControls.Controls.ComboBox();
+            this.capRenderer = new BlueControls.Controls.Caption();
             this.btnSpellChecking = new BlueControls.Controls.Button();
             this.cbxTranslate = new BlueControls.Controls.ComboBox();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
             this.capBildCodeConstHeight = new BlueControls.Controls.Caption();
             this.capTranslate = new BlueControls.Controls.Caption();
-            this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
             this.cbxAlign = new BlueControls.Controls.ComboBox();
             this.txbReplacer = new BlueControls.Controls.TextBox();
@@ -37,15 +37,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAlign = new BlueControls.Controls.Caption();
             this.txbPrefix = new BlueControls.Controls.TextBox();
             this.capPraefix = new BlueControls.Controls.Caption();
+            this.capReplacer = new BlueControls.Controls.Caption();
+            this.capEinheit = new BlueControls.Controls.Caption();
+            this.cbxEinheit = new BlueControls.Controls.ComboBox();
+            this.txbFixedColumnWidth = new BlueControls.Controls.TextBox();
+            this.capFixedColumnWidth = new BlueControls.Controls.Caption();
+            this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.capUeberschrift3 = new BlueControls.Controls.Caption();
             this.capUeberschrift2 = new BlueControls.Controls.Caption();
             this.capUeberschrift1 = new BlueControls.Controls.Caption();
             this.txbUeberschift3 = new BlueControls.Controls.TextBox();
             this.txbUeberschift2 = new BlueControls.Controls.TextBox();
             this.txbUeberschift1 = new BlueControls.Controls.TextBox();
-            this.capReplacer = new BlueControls.Controls.Caption();
-            this.capEinheit = new BlueControls.Controls.Caption();
-            this.cbxEinheit = new BlueControls.Controls.ComboBox();
             this.capSpaltenbild = new BlueControls.Controls.Caption();
             this.btnBackColor = new BlueControls.Controls.Button();
             this.cbxRandRechts = new BlueControls.Controls.ComboBox();
@@ -137,6 +140,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellTelefonNummer = new BlueControls.Controls.Button();
             this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
             this.btnSchnellGanzzahl = new BlueControls.Controls.Button();
+            this.tabSpaltenKopf = new System.Windows.Forms.TabPage();
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
             this.tblFilterliste = new BlueControls.Controls.Table();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
@@ -146,8 +150,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
             this.btnSpaltenkopf = new BlueControls.Controls.Button();
-            this.capRenderer = new BlueControls.Controls.Caption();
-            this.cbxRenderer = new BlueControls.Controls.ComboBox();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -159,6 +161,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.SuspendLayout();
             this.tabDatenFormat.SuspendLayout();
             this.grpSchnellformat.SuspendLayout();
+            this.tabSpaltenKopf.SuspendLayout();
             this.tabSpaltenVerlinkung.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -170,16 +173,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabAnzeige
             // 
             this.tabAnzeige.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAnzeige.Controls.Add(this.RendererEditor);
             this.tabAnzeige.Controls.Add(this.cbxRenderer);
             this.tabAnzeige.Controls.Add(this.capRenderer);
-            this.tabAnzeige.Controls.Add(this.txbFixedColumnWidth);
-            this.tabAnzeige.Controls.Add(this.capFixedColumnWidth);
             this.tabAnzeige.Controls.Add(this.btnSpellChecking);
             this.tabAnzeige.Controls.Add(this.cbxTranslate);
             this.tabAnzeige.Controls.Add(this.txbBildCodeConstHeight);
             this.tabAnzeige.Controls.Add(this.capBildCodeConstHeight);
             this.tabAnzeige.Controls.Add(this.capTranslate);
-            this.tabAnzeige.Controls.Add(this.txbSpaltenbild);
             this.tabAnzeige.Controls.Add(this.cbxBildTextVerhalten);
             this.tabAnzeige.Controls.Add(this.cbxAlign);
             this.tabAnzeige.Controls.Add(this.txbReplacer);
@@ -188,22 +189,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnzeige.Controls.Add(this.capAlign);
             this.tabAnzeige.Controls.Add(this.txbPrefix);
             this.tabAnzeige.Controls.Add(this.capPraefix);
-            this.tabAnzeige.Controls.Add(this.capUeberschrift3);
-            this.tabAnzeige.Controls.Add(this.capUeberschrift2);
-            this.tabAnzeige.Controls.Add(this.capUeberschrift1);
-            this.tabAnzeige.Controls.Add(this.txbUeberschift3);
-            this.tabAnzeige.Controls.Add(this.txbUeberschift2);
-            this.tabAnzeige.Controls.Add(this.txbUeberschift1);
             this.tabAnzeige.Controls.Add(this.capReplacer);
             this.tabAnzeige.Controls.Add(this.capEinheit);
             this.tabAnzeige.Controls.Add(this.cbxEinheit);
-            this.tabAnzeige.Controls.Add(this.capSpaltenbild);
-            this.tabAnzeige.Controls.Add(this.btnBackColor);
-            this.tabAnzeige.Controls.Add(this.cbxRandRechts);
-            this.tabAnzeige.Controls.Add(this.btnTextColor);
-            this.tabAnzeige.Controls.Add(this.cbxRandLinks);
-            this.tabAnzeige.Controls.Add(this.capLinkerRand);
-            this.tabAnzeige.Controls.Add(this.capRechterRand);
             this.tabAnzeige.Location = new System.Drawing.Point(4, 25);
             this.tabAnzeige.Name = "tabAnzeige";
             this.tabAnzeige.Padding = new System.Windows.Forms.Padding(3);
@@ -211,31 +199,43 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnzeige.TabIndex = 0;
             this.tabAnzeige.Text = "Anzeige";
             // 
-            // txbFixedColumnWidth
+            // RendererEditor
             // 
-            this.txbFixedColumnWidth.AllowedChars = "0123456789|";
-            this.txbFixedColumnWidth.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFixedColumnWidth.Location = new System.Drawing.Point(176, 144);
-            this.txbFixedColumnWidth.Name = "txbFixedColumnWidth";
-            this.txbFixedColumnWidth.QuickInfo = "Wenn ein Wert >0 eingegeben wird, \r\nwird die Spalte immer in dieser Breite angeze" +
-    "igt.";
-            this.txbFixedColumnWidth.Size = new System.Drawing.Size(96, 24);
-            this.txbFixedColumnWidth.Suffix = "Pixel";
-            this.txbFixedColumnWidth.TabIndex = 42;
+            this.RendererEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RendererEditor.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Normal;
+            this.RendererEditor.Location = new System.Drawing.Point(528, 152);
+            this.RendererEditor.Name = "RendererEditor";
+            this.RendererEditor.Size = new System.Drawing.Size(456, 328);
+            this.RendererEditor.TabIndex = 45;
             // 
-            // capFixedColumnWidth
+            // cbxRenderer
             // 
-            this.capFixedColumnWidth.CausesValidation = false;
-            this.capFixedColumnWidth.Location = new System.Drawing.Point(8, 144);
-            this.capFixedColumnWidth.Name = "capFixedColumnWidth";
-            this.capFixedColumnWidth.Size = new System.Drawing.Size(160, 16);
-            this.capFixedColumnWidth.Text = "Feste Spaltenbreite:";
+            this.cbxRenderer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxRenderer.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxRenderer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRenderer.Location = new System.Drawing.Point(528, 128);
+            this.cbxRenderer.Name = "cbxRenderer";
+            this.cbxRenderer.Regex = null;
+            this.cbxRenderer.Size = new System.Drawing.Size(456, 24);
+            this.cbxRenderer.TabIndex = 44;
+            this.cbxRenderer.TextChanged += new System.EventHandler(this.cbxRenderer_TextChanged);
+            // 
+            // capRenderer
+            // 
+            this.capRenderer.CausesValidation = false;
+            this.capRenderer.Location = new System.Drawing.Point(528, 112);
+            this.capRenderer.Name = "capRenderer";
+            this.capRenderer.Size = new System.Drawing.Size(88, 16);
+            this.capRenderer.Text = "Renderer:";
             // 
             // btnSpellChecking
             // 
             this.btnSpellChecking.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSpellChecking.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnSpellChecking.Location = new System.Drawing.Point(528, 216);
+            this.btnSpellChecking.Location = new System.Drawing.Point(384, 56);
             this.btnSpellChecking.Name = "btnSpellChecking";
             this.btnSpellChecking.Size = new System.Drawing.Size(352, 16);
             this.btnSpellChecking.TabIndex = 33;
@@ -245,7 +245,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cbxTranslate.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTranslate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxTranslate.Location = new System.Drawing.Point(624, 136);
+            this.cbxTranslate.Location = new System.Drawing.Point(608, 24);
             this.cbxTranslate.Name = "cbxTranslate";
             this.cbxTranslate.Regex = null;
             this.cbxTranslate.Size = new System.Drawing.Size(360, 24);
@@ -255,7 +255,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.txbBildCodeConstHeight.AllowedChars = "0123456789|";
             this.txbBildCodeConstHeight.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbBildCodeConstHeight.Location = new System.Drawing.Point(176, 208);
+            this.txbBildCodeConstHeight.Location = new System.Drawing.Point(552, 80);
             this.txbBildCodeConstHeight.Name = "txbBildCodeConstHeight";
             this.txbBildCodeConstHeight.QuickInfo = "Beispieleingabe: 24|16";
             this.txbBildCodeConstHeight.Size = new System.Drawing.Size(96, 24);
@@ -265,7 +265,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capBildCodeConstHeight
             // 
             this.capBildCodeConstHeight.CausesValidation = false;
-            this.capBildCodeConstHeight.Location = new System.Drawing.Point(8, 208);
+            this.capBildCodeConstHeight.Location = new System.Drawing.Point(384, 80);
             this.capBildCodeConstHeight.Name = "capBildCodeConstHeight";
             this.capBildCodeConstHeight.Size = new System.Drawing.Size(160, 16);
             this.capBildCodeConstHeight.Text = "Breite/Höhe von Bildern:";
@@ -274,37 +274,26 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capTranslate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capTranslate.CausesValidation = false;
-            this.capTranslate.Location = new System.Drawing.Point(528, 136);
+            this.capTranslate.Location = new System.Drawing.Point(512, 24);
             this.capTranslate.Name = "capTranslate";
             this.capTranslate.Size = new System.Drawing.Size(96, 24);
             this.capTranslate.Text = "Übersetzen:";
-            // 
-            // txbSpaltenbild
-            // 
-            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
-            this.txbSpaltenbild.Name = "txbSpaltenbild";
-            this.txbSpaltenbild.Regex = null;
-            this.txbSpaltenbild.Size = new System.Drawing.Size(456, 24);
-            this.txbSpaltenbild.TabIndex = 40;
             // 
             // cbxBildTextVerhalten
             // 
             this.cbxBildTextVerhalten.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxBildTextVerhalten.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBildTextVerhalten.Location = new System.Drawing.Point(176, 184);
+            this.cbxBildTextVerhalten.Location = new System.Drawing.Point(136, 80);
             this.cbxBildTextVerhalten.Name = "cbxBildTextVerhalten";
             this.cbxBildTextVerhalten.Regex = null;
-            this.cbxBildTextVerhalten.Size = new System.Drawing.Size(336, 24);
+            this.cbxBildTextVerhalten.Size = new System.Drawing.Size(240, 24);
             this.cbxBildTextVerhalten.TabIndex = 34;
             // 
             // cbxAlign
             // 
             this.cbxAlign.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxAlign.Location = new System.Drawing.Point(384, 136);
+            this.cbxAlign.Location = new System.Drawing.Point(368, 24);
             this.cbxAlign.Name = "cbxAlign";
             this.cbxAlign.Regex = null;
             this.cbxAlign.Size = new System.Drawing.Size(128, 24);
@@ -312,31 +301,30 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbReplacer
             // 
-            this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.txbReplacer.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbReplacer.Location = new System.Drawing.Point(8, 264);
+            this.txbReplacer.Location = new System.Drawing.Point(8, 136);
             this.txbReplacer.MultiLine = true;
             this.txbReplacer.Name = "txbReplacer";
             this.txbReplacer.QuickInfo = "Texte in der Spalte werden mit diesen Angaben <b>optisch</b> ersetzt.<br><i><u>Be" +
     "ispiel:</i></u>Beispiel-Text|Bsp.-Txt";
             this.txbReplacer.Regex = null;
-            this.txbReplacer.Size = new System.Drawing.Size(985, 217);
+            this.txbReplacer.Size = new System.Drawing.Size(504, 345);
             this.txbReplacer.SpellCheckingEnabled = true;
             this.txbReplacer.TabIndex = 35;
             // 
             // capBildCodeImageNotfound
             // 
             this.capBildCodeImageNotfound.CausesValidation = false;
-            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 184);
+            this.capBildCodeImageNotfound.Location = new System.Drawing.Point(8, 80);
             this.capBildCodeImageNotfound.Name = "capBildCodeImageNotfound";
-            this.capBildCodeImageNotfound.Size = new System.Drawing.Size(136, 16);
+            this.capBildCodeImageNotfound.Size = new System.Drawing.Size(128, 16);
             this.capBildCodeImageNotfound.Text = "Bild/Text-Verhalten:";
             // 
             // btnStandard
             // 
-            this.btnStandard.Location = new System.Drawing.Point(384, 16);
+            this.btnStandard.Location = new System.Drawing.Point(232, 8);
             this.btnStandard.Name = "btnStandard";
             this.btnStandard.Size = new System.Drawing.Size(128, 48);
             this.btnStandard.TabIndex = 39;
@@ -346,7 +334,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capAlign
             // 
             this.capAlign.CausesValidation = false;
-            this.capAlign.Location = new System.Drawing.Point(384, 120);
+            this.capAlign.Location = new System.Drawing.Point(368, 8);
             this.capAlign.Name = "capAlign";
             this.capAlign.Size = new System.Drawing.Size(104, 16);
             this.capAlign.Text = "Ausrichtung:";
@@ -368,64 +356,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capPraefix.Size = new System.Drawing.Size(48, 16);
             this.capPraefix.Text = "Präfix:";
             // 
-            // capUeberschrift3
-            // 
-            this.capUeberschrift3.CausesValidation = false;
-            this.capUeberschrift3.Location = new System.Drawing.Point(528, 56);
-            this.capUeberschrift3.Name = "capUeberschrift3";
-            this.capUeberschrift3.Size = new System.Drawing.Size(88, 16);
-            this.capUeberschrift3.Text = "Überschrift 3:";
-            this.capUeberschrift3.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // capUeberschrift2
-            // 
-            this.capUeberschrift2.CausesValidation = false;
-            this.capUeberschrift2.Location = new System.Drawing.Point(528, 32);
-            this.capUeberschrift2.Name = "capUeberschrift2";
-            this.capUeberschrift2.Size = new System.Drawing.Size(88, 16);
-            this.capUeberschrift2.Text = "Überschrift 2:";
-            this.capUeberschrift2.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // capUeberschrift1
-            // 
-            this.capUeberschrift1.CausesValidation = false;
-            this.capUeberschrift1.Location = new System.Drawing.Point(528, 8);
-            this.capUeberschrift1.Name = "capUeberschrift1";
-            this.capUeberschrift1.Size = new System.Drawing.Size(88, 16);
-            this.capUeberschrift1.Text = "Überschrift 1:";
-            this.capUeberschrift1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // txbUeberschift3
-            // 
-            this.txbUeberschift3.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbUeberschift3.Location = new System.Drawing.Point(624, 56);
-            this.txbUeberschift3.Name = "txbUeberschift3";
-            this.txbUeberschift3.Regex = null;
-            this.txbUeberschift3.Size = new System.Drawing.Size(288, 24);
-            this.txbUeberschift3.TabIndex = 38;
-            // 
-            // txbUeberschift2
-            // 
-            this.txbUeberschift2.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbUeberschift2.Location = new System.Drawing.Point(624, 32);
-            this.txbUeberschift2.Name = "txbUeberschift2";
-            this.txbUeberschift2.Regex = null;
-            this.txbUeberschift2.Size = new System.Drawing.Size(288, 24);
-            this.txbUeberschift2.TabIndex = 37;
-            // 
-            // txbUeberschift1
-            // 
-            this.txbUeberschift1.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbUeberschift1.Location = new System.Drawing.Point(624, 8);
-            this.txbUeberschift1.Name = "txbUeberschift1";
-            this.txbUeberschift1.Regex = null;
-            this.txbUeberschift1.Size = new System.Drawing.Size(288, 24);
-            this.txbUeberschift1.TabIndex = 36;
-            // 
             // capReplacer
             // 
             this.capReplacer.CausesValidation = false;
-            this.capReplacer.Location = new System.Drawing.Point(8, 240);
+            this.capReplacer.Location = new System.Drawing.Point(8, 112);
             this.capReplacer.Name = "capReplacer";
             this.capReplacer.Size = new System.Drawing.Size(144, 24);
             this.capReplacer.Text = "Optische Ersetzungen:";
@@ -447,10 +381,95 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
             this.cbxEinheit.TabIndex = 31;
             // 
+            // txbFixedColumnWidth
+            // 
+            this.txbFixedColumnWidth.AllowedChars = "0123456789|";
+            this.txbFixedColumnWidth.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbFixedColumnWidth.Location = new System.Drawing.Point(160, 184);
+            this.txbFixedColumnWidth.Name = "txbFixedColumnWidth";
+            this.txbFixedColumnWidth.QuickInfo = "Wenn ein Wert >0 eingegeben wird, \r\nwird die Spalte immer in dieser Breite angeze" +
+    "igt.";
+            this.txbFixedColumnWidth.Size = new System.Drawing.Size(88, 24);
+            this.txbFixedColumnWidth.Suffix = "Pixel";
+            this.txbFixedColumnWidth.TabIndex = 42;
+            // 
+            // capFixedColumnWidth
+            // 
+            this.capFixedColumnWidth.CausesValidation = false;
+            this.capFixedColumnWidth.Location = new System.Drawing.Point(32, 184);
+            this.capFixedColumnWidth.Name = "capFixedColumnWidth";
+            this.capFixedColumnWidth.Size = new System.Drawing.Size(128, 16);
+            this.capFixedColumnWidth.Text = "Feste Spaltenbreite:";
+            // 
+            // txbSpaltenbild
+            // 
+            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbSpaltenbild.Location = new System.Drawing.Point(336, 168);
+            this.txbSpaltenbild.Name = "txbSpaltenbild";
+            this.txbSpaltenbild.Regex = null;
+            this.txbSpaltenbild.Size = new System.Drawing.Size(456, 24);
+            this.txbSpaltenbild.TabIndex = 40;
+            // 
+            // capUeberschrift3
+            // 
+            this.capUeberschrift3.CausesValidation = false;
+            this.capUeberschrift3.Location = new System.Drawing.Point(288, 70);
+            this.capUeberschrift3.Name = "capUeberschrift3";
+            this.capUeberschrift3.Size = new System.Drawing.Size(88, 16);
+            this.capUeberschrift3.Text = "Überschrift 3:";
+            this.capUeberschrift3.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capUeberschrift2
+            // 
+            this.capUeberschrift2.CausesValidation = false;
+            this.capUeberschrift2.Location = new System.Drawing.Point(288, 46);
+            this.capUeberschrift2.Name = "capUeberschrift2";
+            this.capUeberschrift2.Size = new System.Drawing.Size(88, 16);
+            this.capUeberschrift2.Text = "Überschrift 2:";
+            this.capUeberschrift2.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capUeberschrift1
+            // 
+            this.capUeberschrift1.CausesValidation = false;
+            this.capUeberschrift1.Location = new System.Drawing.Point(288, 22);
+            this.capUeberschrift1.Name = "capUeberschrift1";
+            this.capUeberschrift1.Size = new System.Drawing.Size(88, 16);
+            this.capUeberschrift1.Text = "Überschrift 1:";
+            this.capUeberschrift1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // txbUeberschift3
+            // 
+            this.txbUeberschift3.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbUeberschift3.Location = new System.Drawing.Point(380, 63);
+            this.txbUeberschift3.Name = "txbUeberschift3";
+            this.txbUeberschift3.Regex = null;
+            this.txbUeberschift3.Size = new System.Drawing.Size(288, 24);
+            this.txbUeberschift3.TabIndex = 38;
+            // 
+            // txbUeberschift2
+            // 
+            this.txbUeberschift2.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbUeberschift2.Location = new System.Drawing.Point(380, 39);
+            this.txbUeberschift2.Name = "txbUeberschift2";
+            this.txbUeberschift2.Regex = null;
+            this.txbUeberschift2.Size = new System.Drawing.Size(288, 24);
+            this.txbUeberschift2.TabIndex = 37;
+            // 
+            // txbUeberschift1
+            // 
+            this.txbUeberschift1.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbUeberschift1.Location = new System.Drawing.Point(380, 15);
+            this.txbUeberschift1.Name = "txbUeberschift1";
+            this.txbUeberschift1.Regex = null;
+            this.txbUeberschift1.Size = new System.Drawing.Size(288, 24);
+            this.txbUeberschift1.TabIndex = 36;
+            // 
             // capSpaltenbild
             // 
             this.capSpaltenbild.CausesValidation = false;
-            this.capSpaltenbild.Location = new System.Drawing.Point(528, 88);
+            this.capSpaltenbild.Location = new System.Drawing.Point(336, 152);
             this.capSpaltenbild.Name = "capSpaltenbild";
             this.capSpaltenbild.Size = new System.Drawing.Size(152, 24);
             this.capSpaltenbild.Text = "Spaltenbild:";
@@ -458,7 +477,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnBackColor
             // 
-            this.btnBackColor.Location = new System.Drawing.Point(248, 40);
+            this.btnBackColor.Location = new System.Drawing.Point(16, 40);
             this.btnBackColor.Name = "btnBackColor";
             this.btnBackColor.Size = new System.Drawing.Size(128, 24);
             this.btnBackColor.TabIndex = 3;
@@ -469,7 +488,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cbxRandRechts.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandRechts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRandRechts.Location = new System.Drawing.Point(384, 88);
+            this.cbxRandRechts.Location = new System.Drawing.Point(188, 135);
             this.cbxRandRechts.Name = "cbxRandRechts";
             this.cbxRandRechts.Regex = null;
             this.cbxRandRechts.Size = new System.Drawing.Size(128, 24);
@@ -477,7 +496,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnTextColor
             // 
-            this.btnTextColor.Location = new System.Drawing.Point(248, 16);
+            this.btnTextColor.Location = new System.Drawing.Point(12, 15);
             this.btnTextColor.Name = "btnTextColor";
             this.btnTextColor.Size = new System.Drawing.Size(128, 24);
             this.btnTextColor.TabIndex = 4;
@@ -488,7 +507,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cbxRandLinks.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandLinks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRandLinks.Location = new System.Drawing.Point(248, 88);
+            this.cbxRandLinks.Location = new System.Drawing.Point(52, 135);
             this.cbxRandLinks.Name = "cbxRandLinks";
             this.cbxRandLinks.Regex = null;
             this.cbxRandLinks.Size = new System.Drawing.Size(128, 24);
@@ -497,7 +516,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capLinkerRand
             // 
             this.capLinkerRand.CausesValidation = false;
-            this.capLinkerRand.Location = new System.Drawing.Point(248, 72);
+            this.capLinkerRand.Location = new System.Drawing.Point(52, 119);
             this.capLinkerRand.Name = "capLinkerRand";
             this.capLinkerRand.Size = new System.Drawing.Size(80, 16);
             this.capLinkerRand.Text = "Linker Rand:";
@@ -506,7 +525,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capRechterRand
             // 
             this.capRechterRand.CausesValidation = false;
-            this.capRechterRand.Location = new System.Drawing.Point(384, 72);
+            this.capRechterRand.Location = new System.Drawing.Point(188, 119);
             this.capRechterRand.Name = "capRechterRand";
             this.capRechterRand.Size = new System.Drawing.Size(88, 16);
             this.capRechterRand.Text = "Rechter Rand:";
@@ -1233,6 +1252,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl.Controls.Add(this.tabDatenFormat);
             this.tabControl.Controls.Add(this.tabAnzeige);
+            this.tabControl.Controls.Add(this.tabSpaltenKopf);
             this.tabControl.Controls.Add(this.tabBearbeitung);
             this.tabControl.Controls.Add(this.tabAutoKorrektur);
             this.tabControl.Controls.Add(this.tabFilter);
@@ -1431,6 +1451,32 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellGanzzahl.Text = "Ganzzahl";
             this.btnSchnellGanzzahl.Click += new System.EventHandler(this.btnSchnellGanzzahl_Click);
             // 
+            // tabSpaltenKopf
+            // 
+            this.tabSpaltenKopf.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSpaltenKopf.Controls.Add(this.btnTextColor);
+            this.tabSpaltenKopf.Controls.Add(this.btnBackColor);
+            this.tabSpaltenKopf.Controls.Add(this.txbFixedColumnWidth);
+            this.tabSpaltenKopf.Controls.Add(this.capFixedColumnWidth);
+            this.tabSpaltenKopf.Controls.Add(this.txbUeberschift1);
+            this.tabSpaltenKopf.Controls.Add(this.txbUeberschift3);
+            this.tabSpaltenKopf.Controls.Add(this.txbSpaltenbild);
+            this.tabSpaltenKopf.Controls.Add(this.capSpaltenbild);
+            this.tabSpaltenKopf.Controls.Add(this.txbUeberschift2);
+            this.tabSpaltenKopf.Controls.Add(this.capUeberschrift3);
+            this.tabSpaltenKopf.Controls.Add(this.cbxRandRechts);
+            this.tabSpaltenKopf.Controls.Add(this.capUeberschrift1);
+            this.tabSpaltenKopf.Controls.Add(this.capRechterRand);
+            this.tabSpaltenKopf.Controls.Add(this.capLinkerRand);
+            this.tabSpaltenKopf.Controls.Add(this.capUeberschrift2);
+            this.tabSpaltenKopf.Controls.Add(this.cbxRandLinks);
+            this.tabSpaltenKopf.Location = new System.Drawing.Point(4, 25);
+            this.tabSpaltenKopf.Name = "tabSpaltenKopf";
+            this.tabSpaltenKopf.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSpaltenKopf.Size = new System.Drawing.Size(993, 483);
+            this.tabSpaltenKopf.TabIndex = 13;
+            this.tabSpaltenKopf.Text = "Spaltenkopf";
+            // 
             // tabSpaltenVerlinkung
             // 
             this.tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -1529,24 +1575,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSpaltenkopf.TabIndex = 49;
             this.btnSpaltenkopf.Click += new System.EventHandler(this.btnSpaltenkopf_Click);
             // 
-            // capRenderer
-            // 
-            this.capRenderer.CausesValidation = false;
-            this.capRenderer.Location = new System.Drawing.Point(528, 176);
-            this.capRenderer.Name = "capRenderer";
-            this.capRenderer.Size = new System.Drawing.Size(88, 16);
-            this.capRenderer.Text = "Renderer:";
-            // 
-            // cbxRenderer
-            // 
-            this.cbxRenderer.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxRenderer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRenderer.Location = new System.Drawing.Point(624, 176);
-            this.cbxRenderer.Name = "cbxRenderer";
-            this.cbxRenderer.Regex = null;
-            this.cbxRenderer.Size = new System.Drawing.Size(360, 24);
-            this.cbxRenderer.TabIndex = 44;
-            // 
             // ColumnEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1573,6 +1601,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.ResumeLayout(false);
             this.tabDatenFormat.ResumeLayout(false);
             this.grpSchnellformat.ResumeLayout(false);
+            this.tabSpaltenKopf.ResumeLayout(false);
             this.tabSpaltenVerlinkung.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1706,5 +1735,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnSpaltenkopf;
         private ComboBox cbxRenderer;
         private Caption capRenderer;
+        private System.Windows.Forms.TabPage tabSpaltenKopf;
+        private GroupBox RendererEditor;
     }
 }

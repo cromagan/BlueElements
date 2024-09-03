@@ -166,8 +166,7 @@ public enum DatabaseDataType : byte {
     // co_SteuerelementName = 119
     // co_BezugsSpalte = 120
     DefaultRenderer = 121, // FREI = 121
-
-    // co_ReplaceAnsicht = 122
+    RendererSettings = 122,     // co_ReplaceAnsicht = 122
     // co_CellUBound = 123
     // co_GetFilesAufruf = 124
     PermissionGroupsChangeCell = 125,

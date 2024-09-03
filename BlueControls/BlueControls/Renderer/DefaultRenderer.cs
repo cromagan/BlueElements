@@ -18,10 +18,13 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
@@ -29,16 +32,16 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
 
-public class DefaultRenderer : AbstractCellRenderer {
+public class DefaultRenderer : AbstractRenderer {
+    public DefaultRenderer(string keyName) : base(keyName) { }
 
     #region Properties
 
-    public override string KeyName => "Default";
-    public override string QuickInfo => "Standard Anzeige für Zellen";
+    public override string Description => "Standard Anzeige";
 
     #endregion
 
-    #region Methods
+
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, ColumnItem? column, float scale) {
         if (column == null) { return; }
@@ -257,8 +260,7 @@ public class DefaultRenderer : AbstractCellRenderer {
         }
     }
 
-    //public static List<string>? ValuesReadable(ColumnItem? column, RowItem? row, ShortenStyle style) {
-    //    if (column == null || row == null) { return null; }
+
     private void DrawOneLine(Graphics gr, string drawString, ColumnItem column, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, BildTextVerhalten bildTextverhalten, States state, float scale) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
@@ -281,5 +283,46 @@ public class DefaultRenderer : AbstractCellRenderer {
         return txt.Contains("<br>");
     }
 
-    #endregion
+
+    public string Suffix { get; set; } = string.Empty;
+    public string Präfix { get; set; } = string.Empty;
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+
+        List<GenericControl> result =
+        [   new FlexiControlForProperty<string>(() => Präfix),
+                    new FlexiControlForProperty<string>(() => Suffix)
+        ];
+        return result;
+
+    }
+
+    public override void ParseFinished(string parsed) { }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key.ToLower()) {
+            case "prefix": Präfix = value.FromNonCritical(); return true;
+            case "suffix": Suffix = value.FromNonCritical(); return true;
+
+        }
+        return false;
+
+    }
+
+    public static string ClassId => "Default";
+
+    public override string ToParseableString() {
+
+        List<string> result = [];
+
+        result.ParseableAdd("Prefix", Präfix);
+        result.ParseableAdd("Suffix", Suffix);
+
+
+        return result.Parseable(base.ToParseableString());
+    }
+
+
+
+
 }

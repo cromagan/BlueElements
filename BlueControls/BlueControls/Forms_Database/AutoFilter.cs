@@ -51,7 +51,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, AbstractCellRenderer? renderer) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, AbstractRenderer? renderer) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
@@ -86,7 +86,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         return column.Contents(fc2, pinned);
     }
 
-    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, AbstractCellRenderer? renderer) {
+    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, AbstractRenderer renderer) {
         var nochOk = true;
         var listFilterString = Autofilter_ItemList(_column, fc, pinned);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);

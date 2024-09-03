@@ -52,7 +52,7 @@ public class TextListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => ((Font)Skin.GetBlueFont(TempDesign(itemdesign), States.Standard)).FormatedText_NeededSize(Text, Symbol, 16);
 

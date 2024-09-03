@@ -222,7 +222,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            var r = AbstractCellRenderer.AllRenderer.Get(thisColumn.DefaultRenderer);
+                            var r = AbstractRenderer.RendererOf(thisColumn);
                             flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, r);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;

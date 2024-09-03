@@ -36,6 +36,7 @@ using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueControls.ItemCollectionPad.Abstract;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -46,6 +47,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private readonly Table? _table;
 
     private ColumnItem? _column;
+
+    private AbstractRenderer? _renderer;
 
     #endregion
 
@@ -332,7 +335,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
-        cbxRenderer.ItemAddRange(ItemsOf(AbstractCellRenderer.AllRenderer));
+        cbxRenderer.ItemAddRange(ItemsOf(Generic.GetInstaceOfType<AbstractRenderer>()));
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
 
@@ -558,6 +561,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
         _column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
         _column.DefaultRenderer = cbxRenderer.Text;
+        _column.RendererSettings = _renderer?.ToParseableString() ?? string.Empty;
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
         _column.Invalidate_ColumAndContent();
@@ -717,4 +721,15 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     #endregion
+
+    private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
+        _renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(cbxRenderer.Name, "dummy");
+        if (_renderer == null || _column == null) { return; }
+
+        _renderer.Parse(_column.RendererSettings);
+
+        _renderer.DoForm(RendererEditor.Controls, RendererEditor.Width - Skin.PaddingSmal *2);
+    }
+
+
 }

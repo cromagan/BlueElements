@@ -570,7 +570,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 case ComboBox comboBox:
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
-                        var r = AbstractCellRenderer.AllRenderer.Get(column?.DefaultRenderer);
+                        var r = AbstractRenderer.RendererOf(column);
                         item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
@@ -615,7 +615,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
-            var r = AbstractCellRenderer.AllRenderer.Get(column.DefaultRenderer);
+            var r = AbstractRenderer.RendererOf( column);
             item.AddRange(ItemsOf(column, null, 10000, r));
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
@@ -667,7 +667,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         control.SuggestionsClear();
         if (column is not { IsDisposed: not true }) { return; }
 
-        var r = AbstractCellRenderer.AllRenderer.Get(column.DefaultRenderer);
+        var r = AbstractRenderer.RendererOf(column);
 
         var item = new List<AbstractListItem>();
         item.AddRange(ItemsOf(column, null, 10000, r));

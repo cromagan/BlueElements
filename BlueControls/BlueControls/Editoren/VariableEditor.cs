@@ -77,7 +77,7 @@ public partial class VariableEditor : EditorEasy {
         _ = db.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
         _ = db.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
         var inh = db.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
-        var kom = db.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
+        var kom = db.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Kommentar");
 
         foreach (var thisColumn in db.Column) {
             if (!thisColumn.IsSystemColumn()) {

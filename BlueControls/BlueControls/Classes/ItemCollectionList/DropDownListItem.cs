@@ -55,7 +55,7 @@ public class DropDownListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => false;
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractCellRenderer renderer) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer) {
         var he = 16;
 
         foreach (var item in DDItems) {
