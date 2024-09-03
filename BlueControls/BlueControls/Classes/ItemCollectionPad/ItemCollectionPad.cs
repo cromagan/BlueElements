@@ -763,7 +763,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return -1;
     }
 
-    internal void InDenHintergrund(AbstractPadItem thisItem) {
+    public void InDenHintergrund(AbstractPadItem thisItem) {
         if (IndexOf(thisItem) == 0) { return; }
         var g1 = thisItem.Gruppenzugehörigkeit;
         thisItem.Gruppenzugehörigkeit = string.Empty;
@@ -772,7 +772,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         thisItem.Gruppenzugehörigkeit = g1;
     }
 
-    internal void InDenVordergrund(AbstractPadItem thisItem) {
+    public void InDenVordergrund(AbstractPadItem thisItem) {
         if (IndexOf(thisItem) == Count - 1) { return; }
         var g1 = thisItem.Gruppenzugehörigkeit;
         thisItem.Gruppenzugehörigkeit = string.Empty;
