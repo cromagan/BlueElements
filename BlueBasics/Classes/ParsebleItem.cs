@@ -35,8 +35,8 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
     #region Constructors
 
     protected ParsebleItem(string keyName) {
-        KeyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
-        if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
+        _keyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
+        if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
     }
 
     #endregion

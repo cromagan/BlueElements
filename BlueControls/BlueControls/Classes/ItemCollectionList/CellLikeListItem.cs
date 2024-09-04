@@ -23,6 +23,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
 using BlueControls.CellRenderer;
+using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -72,16 +73,16 @@ public class CellLikeListItem : AbstractListItem {
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
-        if (_styleLikeThis == null) { return new Size(16, 0); }
+        if (_styleLikeThis == null || _cellRenderer == null) { return new Size(16, 0); }
 
-        return _cellRenderer.GetSizeOfCellContent(_styleLikeThis, KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode);
+        return _cellRenderer.GetSizeOfCellContent(KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _styleLikeThis, 1f);
+        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode, 1f, (Alignment)_styleLikeThis.Align);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }

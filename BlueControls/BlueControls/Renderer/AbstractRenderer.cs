@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -30,12 +31,13 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISimpleEditor {
+public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISimpleEditor, IPropertyChangedFeedback {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     internal static readonly AbstractRenderer Default = new DefaultRenderer("Default");
+    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
+    private string _lastCode = "?";
 
     #endregion
 
@@ -48,6 +50,7 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
     #region Properties
 
     public abstract string Description { get; }
+
     public string QuickInfo => Description;
 
     #endregion
@@ -65,30 +68,39 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
         return renderer;
     }
 
-    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, ColumnItem? column, float scale);
+    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
-    public Size GetSizeOfCellContent(ColumnItem column, string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
+    public Size GetSizeOfCellContent(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
-        var key = TextSizeKey(column, KeyName, content);
+        var key = TextSizeKey(_lastCode, content);
 
         if (key == null) { return Size.Empty; }
 
         if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
-        var contentsize = CalculateContentSize(column, content, design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace,
-             constantHeightOfImageCode);
+        var contentsize = CalculateContentSize(content, design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode);
 
-        SetSizeOfCellContent(column, key, content, contentsize);
+        SetSizeOfCellContent(content, contentsize);
         return contentsize;
+    }
+
+    public override void OnPropertyChanged() {
+        _lastCode = ToParseableString();
+        base.OnPropertyChanged();
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _lastCode = ToParseableString();
     }
 
     public abstract string ReadableText();
 
-    public void SetSizeOfCellContent(ColumnItem column, string renderer, string content, Size contentSize) {
-        var key = TextSizeKey(column, renderer, content);
+    public void SetSizeOfCellContent(string content, Size contentSize) {
+        var key = TextSizeKey(_lastCode, content);
 
         if (key == null) { return; }
 
@@ -102,8 +114,7 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
 
     public abstract QuickImage? SymbolForReadableText();
 
-    public abstract string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText,
-                                        bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace);
+    public abstract string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace);
 
     internal static AbstractRenderer? RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
@@ -118,7 +129,7 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
         return RendererOf(columnViewItem.Column);
     }
 
-    protected abstract Size CalculateContentSize(ColumnItem column, string originalText, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode);
+    protected abstract Size CalculateContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode);
 
     /// <summary>
     /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist, ab.
@@ -126,9 +137,8 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
     /// <param name="column"></param>
     /// <param name="renderer"></param>
     /// <param name="content"></param>
-    private string? TextSizeKey(ColumnItem? column, string renderer, string content) {
-        if (column?.Database is not { IsDisposed: false } db || column.IsDisposed) { return null; }
-        return renderer + "|" + db.TableName + "|" + column.KeyName + "|" + content;
+    private string? TextSizeKey(string renderer, string content) {
+        return renderer + "|" + content;
     }
 
     #endregion

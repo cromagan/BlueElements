@@ -36,9 +36,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     #region Fields
 
-    public int? Contentwidth;
-
     public AbstractRenderer? _renderer;
+    public int? Contentwidth;
 
     #endregion
 
@@ -70,6 +69,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
     #region Properties
 
     public ColumnItem? Column { get; private set; }
+
     public string Renderer {
         get;
         set;
@@ -126,7 +126,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
-                var wx = renderer.GetSizeOfCellContent(Column, thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, Column.ConstantHeightOfImageCode).Width;
+                var wx = renderer.GetSizeOfCellContent(thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, Column.ConstantHeightOfImageCode).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {
@@ -152,9 +152,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         if (TmpReduced) {
             TmpDrawWidth = Table.GetPix(16, scale);
         } else {
-
-    
-
             TmpDrawWidth = ViewType == ViewType.PermanentColumn
                 ? Math.Min(Table.GetPix(CalculateColumnContentWidth(Design.Table_Cell, States.Standard), scale), (int)(displayRectangleWoSlider.Width * 0.3))
                 : Math.Min(Table.GetPix(CalculateColumnContentWidth(Design.Table_Cell, States.Standard), scale), (int)(displayRectangleWoSlider.Width * 0.6));
@@ -167,14 +164,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
     }
 
     public AbstractRenderer? GetRenderer() {
-
         if (_renderer != null) { return _renderer; }
 
         _renderer = AbstractRenderer.RendererOf(this);
         return _renderer;
     }
-
-
 
     public void Invalidate_DrawWidth() => TmpDrawWidth = null;
 
@@ -216,10 +210,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
             case "renderer":
                 Renderer = value;
                 return true;
+
             case "renderersettings":
                 RendererSettings = value.FromNonCritical();
                 return true;
-
         }
 
         return false;

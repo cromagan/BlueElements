@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Windows.Media.TextFormatting;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -35,6 +34,14 @@ namespace BlueControls.CellRenderer;
 
 public class DefaultRenderer : AbstractRenderer {
 
+    #region Fields
+
+    private string _präfix = string.Empty;
+
+    private string _suffix = string.Empty;
+
+    #endregion
+
     #region Constructors
 
     public DefaultRenderer(string keyname) : base(keyname) { }
@@ -46,54 +53,64 @@ public class DefaultRenderer : AbstractRenderer {
     public static string ClassId => "Default";
     public override string Description => "Standard Anzeige";
     public override string MyClassId => ClassId;
-    public string Präfix { get; set; } = string.Empty;
 
-    public string Suffix { get; set; } = string.Empty;
+    public string Präfix {
+        get => _präfix;
+        set {
+            if (_präfix != value) { return; }
+            _präfix = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Suffix {
+        get => _suffix;
+        set {
+            if (_suffix != value) { return; }
+            _suffix = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, ColumnItem? column, float scale) {
-        if (column == null) { return; }
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align) {
         if (string.IsNullOrEmpty(content)) { return; }
         var font = Skin.DesignOf(design, state).BFont?.Scale(scale);
         if (font == null) { return; }
 
         var pix16 = Table.GetPix(16, scale);
 
-        if (!ShowMultiLine(content, column.MultiLine)) {
-            DrawOneLine(gr, content, column, drawarea, 0, false, font, pix16, column.BehaviorOfImageAndText, state, scale);
-        } else {
-            var mei = content.SplitAndCutByCrAndBr();
+        var mei = content.SplitAndCutByCrAndBr();
 
-            switch (column.BehaviorOfImageAndText) {
-                case BildTextVerhalten.Nur_erste_Zeile_darstellen:
-                    if (mei.Length > 1) {
-                        DrawOneLine(gr, mei[0] + "...", column, drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale);
-                    } else if (mei.Length == 1) {
-                        DrawOneLine(gr, mei[0], column, drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale);
+        switch (behaviorOfImageAndText) {
+            case BildTextVerhalten.Nur_erste_Zeile_darstellen:
+                if (mei.Length > 1) {
+                    DrawOneLine(gr, mei[0] + "...", drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale, doOpticalTranslation, opticalReplace, constantHeightOfImageCode, align);
+                } else if (mei.Length == 1) {
+                    DrawOneLine(gr, mei[0], drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale, doOpticalTranslation, opticalReplace, constantHeightOfImageCode, align);
+                }
+                break;
+
+            case BildTextVerhalten.Mehrzeilig_einzeilig_darsellen:
+                DrawOneLine(gr, mei.JoinWith("; "), drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale, doOpticalTranslation, opticalReplace, constantHeightOfImageCode, align);
+                break;
+
+            default: {
+                    var y = 0;
+                    for (var z = 0; z <= mei.GetUpperBound(0); z++) {
+                        DrawOneLine(gr, mei[z], drawarea, y, z != mei.GetUpperBound(0), font, pix16, behaviorOfImageAndText, state, scale, doOpticalTranslation, opticalReplace, constantHeightOfImageCode, align);
+                        y += Table.GetPix(GetSizeOfCellContent(mei[z], design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode).Height, scale);
                     }
+
                     break;
-
-                case BildTextVerhalten.Mehrzeilig_einzeilig_darsellen:
-                    DrawOneLine(gr, mei.JoinWith("; "), column, drawarea, 0, false, font, pix16, BildTextVerhalten.Nur_Text, state, scale);
-                    break;
-
-                default: {
-                        var y = 0;
-                        for (var z = 0; z <= mei.GetUpperBound(0); z++) {
-                            DrawOneLine(gr, mei[z], column, drawarea, y, z != mei.GetUpperBound(0), font, pix16, column.BehaviorOfImageAndText, state, scale);
-                            y += Table.GetPix(GetSizeOfCellContent(column, mei[z], design, state, column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, column.ConstantHeightOfImageCode).Height, scale);
-                        }
-
-                        break;
-                    }
-            }
+                }
         }
     }
 
-    public (string text, QuickImage? qi) GetDrawingData(string colkeyname, string originalText, BildTextVerhalten bildTextverhalten, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
+    public (string text, QuickImage? qi) GetDrawingData(string originalText, BildTextVerhalten bildTextverhalten, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
         var tmpText = ValueReadable(originalText, ShortenStyle.Replaced, bildTextverhalten, true, doOpticalTranslation, opticalReplace);
 
         #region  tmpImageCode
@@ -117,12 +134,9 @@ public class DefaultRenderer : AbstractRenderer {
                 x[2] = gr2[1];
                 var ntxt = x.JoinWith("|").TrimEnd("|");
 
-                tmpImageCode = QuickImage.Get(colkeyname.ToLowerInvariant() + "_" + ntxt);
+                tmpImageCode = QuickImage.Get(ntxt);
                 if (tmpImageCode.IsError) {
-                    tmpImageCode = QuickImage.Get(ntxt);
-                    if (tmpImageCode.IsError) {
-                        tmpImageCode = StandardErrorImage(gr, bildTextverhalten, imgtxt);
-                    }
+                    tmpImageCode = StandardErrorImage(gr, bildTextverhalten, imgtxt);
                 }
             }
         }
@@ -163,16 +177,14 @@ public class DefaultRenderer : AbstractRenderer {
         return result;
     }
 
-    public override void ParseFinished(string parsed) { }
-
     public override bool ParseThis(string key, string value) {
         switch (key.ToLower()) {
             case "prefix":
-                Präfix = value.FromNonCritical();
+                _präfix = value.FromNonCritical();
                 return true;
 
             case "suffix":
-                Suffix = value.FromNonCritical();
+                _suffix = value.FromNonCritical();
                 return true;
         }
         return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
@@ -201,8 +213,8 @@ public class DefaultRenderer : AbstractRenderer {
     /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
     /// <param name="doOpticalTranslation"></param>
     /// <param name="opticalReplace"></param>
-    /// 
-    /// 
+    ///
+    ///
     /// <returns></returns>
     public override string ValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
@@ -229,48 +241,33 @@ public class DefaultRenderer : AbstractRenderer {
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     ///
-    protected override Size CalculateContentSize(ColumnItem column, string originalText, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
-
+    protected override Size CalculateContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
         var font = Skin.DesignOf(design, state).BFont?.Font(1);
-
 
         if (font == null) { return new Size(16, 16); }
 
         var contentSize = Size.Empty;
 
-        var tmp = new List<string>();
+        var tmp = content.SplitAndCutByCrAndBr();
 
-        if (column.MultiLine) {
-            tmp.AddRange(originalText.SplitAndCutByCrAndBr());
-
-
-        } else {
-            tmp.Add(originalText);
-
-        }
-
-        switch (column.BehaviorOfImageAndText) {
+        switch (behaviorOfImageAndText) {
             case BildTextVerhalten.Nur_erste_Zeile_darstellen:
-                if (tmp.Count > 1) {
+                if (tmp.Length > 1) {
                     contentSize = font.FormatedText_NeededSize(tmp[0] + "...", null, 16);
-                    //  contentSize = ContentSize(column, tmp[0] + "...", design, state, BildTextVerhalten.Nur_Text, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode);
                 }
-                if (tmp.Count == 1) {
+                if (tmp.Length == 1) {
                     contentSize = font.FormatedText_NeededSize(tmp[0], null, 16);
-                    //contentSize = ContentSize(column, tmp[0], design, state, BildTextVerhalten.Nur_Text, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode);
                 }
                 break;
 
             case BildTextVerhalten.Mehrzeilig_einzeilig_darsellen:
                 contentSize = font.FormatedText_NeededSize(tmp.JoinWith("; "), null, 16);
-                //contentSize = ContentSize(column, tmp.JoinWith("; "), design, state, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode);
                 break;
 
             default: {
                     foreach (var thisString in tmp) {
-                        var (text, qi) = GetDrawingData(column.KeyName, thisString, behaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, column.ConstantHeightOfImageCode);
+                        var (text, qi) = GetDrawingData(thisString, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode);
                         var tmpSize = font.FormatedText_NeededSize(text, qi, 16);
-                        //var tmpSize = ContentSize(column, thisString, design, state, column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, scale, column.ConstantHeightOfImageCode);
                         contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
                         contentSize.Height += Math.Max(tmpSize.Height, 16);
                     }
@@ -281,7 +278,7 @@ public class DefaultRenderer : AbstractRenderer {
 
         contentSize.Width = Math.Max(contentSize.Width, 16);
         contentSize.Height = Math.Max(contentSize.Height, 16);
-        SetSizeOfCellContent(column, KeyName, originalText, contentSize);
+        SetSizeOfCellContent(content, contentSize);
         return contentSize;
     }
 
@@ -328,7 +325,7 @@ public class DefaultRenderer : AbstractRenderer {
         }
     }
 
-    private void DrawOneLine(Graphics gr, string drawString, ColumnItem column, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, BildTextVerhalten bildTextverhalten, States state, float scale) {
+    private void DrawOneLine(Graphics gr, string drawString, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, BildTextVerhalten bildTextverhalten, States state, float scale, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, Alignment align) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
         if (r.Bottom + pix16 > drawarea.Bottom) {
@@ -336,11 +333,11 @@ public class DefaultRenderer : AbstractRenderer {
             if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
         }
 
-        var (text, qi) = GetDrawingData(column.KeyName, drawString, bildTextverhalten, column.DoOpticalTranslation, column.OpticalReplace, column.ConstantHeightOfImageCode);
+        var (text, qi) = GetDrawingData(drawString, bildTextverhalten, doOpticalTranslation, opticalReplace, constantHeightOfImageCode);
         var tmpImageCode = qi?.Scale(scale);
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
-        Skin.Draw_FormatedText(gr, text, tmpImageCode, (Alignment)column.Align, r, null, false, font, false);
+        Skin.Draw_FormatedText(gr, text, tmpImageCode, align, r, null, false, font, false);
     }
 
     private bool ShowMultiLine(string txt, bool ml) {
