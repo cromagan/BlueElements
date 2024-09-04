@@ -175,15 +175,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return this[n];
     }
 
-    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format, string quickinfo) => GenerateAndAdd(keyName, caption, string.Empty, format, quickinfo);
 
-    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption, string.Empty, format, string.Empty);
+    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption,  format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string keyName) => GenerateAndAdd(keyName, string.Empty, string.Empty, null, string.Empty);
+    public ColumnItem? GenerateAndAdd(string keyName) => GenerateAndAdd(keyName,  string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(Freename(string.Empty), string.Empty, string.Empty, null, string.Empty);
+    public ColumnItem? GenerateAndAdd() => GenerateAndAdd(Freename(string.Empty), string.Empty, null, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string keyName, string caption, string suffix, IColumnInputFormat? format, string quickinfo) {
+    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(keyName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
             return null;
@@ -207,7 +206,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         item.Caption = caption;
 
         item.GetStyleFrom(format);
-        item.Suffix = suffix;
         item.QuickInfo = quickinfo;
         return item;
     }
@@ -438,7 +436,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
             var l = this[thisColumn.KeyName] ??
-                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.QuickInfo);
+                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.QuickInfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true);

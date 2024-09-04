@@ -37,13 +37,11 @@ public interface IInputFormat {
 
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
-    public string Prefix { get; set; }
     public string Regex { get; set; }
 
     //public enSortierTyp SortType { get; set; }
     public bool SpellCheckingEnabled { get; set; }
 
-    public string Suffix { get; set; }
 
     #endregion
 
@@ -64,9 +62,7 @@ public static class InputFormatExtensions {
 
         t.AdditionalFormatCheck = source.AdditionalFormatCheck;
         t.AllowedChars = source.AllowedChars;
-        t.Prefix = source.Prefix;
         t.Regex = source.Regex;
-        t.Suffix = source.Suffix;
         t.MultiLine = source.MultiLine;
         t.MaxTextLenght = source.MaxTextLenght;
         t.SpellCheckingEnabled = source.SpellCheckingEnabled;
@@ -145,9 +141,7 @@ public static class InputFormatExtensions {
 
     public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
         t.AllowedChars == source.AllowedChars &&
-        t.Prefix == source.Prefix &&
         t.Regex == source.Regex &&
-        t.Suffix == source.Suffix &&
         t.MultiLine == source.MultiLine &&
         t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
         t.FormatierungErlaubt == source.FormatierungErlaubt &&
@@ -162,9 +156,7 @@ public static class InputFormatExtensions {
     public static bool IsFormatIdenticalSoft(this IInputFormat t, IInputFormat source) {
         var x = t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
                    t.AllowedChars == source.AllowedChars &&
-                   t.Prefix == source.Prefix &&
                    t.Regex == source.Regex &&
-                   t.Suffix == source.Suffix &&
                    t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
                    t.FormatierungErlaubt == source.FormatierungErlaubt;
         if (!x) { return false; }

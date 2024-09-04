@@ -35,11 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.btnStandard = new BlueControls.Controls.Button();
             this.capAlign = new BlueControls.Controls.Caption();
-            this.txbPrefix = new BlueControls.Controls.TextBox();
-            this.capPraefix = new BlueControls.Controls.Caption();
             this.capReplacer = new BlueControls.Controls.Caption();
-            this.capEinheit = new BlueControls.Controls.Caption();
-            this.cbxEinheit = new BlueControls.Controls.ComboBox();
             this.txbFixedColumnWidth = new BlueControls.Controls.TextBox();
             this.capFixedColumnWidth = new BlueControls.Controls.Caption();
             this.txbSpaltenbild = new BlueControls.Controls.TextBox();
@@ -187,11 +183,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnzeige.Controls.Add(this.capBildCodeImageNotfound);
             this.tabAnzeige.Controls.Add(this.btnStandard);
             this.tabAnzeige.Controls.Add(this.capAlign);
-            this.tabAnzeige.Controls.Add(this.txbPrefix);
-            this.tabAnzeige.Controls.Add(this.capPraefix);
             this.tabAnzeige.Controls.Add(this.capReplacer);
-            this.tabAnzeige.Controls.Add(this.capEinheit);
-            this.tabAnzeige.Controls.Add(this.cbxEinheit);
             this.tabAnzeige.Location = new System.Drawing.Point(4, 25);
             this.tabAnzeige.Name = "tabAnzeige";
             this.tabAnzeige.Padding = new System.Windows.Forms.Padding(3);
@@ -339,23 +331,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAlign.Size = new System.Drawing.Size(104, 16);
             this.capAlign.Text = "Ausrichtung:";
             // 
-            // txbPrefix
-            // 
-            this.txbPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbPrefix.Location = new System.Drawing.Point(56, 48);
-            this.txbPrefix.Name = "txbPrefix";
-            this.txbPrefix.Regex = null;
-            this.txbPrefix.Size = new System.Drawing.Size(168, 24);
-            this.txbPrefix.TabIndex = 36;
-            // 
-            // capPraefix
-            // 
-            this.capPraefix.CausesValidation = false;
-            this.capPraefix.Location = new System.Drawing.Point(8, 48);
-            this.capPraefix.Name = "capPraefix";
-            this.capPraefix.Size = new System.Drawing.Size(48, 16);
-            this.capPraefix.Text = "Präfix:";
-            // 
             // capReplacer
             // 
             this.capReplacer.CausesValidation = false;
@@ -363,23 +338,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capReplacer.Name = "capReplacer";
             this.capReplacer.Size = new System.Drawing.Size(144, 24);
             this.capReplacer.Text = "Optische Ersetzungen:";
-            // 
-            // capEinheit
-            // 
-            this.capEinheit.CausesValidation = false;
-            this.capEinheit.Location = new System.Drawing.Point(8, 8);
-            this.capEinheit.Name = "capEinheit";
-            this.capEinheit.Size = new System.Drawing.Size(48, 32);
-            this.capEinheit.Text = "Einheit:<br>(Suffix)";
-            // 
-            // cbxEinheit
-            // 
-            this.cbxEinheit.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxEinheit.Location = new System.Drawing.Point(56, 8);
-            this.cbxEinheit.Name = "cbxEinheit";
-            this.cbxEinheit.Regex = null;
-            this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
-            this.cbxEinheit.TabIndex = 31;
             // 
             // txbFixedColumnWidth
             // 
@@ -1655,8 +1613,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnLogUndo;
         private Button btnSpellChecking;
         private Caption capSpaltenbild;
-        private Caption capEinheit;
-        private ComboBox cbxEinheit;
         private TextBox txbJoker;
         private Caption capJokerValue;
         private Button btnAutoEditKleineFehler;
@@ -1680,8 +1636,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbUeberschift3;
         private TextBox txbUeberschift2;
         private TextBox txbUeberschift1;
-        private TextBox txbPrefix;
-        private Caption capPraefix;
         private Button btnStandard;
         private Caption capSortiermaske;
         private TextBox txbRegex;

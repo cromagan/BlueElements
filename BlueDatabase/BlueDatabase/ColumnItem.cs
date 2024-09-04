@@ -106,7 +106,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private int _maxTextLenght;
     private bool _multiLine;
     private string _name;
-    private string _prefix;
     private string _quickInfo;
     private string _regex = string.Empty;
     private int _roundAfterEdit;
@@ -114,7 +113,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _showUndo;
     private SortierTyp _sortType;
     private bool _spellCheckingEnabled;
-    private string _suffix;
     private bool _textBearbeitungErlaubt;
 
     #endregion
@@ -192,11 +190,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _showUndo = true;
         _doOpticalTranslation = TranslationType.Original_Anzeigen;
         _editAllowedDespiteLock = false;
-        _suffix = string.Empty;
         _linkedDatabaseTableName = string.Empty;
         _behaviorOfImageAndText = BildTextVerhalten.Nur_Text;
         _constantHeightOfImageCode = string.Empty;
-        _prefix = string.Empty;
         UcaseNamesSortedByLenght = null;
         Am_A_Key_For_Other_Column = string.Empty;
 
@@ -814,17 +810,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    public string Prefix {
-        get => _prefix;
-        set {
-            if (IsDisposed) { return; }
-            if (_prefix == value) { return; }
-
-            _ = Database?.ChangeData(DatabaseDataType.Prefix, this, null, _prefix, value, Generic.UserName, DateTime.UtcNow, string.Empty);
-            Invalidate_ColumAndContent();
-            OnPropertyChanged();
-        }
-    }
 
     public string QuickInfo {
         get => _quickInfo;
@@ -903,17 +888,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    public string Suffix {
-        get => _suffix;
-        set {
-            if (IsDisposed) { return; }
-            if (_suffix == value) { return; }
-
-            _ = Database?.ChangeData(DatabaseDataType.Suffix, this, null, _suffix, value, Generic.UserName, DateTime.UtcNow, string.Empty);
-            Invalidate_ColumAndContent();
-            OnPropertyChanged();
-        }
-    }
 
     /// <summary>
     /// Was in Textfeldern oder Datenbankzeilen für ein Suffix angezeigt werden soll. Beispiel: mm
@@ -1383,9 +1357,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_dropdownAllesAbwählenErlaubt && !_function.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
         if (_dropDownItems.Count > 0 && !_function.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
-        if (!string.IsNullOrEmpty(_suffix) || !string.IsNullOrEmpty(_prefix)) {
-            if (_multiLine) { return "Präfix/Suffix und Mehrzeilig darf nicht kombiniert werden."; }
-        }
+
         if (_roundAfterEdit > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
@@ -1406,9 +1378,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }
 
-            if (!string.IsNullOrEmpty(_suffix) || !string.IsNullOrEmpty(_prefix)) {
-                return "Dieses Format unterstützt kein Präfix/Suffix.";
-            }
         }
 
         return string.Empty;
@@ -2307,9 +2276,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _captionBitmapCode = newvalue;
                 break;
 
-            case DatabaseDataType.Suffix:
-                _suffix = newvalue;
-                break;
+   
 
             case DatabaseDataType.LinkedDatabase:
                 _linkedDatabaseTableName = newvalue;
@@ -2321,8 +2288,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _constantHeightOfImageCode = newvalue;
                 break;
 
-            case DatabaseDataType.Prefix:
-                _prefix = newvalue;
+            case (DatabaseDataType)160: //DatabaseDataType.Suffix:
+                ManipulateRendererSettings("Suffix", newvalue);
+                break;
+
+            case (DatabaseDataType) 177: //DatabaseDataType.Prefix:
+                ManipulateRendererSettings("Prefix", newvalue);
                 break;
 
             case DatabaseDataType.DoOpticalTranslation:
@@ -2385,6 +2356,27 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
         }
         return string.Empty;
+    }
+
+    private void ManipulateRendererSettings(string settingname, string newvalue) {
+
+        if(string.IsNullOrEmpty(newvalue)) { return; }
+
+
+        string tmp2 = string.Empty;
+
+        if(!string.IsNullOrEmpty(_rendererSettings)) { tmp2 = ", "; }
+
+        tmp2 = tmp2 + settingname + "=" + newvalue.ToNonCriticalWithQuote();
+
+        var tmp = _rendererSettings;
+
+        if (string.IsNullOrEmpty(tmp)) { tmp = "{}"; }
+
+        tmp = tmp.Substring(0, tmp.Length - 1) + tmp2 + "}"; 
+
+        RendererSettings = tmp;
+
     }
 
     private static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {

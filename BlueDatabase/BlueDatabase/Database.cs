@@ -1702,7 +1702,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (thisc != colForFilename) {
                         var c = Column[thisc.KeyName];
                         if (c == null) {
-                            c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, string.Empty, null, string.Empty);
+                            c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, null, string.Empty);
                             if (c == null) { return "Spalte konnte nicht generiert werden."; }
                             c.CloneFrom(thisc, false);
                         }
@@ -2917,14 +2917,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
         SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), name);
         SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, name);
         SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseTableName, name);
         SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
         SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
         SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);
         SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
         SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, name);
         //SaveToByteList(l, DatabaseDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
         SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
         //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);

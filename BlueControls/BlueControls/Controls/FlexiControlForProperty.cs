@@ -57,8 +57,17 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    ///
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list) : this(expr, list, false) { }
+
+
+    /// <summary>
+    /// Anzeige als Dropdown-Feld
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <param name="list"></param>
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, texteditAllowed ?  ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList) { }
+
+
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
@@ -66,28 +75,28 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
     ///
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
     ///
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="captionText"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
 
-    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None) { }
+    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed, ComboBoxStyle comboBoxStyle) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -139,7 +148,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
-                        StyleComboBox(GetComboBox(), list, ComboBoxStyle.DropDownList, true);
+                        StyleComboBox(GetComboBox(), list, comboBoxStyle, true);
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);

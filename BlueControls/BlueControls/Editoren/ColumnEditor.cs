@@ -410,7 +410,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbUeberschift1.Text = _column.CaptionGroup1;
         txbUeberschift2.Text = _column.CaptionGroup2;
         txbUeberschift3.Text = _column.CaptionGroup3;
-        txbPrefix.Text = _column.Prefix;
         txbSpaltenbild.Text = _column.CaptionBitmapCode;
         btnLogUndo.Checked = _column.ShowUndo;
         btnFormatierungErlaubt.Checked = _column.FormatierungErlaubt;
@@ -429,7 +428,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         txbQuickinfo.Text = _column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        cbxEinheit.Text = _column.Suffix;
         txbBildCodeConstHeight.Text = _column.ConstantHeightOfImageCode;
         cbxBildTextVerhalten.Text = ((int)_column.BehaviorOfImageAndText).ToString();
         //txbBestFileStandardFolder.Text = _column.BestFile_StandardFolder;
@@ -485,7 +483,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.Function = (ColumnFunction)IntParse(cbxFunction.Text);
         _column.QuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
         _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
-        _column.Suffix = cbxEinheit.Text;
         _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.LineLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
@@ -532,7 +529,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.CaptionGroup1 = txbUeberschift1.Text;
         _column.CaptionGroup2 = txbUeberschift2.Text;
         _column.CaptionGroup3 = txbUeberschift3.Text;
-        _column.Prefix = txbPrefix.Text;
         _column.CaptionBitmapCode = txbSpaltenbild.Text;
         _column.Tags = txbTags.Text.SplitAndCutByCrToList();
         _column.Regex = txbRegex.Text;

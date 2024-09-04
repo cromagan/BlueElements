@@ -93,7 +93,7 @@ public static class LanguageTool {
     public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
         if (!string.IsNullOrEmpty(txt)) {
             if (Translation != null && doOpticalTranslation == TranslationType.Übersetzen) {
-                txt = DoTranslate(prefix, true);
+                txt = DoTranslate(txt, true);
                 if (!string.IsNullOrEmpty(prefix)) { prefix = DoTranslate(prefix, true); }
                 if (!string.IsNullOrEmpty(suffix)) { suffix = DoTranslate(suffix, true); }
             }

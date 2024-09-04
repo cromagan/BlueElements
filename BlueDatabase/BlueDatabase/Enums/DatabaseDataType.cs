@@ -212,7 +212,7 @@ public enum DatabaseDataType : byte {
     //co_TagsInternal = 157,
     //co_QuickInfoImage = 158
     //co_CaptionBitmapCode = 159,
-    Suffix = 160,
+    //Suffix = 160,
 
     DoUcaseAfterEdit = 161,
     AutoCorrectAfterEdit = 162,
@@ -236,7 +236,7 @@ public enum DatabaseDataType : byte {
     CaptionGroup1 = 174,
     CaptionGroup2 = 175,
     CaptionGroup3 = 176,
-    Prefix = 177,
+    //Prefix = 177,
 
     //KeyColumnKey = 178,
     //co_LinkedCell_RowKeyIsInColumn = 179,

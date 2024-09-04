@@ -38,6 +38,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     public int? Contentwidth;
 
+    public AbstractRenderer? _renderer;
+
     #endregion
 
     #region Constructors
@@ -124,7 +126,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
-                var wx = renderer.GetSizeOfCellContent(Column, thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.Prefix, Column.Suffix, Column.DoOpticalTranslation, Column.OpticalReplace, scale, Column.ConstantHeightOfImageCode).Width;
+                var wx = renderer.GetSizeOfCellContent(Column, thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, scale, Column.ConstantHeightOfImageCode).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {
@@ -161,7 +163,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         return (int)TmpDrawWidth;
     }
 
-    public AbstractRenderer? GetRenderer() => AbstractRenderer.RendererOf(this);
+    public AbstractRenderer? GetRenderer() {
+
+        if (_renderer != null) { return _renderer; }
+
+        _renderer = AbstractRenderer.RendererOf(this);
+        return _renderer;
+    }
 
 
 

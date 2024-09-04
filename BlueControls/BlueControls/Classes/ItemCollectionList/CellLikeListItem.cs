@@ -65,7 +65,7 @@ public class CellLikeListItem : AbstractListItem {
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
         if (_cellRenderer == null) { return false; }
-        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
 
@@ -74,7 +74,7 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         if (_styleLikeThis == null) { return new Size(16, 0); }
 
-        return _cellRenderer.GetSizeOfCellContent(_styleLikeThis, KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, 1f, _styleLikeThis.ConstantHeightOfImageCode);
+        return _cellRenderer.GetSizeOfCellContent(_styleLikeThis, KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, 1f, _styleLikeThis.ConstantHeightOfImageCode);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
@@ -94,7 +94,7 @@ public class CellLikeListItem : AbstractListItem {
             return string.Empty;
         }
         // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
-        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils
         var compareKey = txt.CompareKey(_styleLikeThis.SortType);
         // Rückgabe des Compare-Keys mit dem internen Wert

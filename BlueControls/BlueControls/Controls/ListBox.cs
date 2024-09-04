@@ -257,7 +257,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    public AbstractRenderer? Renderer => AbstractRenderer.RendererOf(null as ColumnItem);
+    public AbstractRenderer? Renderer => AbstractRenderer.Default;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

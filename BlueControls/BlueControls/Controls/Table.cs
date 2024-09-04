@@ -509,7 +509,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
-            column.BehaviorOfImageAndText, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+            column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
     }
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
@@ -696,7 +696,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     if (renderer is { }) {
                         ist2 = renderer.ValueReadable(contentHolderCellRow.CellGetString(contentHolderCellColumn),
                             ShortenStyle.Both, contentHolderCellColumn.BehaviorOfImageAndText, true,
-                            contentHolderCellColumn.Prefix, contentHolderCellColumn.Suffix,
                             contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace);
                     }
                 }
@@ -705,8 +704,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     ist1 = tmprow.CellGetString(c);
                     if (renderer is { }) {
                         ist2 = renderer.ValueReadable(tmprow.CellGetString(c), ShortenStyle.Both,
-                            c.BehaviorOfImageAndText, true, c.Prefix, c.Suffix, c.DoOpticalTranslation,
-                            c.OpticalReplace);
+                            c.BehaviorOfImageAndText, true, c.DoOpticalTranslation, c.OpticalReplace);
                     }
                 }
             }
@@ -3474,7 +3472,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (CellCollection.IsInCache(thisViewItem.Column, row) && thisViewItem.Column is { IsDisposed: false } tmpc && !row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer();
 
-                if (renderer != null) { tmp = Math.Max(tmp, renderer.GetSizeOfCellContent(tmpc, row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.Prefix, tmpc.Suffix, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, db.GlobalScale, tmpc.ConstantHeightOfImageCode).Height); }
+                if (renderer != null) { tmp = Math.Max(tmp, renderer.GetSizeOfCellContent(tmpc, row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, db.GlobalScale, tmpc.ConstantHeightOfImageCode).Height); }
             }
         }
 
