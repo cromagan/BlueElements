@@ -312,12 +312,12 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
 
     public string ReadableText() => string.Empty;
 
-    public QuickImage Scale(double zoom) {
-        if (Math.Abs(zoom - 1f) < DefaultTolerance) { return this; }
+    public QuickImage Scale(double scale) {
+        if (Math.Abs(scale - 1f) < DefaultTolerance) { return this; }
 
-        zoom = Math.Max(zoom, 0.001);
+        scale = Math.Max(scale, 0.001);
 
-        return Get(GenerateCode(Name, (int)(Width * zoom), (int)(Height * zoom), Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol));
+        return Get(GenerateCode(Name, (int)(Width * scale), (int)(Height * scale), Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol));
     }
 
     public QuickImage SymbolForReadableText() => this;

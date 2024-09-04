@@ -499,18 +499,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return t;
     }
 
-    public static Size ContentSize(ColumnItem column, RowItem row, AbstractRenderer renderer) {
-        if (column.Database is not { IsDisposed: false } db) { return new Size(16, 16); }
+    //public static Size ContentSize(ColumnItem column, RowItem row, AbstractRenderer renderer) {
+    //    if (column.Database is not { IsDisposed: false } db) { return new Size(16, 16); }
 
-        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
-            return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
-                : new Size(16, 16);
-        }
+    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+    //        var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
+    //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
+    //            : new Size(16, 16);
+    //    }
 
-        return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
-            column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
-    }
+    //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
+    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+    //}
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
@@ -3466,18 +3466,20 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private int Row_DrawHeight(ColumnViewCollection ca, RowItem row, Rectangle displayRectangleWoSlider) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return _pix18; }
 
-        var tmp = _pix18;
+        var tmp = 18;
 
         foreach (var thisViewItem in ca) {
             if (CellCollection.IsInCache(thisViewItem.Column, row) && thisViewItem.Column is { IsDisposed: false } tmpc && !row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer();
 
-                if (renderer != null) { tmp = Math.Max(tmp, renderer.GetSizeOfCellContent(tmpc, row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, db.GlobalScale, tmpc.ConstantHeightOfImageCode).Height); }
+                if (renderer != null) { tmp = Math.Max(tmp, renderer.GetSizeOfCellContent(tmpc, row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, tmpc.ConstantHeightOfImageCode).Height); }
             }
         }
 
-        tmp = Math.Min(tmp, (int)(displayRectangleWoSlider.Height * 0.9) - ca.HeadSize(_columnFont));
-        tmp = Math.Max(tmp, _pix18);
+        tmp = GetPix(tmp, db.GlobalScale);
+
+        tmp = Math.Min(tmp, (int)(displayRectangleWoSlider.Height * 0.4) - ca.HeadSize(_columnFont));
+        tmp = Math.Max(tmp, GetPix(18, db.GlobalScale));
         return tmp;
     }
 

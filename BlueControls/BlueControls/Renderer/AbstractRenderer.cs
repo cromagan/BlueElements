@@ -69,7 +69,7 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
-    public Size GetSizeOfCellContent(ColumnItem column, string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode) {
+    public Size GetSizeOfCellContent(ColumnItem column, string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
         var key = TextSizeKey(column, KeyName, content);
@@ -79,7 +79,7 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
         if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
         var contentsize = CalculateContentSize(column, content, design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace,
-            scale, constantHeightOfImageCode);
+             constantHeightOfImageCode);
 
         SetSizeOfCellContent(column, key, content, contentsize);
         return contentsize;
@@ -118,7 +118,7 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
         return RendererOf(columnViewItem.Column);
     }
 
-    protected abstract Size CalculateContentSize(ColumnItem column, string originalText, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, float scale, string constantHeightOfImageCode);
+    protected abstract Size CalculateContentSize(ColumnItem column, string originalText, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode);
 
     /// <summary>
     /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist, ab.

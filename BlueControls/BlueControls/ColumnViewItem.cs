@@ -106,7 +106,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     #region Methods
 
-    public int CalculateColumnContentWidth(Design design, States state, float scale) {
+    public int CalculateColumnContentWidth(Design design, States state) {
         if (Column is not { IsDisposed: false }) { return 16; }
         if (Column.Database is not { IsDisposed: false } db) { return 16; }
         if (Column.FixedColumnWidth > 0) { return Column.FixedColumnWidth; }
@@ -117,7 +117,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         //var font = Skin.DesignOf(design, state).BFont;
         //if (font == null) { return 16; }
 
-        var newContentWidth = Table.GetPix(16, scale); // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
+        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
 
         var renderer = GetRenderer();
 
@@ -126,12 +126,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
-                var wx = renderer.GetSizeOfCellContent(Column, thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, scale, Column.ConstantHeightOfImageCode).Width;
+                var wx = renderer.GetSizeOfCellContent(Column, thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, Column.ConstantHeightOfImageCode).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {
             Develop.CheckStackForOverflow();
-            return CalculateColumnContentWidth(design, state, scale);
+            return CalculateColumnContentWidth(design, state);
         }
 
         Contentwidth = newContentWidth;
@@ -152,9 +152,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         if (TmpReduced) {
             TmpDrawWidth = Table.GetPix(16, scale);
         } else {
+
+    
+
             TmpDrawWidth = ViewType == ViewType.PermanentColumn
-                ? Math.Min(CalculateColumnContentWidth(Design.Table_Cell, States.Standard, scale), (int)(displayRectangleWoSlider.Width * 0.3))
-                : Math.Min(CalculateColumnContentWidth(Design.Table_Cell, States.Standard, scale), (int)(displayRectangleWoSlider.Width * 0.6));
+                ? Math.Min(Table.GetPix(CalculateColumnContentWidth(Design.Table_Cell, States.Standard), scale), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(Table.GetPix(CalculateColumnContentWidth(Design.Table_Cell, States.Standard), scale), (int)(displayRectangleWoSlider.Width * 0.6));
         }
 
         TmpDrawWidth = Math.Max((int)TmpDrawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;

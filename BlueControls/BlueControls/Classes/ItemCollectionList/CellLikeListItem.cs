@@ -74,7 +74,7 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         if (_styleLikeThis == null) { return new Size(16, 0); }
 
-        return _cellRenderer.GetSizeOfCellContent(_styleLikeThis, KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, 1f, _styleLikeThis.ConstantHeightOfImageCode);
+        return _cellRenderer.GetSizeOfCellContent(_styleLikeThis, KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
