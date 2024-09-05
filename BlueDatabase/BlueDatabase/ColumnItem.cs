@@ -56,7 +56,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private readonly List<string> _tags = [];
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
-    private string _rendererSettings;
     private bool _afterEditAutoCorrect;
     private bool _afterEditDoUCase;
     private bool _afterEditQuickSortRemoveDouble;
@@ -76,7 +75,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     //private string _cellInitValue;
     private Database? _database;
 
-    private string _defaultRenderer = "Default";
+    private string _defaultRenderer;
     private TranslationType _doOpticalTranslation;
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
@@ -108,6 +107,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private string _name;
     private string _quickInfo;
     private string _regex = string.Empty;
+    private string _rendererSettings;
     private int _roundAfterEdit;
     private ScriptType _scriptType;
     private bool _showUndo;
@@ -244,19 +244,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_adminInfo == value) { return; }
 
             _ = Database?.ChangeData(DatabaseDataType.ColumnAdminInfo, this, null, _adminInfo, value, Generic.UserName, DateTime.UtcNow, string.Empty);
-            OnPropertyChanged();
-        }
-    }
-
-    public string RendererSettings
-    {
-        get => _rendererSettings;
-        set
-        {
-            if (IsDisposed) { return; }
-            if (_rendererSettings == value) { return; }
-
-            _ = Database?.ChangeData(DatabaseDataType.RendererSettings, this, null, _rendererSettings, value, Generic.UserName, DateTime.UtcNow, string.Empty);
             OnPropertyChanged();
         }
     }
@@ -810,7 +797,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-
     public string QuickInfo {
         get => _quickInfo;
         set {
@@ -829,6 +815,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_regex == value) { return; }
 
             _ = Database?.ChangeData(DatabaseDataType.RegexCheck, this, null, _regex, value, Generic.UserName, DateTime.UtcNow, string.Empty);
+            OnPropertyChanged();
+        }
+    }
+
+    public string RendererSettings {
+        get => _rendererSettings;
+        set {
+            if (IsDisposed) { return; }
+            if (_rendererSettings == value) { return; }
+
+            _ = Database?.ChangeData(DatabaseDataType.RendererSettings, this, null, _rendererSettings, value, Generic.UserName, DateTime.UtcNow, string.Empty);
             OnPropertyChanged();
         }
     }
@@ -887,7 +884,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             OnPropertyChanged();
         }
     }
-
 
     /// <summary>
     /// Was in Textfeldern oder Datenbankzeilen für ein Suffix angezeigt werden soll. Beispiel: mm
@@ -1096,7 +1092,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
         DefaultRenderer = source.DefaultRenderer;
-        RendererSettings= source.RendererSettings;
+        RendererSettings = source.RendererSettings;
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
         DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
@@ -1357,7 +1353,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_dropdownAllesAbwählenErlaubt && !_function.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
         if (_dropDownItems.Count > 0 && !_function.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
-
         if (_roundAfterEdit > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
@@ -1377,7 +1372,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_roundAfterEdit != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
                 return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }
-
         }
 
         return string.Empty;
@@ -2276,8 +2270,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _captionBitmapCode = newvalue;
                 break;
 
-   
-
             case DatabaseDataType.LinkedDatabase:
                 _linkedDatabaseTableName = newvalue;
                 Invalidate_LinkedDatabase();
@@ -2292,7 +2284,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 ManipulateRendererSettings("Suffix", newvalue);
                 break;
 
-            case (DatabaseDataType) 177: //DatabaseDataType.Prefix:
+            case (DatabaseDataType)177: //DatabaseDataType.Prefix:
                 ManipulateRendererSettings("Prefix", newvalue);
                 break;
 
@@ -2356,27 +2348,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
         }
         return string.Empty;
-    }
-
-    private void ManipulateRendererSettings(string settingname, string newvalue) {
-
-        if(string.IsNullOrEmpty(newvalue)) { return; }
-
-
-        string tmp2 = string.Empty;
-
-        if(!string.IsNullOrEmpty(_rendererSettings)) { tmp2 = ", "; }
-
-        tmp2 = tmp2 + settingname + "=" + newvalue.ToNonCriticalWithQuote();
-
-        var tmp = _rendererSettings;
-
-        if (string.IsNullOrEmpty(tmp)) { tmp = "{}"; }
-
-        tmp = tmp.Substring(0, tmp.Length - 1) + tmp2 + "}"; 
-
-        RendererSettings = tmp;
-
     }
 
     private static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
@@ -2615,6 +2586,24 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             txt = txt.Replace("<br>", "\r");
         }
         return txt;
+    }
+
+    private void ManipulateRendererSettings(string settingname, string newvalue) {
+        if (string.IsNullOrEmpty(newvalue)) { return; }
+
+        string tmp2 = string.Empty;
+
+        if (!string.IsNullOrEmpty(_rendererSettings)) { tmp2 = ", "; }
+
+        tmp2 = tmp2 + settingname + "=" + newvalue.ToNonCriticalWithQuote();
+
+        var tmp = _rendererSettings;
+
+        if (string.IsNullOrEmpty(tmp)) { tmp = "{}"; }
+
+        tmp = tmp.Substring(0, tmp.Length - 1) + tmp2 + "}";
+
+        RendererSettings = tmp;
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);

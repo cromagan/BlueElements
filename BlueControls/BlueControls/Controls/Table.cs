@@ -220,7 +220,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             _currentArrangement = tcvc.Get(_arrangement);
             if (string.IsNullOrEmpty(_arrangement) || _currentArrangement == null) {
-                if (tcvc.Count > 0) { _currentArrangement = tcvc[1]; }
+                if (tcvc.Count > 0) {
+                    _currentArrangement = tcvc[1];
+                    return _currentArrangement;
+                }
                 return null;
             }
 
@@ -1315,11 +1318,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CursorPosColumn = null;
         CursorPosRow = null;
         _arrangement = string.Empty;
-        _unterschiede = null;
-
         _currentArrangement = null;
-
-        //Invalidate_AllColumnArrangements();
+        _unterschiede = null;
         Invalidate_SortedRowData();
         OnViewChanged();
         Invalidate();

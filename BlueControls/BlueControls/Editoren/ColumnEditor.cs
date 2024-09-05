@@ -240,14 +240,14 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
 
-        _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column;
+        _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column ?? _column;
         Column_DatenAuslesen();
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
-        _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column;
+        _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column ?? _column;
         Column_DatenAuslesen();
     }
 
@@ -487,6 +487,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut) || _column?.Database is null) { return; }
 
         if (_column.IsDisposed) { return; }
+        if(IsClosed) { return; }
 
         if (_column.ColumNameAllowed(txbName.Text)) {
             _column.KeyName = txbName.Text;

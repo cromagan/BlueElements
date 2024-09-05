@@ -38,7 +38,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
 
     #region Fields
 
-    internal static readonly Renderer_Abstract Default = new Renderer_Default("Default");
+    internal static readonly Renderer_Abstract Default = new Renderer_Default("ImageAndText");
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
 

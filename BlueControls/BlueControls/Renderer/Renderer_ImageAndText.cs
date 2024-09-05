@@ -159,13 +159,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
         var y = 0;
         for (var z = 0; z <= splitedContent.GetUpperBound(0); z++) {
-            QuickImage? image;
-
             var rect = new Rectangle(drawarea.Left, drawarea.Top + y, drawarea.Width, pix16);
 
             if (rect.Bottom > drawarea.Bottom) { break; }
 
-            image = GetImage(splitedContent[z], maxW, constH);
+            var image = GetImage(splitedContent[z], maxW, constH);
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, _opticalReplace.AsReadOnly());
 
