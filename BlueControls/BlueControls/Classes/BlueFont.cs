@@ -77,20 +77,20 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public string KeyName { get; private set; } = string.Empty;
     internal bool Bold { get; private set; }
 
-    internal Color ColorMain { get; private set; } = Color.Black;
+    public Color ColorMain { get; private set; } = Color.Black;
 
-    internal Color ColorOutline { get; private set; } = Color.Magenta;
+    public Color ColorOutline { get; private set; } = Color.Magenta;
 
-    internal string FontName { get; private set; } = "Arial";
+    public string FontName { get; private set; } = "Arial";
 
-    internal bool Italic { get; private set; }
-    internal bool Kapitälchen { get; private set; }
-    internal bool OnlyLower { get; private set; }
-    internal bool OnlyUpper { get; private set; }
-    internal bool Outline { get; private set; }
-    internal float Size { get; private set; } = 9;
-    internal bool StrikeOut { get; private set; }
-    internal bool Underline { get; private set; }
+    public bool Italic { get; private set; }
+    public bool Kapitälchen { get; private set; }
+    public bool OnlyLower { get; private set; }
+    public bool OnlyUpper { get; private set; }
+    public bool Outline { get; private set; }
+    public float Size { get; private set; } = 9;
+    public bool StrikeOut { get; private set; }
+    public bool Underline { get; private set; }
 
     #endregion
 
@@ -504,7 +504,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     internal float Oberlänge(float scale) => _oberlänge * scale;
 
-    internal BlueFont Scale(float scale) => Math.Abs(1 - scale) < 0.01 ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
+    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < 0.01 ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
 
     private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
         var result = new List<string>();
