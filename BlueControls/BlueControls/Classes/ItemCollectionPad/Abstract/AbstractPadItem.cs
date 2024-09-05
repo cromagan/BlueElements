@@ -444,7 +444,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return result.Parseable(base.ToParseableString());
     }
 
-    public void UpdateSideOptionMenu() => OnDoUpdateSideOptionMenu();
+    //public void UpdateSideOptionMenu() => OnDoUpdateSideOptionMenu();
 
     //public void RemoveAllConnections() {
     //    foreach (var thisCon in Parent.Connections) {
@@ -526,7 +526,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         }
     }
 
-    private void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

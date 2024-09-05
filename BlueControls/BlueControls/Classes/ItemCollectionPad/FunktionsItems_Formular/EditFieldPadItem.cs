@@ -113,7 +113,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (_columnName == value) { return; }
             _columnName = value;
             OnPropertyChanged();
-            UpdateSideOptionMenu();
+            OnDoUpdateSideOptionMenu();
         }
     }
 

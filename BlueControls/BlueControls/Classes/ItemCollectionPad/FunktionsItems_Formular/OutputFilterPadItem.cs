@@ -91,7 +91,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (_columnName == value) { return; }
             _columnName = value;
             OnPropertyChanged();
-            UpdateSideOptionMenu();
+            OnDoUpdateSideOptionMenu();
         }
     }
 
@@ -130,7 +130,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var r = AbstractRenderer.RendererOf(Column);
+        var r = Renderer_Abstract.RendererOf(Column);
 
         var con = new FlexiControlForFilter(Column, _überschriftanordung, r) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,

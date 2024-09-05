@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,19 +32,23 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISimpleEditor, IPropertyChangedFeedback {
+public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, ISimpleEditor, IPropertyChangedFeedback {
+
+    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #region Fields
 
-    internal static readonly AbstractRenderer Default = new DefaultRenderer("Default");
+    internal static readonly Renderer_Abstract Default = new Renderer_Default("Default");
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
+
+    public event EventHandler? DoUpdateSideOptionMenu;
 
     #endregion
 
     #region Constructors
 
-    protected AbstractRenderer(string keyName) : base(keyName) { KeyName = keyName; }
+    protected Renderer_Abstract(string keyName) : base(keyName) { KeyName = keyName; }
 
     #endregion
 
@@ -57,11 +62,11 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
 
     #region Methods
 
-    public static AbstractRenderer RendererOf(ColumnItem? column) {
-        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return new DefaultRenderer("Null Renderer"); }
+    public static Renderer_Abstract RendererOf(ColumnItem? column) {
+        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return new Renderer_Default("Null Renderer"); }
 
-        var renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(column.DefaultRenderer, "Renderer of " + column.KeyName);
-        if (renderer == null) { return new DefaultRenderer("Unknown Renderer"); }
+        var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer, "Renderer of " + column.KeyName);
+        if (renderer == null) { return new Renderer_Default("Unknown Renderer"); }
 
         renderer.Parse(column.RendererSettings);
 
@@ -116,9 +121,9 @@ public abstract class AbstractRenderer : ParsebleItem, IReadableTextWithKey, ISi
 
     public abstract string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace);
 
-    internal static AbstractRenderer? RendererOf(ColumnViewItem columnViewItem) {
+    internal static Renderer_Abstract? RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
-            var renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(columnViewItem.Renderer, "Renderer");
+            var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer, "Renderer");
             if (renderer == null) { return RendererOf(columnViewItem.Column); }
 
             renderer.Parse(columnViewItem.RendererSettings);

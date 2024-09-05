@@ -73,24 +73,20 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     #region Properties
 
     public string CaptionForEditor => "Schriftart";
-    public Type? Editor { get; set; }
-    public string KeyName { get; private set; } = string.Empty;
-    internal bool Bold { get; private set; }
-
     public Color ColorMain { get; private set; } = Color.Black;
-
     public Color ColorOutline { get; private set; } = Color.Magenta;
-
+    public Type? Editor { get; set; }
     public string FontName { get; private set; } = "Arial";
-
     public bool Italic { get; private set; }
     public bool Kapitälchen { get; private set; }
+    public string KeyName { get; private set; } = string.Empty;
     public bool OnlyLower { get; private set; }
     public bool OnlyUpper { get; private set; }
     public bool Outline { get; private set; }
     public float Size { get; private set; } = 9;
     public bool StrikeOut { get; private set; }
     public bool Underline { get; private set; }
+    internal bool Bold { get; private set; }
 
     #endregion
 
@@ -135,7 +131,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return f;
     }
 
-    public static implicit operator Font(BlueFont font) => font._font; // font.SizeOk(font.Size) ? font._font : new Font("Arial", font._fontOl.Size, font._font.Style, font._font.Unit);
+    public static implicit operator Font(BlueFont font) => font._font;
 
     public static List<string> SplitByWidth(Font font, string text, float maxWidth, int maxLines) {
         List<string> broken = [];
@@ -171,6 +167,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         } while (true);
     }
 
+    // font.SizeOk(font.Size) ? font._font : new Font("Arial", font._fontOl.Size, font._font.Style, font._font.Unit);
     public static string TrimByWidth(Font font, string txt, float maxWidth) {
         var tSize = font.MeasureString(txt);
         if (tSize.Width - 1 > maxWidth && txt.Length > 1) {
@@ -248,6 +245,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         //    GR.DrawLine(new Pen(Color.Red), DrawX + 1, DrawY - 4, DrawX + 1, DrawY + 16);
         //}
     }
+
+    public Font Font() => _font;
 
     public Font Font(float scale) {
         if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
@@ -439,6 +438,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _sampleTextSym;
     }
 
+    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < 0.01 ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
+
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
@@ -503,8 +504,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     internal float KapitälchenPlus(float scale) => _kapitälchenPlus * scale;
 
     internal float Oberlänge(float scale) => _oberlänge * scale;
-
-    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < 0.01 ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
 
     private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
         var result = new List<string>();

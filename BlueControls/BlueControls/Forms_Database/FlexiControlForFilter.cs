@@ -42,7 +42,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     #region Fields
 
     private const int MaxCount = 20;
-    private readonly AbstractRenderer _renderer;
+    private readonly Renderer_Abstract _renderer;
     private bool _doFilterDeleteButton;
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
 
@@ -56,7 +56,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, AbstractRenderer renderer) : base(false, false) {
+    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, Renderer_Abstract renderer) : base(false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 

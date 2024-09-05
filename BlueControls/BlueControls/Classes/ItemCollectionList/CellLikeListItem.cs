@@ -35,7 +35,7 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Fields
 
-    private readonly AbstractRenderer? _cellRenderer;
+    private readonly Renderer_Abstract? _cellRenderer;
 
     /// <summary>
     /// Nach welcher Spalte sich der Stil richten muss.
@@ -48,7 +48,7 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Constructors
 
-    public CellLikeListItem(string keyNameAndReadableText, ColumnItem? columnStyle, bool enabled, AbstractRenderer cellRenderer) : base(keyNameAndReadableText, enabled) {
+    public CellLikeListItem(string keyNameAndReadableText, ColumnItem? columnStyle, bool enabled, Renderer_Abstract cellRenderer) : base(keyNameAndReadableText, enabled) {
         _styleLikeThis = columnStyle;
         _cellRenderer = cellRenderer;
     }
@@ -70,7 +70,7 @@ public class CellLikeListItem : AbstractListItem {
         return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, AbstractRenderer renderer) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         if (_styleLikeThis == null || _cellRenderer == null) { return new Size(16, 0); }

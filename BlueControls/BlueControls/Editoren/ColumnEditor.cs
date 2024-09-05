@@ -47,7 +47,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     private ColumnItem? _column;
 
-    private AbstractRenderer? _renderer;
+    private Renderer_Abstract? _renderer;
 
     #endregion
 
@@ -320,7 +320,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
-        _renderer = ParsebleItem.NewByTypeName<AbstractRenderer>(cbxRenderer.Text, "dummy");
+        _renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text, "dummy");
         if (_renderer == null || _column == null) { return; }
 
         _renderer.Parse(_column.RendererSettings);
@@ -344,7 +344,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
-        var l = Generic.GetInstaceOfType<AbstractRenderer>("Dummy");
+        var l = Generic.GetInstaceOfType<Renderer_Abstract>("Dummy");
         foreach (var thisr in l) {
             thisr.KeyName = thisr.MyClassId;
         }
@@ -352,7 +352,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxRenderer.ItemAddRange(ItemsOf(l));
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
-
 
         lbxCellEditor.Suggestions.Clear();
 

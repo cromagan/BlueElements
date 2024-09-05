@@ -142,7 +142,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
             CalculateInputColorIds();
             OnPropertyChanged();
-            UpdateSideOptionMenu();
+            OnDoUpdateSideOptionMenu();
         }
     }
 

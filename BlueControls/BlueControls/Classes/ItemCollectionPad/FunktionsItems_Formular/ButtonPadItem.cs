@@ -78,7 +78,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (_action == value) { return; }
             _action = value;
             OnPropertyChanged();
-            UpdateSideOptionMenu();
+            OnDoUpdateSideOptionMenu();
         }
     }
 
@@ -219,7 +219,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             _enabledwhenrows = value;
             if (!PossibleFor(Method.AllMethods.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
             OnPropertyChanged();
-            UpdateSideOptionMenu();
+            OnDoUpdateSideOptionMenu();
         }
     }
 

@@ -36,7 +36,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     #region Fields
 
-    public AbstractRenderer? _renderer;
+    public Renderer_Abstract? _renderer;
     public int? Contentwidth;
 
     #endregion
@@ -163,10 +163,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         return (int)TmpDrawWidth;
     }
 
-    public AbstractRenderer? GetRenderer() {
+    public Renderer_Abstract? GetRenderer() {
         if (_renderer != null) { return _renderer; }
 
-        _renderer = AbstractRenderer.RendererOf(this);
+        _renderer = Renderer_Abstract.RendererOf(this);
         return _renderer;
     }
 

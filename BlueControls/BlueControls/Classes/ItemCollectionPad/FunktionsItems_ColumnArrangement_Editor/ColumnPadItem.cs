@@ -41,7 +41,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnPadItem(string keyName) : base(keyName) { }
 
-    public ColumnPadItem(ColumnItem c, bool permanent, AbstractRenderer? renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
+    public ColumnPadItem(ColumnItem c, bool permanent, Renderer_Abstract? renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
         Column = c;
         Permanent = permanent;
         Renderer = renderer;
@@ -67,7 +67,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //}
     public bool Permanent { get; set; }
 
-    public AbstractRenderer? Renderer { get; }
+    public Renderer_Abstract? Renderer { get; }
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen

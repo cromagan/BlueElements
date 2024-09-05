@@ -32,7 +32,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.CellRenderer;
 
-public class DefaultRenderer : AbstractRenderer {
+public class Renderer_Default : Renderer_Abstract {
 
     #region Fields
 
@@ -44,14 +44,14 @@ public class DefaultRenderer : AbstractRenderer {
 
     #region Constructors
 
-    public DefaultRenderer(string keyname) : base(keyname) { }
+    public Renderer_Default(string keyname) : base(keyname) { }
 
     #endregion
 
     #region Properties
 
     public static string ClassId => "Default";
-    public override string Description => "Standard Anzeige";
+    public override string Description => "ALT!!! Standard Anzeige";
     public override string MyClassId => ClassId;
 
     public string Präfix {
@@ -190,7 +190,7 @@ public class DefaultRenderer : AbstractRenderer {
         return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
     }
 
-    public override string ReadableText() => "Standard";
+    public override string ReadableText() => "Standard (alt)";
 
     public override QuickImage? SymbolForReadableText() => null;
 

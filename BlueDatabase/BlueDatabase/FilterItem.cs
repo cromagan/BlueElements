@@ -353,9 +353,9 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case "values":
 
                 if (string.IsNullOrEmpty(value)) {
-                    SearchValue = new List<string> { string.Empty }.AsReadOnly();
+                    _searchValue = new List<string> { string.Empty }.AsReadOnly();
                 } else {
-                    SearchValue = value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
+                    _searchValue = value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
                 }
 
                 return true;

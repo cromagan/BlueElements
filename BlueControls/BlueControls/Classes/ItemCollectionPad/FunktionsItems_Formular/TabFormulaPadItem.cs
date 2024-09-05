@@ -347,7 +347,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         _childs.AddRange(((Controls.ListBox)sender).Checked);
         OnPropertyChanged();
         this.RaiseVersion();
-        UpdateSideOptionMenu();
+        OnDoUpdateSideOptionMenu();
     }
 
     private void ParentFormula_PropertyChanged(object sender, System.EventArgs e) {

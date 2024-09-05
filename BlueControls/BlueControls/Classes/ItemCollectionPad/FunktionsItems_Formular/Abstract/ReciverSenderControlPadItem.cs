@@ -103,7 +103,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
             _databaseOutputLoaded = true;
             DoChilds();
             OnPropertyChanged();
-            UpdateSideOptionMenu();
+            OnDoUpdateSideOptionMenu();
         }
     }
 
