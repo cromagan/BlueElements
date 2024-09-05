@@ -35,6 +35,7 @@ public interface ISimpleEditor {
 
     #region Events
 
+
     public event EventHandler? DoUpdateSideOptionMenu;
 
     #endregion
@@ -56,14 +57,14 @@ public static class SimpleEditorExtension {
 
     #region Methods
 
-    public static void DoForm(this ISimpleEditor? element, ControlCollection controls, int width) {
+    public static void DoForm(this ISimpleEditor? element, Control control) {
 
         #region  SideMenu leeren
 
-        foreach (var thisControl in controls) {
+        foreach (var thisControl in control.Controls) {
             if (thisControl is IDisposable d) { d.Dispose(); }
         }
-        controls.Clear();
+        control.Controls.Clear();
 
         #endregion
 
@@ -71,19 +72,19 @@ public static class SimpleEditorExtension {
 
         //var stdWidth = width - (Skin.Padding * 4);
 
-        var flexis = element.GetProperties(width);
+        var flexis = element.GetProperties(control.Width);
         if (flexis.Count == 0) { return; }
 
         //Rückwärts inserten
 
         if (element is IErrorCheckable iec && !iec.IsOk()) {
-            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), width, false)); // Fehlergrund
-            flexis.Insert(0, new FlexiControl("Achtung!", width, true));
+            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), control.Width, false)); // Fehlergrund
+            flexis.Insert(0, new FlexiControl("Achtung!", control.Width, true));
         }
 
         if (!string.IsNullOrEmpty(element.Description)) {
-            flexis.Insert(0, new FlexiControl(element.Description, width, false)); // Beschreibung
-            flexis.Insert(0, new FlexiControl("Beschreibung:", width, true));
+            flexis.Insert(0, new FlexiControl(element.Description, control.Width, false)); // Beschreibung
+            flexis.Insert(0, new FlexiControl("Beschreibung:", control.Width, true));
         }
 
         #region  SideMenu erstellen
@@ -91,12 +92,12 @@ public static class SimpleEditorExtension {
         var top = Skin.Padding;
         foreach (var thisFlexi in flexis) {
             if (thisFlexi is { IsDisposed: false }) {
-                controls.Add(thisFlexi);
+                control.Controls.Add(thisFlexi);
                 thisFlexi.Left = Skin.Padding;
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = width - (Skin.Padding * 2);
+                thisFlexi.Width = control.Width - (Skin.Padding * 2);
             }
         }
 
@@ -109,7 +110,7 @@ public static class SimpleEditorExtension {
         l.Height = 100;
         l.Visible = true;
 
-        element.DoForm(l.Controls, l.Width);
+        element.DoForm(l);
 
         foreach (var control in l.Controls) {
             if (control is Control c) {

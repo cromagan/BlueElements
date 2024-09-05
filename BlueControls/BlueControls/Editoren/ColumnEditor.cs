@@ -94,6 +94,10 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
     }
 
+    private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) {
+        _renderer.DoForm(RendererEditor);
+    }
+
     private bool AllOk() {
         var feh = string.Empty;
 
@@ -320,12 +324,22 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
-        _renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text, "dummy");
-        if (_renderer == null || _column == null) { return; }
+        if (_renderer != null) {
+            _renderer.DoUpdateSideOptionMenu -= _renderer_DoUpdateSideOptionMenu;
+        }
 
-        _renderer.Parse(_column.RendererSettings);
+        if (_column != null && !string.IsNullOrEmpty(cbxRenderer.Text)) {
+            _renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text, "dummy");
+            _renderer?.Parse(_column.RendererSettings);
+        } else {
+            _renderer = null;
+        }
 
-        _renderer.DoForm(RendererEditor.Controls, RendererEditor.Width - Skin.PaddingSmal * 2);
+        _renderer_DoUpdateSideOptionMenu(_renderer, System.EventArgs.Empty);
+
+        if (_renderer != null) {
+            _renderer.DoUpdateSideOptionMenu += _renderer_DoUpdateSideOptionMenu;
+        }
     }
 
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
@@ -561,6 +575,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         GetLinkedCellFilter();
 
         _column.Repair();
+
+        cbxRenderer.Text = string.Empty;
     }
 
     private void GeneratFilterListe() {
