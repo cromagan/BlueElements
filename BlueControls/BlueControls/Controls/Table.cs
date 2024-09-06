@@ -695,8 +695,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     ist1 = contentHolderCellRow.CellGetString(contentHolderCellColumn);
                     if (renderer is { }) {
                         ist2 = renderer.ValueReadable(contentHolderCellRow.CellGetString(contentHolderCellColumn),
-                            ShortenStyle.Both, contentHolderCellColumn.BehaviorOfImageAndText, true,
-                            contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace);
+                            ShortenStyle.Both, contentHolderCellColumn.DoOpticalTranslation);
                     }
                 }
             } else {
@@ -704,7 +703,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     ist1 = tmprow.CellGetString(c);
                     if (renderer is { }) {
                         ist2 = renderer.ValueReadable(tmprow.CellGetString(c), ShortenStyle.Both,
-                            c.BehaviorOfImageAndText, true, c.DoOpticalTranslation, c.OpticalReplace);
+                            c.DoOpticalTranslation);
                     }
                 }
             }
@@ -2270,8 +2269,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (CurrentArrangement is { IsDisposed: false } ca) {
             if (ca[e.Column] != null) {
-                if (e.Column.MultiLine ||
-                    e.Column.BehaviorOfImageAndText is BildTextVerhalten.Nur_Bild or BildTextVerhalten.Wenn_möglich_Bild_und_immer_Text) {
+                if (e.Column.MultiLine) {
                     Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern...
                 }
             }
@@ -2884,7 +2882,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (!string.IsNullOrEmpty(txt)) {
                 var pos = new Rectangle(columnX1 + plus, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth - plus, _pix16);
-                viewItem.GetRenderer()?.Draw(gr, txt, pos, Design.Table_Cell_New, state, cellInThisDatabaseColumn.BehaviorOfImageAndText, cellInThisDatabaseColumn.DoOpticalTranslation, cellInThisDatabaseColumn.OpticalReplace, cellInThisDatabaseColumn.ConstantHeightOfImageCode, db.GlobalScale, (Alignment)cellInThisDatabaseColumn.Align);
+                viewItem.GetRenderer()?.Draw(gr, txt, pos, Design.Table_Cell_New, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                 gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
             }
         }
@@ -2957,7 +2955,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                         if (contentHolderCellColumn != null && contentHolderCellRow != null) {
                             var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
-                            viewItem.GetRenderer()?.Draw(gr, toDraw, cellrectangle, Design.Table_Cell, state, contentHolderCellColumn.BehaviorOfImageAndText, cellInThisDatabaseColumn.DoOpticalTranslation, cellInThisDatabaseColumn.OpticalReplace, cellInThisDatabaseColumn.ConstantHeightOfImageCode, db.GlobalScale, (Alignment)cellInThisDatabaseColumn.Align);
+                            viewItem.GetRenderer()?.Draw(gr, toDraw, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                         } else {
                             if (isAdmin) {
                                 gr.DrawImage(errorImg, cellrectangle.Left + 3, cellrectangle.Top + 1);
@@ -2968,12 +2966,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     case ColumnFunction.Virtuelle_Spalte:
                         cellInThisDatabaseRow.CheckRowDataIfNeeded();
                         var toDrawd2 = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        viewItem.GetRenderer()?.Draw(gr, toDrawd2, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.BehaviorOfImageAndText, cellInThisDatabaseColumn.DoOpticalTranslation, cellInThisDatabaseColumn.OpticalReplace, cellInThisDatabaseColumn.ConstantHeightOfImageCode, db.GlobalScale, (Alignment)cellInThisDatabaseColumn.Align);
+                        viewItem.GetRenderer()?.Draw(gr, toDrawd2, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                         break;
 
                     default:
                         var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        viewItem.GetRenderer()?.Draw(gr, toDrawd, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.BehaviorOfImageAndText, cellInThisDatabaseColumn.DoOpticalTranslation, cellInThisDatabaseColumn.OpticalReplace, cellInThisDatabaseColumn.ConstantHeightOfImageCode, db.GlobalScale, (Alignment)cellInThisDatabaseColumn.Align);
+                        viewItem.GetRenderer()?.Draw(gr, toDrawd, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                         break;
                 }
 
@@ -3472,7 +3470,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (CellCollection.IsInCache(thisViewItem.Column, row) && thisViewItem.Column is { IsDisposed: false } tmpc && !row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer();
 
-                if (renderer != null) { tmp = Math.Max(tmp, renderer.ContentSize(row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, tmpc.ConstantHeightOfImageCode).Height); }
+                if (renderer != null) { tmp = Math.Max(tmp, renderer.ContentSize(row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.DoOpticalTranslation).Height); }
             }
         }
 

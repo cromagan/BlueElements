@@ -226,12 +226,12 @@ public enum DatabaseDataType : byte {
     //co_LinkKeyKennung = 167,
     //co_BestFile_StandardSuffix = 168,
     //co_BestFile_StandardFolder = 169,
-    ConstantHeightOfImageCode = 170,
+    //ConstantHeightOfImageCode = 170,
 
-    BehaviorOfImageAndText = 171,
+    //BehaviorOfImageAndText = 171,
 
     //co_FontScale = 172,
-    OpticalTextReplace = 173,
+    //OpticalTextReplace = 173,
 
     CaptionGroup1 = 174,
     CaptionGroup2 = 175,

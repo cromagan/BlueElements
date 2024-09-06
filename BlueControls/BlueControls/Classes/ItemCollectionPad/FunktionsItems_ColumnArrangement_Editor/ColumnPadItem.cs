@@ -173,7 +173,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         var r = Column.Database?.Row.First();
         if (r is { IsDisposed: false }) {
-            Renderer?.Draw(gr, r.CellGetString(Column), new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, Column.ConstantHeightOfImageCode, 1f, (Alignment)Column.Align);
+            Renderer?.Draw(gr, r.CellGetString(Column), new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, Column.DoOpticalTranslation, (Alignment)Column.Align, 1f);
         }
 
         GeneratedBitmap = bmp;

@@ -156,7 +156,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align) {
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         var font = Skin.DesignOf(design, state).BFont?.Scale(scale);
         if (font == null) { return; }
@@ -176,7 +176,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             var image = GetImage(splitedContent[z], maxW, constH);
 
-            var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, _opticalReplace.AsReadOnly());
+            var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, doOpticalTranslation);
 
             if (rect.Bottom + pix16 > drawarea.Bottom && z < splitedContent.GetUpperBound(0)) {
                 replacedText = "...";
@@ -301,7 +301,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     ///
-    protected override Size CalculateContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
+    protected override Size CalculateContentSize(string content, Design design, States state, TranslationType doOpticalTranslation) {
         var font = Skin.DesignOf(design, state).BFont?.Font();
 
         if (font == null) { return new Size(16, 16); }
@@ -313,7 +313,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         foreach (var thisString in splitedContent) {
             var image = GetImage(thisString, _constantWidth, _constantHeight);
 
-            var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, opticalReplace);
+            var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, doOpticalTranslation);
 
             var tmpSize = font.FormatedText_NeededSize(replacedText, image, 16);
             contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
@@ -331,15 +331,12 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="bildTextverhalten"></param>
-    /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
-    /// <param name="doOpticalTranslation"></param>
-    /// <param name="opticalReplace"></param>
+    /// <param name="translate"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhaltenx, bool removeLineBreaksx, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplacex) {
-        //if (_bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
+        if (!_text_anzeigen) { return string.Empty; }
 
-        content = LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, doOpticalTranslation, _opticalReplace.AsReadOnly());
+        content = LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, translate, _opticalReplace.AsReadOnly());
 
         if (style != ShortenStyle.HTML) { return content; }
 

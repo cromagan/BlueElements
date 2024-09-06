@@ -30,7 +30,6 @@ public interface IColumnInputFormat : IInputFormat {
 
     public bool AfterEditQuickSortRemoveDouble { get; set; }
     public AlignmentHorizontal Align { get; set; }
-    public BildTextVerhalten BehaviorOfImageAndText { get; set; }
     public TranslationType DoOpticalTranslation { get; set; }
     public bool DropdownAllesAbwählenErlaubt { get; set; }
     public bool DropdownBearbeitungErlaubt { get; set; }
@@ -55,7 +54,6 @@ public static class ColumnInputFormatExtensions {
 
         t.AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
         t.Align = source.Align;
-        t.BehaviorOfImageAndText = source.BehaviorOfImageAndText;
         t.DoOpticalTranslation = source.DoOpticalTranslation;
         t.DropdownAllesAbwählenErlaubt = source.DropdownAllesAbwählenErlaubt;
         t.DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;

@@ -80,12 +80,12 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align) {
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         var font = Skin.DesignOf(design, state).BFont?.Scale(scale);
         if (font == null) { return; }
 
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, false, doOpticalTranslation, null);
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
         Skin.Draw_FormatedText(gr, replacedText, null, align, drawarea, font, false);
     }
@@ -150,11 +150,11 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     ///
-    protected override Size CalculateContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
+    protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
         var font = Skin.DesignOf(design, state).BFont?.Font();
 
         if (font == null) { return new Size(16, 16); }
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, false, doOpticalTranslation, opticalReplace);
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
         return font.FormatedText_NeededSize(replacedText, null, 16);
     }
@@ -164,15 +164,12 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="bildTextverhalten"></param>
-    /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
-    /// <param name="doOpticalTranslation"></param>
-    /// <param name="opticalReplace"></param>
+    /// <param name="translate"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhaltenx, bool removeLineBreaksx, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplacex) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
         //if (_bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
-        content = LanguageTool.PrepaireText(content, style, _präfix, _suffix, doOpticalTranslation, null);
+        content = LanguageTool.PrepaireText(content, style, _präfix, _suffix, translate, null);
 
         content = content.Replace("\r\n", "; ");
         content = content.Replace("\r", "; ");

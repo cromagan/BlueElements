@@ -73,7 +73,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return renderer;
     }
 
-    public Size ContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
+    public Size ContentSize(string content, Design design, States state, TranslationType translate) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
         var key = TextSizeKey(_lastCode, content);
@@ -81,14 +81,14 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
         if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
-        var contentsize = CalculateContentSize(content, design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode);
+        var contentsize = CalculateContentSize(content, design, state, translate);
 
         _ = Sizes.TryAdd(key, contentsize);
 
         return contentsize;
     }
 
-    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align);
+    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
@@ -107,15 +107,15 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
     public abstract QuickImage? SymbolForReadableText();
 
-    public string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace) {
+    public string ValueReadable(string content, ShortenStyle style, TranslationType translate) {
         if (string.IsNullOrEmpty(content)) { return string.Empty; }
 
-        var key = (int)style + "|" + (int)doOpticalTranslation + "|" + TextSizeKey(_lastCode, content);
+        var key = (int)style + "|" + (int)translate + "|" + TextSizeKey(_lastCode, content);
         if (key == null) { return string.Empty; }
 
         if (Replaced.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
-        var replaced = CalculateValueReadable(content, style, behaviorOfImageAndText, removeLineBreaks, doOpticalTranslation, opticalReplace);
+        var replaced = CalculateValueReadable(content, style, translate);
 
         _ = Replaced.TryAdd(key, replaced);
 
@@ -135,8 +135,8 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return RendererOf(columnViewItem.Column);
     }
 
-    protected abstract Size CalculateContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode);
-    protected abstract string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace);
+    protected abstract Size CalculateContentSize(string content, Design design, States state, TranslationType doOpticalTranslation);
+    protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>

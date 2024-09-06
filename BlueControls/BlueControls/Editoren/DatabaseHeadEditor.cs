@@ -36,6 +36,7 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using BlueControls.Interfaces;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -213,11 +214,16 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 thisColumn.MultiLine = true;
                 thisColumn.TextBearbeitungErlaubt = false;
                 thisColumn.DropdownBearbeitungErlaubt = false;
-                thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
+                thisColumn.DefaultRenderer = Renderer_TextOneLine.ClassId;
             }
         }
 
-        if (db.Column["Symbol"] is { IsDisposed: false } c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
+        if (db.Column["Symbol"] is { IsDisposed: false } c) { 
+            var o = new Renderer_ImageAndText();
+            o.Text_anzeigen = false;
+            o.Bild_anzeigen = true;
+ 
+            c.RendererSettings = o.ToParseableString(); }
 
         db.RepairAfterParse();
 

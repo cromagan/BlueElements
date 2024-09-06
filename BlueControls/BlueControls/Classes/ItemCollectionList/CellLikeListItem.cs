@@ -66,7 +66,7 @@ public class CellLikeListItem : AbstractListItem {
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
         if (_cellRenderer == null) { return false; }
-        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.Both, _styleLikeThis.DoOpticalTranslation);
         return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
 
@@ -75,14 +75,14 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         if (_styleLikeThis == null || _cellRenderer == null) { return new Size(16, 0); }
 
-        return _cellRenderer.ContentSize(KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode);
+        return _cellRenderer.ContentSize(KeyName, itemdesign, States.Standard, _styleLikeThis.DoOpticalTranslation);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode, 1f, (Alignment)_styleLikeThis.Align);
+        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _styleLikeThis.DoOpticalTranslation, (Alignment)_styleLikeThis.Align, 1f);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }
@@ -95,7 +95,7 @@ public class CellLikeListItem : AbstractListItem {
             return string.Empty;
         }
         // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
-        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
+        var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _styleLikeThis.DoOpticalTranslation);
         // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils
         var compareKey = txt.CompareKey(_styleLikeThis.SortType);
         // Rückgabe des Compare-Keys mit dem internen Wert

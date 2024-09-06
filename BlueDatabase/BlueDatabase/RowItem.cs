@@ -1103,7 +1103,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     break;
             }
 
-            if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, column.DoOpticalTranslation, column.OpticalReplace); }
+            if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, column.DoOpticalTranslation, null); }
             // Multiline-Typ ermitteln  --------------------------------------------
             var tmpMultiLine = column.MultiLine;
             if (typ.HasFlag(FilterType.MultiRowIgnorieren)) {
@@ -1162,7 +1162,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             {
                 if (!thisColumnItem.IgnoreAtRowFilter) {
                     var txt = CellGetString(thisColumnItem);
-                    txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, thisColumnItem.OpticalReplace);
+                    txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, null);
                     if (!string.IsNullOrEmpty(txt) && txt.ToUpperInvariant().Contains(searchText)) { return true; }
                 }
             }

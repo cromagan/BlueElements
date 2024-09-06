@@ -63,7 +63,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxFunction.ItemAddRange(ItemsOf(typeof(ColumnFunction)));
         cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
         cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
-        cbxBildTextVerhalten.ItemAddRange(ItemsOf(typeof(BildTextVerhalten)));
         cbxAlign.ItemAddRange(ItemsOf(typeof(AlignmentHorizontal)));
         cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
@@ -428,7 +427,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnFormatierungErlaubt.Checked = _column.FormatierungErlaubt;
         btnSpellChecking.Checked = _column.SpellCheckingEnabled;
         txbAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
-        txbReplacer.Text = _column.OpticalReplace.JoinWithCr();
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
         txbRegex.Text = _column.Regex;
         txbTags.Text = _column.Tags.JoinWithCr();
@@ -441,8 +439,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         txbQuickinfo.Text = _column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        txbBildCodeConstHeight.Text = _column.ConstantHeightOfImageCode;
-        cbxBildTextVerhalten.Text = ((int)_column.BehaviorOfImageAndText).ToString();
         cbxLinkedDatabase.Text = _column.LinkedDatabaseTableName;
         txbAutoRemove.Text = _column.AutoRemove;
         cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
@@ -506,7 +502,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
         _column.PermissionGroupsChangeCell = new(lbxCellEditor.Checked);
         _column.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
-        _column.OpticalReplace = new(txbReplacer.Text.SplitAndCutByCrToList());
         _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());
 
         _column.AutoFilterJoker = txbJoker.Text;
@@ -524,16 +519,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.AllowedChars = txbAllowedChars.Text;
         _column.MaxTextLenght = IntParse(txbMaxTextLenght.Text);
         _column.MaxCellLenght = IntParse(txbMaxCellLenght.Text);
-
-        _column.ConstantHeightOfImageCode = txbBildCodeConstHeight.Text;
-        _ = IntTryParse(cbxBildTextVerhalten.Text, out var imNf);
-        _column.BehaviorOfImageAndText = (BildTextVerhalten)imNf;
-        //_column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
-        //_column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-        //_column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
         _column.LinkedCell_ColumnNameOfLinkedDatabase = cbxTargetColumn.Text; // LINKED DATABASE
-        //_column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         _column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
@@ -588,7 +575,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             b.DropdownBearbeitungErlaubt = true;
 
             var dd = b.DropDownItems.Clone();
-            var or = b.OpticalReplace.Clone();
+            var or = new List<string>();
 
             foreach (var thisColumn in db2.Column) {
                 if (thisColumn.Function.CanBeCheckedByRules() && !thisColumn.MultiLine) {
@@ -598,7 +585,14 @@ internal sealed partial class ColumnEditor : IIsEditor {
             }
 
             b.DropDownItems = dd.AsReadOnly();
-            b.OpticalReplace = or.AsReadOnly();
+
+           b.DefaultRenderer = Renderer_ImageAndText.ClassId;
+
+            var s = new Renderer_ImageAndText();
+            s.Text_ersetzen = or.JoinWithCr();
+            b.RendererSettings = s.ReadableText();
+
+    
 
             db.RepairAfterParse();
             var tcvc = ColumnViewCollection.ParseAll(db);
