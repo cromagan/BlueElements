@@ -220,10 +220,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             _currentArrangement = tcvc.Get(_arrangement);
             if (string.IsNullOrEmpty(_arrangement) || _currentArrangement == null) {
-                if (tcvc.Count > 0) {
-                    _currentArrangement = tcvc[1];
-                    return _currentArrangement;
-                }
+                if (tcvc.Count > 0) { _currentArrangement = tcvc[1]; }
                 return null;
             }
 
@@ -1318,8 +1315,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CursorPosColumn = null;
         CursorPosRow = null;
         _arrangement = string.Empty;
-        _currentArrangement = null;
         _unterschiede = null;
+
+        _currentArrangement = null;
+
+        //Invalidate_AllColumnArrangements();
         Invalidate_SortedRowData();
         OnViewChanged();
         Invalidate();
@@ -3472,7 +3472,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (CellCollection.IsInCache(thisViewItem.Column, row) && thisViewItem.Column is { IsDisposed: false } tmpc && !row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer();
 
-                if (renderer != null) { tmp = Math.Max(tmp, renderer.GetSizeOfCellContent(row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, tmpc.ConstantHeightOfImageCode).Height); }
+                if (renderer != null) { tmp = Math.Max(tmp, renderer.ContentSize(row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.BehaviorOfImageAndText, tmpc.DoOpticalTranslation, tmpc.OpticalReplace, tmpc.ConstantHeightOfImageCode).Height); }
             }
         }
 

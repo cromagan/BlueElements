@@ -75,7 +75,7 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         if (_styleLikeThis == null || _cellRenderer == null) { return new Size(16, 0); }
 
-        return _cellRenderer.GetSizeOfCellContent(KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode);
+        return _cellRenderer.ContentSize(KeyName, itemdesign, States.Standard, _styleLikeThis.BehaviorOfImageAndText, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.ConstantHeightOfImageCode);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
@@ -90,7 +90,7 @@ public class CellLikeListItem : AbstractListItem {
 
     protected override string GetCompareKey() {
         // Die Hauptklasse fragt nach diesem Compare-Key
-        if (_styleLikeThis == null) {
+        if (_styleLikeThis == null || _cellRenderer == null) {
             // Wenn _styleLikeThis null ist, geben wir einen leeren String zurück
             return string.Empty;
         }

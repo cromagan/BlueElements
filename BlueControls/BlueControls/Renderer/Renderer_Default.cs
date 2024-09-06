@@ -102,7 +102,7 @@ public class Renderer_Default : Renderer_Abstract {
                     var y = 0;
                     for (var z = 0; z <= mei.GetUpperBound(0); z++) {
                         DrawOneLine(gr, mei[z], drawarea, y, z != mei.GetUpperBound(0), font, pix16, behaviorOfImageAndText, state, scale, doOpticalTranslation, opticalReplace, constantHeightOfImageCode, align);
-                        y += Table.GetPix(GetSizeOfCellContent(mei[z], design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode).Height, scale);
+                        y += Table.GetPix(ContentSize(mei[z], design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode).Height, scale);
                     }
 
                     break;
@@ -111,7 +111,7 @@ public class Renderer_Default : Renderer_Abstract {
     }
 
     public (string text, QuickImage? qi) GetDrawingData(string originalText, BildTextVerhalten bildTextverhalten, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
-        var tmpText = ValueReadable(originalText, ShortenStyle.Replaced, bildTextverhalten, true, doOpticalTranslation, opticalReplace);
+        var tmpText = CalculateValueReadable(originalText, ShortenStyle.Replaced, bildTextverhalten, true, doOpticalTranslation, opticalReplace);
 
         #region  tmpImageCode
 
@@ -121,7 +121,7 @@ public class Renderer_Default : Renderer_Abstract {
             var imgtxt = tmpText;
 
             if (bildTextverhalten == BildTextVerhalten.Nur_Bild) {
-                imgtxt = ValueReadable(originalText, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, doOpticalTranslation, opticalReplace);
+                imgtxt = CalculateValueReadable(originalText, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, doOpticalTranslation, opticalReplace);
             }
 
             if (!string.IsNullOrEmpty(imgtxt)) {
@@ -216,7 +216,7 @@ public class Renderer_Default : Renderer_Abstract {
     ///
     ///
     /// <returns></returns>
-    public override string ValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
         content = LanguageTool.PrepaireText(content, style, Präfix, Suffix, doOpticalTranslation, opticalReplace);
@@ -278,7 +278,7 @@ public class Renderer_Default : Renderer_Abstract {
 
         contentSize.Width = Math.Max(contentSize.Width, 16);
         contentSize.Height = Math.Max(contentSize.Height, 16);
-        SetSizeOfCellContent(content, contentSize);
+
         return contentSize;
     }
 

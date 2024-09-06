@@ -126,7 +126,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
-                var wx = renderer.GetSizeOfCellContent(thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, Column.ConstantHeightOfImageCode).Width;
+                var wx = renderer.ContentSize(thisRowItem.CellGetString(Column), design, state, Column.BehaviorOfImageAndText, Column.DoOpticalTranslation, Column.OpticalReplace, Column.ConstantHeightOfImageCode).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {

@@ -29,6 +29,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using static System.Windows.Forms.AxHost;
 
 namespace BlueControls.CellRenderer;
 
@@ -40,6 +41,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
 
     internal static readonly Renderer_Abstract Default = new Renderer_Default("ImageAndText");
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
+    private static readonly ConcurrentDictionary<string, string> Replaced = [];
     private string _lastCode = "?";
 
     public event EventHandler? DoUpdateSideOptionMenu;
@@ -51,6 +53,9 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
     protected Renderer_Abstract(string keyName) : base(keyName) { KeyName = keyName; }
 
     #endregion
+
+
+  
 
     #region Properties
 
@@ -77,23 +82,27 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
-    public Size GetSizeOfCellContent(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
+    public Size ContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
         var key = TextSizeKey(_lastCode, content);
-
         if (key == null) { return Size.Empty; }
 
         if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
         var contentsize = CalculateContentSize(content, design, state, behaviorOfImageAndText, doOpticalTranslation, opticalReplace, constantHeightOfImageCode);
 
-        SetSizeOfCellContent(content, contentsize);
+        _ = Sizes.TryAdd(key, contentsize);
+
         return contentsize;
     }
 
     public override void OnPropertyChanged() {
         _lastCode = ToParseableString();
+
+
+
+
         base.OnPropertyChanged();
     }
 
@@ -104,22 +113,28 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
 
     public abstract string ReadableText();
 
-    public void SetSizeOfCellContent(string content, Size contentSize) {
-        var key = TextSizeKey(_lastCode, content);
-
-        if (key == null) { return; }
-
-        if (Sizes.ContainsKey(key)) {
-            Sizes[key] = contentSize;
-            return;
-        }
-
-        _ = Sizes.TryAdd(key, contentSize);
-    }
+  
 
     public abstract QuickImage? SymbolForReadableText();
 
-    public abstract string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace);
+
+    public string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
+        if (string.IsNullOrEmpty(content)) { return string.Empty; }
+
+        var key = (int)style + "|" +   (int)doOpticalTranslation + "|" + TextSizeKey(_lastCode, content);
+        if (key == null) { return string.Empty; }
+
+        if (Replaced.TryGetValue(key, out var excontentsize)) { return excontentsize; }
+
+        var replaced= CalculateValueReadable(content, style, behaviorOfImageAndText, removeLineBreaks, doOpticalTranslation, opticalReplace);
+
+        _ = Replaced.TryAdd(key, replaced);
+
+        return replaced;
+
+    }
+
+    protected abstract string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace);
 
     internal static Renderer_Abstract? RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {

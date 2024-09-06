@@ -165,7 +165,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             var image = GetImage(splitedContent[z], maxW, constH);
 
-            var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, _opticalReplace.AsReadOnly());
+            var replacedText = CalculateValueReadable(splitedContent[z], ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, _opticalReplace.AsReadOnly());
 
             if (rect.Bottom + pix16 > drawarea.Bottom && z < splitedContent.GetUpperBound(0)) {
                 replacedText = "...";
@@ -291,7 +291,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     /// <param name="doOpticalTranslation"></param>
     /// <param name="opticalReplace"></param>
     /// <returns></returns>
-    public override string ValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhaltenx, bool removeLineBreaksx, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplacex) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhaltenx, bool removeLineBreaksx, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplacex) {
         //if (_bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
         content = LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, doOpticalTranslation, _opticalReplace.AsReadOnly());
@@ -321,7 +321,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         foreach (var thisString in splitedContent) {
             var image = GetImage(thisString, _constantWidth, _constantHeight);
 
-            var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, opticalReplace);
+            var replacedText = CalculateValueReadable(thisString, ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, opticalReplace);
 
             var tmpSize = font.FormatedText_NeededSize(replacedText, image, 16);
             contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
@@ -330,7 +330,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
         contentSize.Width = Math.Max(contentSize.Width, 16);
         contentSize.Height = Math.Max(contentSize.Height, 16);
-        SetSizeOfCellContent(content, contentSize);
+
         return contentSize;
     }
 
