@@ -128,6 +128,8 @@ public static partial class Extensions {
             Develop.DebugPrint(FehlerArt.Fehler, "Basestringfehler!");
         }
 
+        if(col.Count ==0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
+
         return baseToString.Substring(0, baseToString.Length - 1) + ", " + col.JoinWith(", ") + "}";
     }
 

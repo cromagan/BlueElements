@@ -47,9 +47,10 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     #region Constructors
 
+    public FilterConverterElementPadItem() : this(string.Empty) { }
+
     public FilterConverterElementPadItem(string keyName) : this(keyName, null, null) { }
 
-    //private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     public FilterConverterElementPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion

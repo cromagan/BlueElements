@@ -42,15 +42,15 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     private int _constantHeight = 16;
     private int _constantWidth = 16;
     private List<string> _opticalReplace = new();
-   // private string _präfix = string.Empty;
-   // private string _suffix = string.Empty;
+    // private string _präfix = string.Empty;
+    // private string _suffix = string.Empty;
     private bool _text_anzeigen = true;
 
     #endregion
 
     #region Constructors
 
-    public Renderer_ImageAndText(string keyname) : base(keyname) { }
+    public Renderer_ImageAndText() : base() { }
 
     #endregion
 
@@ -70,12 +70,12 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override string Description => "Kann Bilder mit einem Bild davor anzeigen.";
 
-    public int Konstant_Breite_von_Bildern {
+    public int Konstante_Breite_von_Bildern {
         get => _constantWidth;
         set {
             value = Math.Max(value, 16);
             value = Math.Min(value, 128);
-            if (_constantWidth != value) { return; }
+            if (_constantWidth == value) { return; }
             _constantWidth = value;
             OnPropertyChanged();
         }
@@ -211,14 +211,14 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         if (Text_anzeigen) {
             //result.Add(new FlexiControlForProperty<string>(() => Präfix));
             //result.Add(new FlexiControlForProperty<string>(() => Suffix, cbxEinheit, true));
-            result.Add(new FlexiControlForProperty<List<string>>(() => Text_ersetzen,5));
+            result.Add(new FlexiControlForProperty<List<string>>(() => Text_ersetzen, 5));
         }
 
         result.Add(new FlexiControlForProperty<bool>(() => Bild_anzeigen));
 
         if (Bild_anzeigen) {
             result.Add(new FlexiControlForProperty<int>(() => Konstante_Höhe_von_Bildern));
-            result.Add(new FlexiControlForProperty<int>(() => Konstant_Breite_von_Bildern));
+            result.Add(new FlexiControlForProperty<int>(() => Konstante_Breite_von_Bildern));
         }
 
         return result;
@@ -235,25 +235,25 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             //return true;
             case "showpic":
                 _bild_anzeigen = value.FromPlusMinus();
-                break;
+                return true;
 
             case "showtext":
                 _text_anzeigen = value.FromPlusMinus();
-                break ;
+                return true;
 
             case "replace":
                 _opticalReplace = value.SplitBy("|").ToList().FromNonCritical();
-                break;
+                return true;
 
 
             case "imagewidth":
-               _constantWidth = IntParse(value.FromNonCritical());
-                break;
+                _constantWidth = IntParse(value.FromNonCritical());
+                return true;
 
 
             case "imageheight":
                 _constantHeight = IntParse(value.FromNonCritical());
-                break;
+                return true;
 
         }
         return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
@@ -335,9 +335,13 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     }
 
     private QuickImage? GetImage(string name, int constw, int consth) {
-        if (_bild_anzeigen || !string.IsNullOrEmpty(name)) { return null; }
+        if (!_bild_anzeigen || string.IsNullOrEmpty(name)) { return null; }
 
-        return QuickImage.Get(QuickImage.GenerateCode(name, constw, consth, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+        var i = QuickImage.Get(QuickImage.GenerateCode(name, constw, consth, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+
+        if (i.IsError) { return null; }
+        return i;
+
     }
 
     #endregion

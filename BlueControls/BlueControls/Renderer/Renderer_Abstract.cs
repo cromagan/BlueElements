@@ -29,17 +29,16 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using static System.Windows.Forms.AxHost;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, ISimpleEditor, IPropertyChangedFeedback {
+public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor, IPropertyChangedFeedback {
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #region Fields
 
-    internal static readonly Renderer_Abstract Default = new Renderer_Default("ImageAndText");
+    internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
     private string _lastCode = "?";
@@ -48,14 +47,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
 
     #endregion
 
-    #region Constructors
-
-    protected Renderer_Abstract(string keyName) : base(keyName) { KeyName = keyName; }
-
-    #endregion
-
-
-  
 
     #region Properties
 
@@ -68,10 +59,10 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
     #region Methods
 
     public static Renderer_Abstract RendererOf(ColumnItem? column) {
-        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return new Renderer_Default("Null Renderer"); }
+        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Renderer_Abstract.Default; }
 
-        var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer, "Renderer of " + column.KeyName);
-        if (renderer == null) { return new Renderer_Default("Unknown Renderer"); }
+        var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
+        if (renderer == null) { return Renderer_Abstract.Default; }
 
         renderer.Parse(column.RendererSettings);
 
@@ -138,7 +129,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableTextWithKey, IS
 
     internal static Renderer_Abstract? RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
-            var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer, "Renderer");
+            var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
             if (renderer == null) { return RendererOf(columnViewItem.Column); }
 
             renderer.Parse(columnViewItem.RendererSettings);

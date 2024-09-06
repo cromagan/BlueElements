@@ -26,8 +26,6 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     #region Constructors
 
-    public PhysicPadItem(string keyName) : base(keyName) { }
-
     public PhysicPadItem() : base(string.Empty) { }
 
     #endregion

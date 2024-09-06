@@ -44,7 +44,7 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
         Size = s;
     }
 
-    public GenericPadItem(string keyName) : this(keyName, string.Empty, new Size(10, 10)) { }
+    public GenericPadItem() : this(string.Empty, string.Empty, new Size(10, 10)) { }
 
     #endregion
 

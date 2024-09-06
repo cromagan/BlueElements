@@ -51,9 +51,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     #region Constructors
 
-    public TableViewPadItem(string keyName, string toParse) : this(keyName) => this.Parse(toParse);
-
-    public TableViewPadItem(Database? db) : this(string.Empty, db, null) { }
+    public TableViewPadItem() : this(string.Empty) { }
 
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 

@@ -32,6 +32,18 @@ namespace BlueScript.Variables;
 
 public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName, IPropertyChangedFeedback {
 
+    private string _keyName = string.Empty;
+
+    public string KeyName {
+        get => _keyName;
+        set {
+            if (_keyName == value) { return; }
+            _keyName = value;
+            OnPropertyChanged();
+        }
+    }
+
+
     #region Fields
 
     private static long _dummyCount;
@@ -45,7 +57,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     #region Constructors
 
-    protected Variable(string name, bool ronly, string comment) : base(name.ToLowerInvariant()) {
+    protected Variable(string name, bool ronly, string comment) : base() {
+       KeyName = name.ToLowerInvariant();
         ReadOnly = ronly;
         Comment = comment;
     }
@@ -247,13 +260,14 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         switch (key) {
             case "key":
             case "name":
-                KeyName = value.FromNonCritical();
+            case "keyname":
+                _keyName = value.FromNonCritical();
                 return true;
 
             case "classid":
             case "type":
-                if (value.ToNonCritical() != MyClassId) { return false; }
-                return true;
+                return value.ToNonCritical() == MyClassId;
+
 
             case "value":
                 ValueForReplace = value.FromNonCritical();
@@ -284,6 +298,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (!ToStringPossible) { return string.Empty; }
 
         List<string> result = [];
+        result.ParseableAdd("Key", KeyName);
         result.ParseableAdd("Value", ValueForReplace);
         result.ParseableAdd("Comment", Comment);
         result.ParseableAdd("ReadOnly", ReadOnly);

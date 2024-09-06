@@ -49,6 +49,8 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     #region Constructors
 
+    public DropDownSelectRowPadItem() : this(string.Empty) { }
+
     public DropDownSelectRowPadItem(string keyName) : this(keyName, null, null) { }
 
     public DropDownSelectRowPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }

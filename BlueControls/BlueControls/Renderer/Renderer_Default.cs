@@ -44,7 +44,7 @@ public class Renderer_Default : Renderer_Abstract {
 
     #region Constructors
 
-    public Renderer_Default(string keyname) : base(keyname) { }
+    public Renderer_Default() : base() { }
 
     #endregion
 

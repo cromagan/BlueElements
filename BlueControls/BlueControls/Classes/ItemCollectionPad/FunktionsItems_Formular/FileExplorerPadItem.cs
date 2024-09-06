@@ -45,6 +45,8 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Constructors
 
+    public FileExplorerPadItem() : this(string.Empty) { }
+
     public FileExplorerPadItem(string keyName) : this(keyName, null) { }
 
     public FileExplorerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {

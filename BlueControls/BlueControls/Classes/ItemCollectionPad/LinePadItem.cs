@@ -48,7 +48,7 @@ public class LinePadItem : AbstractPadItem {
 
     #region Constructors
 
-    public LinePadItem(string keyName) : this(keyName, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+    public LinePadItem() : this(string.Empty, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
 
     public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 

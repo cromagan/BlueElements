@@ -48,6 +48,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     #region Constructors
 
+    public RegionFormulaPadItem() : this(string.Empty) { }
+
     public RegionFormulaPadItem(string keyName) : this(keyName, null) { }
 
     public RegionFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {

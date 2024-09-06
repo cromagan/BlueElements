@@ -41,6 +41,8 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Constructors
 
+    public EasyPicPadItem() : this(string.Empty) { }
+
     public EasyPicPadItem(string keyName) : this(keyName, null) { }
 
     public EasyPicPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
@@ -95,7 +97,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
             .. base.GetProperties(widthOfControl),
             new FlexiControl("Einstellungen:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Bild_Dateiname),
-       
+
         ];
         return result;
     }

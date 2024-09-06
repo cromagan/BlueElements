@@ -33,6 +33,8 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Constructors
 
+    public MonitorPadItem() : this(string.Empty) { }
+
     public MonitorPadItem(string keyName) : this(keyName, null) { }
 
     public MonitorPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {

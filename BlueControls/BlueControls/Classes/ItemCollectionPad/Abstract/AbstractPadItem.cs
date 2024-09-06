@@ -48,6 +48,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// <remarks></remarks>
     private bool _beiExportSichtbar = true;
 
+    private string _keyName = string.Empty;
     private string _page = string.Empty;
 
     private ItemCollectionPad? _parent;
@@ -62,7 +63,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     #region Constructors
 
-    protected AbstractPadItem(string keyName) : base(keyName) => MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
+    protected AbstractPadItem(string keyName) : base() {
+        _keyName = keyName;
+        MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
+    }
 
     #endregion
 
@@ -95,6 +99,16 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
+
+    public string KeyName {
+        get => _keyName;
+        set {
+            if (_keyName == value) { return; }
+            _keyName = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ObservableCollection<PointM> MovablePoint { get; } = [];
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
@@ -197,19 +211,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return 0;
     }
 
-    //            case "keyName":
-    //                name = thisIt.Value;
-    //                break;
-    //        }
-    //    }
-    //    if (string.IsNullOrEmpty(ding)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Itemtyp unbekannt: " + code);
-    //        return null;
-    //    }
-    //    if (string.IsNullOrEmpty(name)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Itemname unbekannt: " + code);
-    //        return null;
-    //    }
     /// <summary>
     /// Prüft, ob die angegebenen Koordinaten das Element berühren.
     /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
@@ -223,19 +224,12 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         return tmp.Contains(value);
     }
 
-    //    foreach (var thisIt in x) {
-    //        switch (thisIt.Key) {
-    //            case "type":
-    //            case "classid":
-    //                ding = thisIt.Value;
-    //                break;
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
-    //    var x = code.GetAllTags();
     public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
         if (_parent == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert");
@@ -341,8 +335,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
-            case "classid": // Wurde bereits abgefragt, dadurch st erst die Routine aufgerufen worden
             case "type":
+            case "classid": // Wurde bereits abgefragt, dadurch ist erst die Routine aufgerufen worden
+                return value.ToNonCritical() == MyClassId;
+
             case "enabled":
             case "checked":
                 return true;
@@ -386,9 +382,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
             case "key":
             case "keyname":
             case "internalname":
-                if (value != KeyName) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + KeyName);
-                }
+                _keyName = value;
                 return true;
 
             case "zoompadding":
@@ -425,7 +419,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
-
+        result.ParseableAdd("Key", KeyName);
         result.ParseableAdd("Style", _style);
         result.ParseableAdd("Page", _page);
         result.ParseableAdd("Print", _beiExportSichtbar);
@@ -502,6 +496,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
         } catch { }
     }
 
+    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+
     private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
@@ -525,8 +521,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
             Develop.DebugPrint_NichtImplementiert(true);
         }
     }
-
-    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

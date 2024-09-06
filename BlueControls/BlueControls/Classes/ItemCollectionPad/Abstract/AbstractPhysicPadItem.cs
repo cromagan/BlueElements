@@ -29,6 +29,8 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
 
     #region Constructors
 
+    public AbstractPhysicPadItem() : this(string.Empty) { }
+
     protected AbstractPhysicPadItem(string keyName) : base(keyName) {
         MovablePoint.Add(new PointM(5, 0));
         MovablePoint.Add(new PointM(10, 10));

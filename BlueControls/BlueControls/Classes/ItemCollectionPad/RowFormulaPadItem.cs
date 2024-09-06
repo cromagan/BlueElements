@@ -49,10 +49,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public RowFormulaPadItem() : this(string.Empty, null, string.Empty, string.Empty) { }
 
-    public RowFormulaPadItem(string keyName) : this(keyName, null, string.Empty, string.Empty) { }
-
-    public RowFormulaPadItem(Database database, string rowkey) : this(database, rowkey, string.Empty) { }
-
     public RowFormulaPadItem(Database database, string rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
     public RowFormulaPadItem(string keyName, Database? database, string rowkey, string layoutFileName) : base(keyName) {

@@ -46,14 +46,13 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     private string _columnName = string.Empty;
     private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-
-    //private string _anzeige = string.Empty;
-    //private string _überschrift = string.Empty;
     private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
     #region Constructors
+
+    public OutputFilterPadItem() : this(string.Empty) { }
 
     public OutputFilterPadItem(string keyName) : this(keyName, null, null) { }
 

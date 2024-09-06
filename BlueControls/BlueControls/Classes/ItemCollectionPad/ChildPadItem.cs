@@ -50,9 +50,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Constructors
 
-    public ChildPadItem() : this(string.Empty) { }
-
-    public ChildPadItem(string keyName) : base(keyName) {
+    public ChildPadItem() : base(string.Empty) {
         PadInternal = null; // new CreativePad();
         Seite = string.Empty;
         ZoomItems = null;

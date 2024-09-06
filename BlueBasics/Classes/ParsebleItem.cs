@@ -24,22 +24,7 @@ using System.Collections.Generic;
 
 namespace BlueBasics;
 
-public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFeedback {
-
-    #region Fields
-
-    private string _keyName = string.Empty;
-
-    #endregion
-
-    #region Constructors
-
-    protected ParsebleItem(string keyName) {
-        _keyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
-        if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
-    }
-
-    #endregion
+public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
     #region Events
 
@@ -49,15 +34,6 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
 
     #region Properties
 
-    public string KeyName {
-        get => _keyName;
-        set {
-            if (_keyName == value) { return; }
-            _keyName = value;
-            OnPropertyChanged();
-        }
-    }
-
     public abstract string MyClassId { get; }
 
     #endregion
@@ -66,7 +42,6 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
 
     public static T? NewByParsing<T>(string toParse) where T : ParsebleItem {
         var typeName = string.Empty;
-        var name = string.Empty;
 
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
@@ -78,22 +53,16 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
                 case "classid":
                     typeName = thisIt.Value;
                     break;
-
-                case "key":
-                case "keyname":
-                case "internalname":
-                    name = thisIt.Value;
-                    break;
             }
         }
 
-        var ni = NewByTypeName<T>(typeName, name);
+        var ni = NewByTypeName<T>(typeName);
         if (ni == null) { return default; }
         ni.Parse(toParse);
         return ni;
     }
 
-    public static T? NewByTypeName<T>(string typname, string name) where T : ParsebleItem {
+    public static T? NewByTypeName<T>(string typname) where T : ParsebleItem {
         var types = Generic.GetEnumerableOfType<T>();
 
         if (types.Count == 0) {
@@ -105,17 +74,17 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
             return default;
         }
 
-        if (string.IsNullOrEmpty(name)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + name);
-            return default;
-        }
+        //if (string.IsNullOrEmpty(name)) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + name);
+        //    return default;
+        //}
 
         foreach (var thist in types) {
             if (thist != null) {
                 var v = (string)thist.GetProperty("ClassId")?.GetValue(null, null);
 
                 if (v.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
-                    var ni = (T)Activator.CreateInstance(thist, name);
+                    var ni = (T)Activator.CreateInstance(thist);
                     return ni;
                 }
             }
@@ -136,7 +105,6 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IPropertyChangedFe
         if (ci != null) {
             result.ParseableAdd("ClassId", ci);
         }
-        result.ParseableAdd("Key", KeyName);
 
         return result.Parseable();
     }

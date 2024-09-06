@@ -37,9 +37,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     #region Constructors
 
-    public RowEntryPadItem(string keyName, string toParse) : this(keyName, null, null) => this.Parse(toParse);
-
-    public RowEntryPadItem(Database? db) : this(string.Empty, db, null) { }
+    public RowEntryPadItem() : this(string.Empty) { }
 
     public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 

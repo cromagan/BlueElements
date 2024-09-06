@@ -49,13 +49,11 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     #region Constructors
 
-    public BitmapPadItem(string keyName) : this(keyName, null, Size.Empty) { }
+    public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
     public BitmapPadItem(string keyName, Bitmap? bmp) : this(keyName, bmp, Size.Empty) { }
 
     public BitmapPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
-
-    public BitmapPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
 
     public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
         Bitmap = bmp;

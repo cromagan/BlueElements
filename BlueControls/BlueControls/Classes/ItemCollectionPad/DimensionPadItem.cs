@@ -66,8 +66,6 @@ public class DimensionPadItem : AbstractPadItem {
 
     public DimensionPadItem() : this(string.Empty, null, null, 0) { }
 
-    public DimensionPadItem(string keyName) : this(keyName, null, null, 0) { }
-
     public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
 
     public DimensionPadItem(string keyName, PointM? point1, PointM? point2, float abstandinMm) : base(keyName) {

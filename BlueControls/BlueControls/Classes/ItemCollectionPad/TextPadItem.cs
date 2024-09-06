@@ -63,8 +63,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public TextPadItem() : this(string.Empty, string.Empty) { }
 
-    public TextPadItem(string keyName) : this(keyName, string.Empty) { }
-
     public TextPadItem(string keyName, string readableText) : base(keyName) {
         _textReplaced = readableText;
         _textOriginal = readableText;
@@ -117,8 +115,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     #endregion
 
-    //private DataFormat Format { get; set; } = DataFormat.Text;
-
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -126,8 +122,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         aursicht.Add(ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig));
         aursicht.Add(ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren));
         aursicht.Add(ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig));
-
-
 
         List<GenericControl> result =
         [

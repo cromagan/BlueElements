@@ -329,7 +329,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
 
         if (_column != null && !string.IsNullOrEmpty(cbxRenderer.Text)) {
-            _renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text, "dummy");
+            _renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text);
             _renderer?.Parse(_column.RendererSettings);
         } else {
             _renderer = null;
@@ -358,12 +358,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
-        var l = Generic.GetInstaceOfType<Renderer_Abstract>("Dummy");
+        var l = Generic.GetInstaceOfType<Renderer_Abstract>();
         foreach (var thisr in l) {
-            thisr.KeyName = thisr.MyClassId;
+            cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId,  thisr.SymbolForReadableText() ));
         }
 
-        cbxRenderer.ItemAddRange(ItemsOf(l));
+       
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
 

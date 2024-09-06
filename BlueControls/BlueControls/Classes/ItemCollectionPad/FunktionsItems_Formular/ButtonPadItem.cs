@@ -42,23 +42,38 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
     #region Fields
 
     private string _action = string.Empty;
+
     private string _anzeige = string.Empty;
+
     private string _arg1 = string.Empty;
+
     private string _arg2 = string.Empty;
+
     private string _arg3 = string.Empty;
+
     private string _arg4 = string.Empty;
+
     private string _arg5 = string.Empty;
+
     private string _arg6 = string.Empty;
+
     private string _arg7 = string.Empty;
+
     private string _arg8 = string.Empty;
+
     private ButtonArgs _enabledwhenrows;
+
     private ExtText? _eTxt;
+
     private string _image = string.Empty;
+
     private string _quickinfo = string.Empty;
 
     #endregion
 
     #region Constructors
+
+    public ButtonPadItem() : this(string.Empty) { }
 
     public ButtonPadItem(string keyName) : this(keyName, null) { }
 
