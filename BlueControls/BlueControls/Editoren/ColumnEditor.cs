@@ -34,7 +34,6 @@ using System.Windows.Forms;
 using BlueControls.CellRenderer;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -60,6 +59,23 @@ internal sealed partial class ColumnEditor : IIsEditor {
         InitializeComponent();
         _table = table;
         _column = column;
+
+        cbxFunction.ItemAddRange(ItemsOf(typeof(ColumnFunction)));
+        cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
+        cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
+        cbxBildTextVerhalten.ItemAddRange(ItemsOf(typeof(BildTextVerhalten)));
+        cbxAlign.ItemAddRange(ItemsOf(typeof(AlignmentHorizontal)));
+        cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
+        cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
+        cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
+
+        var l = Generic.GetInstaceOfType<Renderer_Abstract>();
+        foreach (var thisr in l) {
+            cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
+        }
+
+        cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
+
         Column_DatenAuslesen();
     }
 
@@ -349,22 +365,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
-        cbxFunction.ItemAddRange(ItemsOf(typeof(ColumnFunction)));
-        cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
-        cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
-        cbxBildTextVerhalten.ItemAddRange(ItemsOf(typeof(BildTextVerhalten)));
-        cbxAlign.ItemAddRange(ItemsOf(typeof(AlignmentHorizontal)));
-        cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
-        cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
-        cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
-
-        var l = Generic.GetInstaceOfType<Renderer_Abstract>();
-        foreach (var thisr in l) {
-            cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId,  thisr.SymbolForReadableText() ));
-        }
-
-       
-        cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
         cbxLinkedDatabase.ItemClear();
 
         lbxCellEditor.Suggestions.Clear();
@@ -443,38 +443,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbQuickinfo.Text = _column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         txbBildCodeConstHeight.Text = _column.ConstantHeightOfImageCode;
         cbxBildTextVerhalten.Text = ((int)_column.BehaviorOfImageAndText).ToString();
-        //txbBestFileStandardFolder.Text = _column.BestFile_StandardFolder;
-        //txbBestFileStandardSuffix.Text = _column.BestFile_StandardSuffix;
         cbxLinkedDatabase.Text = _column.LinkedDatabaseTableName;
-        //txbLinkedKeyKennung.Text = _column.LinkedKeyKennung;
-
         txbAutoRemove.Text = _column.AutoRemove;
-        //butSaveContent.Checked = _column.SaveContent;
-
-        //cbxSchlüsselspalte.Item.Clear();
-        //cbxSchlüsselspalte.ItemAdd(Add("#Ohne", "-1"));
-        //cbxDropDownKey.Item.Clear();
-        //cbxDropDownKey.ItemAdd(Add("#Ohne", "-1"));
-        //cbxVorschlagSpalte.Item.Clear();
-        //cbxVorschlagSpalte.ItemAdd(Add("#Ohne", "-1"));
-        // Einige Dropdown-Menüs sind abhängig von der LinkedDatabase und werden in dessen TextChanged-Event befüllt
-        // siehe Ende dieser Routine
-        //foreach (var thisColumn in _column.Database.Column) {
-        //    if (thisColumn.IsOk() && thisColumn.Format.CanBeCheckedByRules()) {
-        //        //if (thisColumn.Format == DataFormat.RelationText || !thisColumn.MultiLine) { cbxSchlüsselspalte.ItemAdd(thisColumn); }
-        //        if (!thisColumn.MultiLine && !thisColumn.Format.NeedTargetDatabase()) {
-        //            //cbxDropDownKey.ItemAdd(thisColumn);
-        //            //cbxVorschlagSpalte.ItemAdd(thisColumn);
-        //        }
-        //    }
-        //}
-        //cbxSchlüsselspalte.Item.Sort();
-        //cbxVorschlagSpalte.Item.Sort();
-        //cbxDropDownKey.Item.Sort();
-
-        //SetKeyTo(cbxSchlüsselspalte, _column.KeyColumnKey);
-        //SetKeyTo(cbxDropDownKey, _column.DropdownKey);
-        //SetKeyTo(cbxVorschlagSpalte, _column.VorschlagsColumn);
         cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
     }
 
@@ -487,7 +457,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut) || _column?.Database is null) { return; }
 
         if (_column.IsDisposed) { return; }
-        if(IsClosed) { return; }
+        if (IsClosed) { return; }
 
         if (_column.ColumNameAllowed(txbName.Text)) {
             _column.KeyName = txbName.Text;

@@ -111,7 +111,7 @@ public class Renderer_Default : Renderer_Abstract {
     }
 
     public (string text, QuickImage? qi) GetDrawingData(string originalText, BildTextVerhalten bildTextverhalten, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
-        var tmpText = CalculateValueReadable(originalText, ShortenStyle.Replaced, bildTextverhalten, true, doOpticalTranslation, opticalReplace);
+        var tmpText = ValueReadable(originalText, ShortenStyle.Replaced, bildTextverhalten, true, doOpticalTranslation, opticalReplace);
 
         #region  tmpImageCode
 
@@ -121,7 +121,7 @@ public class Renderer_Default : Renderer_Abstract {
             var imgtxt = tmpText;
 
             if (bildTextverhalten == BildTextVerhalten.Nur_Bild) {
-                imgtxt = CalculateValueReadable(originalText, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, doOpticalTranslation, opticalReplace);
+                imgtxt = ValueReadable(originalText, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true, doOpticalTranslation, opticalReplace);
             }
 
             if (!string.IsNullOrEmpty(imgtxt)) {
@@ -205,38 +205,6 @@ public class Renderer_Default : Renderer_Abstract {
     }
 
     /// <summary>
-    /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="style"></param>
-    /// <param name="bildTextverhalten"></param>
-    /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
-    /// <param name="doOpticalTranslation"></param>
-    /// <param name="opticalReplace"></param>
-    ///
-    ///
-    /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
-        if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
-
-        content = LanguageTool.PrepaireText(content, style, Präfix, Suffix, doOpticalTranslation, opticalReplace);
-        if (removeLineBreaks) {
-            content = content.Replace("\r\n", " ");
-            content = content.Replace("\r", " ");
-        }
-
-        if (style != ShortenStyle.HTML) { return content; }
-
-        content = content.Replace("\r\n", "<br>");
-        content = content.Replace("\r", "<br>");
-        while (content.StartsWith(" ") || content.StartsWith("<br>") || content.EndsWith(" ") || content.EndsWith("<br>")) {
-            content = content.Trim();
-            content = content.Trim("<br>");
-        }
-        return content;
-    }
-
-    /// <summary>
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
@@ -280,6 +248,38 @@ public class Renderer_Default : Renderer_Abstract {
         contentSize.Height = Math.Max(contentSize.Height, 16);
 
         return contentSize;
+    }
+
+    /// <summary>
+    /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="style"></param>
+    /// <param name="bildTextverhalten"></param>
+    /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
+    /// <param name="doOpticalTranslation"></param>
+    /// <param name="opticalReplace"></param>
+    ///
+    ///
+    /// <returns></returns>
+    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace) {
+        if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
+
+        content = LanguageTool.PrepaireText(content, style, Präfix, Suffix, doOpticalTranslation, opticalReplace);
+        if (removeLineBreaks) {
+            content = content.Replace("\r\n", " ");
+            content = content.Replace("\r", " ");
+        }
+
+        if (style != ShortenStyle.HTML) { return content; }
+
+        content = content.Replace("\r\n", "<br>");
+        content = content.Replace("\r", "<br>");
+        while (content.StartsWith(" ") || content.StartsWith("<br>") || content.EndsWith(" ") || content.EndsWith("<br>")) {
+            content = content.Trim();
+            content = content.Trim("<br>");
+        }
+        return content;
     }
 
     private static QuickImage? StandardErrorImage(string gr, BildTextVerhalten bildTextverhalten, string originalText) {

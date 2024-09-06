@@ -90,7 +90,7 @@ public static class LanguageTool {
     /// <param name="doOpticalTranslation"></param>
     /// <param name="opticalReplace"></param>
     /// <returns></returns>
-    public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
+    public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace) {
         if (!string.IsNullOrEmpty(txt)) {
             if (Translation != null && doOpticalTranslation == TranslationType.Übersetzen) {
                 txt = DoTranslate(txt, true);
@@ -101,7 +101,7 @@ public static class LanguageTool {
             if (!string.IsNullOrEmpty(suffix)) { txt = $"{txt} {suffix}"; }
         }
 
-        if (style == ShortenStyle.Unreplaced || opticalReplace.Count == 0) { return txt; }
+        if (opticalReplace == null || style == ShortenStyle.Unreplaced || opticalReplace.Count == 0) { return txt; }
 
         var ot = txt;
         foreach (var thisString in opticalReplace) {

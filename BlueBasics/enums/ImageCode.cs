@@ -94,6 +94,7 @@ public enum ImageCode {
     LupePlus,
     Mauspfeil,
     MinusZeichen,
+    Monitor,
     Note,
     Ordner,
     Papierkorb,

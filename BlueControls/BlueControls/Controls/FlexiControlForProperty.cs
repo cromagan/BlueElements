@@ -59,18 +59,16 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="list"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list) : this(expr, list, false) { }
 
-
     /// <summary>
     /// Anzeige als Dropdown-Feld
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, texteditAllowed ?  ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList) { }
-
-
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, texteditAllowed ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList) { }
 
     /// <summary>
-    /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
+    /// Je nach Datentyp eine andere Anzeige, mit der angegeben Anzahl an Zeilen.
+    /// Listen werden zu Listbox, String zu Textfeldern
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>

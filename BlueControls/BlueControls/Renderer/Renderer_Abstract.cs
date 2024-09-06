@@ -34,19 +34,23 @@ namespace BlueControls.CellRenderer;
 
 public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor, IPropertyChangedFeedback {
 
-    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
-
     #region Fields
 
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
-    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
+
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
+
+    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
+
     private string _lastCode = "?";
+
+    #endregion
+
+    #region Events
 
     public event EventHandler? DoUpdateSideOptionMenu;
 
     #endregion
-
 
     #region Properties
 
@@ -69,10 +73,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return renderer;
     }
 
-    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align);
-
-    public abstract List<GenericControl> GetProperties(int widthOfControl);
-
     public Size ContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
@@ -88,11 +88,12 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return contentsize;
     }
 
+    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode, float scale, Alignment align);
+
+    public abstract List<GenericControl> GetProperties(int widthOfControl);
+
     public override void OnPropertyChanged() {
         _lastCode = ToParseableString();
-
-
-
 
         base.OnPropertyChanged();
     }
@@ -104,28 +105,22 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
     public abstract string ReadableText();
 
-  
-
     public abstract QuickImage? SymbolForReadableText();
 
-
-    public string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
+    public string ValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace) {
         if (string.IsNullOrEmpty(content)) { return string.Empty; }
 
-        var key = (int)style + "|" +   (int)doOpticalTranslation + "|" + TextSizeKey(_lastCode, content);
+        var key = (int)style + "|" + (int)doOpticalTranslation + "|" + TextSizeKey(_lastCode, content);
         if (key == null) { return string.Empty; }
 
         if (Replaced.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
-        var replaced= CalculateValueReadable(content, style, behaviorOfImageAndText, removeLineBreaks, doOpticalTranslation, opticalReplace);
+        var replaced = CalculateValueReadable(content, style, behaviorOfImageAndText, removeLineBreaks, doOpticalTranslation, opticalReplace);
 
         _ = Replaced.TryAdd(key, replaced);
 
         return replaced;
-
     }
-
-    protected abstract string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace);
 
     internal static Renderer_Abstract? RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
@@ -141,6 +136,8 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     }
 
     protected abstract Size CalculateContentSize(string content, Design design, States state, BildTextVerhalten behaviorOfImageAndText, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace, string constantHeightOfImageCode);
+    protected abstract string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten behaviorOfImageAndText, bool removeLineBreaks, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace);
+    protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist, ab.

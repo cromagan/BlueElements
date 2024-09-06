@@ -109,6 +109,7 @@
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="Renderer\Renderer_Abstract.cs" />
+    <Compile Include="Renderer\Renderer_TextOneLine.cs" />
     <Compile Include="Renderer\Renderer_ImageAndText.cs" />
     <Compile Include="Renderer\Renderer_Default.cs" />
     <Compile Include="Classes\AdderItem.cs" />

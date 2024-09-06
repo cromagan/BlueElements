@@ -41,7 +41,9 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     private bool _bild_anzeigen = false;
     private int _constantHeight = 16;
     private int _constantWidth = 16;
+    private List<string> _imagereplace = new();
     private List<string> _opticalReplace = new();
+
     // private string _präfix = string.Empty;
     // private string _suffix = string.Empty;
     private bool _text_anzeigen = true;
@@ -65,6 +67,15 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             _bild_anzeigen = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
+        }
+    }
+
+    public string Bild_ersetzen {
+        get => _imagereplace.JoinWithCr();
+        set {
+            if (string.Equals(_imagereplace.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
+            _imagereplace = value.SplitAndCutByCr().ToList();
+            OnPropertyChanged();
         }
     }
 
@@ -122,11 +133,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         }
     }
 
-    public List<string> Text_ersetzen {
-        get => _opticalReplace;
+    public string Text_ersetzen {
+        get => _opticalReplace.JoinWithCr();
         set {
-            if (!_opticalReplace.IsDifferentTo(value)) { return; }
-            _opticalReplace = value;
+            if (string.Equals(_opticalReplace.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
+            _opticalReplace = value.SplitAndCutByCr().ToList();
             OnPropertyChanged();
         }
     }
@@ -165,7 +176,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             var image = GetImage(splitedContent[z], maxW, constH);
 
-            var replacedText = CalculateValueReadable(splitedContent[z], ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, _opticalReplace.AsReadOnly());
+            var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, _opticalReplace.AsReadOnly());
 
             if (rect.Bottom + pix16 > drawarea.Bottom && z < splitedContent.GetUpperBound(0)) {
                 replacedText = "...";
@@ -211,7 +222,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         if (Text_anzeigen) {
             //result.Add(new FlexiControlForProperty<string>(() => Präfix));
             //result.Add(new FlexiControlForProperty<string>(() => Suffix, cbxEinheit, true));
-            result.Add(new FlexiControlForProperty<List<string>>(() => Text_ersetzen, 5));
+            result.Add(new FlexiControlForProperty<string>(() => Text_ersetzen, 5));
         }
 
         result.Add(new FlexiControlForProperty<bool>(() => Bild_anzeigen));
@@ -219,6 +230,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         if (Bild_anzeigen) {
             result.Add(new FlexiControlForProperty<int>(() => Konstante_Höhe_von_Bildern));
             result.Add(new FlexiControlForProperty<int>(() => Konstante_Breite_von_Bildern));
+            result.Add(new FlexiControlForProperty<string>(() => Bild_ersetzen, 5));
         }
 
         return result;
@@ -242,26 +254,28 @@ public class Renderer_ImageAndText : Renderer_Abstract {
                 return true;
 
             case "replace":
+            case "textreplace":
                 _opticalReplace = value.SplitBy("|").ToList().FromNonCritical();
                 return true;
 
+            case "imagereplace":
+                _imagereplace = value.SplitBy("|").ToList().FromNonCritical();
+                return true;
 
             case "imagewidth":
                 _constantWidth = IntParse(value.FromNonCritical());
                 return true;
 
-
             case "imageheight":
                 _constantHeight = IntParse(value.FromNonCritical());
                 return true;
-
         }
         return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
     }
 
     public override string ReadableText() => "Standard";
 
-    public override QuickImage? SymbolForReadableText() => null;
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
 
     public override string ToParseableString() {
         List<string> result = [];
@@ -273,35 +287,13 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
         //result.ParseableAdd("Suffix", _suffix);
 
-        result.ParseableAdd("Replace", _opticalReplace, true);
+        result.ParseableAdd("TextReplace", _opticalReplace, true);
+        result.ParseableAdd("ImageReplace", _imagereplace, true);
 
         result.ParseableAdd("ImageWidth", _constantWidth);
         result.ParseableAdd("ImageHeight", _constantHeight);
 
         return result.Parseable(base.ToParseableString());
-    }
-
-    /// <summary>
-    /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="style"></param>
-    /// <param name="bildTextverhalten"></param>
-    /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
-    /// <param name="doOpticalTranslation"></param>
-    /// <param name="opticalReplace"></param>
-    /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhaltenx, bool removeLineBreaksx, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplacex) {
-        //if (_bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
-
-        content = LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, doOpticalTranslation, _opticalReplace.AsReadOnly());
-
-        if (style != ShortenStyle.HTML) { return content; }
-
-        content = content.Replace("\r\n", "; ");
-        content = content.Replace("\r", "; ");
-
-        return content;
     }
 
     /// <summary>
@@ -321,7 +313,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         foreach (var thisString in splitedContent) {
             var image = GetImage(thisString, _constantWidth, _constantHeight);
 
-            var replacedText = CalculateValueReadable(thisString, ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, opticalReplace);
+            var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, BehaviorOfImageAndText, false, doOpticalTranslation, opticalReplace);
 
             var tmpSize = font.FormatedText_NeededSize(replacedText, image, 16);
             contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
@@ -334,14 +326,48 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         return contentSize;
     }
 
+    /// <summary>
+    /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="style"></param>
+    /// <param name="bildTextverhalten"></param>
+    /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
+    /// <param name="doOpticalTranslation"></param>
+    /// <param name="opticalReplace"></param>
+    /// <returns></returns>
+    protected override string CalculateValueReadable(string content, ShortenStyle style, BildTextVerhalten bildTextverhaltenx, bool removeLineBreaksx, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplacex) {
+        //if (_bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
+
+        content = LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, doOpticalTranslation, _opticalReplace.AsReadOnly());
+
+        if (style != ShortenStyle.HTML) { return content; }
+
+        content = content.Replace("\r\n", "; ");
+        content = content.Replace("\r", "; ");
+
+        return content;
+    }
+
     private QuickImage? GetImage(string name, int constw, int consth) {
         if (!_bild_anzeigen || string.IsNullOrEmpty(name)) { return null; }
+
+        if (_imagereplace.Count > 0) {
+            foreach (var image in _imagereplace) {
+                if (image.Contains("|")) {
+                    var t = image.SplitBy("|");
+                    if (string.Equals(t[0], name, StringComparison.OrdinalIgnoreCase)) {
+                        name = t[1];
+                        break;
+                    }
+                }
+            }
+        }
 
         var i = QuickImage.Get(QuickImage.GenerateCode(name, constw, consth, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
 
         if (i.IsError) { return null; }
         return i;
-
     }
 
     #endregion
