@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using BlueBasics;
@@ -275,7 +274,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override string ReadableText() => "Standard";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
 
     public override string ToParseableString() {
         List<string> result = [];
@@ -283,15 +282,17 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         result.ParseableAdd("ShowPic", _bild_anzeigen);
         result.ParseableAdd("ShowText", _text_anzeigen);
 
-        //result.ParseableAdd("Prefix", _präfix);
+        // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
+        if (_text_anzeigen) {
+            result.ParseableAdd("TextReplace", _opticalReplace, true);
+        }
 
-        //result.ParseableAdd("Suffix", _suffix);
-
-        result.ParseableAdd("TextReplace", _opticalReplace, true);
-        result.ParseableAdd("ImageReplace", _imagereplace, true);
-
-        result.ParseableAdd("ImageWidth", _constantWidth);
-        result.ParseableAdd("ImageHeight", _constantHeight);
+        // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
+        if (_bild_anzeigen) {
+            result.ParseableAdd("ImageReplace", _imagereplace, true);
+            result.ParseableAdd("ImageWidth", _constantWidth);
+            result.ParseableAdd("ImageHeight", _constantHeight);
+        }
 
         return result.Parseable(base.ToParseableString());
     }

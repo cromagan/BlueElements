@@ -22,7 +22,6 @@ using BlueControls.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using static System.Windows.Forms.Control;
 
 namespace BlueBasics.Interfaces;
 
@@ -34,7 +33,6 @@ namespace BlueBasics.Interfaces;
 public interface ISimpleEditor {
 
     #region Events
-
 
     public event EventHandler? DoUpdateSideOptionMenu;
 

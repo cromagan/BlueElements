@@ -17,11 +17,8 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -30,7 +27,6 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
@@ -133,7 +129,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public override string ReadableText() => "Einzeiliger Text";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
     public override string ToParseableString() {
         List<string> result = [];

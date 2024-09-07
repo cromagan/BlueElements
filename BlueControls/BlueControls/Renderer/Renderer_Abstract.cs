@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -122,7 +121,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return replaced;
     }
 
-    internal static Renderer_Abstract? RendererOf(ColumnViewItem columnViewItem) {
+    internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
             var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
             if (renderer == null) { return RendererOf(columnViewItem.Column); }
@@ -136,7 +135,9 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     }
 
     protected abstract Size CalculateContentSize(string content, Design design, States state, TranslationType doOpticalTranslation);
+
     protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
+
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
@@ -145,7 +146,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     /// <param name="column"></param>
     /// <param name="renderer"></param>
     /// <param name="content"></param>
-    private string? TextSizeKey(string renderer, string content) {
+    private string TextSizeKey(string renderer, string content) {
         return renderer + "|" + content;
     }
 

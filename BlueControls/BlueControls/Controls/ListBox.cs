@@ -19,11 +19,14 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.CellRenderer;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,15 +36,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
-using MessageBox = BlueControls.Forms.MessageBox;
-using Orientation = BlueBasics.Enums.Orientation;
-using BlueControls.ItemCollectionList;
-using BlueBasics.Interfaces;
-using BlueControls.CellRenderer;
-using BlueDatabase;
 
 namespace BlueControls.Controls;
 
@@ -257,7 +252,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    public Renderer_Abstract? Renderer => Renderer_Abstract.Default;
+    public Renderer_Abstract Renderer => Renderer_Abstract.Default;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -853,20 +848,20 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         DoMouseMovement();
     }
 
-    protected override void OnMouseMove(MouseEventArgs e) {
+    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseMove(e);
         if (e.X != _mousepos.X || e.Y != _mousepos.Y) { _mousemoved = true; }
         _mousepos = new Point(e.X, e.Y);
         DoMouseMovement();
     }
 
-    protected override void OnMouseUp(MouseEventArgs e) {
+    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
         var nd = MouseOverNode(e.X, e.Y);
         if (nd is { Enabled: false }) { return; }
         switch (e.Button) {
-            case MouseButtons.Left:
+            case System.Windows.Forms.MouseButtons.Left:
                 if (nd != null) {
                     if (_appearance is ListBoxAppearance.Listbox or
                                       ListBoxAppearance.Listbox_Boxes or
@@ -883,13 +878,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
                 break;
 
-            case MouseButtons.Right:
+            case System.Windows.Forms.MouseButtons.Right:
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                 break;
         }
     }
 
-    protected override void OnMouseWheel(MouseEventArgs e) {
+    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!SliderY.Visible) { return; }
         _mousemoved = false;
