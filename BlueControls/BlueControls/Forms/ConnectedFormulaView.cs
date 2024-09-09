@@ -78,6 +78,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     private void btnElementBearbeiten_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
+        if (!Generic.IsAdministrator()) { return; }
 
         if (_lastItem is not { IsDisposed: false } api) { return; }
 
@@ -96,6 +97,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
+        if (!Generic.IsAdministrator()) { return; }
 
         if (!CFormula.ConnectedFormula.LockEditing()) { return; }
 

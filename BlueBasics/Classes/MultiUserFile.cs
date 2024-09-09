@@ -323,6 +323,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     }
 
     public bool LockEditing() {
+        if (!Generic.IsAdministrator()) { return false; }
+
         if (AgeOfBlockDatei is < 0 or > 3600) {
             //if (AmIBlocker()) { return false; }
 

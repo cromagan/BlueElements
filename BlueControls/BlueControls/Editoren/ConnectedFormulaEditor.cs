@@ -312,10 +312,15 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
+        if (!Generic.IsAdministrator()) { return false; }
+
         if (filename == null || !FileExists(filename)) {
             //CheckButtons();
             return false;
         }
+
+
+
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
@@ -330,6 +335,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
+        if (!Generic.IsAdministrator()) { return; }
         if (_cFormula == formular) { return; }
 
         if (_cFormula != null) {
