@@ -39,7 +39,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     private string _quickinfo;
 
-    private string _scriptText;
+    private string _script;
 
     private List<string> _usergroups;
 
@@ -49,7 +49,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     protected ScriptDescription(string name, string script) {
         _keyName = name;
-        _scriptText = script;
+        _script = script;
 
         _admininfo = string.Empty;
         _quickinfo = string.Empty;
@@ -134,12 +134,12 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         }
     }
 
-    public string ScriptText {
-        get => _scriptText;
+    public string Script {
+        get => _script;
         set {
             if (IsDisposed) { return; }
-            if (_scriptText == value) { return; }
-            _scriptText = value;
+            if (_script == value) { return; }
+            _script = value;
             OnPropertyChanged();
         }
     }
@@ -186,7 +186,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
             case "script":
 
-                _scriptText = value.FromNonCritical();
+                _script = value.FromNonCritical();
                 return true;
 
             case "manualexecutable":
@@ -250,7 +250,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             List<string> result = [];
 
             result.ParseableAdd("Name", _keyName);
-            result.ParseableAdd("Script", _scriptText);
+            result.ParseableAdd("Script", _script);
             //result.ParseableAdd("ManualExecutable", _manualexecutable);
             result.ParseableAdd("ChangeValues", _changeValues);
             result.ParseableAdd("QuickInfo", _quickinfo);

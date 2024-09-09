@@ -81,6 +81,12 @@ public partial class PadEditor : PadEditorReadOnly {
         Pad.AddCentered(b);
     }
 
+    private void btnAddDynamicSymbol_Click(object sender, System.EventArgs e) {
+        DynamicSymbolPadItem b = new();
+        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        Pad.AddCentered(b);
+    }
+
     private void btnAddImage_Click(object sender, System.EventArgs e) {
         BitmapPadItem b = new(QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
         Pad.AddCentered(b);
@@ -178,15 +184,11 @@ public partial class PadEditor : PadEditorReadOnly {
             ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
             txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
             txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
-            if (Pad.Items.SheetStyle != null)
-            {
+            if (Pad.Items.SheetStyle != null) {
                 PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
             }
 
-            cbxSchriftGröße.Text =( (int) (Pad.Items.SheetStyleScale*100)).ToStringInt3();
-            
-
-
+            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
         }
     }
 

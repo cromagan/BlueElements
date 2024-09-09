@@ -97,7 +97,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.eventScriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.eventScriptEditor.Location = new System.Drawing.Point(3, 3);
             this.eventScriptEditor.Name = "eventScriptEditor";
-            this.eventScriptEditor.ScriptText = "";
+            this.eventScriptEditor.Script = "";
             this.eventScriptEditor.Size = new System.Drawing.Size(1046, 504);
             this.eventScriptEditor.TabIndex = 6;
             this.eventScriptEditor.TabStop = false;

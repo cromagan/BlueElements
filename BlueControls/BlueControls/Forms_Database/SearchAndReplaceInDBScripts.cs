@@ -121,10 +121,10 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
                 // db.EventScript =
 
                 foreach (var thiss in t) {
-                    var neu = thiss.ScriptText.Replace(txbAlt.Text, txbNeu.Text);
+                    var neu = thiss.Script.Replace(txbAlt.Text, txbNeu.Text);
 
-                    if (neu != thiss.ScriptText) {
-                        thiss.ScriptText = neu;
+                    if (neu != thiss.Script) {
+                        thiss.Script = neu;
                         count++;
                     }
                 }

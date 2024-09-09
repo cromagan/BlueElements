@@ -38,7 +38,7 @@ internal class Method_Round : Method {
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodType => MethodType.Standard | MethodType.Math;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";

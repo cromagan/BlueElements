@@ -38,7 +38,7 @@ internal class Method_Var : Method {
     public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodType => MethodType.Standard | MethodType.Math;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;

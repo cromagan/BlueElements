@@ -7,7 +7,7 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
-    public sealed partial class AdderScriptEditor  {
+    public sealed partial class DynamicSymbolScriptEditor {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
@@ -29,9 +29,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnBefehlsUebersicht = new BlueControls.Controls.Button();
             this.grpAusführen = new BlueControls.Controls.GroupBox();
             this.btnAusführen = new BlueControls.Controls.Button();
-            this.txbTestZeile = new BlueControls.Controls.TextBox();
-            this.cpZeile = new BlueControls.Controls.Caption();
-            this.btnDatenbankKopf = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -94,7 +91,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.Controls.Add(this.btnSaveLoad);
             this.grpAktionen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAktionen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAktionen.Location = new System.Drawing.Point(608, 3);
+            this.grpAktionen.Location = new System.Drawing.Point(152, 3);
             this.grpAktionen.Name = "grpAktionen";
             this.grpAktionen.Size = new System.Drawing.Size(64, 75);
             this.grpAktionen.TabIndex = 2;
@@ -116,13 +113,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpInfos
             // 
             this.grpInfos.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpInfos.Controls.Add(this.btnDatenbankKopf);
             this.grpInfos.Controls.Add(this.btnBefehlsUebersicht);
             this.grpInfos.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpInfos.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpInfos.Location = new System.Drawing.Point(464, 3);
+            this.grpInfos.Location = new System.Drawing.Point(72, 3);
             this.grpInfos.Name = "grpInfos";
-            this.grpInfos.Size = new System.Drawing.Size(144, 75);
+            this.grpInfos.Size = new System.Drawing.Size(80, 75);
             this.grpInfos.TabIndex = 1;
             this.grpInfos.TabStop = false;
             this.grpInfos.Text = "Infos";
@@ -131,24 +127,21 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnBefehlsUebersicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnBefehlsUebersicht.ImageCode = "Tabelle|16";
-            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(72, 2);
+            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(8, 2);
             this.btnBefehlsUebersicht.Name = "btnBefehlsUebersicht";
             this.btnBefehlsUebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 4;
             this.btnBefehlsUebersicht.Text = "Befehls-Übersicht";
-            this.btnBefehlsUebersicht.Click += new System.EventHandler(DatabaseScriptEditor.btnBefehlsUebersicht_Click);
             // 
             // grpAusführen
             // 
             this.grpAusführen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAusführen.Controls.Add(this.txbTestZeile);
-            this.grpAusführen.Controls.Add(this.cpZeile);
             this.grpAusführen.Controls.Add(this.btnAusführen);
             this.grpAusführen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAusführen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAusführen.Location = new System.Drawing.Point(3, 3);
             this.grpAusführen.Name = "grpAusführen";
-            this.grpAusführen.Size = new System.Drawing.Size(461, 75);
+            this.grpAusführen.Size = new System.Drawing.Size(69, 75);
             this.grpAusführen.TabIndex = 0;
             this.grpAusführen.TabStop = false;
             this.grpAusführen.Text = "Ausführen";
@@ -164,42 +157,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnAusführen.Text = "Aus-führen";
             this.btnAusführen.Click += new System.EventHandler(this.btnAusführen_Click);
             // 
-            // txbTestZeile
+            // DynamicSymbolScriptEditor
             // 
-            this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTestZeile.Enabled = true;
-            this.txbTestZeile.Location = new System.Drawing.Point(73, 24);
-            this.txbTestZeile.Name = "txbTestZeile";
-            this.txbTestZeile.RaiseChangeDelay = 5;
-            this.txbTestZeile.Size = new System.Drawing.Size(379, 22);
-            this.txbTestZeile.TabIndex = 9;
-            // 
-            // cpZeile
-            // 
-            this.cpZeile.CausesValidation = false;
-            this.cpZeile.Location = new System.Drawing.Point(73, 2);
-            this.cpZeile.Name = "cpZeile";
-            this.cpZeile.Size = new System.Drawing.Size(112, 22);
-            this.cpZeile.Text = "Betreffende Zeile:";
-            // 
-            // btnDatenbankKopf
-            // 
-            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
-            this.btnDatenbankKopf.Location = new System.Drawing.Point(8, 2);
-            this.btnDatenbankKopf.Name = "btnDatenbankKopf";
-            this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
-            this.btnDatenbankKopf.TabIndex = 46;
-            this.btnDatenbankKopf.Text = "Datenbank-Kopf";
-            this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
-            // 
-            // AdderScriptEditor
-            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(1297, 677);
             this.Controls.Add(this.eventScriptEditor);
             this.Controls.Add(this.ribMain);
             this.MinimizeBox = false;
-            this.Name = "AdderScriptEditor";
+            this.Name = "DynamicSymbolScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
             this.TopMost = true;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -224,8 +189,5 @@ namespace BlueControls.BlueDatabaseDialogs {
         private GroupBox grpAktionen;
         private Button btnSaveLoad;
         private Button btnAusführen;
-        private TextBox txbTestZeile;
-        private Caption cpZeile;
-        private Button btnDatenbankKopf;
     }
 }

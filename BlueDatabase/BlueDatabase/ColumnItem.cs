@@ -1879,7 +1879,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
 
         foreach (var thiss in Database.EventScript) {
-            if (thiss.ScriptText.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
+            if (thiss.Script.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
         }
 
         return false;

@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueControls.Enums;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
 using BlueControls.CellRenderer;

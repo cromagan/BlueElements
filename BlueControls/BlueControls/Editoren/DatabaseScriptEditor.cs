@@ -138,7 +138,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
                 chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 chkAendertWerte.Checked = value.ChangeValues;
-                eventScriptEditor.ScriptText = value.ScriptText;
+                eventScriptEditor.Script = value.Script;
 
                 lstPermissionExecute.ItemClear();
                 var l = Table.Permission_AllUsed(false).ToList();
@@ -159,7 +159,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 txbName.Text = string.Empty;
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
-                eventScriptEditor.ScriptText = string.Empty;
+                eventScriptEditor.Script = string.Empty;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_prepaireformula.Checked = false;
@@ -312,8 +312,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 var found = false;
                 foreach (var t in ai) {
                     var s = new DatabaseScriptDescription(db, t);
-                    if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.ScriptText != s.ScriptText) {
-                        l.Add(s.ScriptText);
+                    if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.Script != s.Script) {
+                        l.Add(s.Script);
                         found = true;
                         break;
                     }
@@ -485,7 +485,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void ScriptEditor_PropertyChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
-        Item.ScriptText = eventScriptEditor.ScriptText;
+        Item.Script = eventScriptEditor.Script;
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
@@ -534,7 +534,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }) { return; }
 
         if (_item != null) {
-            _item.ScriptText = eventScriptEditor.ScriptText;
+            _item.Script = eventScriptEditor.Script;
         }
 
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst

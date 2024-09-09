@@ -64,7 +64,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     #region Constructors
 
     protected AbstractPadItem(string keyName) : base() {
+      
         _keyName = keyName;
+        if(string.IsNullOrEmpty(_keyName)) {_keyName = Generic.GetUniqueKey(); }
+
         MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
     }
 
@@ -157,8 +160,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     public List<string> Tags { get; } = [];
 
     /// <summary>
-    /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
-    /// nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
+    /// Gibt die aktuellen Koordinaten des Objektes zurück. Unabhängig von der aktuellen Ansicht.
+    /// Nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
     /// </summary>
     /// <remarks></remarks>
     public RectangleF UsedArea {

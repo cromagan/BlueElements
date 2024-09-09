@@ -108,6 +108,13 @@
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
+    <Compile Include="Editoren\DynamicSymbolScriptEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editoren\DynamicSymbolScriptEditor.Designer.cs">
+      <DependentUpon>DynamicSymbolScriptEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Renderer\Renderer_Abstract.cs" />
     <Compile Include="Renderer\Renderer_TextOneLine.cs" />
     <Compile Include="Renderer\Renderer_ImageAndText.cs" />
@@ -723,6 +730,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectedFormula\RowAdder.resx">
       <DependentUpon>RowAdder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editoren\DynamicSymbolScriptEditor.resx">
+      <DependentUpon>DynamicSymbolScriptEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\AdderScriptEditor.resx">
       <DependentUpon>AdderScriptEditor.cs</DependentUpon>

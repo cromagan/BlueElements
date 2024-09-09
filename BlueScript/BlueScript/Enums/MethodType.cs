@@ -30,6 +30,11 @@ public enum MethodType {
     Standard = 1,
 
     /// <summary>
+    /// Einfache Berechnungen
+    /// </summary>
+    Math = 2,
+
+    /// <summary>
     /// Methoden, die über einer Datenbank aufgerufen werden müssen.
     /// Z.B. weil sie die eigene Datenbank brauchen, um andere Datenbanken finden zu können.
     /// </summary>
@@ -57,5 +62,5 @@ public enum MethodType {
     /// </summary>
     Special = 256,
 
-    AllDefault = Standard | Database | MyDatabaseRow | ManipulatesUser | SpecialVariables
+    AllDefault = Standard | Math | Database | MyDatabaseRow | ManipulatesUser | SpecialVariables 
 }

@@ -71,7 +71,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
 
     #region Properties
 
-    public string ScriptText {
+    public string Script {
         get => txtSkript.Text.TrimEnd(" ");
         set => txtSkript.Text = value.TrimEnd(" ") + "    ";
     }

@@ -56,8 +56,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
     #region Constructors
 
     protected AbstractListItem(string keyName, bool enabled) {
-        KeyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
-        if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
+        _keyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
+        if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
         _enabled = enabled;
         Pos = Rectangle.Empty;
         _userDefCompareKey = string.Empty;

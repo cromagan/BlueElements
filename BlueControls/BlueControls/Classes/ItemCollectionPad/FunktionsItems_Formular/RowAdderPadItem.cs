@@ -258,7 +258,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
                 return true;
 
             case "script":
-                Script = value.FromNonCritical();
+                _script = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);
@@ -290,7 +290,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
-        result.ParseableAdd("Script", Script);
+        result.ParseableAdd("Script", _script);
         return result.Parseable(base.ToParseableString());
     }
 

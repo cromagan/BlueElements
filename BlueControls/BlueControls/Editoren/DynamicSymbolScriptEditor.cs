@@ -17,53 +17,50 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
-using System.Collections.Generic;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.IO;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
+using BlueControls.ItemCollectionPad;
+using BlueBasics;
+using BlueScript.Enums;
+using BlueScript.Variables;
+using System.Drawing;
+using System;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase {
+public sealed partial class DynamicSymbolScriptEditor: FormWithStatusBar {
 
     #region Fields
 
-    private Database? _database;
 
-    private RowAdderPadItem? _item;
+    private DynamicSymbolPadItem? _item;
 
     #endregion
 
     #region Constructors
 
-    public AdderScriptEditor() {
+    public DynamicSymbolScriptEditor() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         eventScriptEditor.Enabled = false;
 
-        var l = new List<string> {
-                "In die Variable MENU muss das Menu erstellt werden.",
-                "Dies muss folgendens Format sein:",
-                "Backen",
-                "Backen\\Zutaten",
-                "Backen\\Zutaten\\Mehl",
-                " ",
-                "Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.",
-                " ",
-                "Parallel dazu kann die Variable Infos erstellt werden.",
-                "Freie Texte."
-            };
-        l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
+        //var l = new List<string> {
+        //        "In die Variable MENU muss das Menu erstellt werden.",
+        //        "Dies muss folgendens Format sein:",
+        //        "Backen",
+        //        "Backen\\Zutaten",
+        //        "Backen\\Zutaten\\Mehl",
+        //        " ",
+        //        "Parallel dazu kann die Variable Infos erstellt werden.",
+        //        "Freie Texte."
+        //    };
+        //l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
 
         FormManager.RegisterForm(this);
     }
@@ -72,24 +69,9 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
 
     #region Properties
 
-    public Database? Database {
-        get => _database;
-        set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _database) { return; }
 
-            if (_database != null) {
-                _database.DisposingEvent -= _database_Disposing;
-            }
-            _database = value;
 
-            if (_database != null) {
-                _database.DisposingEvent += _database_Disposing;
-            }
-        }
-    }
-
-    public RowAdderPadItem? Item {
+    public DynamicSymbolPadItem? Item {
         get {
             if (IsDisposed) { return null; }
 
@@ -108,6 +90,7 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
                 _item = value;
             } else {
                 eventScriptEditor.Enabled = false;
+
                 eventScriptEditor.Script = string.Empty;
             }
         }
@@ -133,14 +116,9 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
 
     protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}
 
-    private void _database_Disposing(object sender, System.EventArgs e) {
-        Database = null;
-        Close();
-    }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;
@@ -152,8 +130,8 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
     }
 
     private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false }) {
-            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
+        if (IsDisposed ) {
+            e.Feedback = new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
             return;
         }
 
@@ -164,27 +142,48 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
 
         WriteInfosBack();
 
-        if (!_item.IsOk()) {
-            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
-            return;
-        }
+        //if (!_item.IsOk()) {
+        //    e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
+        //    return;
+        //}
 
-        if (Database.Row.Count == 0) {
-            e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
-            return;
-        }
-        if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-            txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
-        }
+        //if (Database.Row.Count == 0) {
+        //    e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+        //    return;
+        //}
+        //if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+        //    txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
+        //}
 
-        RowItem? r = Database?.Row[txbTestZeile.Text];
-        if (r is not { IsDisposed: not true }) {
-            e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
-            return;
-        }
+        //RowItem? r = Database?.Row[txbTestZeile.Text];
+        //if (r is not { IsDisposed: not true }) {
+        //    e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
+        //    return;
+        //}
 
-        e.Feedback = RowAdder.ExecuteScript(_item.Script, "Testmodus", _item.EntityID, r);
+         var r = _item.UsedArea.ToRect();
+        using var bmp = new Bitmap(Math.Max(r.Width,16), Math.Max(r.Height, 16));
+
+        e.Feedback = DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void WriteInfosBack() {
         //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }

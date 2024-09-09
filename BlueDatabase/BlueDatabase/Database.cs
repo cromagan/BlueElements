@@ -1340,7 +1340,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         foreach (var thisCom in BlueScript.Methods.Method.AllMethods) {
             if (thisCom.Verwendung.Count < 3) {
-                if (ev.ScriptText.ContainsWord(thisCom.Command + thisCom.StartSequence, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
+                if (ev.Script.ContainsWord(thisCom.Command + thisCom.StartSequence, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
                     thisCom.Verwendung.AddIfNotExists($"Datenbank: {Caption} / {ev.KeyName}");
                     if (thisCom.LastArgMinCount == 3) {
                         thisCom.Verwendung.Add("[WEITERE VERWENDUNGEN VORHANDEN]");
@@ -1409,7 +1409,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             vars.Add(new VariableString("AdditionalFilesPfad", (AdditionalFilesPfadWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
             var sc = new Script(vars, scp) {
-                ScriptText = s.ScriptText
+                ScriptText = s.Script
             };
 
             var scf = sc.Parse(0, s.KeyName, attributes);
