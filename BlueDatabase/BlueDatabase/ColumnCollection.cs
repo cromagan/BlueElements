@@ -234,9 +234,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateOverView() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        Html da = new(Database.TableName);
-        da.AddCaption("Spaltenliste von: " + Database.Caption);
-        da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
+        Html da = new(db.TableName);
+        da.AddCaption("Spaltenliste von: " + db.Caption);
+        da.Add("  <Font face=\"Arial\" Size=\"4\">" + db.TableName + "</h1><br>");
         da.TableBeginn();
         da.RowBeginn();
         da.CellAdd("#");

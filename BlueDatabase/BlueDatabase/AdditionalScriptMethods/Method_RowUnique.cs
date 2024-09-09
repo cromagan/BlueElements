@@ -71,13 +71,13 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public static DoItFeedback UniqueRow(LogData ld, FilterCollection allFi, ScriptProperties scp, string coment) {
+    public static DoItFeedback UniqueRow(LogData ld, FilterCollection fic, string coment) {
         RowItem? newrow;
         string message;
         var t = Stopwatch.StartNew();
 
         do {
-            (newrow, message) = RowCollection.UniqueRow(allFi, coment);
+            (newrow, message) = RowCollection.UniqueRow(fic, coment);
 
             if (newrow != null && string.IsNullOrEmpty(message)) { break; }
             if (t.Elapsed.TotalMinutes > 5) { break; }
@@ -130,7 +130,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         //    return Method_Row.RowToObjectFeedback(nr.newrow);
         //}
 
-        return UniqueRow(ld, allFi, scp, $"Script-Befehl: 'RowUnique' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+        return UniqueRow(ld, allFi, $"Script-Befehl: 'RowUnique' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;

@@ -117,6 +117,8 @@ public class VariableBool : Variable {
         }
     }
 
+ private static readonly LogData dummyLog = new LogData("Bool",0 );
+
     protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (Method_If.GetBool(txt) is { } b) { return (true, b); }
 
@@ -142,7 +144,7 @@ public class VariableBool : Variable {
             var s1 = txt.Substring(0, i);
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, null, vs, scp);
+                var tmp1 = GetVariableByParsing(s1, dummyLog, vs, scp);
                 if (!tmp1.AllOk) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                 v1 = tmp1.Variable;
@@ -157,7 +159,7 @@ public class VariableBool : Variable {
             var s2 = txt.Substring(i + check.Length);
             if (string.IsNullOrEmpty(s2)) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
-            var tmp2 = GetVariableByParsing(s2, null, vs, scp);
+            var tmp2 = GetVariableByParsing(s2, dummyLog, vs, scp);
             if (!tmp2.AllOk) {
                 return (false, null);//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }

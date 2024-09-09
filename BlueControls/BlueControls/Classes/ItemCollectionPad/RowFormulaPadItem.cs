@@ -191,7 +191,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         }
 
         CreativePad pad = new(new ItemCollectionPad(_layoutFileName));
-        if (pad.Item is { IsDisposed: false } icp) {
+        if (pad.Items is { IsDisposed: false } icp) {
             icp.ResetVariables();
             icp.ReplaceVariables(db, _rowKey);
 
@@ -206,7 +206,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             pad.ShowInPrintMode = true;
             pad.Unselect();
             if (Parent?.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
-            pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, string.Empty);
+            pad.Items.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, string.Empty);
             GeneratedBitmap = generatedBitmap;
         }
     }

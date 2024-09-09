@@ -146,9 +146,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     /// <param name="column"></param>
     /// <param name="renderer"></param>
     /// <param name="content"></param>
-    private string TextSizeKey(string renderer, string content) {
-        return renderer + "|" + content;
-    }
+    private string TextSizeKey(string renderer, string content) => renderer + "|" + content;
 
     #endregion
 }

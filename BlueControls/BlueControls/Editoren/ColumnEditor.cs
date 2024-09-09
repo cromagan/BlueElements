@@ -109,9 +109,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
     }
 
-    private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) {
-        _renderer.DoForm(RendererEditor);
-    }
+    private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
 
     private bool AllOk() {
         var feh = string.Empty;

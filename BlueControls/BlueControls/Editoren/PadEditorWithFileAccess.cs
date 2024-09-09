@@ -49,7 +49,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     public void DisablePad() {
         CheckSave();
         _lastFileName = string.Empty;
-        Pad.Item = [];
+        Pad.Items = [];
         Pad.Enabled = false;
     }
 
@@ -60,7 +60,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     public void LoadFile(string fileName) {
         CheckSave();
         Pad.Enabled = true;
-        Pad.Item = new ItemCollectionPad.ItemCollectionPad(fileName);
+        Pad.Items = new ItemCollectionPad.ItemCollectionPad(fileName);
         btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
         _lastFileName = fileName;
     }
@@ -75,7 +75,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnNeu_Click(object sender, System.EventArgs e) {
         CheckSave();
         _lastFileName = string.Empty;
-        Pad?.Item?.Clear();
+        Pad?.Items?.Clear();
         Pad?.ZoomFit();
     }
 
@@ -88,22 +88,22 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void CheckSave() {
         if (string.IsNullOrWhiteSpace(_lastFileName)) { return; }
-        if (Pad?.Item is not { IsSaved: not true }) { return; }
+        if (Pad?.Items is not { IsSaved: not true }) { return; }
 
-        Pad.Item.IsSaved = true;
+        Pad.Items.IsSaved = true;
 
         if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
-        var t = Pad.Item.ToParseableString();
+        var t = Pad.Items.ToParseableString();
         WriteAllText(_lastFileName, t, Constants.Win1252, false);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName);
 
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {
-        if (Pad?.Item == null) { return; }
+        if (Pad?.Items == null) { return; }
 
-        var t = Pad.Item.ToParseableString();
+        var t = Pad.Items.ToParseableString();
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         _lastFileName = SaveTab.FileName;

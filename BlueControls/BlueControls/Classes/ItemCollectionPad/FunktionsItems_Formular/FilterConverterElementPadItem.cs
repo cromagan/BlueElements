@@ -268,7 +268,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, forPrinting, OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

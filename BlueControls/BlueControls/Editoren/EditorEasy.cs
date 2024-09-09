@@ -37,9 +37,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
     #region Constructors
 
-    public EditorEasy() {
-        InitializeComponent();
-    }
+    public EditorEasy() => InitializeComponent();
 
     #endregion
 

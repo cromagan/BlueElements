@@ -86,7 +86,7 @@ public class Script {
         #region Befehle prüfen
 
         foreach (var thisC in scp.AllowedMethods) {
-            var f = thisC.CanDo(scp, scriptText, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
@@ -124,7 +124,7 @@ public class Script {
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
         foreach (var thisC in scp.AllowedMethods) {
-            var f = thisC.CanDo(scp, scriptText, pos, !expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
@@ -145,7 +145,7 @@ public class Script {
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 
         foreach (var thisC in Method.AllMethods) {
-            var f = thisC.CanDo(scp, scriptText, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
             //if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {

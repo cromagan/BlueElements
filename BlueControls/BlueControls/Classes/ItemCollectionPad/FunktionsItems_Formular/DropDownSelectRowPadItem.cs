@@ -193,7 +193,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, forPrinting, OutputColorId);
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
             DrawColorScheme(gr, positionModified, zoom, null, true, true, true);
         } else {

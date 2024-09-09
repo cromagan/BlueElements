@@ -59,7 +59,7 @@ public partial class PadEditorReadOnly : FormWithStatusBar {
 
             var x = new List<string>();
 
-            if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }
+            if (Pad?.Items != null) { x.AddRange(Pad.Items.AllPages()); }
 
             if (Pad != null) { _ = x.AddIfNotExists(Pad.CurrentPage); }
 

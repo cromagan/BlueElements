@@ -30,9 +30,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
 
     #region Constructors
 
-    public FilterCollectionEditor() {
-        InitializeComponent();
-    }
+    public FilterCollectionEditor() => InitializeComponent();
 
     #endregion
 

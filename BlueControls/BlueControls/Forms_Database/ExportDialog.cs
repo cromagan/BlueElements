@@ -125,9 +125,9 @@ public sealed partial class ExportDialog : IHasDatabase {
     /// <param name="abstandMm"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
     public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, List<RowItem>? rowsForExport, float abstandMm) {
-        if (pad.Item == null) { return -1; }
+        if (pad.Items == null) { return -1; }
 
-        pad.Item.Clear();
+        pad.Items.Clear();
         Generic.CollectGarbage();
 
         if (rowsForExport is not { Count: >= 1 }) { return -1; }
@@ -138,10 +138,10 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (!scx.AllOk) { return -1; }
 
         var oneItem = tmp.MaxBounds(string.Empty);
-        pad.Item.SheetStyle = tmp.SheetStyle;
-        pad.Item.SheetStyleScale = tmp.SheetStyleScale;
+        pad.Items.SheetStyle = tmp.SheetStyle;
+        pad.Items.SheetStyleScale = tmp.SheetStyleScale;
         tmp.Dispose();
-        var druckB = pad.Item.DruckbereichRect();
+        var druckB = pad.Items.DruckbereichRect();
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), MidpointRounding.AwayFromZero);
         var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));
         for (var x = 0; x < tempVar; x++) {
@@ -151,12 +151,12 @@ public sealed partial class ExportDialog : IHasDatabase {
                     PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layoutFileName))
                 };
 
-                if (it.PadInternal.Item is { IsDisposed: false } icp) {
+                if (it.PadInternal.Items is { IsDisposed: false } icp) {
                     icp.ResetVariables();
                     icp.ReplaceVariables(rowsForExport[startNr]);
                 }
 
-                pad.Item.Add(it);
+                pad.Items.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
@@ -185,10 +185,10 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
 
-        if (padSchachteln.Item != null) {
-            padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
-            padSchachteln.Item.RandinMm = Padding.Empty;
-            padSchachteln.Item.BackColor = Color.Transparent;
+        if (padSchachteln.Items != null) {
+            padSchachteln.Items.SheetSizeInMm = new SizeF(b, h);
+            padSchachteln.Items.RandinMm = Padding.Empty;
+            padSchachteln.Items.BackColor = Color.Transparent;
         }
 
         _ = GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
@@ -224,8 +224,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
-        padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
-        padSchachteln.Item.RandinMm = Padding.Empty;
+        padSchachteln.Items.SheetSizeInMm = new SizeF(b, h);
+        padSchachteln.Items.RandinMm = Padding.Empty;
         List<string> l = [];
         _itemNrForPrint = 0;
         do {
@@ -233,8 +233,8 @@ public sealed partial class ExportDialog : IHasDatabase {
             _itemNrForPrint = GeneratePrintPad(padSchachteln, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, ab);
 
             var x = TempFile(_zielPfad, _rowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
-            padSchachteln.Item.BackColor = Color.Transparent;
-            padSchachteln.Item.SaveAsBitmap(x, string.Empty);
+            padSchachteln.Items.BackColor = Color.Transparent;
+            padSchachteln.Items.SaveAsBitmap(x, string.Empty);
             l.Add(x);
             if (nr == _itemNrForPrint) { break; }
             if (_itemNrForPrint >= _rowsForExport.Count) { break; }
@@ -256,12 +256,12 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
         if (Database == null || string.IsNullOrEmpty(cbxLayoutWahl.Text) || _rowsForExport == null || !_rowsForExport.Any()) {
-            padVorschau.Item?.Clear();
+            padVorschau.Items?.Clear();
         } else {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text);
-            padVorschau.Item.ResetVariables();
-            padVorschau.Item.ReplaceVariables(_rowsForExport[0]);
+            padVorschau.Items = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text);
+            padVorschau.Items.ResetVariables();
+            padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();
         }
     }

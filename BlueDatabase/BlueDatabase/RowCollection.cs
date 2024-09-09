@@ -514,7 +514,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0, null, true, false);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, 0, null, true, false);
 
             if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
@@ -617,7 +617,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 
-        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, true, true, 0.1f, null, true, false);
+        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
         //if (db.Column.HasKeyColumns()) {
         //    _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null, true);
         //}
@@ -742,8 +742,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public void RemoveYoungest(ICollection<RowItem> rows, bool reduceToOne) {
         if (Database is not { IsDisposed: false } db) { return; }
 
-        var l = new List<RowItem>();
-        l = rows.Distinct().ToList();
+        var l = rows.Distinct().ToList();
 
         if (l.Count < 2) { return; }
 
@@ -864,7 +863,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             OnRowRemoving(new RowChangedEventArgs(row, reason));
 
             if (reason == Reason.SetCommand) {
-                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, false, false, true, 3, null, true, false);
+                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
             }
 
             foreach (var thisColumn in db.Column) {
@@ -891,7 +890,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: not true } r) { return; }
-        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10, null, true, false);
+        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, 10, null, true, false);
     }
 
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);

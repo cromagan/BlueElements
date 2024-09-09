@@ -91,7 +91,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
-        if (Pad?.Item?[what] != null) { return null; }
+        if (Pad?.Items?[what] != null) { return null; }
         var r = db.Row[what];
         if (r is not { IsDisposed: not true }) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
@@ -108,8 +108,8 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     public RowFormulaPadItem? ItemOfRow(RowItem r) {
-        if (Pad.Item != null) {
-            foreach (var thisItem in Pad.Item) {
+        if (Pad.Items != null) {
+            foreach (var thisItem in Pad.Items) {
                 if (thisItem is RowFormulaPadItem tempVar && tempVar.Row == r) {
                     return tempVar;
                 }
@@ -312,14 +312,14 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //}
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
-        if (Pad.Item is not { IsDisposed: not true }) { return; }
+        if (Pad.Items is not { IsDisposed: not true }) { return; }
         if (_column == null) { return; }
 
         FolderBrowserDialog fl = new();
         _ = fl.ShowDialog();
 
         List<string> l = [];
-        foreach (var thisR in Pad.Item) {
+        foreach (var thisR in Pad.Items) {
             if (thisR is RowFormulaPadItem { Row: { IsDisposed: false } r }) {
                 //_ = r.Row.ExecuteScript(true, true, "to be sure");
                 l.Add("#######################################################################");
@@ -354,7 +354,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (i is not { Count: 1 }) { return; }
 
         _ = AddOne(i[0], 0, 0, string.Empty);
-        if (Pad.Item is { Count: < 10 }) {
+        if (Pad.Items is { Count: < 10 }) {
             Pad.ZoomFit();
         }
         //RepairLinesAndFullProcessing();

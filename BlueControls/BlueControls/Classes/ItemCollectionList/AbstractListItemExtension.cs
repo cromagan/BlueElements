@@ -40,7 +40,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);
 
-    public static CellLikeListItem ItemOf(string value, ColumnItem? columnStyle, Renderer_Abstract cellRenderer) => new(value, columnStyle, true, cellRenderer);
+    public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType);
 
     public static TextListItem ItemOf(ContextMenuCommands command, bool enabled = true) {
         var internalName = command.ToString();

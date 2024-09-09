@@ -148,9 +148,9 @@ public partial class Voting : System.Windows.Forms.Form {
         }
 
         if (_fr1 == null || _fr2 == null || string.IsNullOrWhiteSpace(_filename)) {
-            Pad1.Item?.Clear();
+            Pad1.Items?.Clear();
             btn1.Enabled = false;
-            Pad2.Item?.Clear();
+            Pad2.Items?.Clear();
             btn2.Enabled = false;
             return;
         }
@@ -178,7 +178,7 @@ public partial class Voting : System.Windows.Forms.Form {
         p1.ResetVariables();
         p1.ReplaceVariables(_fr1);
 
-        Pad1.Item = p1;
+        Pad1.Items = p1;
         Pad1.ShowInPrintMode = true;
         Pad1.ZoomFit();
 
@@ -186,7 +186,7 @@ public partial class Voting : System.Windows.Forms.Form {
         p2.ResetVariables();
         p2.ReplaceVariables(_fr2);
 
-        Pad2.Item = p2;
+        Pad2.Items = p2;
         Pad2.ShowInPrintMode = true;
         Pad2.ZoomFit();
 

@@ -489,7 +489,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
     }
 
-    protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, int colorId) {
+    protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
         var arrowY = (int)(zoom * 12) * 0.45f;
         DrawArrow(gr, positionModified, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);

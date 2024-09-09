@@ -43,8 +43,8 @@ public partial class PadEditor : PadEditorReadOnly {
         PadDesign.ItemAddRange(ItemsOf(Skin.AllStyles()));
         PadDesign.Text = PadDesign[0]?.KeyName ?? string.Empty;
 
-        if (Pad?.Item != null && Skin.StyleDb != null) {
-            Pad.Item.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
+        if (Pad?.Items != null && Skin.StyleDb != null) {
+            Pad.Items.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
         }
 
         cbxSchriftGröße.ItemAdd(ItemOf("30%", "030"));
@@ -70,9 +70,9 @@ public partial class PadEditor : PadEditorReadOnly {
     public void ItemChanged() {
         Pad.ZoomFit();
 
-        if (Pad?.Item?.SheetStyle != null) {
-            PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
-            cbxSchriftGröße.Text = ((int)(Pad.Item.SheetStyleScale * 100)).ToStringInt3();
+        if (Pad?.Items?.SheetStyle != null) {
+            PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
+            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
         }
     }
 
@@ -123,29 +123,29 @@ public partial class PadEditor : PadEditorReadOnly {
     private void btnArbeitsbreichSetup_Click(object sender, System.EventArgs e) => Pad.ShowWorkingAreaSetup();
 
     private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
-        if (Pad?.Item == null) { return; }
+        if (Pad?.Items == null) { return; }
 
-        ColorDia.Color = Pad.Item.BackColor;
+        ColorDia.Color = Pad.Items.BackColor;
         _ = ColorDia.ShowDialog();
-        Pad.Item.BackColor = ColorDia.Color;
+        Pad.Items.BackColor = ColorDia.Color;
         Pad.Invalidate();
     }
 
     private void btnKeinHintergrund_Click(object sender, System.EventArgs e) {
-        if (Pad?.Item == null) { return; }
+        if (Pad?.Items == null) { return; }
 
-        Pad.Item.BackColor = Color.Transparent;
+        Pad.Items.BackColor = Color.Transparent;
         Pad.Invalidate();
     }
 
     private void cbxSchriftGröße_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Item == null) { return; }
-        Pad.Item.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
+        if (Pad?.Items == null) { return; }
+        Pad.Items.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
     }
 
     private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
-        if (Pad?.Item == null) { return; }
-        Pad.Item.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
+        if (Pad?.Items == null) { return; }
+        Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
     }
 
     private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
@@ -170,20 +170,20 @@ public partial class PadEditor : PadEditorReadOnly {
     }
 
     private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
-        ckbRaster.Enabled = Pad.Item != null;
-        txbRasterAnzeige.Enabled = Pad.Item != null;
-        txbRasterFangen.Enabled = Pad.Item != null;
+        ckbRaster.Enabled = Pad.Items != null;
+        txbRasterAnzeige.Enabled = Pad.Items != null;
+        txbRasterFangen.Enabled = Pad.Items != null;
 
-        if (Pad.Item != null) {
-            ckbRaster.Checked = Pad.Item.SnapMode == SnapMode.SnapToGrid;
-            txbRasterAnzeige.Text = Pad.Item.GridShow.ToStringFloat2();
-            txbRasterFangen.Text = Pad.Item.GridSnap.ToStringFloat2();
-            if (Pad.Item.SheetStyle != null)
+        if (Pad.Items != null) {
+            ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
+            txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
+            txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
+            if (Pad.Items.SheetStyle != null)
             {
-                PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
+                PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
             }
 
-            cbxSchriftGröße.Text =( (int) (Pad.Item.SheetStyleScale*100)).ToStringInt3();
+            cbxSchriftGröße.Text =( (int) (Pad.Items.SheetStyleScale*100)).ToStringInt3();
             
 
 
@@ -191,23 +191,23 @@ public partial class PadEditor : PadEditorReadOnly {
     }
 
     private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Item != null && Skin.StyleDb?.Row != null) {
-            Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
+        if (Pad?.Items != null && Skin.StyleDb?.Row != null) {
+            Pad.Items.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
         }
     }
 
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
         if (!txbRasterAnzeige.Visible) { return; }
-        if (Pad?.Item == null) { return; }
-        Pad.Item.GridShow = FloatParse(txbRasterAnzeige.Text);
+        if (Pad?.Items == null) { return; }
+        Pad.Items.GridShow = FloatParse(txbRasterAnzeige.Text);
     }
 
     private void txbRasterFangen_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterFangen.Text.IsNumeral()) { return; }
         if (!txbRasterFangen.Visible) { return; }
-        if (Pad?.Item == null) { return; }
-        Pad.Item.GridSnap = FloatParse(txbRasterFangen.Text);
+        if (Pad?.Items == null) { return; }
+        Pad.Items.GridSnap = FloatParse(txbRasterFangen.Text);
     }
 
     #endregion

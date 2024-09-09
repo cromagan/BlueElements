@@ -50,7 +50,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private readonly List<IMoveable> _itemsToMove = [];
     private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseCommandsTo;
-    private ItemCollectionPad.ItemCollectionPad? _item;
+    private ItemCollectionPad.ItemCollectionPad? _items;
     private AbstractPadItem? _lastClickedItem;
     private string _lastQuickInfo = string.Empty;
     private bool _repairPrinterDataPrepaired;
@@ -64,7 +64,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
-        Item = itemCollectionPad;
+        Items = itemCollectionPad;
         Unselect();
         MouseHighlight = false;
     }
@@ -127,22 +127,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionPad.ItemCollectionPad? Item {
-        get => _item;
+    public ItemCollectionPad.ItemCollectionPad? Items {
+        get => _items;
         set {
-            if (_item == value) { return; }
-            if (_item != null) {
-                _item.ItemRemoved -= _Item_ItemRemoved;
-                _item.ItemRemoving -= _Item_ItemRemoving;
-                _item.ItemAdded -= _Item_ItemAdded;
-                _item.PropertyChanged -= Item_PropertyChanged;
+            if (_items == value) { return; }
+            if (_items != null) {
+                _items.ItemRemoved -= _Items_ItemRemoved;
+                _items.ItemRemoving -= _Items_ItemRemoving;
+                _items.ItemAdded -= _Items_ItemAdded;
+                _items.PropertyChanged -= Items_PropertyChanged;
             }
-            _item = value;
-            if (_item != null) {
-                _item.ItemRemoved += _Item_ItemRemoved;
-                _item.ItemRemoving += _Item_ItemRemoving;
-                _item.ItemAdded += _Item_ItemAdded;
-                _item.PropertyChanged += Item_PropertyChanged;
+            _items = value;
+            if (_items != null) {
+                _items.ItemRemoved += _Items_ItemRemoved;
+                _items.ItemRemoving += _Items_ItemRemoving;
+                _items.ItemAdded += _Items_ItemAdded;
+                _items.PropertyChanged += Items_PropertyChanged;
             }
             Invalidate();
             OnGotNewItemCollection();
@@ -178,14 +178,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     #region Methods
 
     public void CopyPrinterSettingsToWorkingArea() {
-        if (_item is not { IsDisposed: not true }) { return; }
+        if (_items is not { IsDisposed: not true }) { return; }
         if (DruckerDokument.DefaultPageSettings.Landscape) {
-            _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
-            _item.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+            _items.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
+            _items.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
         } else {
             // Hochformat
-            _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-            _item.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+            _items.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+            _items.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
         }
     }
 
@@ -215,7 +215,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 case "#duplicate":
                     var n = (AbstractPadItem)((ICloneable)thisItem).Clone();
                     n.KeyName = Generic.GetUniqueKey();
-                    _item?.Add(n);
+                    _items?.Add(n);
                     return;
             }
         }
@@ -227,13 +227,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         if (hasbase) { base.OnKeyUp(e); }
-        if (!EditAllowed || _item == null) { return; }
+        if (!EditAllowed || _items == null) { return; }
         if (_givesMouseCommandsTo != null) {
             if (_givesMouseCommandsTo.KeyUp(e, Zoom, ShiftX, ShiftY)) { return; }
         }
         var multi = 1f;
-        if (_item.SnapMode == SnapMode.SnapToGrid) {
-            multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);
+        if (_items.SnapMode == SnapMode.SnapToGrid) {
+            multi = Converter.MmToPixel(_items.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);
         }
         if (multi < 1) { multi = 1f; }
         switch (e.KeyCode) {
@@ -245,7 +245,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
                 }
                 Unselect();
-                _item.RemoveRange(itemsDoDelete);
+                _items.RemoveRange(itemsDoDelete);
                 break;
 
             case Keys.Up:
@@ -286,14 +286,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public List<AbstractPadItem> HotItems(MouseEventArgs? e) {
-        if (e == null || _item == null) { return []; }
+        if (e == null || _items == null) { return []; }
 
         if (_givesMouseCommandsTo != null) {
             return _givesMouseCommandsTo.HotItems(e, Zoom, ShiftX, ShiftY);
         }
 
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
-        return _item.Where(thisItem => thisItem != null &&
+        return _items.Where(thisItem => thisItem != null &&
                                         thisItem.IsOnPage(CurrentPage) &&
                                         thisItem.Contains(p, Zoom)).ToList();
     }
@@ -345,19 +345,19 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void ShowWorkingAreaSetup() {
-        if (_item == null) { return; }
+        if (_items == null) { return; }
 
         PrintDocument oriD = new();
         oriD.DefaultPageSettings.Landscape = false;
-        oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_item.SheetSizeInMm.Width / 25.4 * 100), (int)(_item.SheetSizeInMm.Height / 25.4 * 100));
-        oriD.DefaultPageSettings.Margins.Top = (int)(_item.RandinMm.Top / 25.4 * 100);
-        oriD.DefaultPageSettings.Margins.Bottom = (int)(_item.RandinMm.Bottom / 25.4 * 100);
-        oriD.DefaultPageSettings.Margins.Left = (int)(_item.RandinMm.Left / 25.4 * 100);
-        oriD.DefaultPageSettings.Margins.Right = (int)(_item.RandinMm.Right / 25.4 * 100);
+        oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_items.SheetSizeInMm.Width / 25.4 * 100), (int)(_items.SheetSizeInMm.Height / 25.4 * 100));
+        oriD.DefaultPageSettings.Margins.Top = (int)(_items.RandinMm.Top / 25.4 * 100);
+        oriD.DefaultPageSettings.Margins.Bottom = (int)(_items.RandinMm.Bottom / 25.4 * 100);
+        oriD.DefaultPageSettings.Margins.Left = (int)(_items.RandinMm.Left / 25.4 * 100);
+        oriD.DefaultPageSettings.Margins.Right = (int)(_items.RandinMm.Right / 25.4 * 100);
         var nOriD = PageSetupDialog.Show(oriD, true);
         if (nOriD == null) { return; }
-        _item.SheetSizeInMm = new SizeF((int)(nOriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(nOriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-        _item.RandinMm = new Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+        _items.SheetSizeInMm = new SizeF((int)(nOriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(nOriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+        _items.RandinMm = new Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
     }
 
     public void Unselect() {
@@ -379,7 +379,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         it.InitialPosition(pos.X - (wid / 2), pos.Y - (he / 2), wid, he);
 
-        Item?.Add(it);
+        Items?.Add(it);
     }
 
     internal void DoMouseDown(MouseEventArgs e) {
@@ -497,7 +497,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     protected override void Dispose(bool disposing) {
-        Item = null;
+        Items = null;
         base.Dispose(disposing);
     }
 
@@ -508,9 +508,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
-        if (_item != null) {
-            var l = _item.ItemsOnPage(_currentPage);
-            _ = _item.DrawCreativePadTo(gr, l, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, state);
+        if (_items != null) {
+            var l = _items.ItemsOnPage(_currentPage);
+            _ = _items.DrawCreativePadTo(gr, l, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, state);
 
             #region Dann die selektierten Punkte
 
@@ -546,7 +546,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         // Ganz wichtig diese Routine!
         keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
-    protected override RectangleF MaxBounds() => _item?.MaxBounds(_currentPage) ?? new RectangleF(0, 0, 0, 0);
+    protected override RectangleF MaxBounds() => _items?.MaxBounds(_currentPage) ?? new RectangleF(0, 0, 0, 0);
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 
@@ -556,9 +556,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
-    private void _Item_ItemAdded(object sender, ListEventArgs e) {
+    private void _Items_ItemAdded(object sender, ListEventArgs e) {
         if (IsDisposed) { return; }
-        if (_item is not { Count: not 0 } || Fitting) { ZoomFit(); }
+        if (_items is not { Count: not 0 } || Fitting) { ZoomFit(); }
         Invalidate();
 
         var it = (AbstractPadItem)e.Item;
@@ -568,7 +568,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnItemAdded(e);
     }
 
-    private void _Item_ItemRemoved(object sender, System.EventArgs e) {
+    private void _Items_ItemRemoved(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (Fitting) { ZoomFit(); }
 
@@ -579,7 +579,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnItemRemoved();
     }
 
-    private void _Item_ItemRemoving(object sender, ListEventArgs e) {
+    private void _Items_ItemRemoving(object sender, ListEventArgs e) {
         if (IsDisposed) { return; }
         OnItemRemoving(e);
     }
@@ -611,12 +611,12 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
         e.HasMorePages = false;
         OnPrintPage(e);
-        var i = _item?.ToBitmap(3, string.Empty);
+        var i = _items?.ToBitmap(3, string.Empty);
         if (i == null) { return; }
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
-    private void Item_PropertyChanged(object sender, System.EventArgs e) {
+    private void Items_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate();
         OnPropertyChanged();
@@ -668,35 +668,35 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
 
     private void PicsSave_FileOk(object sender, CancelEventArgs e) {
-        if (e.Cancel || _item == null) { return; }
-        _item.SaveAsBitmap(PicsSave.FileName, CurrentPage);
+        if (e.Cancel || _items == null) { return; }
+        _items.SaveAsBitmap(PicsSave.FileName, CurrentPage);
     }
 
     private void RepairPrinterData() {
-        if (_repairPrinterDataPrepaired || _item == null) { return; }
+        if (_repairPrinterDataPrepaired || _items == null) { return; }
         _repairPrinterDataPrepaired = true;
-        DruckerDokument.DocumentName = _item.Caption;
+        DruckerDokument.DocumentName = _items.Caption;
         var done = false;
         foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes) {
-            if (ps.Width == (int)(_item.SheetSizeInMm.Width / 25.4 * 100) && ps.Height == (int)(_item.SheetSizeInMm.Height / 25.4 * 100)) {
+            if (ps.Width == (int)(_items.SheetSizeInMm.Width / 25.4 * 100) && ps.Height == (int)(_items.SheetSizeInMm.Height / 25.4 * 100)) {
                 done = true;
                 DruckerDokument.DefaultPageSettings.PaperSize = ps;
                 break;
             }
         }
         if (!done) {
-            DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(_item.SheetSizeInMm.Width / 25.4 * 100), (int)(_item.SheetSizeInMm.Height / 25.4 * 100));
+            DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(_items.SheetSizeInMm.Width / 25.4 * 100), (int)(_items.SheetSizeInMm.Height / 25.4 * 100));
         }
         DruckerDokument.DefaultPageSettings.PrinterResolution = DruckerDokument.DefaultPageSettings.PrinterSettings.PrinterResolutions[0];
         DruckerDokument.OriginAtMargins = true;
-        DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_item.RandinMm.Left / 25.4 * 100), (int)(_item.RandinMm.Right / 25.4 * 100), (int)(_item.RandinMm.Top / 25.4 * 100), (int)(_item.RandinMm.Bottom / 25.4 * 100));
+        DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_items.RandinMm.Left / 25.4 * 100), (int)(_items.RandinMm.Right / 25.4 * 100), (int)(_items.RandinMm.Top / 25.4 * 100), (int)(_items.RandinMm.Bottom / 25.4 * 100));
     }
 
     private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {
-        if (_item is not { SnapMode: SnapMode.SnapToGrid } || Math.Abs(_item.GridSnap) < 0.001) { return mouseMovedTo; }
+        if (_items is not { SnapMode: SnapMode.SnapToGrid } || Math.Abs(_items.GridSnap) < 0.001) { return mouseMovedTo; }
         if (movedPoint is null) { return 0f; }
 
-        var multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);
+        var multi = Converter.MmToPixel(_items.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);
         float value;
         if (doX) {
             value = movedPoint.X + mouseMovedTo;

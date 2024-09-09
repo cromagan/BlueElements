@@ -249,7 +249,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var it = new RowEntryPadItem(string.Empty) {
             Page = n
         };
-        Pad.Item?.Add(it);
+        Pad.Items?.Add(it);
         CFormula?.Repair();
 
         //it.Datenbank_wählen();
@@ -353,7 +353,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             CFormula.NotAllowedChilds = l.AsReadOnly();
         }
 
-        Pad.Item = CFormula?.PadData;
+        Pad.Items = CFormula?.PadData;
 
         CheckButtons();
     }

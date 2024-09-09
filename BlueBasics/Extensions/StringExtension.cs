@@ -67,11 +67,11 @@ public static partial class Extensions {
         return pose == txt.Length - 1;
     }
 
-    public static string CompareKey(this string isValue, SortierTyp format) {
+    public static string CompareKey(this string isValue, SortierTyp sortType) {
         var compareKeySOk = SecondSortChar + "X";
         var compareKeySNok = SecondSortChar + "A";
 
-        switch (format) {
+        switch (sortType) {
             case SortierTyp.ZahlenwertInt:
                 if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
                 if (IntTryParse(isValue, out var w)) {
@@ -108,7 +108,7 @@ public static partial class Extensions {
                 return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString1() : compareKeySNok + isValue;
 
             default:
-                Develop.DebugPrint(format);
+                Develop.DebugPrint(sortType);
                 return SecondSortChar + isValue;
         }
     }

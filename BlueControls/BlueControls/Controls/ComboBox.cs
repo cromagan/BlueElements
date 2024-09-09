@@ -56,7 +56,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     /// </summary>
     private string _initialtext = string.Empty;
 
-    private List<AbstractListItem> _item = new();
+    private List<AbstractListItem> _items = new();
     private bool _itemEditAllowed;
 
     private string? _lastClickedText;
@@ -140,7 +140,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public int ItemCount => _item.Count;
+    public int ItemCount => _items.Count;
 
     [DefaultValue(false)]
     public bool ItemEditAllowed {
@@ -162,7 +162,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     public AbstractListItem? this[string @internal] {
         get {
             try {
-                return _item.Get(@internal);
+                return _items.Get(@internal);
             } catch {
                 Develop.CheckStackForOverflow();
                 return this[@internal];
@@ -173,9 +173,9 @@ public partial class ComboBox : TextBox, ITranslateable {
     public AbstractListItem? this[int no] {
         get {
             try {
-                if (no < 0 || no >= _item.Count) { return null; }
+                if (no < 0 || no >= _items.Count) { return null; }
 
-                return _item[no];
+                return _items[no];
             } catch {
                 Develop.CheckStackForOverflow();
                 return this[no];
@@ -188,13 +188,13 @@ public partial class ComboBox : TextBox, ITranslateable {
     #region Methods
 
     public void ItemAdd(AbstractListItem item) {
-        _item.Add(item);
+        _items.Add(item);
         Invalidate();
     }
 
     public void ItemClear() {
-        if (_item.Count == 0) { return; }
-        _item.Clear();
+        if (_items.Count == 0) { return; }
+        _items.Clear();
         Invalidate();
     }
 
@@ -205,7 +205,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (_btnDropDownIsIn || !Enabled) { return; }
         _btnDropDownIsIn = true;
         OnDropDownShowing();
-        if (_item.Count == 0) { _btnDropDownIsIn = false; return; }
+        if (_items.Count == 0) { _btnDropDownIsIn = false; return; }
         int x, y;
         if (sender is Button but) {
             x = Cursor.Position.X - but.MousePos().X - but.Location.X;
@@ -217,7 +217,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         List<string> itc = [];
         if (_drawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, _autoSort);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, _autoSort);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;
@@ -227,16 +227,16 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (items == null) { return; }
 
         foreach (var thisIt in items) {
-            _item.Remove(thisIt.KeyName);
+            _items.Remove(thisIt.KeyName);
             ItemAdd(thisIt);
         }
     }
 
-    internal ReadOnlyCollection<AbstractListItem> Items() => _item.AsReadOnly();
+    internal ReadOnlyCollection<AbstractListItem> Items() => _items.AsReadOnly();
 
     internal void Remove(AbstractListItem thisit) {
-        if (!_item.Contains(thisit)) { return; }
-        _item.Remove(thisit);
+        if (!_items.Contains(thisit)) { return; }
+        _items.Remove(thisit);
         Invalidate();
     }
 
@@ -244,7 +244,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected override void DrawControl(Graphics gr, States state) {
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
-            if (_item.Count == 0) {
+            if (_items.Count == 0) {
                 state = States.Standard_Disabled;
             }
         }
@@ -260,13 +260,13 @@ public partial class ComboBox : TextBox, ITranslateable {
             return;
         }
 
-        btnDropDown.Enabled = _item.Count > 0;
+        btnDropDown.Enabled = _items.Count > 0;
         var vType = Design.ComboBox_Textbox;
         if (GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage) {
             vType = Design.Ribbon_ComboBox_Textbox;
         }
 
-        var i = _item.Get(Text);
+        var i = _items.Get(Text);
         if (i == null) {
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
@@ -342,7 +342,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         if (!_itemEditAllowed) { return; }
 
-        var _mouseOverItem = _item.Get(Text);
+        var _mouseOverItem = _items.Get(Text);
 
         var editok = false;
 
@@ -386,7 +386,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (IsDisposed) { return; }
         FloatingForm.Close(this);
 
-        var _mouseOverItem = _item.Get(Text);
+        var _mouseOverItem = _items.Get(Text);
 
         if (_itemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
             ie.Edit();

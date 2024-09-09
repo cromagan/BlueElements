@@ -39,7 +39,7 @@ public partial class ConnectedCreativePad : GenericControlReciver {
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
         SetNotFocusable();
-        pad.Item = itemCollectionPad;
+        pad.Items = itemCollectionPad;
         pad.Unselect();
         pad.ShowInPrintMode = true;
         pad.EditAllowed = false;
@@ -59,13 +59,13 @@ public partial class ConnectedCreativePad : GenericControlReciver {
             if (value?.Database == null || value.IsDisposed) { value = null; }
 
             if (_lastRow == value) { return; }
-            if (pad.Item == null) { return; }
+            if (pad.Items == null) { return; }
 
-            pad.Item.ResetVariables();
+            pad.Items.ResetVariables();
 
             _lastRow = value;
 
-            pad.Item.ReplaceVariables(_lastRow);
+            pad.Items.ReplaceVariables(_lastRow);
 
             pad.ZoomFit();
         }
@@ -81,7 +81,7 @@ public partial class ConnectedCreativePad : GenericControlReciver {
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            pad.Item?.Clear();
+            pad.Items?.Clear();
             pad.Dispose();
             components?.Dispose();
         }

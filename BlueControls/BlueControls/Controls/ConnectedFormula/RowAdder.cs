@@ -57,9 +57,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
     #region Constructors
 
-    public RowAdder() : base(false, false) {
-        InitializeComponent();
-    }
+    public RowAdder() : base(false, false) => InitializeComponent();
 
     #endregion
 

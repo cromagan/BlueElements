@@ -472,11 +472,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private ColumnPadItem? LeftestItem(IEnumerable<AbstractPadItem> ignore) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
-        if (Pad?.Item == null) { return null; }
+        if (Pad?.Items == null) { return null; }
 
         ColumnPadItem? found = null;
 
-        foreach (var thisIt in Pad.Item) {
+        foreach (var thisIt in Pad.Items) {
             if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
                 if (fi.Column?.Database == db) {
                     if (found == null || fi.UsedArea.X < found.UsedArea.X) {
@@ -497,12 +497,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private void ShowOrder() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        if (Pad?.Item == null) { return; }
+        if (Pad?.Items == null) { return; }
 
         if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
 
         Generating = true;
-        Pad.Item.Clear();
+        Pad.Items.Clear();
 
         ColumnPadItem? anyitem = null;
 
@@ -517,7 +517,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         foreach (var thisColumnViewItem in ca) {
             if (thisColumnViewItem?.Column is { IsDisposed: false } c) {
                 var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.GetRenderer());
-                Pad.Item.Add(it);
+                Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.UsedArea.Right;
                 anyitem = it;
@@ -544,17 +544,17 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         foreach (var thisCombi in dbColumnCombi) {
             foreach (var thisc in ca) {
                 if (thisc?.Column is { IsDisposed: false } c) {
-                    var it = Pad.Item[c.Database?.TableName + "|" + c.KeyName] as ColumnPadItem;
+                    var it = Pad.Items[c.Database?.TableName + "|" + c.KeyName] as ColumnPadItem;
 
                     if (c.LinkedDatabase != null) {
                         // String als Namen als eindeutige Kennung
                         var toCheckCombi = c.LinkedDatabase.TableName + "|" + c.LinkedCellFilter.JoinWithCr();
 
                         if (toCheckCombi == thisCombi) {
-                            if (Pad.Item[toCheckCombi] is not GenericPadItem databItem) {
+                            if (Pad.Items[toCheckCombi] is not GenericPadItem databItem) {
                                 var nam = c.LinkedDatabase.TableName;
                                 databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
-                                Pad.Item.Add(databItem);
+                                Pad.Items.Add(databItem);
                                 if (it != null) {
                                     databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
                                 }
@@ -568,9 +568,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                                     foreach (var thisc2 in db2.Column) {
                                         if (tmp[2].Contains("~" + thisc2.KeyName + "~")) {
                                             if (thisc2.Database is { IsDisposed: false } db3) {
-                                                var rkcolit = (ColumnPadItem?)Pad.Item[db3.TableName + "|" + thisc2.KeyName];
+                                                var rkcolit = (ColumnPadItem?)Pad.Items[db3.TableName + "|" + thisc2.KeyName];
                                                 if (rkcolit != null) {
-                                                    _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
+                                                    _ = Pad.Items.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                                 }
                                             }
                                         }
@@ -580,15 +580,15 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                             var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
                                 var it2 = new ColumnPadItem(c2, false, thisc.GetRenderer());
-                                Pad.Item.Add(it2);
+                                Pad.Items.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
                                 if (it != null) {
-                                    Pad.Item.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
+                                    Pad.Items.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
                                 }
                                 kx = it2.UsedArea.Right;
 
                                 // und noch die Datenbank auf die Spalte zeigen lassem
-                                _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
+                                _ = Pad.Items.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
                             }
                         }
                     }

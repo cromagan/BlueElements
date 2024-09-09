@@ -53,7 +53,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     public override bool DatabaseInputMustMatchOutputDatabase => true;
 
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
-    public List<int> InputColorId => [OutputColorId];
+    public new List<int> InputColorId => [OutputColorId];
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
     public override string MyClassId => ClassId;
@@ -102,7 +102,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
         // Deswegen ist InputColorID nur Fake
 
         if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, forPrinting, OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 

@@ -83,7 +83,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
         var vs = attvar.ValueStringGet(0);
 
-        var s2 = row.ExecuteScript(null, vs, false, false, scp.ProduktivPhase, 0, a, false, true);
+        var s2 = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
         if (!s2.AllOk) {
             ld.Protocol.AddRange(s2.Protocol);
             return new DoItFeedback(ld, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");

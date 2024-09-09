@@ -35,14 +35,9 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
     #region Constructors
 
-    public SearchAndReplaceInDBScripts() {
+    public SearchAndReplaceInDBScripts() =>
         // Dieser Aufruf ist für den Designer erforderlich.
-        InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        //_table = table;
-        //_table.SelectedCellChanged += SelectedCellChanged;
-        //SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
-    }
+        InitializeComponent();// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.//_table = table;//_table.SelectedCellChanged += SelectedCellChanged;//SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
 
     #endregion
 

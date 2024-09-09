@@ -32,7 +32,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
@@ -169,9 +168,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        OnContextMenuInit(e);
-    }
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 

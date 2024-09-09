@@ -51,9 +51,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     #region Constructors
 
-    public ConnectedFormulaButton() : base(false, false) {
-        InitializeComponent();
-    }
+    public ConnectedFormulaButton() : base(false, false) => InitializeComponent();
 
     #endregion
 

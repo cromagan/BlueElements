@@ -185,7 +185,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Database, ToParseableString());
 
-    public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
+    public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
         foreach (var thisViewItem in this) {

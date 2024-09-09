@@ -49,9 +49,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     public FileExplorerPadItem(string keyName) : this(keyName, null) { }
 
-    public FileExplorerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
-    }
+    public FileExplorerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
 
     #endregion
 

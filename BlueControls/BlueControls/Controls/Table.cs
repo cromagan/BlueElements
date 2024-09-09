@@ -28,6 +28,7 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -48,7 +49,6 @@ using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -70,7 +70,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private AutoFilter? _autoFilter;
 
-    private BlueFont _cellFont = BlueFont.DefaultFont;
 
     private BlueFont _chapterFont = BlueFont.DefaultFont;
 
@@ -1691,7 +1690,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     protected void InitializeSkin() {
-        _cellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard).Scale(FontScale);
         _columnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard).Scale(FontScale);
         _chapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard).Scale(FontScale);
         _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false);
@@ -2715,7 +2713,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos, out ColumnViewItem? column, out RowData? row) {
-        column = ca.ColumnOnCoordinate(xpos, DisplayRectangleWithoutSlider(), _pix16, _cellFont);
+        column = ca.ColumnOnCoordinate(xpos, DisplayRectangleWithoutSlider());
         row = RowOnCoordinate(ca, ypos);
     }
 

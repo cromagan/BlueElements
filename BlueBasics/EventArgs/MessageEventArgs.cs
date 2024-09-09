@@ -56,7 +56,7 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
     public string ReadableText() => $"[{Time.ToString4()}]  {Message}";
 
     public QuickImage? SymbolForReadableText() {
-
+        
         switch (Type) {
 
             case FehlerArt.Warnung: return QuickImage.Get(ImageCode.Warnung, 16);

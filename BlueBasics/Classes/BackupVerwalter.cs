@@ -129,8 +129,7 @@ public class BackupVerwalter {
     private string? FileOf(DateTime date) {
         var dts = date.ToString6();
         if (!_data.ContainsKey(dts)) { return null; }
-        if (!_data.TryGetValue(dts, out var file)) { return null; }
-        return file;
+        return !_data.TryGetValue(dts, out var file) ? null : file;
     }
 
     private bool IsThereALaterVersion(int myAge, int maxAge) {

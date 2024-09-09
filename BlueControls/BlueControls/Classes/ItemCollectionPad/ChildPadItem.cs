@@ -86,12 +86,12 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     public CreativePad? PadInternal {
         get => _padInternal;
         set {
-            if (_padInternal?.Item != null) {
-                _padInternal.Item.PropertyChanged -= _Pad_DoInvalidate;
+            if (_padInternal?.Items != null) {
+                _padInternal.Items.PropertyChanged -= _Pad_DoInvalidate;
             }
             _padInternal = value;
-            if (_padInternal?.Item != null) {
-                _padInternal.Item.PropertyChanged += _Pad_DoInvalidate;
+            if (_padInternal?.Items != null) {
+                _padInternal.Items.PropertyChanged += _Pad_DoInvalidate;
             }
         }
     }
@@ -131,7 +131,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool KeyUp(KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item is not { Count: not 0 }) { return false; }
+        if (PadInternal?.Items is not { Count: not 0 }) { return false; }
         PadInternal.DoKeyUp(e, false);
         return true;
     }
@@ -177,7 +177,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 PadInternal = new CreativePad();
                 var it = new ItemCollectionPad();
                 it.Parse(value);
-                PadInternal.Item = it;
+                PadInternal.Items = it;
                 return true;
 
             case "checked":
@@ -206,25 +206,25 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public override void ProcessStyleChange() {
-        if (PadInternal?.Item == null || Parent == null) { return; }
+        if (PadInternal?.Items == null || Parent == null) { return; }
 
         RemovePic();
-        PadInternal.Item.SheetStyle = Parent.SheetStyle;
-        PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
+        PadInternal.Items.SheetStyle = Parent.SheetStyle;
+        PadInternal.Items.SheetStyleScale = Parent.SheetStyleScale;
     }
 
     public bool ReplaceVariable(Variable variable) {
         if (IsDisposed) { return false; }
-        if (PadInternal?.Item == null) { return false; }
-        var b = PadInternal.Item.ReplaceVariable(variable);
+        if (PadInternal?.Items == null) { return false; }
+        var b = PadInternal.Items.ReplaceVariable(variable);
         if (b) { OnPropertyChanged(); }
         return b;
     }
 
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
-        if (PadInternal?.Item == null) { return false; }
-        var b = PadInternal.Item.ResetVariables();
+        if (PadInternal?.Items == null) { return false; }
+        var b = PadInternal.Items.ResetVariables();
         if (b) { OnPropertyChanged(); }
         return b;
     }
@@ -238,22 +238,22 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         if (Textlage != (Alignment)(-1)) { result.ParseableAdd("Pos", Textlage); }
         result.ParseableAdd("Embedded", Eingebettete_Ansichten, false);
         result.ParseableAdd("Color", Randfarbe.ToArgb());
-        result.ParseableAdd("Data", "Item", PadInternal?.Item);
+        result.ParseableAdd("Data", "Item", PadInternal?.Items);
 
         return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        if (PadInternal?.Item == null || Parent == null) { return; }
+        if (PadInternal?.Items == null || Parent == null) { return; }
 
         try {
             var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             Font font = new("Arial", 30 * zoom);
-            if (PadInternal?.Item != null) {
-                PadInternal.Item.SheetStyle = Parent.SheetStyle;
-                PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
+            if (PadInternal?.Items != null) {
+                PadInternal.Items.SheetStyle = Parent.SheetStyle;
+                PadInternal.Items.SheetStyleScale = Parent.SheetStyleScale;
                 if (_tmpBmp != null) {
                     if (Math.Abs(_tmpBmp.Width - positionModified.Width) > IntTolerance || Math.Abs(positionModified.Height - _tmpBmp.Height) > IntTolerance) {
                         _tmpBmp?.Dispose();
@@ -263,13 +263,13 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 }
                 if (positionModified.Width < 1 || positionModified.Height < 1 || positionModified.Width > 20000 || positionModified.Height > 20000) { return; }
                 _tmpBmp ??= new Bitmap((int)Math.Abs(positionModified.Width), (int)Math.Abs(positionModified.Height));
-                var mb = PadInternal.Item.MaxBounds(ZoomItems);
+                var mb = PadInternal.Items.MaxBounds(ZoomItems);
                 var zoomv = ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
                 var centerpos = ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);
                 var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
                 PadInternal.ShowInPrintMode = forPrinting;
                 if (forPrinting) { PadInternal.Unselect(); }
-                PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, Seite);
+                PadInternal.Items.DrawCreativePadToBitmap(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y, Seite);
                 if (_tmpBmp != null) {
                     foreach (var thisA in Eingebettete_Ansichten) {
                         ChildPadItem? pad = null;
@@ -281,8 +281,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                                 }
                             }
                         }
-                        if (pad?.PadInternal?.Item != null) {
-                            var mb2 = pad.PadInternal.Item.MaxBounds(pad.ZoomItems);
+                        if (pad?.PadInternal?.Items != null) {
+                            var mb2 = pad.PadInternal.Items.MaxBounds(pad.ZoomItems);
                             mb2.Inflate(-1, -1);
                             var tmpG = Graphics.FromImage(_tmpBmp);
                             Pen p = new(pad.Randfarbe, (float)(8.7d * zoom));
@@ -336,9 +336,9 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     private MouseEventArgs? ZoomMouse(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        if (PadInternal?.Item is not { Count: not 0 }) { return null; }
+        if (PadInternal?.Items is not { Count: not 0 }) { return null; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-        var l2 = PadInternal.Item.MaxBounds(ZoomItems);
+        var l2 = PadInternal.Items.MaxBounds(ZoomItems);
         if (l1.Width <= 0 || l2.Height <= 0) { return null; }
         float tZo = 1;
         if (l2 is { Width: > 0, Height: > 0 }) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }

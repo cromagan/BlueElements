@@ -101,25 +101,6 @@ public class BitmapExt : IDisposable, IDisposableExtended {
 
     #region Methods
 
-    public static Bitmap? Area(Bitmap sourceBitmap, Rectangle r) {
-        if (r.Width < 2 || r.Height < 2) { return null; }
-        Bitmap clipedArea = new(r.Width, r.Height);
-        using var gr = Graphics.FromImage(clipedArea);
-        gr.Clear(Color.Black);
-        gr.DrawImage(sourceBitmap, 0, 0, r, GraphicsUnit.Pixel);
-        return clipedArea;
-    }
-
-    public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {
-        var pa = GetAutoValuesForCrop(pic, minBrightness);
-        return Crop(pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
-    }
-
-    public static Bitmap? Crop(Bitmap? bmp, Rectangle r) {
-        if (bmp == null) { return null; }
-        return Crop(bmp, r.Left, -(bmp.Width - r.Right), r.Top, -(bmp.Height - r.Bottom));
-    }
-
     /// <summary>
     ///
     /// </summary>
@@ -409,7 +390,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public bool ApplyFilter(string name, float factor) {
-        if (IsDisposed) { return false; }
+        if (IsDisposed || _bitmapData == null) { return false; }
         if (!_isLocked || _bits == null) {
             Develop.DebugPrint("unlocked!");
             return false;
@@ -553,6 +534,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
             Develop.DebugPrint("unlocked!");
             return;
         }
+
+        if (_bitmapData == null) { return; }
 
         var index = (y * _bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
         _bits[index] = color.B;

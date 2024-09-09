@@ -27,9 +27,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
 
     #region Constructors
 
-    public RowEditor() {
-        InitializeComponent();
-    }
+    public RowEditor() => InitializeComponent();
 
     #endregion
 

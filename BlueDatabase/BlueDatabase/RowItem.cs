@@ -335,7 +335,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         //if (IsInCache == null) { Develop.DebugPrint(FehlerArt.Fehler, "Refresh-Fehler"); }
 
-        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0, null, true, false);
+        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
@@ -365,7 +365,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
 
         if (db?.Column.SysCorrect is { IsDisposed: false } sc) {
-            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(db.Column.SysCorrect)) {
+            if (IsNullOrEmpty(sc) || cols.Count == 0 != CellGetBoolean(db.Column.SysCorrect)) {
                 CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
             }
         }
@@ -446,13 +446,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="eventname"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
-            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, produktivphase, attributes, dbVariables, extended);
+            var erg = ExecuteScript(eventname, scriptname, produktivphase, attributes, dbVariables, extended);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -740,7 +740,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
             OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
-            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2, null, true, mustBeExtended);
+            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
@@ -986,14 +986,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="eventname"></param>
     /// <param name="scriptname"></param>
-    /// <param name="doFemdZelleInvalidate"></param>
-    /// <param name="fullCheck"></param>
     /// <param name="produktivphase"></param>
     /// <param name="attributes"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// 
+    /// 
     /// <returns></returns>
-    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool produktivphase, List<string>? attributes, bool dbVariables, bool extended) {
+    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 

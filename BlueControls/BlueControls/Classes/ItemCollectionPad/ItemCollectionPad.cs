@@ -602,7 +602,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
         if (row is not { IsDisposed: not true }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
-        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0, null, true, false);
+        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
         if (!script.AllOk) { return script; }
 
         this.ParseVariables(script.Variables);
