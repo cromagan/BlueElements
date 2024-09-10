@@ -39,7 +39,7 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
     #region Fields
 
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = [];
-    private readonly Bitmap _bitmap;
+    private Bitmap _bitmap;
 
     #endregion
 
@@ -50,17 +50,12 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
     /// </summary>
     public QuickImage(string imageCode) : base() {
         var w = (imageCode + "||||||||||").Split('|');
+
         Name = w[0];
-        var width = -1;
-        if (!string.IsNullOrEmpty(w[1])) { _ = IntTryParse(w[1], out width); }
-        var height = -1;
-        if (!string.IsNullOrEmpty(w[2])) { _ = IntTryParse(w[2], out height); }
-        CorrectSize(width, height, null);
-        Effekt = ImageCodeEffect.Ohne;
-        if (!string.IsNullOrEmpty(w[3])) {
-            _ = IntTryParse(w[3], out var tmp);
-            Effekt = (ImageCodeEffect)tmp;
-        }
+        IntTryParse(w[1], out var width);
+        IntTryParse(w[2], out var height);
+
+        Effekt = (ImageCodeEffect)IntParse(w[3]);
         Färbung = w[4];
         ChangeGreenTo = w[5];
         Helligkeit = string.IsNullOrEmpty(w[6]) ? 100 : IntParse(w[6]);
@@ -69,7 +64,8 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
         Transparenz = string.IsNullOrEmpty(w[9]) ? 0 : IntParse(w[9]);
         Zweitsymbol = string.IsNullOrEmpty(w[10]) ? string.Empty : w[10];
 
-        //Code = GenerateCode(Name, width, height, Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol);
+        CorrectSize(width, height, null);
+
         Code = imageCode;
 
         (_bitmap, IsError) = Generate();
@@ -78,17 +74,17 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
     /// <summary>
     /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
     /// </summary>
-    public QuickImage(string imagecode, Bitmap? bmp) {
-        if (string.IsNullOrEmpty(imagecode)) {
+    public QuickImage(string name, Bitmap bmp) {
+        if (string.IsNullOrEmpty(name)) {
             _bitmap = GenerateErrorImage(5, 5);
             IsError = true;
             return;
         }
 
-        if (Exists(imagecode)) { Develop.DebugPrint(FehlerArt.Warnung, "Doppeltes Bild:" + imagecode); }
-        if (imagecode.Contains("|")) { Develop.DebugPrint(FehlerArt.Warnung, "Fehlerhafter Name:" + imagecode); }
+        if (Exists(name)) { Develop.DebugPrint(FehlerArt.Warnung, "Doppeltes Bild:" + name); }
+        if (name.Contains("|")) { Develop.DebugPrint(FehlerArt.Warnung, "Fehlerhafter Name:" + name); }
 
-        Name = imagecode;
+        Name = name;
         Code = Name;
 
         CorrectSize(-1, -1, bmp);
@@ -242,33 +238,12 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
         return c.ToString().TrimEnd('|');
     }
 
-    public static Bitmap GenerateErrorImage(int width, int height) {
-        var bmp = new Bitmap(width, height);
-
-        using var gr = Graphics.FromImage(bmp);
-        gr.Clear(Color.Black);
-        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, width - 1, height - 1);
-        gr.DrawLine(new Pen(Color.Red, 3), width - 1, 0, 0, height - 1);
-        return bmp;
-    }
-
     public static QuickImage Get(QuickImage qi, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? qi
             : Get(GenerateCode(qi.Name, qi.Width, qi.Height, qi.Effekt | additionalState, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
 
     public static QuickImage Get(string code) {
-        //if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
-
         if (Pics.TryGetValue(code, out var p)) { return p; }
-        var x = new QuickImage(code);
-
-        if (Pics.Count == 0) {
-            BindingOperations.EnableCollectionSynchronization(Pics, new object());
-        }
-
-        _ = Pics.TryAdd(code, x);
-
-        x.Generate();
-        return x;
+        return new QuickImage(code);
     }
 
     public static QuickImage Get(string image, int squareWidth) {
@@ -350,15 +325,21 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
     }
 
     private (Bitmap bmp, bool isError) Generate() {
-        var bmpOri = GetBitmap(Name);
+        var bmpOri = GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), Name + ".png");
 
-        #region Fehlerhaftes Bild erzeugen
+        if (bmpOri == null && Pics.TryGetValue(Name, out var p) && p != this) {
+            if (p.IsError) { return (p._bitmap, true); }
+        }
+
+        if (bmpOri == null) {
+            NeedImageEventArgs e = new(Name);
+            OnNeedImage(e);
+            if (e.Done && e.Bmp != null) { bmpOri = e.Bmp; }
+        }
 
         if (bmpOri == null) {
             return (GenerateErrorImage(Width, Height), true);
         }
-
-        #endregion
 
         bmpOri = bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
@@ -498,20 +479,14 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
         return (bmp, false);
     }
 
-    private Bitmap? GetBitmap(string tmpname) {
-        var vbmp = GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), tmpname + ".png");
-        if (vbmp != null) { return vbmp; }
+    private Bitmap GenerateErrorImage(int width, int height) {
+        var bmp = new Bitmap(width, height);
 
-        if (Pics.TryGetValue(tmpname, out var p) && p != this) {
-            return p.IsError ? null : (Bitmap?)p;
-        }
-
-        NeedImageEventArgs e = new(tmpname);
-        OnNeedImage(e);
-
-        // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
-        // Falls nicht, hier noch erledigen
-        return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : e.Bmp;
+        using var gr = Graphics.FromImage(bmp);
+        gr.Clear(Color.Black);
+        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, width - 1, height - 1);
+        gr.DrawLine(new Pen(Color.Red, 3), width - 1, 0, 0, height - 1);
+        return bmp;
     }
 
     #endregion

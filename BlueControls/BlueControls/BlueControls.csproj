@@ -116,6 +116,7 @@
       <DependentUpon>DynamicSymbolScriptEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Renderer\Renderer_Abstract.cs" />
+    <Compile Include="Renderer\Renderer_Button.cs" />
     <Compile Include="Renderer\Renderer_TextOneLine.cs" />
     <Compile Include="Renderer\Renderer_ImageAndText.cs" />
     <Compile Include="Classes\AdderItem.cs" />

@@ -379,7 +379,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var colsToRefresh = new List<ColumnItem>();
         var reverse = false;
         if (sortused is { } rsd) { colsToRefresh.AddRange(rsd.Columns); reverse = rsd.Reverse; }
-        if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
+        //if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
         if (db.Column.First() is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
 
         db.RefreshColumnsData(colsToRefresh.ToArray());

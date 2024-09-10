@@ -1046,7 +1046,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public bool CanDoPrepareFormulaCheckScript() {
-        if (!IsRowScriptPossible(true)) { return false; }
+        if (!IsRowScriptPossible(false)) { return false; }
 
         var e = EventScript.Get(ScriptEventTypes.prepare_formula);
         return e.Count == 1;
@@ -1465,6 +1465,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     Variables = VariableCollection.Combine(Variables, vars, "DB_");
                 }
             }
+
+            if(prepf) {
+                if (row is { IsDisposed: false }) {
+                    foreach (var thisCol in Column) {
+                        if (thisCol.Function == ColumnFunction.Virtuelle_Spalte) {
+                            row.VariableToCell(thisCol, vars, s.KeyName);
+                        }
+                    }
+                }
+            }
+
 
             #endregion
 

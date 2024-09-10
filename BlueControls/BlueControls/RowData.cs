@@ -109,7 +109,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Methods
 
-    public string CompareKey() => PinStateSortAddition + ";" + Chapter.StarkeVereinfachung(" ", false) + ";" + AdditionalSort;
+    public string CompareKey() => PinStateSortAddition + ";" + AdditionalSort;
 
     public int CompareTo(object obj) {
         if (obj is RowData robj) {

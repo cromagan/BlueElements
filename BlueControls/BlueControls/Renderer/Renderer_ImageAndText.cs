@@ -41,11 +41,10 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     private int _constantHeight = 16;
     private int _constantWidth = 16;
     private List<string> _imagereplacement = new();
+    private string _imgpräfix = string.Empty;
     private List<string> _opticalReplace = new();
-
-    // private string _präfix = string.Empty;
-    // private string _suffix = string.Empty;
     private bool _text_anzeigen = true;
+    private string _defaultImage = string.Empty;
 
     #endregion
 
@@ -57,8 +56,8 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         _bild_anzeigen = true;
         _text_anzeigen = false;
         _imagereplacement = imageReplacement.SplitAndCutByCr().ToList();
-
     }
+
     #endregion
 
     #region Properties
@@ -69,7 +68,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         get => _bild_anzeigen;
         set {
             if (_bild_anzeigen == value) { return; }
-            if(ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _bild_anzeigen = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
@@ -79,10 +78,42 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public string Bild_ersetzen {
         get => _imagereplacement.JoinWithCr();
         set {
-            if (string.Equals(_imagereplacement.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
+            var old = _imagereplacement.JoinWithCr();
+            if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _imagereplacement = value.SplitAndCutByCr().ToList();
             OnPropertyChanged();
+
+            if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
+                OnDoUpdateSideOptionMenu();
+            }
+        }
+    }
+
+    public string Standard_Bild {
+        get => _defaultImage;
+        set {
+            if (_defaultImage == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            _defaultImage = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Bild_Präfix {
+        get => _imgpräfix;
+        set {
+            if (_imgpräfix == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+
+            var vc = string.IsNullOrEmpty(_imgpräfix) == string.IsNullOrEmpty(value);
+
+            _imgpräfix = value;
+            OnPropertyChanged();
+
+            if (!vc) {
+                OnDoUpdateSideOptionMenu();
+            }
         }
     }
 
@@ -114,24 +145,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override string MyClassId => ClassId;
 
-    //public string Präfix {
-    //    get => _präfix;
-    //    set {
-    //        if (_präfix != value) { return; }
-    //        _präfix = value;
-    //        OnPropertyChanged();
-    //    }
-    //}
-
-    //public string Suffix {
-    //    get => _suffix;
-    //    set {
-    //        if (_suffix != value) { return; }
-    //        _suffix = value;
-    //        OnPropertyChanged();
-    //    }
-    //}
-
     public bool Text_anzeigen {
         get => _text_anzeigen;
         set {
@@ -145,9 +158,12 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public string Text_ersetzen {
         get => _opticalReplace.JoinWithCr();
         set {
+  
             if (string.Equals(_opticalReplace.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
             _opticalReplace = value.SplitAndCutByCr().ToList();
             OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
+
         }
     }
 
@@ -239,7 +255,19 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         if (Bild_anzeigen) {
             result.Add(new FlexiControlForProperty<int>(() => Konstante_Höhe_von_Bildern));
             result.Add(new FlexiControlForProperty<int>(() => Konstante_Breite_von_Bildern));
-            result.Add(new FlexiControlForProperty<string>(() => Bild_ersetzen, 5));
+            result.Add(new FlexiControlForProperty<string>(() => Standard_Bild));
+            if (string.IsNullOrEmpty(Bild_ersetzen)) {
+                result.Add(new FlexiControlForProperty<string>(() => Bild_Präfix));
+            }
+
+
+            if (string.IsNullOrEmpty(Bild_Präfix)) {
+                result.Add(new FlexiControlForProperty<string>(() => Bild_ersetzen,5));
+            }
+
+
+
+
         }
 
         return result;
@@ -247,13 +275,14 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override bool ParseThis(string key, string value) {
         switch (key.ToLower()) {
-            //case "prefix":
-            //    _präfix = value.FromNonCritical();
-            //    return true;
+            case "defaultimage":
+                _defaultImage = value.FromNonCritical();
+                return true;
 
-            //case "suffix":
-            //    _suffix = value.FromNonCritical();
-            //return true;
+            case "imageprefix":
+                _imgpräfix = value.FromNonCritical();
+                return true;
+
             case "showpic":
                 _bild_anzeigen = value.FromPlusMinus();
                 return true;
@@ -299,9 +328,13 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
         // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
         if (_bild_anzeigen) {
+            result.ParseableAdd("ImagePrefix", _imgpräfix);
+
             result.ParseableAdd("ImageReplace", _imagereplacement, true);
+
             result.ParseableAdd("ImageWidth", _constantWidth);
             result.ParseableAdd("ImageHeight", _constantHeight);
+            result.ParseableAdd("DefaultImage", _defaultImage);
         }
 
         return result.Parseable(base.ToParseableString());
@@ -372,9 +405,15 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             }
         }
 
-        var i = QuickImage.Get(QuickImage.GenerateCode(name, constw, consth, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+        var i = QuickImage.Get(QuickImage.GenerateCode(_imgpräfix + name, constw, consth, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
 
-        if (i.IsError) { return null; }
+        if (i.IsError) {
+            if (!string.IsNullOrEmpty(_defaultImage)) {
+                i = QuickImage.Get(QuickImage.GenerateCode(_defaultImage, constw, consth, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+                if(!i.IsError) {  return i; }
+            }
+            return null; 
+        }
         return i;
     }
 
