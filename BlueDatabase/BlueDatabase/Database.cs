@@ -1384,7 +1384,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region  Erlaubte Methoden ermitteln
 
-            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables;
+            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.Math;
 
             if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
 

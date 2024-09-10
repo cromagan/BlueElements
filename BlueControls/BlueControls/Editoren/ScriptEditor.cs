@@ -116,7 +116,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var m = Method.GetMethods(MethodType.Standard);
+            var m = Method.GetMethods(MethodType.Standard | MethodType.MyDatabaseRow | MethodType.Math);
 
             var scp = new ScriptProperties("Skript-Editor: " + scriptname, m, false, [], null, 0);
             var s = new Script(null, scp);
