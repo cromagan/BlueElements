@@ -35,13 +35,22 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
     #region Fields
 
+
+    public Renderer_Abstract(): this(false) { }
+
+    protected Renderer_Abstract(bool readOnly) => ReadOnly = readOnly;
+
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
+
+    internal static readonly Renderer_Abstract Bool = new Renderer_ImageAndText("+|Häkchen\r\no|Kreis2\r\n-|Kreuz");
+
 
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
 
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
 
     private string _lastCode = "?";
+    public readonly bool ReadOnly;
 
     #endregion
 

@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,8 +24,12 @@ using BlueControls.Enums;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.CellRenderer;
 
@@ -40,7 +40,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     private bool _bild_anzeigen = false;
     private int _constantHeight = 16;
     private int _constantWidth = 16;
-    private List<string> _imagereplace = new();
+    private List<string> _imagereplacement = new();
     private List<string> _opticalReplace = new();
 
     // private string _präfix = string.Empty;
@@ -51,8 +51,14 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Constructors
 
-    public Renderer_ImageAndText() : base() { }
+    public Renderer_ImageAndText() : base(false) { }
 
+    public Renderer_ImageAndText(string imageReplacement) : base(true) {
+        _bild_anzeigen = true;
+        _text_anzeigen = false;
+        _imagereplacement = imageReplacement.SplitAndCutByCr().ToList();
+
+    }
     #endregion
 
     #region Properties
@@ -63,6 +69,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         get => _bild_anzeigen;
         set {
             if (_bild_anzeigen == value) { return; }
+            if(ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _bild_anzeigen = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
@@ -70,10 +77,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     }
 
     public string Bild_ersetzen {
-        get => _imagereplace.JoinWithCr();
+        get => _imagereplacement.JoinWithCr();
         set {
-            if (string.Equals(_imagereplace.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
-            _imagereplace = value.SplitAndCutByCr().ToList();
+            if (string.Equals(_imagereplacement.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            _imagereplacement = value.SplitAndCutByCr().ToList();
             OnPropertyChanged();
         }
     }
@@ -86,6 +94,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             value = Math.Max(value, 16);
             value = Math.Min(value, 128);
             if (_constantWidth == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _constantWidth = value;
             OnPropertyChanged();
         }
@@ -97,6 +106,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             value = Math.Max(value, 16);
             value = Math.Min(value, 128);
             if (_constantHeight == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _constantHeight = value;
             OnPropertyChanged();
         }
@@ -258,7 +268,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
                 return true;
 
             case "imagereplace":
-                _imagereplace = value.SplitBy("|").ToList().FromNonCritical();
+                _imagereplacement = value.SplitBy("|").ToList().FromNonCritical();
                 return true;
 
             case "imagewidth":
@@ -289,7 +299,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
         // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
         if (_bild_anzeigen) {
-            result.ParseableAdd("ImageReplace", _imagereplace, true);
+            result.ParseableAdd("ImageReplace", _imagereplacement, true);
             result.ParseableAdd("ImageWidth", _constantWidth);
             result.ParseableAdd("ImageHeight", _constantHeight);
         }
@@ -350,8 +360,8 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     private QuickImage? GetImage(string name, int constw, int consth) {
         if (!_bild_anzeigen || string.IsNullOrEmpty(name)) { return null; }
 
-        if (_imagereplace.Count > 0) {
-            foreach (var image in _imagereplace) {
+        if (_imagereplacement.Count > 0) {
+            foreach (var image in _imagereplacement) {
                 if (image.Contains("|")) {
                     var t = image.SplitBy("|");
                     if (string.Equals(t[0], name, StringComparison.OrdinalIgnoreCase)) {

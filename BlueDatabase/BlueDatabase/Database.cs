@@ -2177,6 +2177,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
+
+        if(string.IsNullOrEmpty(  _scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
+
         //if (EventScriptVersion < Date) { EventScriptVersion = 1; }
 
         OnAdditionalRepair();

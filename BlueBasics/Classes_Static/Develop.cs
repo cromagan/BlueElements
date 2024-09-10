@@ -230,6 +230,8 @@ public static class Develop {
         DebugPrint(fehler ? FehlerArt.Fehler : FehlerArt.Warnung, "Es wird von einem Unterthread zugegriffen.");
     }
 
+    public static void DebugPrint_ReadOnly() => DebugPrint(FehlerArt.Warnung, "Der Wert ist schreibgeschützt.");
+
     public static void DebugPrint_MissingCommand(string command) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
     public static void DebugPrint_NichtImplementiert(bool doend) {

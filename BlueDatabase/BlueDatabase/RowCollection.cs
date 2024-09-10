@@ -189,14 +189,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var n = 0;
 
         //DidRows.Clear();
-        try {
-            while (InvalidatedRows.Count > 0) {
-                if (InvalidatedRows.Count > ra) {
-                    masterRow?.OnDropMessage(FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
-                    ra = InvalidatedRows.Count;
-                }
 
-                n++;
+        while (InvalidatedRows.Count > 0) {
+            if (InvalidatedRows.Count > ra) {
+                masterRow?.OnDropMessage(FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
+                ra = InvalidatedRows.Count;
+            }
+
+            n++;
+            try {
                 var r = InvalidatedRows[0];
                 InvalidatedRows.RemoveAt(0);
 
@@ -209,8 +210,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                         r.UpdateRow(extendedAllowed, true, "Normales Update");
                     }
                 }
-            }
-        } catch { }
+            } catch { }
+        }
+
 
         DidRows.Clear();
         masterRow?.OnDropMessage(FehlerArt.Info, "Updates abgearbeitet");

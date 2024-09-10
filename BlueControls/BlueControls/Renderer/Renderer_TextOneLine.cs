@@ -58,6 +58,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         get => _präfix;
         set {
             if (_präfix == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _präfix = value;
             OnPropertyChanged();
         }
@@ -67,6 +68,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         get => _suffix;
         set {
             if (_suffix == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _suffix = value;
             OnPropertyChanged();
         }
