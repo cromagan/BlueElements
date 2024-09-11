@@ -159,7 +159,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public event EventHandler<CellEditBlockReasonEventArgs>? BlockEdit;
 
-    public event EventHandler<CellEventArgs>? ButtonCellClicked;
+    public event EventHandler<CellEventArgs>? CellClicked;
 
     public event EventHandler<CellChangedEventArgs>? CellValueChanged;
 
@@ -172,8 +172,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public new event EventHandler<CellExtEventArgs>? DoubleClick;
 
     public event EventHandler? FilterChanged;
-
-    public event EventHandler<ButtonCellEventArgs>? NeedButtonArgs;
 
     public event EventHandler? PinnedChanged;
 
@@ -2058,8 +2056,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     return;
                 }
 
-                if (_mouseOverRow?.Row is { IsDisposed: false } r && column.Function == ColumnFunction.Button) {
-                    OnButtonCellClicked(new CellEventArgs(column, r));
+                if (_mouseOverRow?.Row is { IsDisposed: false } r ) {
+                    OnCellClicked(new CellEventArgs(column, r));
                     Invalidate();
                 }
             }
@@ -2922,28 +2920,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 #region Draw_CellTransparent
 
                 switch (cellInThisDatabaseColumn.Function) {
-                    case ColumnFunction.Button:
-                        ButtonCellEventArgs e = new(cellInThisDatabaseColumn, cellInThisDatabaseRow);
-                        OnNeedButtonArgs(e);
-
-                        var s = States.Standard;
-                        if (!Enabled) { s = States.Standard_Disabled; }
-                        if (e.Cecked) { s |= States.Checked; }
-
-                        var x = new ExtText(Design.Button_CheckBox, s);
-
-                        if (cellrectangle.Width > 40) {
-                            cellrectangle.X += Skin.PaddingSmal;
-                            cellrectangle.Width -= Skin.PaddingSmal * 2;
-                        }
-
-                        if (cellrectangle.Height > 40) {
-                            cellrectangle.Y += Skin.Padding;
-                            cellrectangle.Height -= Skin.Padding * 2;
-                        }
-
-                        Button.DrawButton(this, gr, Design.Button_CheckBox, s, e.Image, Alignment.Horizontal_Vertical_Center, false, x, e.Text, cellrectangle, true);
-                        break;
 
                     case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                         var (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
@@ -3353,7 +3329,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void OnBlockEdit(CellEditBlockReasonEventArgs ed) => BlockEdit?.Invoke(this, ed);
 
-    private void OnButtonCellClicked(CellEventArgs e) => ButtonCellClicked?.Invoke(this, e);
+    private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnCellValueChanged(CellChangedEventArgs e) {
         if (IsDisposed) { return; }
@@ -3365,7 +3341,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     //private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
     private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnNeedButtonArgs(ButtonCellEventArgs e) => NeedButtonArgs?.Invoke(this, e);
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 

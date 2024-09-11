@@ -133,7 +133,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
 
-        if (column.Function == ColumnFunction.Virtuelle_Spalte) { return "Virtuelle Spalten können nicht bearbeitet werden."; }
+        //if (column.Function == ColumnFunction.Virtuelle_Spalte) { return "Virtuelle Spalten können nicht bearbeitet werden."; }
 
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }

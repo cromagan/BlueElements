@@ -471,10 +471,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         UpdateScripts(Table.Database);
     }
 
-    protected void ChangeDatabaseInTab(ConnectionInfo connectionId, TabPage? xtab) {
-        if (xtab == null) {
-            return;
-        }
+    protected void ChangeDatabaseInTab(ConnectionInfo? connectionId, TabPage? xtab) {
+        if (xtab == null || connectionId == null) { return; }
 
         tbcDatabaseSelector.Enabled = false;
         Table.Enabled = false;

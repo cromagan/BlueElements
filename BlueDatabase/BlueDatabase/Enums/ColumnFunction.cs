@@ -66,7 +66,7 @@ public enum ColumnFunction {
     RelationText = 77,
 
     // KeyForSame = 78
-    Button = 79,
+    //Button = 79,
 
     Verknüpfung_zu_anderer_Datenbank = 80,
 
@@ -148,7 +148,8 @@ public static class ColumnFunctionExtensions {
     public static bool TextboxEditPossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
-                                                                                     or ColumnFunction.RelationText;
+                                                                                     or ColumnFunction.RelationText
+                                                                                     or ColumnFunction.Virtuelle_Spalte;
 
     #endregion
 }

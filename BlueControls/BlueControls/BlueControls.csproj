@@ -355,7 +355,6 @@
     <Compile Include="Enums\WndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
     <Compile Include="EventArgs\AdditionalDrawing.cs" />
-    <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1DownAndCurrent.cs" />
     <Compile Include="EventArgs\MoveEventArgs.cs" />
     <Compile Include="EventArgs\PositionEventArgs.cs" />

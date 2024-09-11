@@ -266,7 +266,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public long CellGetLong(ColumnItem? column) => LongParse(Database?.Cell.GetString(column, this));
 
     public Point CellGetPoint(ColumnItem? column) // Main Method
-        {
+    {
         var value = Database?.Cell.GetString(column, this);
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
@@ -576,7 +576,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        return t.TotalMinutes < 5;
+        return t.TotalSeconds > 1 && t.TotalMinutes < 5; // 1 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
     }
 
     /// <summary>
@@ -740,6 +740,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
             OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
+            if (extendedAllowed) {
+                RowCollection.InvalidatedRows.Remove(this);
+            }
+
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
@@ -868,9 +872,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             RowCollection.FailedRows.Remove(this);
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                if (reason != Reason.UpdateChanges) {
-                    RowCollection.InvalidatedRows.AddIfNotExists(this);
-                }
+                //if (reason != Reason.UpdateChanges)
+                //{
+                //    RowCollection.InvalidatedRows.AddIfNotExists(this);
+                //}
 
                 RowCollection.WaitDelay = 0;
 
@@ -990,8 +995,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="attributes"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    /// 
-    /// 
+    ///
+    ///
     /// <returns></returns>
     private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);

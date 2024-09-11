@@ -203,16 +203,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 if (r is { IsDisposed: false, Database.IsDisposed: false } && !DidRows.Contains(r)) {
                     DidRows.Add(r);
-                    if (masterRow?.Database != null) {
-                        r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
-                    } else {
-                        r.UpdateRow(extendedAllowed, true, "Normales Update");
+                    if (r.NeedsRowUpdate(false, true)) {
+                        if (masterRow?.Database != null) {
+                            r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
+                            masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                        } else {
+                            r.UpdateRow(extendedAllowed, true, "Normales Update");
+                        }
                     }
                 }
             } catch { }
         }
-
 
         DidRows.Clear();
         masterRow?.OnDropMessage(FehlerArt.Info, "Updates abgearbeitet");

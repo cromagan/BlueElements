@@ -1045,13 +1045,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    public bool CanDoPrepareFormulaCheckScript() {
-        if (!IsRowScriptPossible(false)) { return false; }
-
-        var e = EventScript.Get(ScriptEventTypes.prepare_formula);
-        return e.Count == 1;
-    }
-
     public bool CanDoValueChangedScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
@@ -2071,7 +2064,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
                                       not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 and
                                       not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
-                                      not ColumnFunction.Button and
                                       not ColumnFunction.Virtuelle_Spalte) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
@@ -2462,6 +2454,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsCellValue()) {
             if (column?.Database is not { IsDisposed: false } db) { return (string.Empty, column, row); }
             if (row == null) { return (string.Empty, column, row); }
+            if(column.Function == ColumnFunction.Virtuelle_Spalte) { return (string.Empty, column, row); }
 
             //column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();

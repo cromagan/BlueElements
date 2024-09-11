@@ -58,7 +58,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     #region Constructors
 
     protected Variable(string name, bool ronly, string comment) : base() {
-       KeyName = name.ToLowerInvariant();
+
+        if (string.IsNullOrEmpty(name)) { name = Generic.GetUniqueKey(); }
+
+        KeyName = name.ToLowerInvariant();
+
+
         ReadOnly = ronly;
         Comment = comment;
     }
