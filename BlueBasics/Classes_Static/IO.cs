@@ -322,7 +322,6 @@ public static class IO {
         }
     }
 
-
     public static string GetFileInfo(string filename, bool mustDo) {
         try {
             FileInfo f = new(filename);
@@ -415,7 +414,10 @@ public static class IO {
         var z = -1;
         pfad = pfad.CheckPath();
         if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }
-        wunschname = wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
+        wunschname = wunschname.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
+
+        if (wunschname.Length > 30) { wunschname = wunschname.Substring(0, 30); }
+
         string? filename;
         do {
             z++;
@@ -479,6 +481,7 @@ public static class IO {
     /// <param name="processMethod"></param>
     /// <param name="file1"></param>
     /// <param name="file2"></param>
+    /// <param name="tries"></param>
     /// <param name="toBeSure">Stellt sicher, dass der Befehl ausgeführt wird. Ansonsten wird das Programm abgebrochen</param>
     /// <returns>True bei Erfolg</returns>
     private static bool ProcessFile(DoThis processMethod, string file1, string file2, int tries, bool toBeSure) {
