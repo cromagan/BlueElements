@@ -103,6 +103,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_DrawLine.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_mm.cs" />
     <Compile Include="AdditionalScriptMethods\Method_MsgBox.cs" />
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />

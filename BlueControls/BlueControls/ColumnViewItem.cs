@@ -29,15 +29,24 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
+using System.Runtime.InteropServices;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem : IParseable, IReadableText {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
 
     #region Fields
 
     public Renderer_Abstract? _renderer;
     public int? Contentwidth;
+
+    private ColumnItem? _column = null;
+
+    private bool _reduced = false;
+
+    private ViewType _viewType = BlueDatabase.Enums.ViewType.None;
+
+    private bool disposedValue;
 
     #endregion
 
@@ -57,38 +66,55 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         Column = null;
         X_WithSlider = null;
         X = null;
-        TmpAutoFilterLocation = Rectangle.Empty;
-        TmpReduceLocation = Rectangle.Empty;
-        TmpDrawWidth = null;
-        TmpReduced = false;
+        AutoFilterLocation = Rectangle.Empty;
+        ReduceLocation = Rectangle.Empty;
+        _drawWidth = null;
+        Reduced = false;
         Renderer = string.Empty;
+        RendererSettings = string.Empty;
     }
 
     #endregion
 
     #region Properties
 
-    public ColumnItem? Column { get; private set; }
+    public Rectangle AutoFilterLocation { get; set; }
 
-    public string Renderer {
-        get;
-        set;
+    public ColumnItem? Column {
+        get => _column;
+        private set {
+            if (_column == value) { return; }
+
+            UnRegisterEvents();
+            _column = value;
+            RegisterEvents();
+        }
     }
 
-    public string RendererSettings {
-        get;
-        set;
+    public bool Reduced {
+        get => _reduced;
+        set {
+            if (_reduced != value) {
+                _reduced = value;
+                _drawWidth = null;
+            }
+        }
     }
 
-    public Rectangle TmpAutoFilterLocation { get; set; }
+    public Rectangle ReduceLocation { get; set; }
+    public string Renderer { get; set; }
 
-    public int? TmpDrawWidth { get; set; }
+    public string RendererSettings { get; set; }
 
-    public bool TmpReduced { get; set; }
-
-    public Rectangle TmpReduceLocation { get; set; }
-
-    public ViewType ViewType { get; set; }
+    public ViewType ViewType {
+        get => _viewType;
+        set {
+            if (_viewType != value) {
+                _viewType = value;
+                _drawWidth = null;
+            }
+        }
+    }
 
     /// <summary>
     /// Koordinate der Spalte ohne Slider
@@ -100,67 +126,44 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
     /// </summary>
     public int? X_WithSlider { get; set; }
 
-    private ColumnViewCollection Parent { get; }
+    private int? _drawWidth { get; set; }
+    private ColumnViewCollection Parent { get; set; }
 
     #endregion
 
     #region Methods
 
-    public int CalculateColumnContentWidth(Design design, States state) {
-        if (Column is not { IsDisposed: false }) { return 16; }
-        if (Column.Database is not { IsDisposed: false } db) { return 16; }
-        if (Column.FixedColumnWidth > 0) { return Column.FixedColumnWidth; }
-        if (Contentwidth is { } v) { return v; }
-
-        Column.RefreshColumnsData();
-
-        //var font = Skin.DesignOf(design, state).BFont;
-        //if (font == null) { return 16; }
-
-        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
-
-        var renderer = GetRenderer();
-
-        if (renderer == null) { return 16; }
-
-        try {
-            //  Parallel.ForEach führt ab und zu zu DeadLocks
-            foreach (var thisRowItem in db.Row) {
-                var wx = renderer.ContentSize(thisRowItem.CellGetString(Column), design, state, Column.DoOpticalTranslation).Width;
-                newContentWidth = Math.Max(newContentWidth, wx);
-            }
-        } catch {
-            Develop.CheckStackForOverflow();
-            return CalculateColumnContentWidth(design, state);
-        }
-
-        Contentwidth = newContentWidth;
-        return newContentWidth;
+    public void Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     public int DrawWidth(Rectangle displayRectangleWoSlider, float scale) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
-        if (Column == null) { return 0; }
-        if (TmpDrawWidth is { } v) { return v; }
+        if (_drawWidth is { } v) { return v; }
+
+        if (_column == null || _column.IsDisposed) {
+            _drawWidth = Table.GetPix(16, scale);
+            return (int)_drawWidth;
+        }
 
         if (Parent.Count == 1) {
-            TmpDrawWidth = displayRectangleWoSlider.Width;
+            _drawWidth = displayRectangleWoSlider.Width;
             return displayRectangleWoSlider.Width;
         }
 
-        if (TmpReduced) {
-            TmpDrawWidth = Table.GetPix(16, scale);
+        if (Reduced) {
+            _drawWidth = Table.GetPix(16, scale);
         } else {
-            TmpDrawWidth = ViewType == ViewType.PermanentColumn
-                ? Math.Min(Table.GetPix(CalculateColumnContentWidth(Design.Table_Cell, States.Standard), scale), (int)(displayRectangleWoSlider.Width * 0.3))
-                : Math.Min(Table.GetPix(CalculateColumnContentWidth(Design.Table_Cell, States.Standard), scale), (int)(displayRectangleWoSlider.Width * 0.6));
+            _drawWidth = _viewType == ViewType.PermanentColumn
+                ? Math.Min(Table.GetPix(CalculateColumnContentWidth(), scale), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(Table.GetPix(CalculateColumnContentWidth(), scale), (int)(displayRectangleWoSlider.Width * 0.6));
         }
 
-        TmpDrawWidth = Math.Max((int)TmpDrawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
-
-        //TmpDrawWidth = Math.Max((int)TmpDrawWidth, (int)Column.ColumnCaptionText_Size(columnFont).Width);
-        return (int)TmpDrawWidth;
+        _drawWidth = Math.Max((int)_drawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
+        return (int)_drawWidth;
     }
 
     public Renderer_Abstract? GetRenderer() {
@@ -170,7 +173,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
         return _renderer;
     }
 
-    public void Invalidate_DrawWidth() => TmpDrawWidth = null;
+    public void Invalidate_DrawWidth() => _drawWidth = null;
 
     public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
 
@@ -186,26 +189,23 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
             case "column":
             case "columnname":// ColumnName wichtg, wegen CopyLayout
                 Column = db.Column[value];
-                //Column?.Repair(); // Alte Formate reparieren
                 return true;
 
             case "columnkey":
-                //Column = database.Column.SearchByKey(LongParse(value));
-                //Column?.Repair(); // Alte Formate reparieren
                 return true;
 
-            case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-                ViewType = ViewType.PermanentColumn;
-                return true;
+            //case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
+            //    ViewType = ViewType.PermanentColumn;
+            //    return true;
 
             case "type":
                 ViewType = (ViewType)IntParse(value);
-                if (Column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
+                if (_column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
 
-            case "edittype":
-                //    _editType = (EditTypeFormula)IntParse(value);
-                return true;
+            //case "edittype":
+            //    //    _editType = (EditTypeFormula)IntParse(value);
+            //    return true;
 
             case "renderer":
                 Renderer = value;
@@ -221,16 +221,16 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
 
-    public string ReadableText() => Column?.ReadableText() ?? "?";
+    public string ReadableText() => _column?.ReadableText() ?? "?";
 
-    public QuickImage? SymbolForReadableText() => Column?.SymbolForReadableText();
+    public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
 
     public string ToParseableString() {
         var result = new List<string>();
         result.ParseableAdd("Type", ViewType);
-        result.ParseableAdd("ColumnName", Column);
+        result.ParseableAdd("ColumnName", _column);
 
-        if (Column is not { } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
+        if (_column is not { } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
             result.ParseableAdd("Renderer", Renderer);
             result.ParseableAdd("RendererSettings", RendererSettings);
         }
@@ -240,5 +240,81 @@ public sealed class ColumnViewItem : IParseable, IReadableText {
 
     public override string ToString() => ToParseableString();
 
+    private void _column_PropertyChanged(object sender, System.EventArgs e) { _drawWidth = null; }
+
+    private int CalculateColumnContentWidth() {
+        if (_column is not { IsDisposed: false }) { return 16; }
+        if (_column.Database is not { IsDisposed: false } db) { return 16; }
+        if (_column.FixedColumnWidth > 0) { return _column.FixedColumnWidth; }
+        if (Contentwidth is { } v) { return v; }
+
+        _column.RefreshColumnsData();
+
+        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
+
+        var renderer = GetRenderer();
+
+        if (renderer == null) { return 16; }
+
+        try {
+            //  Parallel.ForEach führt ab und zu zu DeadLocks
+            foreach (var thisRowItem in db.Row) {
+                var wx = renderer.ContentSize(thisRowItem.CellGetString(_column), Design.Table_Cell, States.Standard, _column.DoOpticalTranslation).Width;
+                newContentWidth = Math.Max(newContentWidth, wx);
+            }
+        } catch {
+            Develop.CheckStackForOverflow();
+            return CalculateColumnContentWidth();
+        }
+
+        Contentwidth = newContentWidth;
+        return newContentWidth;
+    }
+
+    private void Cell_CellValueChanged(object sender, EventArgs.CellChangedEventArgs e) {
+        if (e.Column == _column) { _drawWidth = null; }
+    }
+
+    private void Dispose(bool disposing) {
+        if (!disposedValue) {
+            if (disposing) {
+                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                UnRegisterEvents();
+                Parent = null;
+                _column = null;
+            }
+
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            disposedValue = true;
+        }
+    }
+
+    private void RegisterEvents() {
+        if (_column != null) {
+            _column.PropertyChanged += _column_PropertyChanged;
+
+            if (_column.Database is Database db && !db.IsDisposed) {
+                db.Cell.CellValueChanged += Cell_CellValueChanged;
+            }
+        }
+    }
+
+    private void UnRegisterEvents() {
+        if (_column != null) {
+            _column.PropertyChanged -= _column_PropertyChanged;
+            if (_column.Database is Database db && !db.IsDisposed) {
+                db.Cell.CellValueChanged += Cell_CellValueChanged;
+            }
+        }
+    }
+
     #endregion
+
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~ColumnViewItem()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
 }

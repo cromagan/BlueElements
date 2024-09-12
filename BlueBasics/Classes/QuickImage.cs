@@ -69,6 +69,8 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
         Code = imageCode;
 
         (_bitmap, IsError) = Generate();
+
+        _ = Pics.TryAdd(Code, this);
     }
 
     /// <summary>

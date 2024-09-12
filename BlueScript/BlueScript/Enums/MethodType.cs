@@ -45,6 +45,8 @@ public enum MethodType {
     /// </summary>
     MyDatabaseRow = 8,
 
+    DrawOnBitmap = 16,
+
     /// <summary>
     /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipbard verändert der ein Programm gestartet.
     /// Dateioperationen fallen nicht darunter, dafür ist IO zu verwenden.
@@ -62,5 +64,5 @@ public enum MethodType {
     /// </summary>
     Special = 256,
 
-    AllDefault = Standard | Math | Database | MyDatabaseRow | ManipulatesUser | SpecialVariables 
+    AllDefault = Standard | Math | Database | MyDatabaseRow | ManipulatesUser | SpecialVariables | DrawOnBitmap
 }

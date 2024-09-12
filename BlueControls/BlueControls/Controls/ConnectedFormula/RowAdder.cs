@@ -109,7 +109,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
         vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math);
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
 

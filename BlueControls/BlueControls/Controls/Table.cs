@@ -954,9 +954,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             #region Recude-Button zeichnen
 
-            if (viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) > 70 || viewItem.TmpReduced) {
-                viewItem.TmpReduceLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) - 18, down, 18, 18);
-                gr.DrawImage(viewItem.TmpReduced ? QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20") : QuickImage.Get("Pfeil_Links|16||||||||75"), viewItem.TmpReduceLocation.Left + 2, viewItem.TmpReduceLocation.Top + 2);
+            if (viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) > 70 || viewItem.Reduced) {
+                viewItem.ReduceLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) - 18, down, 18, 18);
+                gr.DrawImage(viewItem.Reduced ? QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20") : QuickImage.Get("Pfeil_Links|16||||||||75"), viewItem.ReduceLocation.Left + 2, viewItem.ReduceLocation.Top + 2);
             }
 
             #endregion
@@ -966,7 +966,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var trichterText = string.Empty;
             QuickImage? trichterIcon = null;
             var trichterState = States.Undefiniert;
-            viewItem.TmpAutoFilterLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) - AutoFilterSize, ca.HeadSize(_columnFont) - AutoFilterSize, AutoFilterSize, AutoFilterSize);
+            viewItem.AutoFilterLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) - AutoFilterSize, ca.HeadSize(_columnFont) - AutoFilterSize, AutoFilterSize, AutoFilterSize);
             var fi = Filter[viewItem.Column];
 
             if (viewItem.Column.AutoFilterSymbolPossible()) {
@@ -991,24 +991,24 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
 
             if (trichterState != States.Undefiniert) {
-                Skin.Draw_Back(gr, Design.Button_AutoFilter, trichterState, viewItem.TmpAutoFilterLocation, null, false);
-                Skin.Draw_Border(gr, Design.Button_AutoFilter, trichterState, viewItem.TmpAutoFilterLocation);
+                Skin.Draw_Back(gr, Design.Button_AutoFilter, trichterState, viewItem.AutoFilterLocation, null, false);
+                Skin.Draw_Border(gr, Design.Button_AutoFilter, trichterState, viewItem.AutoFilterLocation);
             }
 
             if (trichterIcon != null) {
-                gr.DrawImage(trichterIcon, viewItem.TmpAutoFilterLocation.Left + 2, viewItem.TmpAutoFilterLocation.Top + 2);
+                gr.DrawImage(trichterIcon, viewItem.AutoFilterLocation.Left + 2, viewItem.AutoFilterLocation.Top + 2);
             }
 
             if (!string.IsNullOrEmpty(trichterText)) {
                 var s = _columnFilterFont.MeasureString(trichterText, StringFormat.GenericDefault);
 
                 _columnFilterFont.DrawString(gr, trichterText,
-                    viewItem.TmpAutoFilterLocation.Left + ((AutoFilterSize - s.Width) / 2),
-                    viewItem.TmpAutoFilterLocation.Top + ((AutoFilterSize - s.Height) / 2));
+                    viewItem.AutoFilterLocation.Left + ((AutoFilterSize - s.Width) / 2),
+                    viewItem.AutoFilterLocation.Top + ((AutoFilterSize - s.Height) / 2));
             }
 
             if (trichterState == States.Undefiniert) {
-                viewItem.TmpAutoFilterLocation = new Rectangle(0, 0, 0, 0);
+                viewItem.AutoFilterLocation = new Rectangle(0, 0, 0, 0);
             }
 
             #endregion Filter-Knopf mit Trichter
@@ -1018,11 +1018,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (_showNumber) {
                 for (var x = -1; x < 2; x++) {
                     for (var y = -1; y < 2; y++) {
-                        BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.Black, (int)viewItem.X_WithSlider + x, viewItem.TmpAutoFilterLocation.Top + y);
+                        BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.Black, (int)viewItem.X_WithSlider + x, viewItem.AutoFilterLocation.Top + y);
                     }
                 }
 
-                BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.White, (int)viewItem.X_WithSlider, viewItem.TmpAutoFilterLocation.Top);
+                BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.White, (int)viewItem.X_WithSlider, viewItem.AutoFilterLocation.Top);
             }
 
             #endregion LaufendeNummer
@@ -2043,8 +2043,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 }
 
                 if (Mouse_IsInRedcueButton(_mouseOverColumn, e, ca)) {
-                    _mouseOverColumn.TmpReduced = !_mouseOverColumn.TmpReduced;
-                    _mouseOverColumn.TmpDrawWidth = null;
+                    _mouseOverColumn.Reduced = !_mouseOverColumn.Reduced;
                     Invalidate();
                     return;
                 }
@@ -2161,12 +2160,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e, ColumnViewCollection ca) {
         if (!ca.ShowHead) { return false; }
 
-        return viewItem is { Column: not null, TmpAutoFilterLocation.Width: not 0 } && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
+        return viewItem is { Column: not null, AutoFilterLocation.Width: not 0 } && viewItem.Column.AutoFilterSymbolPossible() && viewItem.AutoFilterLocation.Contains(e.X, e.Y);
     }
 
     private static bool Mouse_IsInRedcueButton(ColumnViewItem? viewItem, MouseEventArgs e, ColumnViewCollection ca) {
         if (!ca.ShowHead) { return false; }
-        return viewItem is { TmpReduceLocation.Width: not 0 } && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
+        return viewItem is { ReduceLocation.Width: not 0 } && viewItem.ReduceLocation.Contains(e.X, e.Y);
     }
 
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
@@ -3056,11 +3055,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var permaX = 0;
             foreach (var viewItem in ca) {
                 if (viewItem is { Column: not null, ViewType: ViewType.PermanentColumn }) {
-                    if (viewItem.TmpDrawWidth == null) {
-                        // Veränderte Werte!
-                        DrawControl(gr, state);
-                        return;
-                    }
+                    //if (viewItem._drawWidth == null) {
+                    //    // Veränderte Werte!
+                    //    DrawControl(gr, state);
+                    //    return;
+                    //}
 
                     permaX = Math.Max(permaX, viewItem.X_WithSlider ?? 0 + viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale));
                 }

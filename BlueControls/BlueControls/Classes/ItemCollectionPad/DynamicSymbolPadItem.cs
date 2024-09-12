@@ -49,7 +49,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
 
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode,  Bitmap bmp) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         var vars = new VariableCollection();
@@ -62,10 +62,14 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         ////vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         //vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
-        vars.Add(new VariableFloat("Width", (float)Math.Round(PixelToMm(bmp.Width, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero), true, "Breite des Objekts in mm"));
-        vars.Add(new VariableFloat("Height", (float)Math.Round(PixelToMm(bmp.Height, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero), true, "Höhe des Objekts in mm"));
+        //vars.Add(new VariableFloat("Width", (float)Math.Round(PixelToMm(bmp.Width, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero), true, "Breite des Objekts in mm"));
+        //vars.Add(new VariableFloat("Height", (float)Math.Round(PixelToMm(bmp.Height, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero), true, "Höhe des Objekts in mm"));
+        ////vars.Add(new VariableFloat("Scale", (float)Math.Round(scale, 2, MidpointRounding.AwayFromZero)), true, "Anzwuen"));
+        vars.Add(new VariableFloat("Width", bmp.Width, true, "Breite des Objekts in Pixel"));
+        vars.Add(new VariableFloat("Height", bmp.Height, true, "Höhe des Objekts in Pixel"));
+        vars.Add(new VariableBitmap("BMP", bmp, true, "Das Objekt,auf dem gezeichnet werden kann"));
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Math);
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Math | MethodType.DrawOnBitmap);
 
         //using var gr = Graphics.FromImage(bmp); 
 

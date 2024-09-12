@@ -106,9 +106,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewItem? this[int index] => _internal[index];
 
-    public ColumnViewItem? this[ColumnItem? vColumn] {
+    public ColumnViewItem? this[ColumnItem? column] {
         get {
-            return vColumn == null ? null : _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == vColumn);
+            return column == null ? null : _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == column);
         }
     }
 
@@ -364,7 +364,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Reduce(string[] columns) {
         foreach (var thiscv in _internal) {
             if (thiscv?.Column is { IsDisposed: false } ci) {
-                thiscv.TmpReduced = columns.Contains(ci.KeyName);
+                thiscv.Reduced = columns.Contains(ci.KeyName);
             }
         }
     }
@@ -372,7 +372,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public List<ColumnItem> ReducedColumns() {
         var x = new List<ColumnItem>();
         foreach (var thiscol in _internal) {
-            if (thiscol is { Column: not null, TmpReduced: true }) { x.Add(thiscol.Column); }
+            if (thiscol is { Column: not null, Reduced: true }) { x.Add(thiscol.Column); }
         }
         return x;
     }

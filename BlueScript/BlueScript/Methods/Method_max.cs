@@ -41,7 +41,7 @@ internal class Method_Max : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Standard | MethodType.Math;
+    public override MethodType MethodType => MethodType.Math;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";

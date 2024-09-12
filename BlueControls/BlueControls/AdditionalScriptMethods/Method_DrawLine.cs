@@ -24,48 +24,45 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_MsgBox : BlueScript.Methods.Method {
+public class Method_DrawLine : BlueScript.Methods.Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
-    public override string Command => "msgbox";
+    public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], FloatVal, FloatVal, FloatVal, FloatVal];
+    public override string Command => "drawline";
     public override List<string> Constants => [];
-    public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer einen Knopf drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
+    public override string Description => "Zeichnet eine Linie auf dem angegebenen Bild.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType =>  MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.DrawOnBitmap;
     public override bool MustUseReturnValue => false;
-    public override string Returns => VariableFloat.ShortName_Variable;
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "MsgBox(Text, Bild, Knopfbeschriftung, ...);";
+    public override string Syntax => "DrawLine(Bild, x1, y1, x2 , y2);";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var txt = attvar.ValueStringGet(0);
 
-        var img = attvar.ValueStringGet(1);
-        var pic = ImageCode.Information;
+        if (attvar.ValueBitmapGet(0) is not Bitmap bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
-        if (Enum.TryParse(img, out ImageCode type)) { pic = type; }
+        try {
+            using var gr = Graphics.FromImage(bmp);
+            gr.DrawLine(Pens.Black, attvar.ValueIntGet(1), attvar.ValueIntGet(2), attvar.ValueIntGet(3), attvar.ValueIntGet(4));
+        } catch {
 
-        List<string> buttons = [];
-        for (var z = 2; z < attvar.Attributes.Count; z++) {
-            buttons.Add(attvar.ValueStringGet(z));
+            return new DoItFeedback(ld, "Linie konnte nicht gezeichnet werden.");
         }
 
-        if (buttons.Count == 0) { buttons.Add("Ok"); }
 
-        var l = MessageBox.Show(txt, pic, true, buttons.ToArray());
-
-        return new DoItFeedback(l);
+        return DoItFeedback.Null();
     }
 
     #endregion

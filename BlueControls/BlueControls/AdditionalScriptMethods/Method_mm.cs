@@ -17,54 +17,41 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using static BlueBasics.Converter;
 
-namespace BlueScript.Methods;
+namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_Var : Method {
+internal class Method_mm : BlueScript.Methods.Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[Variable.Any_Plain]];
-    public override string Command => "var";
+    public override List<List<string>> Args => [FloatVal];
+
+    public override string Command => "mm";
+
     public override List<string> Constants => [];
-    public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
+    public override string Description => "Rechnet mm in Pixel um - bei 300 dpi.";
+
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Math;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => string.Empty;
-    public override string Syntax => "var VariablenName = Wert;";
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "mm(Number)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.LogData, "Kein Text angekommen."); }
-
-        var vbe = VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
-
-        if (vbe.AllOk) { return vbe; }
-
-        return vbe;
-    }
-
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        // Dummy überschreibung.
-        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
-
-        Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch();
-    }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPad.ItemCollectionPad.Dpi));
 
     #endregion
 }
