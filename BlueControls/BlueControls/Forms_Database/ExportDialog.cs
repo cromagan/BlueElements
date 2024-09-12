@@ -132,7 +132,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         if (rowsForExport is not { Count: >= 1 }) { return -1; }
 
-        ItemCollectionPad.ItemCollectionPad tmp = new(layoutFileName);
+        var  tmp = new ItemCollectionPad.ItemCollectionPad(layoutFileName);
         tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
@@ -140,29 +140,36 @@ public sealed partial class ExportDialog : IHasDatabase {
         var oneItem = tmp.MaxBounds(string.Empty);
         pad.Items.SheetStyle = tmp.SheetStyle;
         pad.Items.SheetStyleScale = tmp.SheetStyleScale;
+        pad.ShowInPrintMode = true;
+        pad.Items.GridShow = -1;
+        pad.Items.BackColor = Color.LightGray;
         tmp.Dispose();
+
+
         var druckB = pad.Items.DruckbereichRect();
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), MidpointRounding.AwayFromZero);
-        var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));
-        for (var x = 0; x < tempVar; x++) {
-            var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));
-            for (var y = 0; y < tempVar2; y++) {
-                ChildPadItem it = new() {
-                    PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layoutFileName))
-                };
 
-                if (it.PadInternal.Items is { IsDisposed: false } icp) {
-                    icp.ResetVariables();
-                    icp.ReplaceVariables(rowsForExport[startNr]);
+        var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01))) ;
+        var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
+
+        for (var y = 0; y < maxY; y++) {
+            for (var x = 0; x < maxX; x++) {
+                var it = new ChildPadItem(new CreativePad(layoutFileName, rowsForExport[startNr]));
+                if (it.PadInternal?.Items is { })
+                {
+                    it.PadInternal.Items.GridShow = -1;
                 }
 
+
                 pad.Items.Add(it);
-                it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
+                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand), Y = druckB.Top + y * (oneItem.Height + abstand) }, true);
+
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
             }
             if (startNr >= rowsForExport.Count) { break; }
         }
+
         pad.ZoomFit();
         return startNr;
     }
@@ -278,8 +285,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (IsDisposed || Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
         if (_rowsForExport is not { Count: not 0 }) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
-        //TODO: Schachteln implementieren
-        if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
+        ////TODO: Schachteln implementieren
+        //if (!optSpezialFormat.Checked && !optEinzelnSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
 
         return string.Empty;
     }
@@ -369,7 +376,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             _ = GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
 
-        if (optSpeichern.Checked || optSpezialFormat.Checked) {
+        if (optEinzelnSpeichern.Checked || optSpezialFormat.Checked) {
             tabStart.Enabled = false; // Geht ja gleich los
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;

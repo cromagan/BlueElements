@@ -50,8 +50,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Constructors
 
-    public ChildPadItem() : base(string.Empty) {
-        PadInternal = null; // new CreativePad();
+    public ChildPadItem(CreativePad? pad) : base(string.Empty) {
+        PadInternal = pad;
         Seite = string.Empty;
         ZoomItems = null;
         _name = string.Empty;
@@ -59,6 +59,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         Randfarbe = Color.Transparent;
         Eingebettete_Ansichten = [];
     }
+
+    public ChildPadItem() : this(null) { }
 
     #endregion
 

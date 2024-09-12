@@ -53,7 +53,7 @@ namespace BlueControls.Forms
             this.grpArt = new BlueControls.Controls.GroupBox();
             this.optSpezialFormat = new BlueControls.Controls.Button();
             this.optBildSchateln = new BlueControls.Controls.Button();
-            this.optSpeichern = new BlueControls.Controls.Button();
+            this.optEinzelnSpeichern = new BlueControls.Controls.Button();
             this.optDrucken = new BlueControls.Controls.Button();
             this.btnWeiter = new BlueControls.Controls.Button();
             this.grpEinträge = new BlueControls.Controls.GroupBox();
@@ -165,11 +165,16 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.padVorschau.EditAllowed = false;
+            this.padVorschau.Item = null;
             this.padVorschau.Location = new System.Drawing.Point(232, 80);
+            this.padVorschau.Mode = "";
             this.padVorschau.Name = "padVorschau";
+            this.padVorschau.ShiftX = 0F;
+            this.padVorschau.ShiftY = 0F;
             this.padVorschau.ShowInPrintMode = true;
             this.padVorschau.Size = new System.Drawing.Size(623, 480);
             this.padVorschau.TabIndex = 1;
+            this.padVorschau.Zoom = 1F;
             // 
             // Tabs
             // 
@@ -212,7 +217,7 @@ namespace BlueControls.Forms
             this.grpArt.Controls.Add(this.optSpezialFormat);
             this.grpArt.Controls.Add(this.optBildSchateln);
             this.grpArt.Controls.Add(this.capLayout);
-            this.grpArt.Controls.Add(this.optSpeichern);
+            this.grpArt.Controls.Add(this.optEinzelnSpeichern);
             this.grpArt.Controls.Add(this.optDrucken);
             this.grpArt.Location = new System.Drawing.Point(0, 64);
             this.grpArt.Name = "grpArt";
@@ -244,14 +249,14 @@ namespace BlueControls.Forms
             // 
             // optSpeichern
             // 
-            this.optSpeichern.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optSpeichern.Checked = true;
-            this.optSpeichern.ImageCode = "Diskette";
-            this.optSpeichern.Location = new System.Drawing.Point(8, 24);
-            this.optSpeichern.Name = "optSpeichern";
-            this.optSpeichern.Size = new System.Drawing.Size(216, 40);
-            this.optSpeichern.TabIndex = 86;
-            this.optSpeichern.Text = "<b>Einzeln Speichern</b><br>Auf einem Datenträger schreiben";
+            this.optEinzelnSpeichern.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.optEinzelnSpeichern.Checked = true;
+            this.optEinzelnSpeichern.ImageCode = "Diskette";
+            this.optEinzelnSpeichern.Location = new System.Drawing.Point(8, 24);
+            this.optEinzelnSpeichern.Name = "optEinzelnSpeichern";
+            this.optEinzelnSpeichern.Size = new System.Drawing.Size(216, 40);
+            this.optEinzelnSpeichern.TabIndex = 86;
+            this.optEinzelnSpeichern.Text = "<b>Einzeln Speichern</b><br>Auf einem Datenträger schreiben";
             // 
             // optDrucken
             // 
@@ -338,11 +343,16 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.padPrint.EditAllowed = false;
+            this.padPrint.Item = null;
             this.padPrint.Location = new System.Drawing.Point(5, 60);
+            this.padPrint.Mode = "";
             this.padPrint.Name = "padPrint";
+            this.padPrint.ShiftX = 0F;
+            this.padPrint.ShiftY = 0F;
             this.padPrint.ShowInPrintMode = true;
             this.padPrint.Size = new System.Drawing.Size(849, 568);
             this.padPrint.TabIndex = 2;
+            this.padPrint.Zoom = 1F;
             this.padPrint.BeginnPrint += new System.Drawing.Printing.PrintEventHandler(this.PrintPad_BeginnPrint);
             this.padPrint.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.PrintPad_PrintPage);
             // 
@@ -435,11 +445,16 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.padSchachteln.EditAllowed = false;
+            this.padSchachteln.Item = null;
             this.padSchachteln.Location = new System.Drawing.Point(8, 40);
+            this.padSchachteln.Mode = "";
             this.padSchachteln.Name = "padSchachteln";
+            this.padSchachteln.ShiftX = 0F;
+            this.padSchachteln.ShiftY = 0F;
             this.padSchachteln.ShowInPrintMode = true;
             this.padSchachteln.Size = new System.Drawing.Size(849, 584);
             this.padSchachteln.TabIndex = 3;
+            this.padSchachteln.Zoom = 1F;
             // 
             // tabDateiExport
             // 
@@ -480,6 +495,7 @@ namespace BlueControls.Forms
             // 
             // ExportDialog
             // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(868, 716);
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.c_Layoutx);
@@ -510,7 +526,7 @@ namespace BlueControls.Forms
 			internal CreativePad padVorschau;
 			internal  TabPage tabDateiExport;
 			internal  TabPage tabStart;
-			private Button optSpeichern;
+			private Button optEinzelnSpeichern;
 			private Button optDrucken;
 			internal  TabPage tabDrucken;
 			internal Caption Caption4;

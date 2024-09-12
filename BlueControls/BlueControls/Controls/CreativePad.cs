@@ -35,6 +35,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Windows.Forms;
+using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
@@ -60,13 +61,24 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     #region Constructors
 
-    public CreativePad(ItemCollectionPad.ItemCollectionPad itemCollectionPad) : base() {
+    public CreativePad(ItemCollectionPad.ItemCollectionPad itemCollectionPad) : this(itemCollectionPad, null) { }
+
+    public CreativePad(string layoutFileName, RowItem? row) : this(new ItemCollectionPad.ItemCollectionPad(layoutFileName), row) { }
+
+    public CreativePad(string layoutFileName) : this(new ItemCollectionPad.ItemCollectionPad(layoutFileName), null) { }
+
+    public CreativePad(ItemCollectionPad.ItemCollectionPad itemCollectionPad, RowItem? row) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
         Items = itemCollectionPad;
         Unselect();
         MouseHighlight = false;
+
+        if (row is { }) {
+            Items.ResetVariables();
+            Items.ReplaceVariables(row);
+        }
     }
 
     public CreativePad() : this([]) { }
@@ -131,19 +143,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         get => _items;
         set {
             if (_items == value) { return; }
-            if (_items != null) {
-                _items.ItemRemoved -= _Items_ItemRemoved;
-                _items.ItemRemoving -= _Items_ItemRemoving;
-                _items.ItemAdded -= _Items_ItemAdded;
-                _items.PropertyChanged -= Items_PropertyChanged;
-            }
+
+            UnRegisterEvents();
+
             _items = value;
-            if (_items != null) {
-                _items.ItemRemoved += _Items_ItemRemoved;
-                _items.ItemRemoving += _Items_ItemRemoving;
-                _items.ItemAdded += _Items_ItemAdded;
-                _items.PropertyChanged += Items_PropertyChanged;
-            }
+
+            RegisterEvents();
+
             Invalidate();
             OnGotNewItemCollection();
         }
@@ -267,6 +273,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+
+        if(!EditAllowed) {return;}
+
         CheckHotItem(e.Mouse, true);
         e.HotItem = HotItem;
 
@@ -497,7 +506,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     protected override void Dispose(bool disposing) {
-        Items = null;
+        UnRegisterEvents();
+        _items = null;
         base.Dispose(disposing);
     }
 
@@ -672,6 +682,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         _items.SaveAsBitmap(PicsSave.FileName, CurrentPage);
     }
 
+    private void RegisterEvents() {
+        if (_items != null) {
+            _items.ItemRemoved += _Items_ItemRemoved;
+            _items.ItemRemoving += _Items_ItemRemoving;
+            _items.ItemAdded += _Items_ItemAdded;
+            _items.PropertyChanged += Items_PropertyChanged;
+        }
+    }
+
     private void RepairPrinterData() {
         if (_repairPrinterDataPrepaired || _items == null) { return; }
         _repairPrinterDataPrepaired = true;
@@ -707,6 +726,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         value = movedPoint.Y + mouseMovedTo;
         value = (int)(value / multi) * multi;
         return value - movedPoint.Y;
+    }
+
+    private void UnRegisterEvents() {
+        if (_items != null) {
+            _items.ItemRemoved -= _Items_ItemRemoved;
+            _items.ItemRemoving -= _Items_ItemRemoving;
+            _items.ItemAdded -= _Items_ItemAdded;
+            _items.PropertyChanged -= Items_PropertyChanged;
+        }
     }
 
     #endregion
