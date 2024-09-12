@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -31,7 +32,7 @@ public static class RowDrawDataExtensions {
 
     #region Methods
 
-    public static RowData? Get(this List<RowData>? l, RowItem? row) => l?.FirstOrDefault(thisr => thisr?.Row == row);
+    public static RowData? Get(this List<RowData>? l, RowItem row) => l?.FirstOrDefault(thisr => thisr?.Row == row);
 
     #endregion
 
@@ -73,15 +74,13 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Constructors
 
-    public RowData(RowItem row) : this(row, string.Empty) { }
-
     public RowData(RowItem row, string chapter) {
         Row = row;
         PinStateSortAddition = "2";
         Y = -1;
         Chapter = chapter;
         Expanded = true;
-        DrawHeight = 0;
+        DrawHeight = 18;
         CaptionPos = Rectangle.Empty;
         AdditionalSort = string.Empty;
         ShowCap = false;
@@ -96,7 +95,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
     public string AdditionalSort { get; set; }
     public Rectangle CaptionPos { get; set; }
     public string Chapter { get; }
-    public int DrawHeight { get; set; }
+    public int DrawHeight { get; private set; }
     public bool Expanded { get; set; }
     public bool IsDisposed { get; private set; }
     public bool MarkYellow { get; set; }
@@ -109,7 +108,24 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Methods
 
-    public string CompareKey() => PinStateSortAddition + ";" + AdditionalSort;
+    public void CalculateScaledDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, float scale) {
+        if (IsDisposed || Row.IsDisposed) { DrawHeight = BlueControls.Controls.Table.GetPix(18, scale); return; }
+
+        DrawHeight = 18;
+
+        foreach (var thisViewItem in ca) {
+            if (CellCollection.IsInCache(thisViewItem.Column, Row) && thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
+                var renderer = thisViewItem.GetRenderer();
+
+                if (renderer != null) { DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.DoOpticalTranslation).Height); }
+            }
+        }
+
+        DrawHeight = Math.Min(DrawHeight, (int)(displayRectangleWoSlider.Height * 0.4) - columnHeadSize);
+        DrawHeight = BlueControls.Controls.Table.GetPix(Math.Max(DrawHeight, 18), scale);
+    }
+
+    public string CompareKey() => PinStateSortAddition + ";" + Chapter + ";" + AdditionalSort;
 
     public int CompareTo(object obj) {
         if (obj is RowData robj) {

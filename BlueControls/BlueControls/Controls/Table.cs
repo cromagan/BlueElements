@@ -1331,71 +1331,64 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var expanded = true;
             var lastCap = string.Empty;
 
-            List<RowData> sortedRowDataNew;
-            long vr = 0;
+
             if (IsDisposed || Database is not { IsDisposed: false } db) {
-                sortedRowDataNew = [];
+                VisibleRowCount = 0;
+                _rowsFilteredAndPinned = [];
             } else {
-                (sortedRowDataNew, vr) = CalculateSortedRows(db, RowsFiltered, PinnedRows, SortUsed());
-            }
+                List<RowData> sortedRowDataNew;
+                (sortedRowDataNew, VisibleRowCount) = CalculateSortedRows(db, RowsFiltered, PinnedRows, SortUsed());
 
-            VisibleRowCount = vr;
-            //if (_rowsFilteredAndPinned != null && !_rowsFilteredAndPinned.IsDifferentTo(sortedRowDataNew)) { return _rowsFilteredAndPinned; }
+                var sortedRowDataTmp = new List<RowData>();
 
-            var sortedRowDataTmp = new List<RowData>();
+                foreach (var thisRow in sortedRowDataNew) {
+                    var thisRowData = thisRow;
 
-            foreach (var thisRow in sortedRowDataNew) {
-                var thisRowData = thisRow;
+                    if (_mouseOverRow != null && _mouseOverRow.Row == thisRow.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
+                        _mouseOverRow.GetDataFrom(thisRowData);
+                        thisRowData = _mouseOverRow;
+                    } // Mouse-Daten wiederverwenden
 
-                if (_mouseOverRow != null && _mouseOverRow.Row == thisRow.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
-                    _mouseOverRow.GetDataFrom(thisRowData);
-                    thisRowData = _mouseOverRow;
-                } // Mouse-Daten wiederverwenden
+                    if (CursorPosRow?.Row != null && CursorPosRow.Row == thisRow.Row && CursorPosRow.Chapter == thisRow.Chapter) {
+                        CursorPosRow.GetDataFrom(thisRowData);
+                        thisRowData = CursorPosRow;
+                    } // Cursor-Daten wiederverwenden
 
-                if (CursorPosRow?.Row != null && CursorPosRow.Row == thisRow.Row && CursorPosRow.Chapter == thisRow.Chapter) {
-                    CursorPosRow.GetDataFrom(thisRowData);
-                    thisRowData = CursorPosRow;
-                } // Cursor-Daten wiederverwenden
+                    thisRowData.Y = maxY;
 
-                thisRowData.Y = maxY;
+                    #region Caption bestimmen
 
-                #region Caption bestimmen
+                    if (thisRow.Chapter != lastCap) {
+                        thisRowData.Y += RowCaptionSizeY;
+                        expanded = !_collapsed.Contains(thisRowData.Chapter);
+                        maxY += RowCaptionSizeY;
+                        thisRowData.ShowCap = true;
+                        lastCap = thisRow.Chapter;
+                    } else {
+                        thisRowData.ShowCap = false;
+                    }
 
-                if (thisRow.Chapter != lastCap) {
-                    thisRowData.Y += RowCaptionSizeY;
-                    expanded = !_collapsed.Contains(thisRowData.Chapter);
-                    maxY += RowCaptionSizeY;
-                    thisRowData.ShowCap = true;
-                    lastCap = thisRow.Chapter;
-                } else {
-                    thisRowData.ShowCap = false;
+                    #endregion
+
+                    #region Expaned (oder pinned) bestimmen
+
+                    thisRowData.Expanded = expanded;
+                    if (thisRowData.Expanded) {
+                        thisRowData.CalculateScaledDrawHeight(ca, ca.HeadSize(_columnFont), displayR, db.GlobalScale);
+                        maxY +=thisRowData.DrawHeight;
+                    }
+
+                    #endregion
+
+                    sortedRowDataTmp.Add(thisRowData);
                 }
 
-                #endregion
 
-                #region Expaned (oder pinned) bestimmen
+                if (CursorPosRow?.Row != null && !sortedRowDataTmp.Contains(CursorPosRow)) { CursorPos_Reset(); }
+                _mouseOverRow = null;
 
-                thisRowData.Expanded = expanded;
-                if (thisRowData.Expanded) {
-                    thisRowData.DrawHeight = Row_DrawHeight(ca, thisRowData.Row, displayR);
-                    //if (_sortedRowDatax == null) {
-                    //    // Folgender Fall: Die Row height reparirt die LinkedCell.
-                    //    // Dadruch wird eine Zelle geändert. Das wiederrum kann _sortedRowDatax auf null setzen..
-                    //    return null;
-                    //}
-                    maxY += thisRowData.DrawHeight;
-                }
-
-                #endregion
-
-                sortedRowDataTmp.Add(thisRowData);
+                _rowsFilteredAndPinned = sortedRowDataTmp;
             }
-
-            if (CursorPosRow?.Row != null && !sortedRowDataTmp.Contains(CursorPosRow)) { CursorPos_Reset(); }
-            _mouseOverRow = null;
-
-            _rowsFilteredAndPinned = sortedRowDataTmp;
-
             //         _ = EnsureVisible(CursorPosColumn, CursorPosRow);
             // EnsureVisible macht probleme, wenn mit der Maus auf ein linked Cell gezogen wird und eine andere Cell
             //markiert ist. Dann wird sortiren angestoßen, und der Cursor zurückgesprungen
@@ -2056,7 +2049,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     return;
                 }
 
-                if (_mouseOverRow?.Row is { IsDisposed: false } r ) {
+                if (_mouseOverRow?.Row is { IsDisposed: false } r) {
                     OnCellClicked(new CellEventArgs(column, r));
                     Invalidate();
                 }
@@ -2674,7 +2667,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         if (contentHolderCellRow != null) {
-            var h = cellInThisDatabaseRow?.DrawHeight ?? _pix16;// Row_DrawHeight(cellInThisDatabaseRow, DisplayRectangle);
+            var h = cellInThisDatabaseRow?.DrawHeight ?? _pix18;// Row_DrawHeight(cellInThisDatabaseRow, DisplayRectangle);
             if (isHeight > 0) { h = isHeight; }
             box.Location = new Point(viewItem.X_WithSlider ?? 0, DrawY(ca, cellInThisDatabaseRow));
             box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, db.GlobalScale) + addWith, h);
@@ -2886,7 +2879,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             gr.SmoothingMode = SmoothingMode.None;
 
             Rectangle cellrectangle = new(columnX1, DrawY(ca, cellInThisDatabaseRowData),
-                viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale), Math.Max(cellInThisDatabaseRowData.DrawHeight, _pix16));
+                viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale), cellInThisDatabaseRowData.DrawHeight);
 
             if (cellInThisDatabaseRowData.Expanded) {
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
@@ -3431,25 +3424,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CheckView();
     }
 
-    private int Row_DrawHeight(ColumnViewCollection ca, RowItem row, Rectangle displayRectangleWoSlider) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return _pix18; }
 
-        var tmp = 18;
-
-        foreach (var thisViewItem in ca) {
-            if (CellCollection.IsInCache(thisViewItem.Column, row) && thisViewItem.Column is { IsDisposed: false } tmpc && !row.CellIsNullOrEmpty(tmpc)) {
-                var renderer = thisViewItem.GetRenderer();
-
-                if (renderer != null) { tmp = Math.Max(tmp, renderer.ContentSize(row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.DoOpticalTranslation).Height); }
-            }
-        }
-
-        tmp = GetPix(tmp, db.GlobalScale);
-
-        tmp = Math.Min(tmp, (int)(displayRectangleWoSlider.Height * 0.4) - ca.HeadSize(_columnFont));
-        tmp = Math.Max(tmp, GetPix(18, db.GlobalScale));
-        return tmp;
-    }
 
     //private void Row_RowAdded(object sender, RowChangedEventArgs e) {
     //    if (IsDisposed) { return; }

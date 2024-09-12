@@ -475,6 +475,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void InvalidateCheckData() {
+        LastCheckedRowFeedback?.Clear();
         LastCheckedRowFeedback = null;
         LastCheckedEventArgs = null;
         LastCheckedMessage = null;
@@ -748,6 +749,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
+                LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen."; 
 
                 RowCollection.FailedRows.AddIfNotExists(this);
                 return false;
@@ -977,10 +979,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             _tmpQuickInfo = null;
-            LastCheckedEventArgs = null;
-            LastCheckedMessage = null;
-            LastCheckedRowFeedback?.Clear();
-            LastCheckedRowFeedback = null;
+            InvalidateCheckData();
 
             IsDisposed = true;
         }
