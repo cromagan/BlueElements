@@ -86,7 +86,6 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
-
         var x = 0f;
         var y = 0f;
 
@@ -98,53 +97,47 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         if (point == _pLo) {
-            if (e.Y) {
-                _pRu.Y = y + Size.Height;
-                _po.Y = y;
-            }
-            if (e.X) {
-                _pRu.X = x + Size.Width;
-                _pl.X = x;
-            }
+            _pRu.Y = y + Size.Height;
+            _po.Y = y;
+
+            _pRu.X = x + Size.Width;
+            _pl.X = x;
         }
 
         if (point == _pRu) {
-            if (e.X) {
-                _pLo.X = x - Size.Width;
-                _pr.X = x;
-            }
-            if (e.Y) {
-                _pLo.Y = y - Size.Height;
-                _pu.Y = y;
-            }
+            _pLo.X = x - Size.Width;
+            _pr.X = x;
+
+            _pLo.Y = y - Size.Height;
+            _pu.Y = y;
         }
 
         if (point == _pRo) {
-            if (e.Y) { _po.Y = y; }
-            if (e.X) { _pr.X = x; }
+            _po.Y = y;
+            _pr.X = x;
         }
 
         if (point == _pLu) {
-            if (e.X) { _pl.X = x; }
-            if (e.Y) { _pu.Y = y; }
+            _pl.X = x;
+            _pu.Y = y;
         }
 
-        if (point == _po && e.Y) {
+        if (point == _po) {
             _pLo.Y = y;
             _pRo.Y = y;
         }
 
-        if (point == _pu && e.Y) {
+        if (point == _pu) {
             _pLu.Y = y;
             _pRu.Y = y;
         }
 
-        if (point == _pl && e.X) {
+        if (point == _pl) {
             _pLo.X = x;
             _pLu.X = x;
         }
 
-        if (point == _pr && e.X) {
+        if (point == _pr) {
             _pRo.X = x;
             _pRu.X = x;
         }

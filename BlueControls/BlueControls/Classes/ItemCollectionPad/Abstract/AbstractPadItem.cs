@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Converter;
+using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
@@ -67,7 +68,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         _keyName = keyName;
         if (string.IsNullOrEmpty(_keyName)) { _keyName = Generic.GetUniqueKey(); }
 
-        MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
+        MovablePoint.CollectionChanged += Point_CollectionChanged;
+        JointPoints.CollectionChanged += Point_CollectionChanged;
     }
 
     #endregion
@@ -111,6 +113,22 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         }
     }
 
+    public PointM? JointParentPoint;
+
+
+    /// <summary>
+    /// Diese Punket sind Verbindungspunkte.
+    /// Sie können an sich verschoben werden, aber dessen Position ist immer in Relation zum JointParentPoint.
+    /// Deswegen verursacht ein Verschoeben auch nur eine Relations-Änderung.
+    /// Zusätzlich werden diese Punkt auf Bewegungen getrackt und auch bei ToString gespeichert
+    /// </summary>
+    public ObservableCollection<PointM> JointPoints { get; } = [];
+
+
+    /// <summary>
+    /// Diese Punkte können vom Benutzer verschoben werden.
+    /// Zusätzlich werden diese Punkt auf Bewegungen getrackt und auch bei ToString gespeichert
+    /// </summary>
     public ObservableCollection<PointM> MovablePoint { get; } = [];
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
@@ -142,6 +160,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         }
     }
 
+    /// <summary>
+    /// Diese Punkte müssen gleichzeitig bewegt werden,
+    /// wenn das ganze Objekt verschoben werden muss.
+    /// </summary>
     public List<PointM> PointsForSuccesfullyMove { get; } = [];
 
     public virtual string QuickInfo { get; set; } = string.Empty;
@@ -314,6 +336,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         foreach (var t in PointsForSuccesfullyMove) {
             t.Move(x, y);
         }
+        // JointPoint werden bewegt, wenn der JointParentPoint angesprochen wird
+
         OnPropertyChanged();
     }
 
@@ -408,9 +432,44 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         return false;
     }
 
-    public virtual void PointMoved(object sender, MoveEventArgs e) => OnPropertyChanged();
+    public virtual void PointMoved(object sender, MoveEventArgs e) {
+        OnPropertyChanged();
 
-    public void PointMoving(object sender, MoveEventArgs e) { }
+        if (sender is PointM p && p == JointParentPoint) {
+
+            foreach (var thisPoint in JointPoints) {
+
+                var oldPoint = new PointF(JointParentPoint.X - e.X, JointParentPoint.Y - e.Y);
+ 
+                foreach (var thispoint in JointPoints) {
+                    var angle = Winkel(oldPoint, thisPoint);
+                    var lenght = Länge(oldPoint, thispoint);
+                    thispoint.SetTo(JointParentPoint, lenght, angle);
+                }
+
+                //if (thisPoint != null) {
+                //    thisPoint.Move(e);
+                //}
+            }
+        }
+    }
+
+    public void AddJointPointAbsolute(string name, float x, float y) {
+        var p = new PointM(name, x, y);
+        JointPoints.Add(p);
+    }
+
+    public void AddJointPointAbsolute(PointM vorlage) {
+        AddJointPointAbsolute(vorlage.KeyName,vorlage.X, vorlage.Y);
+    }
+
+    //private void AddJointPointCartesian(string name, float lenghtToMiddle, float angleToMiddle) {
+    //    var p = new PointM(this, name, 0, 0);
+    //    p.SetTo(JointParentPoint, lenghtToMiddle, angleToMiddle);
+    //    JointPoints.Add(p);
+
+    //}
+
 
     /// <summary>
     /// Teilt dem Item mit, dass das Design geändert wurde.
@@ -431,6 +490,11 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         foreach (var thisPoint in MovablePoint) {
             result.ParseableAdd("Point", thisPoint as IStringable);
         }
+        foreach (var thisPoint in JointPoints) {
+            result.ParseableAdd("JointPoint", thisPoint as IStringable);
+        }
+
+
         if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
         }
@@ -440,17 +504,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         return result.Parseable(base.ToParseableString());
     }
 
-    //public void UpdateSideOptionMenu() => OnDoUpdateSideOptionMenu();
-
-    //public void RemoveAllConnections() {
-    //    foreach (var thisCon in Parent.Connections) {
-    //        if (thisCon.Item1 == this || thisCon.Item2 == this) {
-    //            Parent.Connections.Remove(thisCon);
-    //            RemoveAllConnections();
-    //            return;
-    //        }
-    //    }
-    //}
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
     /// </summary>
@@ -470,7 +523,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
-            MovablePoint.CollectionChanged -= MovablePoint_CollectionChanged;
+            MovablePoint.CollectionChanged -= Point_CollectionChanged;
+            JointPoints.CollectionChanged -= Point_CollectionChanged;
             MovablePoint.RemoveAll();
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
@@ -500,11 +554,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
-    private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void Point_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is PointM p) {
-                    p.Moving += PointMoving;
                     p.Moved += PointMoved;
                 }
             }
@@ -513,7 +566,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
                 if (thisit is PointM p) {
-                    p.Moving -= PointMoving;
                     p.Moved -= PointMoved;
                 }
             }

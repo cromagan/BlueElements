@@ -38,8 +38,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     private object? _parent;
 
-    private string _tag = string.Empty;
-
     private float _x;
 
     private float _y;
@@ -63,11 +61,10 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     public PointM(object? parent, string toParse) : this(parent) => this.Parse(toParse);
 
     public PointM(object? parent, string name, float x, float y) {
-        Parent = parent;
+        _parent = parent;
         _x = x;
         _y = y;
         KeyName = name;
-        //Tag = tag;
     }
 
     public PointM() : this(null, string.Empty, 0f, 0f) { }
@@ -115,14 +112,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         }
     }
 
-    public string Tag {
-        get => _tag;
-        set {
-            if (_tag == value) { return; }
-            _tag = value;
-            OnPropertyChanged();
-        }
-    }
 
     public float X {
         get => _x;
@@ -197,7 +186,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
                 return true;
 
             case "tag":
-                _tag = value.FromNonCritical();
+                //_tag = value.FromNonCritical(); // TODO: 13.09.2024
                 return true;
 
             case "x":
@@ -225,10 +214,10 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     }
 
     public void SetTo(float x, float y) {
-        var mx = Math.Abs(x - _x) > 0.0000001;
-        var my = Math.Abs(y - _y) > 0.0000001;
+        var mx = (float)Math.Round(x - _x, 6);
+        var my = (float)Math.Round(y - _y, 6);
 
-        if (!mx && !my) { return; }
+        if (mx == 0 && my == 0) { return; }
         OnMoving(new MoveEventArgs(mx, my));
         _x = x;
         _y = y;
@@ -252,8 +241,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     public string ToParseableString() {
         List<string> result = [];
 
-        if (Parent != null) {
-            switch (Parent) {
+        if (_parent != null) {
+            switch (_parent) {
                 case IHasKeyName item:
                     result.ParseableAdd("ParentName", item.KeyName);
                     break;
@@ -264,14 +253,14 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
                     break;
 
                 default:
-                    result.ParseableAdd("ParentType", Parent.GetType().FullName);
+                    result.ParseableAdd("ParentType", _parent.GetType().FullName);
                     break;
             }
         }
         result.ParseableAdd("Name", KeyName);
         result.ParseableAdd("X", _x);
         result.ParseableAdd("Y", _y);
-        result.ParseableAdd("Tag", _tag);
+        //result.ParseableAdd("Tag", _tag);
         return result.Parseable();
     }
 
