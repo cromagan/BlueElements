@@ -138,7 +138,10 @@ public class LinePadItem : AbstractPadItem {
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();
+    public override void PointMoved(object sender, MoveEventArgs e) {
+        CalcTempPoints();
+        base.PointMoved(sender, e);
+    }
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

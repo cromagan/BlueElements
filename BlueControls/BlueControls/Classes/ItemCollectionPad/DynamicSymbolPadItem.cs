@@ -27,6 +27,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -129,6 +130,9 @@ public class DynamicSymbolPadItem : RectanglePadItem {
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+
+        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Enums.Design.TextBox, Enums.States.Standard, BlueDatabase.Enums.TranslationType.Original_Anzeigen, Alignment.Left, zoom);
+
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         //gr.TranslateTransform(trp.X, trp.Y);
         //gr.RotateTransform(-Drehwinkel);

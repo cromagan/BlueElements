@@ -70,7 +70,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem(string.Empty));
 
-        if (!FormulaSet(filename, notAllowedchilds)) {
+        if (!string.IsNullOrWhiteSpace(filename) && !FormulaSet(filename, notAllowedchilds)) {
             Close();
         }
 

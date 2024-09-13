@@ -234,7 +234,10 @@ public class DimensionPadItem : AbstractPadItem {
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) => CalculateOtherPoints();
+    public override void PointMoved(object sender, MoveEventArgs e) { 
+        CalculateOtherPoints();
+        base.PointMoved(sender, e);
+    }
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
@@ -257,7 +260,7 @@ public class DimensionPadItem : AbstractPadItem {
         var sz2 = f2.MeasureString(Text_Unten);
         var maxrad = Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height));
         RectangleF x = new(_point1, new SizeF(0, 0));
-        x = x.ExpandTo(_point1);
+        x = x.ExpandTo(_point2);
         x = x.ExpandTo(_bezugslinie1);
         x = x.ExpandTo(_bezugslinie2);
         x = x.ExpandTo(_textPoint, maxrad);

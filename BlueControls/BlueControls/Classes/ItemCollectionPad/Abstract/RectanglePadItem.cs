@@ -116,7 +116,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
-        base.PointMoved(sender, e);
+
 
         if (sender is not PointM point) { return; }
 
@@ -164,6 +164,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
         }
 
         SizeChanged();
+        base.PointMoved(sender, e);
     }
 
     public void SetCoordinates(RectangleF r, bool overrideFixedSize) {

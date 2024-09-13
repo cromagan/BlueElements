@@ -86,7 +86,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
-        base.PointMoved(sender, e);
+
         var x = 0f;
         var y = 0f;
 
@@ -150,6 +150,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         SizeChanged();
+        base.PointMoved(sender, e);
     }
 
     public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
