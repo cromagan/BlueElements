@@ -37,17 +37,18 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
     public SearchAndReplaceInDBScripts() =>
         // Dieser Aufruf ist für den Designer erforderlich.
-        InitializeComponent();// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.//_table = table;//_table.SelectedCellChanged += SelectedCellChanged;//SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
+        InitializeComponent();
 
     #endregion
+
+    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.//_table = table;//_table.SelectedCellChanged += SelectedCellChanged;//SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
 
     #region Methods
 
     private void AltNeu_TextChanged(object sender, System.EventArgs e) => Checkbuttons();
 
     private void Checkbuttons() {
-        var canDo = true;
-        if (!Generic.IsAdministrator()) { canDo = false; }
+        var canDo = !!Generic.IsAdministrator();
         if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
         btnAusfuehren.Enabled = canDo;
     }
@@ -136,8 +137,6 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;
     }
-
-    private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
 
     #endregion
 }

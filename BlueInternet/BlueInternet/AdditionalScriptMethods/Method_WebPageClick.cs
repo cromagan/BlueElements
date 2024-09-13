@@ -58,7 +58,7 @@ internal class Method_WebPageClick : Method_WebPage {
 
             #region Versuch, Button per ID
 
-            var script = @"var button = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
+            var script = "var button = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
                                  if (button) {
                                      button.click();
                                      'success';
@@ -110,7 +110,7 @@ internal class Method_WebPageClick : Method_WebPage {
 
             #region Versuch, Button per Klassenname
 
-            script = @"var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+            script = "var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
                     if (element) {
                         element.click();
                         'success';

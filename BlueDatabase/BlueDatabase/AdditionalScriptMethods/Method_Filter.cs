@@ -117,7 +117,7 @@ public class Method_Filter : Method_Database {
 
         #region Typ ermitteln
 
-        FilterType filtertype = StringToFilterType(attvar.ValueStringGet(2));
+        var filtertype = StringToFilterType(attvar.ValueStringGet(2));
 
         if (filtertype == FilterType.AlwaysFalse) {
             return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(2));

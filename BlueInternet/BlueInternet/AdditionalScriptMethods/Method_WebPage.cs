@@ -39,7 +39,7 @@ public abstract class Method_WebPage : Method {
     public static bool AllImagesLoaded(ChromiumWebBrowser wb) {
         var response = wb.EvaluateScriptAsync("document.readyState === 'complete'").GetAwaiter().GetResult();
 
-        if (response is { Success: true, Result: bool and true }) {
+        if (response is { Success: true, Result: true }) {
             return true;
         }
 

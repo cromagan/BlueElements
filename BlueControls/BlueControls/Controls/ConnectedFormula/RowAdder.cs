@@ -475,7 +475,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     }
 
     private List<string> RepairMenu(List<string> menu, List<string>? infos) {
-        infos = infos ?? new List<string>();
+        infos ??= new List<string>();
 
         while (infos.Count < menu.Count) { infos.Add(string.Empty); }
 

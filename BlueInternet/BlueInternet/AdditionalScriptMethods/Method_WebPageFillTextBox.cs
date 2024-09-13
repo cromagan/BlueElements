@@ -74,7 +74,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
             #region Versuch, Textbox per ID
 
-            var script = @"var inputField = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
+            var script = "var inputField = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
                                  if (inputField) {
                                      inputField.value = '" + attvar.ValueStringGet(2) + @"'
                                      var event = new Event('input', { bubbles: true });
@@ -96,7 +96,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
             #region Versuch, Textbox per Klassenname
 
-            script = @"var inputField = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+            script = "var inputField = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
                                  if (inputField) {
                                      inputField.value = '" + attvar.ValueStringGet(2) + @"'
                                      var event = new Event('input', { bubbles: true });

@@ -47,7 +47,7 @@ internal class Method_RandomInt : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(BlueBasics.Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(BlueBasics.Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
 
     #endregion
 }

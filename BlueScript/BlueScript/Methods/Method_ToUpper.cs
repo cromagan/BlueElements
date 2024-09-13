@@ -28,12 +28,12 @@ namespace BlueScript.Methods;
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ToUpper : Method {
-    public override List<string> Constants => [];
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "toupper";
+    public override List<string> Constants => [];
     public override string Description => "Gibt den Text in Großbuchstaben zurück";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -47,7 +47,7 @@ internal class Method_ToUpper : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(attvar.ValueStringGet(0).ToUpperInvariant());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).ToUpperInvariant());
 
     #endregion
 }

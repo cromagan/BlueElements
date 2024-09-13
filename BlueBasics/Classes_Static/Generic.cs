@@ -294,7 +294,7 @@ public static class Generic {
     public static void Pause(double seconds, bool allowEvents) {
         if (seconds <= 0) { return; }
 
-        long endTicks = Environment.TickCount + (long)(seconds * 1000);
+        var endTicks = Environment.TickCount + (long)(seconds * 1000);
 
         while (Environment.TickCount < endTicks) {
             if (allowEvents) { Develop.DoEvents(); }

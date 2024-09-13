@@ -34,9 +34,7 @@ public abstract class Method : IReadableTextWithKey {
     #region Fields
 
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
-    public static readonly List<string> BoolVar = [VariableBool.ShortName_Variable];
     public static readonly List<string> FloatVal = [VariableFloat.ShortName_Plain];
-    public static readonly List<string> FloatVar = [VariableFloat.ShortName_Variable];
     public static readonly List<string> ListStringVar = [VariableListString.ShortName_Variable];
     public static readonly List<string> StringVal = [VariableString.ShortName_Plain];
     public static readonly List<string> StringVar = [VariableString.ShortName_Variable];
@@ -97,7 +95,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public abstract string Syntax { get; }
 
-    public List<string> Verwendung { get; } = new List<string>();
+    public List<string> Verwendung { get; } = new();
 
     #endregion
 

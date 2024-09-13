@@ -46,7 +46,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
     private bool _enabled;
 
     private bool _isCaption;
-    private string _keyName = string.Empty;
+    private string _keyName;
     private Size _sizeUntouchedForListBox = Size.Empty;
 
     private string _userDefCompareKey;

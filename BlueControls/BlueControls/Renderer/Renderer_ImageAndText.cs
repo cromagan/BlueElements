@@ -33,6 +33,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.CellRenderer;
 
+// ReSharper disable once UnusedMember.Global
 public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Fields
@@ -165,16 +166,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         }
     }
 
-    private BildTextVerhalten BehaviorOfImageAndText {
-        get {
-            if (_bild_anzeigen && _text_anzeigen) { return BildTextVerhalten.Wenn_möglich_Bild_und_immer_Text; }
-
-            if (_text_anzeigen) { return BildTextVerhalten.Nur_Text; }
-
-            return BildTextVerhalten.Nur_Bild;
-        }
-    }
-
     #endregion
 
     #region Methods
@@ -217,26 +208,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var cbxEinheit = new List<AbstractListItem>
-        {
-            ItemOf("µm", ImageCode.Lineal),
-            ItemOf("mm", ImageCode.Lineal),
-            ItemOf("cm", ImageCode.Lineal),
-            ItemOf("dm", ImageCode.Lineal),
-            ItemOf("m", ImageCode.Lineal),
-            ItemOf("km", ImageCode.Lineal),
-            ItemOf("mm²", ImageCode.GrößeÄndern),
-            ItemOf("m²", ImageCode.GrößeÄndern),
-            ItemOf("µg", ImageCode.Gewicht),
-            ItemOf("mg", ImageCode.Gewicht),
-            ItemOf("g", ImageCode.Gewicht),
-            ItemOf("kg", ImageCode.Gewicht),
-            ItemOf("t", ImageCode.Gewicht),
-            ItemOf("h", ImageCode.Uhr),
-            ItemOf("min", ImageCode.Uhr),
-            ItemOf("St.", ImageCode.Eins)
-        };
-
         List<GenericControl> result =
         [
             new FlexiControlForProperty<bool>(() =>  Text_anzeigen)

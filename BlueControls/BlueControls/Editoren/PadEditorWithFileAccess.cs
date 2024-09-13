@@ -46,13 +46,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #region Methods
 
-    public void DisablePad() {
-        CheckSave();
-        _lastFileName = string.Empty;
-        Pad.Items = [];
-        Pad.Enabled = false;
-    }
-
     /// <summary>
     ///
     /// </summary>

@@ -100,7 +100,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         Form? mb = null;
 
         try {
-            object myObject = Activator.CreateInstance(toEdit.Editor);
+            var myObject = Activator.CreateInstance(toEdit.Editor);
 
             if (myObject is IIsEditor ie) {
                 ie.ToEdit = toEdit;

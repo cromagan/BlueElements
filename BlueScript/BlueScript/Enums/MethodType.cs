@@ -63,6 +63,4 @@ public enum MethodType {
     ///  Sehr spezielle Befehle, die nur an einer einzigen Position erlaubt sind
     /// </summary>
     Special = 256,
-
-    AllDefault = Standard | Math | Database | MyDatabaseRow | ManipulatesUser | SpecialVariables | DrawOnBitmap
 }

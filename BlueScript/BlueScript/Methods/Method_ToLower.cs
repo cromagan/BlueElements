@@ -28,11 +28,12 @@ namespace BlueScript.Methods;
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ToLower : Method {
-    public override List<string> Constants => [];
+
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "tolower";
+    public override List<string> Constants => [];
     public override string Description => "Gibt den Text in Kleinbuchstaben zurück";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -46,7 +47,7 @@ internal class Method_ToLower : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(attvar.ValueStringGet(0).ToLowerInvariant());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).ToLowerInvariant());
 
     #endregion
 }

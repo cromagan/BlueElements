@@ -309,20 +309,17 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
 
         if (!HasFileName() || _bitmap == null) { return; }
 
-        try
-        {
-
+        try {
             using var compatibleBitmap = new Bitmap(_bitmap);
 
             using var fs = new FileStream(_filename, FileMode.Create, FileAccess.Write);
             using var memory = new MemoryStream();
             compatibleBitmap.Save(memory, ImageFormat.Png);
-            byte[] bytes = memory.ToArray();
+            var bytes = memory.ToArray();
             fs.Write(bytes, 0, bytes.Length);
         } catch (Exception ex) {
             System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }
-
     }
 
     private void ZoomFitInvalidateAndCheckButtons() {

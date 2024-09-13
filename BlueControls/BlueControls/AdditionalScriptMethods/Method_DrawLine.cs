@@ -17,12 +17,9 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueControls.Forms;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -50,17 +47,14 @@ public class Method_DrawLine : BlueScript.Methods.Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
-        if (attvar.ValueBitmapGet(0) is not Bitmap bmp) { return DoItFeedback.FalscherDatentyp(ld); }
+        if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         try {
             using var gr = Graphics.FromImage(bmp);
             gr.DrawLine(Pens.Black, attvar.ValueIntGet(1), attvar.ValueIntGet(2), attvar.ValueIntGet(3), attvar.ValueIntGet(4));
         } catch {
-
             return new DoItFeedback(ld, "Linie konnte nicht gezeichnet werden.");
         }
-
 
         return DoItFeedback.Null();
     }

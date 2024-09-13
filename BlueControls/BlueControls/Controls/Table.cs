@@ -70,7 +70,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private AutoFilter? _autoFilter;
 
-
     private BlueFont _chapterFont = BlueFont.DefaultFont;
 
     private BlueFont _columnFilterFont = BlueFont.DefaultFont;
@@ -1331,7 +1330,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var expanded = true;
             var lastCap = string.Empty;
 
-
             if (IsDisposed || Database is not { IsDisposed: false } db) {
                 VisibleRowCount = 0;
                 _rowsFilteredAndPinned = [];
@@ -1375,14 +1373,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     thisRowData.Expanded = expanded;
                     if (thisRowData.Expanded) {
                         thisRowData.CalculateScaledDrawHeight(ca, ca.HeadSize(_columnFont), displayR, db.GlobalScale);
-                        maxY +=thisRowData.DrawHeight;
+                        maxY += thisRowData.DrawHeight;
                     }
 
                     #endregion
 
                     sortedRowDataTmp.Add(thisRowData);
                 }
-
 
                 if (CursorPosRow?.Row != null && !sortedRowDataTmp.Contains(CursorPosRow)) { CursorPos_Reset(); }
                 _mouseOverRow = null;
@@ -1601,8 +1598,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        int firstVisibleRow = sortedRowData.Count;
-        int lastVisibleRow = -1;
+        var firstVisibleRow = sortedRowData.Count;
+        var lastVisibleRow = -1;
 
         var rowsToRefreh = new List<RowItem>();
 
@@ -2912,7 +2909,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 #region Draw_CellTransparent
 
                 switch (cellInThisDatabaseColumn.Function) {
-
                     case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                         var (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow, false, false);
 
@@ -3333,7 +3329,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     //private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
     private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 
-
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
     //private void OnRowAdded(RowChangedEventArgs e) {
@@ -3422,8 +3417,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         CheckView();
     }
-
-
 
     //private void Row_RowAdded(object sender, RowChangedEventArgs e) {
     //    if (IsDisposed) { return; }

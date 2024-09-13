@@ -291,29 +291,6 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<RowFormulaListItem> ItemsOf(IEnumerable<RowItem?>? list, string layoutId) {
-        var l = new List<RowFormulaListItem>();
-        if (list == null) { return l; }
-
-        foreach (var thisRow in list) {
-            if (thisRow is { IsDisposed: false }) {
-                l.Add(ItemOf(thisRow, layoutId));
-            }
-        }
-
-        return l;
-    }
-
-    public static List<AbstractListItem> ItemsOf(IEnumerable<IReadableTextWithKey>? list) {
-        var l = new List<AbstractListItem>();
-        if (list == null) { return l; }
-
-        foreach (var thisitem in list) {
-            if (thisitem != null) { l.Add(ItemOf(thisitem)); }
-        }
-        return l;
-    }
-
     public static List<AbstractListItem> ItemsOf(IEnumerable<string>? list) {
         var l = new List<AbstractListItem>();
         if (list == null) { return l; }

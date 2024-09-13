@@ -17,27 +17,21 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
 using BlueControls.Forms;
-using BlueDatabase;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
 using System.Windows.Forms;
 using BlueBasics.MultiUserFile;
-using BlueControls.Controls;
 using BlueControls.ItemCollectionPad;
 using BlueBasics;
-using BlueScript.Enums;
-using BlueScript.Variables;
 using System.Drawing;
 using System;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DynamicSymbolScriptEditor: FormWithStatusBar {
+public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar {
 
     #region Fields
-
 
     private DynamicSymbolPadItem? _item;
 
@@ -68,8 +62,6 @@ public sealed partial class DynamicSymbolScriptEditor: FormWithStatusBar {
     #endregion
 
     #region Properties
-
-
 
     public DynamicSymbolPadItem? Item {
         get {
@@ -116,9 +108,7 @@ public sealed partial class DynamicSymbolScriptEditor: FormWithStatusBar {
 
     protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}
 
-
     private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
-
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;
@@ -130,7 +120,7 @@ public sealed partial class DynamicSymbolScriptEditor: FormWithStatusBar {
     }
 
     private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
-        if (IsDisposed ) {
+        if (IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
             return;
         }
@@ -161,29 +151,11 @@ public sealed partial class DynamicSymbolScriptEditor: FormWithStatusBar {
         //    return;
         //}
 
-         var r = _item.UsedArea.ToRect();
-        using var bmp = new Bitmap(Math.Max(r.Width,16), Math.Max(r.Height, 16));
+        var r = _item.UsedArea.ToRect();
+        using var bmp = new Bitmap(Math.Max(r.Width, 16), Math.Max(r.Height, 16));
 
         e.Feedback = DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void WriteInfosBack() {
         //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }

@@ -161,7 +161,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         eText.Design = design;
         eText.HtmlText = LanguageTool.DoTranslate(text, translate);
         eText.Multiline = true;
-        eText.TextDimensions = new Size(maxwidth, eText.TextDimensions.Height);
+        eText.TextDimensions = eText.TextDimensions with { Width = maxwidth };
 
         return eText.LastSize();
     }

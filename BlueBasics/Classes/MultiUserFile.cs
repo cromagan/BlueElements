@@ -53,7 +53,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private bool _isSaved = true;
     private bool _isSaving;
     private string _lastSaveCode;
-    private string _loadedVersion = "0.00";
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -361,7 +360,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 return true;
 
             case "version":
-                _loadedVersion = value;
                 return true;
 
             case "createdate":

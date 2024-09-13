@@ -36,7 +36,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IPropertyChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName, ISimpleEditor {
+public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IMoveable, IDisposableExtended, IComparable, IHasKeyName, ISimpleEditor {
 
     #region Fields
 
@@ -48,7 +48,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     /// <remarks></remarks>
     private bool _beiExportSichtbar = true;
 
-    private string _keyName = string.Empty;
+    private string _keyName;
     private string _page = string.Empty;
 
     private ItemCollectionPad? _parent;
@@ -64,9 +64,8 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IP
     #region Constructors
 
     protected AbstractPadItem(string keyName) : base() {
-      
         _keyName = keyName;
-        if(string.IsNullOrEmpty(_keyName)) {_keyName = Generic.GetUniqueKey(); }
+        if (string.IsNullOrEmpty(_keyName)) { _keyName = Generic.GetUniqueKey(); }
 
         MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
     }

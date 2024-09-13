@@ -32,7 +32,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder Bit = new("Bit") {
         Image = QuickImage.Get(ImageCode.Häkchen, 16),
         AllowedChars = "+-",
-        Regex = @"^([+]|[-])$",
+        Regex = "^([+]|[-])$",
         FormatierungErlaubt = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
@@ -77,7 +77,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         //https://en.wikipedia.org/wiki/Email_address#:~:text=The%20format%20of%20an%20email,a%20maximum%20of%20255%20octets.
         Image = QuickImage.Get(ImageCode.Brief, 16),
         //http://emailregex.com/
-        Regex = @"^[a-z0-9A-Z._-]{1,63}[@][a-z0-9A-Z.-]{1,63}[.][a-zA-Z.]{1,63}$",
+        Regex = "^[a-z0-9A-Z._-]{1,63}[@][a-z0-9A-Z.-]{1,63}[.][a-zA-Z.]{1,63}$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@.-_",
         FormatierungErlaubt = false,
         AdditionalFormatCheck = AdditionalCheck.None,

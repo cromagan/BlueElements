@@ -155,11 +155,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
 
-        var i = db.ColumnArrangements.IndexOf(@"ColumnName[J]", StringComparison.Ordinal);
+        var i = db.ColumnArrangements.IndexOf("ColumnName[J]", StringComparison.Ordinal);
 
         if (i < 5) { return null; }
 
-        var en = db.ColumnArrangements.IndexOf(@"[", i+12, StringComparison.Ordinal);
+        var en = db.ColumnArrangements.IndexOf("[", i + 12, StringComparison.Ordinal);
 
         if (en <= i) { return null; }
 
@@ -175,10 +175,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return this[n];
     }
 
+    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption, format, string.Empty);
 
-    public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption,  format, string.Empty);
-
-    public ColumnItem? GenerateAndAdd(string keyName) => GenerateAndAdd(keyName,  string.Empty, null, string.Empty);
+    public ColumnItem? GenerateAndAdd(string keyName) => GenerateAndAdd(keyName, string.Empty, null, string.Empty);
 
     public ColumnItem? GenerateAndAdd() => GenerateAndAdd(Freename(string.Empty), string.Empty, null, string.Empty);
 
@@ -498,15 +497,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         return "Befehl unbekannt";
-    }
-
-    internal bool HasKeyColumns() {
-        foreach (var thisColumn in _internal) {
-            if (thisColumn.Value.Function == ColumnFunction.Schlüsselspalte) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();

@@ -30,6 +30,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.CellRenderer;
 
+// ReSharper disable once UnusedMember.Global
 public class Renderer_TextOneLine : Renderer_Abstract {
 
     #region Fields

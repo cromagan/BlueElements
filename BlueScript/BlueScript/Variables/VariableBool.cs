@@ -31,6 +31,7 @@ public class VariableBool : Variable {
 
     #region Fields
 
+    private static readonly LogData dummyLog = new("Bool", 0);
     private bool _valuebool;
 
     #endregion
@@ -116,8 +117,6 @@ public class VariableBool : Variable {
             Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
         }
     }
-
- private static readonly LogData dummyLog = new LogData("Bool",0 );
 
     protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (Method_If.GetBool(txt) is { } b) { return (true, b); }

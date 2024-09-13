@@ -39,7 +39,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ConnectedFormula;
 
-public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, IDisposableExtended, IHasKeyName, IEditable, IReadableTextWithKey {
+public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey {
 
     #region Fields
 
@@ -77,9 +77,6 @@ public sealed class ConnectedFormula : MultiUserFile, IPropertyChangedFeedback, 
     #region Properties
 
     public string CaptionForEditor => "Formular";
-
-    [DefaultValue(true)]
-    public bool DropMessages => true;
 
     public Type? Editor { get; set; }
 

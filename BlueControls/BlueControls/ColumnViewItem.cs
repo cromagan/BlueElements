@@ -29,7 +29,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
-using System.Runtime.InteropServices;
 
 namespace BlueDatabase;
 
@@ -40,9 +39,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
     public Renderer_Abstract? _renderer;
     public int? Contentwidth;
 
-    private ColumnItem? _column = null;
+    private ColumnItem? _column;
 
-    private bool _reduced = false;
+    private bool _reduced;
 
     private ViewType _viewType = BlueDatabase.Enums.ViewType.None;
 
@@ -294,7 +293,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
         if (_column != null) {
             _column.PropertyChanged += _column_PropertyChanged;
 
-            if (_column.Database is Database db && !db.IsDisposed) {
+            if (_column.Database is { IsDisposed: false } db) {
                 db.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }
@@ -303,7 +302,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
     private void UnRegisterEvents() {
         if (_column != null) {
             _column.PropertyChanged -= _column_PropertyChanged;
-            if (_column.Database is Database db && !db.IsDisposed) {
+            if (_column.Database is { IsDisposed: false } db) {
                 db.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }

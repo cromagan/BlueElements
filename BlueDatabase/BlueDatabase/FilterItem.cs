@@ -108,8 +108,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     /// <param name="row"></param>
     public FilterItem(RowItem row) : this(row.Database, FilterType.RowKey, row.KeyName) { }
 
-    private FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
-
     private FilterItem(Database? db, FilterType filterType, IList<string>? searchValue) {
         //Database?, weil AlwaysFalse keine Angaben braucht
         Database = db;
@@ -414,7 +412,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
 
                 if (Column == null) { return "Unbekannter Filter"; }
-                return nam + " = " + LanguageTool.PrepaireText(SearchValue[0],  ShortenStyle.Replaced,string.Empty, string.Empty, Column.DoOpticalTranslation, null);
+                return nam + " = " + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null);
 
             case FilterType.Ungleich_MultiRowIgnorieren:
 
@@ -423,7 +421,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case FilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
                 if (Column == null) { return "Unbekannter Filter"; }
-                return nam + " ist nicht '" + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced,string.Empty, string.Empty,  Column.DoOpticalTranslation, null) + "'";
+                return nam + " ist nicht '" + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null) + "'";
 
             case FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
 

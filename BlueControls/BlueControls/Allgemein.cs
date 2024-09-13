@@ -36,40 +36,6 @@ public static class Allgemein {
 
     #region Methods
 
-    public static T? ParentControl<T>(this object o) {
-        if (o is not Control co) {
-            return default;
-        }
-
-        do {
-            co = co.Parent;
-            switch (co) {
-                case null:
-                    return default;
-
-                case T ctr:
-                    return ctr;
-            }
-        } while (true);
-    }
-
-    //public static IContextMenu? ParentControlWithCommands(this object o, List<AbstractListItem> currentContextMenu) {
-    //    var par = o.ParentControl<IContextMenu>();
-    //    if (par == null) { return null; }
-
-    //    List<AbstractListItem> thisContextMenu = [];
-
-    //    var cancel = false;
-    //    par.GetContextMenuItems(null, thisContextMenu, out var hotItem);
-    //    if (cancel) { return null; }
-
-    //    ContextMenuInitEventArgs ec = new(hotItem, userMenu);
-    //    par.OnContextMenuInit(ec);
-    //    if (ec.Cancel) { return null; }
-
-    //    return thisContextMenu.Count > 0 || userMenu.Count > 0 ? par : null;
-    //}
-
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }
         _serviceStarted = true;

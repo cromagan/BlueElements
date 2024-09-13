@@ -123,7 +123,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             tcvc.Add(new ColumnViewCollection(db, t));
         }
 
-        if(tcvc.Count <2) {tcvc.Add(new ColumnViewCollection(db,string.Empty));}
+        if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
 
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
 
@@ -257,8 +257,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public void Invalidate_HeadSize() => _headSize = null;
-
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 
     public List<ColumnItem> ListOfUsedColumn() {
@@ -267,19 +265,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (t?.Column != null) { colList.Add(t.Column); }
         }
         return colList;
-    }
-
-    public ColumnItem? NextVisible(ColumnItem? column) {
-        var viewItemNo = 0;
-        var found = false;
-        do {
-            if (viewItemNo >= _internal.Count) { return null; }
-            if (_internal[viewItemNo]?.Column is { IsDisposed: false } c) {
-                if (found) { return c; }
-                if (c == column) { found = true; }
-            }
-            viewItemNo++;
-        } while (true);
     }
 
     public ColumnViewItem? NextVisible(ColumnViewItem? viewItem) {
@@ -330,19 +315,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
 
         return false;
-    }
-
-    public ColumnItem? PreviousVisible(ColumnItem? column) {
-        var viewItemNo = _internal.Count - 1;
-        var found = false;
-        do {
-            if (viewItemNo < 0) { return null; }
-            if (_internal[viewItemNo]?.Column is { IsDisposed: false } c) {
-                if (found) { return c; }
-                if (c == column) { found = true; }
-            }
-            viewItemNo--;
-        } while (true);
     }
 
     public ColumnViewItem? PreviousVisible(ColumnViewItem viewItem) {

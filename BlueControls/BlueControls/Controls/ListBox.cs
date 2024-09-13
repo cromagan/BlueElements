@@ -1046,9 +1046,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void DoMouseMovement() {
         if (IsDisposed) { return; }
 
-        var isInForm = true;
-
-        if (MousePos().X < 0 || MousePos().Y < 0 || MousePos().X > Width || MousePos().Y > Height) { isInForm = false; }
+        var isInForm = !(MousePos().X < 0 || MousePos().Y < 0 || MousePos().X > Width || MousePos().Y > Height);
 
         var nd = MouseOverNode(MousePos().X, MousePos().Y);
         if (!Enabled || Parent is not { Enabled: true } || !Visible) {
@@ -1206,7 +1204,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void ValidateCheckStates(List<string>? newCheckedItems, string lastaddeditem) {
-        newCheckedItems = newCheckedItems ?? [];
+        newCheckedItems ??= [];
 
         switch (_checkBehavior) {
             case CheckBehavior.AllSelected:

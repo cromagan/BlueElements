@@ -577,7 +577,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        return t.TotalSeconds > 1 && t.TotalMinutes < 5; // 1 Sekunde deswegen, weil machne Routinen gleich die Pr¸fung machen und ansonsten die Routine reingr‰tscht
+        return t is { TotalSeconds: > 1, TotalMinutes: < 5 }; // 1 Sekunde deswegen, weil machne Routinen gleich die Pr¸fung machen und ansonsten die Routine reingr‰tscht
     }
 
     /// <summary>
@@ -749,7 +749,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
-                LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verst‰ndigen."; 
+                LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verst‰ndigen.";
 
                 RowCollection.FailedRows.AddIfNotExists(this);
                 return false;
@@ -813,7 +813,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
-        StringComparison comparisonType = typ.HasFlag(FilterType.GroﬂKleinEgal) ? StringComparison.OrdinalIgnoreCase
+        var comparisonType = typ.HasFlag(FilterType.GroﬂKleinEgal) ? StringComparison.OrdinalIgnoreCase
                                                                                 : StringComparison.Ordinal;
 
         // Entfernen des GroﬂKleinEgal-Flags, da es nicht mehr benˆtigt wird

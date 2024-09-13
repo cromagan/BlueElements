@@ -20,7 +20,6 @@
 namespace BlueControls.Enums;
 
 public enum RahmenArt {
-    Unbekannt = -1,
     Ohne = 0,
     Solide_1px = 100,
     Solide_1px_FocusDotLine = 105,

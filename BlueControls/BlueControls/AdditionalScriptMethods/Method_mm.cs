@@ -51,7 +51,7 @@ internal class Method_mm : BlueScript.Methods.Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPad.ItemCollectionPad.Dpi));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPad.ItemCollectionPad.Dpi));
 
     #endregion
 }

@@ -273,10 +273,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    [Browsable(false)]
-    [DefaultValue("")]
-    public string Prefix { get; set; } = string.Empty;
-
     [DefaultValue("")]
     public string Regex {
         get => _regex;
@@ -729,7 +725,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private Button Control_Create_ButtonColor() {
+    private void Control_Create_ButtonColor() {
         Button control = new() {
             Enabled = Enabled,
             Name = "ColorButton",
@@ -738,13 +734,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Text = string.Empty
         };
         StandardBehandlung(control);
-        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private Button Control_Create_ButtonCommand() {
+    private void Control_Create_ButtonCommand() {
         Button control = new() {
             Enabled = Enabled,
             Name = "CommandButton",
@@ -753,14 +748,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Text = _caption
         };
         StandardBehandlung(control);
-        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
 
-    private Button Control_Create_ButtonYesNo() {
+    private void Control_Create_ButtonYesNo() {
         Button control = new() {
             Enabled = Enabled,
             Name = "YesNoButton",
@@ -770,7 +764,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         };
         StandardBehandlung(control);
         UpdateValueToControl();
-        return control;
     }
 
     private void Control_Create_Caption() {
@@ -815,18 +808,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
 
-    private ComboBox Control_Create_ComboBox() {
+    private void Control_Create_ComboBox() {
         ComboBox control = new();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
         StandardBehandlung(control);
         UpdateValueToControl();
-        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private GroupBox Control_Create_GroupBox() {
+    private void Control_Create_GroupBox() {
         GroupBox control = new() {
             Enabled = Enabled,
             GroupBoxStyle = GroupBoxStyle.NormalBold,
@@ -834,26 +826,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         };
         StandardBehandlung(control);
         UpdateValueToControl();
-        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private Line Control_Create_Line() {
+    private void Control_Create_Line() {
         Line control = new() {
             Enabled = Enabled,
             Orientation = Orientation.Waagerecht
         };
         StandardBehandlung(control);
-        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
 
-    private ListBox Control_Create_ListBox() {
+    private void Control_Create_ListBox() {
         ListBox control = new() {
             Enabled = Enabled
         };
@@ -861,31 +851,28 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.CheckBehavior = CheckBehavior.MultiSelection;
         StandardBehandlung(control);
         UpdateValueToControl();
-        return control;
     }
 
     // Nimmt Teilweise die Routinen der Listbox her
 
-    private SwapListBox Control_Create_SwapListBox() {
+    private void Control_Create_SwapListBox() {
         SwapListBox control = new() {
             Enabled = Enabled
         };
         control.UnCheck();
         StandardBehandlung(control);
         UpdateValueToControl();
-        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
 
-    private TextBox Control_Create_TextBox() {
+    private void Control_Create_TextBox() {
         TextBox control = new();
         StyleTextBox(control);
         StandardBehandlung(control);
         UpdateValueToControl();
-        return control;
     }
 
     private void DoInfoTextCaption(string disabledReason) {

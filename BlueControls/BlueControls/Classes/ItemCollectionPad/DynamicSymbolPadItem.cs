@@ -24,30 +24,54 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueControls.BlueDatabaseDialogs;
-using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-using BlueBasics;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollectionPad.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using static BlueBasics.Converter;
-using static BlueBasics.Geometry;
-using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollectionPad;
 
 public class DynamicSymbolPadItem : RectanglePadItem {
 
+    #region Fields
+
+    private string _script = string.Empty;
+
+    #endregion
+
     #region Constructors
 
+    public DynamicSymbolPadItem() : base(string.Empty) {
+        //Symbol = Symbol.Pfeil;
+        //Hintergrundfarbe = Color.White;
+        //Randfarbe = Color.Black;
+        //Randdicke = 1;
+    }
 
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "DynamicSymbol";
+
+    public override string Description => string.Empty;
+
+    public override string MyClassId => ClassId;
+
+    public string Script {
+        get => _script;
+
+        set {
+            if (value == _script) { return; }
+            _script = value;
+            OnPropertyChanged();
+        }
+    }
+
+    protected override int SaveOrder => 999;
+
+    #endregion
+
+    #region Methods
 
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
@@ -71,7 +95,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
         var m = BlueScript.Methods.Method.GetMethods(MethodType.Math | MethodType.DrawOnBitmap);
 
-        //using var gr = Graphics.FromImage(bmp); 
+        //using var gr = Graphics.FromImage(bmp);
 
         var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, 0);
 
@@ -79,42 +103,6 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         sc.ScriptText = scripttext;
         return sc.Parse(0, "Main", null);
     }
-
-
-    public DynamicSymbolPadItem() : base(string.Empty) {
-        //Symbol = Symbol.Pfeil;
-        //Hintergrundfarbe = Color.White;
-        //Randfarbe = Color.Black;
-        //Randdicke = 1;
-    }
-    private string _script = string.Empty;
-    #endregion
-    public string Script {
-        get => _script;
-
-        set {
-            if (value == _script) { return; }
-            _script = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private void Skript_Bearbeiten() {
-        var x = new DynamicSymbolScriptEditor();
-        x.Item = this;
-        x.ShowDialog();
-    }
-
-    #region Properties
-
-    public static string ClassId => "DynamicSymbol";
-    public override string Description => string.Empty;
-    public override string MyClassId => ClassId;
-    protected override int SaveOrder => 999;
-
-    #endregion
-
-    #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
@@ -184,6 +172,12 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         //gr.TranslateTransform(-trp.X, -trp.Y);
         //gr.ResetTransform();
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+    }
+
+    private void Skript_Bearbeiten() {
+        var x = new DynamicSymbolScriptEditor();
+        x.Item = this;
+        x.ShowDialog();
     }
 
     #endregion

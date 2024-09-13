@@ -97,12 +97,7 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
 
         _ = Pics.TryAdd(Code, this);
 
-        if (bmp == null) {
-            _bitmap = GenerateErrorImage(Width, Height);
-            IsError = true;
-        } else {
-            _bitmap = bmp.CloneFromBitmap();
-        }
+        _bitmap = bmp.CloneFromBitmap();
     }
 
     #endregion
@@ -336,7 +331,7 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
         if (bmpOri == null) {
             NeedImageEventArgs e = new(Name);
             OnNeedImage(e);
-            if (e.Done && e.Bmp != null) { bmpOri = e.Bmp; }
+            if (e is { Done: true, Bmp: not null }) { bmpOri = e.Bmp; }
         }
 
         if (bmpOri == null) {

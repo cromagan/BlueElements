@@ -45,7 +45,7 @@ public class Method_UniqueRowId : BlueScript.Methods.Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(RowCollection.UniqueKeyValue());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(RowCollection.UniqueKeyValue());
 
     #endregion
 }

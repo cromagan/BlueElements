@@ -112,7 +112,7 @@ public partial class Voting : System.Windows.Forms.Form {
 
     private void Change(double v, int value, List<RowItem> notallowed) {
         using var f = new FilterCollection(_column.Database, "ChangeFilter") {
-            new FilterItem(_column, v - 3, v + 3)
+            new(_column, v - 3, v + 3)
         };
 
         var r = f.Rows;
@@ -134,7 +134,7 @@ public partial class Voting : System.Windows.Forms.Form {
         for (var row1 = 0; row1 < _rows.Count - 1; row1++) {
             var sc1 = _rows[row1].CellGetDouble(_column);
 
-            for (int row2 = row1 + 1; row2 < _rows.Count; row2++) {
+            for (var row2 = row1 + 1; row2 < _rows.Count; row2++) {
                 var sc2 = _rows[row2].CellGetDouble(_column);
 
                 var istab = Math.Abs(sc1 - sc2);

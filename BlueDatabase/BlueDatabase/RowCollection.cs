@@ -426,7 +426,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
             }
             if (db.Column.SysRowState is { IsDisposed: false } srs) {
-                r[0].CellSet(srs, string.Empty, $"'UniqueRow' Aufräumen mehrerer Zeilen.");
+                r[0].CellSet(srs, string.Empty, "'UniqueRow' Aufräumen mehrerer Zeilen.");
             }
         }
 

@@ -141,7 +141,6 @@
     <Compile Include="Enums\ShortenStyle.cs" />
     <Compile Include="Enums\ColumnLineStyle.cs" />
     <Compile Include="Enums\EditTypeTable.cs" />
-    <Compile Include="Enums\BildTextVerhalten.cs" />
     <Compile Include="Enums\FirstRow.cs" />
     <Compile Include="Enums\Routinen.cs" />
     <Compile Include="Enums\DatabaseDataType.cs" />

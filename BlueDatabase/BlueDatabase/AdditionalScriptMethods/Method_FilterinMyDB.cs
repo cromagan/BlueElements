@@ -60,7 +60,7 @@ public class Method_FilterInMyDB : Method_Database {
 
         #region Typ ermitteln
 
-        FilterType filtertype = Method_Filter.StringToFilterType(attvar.ValueStringGet(1));
+        var filtertype = Method_Filter.StringToFilterType(attvar.ValueStringGet(1));
 
         if (filtertype == FilterType.AlwaysFalse) {
             return new DoItFeedback(ld, "Filtertype unbekannt: " + attvar.ValueStringGet(1));

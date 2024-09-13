@@ -59,7 +59,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
         try {
             Generic.CollectGarbage();
 
-            const string script = @"document.documentElement.outerHTML";
+            const string script = "document.documentElement.outerHTML";
 
             var task = DoTask(wb, script);
 

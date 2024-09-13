@@ -120,14 +120,6 @@ public static class ColumnFunctionExtensions {
                                                                                             or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
                                                                                             or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2;
 
-    public static bool ExportableForLayout(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                     or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
-                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                     or ColumnFunction.Schlüsselspalte
-                                                                                     or ColumnFunction.Virtuelle_Spalte;
-
     public static bool MultilinePossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                    or ColumnFunction.RelationText
                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank

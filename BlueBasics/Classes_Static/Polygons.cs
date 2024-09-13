@@ -84,7 +84,7 @@ public static class Polygons {
 
     public static GraphicsPath? Poly_RoundRec(int x, int y, int width, int height, int radius) {
         if (width < 1 || height < 1) { return null; }
-        GraphicsPath? tempPolyRoundRec = new();
+        GraphicsPath tempPolyRoundRec = new();
         if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
         if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
 
