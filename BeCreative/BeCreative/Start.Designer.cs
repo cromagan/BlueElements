@@ -49,7 +49,7 @@ namespace BeCreative {
             // btnFormular
             // 
             this.btnFormular.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnFormular.ImageCode = "Textfeld|16";
+            this.btnFormular.ImageCode = "Anwendung";
             this.btnFormular.Location = new System.Drawing.Point(272, 104);
             this.btnFormular.Name = "btnFormular";
             this.btnFormular.Size = new System.Drawing.Size(64, 80);
@@ -104,7 +104,7 @@ namespace BeCreative {
             // 
             this.btnFormularAnsicht.AllowDrop = true;
             this.btnFormularAnsicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnFormularAnsicht.ImageCode = "Layout|16";
+            this.btnFormularAnsicht.ImageCode = "Anwendung";
             this.btnFormularAnsicht.Location = new System.Drawing.Point(16, 16);
             this.btnFormularAnsicht.Name = "btnFormularAnsicht";
             this.btnFormularAnsicht.Size = new System.Drawing.Size(64, 80);

@@ -125,6 +125,7 @@ namespace BlueControls.Forms {
             // 
             this.capStatusBar.Location = new System.Drawing.Point(304, 0);
             this.capStatusBar.Size = new System.Drawing.Size(1025, 24);
+            this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
             // 
             // pnlStatusBar
             // 
@@ -611,7 +612,7 @@ namespace BlueControls.Forms {
             // btnFormular
             // 
             this.btnFormular.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnFormular.ImageCode = "Textfeld|16|||||||||Stift";
+            this.btnFormular.ImageCode = "Anwendung||||||||||Stift";
             this.btnFormular.Location = new System.Drawing.Point(64, 2);
             this.btnFormular.Name = "btnFormular";
             this.btnFormular.Size = new System.Drawing.Size(56, 66);

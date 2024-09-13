@@ -258,7 +258,7 @@ namespace BluePaint
             // btnScreenshot
             // 
             this.btnScreenshot.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnScreenshot.ImageCode = "Screenshot";
+            this.btnScreenshot.ImageCode = "Bild||||||||||Monitor";
             this.btnScreenshot.Location = new System.Drawing.Point(8, 2);
             this.btnScreenshot.Name = "btnScreenshot";
             this.btnScreenshot.Size = new System.Drawing.Size(48, 66);

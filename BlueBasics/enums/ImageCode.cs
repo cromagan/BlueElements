@@ -126,7 +126,6 @@ public enum ImageCode {
     Schild,
     Schloss,
     Schlüssel,
-    Screenshot,
     SeiteEinrichten,
     Smiley,
     SmileyUnhappy,

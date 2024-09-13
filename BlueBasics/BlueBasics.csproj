@@ -280,7 +280,6 @@
     <EmbeddedResource Include="Ressourcen\Image\Icons\Schere.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Schloss.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Schlüssel.png" />
-    <EmbeddedResource Include="Ressourcen\Image\Icons\Screenshot.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\SeiteEinrichten.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Skript.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Smiley.png" />
