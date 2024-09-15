@@ -115,7 +115,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     public static void AddUndoToTable(Table tblUndo, UndoItem work, Database db, float maxAgeInDays) {
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
-        var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToParseableString(), null, "New Undo Item");
+        var r = tblUndo.Database?.Row.GenerateAndAdd(work.ToParseableString(), null, "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("ColumnName", work.ColName, string.Empty);
@@ -218,12 +218,13 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             }
         }
 
-        if (db.Column["Symbol"] is { IsDisposed: false } c) { 
+        if (db.Column["Symbol"] is { IsDisposed: false } c) {
             var o = new Renderer_ImageAndText();
             o.Text_anzeigen = false;
             o.Bild_anzeigen = true;
- 
-            c.RendererSettings = o.ToParseableString(); }
+
+            c.RendererSettings = o.ToParseableString();
+        }
 
         db.RepairAfterParse();
 

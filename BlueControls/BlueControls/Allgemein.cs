@@ -49,7 +49,7 @@ public static class Allgemein {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
                 if (thisit is Database db) {
-                    db.AdditionalRepair += BlueControls.Controls.Table.Database_AdditionalRepair;
+                    db.AdditionalRepair += Controls.Table.Database_AdditionalRepair;
                 }
             }
         }
@@ -60,7 +60,7 @@ public static class Allgemein {
                     dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
                 if (thisit is Database db) {
-                    db.AdditionalRepair += BlueControls.Controls.Table.Database_AdditionalRepair;
+                    db.AdditionalRepair += Controls.Table.Database_AdditionalRepair;
                 }
             }
         }

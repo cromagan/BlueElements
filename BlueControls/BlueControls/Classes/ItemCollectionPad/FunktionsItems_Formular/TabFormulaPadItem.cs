@@ -78,7 +78,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     #region Methods
 
     public System.Windows.Forms.Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
-        var con = new Controls.TabControl();
+        var con = new TabControl();
         con.Name = this.DefaultItemToControlName(ParentFormula?.Filename);
         // Die Input-Settings werden direkt auf das erzeugte
         //con.DoInputSettings(parent, this);
@@ -86,7 +86,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return con;
     }
 
-    public void CreateTabs(Controls.TabControl tabctrl, Controls.ConnectedFormulaView parentView, string mode) {
+    public void CreateTabs(TabControl tabctrl, Controls.ConnectedFormulaView parentView, string mode) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -303,8 +303,8 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
-    private Controls.ListBox Childs() {
-        var childs = new Controls.ListBox {
+    private ListBox Childs() {
+        var childs = new ListBox {
             AddAllowed = AddType.OnlySuggests,
             RemoveAllowed = true,
             MoveAllowed = true,
@@ -335,7 +335,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     private void Childs_Disposed(object sender, System.EventArgs e) {
-        if (sender is Controls.ListBox childs) {
+        if (sender is ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.Disposed -= Childs_Disposed;
         }
@@ -344,7 +344,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         _childs.Clear();
-        _childs.AddRange(((Controls.ListBox)sender).Checked);
+        _childs.AddRange(((ListBox)sender).Checked);
         OnPropertyChanged();
         this.RaiseVersion();
         OnDoUpdateSideOptionMenu();

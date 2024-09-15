@@ -97,7 +97,7 @@ public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar {
 
         if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
             DatabaseScriptEditor._befehlsReferenz.Close();
-            DatabaseScriptEditor._befehlsReferenz?.Dispose();
+            DatabaseScriptEditor._befehlsReferenz.Dispose();
             DatabaseScriptEditor._befehlsReferenz = null;
         }
 

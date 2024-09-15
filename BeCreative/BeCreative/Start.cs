@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls;
@@ -83,8 +82,8 @@ namespace BeCreative {
         }
 
         private void DoForm(System.Windows.Forms.Form frm) {
-            if(frm.IsDisposed) {
-                Develop.DebugPrint("Fenster verworfen!");
+            if (frm.IsDisposed) {
+                DebugPrint("Fenster verworfen!");
                 return;
             }
             FormManager.RegisterForm(frm);

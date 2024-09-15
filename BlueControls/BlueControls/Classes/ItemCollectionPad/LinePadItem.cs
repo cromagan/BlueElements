@@ -110,10 +110,12 @@ public class LinePadItem : AbstractPadItem {
     //}
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var verhalt = new List<AbstractListItem>();
-        verhalt.Add(ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie)));
-        verhalt.Add(ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie)));
-        verhalt.Add(ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie)));
+        var verhalt = new List<AbstractListItem>
+        {
+            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie)),
+            ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie)),
+            ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie))
+        };
 
         List<GenericControl> result = [];
 

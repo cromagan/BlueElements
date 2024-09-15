@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -29,7 +28,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ConnectedFormula;
 
-public partial class FlexiControlRowSelector : GenericControlReciverSender, IDisposableExtended, IHasSettings {
+public partial class FlexiControlRowSelector : GenericControlReciverSender, IHasSettings {
 
     #region Fields
 
@@ -127,7 +126,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IDis
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (cb.ItemCount == 1) {
-            f.ValueSet(cb[0].KeyName, true);
+            f.ValueSet(cb[0]?.KeyName, true);
         } else {
             var fh = this.GetSettings(FilterHash());
 

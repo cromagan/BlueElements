@@ -39,7 +39,7 @@ namespace BlueBasics;
 // Todo: Obselete Routinen:
 // Image_FromFile
 // Resize
-public class BitmapExt : IDisposable, IDisposableExtended {
+public class BitmapExt : IDisposableExtended {
 
     #region Fields
 
@@ -551,7 +551,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
             return;
         }
 
-        if (copyback && _bits != null) {
+        if (copyback && _bits != null && _bitmapData != null) {
             Marshal.Copy(_bits, 0, _bitmapData.Scan0, _bits.Length);
         }
 

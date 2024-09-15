@@ -1459,7 +1459,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-            if(prepf) {
+            if (prepf) {
                 if (row is { IsDisposed: false }) {
                     foreach (var thisCol in Column) {
                         if (thisCol.Function == ColumnFunction.Virtuelle_Spalte) {
@@ -1468,7 +1468,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     }
                 }
             }
-
 
             #endregion
 
@@ -2125,28 +2124,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (columns.Length == 0) { return; }
 
         foreach (var thiscol in columns) {
-            if (thiscol != null) {
-                thiscol.IsInCache = DateTime.UtcNow;
+            thiscol.IsInCache = DateTime.UtcNow;
 
-                if (thiscol.LinkedDatabase is { IsDisposed: false and false } db &&
-                    db.Column[thiscol.LinkedCell_ColumnNameOfLinkedDatabase] is { IsDisposed: false } col) {
-                    db.RefreshColumnsData(col);
-                }
+            if (thiscol.LinkedDatabase is { IsDisposed: false and false } db &&
+                db.Column[thiscol.LinkedCell_ColumnNameOfLinkedDatabase] is { IsDisposed: false } col) {
+                db.RefreshColumnsData(col);
             }
         }
     }
 
     public void RefreshColumnsData(params FilterItem[] filter) {
-        if (filter != null) {
-            var c = new List<ColumnItem>();
+        var c = new List<ColumnItem>();
 
-            foreach (var thisF in filter) {
-                if (thisF.Column is { IsDisposed: false, IsInCache: null } ci) {
-                    _ = c.AddIfNotExists(ci);
-                }
+        foreach (var thisF in filter) {
+            if (thisF.Column is { IsDisposed: false, IsInCache: null } ci) {
+                _ = c.AddIfNotExists(ci);
             }
-            RefreshColumnsData(c.ToArray());
         }
+        RefreshColumnsData(c.ToArray());
     }
 
     public string RefreshRowData(IEnumerable<RowItem> row) {
@@ -2180,8 +2175,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
-
-        if(string.IsNullOrEmpty(  _scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
+        if (string.IsNullOrEmpty(_scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
 
         //if (EventScriptVersion < Date) { EventScriptVersion = 1; }
 
@@ -2454,7 +2448,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsCellValue()) {
             if (column?.Database is not { IsDisposed: false } db) { return (string.Empty, column, row); }
             if (row == null) { return (string.Empty, column, row); }
-            if(column.Function == ColumnFunction.Virtuelle_Spalte) { return (string.Empty, column, row); }
+            if (column.Function == ColumnFunction.Virtuelle_Spalte) { return (string.Empty, column, row); }
 
             //column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();

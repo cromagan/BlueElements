@@ -57,7 +57,7 @@ internal class AdderItem : IReadableTextWithKey {
 
     public List<string> KeysAndInfo { get; } = new();
 
-    public string Last { get; private set; }
+    public string Last { get; }
 
     //public ColumnItem? OriginIDColumn { get; }
     public string QuickInfo => KeyName;

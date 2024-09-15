@@ -56,9 +56,8 @@ public partial class ComboBox : TextBox, ITranslateable {
     /// </summary>
     private string _initialtext = string.Empty;
 
-    private List<AbstractListItem> _items = new();
     private bool _itemEditAllowed;
-
+    private List<AbstractListItem> _items = new();
     private string? _lastClickedText;
 
     #endregion

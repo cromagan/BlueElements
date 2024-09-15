@@ -149,10 +149,12 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         var lastit = initialItem;
         foreach (var thisn in bez) {
             var ro = db.Row[thisn];
-            var it = ItemOfRow(ro);
-            if (it == null) {
-                //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
-                lastit = AddOne(thisn, 0, 0, lastit.Layout_Dateiname);
+            if (ro != null) {
+                var it = ItemOfRow(ro);
+                if (it == null) {
+                    //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
+                    lastit = AddOne(thisn, 0, 0, lastit.Layout_Dateiname);
+                }
             }
         }
         //var Plus = 0;
@@ -367,7 +369,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not RowFormulaPadItem i || e.Item == null) { return; }
+        if (e.HotItem is not RowFormulaPadItem i) { return; }
 
         switch (e.Item.KeyName) {
             case "Bez+":

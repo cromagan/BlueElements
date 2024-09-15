@@ -132,7 +132,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         if (rowsForExport is not { Count: >= 1 }) { return -1; }
 
-        var  tmp = new ItemCollectionPad.ItemCollectionPad(layoutFileName);
+        var tmp = new ItemCollectionPad.ItemCollectionPad(layoutFileName);
         tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
@@ -145,21 +145,18 @@ public sealed partial class ExportDialog : IHasDatabase {
         pad.Items.BackColor = Color.LightGray;
         tmp.Dispose();
 
-
         var druckB = pad.Items.DruckbereichRect();
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), MidpointRounding.AwayFromZero);
 
-        var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01))) ;
+        var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
         var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
                 var it = new ChildPadItem(new CreativePad(layoutFileName, rowsForExport[startNr]));
-                if (it.PadInternal?.Items is { })
-                {
+                if (it.PadInternal?.Items is { }) {
                     it.PadInternal.Items.GridShow = -1;
                 }
-
 
                 pad.Items.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand), Y = druckB.Top + y * (oneItem.Height + abstand) }, true);
@@ -313,7 +310,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not TextListItem tl || e.Item == null) { return; }
+        if (e.HotItem is not TextListItem tl) { return; }
 
         switch (e.Item.KeyName) {
             case "DateiPfadÖffnen":

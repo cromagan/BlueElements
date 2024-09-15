@@ -80,7 +80,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// Da die CaptionPosition von dem Steuerelement bei bedarf geämndert wird,
     /// muss ein default angegeben werden - wie es normalerweise auszusehen hat.
     /// </summary>
-    public CaptionPosition DefaultCaptionPosition { get; private set; }
+    public CaptionPosition DefaultCaptionPosition { get; }
 
     public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe {
         get => _filterart_bei_texteingabe;

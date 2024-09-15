@@ -33,19 +33,15 @@ public class Renderer_Button : Renderer_Abstract {
 
     #region Fields
 
-    private bool _bild_anzeigen = false;
+    private bool _bild_anzeigen;
 
-    private bool _checkstatus_anzeigen = false;
+    private bool _checkstatus_anzeigen;
 
-    private bool _text_anzeigen = false;
-
-    #endregion
-
-    #region Constructors
-
-    public Renderer_Button() : base() { }
+    private bool _text_anzeigen;
 
     #endregion
+
+    //public Renderer_Button() : base() { }
 
     #region Properties
 

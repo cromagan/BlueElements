@@ -32,20 +32,16 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended {
 
     #region Fields
 
-    public Renderer_Abstract? _renderer;
     public int? Contentwidth;
-
     private ColumnItem? _column;
-
+    private int? _drawWidth;
     private bool _reduced;
-
-    private ViewType _viewType = BlueDatabase.Enums.ViewType.None;
-
-    private bool disposedValue;
+    private Renderer_Abstract? _renderer;
+    private ViewType _viewType = ViewType.None;
 
     #endregion
 
@@ -90,6 +86,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
         }
     }
 
+    public bool IsDisposed { get; private set; }
+
     public bool Reduced {
         get => _reduced;
         set {
@@ -125,8 +123,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
     /// </summary>
     public int? X_WithSlider { get; set; }
 
-    private int? _drawWidth { get; set; }
-    private ColumnViewCollection Parent { get; set; }
+    private ColumnViewCollection? Parent { get; set; }
 
     #endregion
 
@@ -135,11 +132,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        //GC.SuppressFinalize(this);
     }
 
     public int DrawWidth(Rectangle displayRectangleWoSlider, float scale) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
+
+        if (Parent == null) { return Table.GetPix(16, scale); }
 
         if (_drawWidth is { } v) { return v; }
 
@@ -165,7 +164,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
         return (int)_drawWidth;
     }
 
-    public Renderer_Abstract? GetRenderer() {
+    public Renderer_Abstract GetRenderer() {
         if (_renderer != null) { return _renderer; }
 
         _renderer = Renderer_Abstract.RendererOf(this);
@@ -174,12 +173,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
 
     public void Invalidate_DrawWidth() => _drawWidth = null;
 
-    public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
+    public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
-        if (Parent.Database is not { IsDisposed: false } db) {
+        if (Parent?.Database is not { IsDisposed: false } db) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank unbekannt");
             return false;
         }
@@ -192,10 +191,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
 
             case "columnkey":
                 return true;
-
-            //case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-            //    ViewType = ViewType.PermanentColumn;
-            //    return true;
 
             case "type":
                 ViewType = (ViewType)IntParse(value);
@@ -218,7 +213,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
         return false;
     }
 
-    public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
+    public ColumnViewItem? PreviewsVisible() => Parent?.PreviousVisible(this);
 
     public string ReadableText() => _column?.ReadableText() ?? "?";
 
@@ -275,7 +270,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
     }
 
     private void Dispose(bool disposing) {
-        if (!disposedValue) {
+        if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 UnRegisterEvents();
@@ -285,7 +280,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposable {
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            disposedValue = true;
+            IsDisposed = true;
         }
     }
 

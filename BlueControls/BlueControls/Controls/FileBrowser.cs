@@ -111,7 +111,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
             if (value == "\\") { value = string.Empty; }
 
-            if (value == _directoryMin) { return; }
+            //if (value == _directoryMin) { return; }
 
             _directoryMin = value;
         }
@@ -384,7 +384,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not BitmapListItem it || e.Item == null) { return; }
+        if (e.HotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         switch (e.Item.KeyName) {
@@ -763,7 +763,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
     private void Watcher_Changed(object sender, FileSystemEventArgs e) {
         var fi = new FileInfo(e.Name);
-        if (!AddThis(fi)) { return; }
+        AddThis(fi);
 
         //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
         //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }

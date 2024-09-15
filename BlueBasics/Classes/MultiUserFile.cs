@@ -59,7 +59,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     #region Constructors
 
-    public MultiUserFile() {
+    protected MultiUserFile() {
         AllFiles.Add(this);
         _checker = new System.Threading.Timer(Checker_Tick);
         Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
@@ -322,7 +322,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     }
 
     public bool LockEditing() {
-        if (!Generic.IsAdministrator()) { return false; }
+        if (!IsAdministrator()) { return false; }
 
         if (AgeOfBlockDatei is < 0 or > 3600) {
             //if (AmIBlocker()) { return false; }
@@ -559,10 +559,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <summary>
     /// Entfernt im Regelfall die Temporäre Datei
     /// </summary>
-    /// <param name="fromParallelProzess"></param>
     /// <param name="tmpFileName"></param>
     /// <param name="fileInfoBeforeSaving"></param>
-    /// <param name="savedDataUncompressed"></param>
+    /// <param name="dataUncompressed"></param>
     /// <returns></returns>
     private string SaveRoutine(string tmpFileName, string fileInfoBeforeSaving, string dataUncompressed) {
         if (_isSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen.", false); }

@@ -181,7 +181,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     public static void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
         if (_befehlsReferenz is { Visible: true }) {
             _befehlsReferenz.Close();
-            _befehlsReferenz?.Dispose();
+            _befehlsReferenz.Dispose();
             _befehlsReferenz = null;
         }
 
@@ -194,7 +194,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         if (_befehlsReferenz is { Visible: true }) {
             _befehlsReferenz.Close();
-            _befehlsReferenz?.Dispose();
+            _befehlsReferenz.Dispose();
             _befehlsReferenz = null;
         }
 

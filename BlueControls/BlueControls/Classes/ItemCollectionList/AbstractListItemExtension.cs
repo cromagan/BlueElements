@@ -274,7 +274,7 @@ public static class AbstractListItemExtension {
                 thisColumnItem.Editor = typeof(ColumnEditor);
 
                 if (doCaptionSort) {
-                    var capt = thisColumnItem.Ueberschriften ?? string.Empty;
+                    var capt = thisColumnItem.Ueberschriften;
 
                     co.UserDefCompareKey = capt + Constants.SecondSortChar + thisColumnItem.KeyName;
 

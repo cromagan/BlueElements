@@ -62,7 +62,7 @@ public class CellLikeListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
-        if (_cellRenderer == null) { return false; }
+        //if (_cellRenderer == null) { return false; }
         var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.Both, _translate);
         return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
@@ -70,7 +70,7 @@ public class CellLikeListItem : AbstractListItem {
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
-        if (_cellRenderer == null) { return new Size(16, 0); }
+        //if (_cellRenderer == null) { return new Size(16, 0); }
 
         return _cellRenderer.ContentSize(KeyName, itemdesign, States.Standard, _translate);
     }
@@ -79,7 +79,7 @@ public class CellLikeListItem : AbstractListItem {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        _cellRenderer?.Draw(gr, KeyName, positionModified, itemdesign, state, _translate, (Alignment)_align, 1f);
+        _cellRenderer.Draw(gr, KeyName, positionModified, itemdesign, state, _translate, _align, 1f);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }
@@ -87,10 +87,10 @@ public class CellLikeListItem : AbstractListItem {
 
     protected override string GetCompareKey() {
         // Die Hauptklasse fragt nach diesem Compare-Key
-        if (_cellRenderer == null) {
-            // Wenn _styleLikeThis null ist, geben wir einen leeren String zurück
-            return string.Empty;
-        }
+        //if (_cellRenderer == null) {
+        //    // Wenn _styleLikeThis null ist, geben wir einen leeren String zurück
+        //    return string.Empty;
+        //}
         // Erzeugen eines lesbaren Werts basierend auf dem internen Wert und dem Stil
         var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.HTML, _translate);
         // Erzeugen des Compare-Keys basierend auf dem lesbaren Wert und dem Sortiertyp des Stils

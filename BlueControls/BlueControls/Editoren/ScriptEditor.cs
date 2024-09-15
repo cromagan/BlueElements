@@ -153,8 +153,6 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
     private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => OnPropertyChanged();
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
-        if (Method.AllMethods == null) { return; }
-
         try {
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
@@ -199,13 +197,11 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
                 AllowTabKey = true
             };
             List<AutocompleteItem> items = [];
-            if (Method.AllMethods != null) {
-                foreach (var thisc in Method.AllMethods) {
-                    items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
-                    items.Add(new AutocompleteItem(thisc.Command));
-                    if (!string.IsNullOrEmpty(thisc.Returns)) {
-                        items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
-                    }
+            foreach (var thisc in Method.AllMethods) {
+                items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
+                items.Add(new AutocompleteItem(thisc.Command));
+                if (!string.IsNullOrEmpty(thisc.Returns)) {
+                    items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                 }
             }
             //set as autocomplete source

@@ -211,7 +211,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
             if (_txt == null) { MakeNewETxt(); }
 
-            if (_txt != null) {
+            if (_txt != null && Parent != null) {
                 _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {

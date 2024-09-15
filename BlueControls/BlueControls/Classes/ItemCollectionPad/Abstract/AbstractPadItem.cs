@@ -43,6 +43,10 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
 
     public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
+    public PointM? JointParentPoint1;
+
+    public PointM? JointParentPoint2;
+
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -104,18 +108,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
 
     public bool IsDisposed { get; private set; }
 
-    public string KeyName {
-        get => _keyName;
-        set {
-            if (_keyName == value) { return; }
-            _keyName = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public PointM? JointParentPoint;
-
-
     /// <summary>
     /// Diese Punket sind Verbindungspunkte.
     /// Sie können an sich verschoben werden, aber dessen Position ist immer in Relation zum JointParentPoint.
@@ -124,6 +116,14 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     /// </summary>
     public ObservableCollection<PointM> JointPoints { get; } = [];
 
+    public string KeyName {
+        get => _keyName;
+        set {
+            if (_keyName == value) { return; }
+            _keyName = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Diese Punkte können vom Benutzer verschoben werden.
@@ -209,6 +209,15 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
 
     public virtual void AddedToCollection() { }
 
+    public void AddJointPointAbsolute(string name, float x, float y) {
+        var p = new PointM(name, x, y);
+        JointPoints.Add(p);
+    }
+
+    public void AddJointPointAbsolute(PointM vorlage) {
+        AddJointPointAbsolute(vorlage.KeyName, vorlage.X, vorlage.Y);
+    }
+
     public object? Clone() {
         var x = ToParseableString();
 
@@ -281,9 +290,9 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
                             var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
                             var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
 
-                            if (Geometry.GetLenght(t1, t2) > 1) {
+                            if (GetLenght(t1, t2) > 1) {
                                 gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                                var wi = Geometry.Winkel(t1, t2);
+                                var wi = Winkel(t1, t2);
                                 if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
                                 if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
                             }
@@ -435,32 +444,28 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     public virtual void PointMoved(object sender, MoveEventArgs e) {
         OnPropertyChanged();
 
-        if (sender is PointM p && p == JointParentPoint) {
+        if (JointPoints.Count > 0 &&
+            JointParentPoint1 is not null && JointParentPoint2 is not null &&
+            sender is PointM p && (p == JointParentPoint1 || p == JointParentPoint2)) {
+            var middleOld = new PointF((JointParentPoint1.X - e.X + JointParentPoint2.X) / 2,
+                                        (JointParentPoint1.Y - e.Y + JointParentPoint2.Y) / 2);
+            // Egal, ob Punkt 1 oder 2 verschoben wird, die Mitte bewegt sich immer die Hälfte
+
+            var middle = new PointM((JointParentPoint1.X + JointParentPoint2.X) / 2,
+                                    (JointParentPoint1.Y + JointParentPoint2.Y) / 2);
+
+            var angelOld = Winkel(middleOld, JointParentPoint1);
+            var angelNew = Winkel(middle, JointParentPoint1);
+            var angelChange = angelOld - angelNew;
 
             foreach (var thisPoint in JointPoints) {
-
-                var oldPoint = new PointF(JointParentPoint.X - e.X, JointParentPoint.Y - e.Y);
- 
                 foreach (var thispoint in JointPoints) {
-                    var angle = Winkel(oldPoint, thisPoint);
-                    var lenght = Länge(oldPoint, thispoint);
-                    thispoint.SetTo(JointParentPoint, lenght, angle);
+                    var angle = Winkel(middleOld, thisPoint);
+                    var lenght = Länge(middleOld, thispoint);
+                    thispoint.SetTo(middle, lenght, angle + angelChange);
                 }
-
-                //if (thisPoint != null) {
-                //    thisPoint.Move(e);
-                //}
             }
         }
-    }
-
-    public void AddJointPointAbsolute(string name, float x, float y) {
-        var p = new PointM(name, x, y);
-        JointPoints.Add(p);
-    }
-
-    public void AddJointPointAbsolute(PointM vorlage) {
-        AddJointPointAbsolute(vorlage.KeyName,vorlage.X, vorlage.Y);
     }
 
     //private void AddJointPointCartesian(string name, float lenghtToMiddle, float angleToMiddle) {
@@ -469,7 +474,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     //    JointPoints.Add(p);
 
     //}
-
 
     /// <summary>
     /// Teilt dem Item mit, dass das Design geändert wurde.
@@ -493,7 +497,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         foreach (var thisPoint in JointPoints) {
             result.ParseableAdd("JointPoint", thisPoint as IStringable);
         }
-
 
         if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
             result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);

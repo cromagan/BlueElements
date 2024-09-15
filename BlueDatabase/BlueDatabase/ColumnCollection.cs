@@ -126,11 +126,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? this[string columnName] {
         get {
-            if (IsDisposed || Database is not { IsDisposed: false } || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+            if (IsDisposed || Database is not { IsDisposed: false } || string.IsNullOrEmpty(columnName)) { return null; }
 
             try {
                 columnName = columnName.ToUpperInvariant();
-                var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;
+                var col = _internal.TryGetValue(columnName, out var value) ? value : null;
                 if (col is { IsDisposed: true }) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
                     return null;

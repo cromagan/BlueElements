@@ -55,7 +55,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
         formular.InitFormula(null, row?.Database);
 
         if (row is { IsDisposed: false }) {
-            formular.GetConnectedFormulaFromDatabase(row?.Database);
+            formular.GetConnectedFormulaFromDatabase(row.Database);
 
             formular.SetToRow(row);
         }

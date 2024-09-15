@@ -146,7 +146,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     #region Methods
 
-    internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? qi, Alignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
+    internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? qi, Alignment align, bool picHeight44, ExtText? etxt, string text, Rectangle displayRectangle, bool translate) {
         var design = Skin.DesignOf(buttontype, state);
         Skin.Draw_Back(gr, design, displayRectangle, control, true);
         Skin.Draw_Border(gr, design, displayRectangle);
@@ -164,7 +164,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
             var tt = LanguageTool.DoTranslate(text, translate);
 
-            if (!string.IsNullOrWhiteSpace(tt)) {
+            if (!string.IsNullOrWhiteSpace(tt) && etxt is { }) {
                 // Mehrzeiligen Text generieren und Zeichnen
                 etxt.Design = buttontype;
                 etxt.State = state; // Fall es nicht nothing ist
@@ -177,7 +177,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
             }
         } else if (buttontype is not Design.OptionButton_TextStyle and not Design.CheckBox_TextStyle) {
             Skin.Draw_FormatedText(gr, text, qi, design, align, displayRectangle, control, false, translate);
-        } else {
+        } else if (etxt is { }) {
             var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
             //etxt = new ExtText(buttontype, state);
             etxt.Design = buttontype;

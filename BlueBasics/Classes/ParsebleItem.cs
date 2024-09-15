@@ -81,9 +81,9 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
         foreach (var thist in types) {
             if (thist != null) {
-                var v = (string)thist.GetProperty("ClassId")?.GetValue(null, null);
+                var v = thist.GetProperty("ClassId")?.GetValue(null, null);
 
-                if (v.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
+                if (v is string tn && tn.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
                     var ni = (T)Activator.CreateInstance(thist);
                     return ni;
                 }

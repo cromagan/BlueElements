@@ -519,7 +519,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                Blinker.Tick -= new EventHandler(Blinker_Tick);
+                Blinker.Tick -= Blinker_Tick;
                 //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
                 components?.Dispose();
             }

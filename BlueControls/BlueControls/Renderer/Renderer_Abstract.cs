@@ -35,22 +35,25 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
     #region Fields
 
-
-    public Renderer_Abstract(): this(false) { }
-
-    protected Renderer_Abstract(bool readOnly) => ReadOnly = readOnly;
-
-    internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
+    public readonly bool ReadOnly;
 
     internal static readonly Renderer_Abstract Bool = new Renderer_ImageAndText("+|Häkchen\r\no|Kreis2\r\n-|Kreuz");
 
+    internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
 
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
 
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
 
     private string _lastCode = "?";
-    public readonly bool ReadOnly;
+
+    #endregion
+
+    #region Constructors
+
+    public Renderer_Abstract() : this(false) { }
+
+    protected Renderer_Abstract(bool readOnly) => ReadOnly = readOnly;
 
     #endregion
 
@@ -71,10 +74,10 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     #region Methods
 
     public static Renderer_Abstract RendererOf(ColumnItem? column) {
-        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Renderer_Abstract.Default; }
+        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Default; }
 
-        var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
-        if (renderer == null) { return Renderer_Abstract.Default; }
+        var renderer = NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
+        if (renderer == null) { return Default; }
 
         renderer.Parse(column.RendererSettings);
 
@@ -85,7 +88,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
         var key = TextSizeKey(_lastCode, content);
-        if (key == null) { return Size.Empty; }
 
         if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
@@ -132,7 +134,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
     internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
-            var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
+            var renderer = NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
             if (renderer == null) { return RendererOf(columnViewItem.Column); }
 
             renderer.Parse(columnViewItem.RendererSettings);
