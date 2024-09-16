@@ -34,6 +34,7 @@ namespace BlueControls.Forms {
             this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
             this.ckbRaster = new BlueControls.Controls.Button();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
+            this.btnAddDynamicSymbol = new BlueControls.Controls.Button();
             this.btnAddPhsyik = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
@@ -53,7 +54,7 @@ namespace BlueControls.Forms {
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabRightSide = new BlueControls.Controls.TabControl();
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
-            this.btnAddDynamicSymbol = new BlueControls.Controls.Button();
+            this.btnWeitere = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -162,6 +163,7 @@ namespace BlueControls.Forms {
             // 
             this.grpKomponenteHinzufügen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpKomponenteHinzufügen.CausesValidation = false;
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitere);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDynamicSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddPhsyik);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
@@ -174,16 +176,27 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(496, 0);
             this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
-            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(272, 81);
+            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(296, 81);
             this.grpKomponenteHinzufügen.TabIndex = 0;
             this.grpKomponenteHinzufügen.TabStop = false;
             this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
+            // 
+            // btnAddDynamicSymbol
+            // 
+            this.btnAddDynamicSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddDynamicSymbol.ImageCode = "Variable|16";
+            this.btnAddDynamicSymbol.Location = new System.Drawing.Point(96, 46);
+            this.btnAddDynamicSymbol.Name = "btnAddDynamicSymbol";
+            this.btnAddDynamicSymbol.Size = new System.Drawing.Size(96, 22);
+            this.btnAddDynamicSymbol.TabIndex = 11;
+            this.btnAddDynamicSymbol.Text = "Dyn. Symbol";
+            this.btnAddDynamicSymbol.Click += new System.EventHandler(this.btnAddDynamicSymbol_Click);
             // 
             // btnAddPhsyik
             // 
             this.btnAddPhsyik.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAddPhsyik.ImageCode = "Formel|16";
-            this.btnAddPhsyik.Location = new System.Drawing.Point(176, 24);
+            this.btnAddPhsyik.Location = new System.Drawing.Point(192, 24);
             this.btnAddPhsyik.Name = "btnAddPhsyik";
             this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
             this.btnAddPhsyik.TabIndex = 10;
@@ -205,7 +218,7 @@ namespace BlueControls.Forms {
             // 
             this.btnAddUnterStufe.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAddUnterStufe.ImageCode = "Datei|16";
-            this.btnAddUnterStufe.Location = new System.Drawing.Point(176, 2);
+            this.btnAddUnterStufe.Location = new System.Drawing.Point(192, 2);
             this.btnAddUnterStufe.Name = "btnAddUnterStufe";
             this.btnAddUnterStufe.Size = new System.Drawing.Size(88, 22);
             this.btnAddUnterStufe.TabIndex = 8;
@@ -385,16 +398,15 @@ namespace BlueControls.Forms {
             this.tabElementEigenschaften.TabIndex = 0;
             this.tabElementEigenschaften.Text = "Element-Eigenschaften";
             // 
-            // btnAddDynamicSymbol
+            // btnWeitere
             // 
-            this.btnAddDynamicSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddDynamicSymbol.ImageCode = "Variable|16";
-            this.btnAddDynamicSymbol.Location = new System.Drawing.Point(96, 46);
-            this.btnAddDynamicSymbol.Name = "btnAddDynamicSymbol";
-            this.btnAddDynamicSymbol.Size = new System.Drawing.Size(168, 22);
-            this.btnAddDynamicSymbol.TabIndex = 11;
-            this.btnAddDynamicSymbol.Text = "Dynamisches Symbol";
-            this.btnAddDynamicSymbol.Click += new System.EventHandler(this.btnAddDynamicSymbol_Click);
+            this.btnWeitere.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitere.Location = new System.Drawing.Point(192, 46);
+            this.btnWeitere.Name = "btnWeitere";
+            this.btnWeitere.Size = new System.Drawing.Size(88, 22);
+            this.btnWeitere.TabIndex = 12;
+            this.btnWeitere.Text = "weitere...";
+            this.btnWeitere.Click += new System.EventHandler(this.btnWeitere_Click);
             // 
             // PadEditor
             // 
@@ -444,5 +456,6 @@ namespace BlueControls.Forms {
         private TabPage tabElementEigenschaften;
         protected TabControl tabRightSide;
         private Button btnAddDynamicSymbol;
+        private Button btnWeitere;
     }
 }

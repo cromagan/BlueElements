@@ -551,12 +551,19 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                         var toCheckCombi = c.LinkedDatabase.TableName + "|" + c.LinkedCellFilter.JoinWithCr();
 
                         if (toCheckCombi == thisCombi) {
-                            if (Pad.Items[toCheckCombi] is not GenericPadItem databItem) {
+                            if (Pad.Items[toCheckCombi] is not TextPadItem databItem) {
                                 var nam = c.LinkedDatabase.TableName;
-                                databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
+                                databItem = new TextPadItem(toCheckCombi, nam);
                                 Pad.Items.Add(databItem);
                                 if (it != null) {
-                                    databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
+
+                                    var r = new RectangleF(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width),
+                                                            600,
+                                                           (int)(anyitem.UsedArea.Height / 2), 
+                                                           (int)anyitem.UsedArea.Height);
+
+
+                                    databItem.SetCoordinates(r, true );
                                 }
                                 kx = databItem.UsedArea.Right;
                             }

@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -32,6 +33,10 @@ using static BlueBasics.Polygons;
 namespace BlueControls.ItemCollectionPad;
 
 public class DimensionPadItem : AbstractPadItem {
+
+    public override string ReadableText() => "Bild";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
     #region Fields
 
@@ -162,7 +167,7 @@ public class DimensionPadItem : AbstractPadItem {
                || value.DistanzZuStrecke(_point2, _bezugslinie2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _schnittPunkt2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _textPoint) < ne
-               || Länge(new PointM(value), _textPoint) < ne * 10;
+               || Lenght(new PointM(value), _textPoint) < ne * 10;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -346,8 +351,8 @@ public class DimensionPadItem : AbstractPadItem {
     }
 
     private void ComputeData() {
-        _länge = Länge(_point1, _point2);
-        _winkel = Winkel(_point1, _point2);
+        _länge = Lenght(_point1, _point2);
+        _winkel = Angle(_point1, _point2);
     }
 
     #endregion

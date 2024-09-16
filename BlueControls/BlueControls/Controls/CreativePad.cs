@@ -408,7 +408,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (Länge(thisPoint, p) < 5f / Zoom) {
+                            if (Lenght(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }

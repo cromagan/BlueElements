@@ -24,7 +24,6 @@ namespace BlueControls.Forms {
             this.grpVorschau = new BlueControls.Controls.GroupBox();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
-            this.btnWeitere = new BlueControls.Controls.Button();
             this.btnRegionAdd = new BlueControls.Controls.Button();
             this.btnButton = new BlueControls.Controls.Button();
             this.btnBild = new BlueControls.Controls.Button();
@@ -170,7 +169,6 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpFelder.Controls.Add(this.btnWeitere);
             this.grpFelder.Controls.Add(this.btnRegionAdd);
             this.grpFelder.Controls.Add(this.btnButton);
             this.grpFelder.Controls.Add(this.btnBild);
@@ -184,17 +182,6 @@ namespace BlueControls.Forms {
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
-            // 
-            // btnWeitere
-            // 
-            this.btnWeitere.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnWeitere.ImageCode = "Frage|16";
-            this.btnWeitere.Location = new System.Drawing.Point(144, 46);
-            this.btnWeitere.Name = "btnWeitere";
-            this.btnWeitere.Size = new System.Drawing.Size(104, 22);
-            this.btnWeitere.TabIndex = 8;
-            this.btnWeitere.Text = "weitere...";
-            this.btnWeitere.Click += new System.EventHandler(this.btnWeitere_Click);
             // 
             // btnRegionAdd
             // 
@@ -540,6 +527,5 @@ namespace BlueControls.Forms {
         private GroupBox grpArbeitsbereich;
         private Button btnArbeitsbereich;
         private Button btnRegionAdd;
-        private Button btnWeitere;
     }
 }

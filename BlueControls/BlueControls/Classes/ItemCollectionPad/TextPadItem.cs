@@ -32,10 +32,15 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 using static BlueBasics.Converter;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls.ItemCollectionPad;
 
 public class TextPadItem : RectanglePadItem, ICanHaveVariables {
+
+    public override string ReadableText() => "Text";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
     #region Fields
 
@@ -69,6 +74,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         _ausrichtung = Alignment.Top_Left;
         InvalidateText();
     }
+
 
     #endregion
 

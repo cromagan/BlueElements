@@ -133,11 +133,13 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         if (point == _pl) {
+            CalculateJointMiddle(_pl, _pr);
             _pLo.X = x;
             _pLu.X = x;
         }
 
         if (point == _pr) {
+            CalculateJointMiddle(_pl, _pr);
             _pRo.X = x;
             _pRu.X = x;
         }

@@ -38,9 +38,13 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     #region Fields
 
     private Database? _database;
+
     private string _lastQuickInfo = string.Empty;
+
     private string _layoutFileName;
+
     private string _rowKey;
+
     private string _tmpQuickInfo = string.Empty;
 
     #endregion
@@ -173,6 +177,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     }
 
     public override void ProcessStyleChange() => RemovePic();
+
+    public override string ReadableText() => "Zeile";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

@@ -37,15 +37,11 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IMoveable, IDisposableExtended, IComparable, IHasKeyName, ISimpleEditor {
+public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
 
     #region Fields
 
     public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-
-    public PointM? JointParentPoint1;
-
-    public PointM? JointParentPoint2;
 
     /// <summary>
     /// Soll es gedruckt werden?
@@ -53,7 +49,26 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     /// <remarks></remarks>
     private bool _beiExportSichtbar = true;
 
+    /// <summary>
+    /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
+    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// </summary>
+    private PointM _jointMiddle = new PointM("JointMiddle", 0, 0);
+
+    /// <summary>
+    /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
+    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// </summary>
+    private PointM? _jointReferenceFirst;
+
+    /// <summary>
+    /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
+    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// </summary>
+    private PointM? _jointReferenceSecond;
+
     private string _keyName;
+
     private string _page = string.Empty;
 
     private ItemCollectionPad? _parent;
@@ -107,6 +122,17 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
+
+    public PointM JointMiddle {
+        get {
+            return _jointMiddle;
+        }
+        private set {
+            if (_jointMiddle == value) { return; }
+            _jointMiddle = value;
+            _jointMiddle.Moved += _jointMiddle_Moved;
+        }
+    }
 
     /// <summary>
     /// Diese Punket sind Verbindungspunkte.
@@ -292,7 +318,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
 
                             if (GetLenght(t1, t2) > 1) {
                                 gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                                var wi = Winkel(t1, t2);
+                                var wi = Angle(t1, t2);
                                 if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
                                 if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
                             }
@@ -357,16 +383,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         _usedArea = default;
         base.OnPropertyChanged();
     }
-
-    //public void Parse(List<KeyValuePair<string, string>> toParse, string parsestring) {
-    //    foreach (var pair in toParse) {
-    //        if (!ParseThis(pair.Key, pair.Value)) {
-    //            Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
-    //        }
-    //    }
-
-    //    ParseFinished(parsestring);
-    //}
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
@@ -441,39 +457,11 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         return false;
     }
 
+    //    ParseFinished(parsestring);
+    //}
     public virtual void PointMoved(object sender, MoveEventArgs e) {
         OnPropertyChanged();
-
-        if (JointPoints.Count > 0 &&
-            JointParentPoint1 is not null && JointParentPoint2 is not null &&
-            sender is PointM p && (p == JointParentPoint1 || p == JointParentPoint2)) {
-            var middleOld = new PointF((JointParentPoint1.X - e.X + JointParentPoint2.X) / 2,
-                                        (JointParentPoint1.Y - e.Y + JointParentPoint2.Y) / 2);
-            // Egal, ob Punkt 1 oder 2 verschoben wird, die Mitte bewegt sich immer die Hälfte
-
-            var middle = new PointM((JointParentPoint1.X + JointParentPoint2.X) / 2,
-                                    (JointParentPoint1.Y + JointParentPoint2.Y) / 2);
-
-            var angelOld = Winkel(middleOld, JointParentPoint1);
-            var angelNew = Winkel(middle, JointParentPoint1);
-            var angelChange = angelOld - angelNew;
-
-            foreach (var thisPoint in JointPoints) {
-                foreach (var thispoint in JointPoints) {
-                    var angle = Winkel(middleOld, thisPoint);
-                    var lenght = Länge(middleOld, thispoint);
-                    thispoint.SetTo(middle, lenght, angle + angelChange);
-                }
-            }
-        }
     }
-
-    //private void AddJointPointCartesian(string name, float lenghtToMiddle, float angleToMiddle) {
-    //    var p = new PointM(this, name, 0, 0);
-    //    p.SetTo(JointParentPoint, lenghtToMiddle, angleToMiddle);
-    //    JointPoints.Add(p);
-
-    //}
 
     /// <summary>
     /// Teilt dem Item mit, dass das Design geändert wurde.
@@ -481,6 +469,11 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     /// </summary>
     public virtual void ProcessStyleChange() { }
 
+    public abstract string ReadableText();
+
+    public abstract QuickImage? SymbolForReadableText();
+
+    //}
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
@@ -507,6 +500,16 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         return result.Parseable(base.ToParseableString());
     }
 
+    //public void Parse(List<KeyValuePair<string, string>> toParse, string parsestring) {
+    //    foreach (var pair in toParse) {
+    //        if (!ParseThis(pair.Key, pair.Value)) {
+    //            Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+    //        }
+    //    }
+    //private void AddJointPointCartesian(string name, float lenghtToMiddle, float angleToMiddle) {
+    //    var p = new PointM(this, name, 0, 0);
+    //    p.SetTo(JointParentPoint, lenghtToMiddle, angleToMiddle);
+    //    JointPoints.Add(p);
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
     /// </summary>
@@ -518,6 +521,18 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
         return x;
     }
 
+    protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
+        if (_jointReferenceFirst == null) { _jointReferenceFirst = firstPoint; }
+        if (_jointReferenceSecond == null) { _jointReferenceSecond = firstPoint; }
+
+        if (firstPoint != _jointReferenceFirst) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Refernz-Punkt falsch!");
+            return;
+        }
+
+        JointMiddle.SetTo((firstPoint.X + secondPoint.X) / 2, (firstPoint.Y + secondPoint.Y) / 2);
+    }
+
     protected abstract RectangleF CalculateUsedArea();
 
     protected virtual void Dispose(bool disposing) {
@@ -526,6 +541,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
+            _jointMiddle.Moved -= _jointMiddle_Moved;
             MovablePoint.CollectionChanged -= Point_CollectionChanged;
             JointPoints.CollectionChanged -= Point_CollectionChanged;
             MovablePoint.RemoveAll();
@@ -556,6 +572,27 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IM
     }
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+
+    private void _jointMiddle_Moved(object sender, MoveEventArgs e) {
+        if (_jointReferenceFirst == null) { return; }
+
+        if (JointPoints.Count > 0) {
+            var middleOld = new PointF(_jointMiddle.X - e.X, _jointMiddle.Y - e.Y);
+            // Egal, ob Punkt 1 oder 2 verschoben wird, die Mitte bewegt sich immer die Hälfte
+
+            var angleOld = Angle(_jointReferenceFirst, middleOld);
+            var angleNew = Angle(_jointReferenceFirst, _jointMiddle);
+            var angleChange = angleOld - angleNew;
+
+            foreach (var thisPoint in JointPoints) {
+                foreach (var thispoint in JointPoints) {
+                    var angle = Angle(middleOld, thisPoint);
+                    var lenght = Lenght(middleOld, thispoint);
+                    thispoint.SetTo(_jointMiddle, lenght, angle + angleChange);
+                }
+            }
+        }
+    }
 
     private void Point_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {

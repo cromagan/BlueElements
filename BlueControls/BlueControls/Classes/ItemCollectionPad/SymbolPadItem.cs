@@ -34,6 +34,10 @@ namespace BlueControls.ItemCollectionPad;
 
 public class SymbolPadItem : RectanglePadItem {
 
+    public override string ReadableText() => "Symbol";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
+
     #region Constructors
 
     public SymbolPadItem() : base(string.Empty) {

@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics;
 using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 
@@ -33,9 +35,13 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
     #region Properties
 
     public static string ClassId => "Physics-Object";
+
     public override string Description => string.Empty;
+
     public List<Kraft> Kraft { get; } = [];
+
     public override string MyClassId => ClassId;
+
     protected override int SaveOrder => 999;
 
     #endregion
@@ -43,6 +49,10 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
     #region Methods
 
     public override void InitialPosition(int x, int y, int width, int height) { }
+
+    public override string ReadableText() => "Physik-Objekt";
+
+    public override QuickImage? SymbolForReadableText() => null;
 
     #endregion
 

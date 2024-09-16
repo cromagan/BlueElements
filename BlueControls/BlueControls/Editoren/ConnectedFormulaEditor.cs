@@ -279,7 +279,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
-    private void btnWeitere_Click(object sender, System.EventArgs e) {
+    protected override void btnWeitere_Click(object sender, System.EventArgs e) {
         if (CFormula == null) { return; }
 
         var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty, CFormula);

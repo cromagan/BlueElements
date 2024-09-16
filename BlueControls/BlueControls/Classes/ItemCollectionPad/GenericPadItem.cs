@@ -29,7 +29,7 @@ namespace BlueControls.ItemCollectionPad;
 /// Ein einfaches Item, das immer als Rechteck dargestellt wird
 /// und einen Text enthalten kann.
 /// </summary>
-public class GenericPadItem : FixedRectangleBitmapPadItem {
+public abstract class GenericPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields
 

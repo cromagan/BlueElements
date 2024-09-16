@@ -37,6 +37,10 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor
 /// </summary>
 public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
+    public override string ReadableText() => "Spalte";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
+
     #region Constructors
 
     public ColumnPadItem() : this(string.Empty) { }

@@ -33,6 +33,10 @@ namespace BlueControls.ItemCollectionPad;
 
 public class DynamicSymbolPadItem : RectanglePadItem {
 
+    public override string ReadableText() => "Bild";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
+
     #region Fields
 
     private string _script = string.Empty;

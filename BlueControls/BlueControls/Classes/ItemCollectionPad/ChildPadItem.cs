@@ -38,6 +38,10 @@ namespace BlueControls.ItemCollectionPad;
 
 public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariables {
 
+    public override string ReadableText() => "Unterstufe";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Pfeil_Oben, 16);
+
     #region Fields
 
     public readonly string Seite;

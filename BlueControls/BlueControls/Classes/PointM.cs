@@ -149,7 +149,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public float DistanzZuLinie(PointM p1, PointM p2) => DistanzZuLinie(p1.X, p1.Y, p2.X, p2.Y);
 
-    public float DistanzZuLinie(float x1, float y1, float x2, float y2) => Länge(this, PointOnLine(this, x1, y1, x2, y2));
+    public float DistanzZuLinie(float x1, float y1, float x2, float y2) => Lenght(this, PointOnLine(this, x1, y1, x2, y2));
 
     public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 

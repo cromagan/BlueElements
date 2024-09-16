@@ -64,6 +64,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
         MovablePoint.Add(_po);
         PointsForSuccesfullyMove.Add(_pLo);
         PointsForSuccesfullyMove.Add(_pRu);
+        CalculateJointMiddle(_pl, _pr);
         Drehwinkel = 0;
     }
 
@@ -116,31 +117,29 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
-
-
         if (sender is not PointM point) { return; }
 
         var x = point.X;
         var y = point.Y;
 
         if (point == _pLo) {
-            _po.Y = y; 
-            _pl.X = x; 
+            _po.Y = y;
+            _pl.X = x;
         }
 
         if (point == _pRo) {
-            _po.Y = y; 
-             _pr.X = x; 
+            _po.Y = y;
+            _pr.X = x;
         }
 
         if (point == _pLu) {
-            _pl.X = x; 
-             _pu.Y = y; 
+            _pl.X = x;
+            _pu.Y = y;
         }
 
         if (point == _pRu) {
-            _pr.X = x; 
-            _pu.Y = y; 
+            _pr.X = x;
+            _pu.Y = y;
         }
 
         if (point == _po) {
@@ -148,17 +147,19 @@ public abstract class RectanglePadItem : AbstractPadItem {
             _pRo.Y = y;
         }
 
-        if (point == _pu ) {
+        if (point == _pu) {
             _pLu.Y = y;
             _pRu.Y = y;
         }
 
         if (point == _pl) {
+            CalculateJointMiddle(_pl, _pr);
             _pLo.X = x;
             _pLu.X = x;
         }
 
         if (point == _pr) {
+            CalculateJointMiddle(_pl, _pr);
             _pRo.X = x;
             _pRu.X = x;
         }

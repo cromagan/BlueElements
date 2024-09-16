@@ -43,6 +43,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     #region Fields
 
     public readonly List<QuickImage> Overlays;
+
     public int Padding;
 
     #endregion
@@ -70,10 +71,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     #region Properties
 
     public static string ClassId => "IMAGE";
+
     public SizeModes Bild_Modus { get; set; }
+
     public Bitmap? Bitmap { get; set; }
+
     public override string Description => string.Empty;
+
     public bool Hintergrund_Weiß_Füllen { get; set; }
+
     public override string MyClassId => ClassId;
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
@@ -162,6 +168,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         return base.ParseThis(key, value);
     }
 
+    public override string ReadableText() => "Bild";
+
     public bool ReplaceVariable(Variable variable) {
         if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
@@ -200,6 +208,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         }
         return false;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

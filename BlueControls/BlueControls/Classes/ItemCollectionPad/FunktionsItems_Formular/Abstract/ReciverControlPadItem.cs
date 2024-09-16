@@ -391,7 +391,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         return base.ParseThis(key, value);
     }
 
-    public abstract string ReadableText();
 
     public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition) {
         if (Parent == null) { return; }
@@ -415,7 +414,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         OnPropertyChanged();
     }
 
-    public abstract QuickImage? SymbolForReadableText();
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

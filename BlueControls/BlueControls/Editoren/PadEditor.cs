@@ -22,8 +22,12 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.Temporär;
+using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -213,4 +217,34 @@ public partial class PadEditor : PadEditorReadOnly {
     }
 
     #endregion
+
+    protected virtual void btnWeitere_Click(object sender, System.EventArgs e) {
+
+
+        var l = Generic.GetInstaceOfType<AbstractPadItem>(string.Empty);
+
+        if (l.Count == 0) { return; }
+
+        var i = new List<AbstractListItem>();
+
+        foreach (var thisl in l) {
+            i.Add(ItemOf(thisl));
+        }
+
+        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
+
+        if (x is not { Count: 1 }) { return; }
+
+        var toadd = i.Get(x[0]);
+
+        if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
+
+        //if (toadd is not AbstractPadItem api) {  return; }
+
+        //var x = new FileExplorerPadItem(string.Empty);
+
+        Pad.AddCentered(api);
+
+
+    }
 }

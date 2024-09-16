@@ -60,6 +60,7 @@ public class LinePadItem : AbstractPadItem {
         MovablePoint.Add(_point1);
         MovablePoint.Add(_point2);
         PointsForSuccesfullyMove.AddRange(MovablePoint);
+        CalculateJointMiddle(_point1, _point2);
         Stil = format;
         _tempPoints = [];
         Linien_Verhalten = ConectorStyle.Direct;
@@ -142,6 +143,7 @@ public class LinePadItem : AbstractPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         CalcTempPoints();
+        CalculateJointMiddle(_point1, _point2);
         base.PointMoved(sender, e);
     }
 
@@ -514,6 +516,11 @@ public class LinePadItem : AbstractPadItem {
         }
         return false;
     }
+
+    public override string ReadableText() => "Line";
+
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
 
     #endregion
 }
