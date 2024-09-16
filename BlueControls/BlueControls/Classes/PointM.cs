@@ -36,10 +36,16 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     #region Fields
 
+    /// <summary>
+    /// Wert wird nur gespeichert, für evtl. erweiterte Berechnungen
+    /// </summary>
+    private float _angle;
+    /// <summary>
+    /// Wert wird nur gespeichert, für evtl. erweiterte Berechnungen
+    /// </summary>
+    private float _distance;
     private object? _parent;
-
     private float _x;
-
     private float _y;
 
     #endregion
@@ -99,9 +105,33 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     #region Properties
 
-    public string KeyName { get; private set; }
 
+    /// <summary>
+    /// Wert wird nur gespeichert, für evtl. erweiterte Berechnungen
+    /// </summary>
+    public float Angle {
+        get => _angle;
+        set {
+            if (Math.Abs(_angle - value) < DefaultTolerance) { return; }
+            _angle = value;
+        }
+    }
+
+    /// <summary>
+    /// Wert wird nur gespeichert, für evtl. erweiterte Berechnungen
+    /// </summary>
+    public float Distance {
+        get => _distance;
+        set {
+            if (Math.Abs(_distance - value) < DefaultTolerance) { return; }
+            _distance = value;
+        }
+    }
+
+    public string KeyName { get; set; }
     public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
+    public bool MoveXByMouse { get; set; } = true;
+    public bool MoveYByMouse { get; set; } = true;
 
     public object? Parent {
         get => _parent;
@@ -116,7 +146,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         get => _x;
         set {
             if (Math.Abs(_x - value) < DefaultTolerance) { return; }
-            SetTo(value, _y);
+            SetTo(value, _y, false);
         }
     }
 
@@ -124,7 +154,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         get => _y;
         set {
             if (Math.Abs(_y - value) < DefaultTolerance) { return; }
-            SetTo(_x, value);
+            SetTo(_x, value, false);
         }
     }
 
@@ -148,7 +178,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public float DistanzZuLinie(PointM p1, PointM p2) => DistanzZuLinie(p1.X, p1.Y, p2.X, p2.Y);
 
-    public float DistanzZuLinie(float x1, float y1, float x2, float y2) => Lenght(this, PointOnLine(this, x1, y1, x2, y2));
+    public float DistanzZuLinie(float x1, float y1, float x2, float y2) => GetLenght(this, PointOnLine(this, x1, y1, x2, y2));
 
     public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
@@ -159,11 +189,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         Skin.Draw_Border(gr, type, state, r);
     }
 
-    public void Move(float x, float y) => SetTo(_x + x, _y + y);
+    public void Move(float x, float y, bool isMouse) => SetTo(_x + x, _y + y, isMouse);
 
     public void Normalize() {
         var magnitude = Magnitude;
-        SetTo(_x / magnitude, _y / magnitude);
+        SetTo(_x / magnitude, _y / magnitude, false);
     }
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
@@ -195,6 +225,14 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
                 _y = FloatParse(value);
                 return true;
 
+            case "distance":
+                _distance = FloatParse(value);
+                return true;
+
+            case "angle":
+                _angle = FloatParse(value);
+                return true;
+
             case "fix": // TODO: Entfernt, 24.05.2021
                 return true;
 
@@ -211,30 +249,30 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         return false;
     }
 
-    public void SetTo(float x, float y) {
+    public void SetTo(float x, float y, bool byMouse) {
         var mx = (float)Math.Round(x - _x, 6);
         var my = (float)Math.Round(y - _y, 6);
 
         if (mx == 0 && my == 0) { return; }
-        OnMoving(new MoveEventArgs(mx, my));
+        OnMoving(new MoveEventArgs(mx, my, byMouse));
         _x = x;
         _y = y;
-        OnMoved(new MoveEventArgs(mx, my));
+        OnMoved(new MoveEventArgs(mx, my, byMouse));
         OnPropertyChanged();
     }
 
-    public void SetTo(PointM startPoint, float länge, float alpha) {
+    public void SetTo(PointM startPoint, float länge, float alpha, bool byMouse) {
         var tempVar = PolarToCartesian(länge, alpha);
-        SetTo(startPoint.X + tempVar.X, Y = startPoint.Y + tempVar.Y);
+        SetTo(startPoint.X + tempVar.X, Y = startPoint.Y + tempVar.Y, byMouse);
     }
 
-    public void SetTo(PointF point) => SetTo(point.X, point.Y);
+    public void SetTo(PointF point, bool byMouse) => SetTo(point.X, point.Y, byMouse);
 
-    public void SetTo(PointM point) => SetTo(point.X, point.Y);
+    public void SetTo(PointM point, bool byMouse) => SetTo(point.X, point.Y, byMouse);
 
-    public void SetTo(Point point) => SetTo(point.X, (float)point.Y);
+    public void SetTo(Point point, bool byMouse) => SetTo(point.X, (float)point.Y, byMouse);
 
-    public void SetTo(int x, int y) => SetTo(x, (float)y);
+    public void SetTo(int x, int y, bool byMouse) => SetTo(x, (float)y, byMouse);
 
     public string ToParseableString() {
         List<string> result = [];
@@ -258,6 +296,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         result.ParseableAdd("Name", KeyName);
         result.ParseableAdd("X", _x);
         result.ParseableAdd("Y", _y);
+        result.ParseableAdd("Distance", _distance);
+        result.ParseableAdd("Angle", _angle);
         //result.ParseableAdd("Tag", _tag);
         return result.Parseable();
     }

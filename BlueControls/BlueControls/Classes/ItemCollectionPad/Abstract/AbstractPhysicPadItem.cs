@@ -326,8 +326,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         return union;
     }
 
-    public void Move(PointM v) => Move(v.X, v.Y);
-
+ 
     //http://csharphelper.com/blog/2014/07/determine-whether-a-point-is-inside-a-polygon-in-c/
     // Alternative:  https://stackoverflow.com/questions/4243042/c-sharp-point-in-polygon
     // Return True if the point is in the polygon.

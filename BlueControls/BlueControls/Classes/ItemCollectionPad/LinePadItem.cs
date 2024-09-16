@@ -55,8 +55,8 @@ public class LinePadItem : AbstractPadItem {
     public LinePadItem(string keyName, PadStyles format, Point point1, Point point2) : base(keyName) {
         _point1 = new PointM(this, "Punkt 1", 0, 0);
         _point2 = new PointM(this, "Punkt 2", 0, 0);
-        _point1.SetTo(point1);
-        _point2.SetTo(point2);
+        _point1.SetTo(point1, false);
+        _point2.SetTo(point2, false);
         MovablePoint.Add(_point1);
         MovablePoint.Add(_point2);
         PointsForSuccesfullyMove.AddRange(MovablePoint);
@@ -128,8 +128,8 @@ public class LinePadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
-        _point1.SetTo(x, y + (height / 2));
-        _point2.SetTo(x + width, y + (height / 2));
+        _point1.SetTo(x, y + (height / 2), false);
+        _point2.SetTo(x + width, y + (height / 2), false);
     }
 
     public override bool ParseThis(string key, string value) {
@@ -142,6 +142,13 @@ public class LinePadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
+        if (sender is not PointM point) { return; }
+
+        if (JointPoints.Contains(point)) {
+            base.PointMoved(sender, e);
+            return;
+        }
+
         CalcTempPoints();
         CalculateJointMiddle(_point1, _point2);
         base.PointMoved(sender, e);

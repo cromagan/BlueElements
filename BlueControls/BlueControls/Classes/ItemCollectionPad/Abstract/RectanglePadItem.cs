@@ -54,6 +54,12 @@ public abstract class RectanglePadItem : AbstractPadItem {
         _pr = new PointM(this, "R", 0, 0);
         _po = new PointM(this, "O", 0, 0);
         _pu = new PointM(this, "U", 0, 0);
+
+        _po.MoveXByMouse = false;
+        _pu.MoveXByMouse = false;
+        _pl.MoveYByMouse = false;
+        _pr.MoveYByMouse = false;
+
         MovablePoint.Add(_pLo);
         MovablePoint.Add(_pRo);
         MovablePoint.Add(_pLu);
@@ -118,6 +124,10 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
+        if(JointPoints.Contains(point)) {
+            base.PointMoved(sender, e);
+            return; 
+        }
 
         var x = point.X;
         var y = point.Y;
@@ -153,13 +163,11 @@ public abstract class RectanglePadItem : AbstractPadItem {
         }
 
         if (point == _pl) {
-            CalculateJointMiddle(_pl, _pr);
             _pLo.X = x;
             _pLu.X = x;
         }
 
         if (point == _pr) {
-            CalculateJointMiddle(_pl, _pr);
             _pRo.X = x;
             _pRu.X = x;
         }
@@ -172,20 +180,21 @@ public abstract class RectanglePadItem : AbstractPadItem {
         if (!overrideFixedSize) {
             var vr = r.PointOf(Alignment.Horizontal_Vertical_Center);
             var ur = UsedArea;
-            _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-            _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height);
+            _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2), false);
+            _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height, false);
         } else {
-            _pLo.SetTo(r.PointOf(Alignment.Top_Left));
-            _pRu.SetTo(r.PointOf(Alignment.Bottom_Right));
+            _pLo.SetTo(r.PointOf(Alignment.Top_Left), false);
+            _pRu.SetTo(r.PointOf(Alignment.Bottom_Right), false);
         }
     }
 
     public virtual void SizeChanged() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
-        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
+        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
+        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
+        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y, false);
+        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y, false);
+        CalculateJointMiddle(_pl, _pr);
     }
 
     public override string ToParseableString() {

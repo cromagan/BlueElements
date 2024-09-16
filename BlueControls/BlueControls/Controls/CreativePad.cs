@@ -134,8 +134,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
 
-    public AbstractPadItem? HotItem { get; private set; }
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -196,35 +194,55 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        AbstractPadItem? thisItem = null;
 
-        if (e.HotItem is AbstractPadItem item) { thisItem = item; }
 
-        if (thisItem != null) {
+        if (e.HotItem is AbstractPadItem item) {
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "#vordergrund":
-                    thisItem.Parent?.InDenVordergrund(thisItem);
+                    item.Parent?.InDenVordergrund(item);
                     return;
 
                 case "#hintergrund":
-                    thisItem.Parent?.InDenHintergrund(thisItem);
+                    item.Parent?.InDenHintergrund(item);
                     return;
 
                 case "#vorne":
-                    thisItem.Parent?.EineEbeneNachVorne(thisItem);
+                    item.Parent?.EineEbeneNachVorne(item);
                     return;
 
                 case "#hinten":
-                    thisItem.Parent?.EineEbeneNachHinten(thisItem);
+                    item.Parent?.EineEbeneNachHinten(item);
                     return;
 
                 case "#duplicate":
-                    var n = (AbstractPadItem)((ICloneable)thisItem).Clone();
+                    var n = (AbstractPadItem)((ICloneable)item).Clone();
                     n.KeyName = Generic.GetUniqueKey();
                     _items?.Add(n);
                     return;
             }
         }
+
+        if (e.HotItem is PointM pm) {
+
+            switch (e.Item.KeyName.ToLowerInvariant()) {
+                case "löschen":
+                    if (pm.Parent is AbstractPadItem api) {
+                        api.JointPoints.Remove(pm);
+                    }
+
+                    return;
+
+                case "umbenennen":
+                    var t = Forms.InputBox.Show("Neuer Name:", pm.KeyName, BlueBasics.FormatHolder.SystemName);
+                    if (!string.IsNullOrEmpty(t)) {
+                        pm.KeyName = t;
+                    }
+                    return;
+            }
+        }
+
+
+
 
         OnContextMenuItemClicked(e);
     }
@@ -274,22 +292,34 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
 
-        if(!EditAllowed) {return;}
+        if (!EditAllowed) { return; }
 
-        CheckHotItem(e.Mouse, true);
-        e.HotItem = HotItem;
+        var hotitem = GetHotItem(e.Mouse);
 
-        if (e.HotItem != null) {
+
+        if (hotitem is AbstractPadItem bpi) {
+            LastClickedItem = bpi;
+            e.HotItem = bpi;
             e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
-            //items.GenerateAndAdd("Objekt bearbeiten", "#Erweitert", ImageCode.Stift);
-            //items.Add(AddSeparator());
             e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
             e.ContextMenu.Add(Separator());
             e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
             e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
             e.ContextMenu.Add(ItemOf("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));
             e.ContextMenu.Add(ItemOf("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten));
+
+            return;
         }
+
+        LastClickedItem = null;
+
+        if (hotitem is PointM pm) {
+            e.HotItem = pm;
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen)); 
+        }
+
+
 
         OnContextMenuInit(e);
     }
@@ -393,30 +423,32 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     internal void DoMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
-        CheckHotItem(e, true);
         if (!EditAllowed) { return; }
+
+        var hotitem = GetHotItem(e);
+
         _lastQuickInfo = string.Empty;
-        if (HotItem is IMouseAndKeyHandle ho2) {
+        if (hotitem is IMouseAndKeyHandle ho2) {
             if (ho2.MouseDown(e, Zoom, ShiftX, ShiftY)) {
                 _givesMouseCommandsTo = ho2;
                 return;
             }
         }
+
         if (e.Button == MouseButtons.Left) {
             var p = KoordinatesUnscaled(e);
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (Lenght(thisPoint, p) < 5f / Zoom) {
+                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
-
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (Lenght(thisPoint, p) < 5f / Zoom) {
+                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -424,18 +456,30 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     }
                 }
             }
-            SelectItem(HotItem, ModifierKeys.HasFlag(Keys.Control));
+
+            if (hotitem is IMoveable imv) {
+                SelectItem(imv, ModifierKeys.HasFlag(Keys.Control));
+            }
+
+            if (hotitem is AbstractPadItem api) {
+                LastClickedItem = api;
+            } else {
+                LastClickedItem = null;
+            }
+
+
         }
     }
 
     internal void DoMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
-        if (e.Button == MouseButtons.None) {
-            CheckHotItem(e, false); // Für QuickInfo usw.
-        }
+
+        var hotitem = GetHotItem(e);
+
         if (!EditAllowed) { return; }
+
         if (_givesMouseCommandsTo != null) {
-            if (e.Button == MouseButtons.None && HotItem != _givesMouseCommandsTo) {
+            if (e.Button == MouseButtons.None && hotitem != _givesMouseCommandsTo) {
                 _givesMouseCommandsTo = null;
                 Invalidate();
             } else {
@@ -447,7 +491,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 }
             }
         } else {
-            if (HotItem is IMouseAndKeyHandle ho2) {
+            if (hotitem is IMouseAndKeyHandle ho2) {
                 if (ho2.MouseMove(e, Zoom, ShiftX, ShiftY)) {
                     _givesMouseCommandsTo = ho2;
                     Invalidate();
@@ -456,14 +500,18 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             }
 
             _lastQuickInfo = string.Empty;
-            if (HotItem != null && e.Button == MouseButtons.None) {
-                if (!string.IsNullOrEmpty(HotItem.QuickInfo)) {
-                    _lastQuickInfo = HotItem.QuickInfo + "<hr>" + HotItem.Description;
+
+
+            if (hotitem is AbstractPadItem bpi && e.Button == MouseButtons.None) {
+                if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
+                    _lastQuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
                 } else {
-                    _lastQuickInfo = HotItem.Description;
+                    _lastQuickInfo = bpi.Description;
                 }
             }
+
         }
+
         if (e.Button == MouseButtons.Left) {
             _lastQuickInfo = string.Empty;
             MoveItemsWithMouse();
@@ -539,19 +587,28 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     }
                     foreach (var p in bpi.JointPoints) {
                         p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Joint, States.Standard);
-           
+
                         var t = p.ZoomAndMove(Zoom, ShiftX, ShiftY);
-                        Rectangle r = new((int)(t.X+ 5), (int)(t.Y+0),200, 200);
+                        Rectangle r = new((int)(t.X + 5), (int)(t.Y + 0), 200, 200);
                         Skin.Draw_FormatedText(gr, p.KeyName, Design.Button_EckpunktSchieber_Joint, States.Standard, null, Alignment.Top_Left, r, null, false, false);
 
                     }
 
+                    if (bpi.JointPoints.Count > 0) {
+                        bpi.JointMiddle.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
+                    }
                 }
                 if (thisItem is PointM p2) {
                     if (p2.Parent is AbstractPadItem bpi2) {
+                        foreach (var p in bpi2.JointPoints) {
+                            p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
+                        }
+
+
                         foreach (var p in bpi2.MovablePoint) {
                             p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
                         }
+
                     }
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
@@ -599,9 +656,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         if (IsDisposed) { return; }
         if (Fitting) { ZoomFit(); }
 
-        CheckHotItem(null, true);
         Unselect();
-        //ZoomFit();
         Invalidate();
         OnItemRemoved();
     }
@@ -611,24 +666,45 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnItemRemoving(e);
     }
 
-    private void CheckHotItem(MouseEventArgs? e, bool doLastClicked) {
+    private object? GetHotItem(MouseEventArgs? e) {
+        if (e == null) { return null; }
+
+
         var l = HotItems(e);
         var mina = long.MaxValue;
-        HotItem = null;
-        if (e != null) {
-            foreach (var thisItem in l) {
-                var a = (long)Math.Abs(thisItem.UsedArea.Width) * (long)Math.Abs(thisItem.UsedArea.Height);
-                if (a <= mina) {
-                    // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
-                    mina = a;
-                    HotItem = thisItem;
-                }
+        object? tmp = null;
+
+
+        foreach (var thisItem in l) {
+            var a = (long)Math.Abs(thisItem.UsedArea.Width) * (long)Math.Abs(thisItem.UsedArea.Height);
+            if (a <= mina) {
+                // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
+                mina = a;
+                tmp = thisItem;
             }
         }
 
-        if (doLastClicked) {
-            LastClickedItem = HotItem;
+        if (LastClickedItem is AbstractPadItem bpi) {
+
+            foreach (var thisPoint in bpi.JointPoints) {
+                Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
+
+
+                if (GetLenght(thisPoint.X, thisPoint.Y, p.X, p.Y) < 5f / Zoom) {
+                    tmp = thisPoint;
+                }
+
+            }
+
+
         }
+
+
+
+
+        return tmp;
+
+
     }
 
     private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
@@ -654,6 +730,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         foreach (var thisIt in _itemsToMove) {
             if (thisIt is PointM p) { pointToMove = p; break; }
         }
+
         if (pointToMove == null) {
             foreach (var thisIt in _itemsToMove) {
                 if (thisIt is AbstractPadItem { PointsForSuccesfullyMove.Count: > 0 } bpi) {
@@ -662,14 +739,23 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 }
             }
         }
-        if (pointToMove != null && x != 0f) { x = SnapToGrid(true, pointToMove, x); }
-        if (pointToMove != null && y != 0f) { y = SnapToGrid(false, pointToMove, y); }
+
+        if (pointToMove != null) {
+            if (x != 0f) { x = SnapToGrid(true, pointToMove, x); }
+            if (y != 0f) { y = SnapToGrid(false, pointToMove, y); }
+        }
+
+        foreach (var thisIt in _itemsToMove) {
+            if (!thisIt.MoveXByMouse) { x = 0f; }
+            if (!thisIt.MoveYByMouse) { y = 0f; }
+        }
 
         if (x == 0f && y == 0f) { return; }
 
         foreach (var thisIt in _itemsToMove) {
-            thisIt.Move(x, y);
+            thisIt.Move(x, y, modifyMouseDown);
         }
+
         if (doSnap && modifyMouseDown) {
             // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
             MouseDownPos11 = new Point((int)(MouseDownPos11.X + x), (int)(MouseDownPos11.Y + y));

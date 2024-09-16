@@ -26,6 +26,7 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
@@ -74,12 +75,12 @@ public class DimensionPadItem : AbstractPadItem {
     public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
 
     public DimensionPadItem(string keyName, PointM? point1, PointM? point2, float abstandinMm) : base(keyName) {
-        if (point1 != null) { _point1.SetTo(point1.X, point1.Y); }
-        if (point2 != null) { _point2.SetTo(point2.X, point2.Y); }
+        if (point1 != null) { _point1.SetTo(point1.X, point1.Y, false); }
+        if (point2 != null) { _point2.SetTo(point2.X, point2.Y, false); }
         ComputeData();
 
         var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPad.Dpi), _winkel - 90f);
-        _textPoint.SetTo(_point1, _länge / 2, _winkel);
+        _textPoint.SetTo(_point1, _länge / 2, _winkel, false);
         _textPoint.X += a.X;
         _textPoint.Y += a.Y;
 
@@ -171,7 +172,7 @@ public class DimensionPadItem : AbstractPadItem {
                || value.DistanzZuStrecke(_point2, _bezugslinie2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _schnittPunkt2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _textPoint) < ne
-               || Lenght(new PointM(value), _textPoint) < ne * 10;
+               || GetLenght(new PointM(value), _textPoint) < ne * 10;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -190,9 +191,9 @@ public class DimensionPadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
-        _point1.SetTo(x, y + height);
-        _point2.SetTo(x + width, y + height);
-        _textPoint.SetTo(x + (width / 2), y);
+        _point1.SetTo(x, y + height, false);
+        _point2.SetTo(x + width, y + height, false);
+        _textPoint.SetTo(x + (width / 2), y, false);
     }
 
     public override void ParseFinished(string parsed) {
@@ -244,6 +245,13 @@ public class DimensionPadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
+        if (sender is not PointM point) { return; }
+
+        if (JointPoints.Contains(point)) {
+            base.PointMoved(sender, e);
+            return;
+        }
+
         CalculateOtherPoints();
         base.PointMoved(sender, e);
     }
@@ -347,20 +355,20 @@ public class DimensionPadItem : AbstractPadItem {
         //Gegeben sind:
         // Point1, Point2 und Textpoint
         var maßL = _textPoint.DistanzZuLinie(_point1, _point2);
-        _schnittPunkt1.SetTo(_point1, maßL, _winkel - 90);
-        _schnittPunkt2.SetTo(_point2, maßL, _winkel - 90);
+        _schnittPunkt1.SetTo(_point1, maßL, _winkel - 90, false);
+        _schnittPunkt2.SetTo(_point2, maßL, _winkel - 90, false);
         if (_textPoint.DistanzZuLinie(_schnittPunkt1, _schnittPunkt2) > 0.5d) {
-            _schnittPunkt1.SetTo(_point1, maßL, _winkel + 90);
-            _schnittPunkt2.SetTo(_point2, maßL, _winkel + 90);
+            _schnittPunkt1.SetTo(_point1, maßL, _winkel + 90, false);
+            _schnittPunkt2.SetTo(_point2, maßL, _winkel + 90, false);
             tmppW = 90;
         }
-        _bezugslinie1.SetTo(_schnittPunkt1, mhlAb, _winkel + tmppW);
-        _bezugslinie2.SetTo(_schnittPunkt2, mhlAb, _winkel + tmppW);
+        _bezugslinie1.SetTo(_schnittPunkt1, mhlAb, _winkel + tmppW, false);
+        _bezugslinie2.SetTo(_schnittPunkt2, mhlAb, _winkel + tmppW, false);
     }
 
     private void ComputeData() {
-        _länge = Lenght(_point1, _point2);
-        _winkel = Angle(_point1, _point2);
+        _länge = GetLenght(_point1, _point2);
+        _winkel = GetAngle(_point1, _point2);
     }
 
     #endregion

@@ -55,7 +55,7 @@ public partial class InputBox : DialogWithOkAndCancel {
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="vorschlagsText"></param>
-    /// <param name="textformat">Beispiel: BlueDatabase.FormatHolder.Text</param>
+    /// <param name="textformat">Beispiel: BlueBasics.FormatHolder oder BlueDatabase.FormatHolder.Text</param>
     /// <returns></returns>
 
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat) => Show(txt, vorschlagsText, textformat, false);

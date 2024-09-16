@@ -168,8 +168,8 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
-        P1.SetTo(x + (width / 2), y);
-        P2.SetTo(x + (width / 2), y + height);
+        P1.SetTo(x + (width / 2), y, false);
+        P2.SetTo(x + (width / 2), y + height, false);
     }
 
 
@@ -197,20 +197,20 @@ public class ComicCompPadItem : AbstractPadItem {
 
     public void SetCoordinates(Rectangle r) {
         _width = r.Width;
-        P1.SetTo(r.PointOf(Alignment.Top_HorizontalCenter));
-        P2.SetTo(r.PointOf(Alignment.Bottom_HorizontalCenter));
+        P1.SetTo(r.PointOf(Alignment.Top_HorizontalCenter), false);
+        P2.SetTo(r.PointOf(Alignment.Bottom_HorizontalCenter), false);
     }
 
     public override string ToParseableString() => string.Empty;
 
     protected override RectangleF CalculateUsedArea() {
         //var wp12 = AngleOfMiddleLine();
-        var angleOfMiddleLine = Angle(P1, JointMiddle);
+        var angleOfMiddleLine = GetAngle(P1, JointMiddle);
 
-        _ber_Lo.SetTo(P1, _width / 2, angleOfMiddleLine - 90);
-        _ber_Ro.SetTo(P1, _width / 2, angleOfMiddleLine + 90);
-        _ber_Lu.SetTo(P2, _width / 2, angleOfMiddleLine - 90);
-        _ber_Ru.SetTo(P2, _width / 2, angleOfMiddleLine + 90);
+        _ber_Lo.SetTo(P1, _width / 2, angleOfMiddleLine - 90, false);
+        _ber_Ro.SetTo(P1, _width / 2, angleOfMiddleLine + 90, false);
+        _ber_Lu.SetTo(P2, _width / 2, angleOfMiddleLine - 90, false);
+        _ber_Ru.SetTo(P2, _width / 2, angleOfMiddleLine + 90, false);
         var x = new List<PointM>
         {
             P1,

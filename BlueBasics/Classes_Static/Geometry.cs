@@ -61,11 +61,20 @@ public static class Geometry {
         var sp = PointOnLine(new PointF(p.X, p.Y), x1, y1, x2, y2);
         PointF p1 = new(p.X, p.Y);
         return sp.PointInRect(x1, y1, x2, y2, 5)
-            ? Lenght(p1, sp)
-            : Math.Min(Lenght(new PointF(x1, y1), p1), Lenght(new PointF(x2, x2), p1));
+            ? GetLenght(p1, sp)
+            : Math.Min(GetLenght(new PointF(x1, y1), p1), GetLenght(new PointF(x2, x2), p1));
     }
 
     public static float GetAngle(PointF sp, PointF eP) => GetAngle(sp.X, sp.Y, eP.X, eP.Y);
+
+    public static float GetLenght(float x1, float y1, float x2, float y2) {
+        // Berechnet die Länge einer Strecke
+        float l1 = x1-x2;
+        float l2 = y1-y2;
+        // ^2 ist langsamer, laut Project Analyzer
+        return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
+    }
+
 
     public static float GetAngle(float x1, float y1, float x2, float y2) {
         // http://de.wikipedia.org/wiki/Polarkoordinaten
@@ -82,21 +91,13 @@ public static class Geometry {
         return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
     }
 
-    public static float GetLenght(PointF sP, PointF ep) {
-        // Berechnet die Länge einer Strecke
-        var l1 = sP.X - ep.X;
-        var l2 = sP.Y - ep.Y;
-        // ^2 ist langsamer, laut Project Analyzer
-        return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
-    }
-
     /// <summary>
     /// Berechnet die Länge einer Strecke
     /// </summary>
     /// <param name="sp"></param>
     /// <param name="ep"></param>
     /// <returns></returns>
-    public static float Lenght(PointF sp, PointF ep) {
+    public static float GetLenght(PointF sp, PointF ep) {
         var l1 = sp.X - ep.X;
         var l2 = sp.Y - ep.Y;
         return (float)Math.Sqrt((l1 * l1) + (l2 * l2)); // ^ 2 ist langsamer, laut Project Analyzer
@@ -197,8 +198,6 @@ public static class Geometry {
     public static float Sinus(float winkel) => (float)Math.Sin(winkel * Rad);
 
     public static float Tangens(float winkel) => (float)Math.Tan(winkel * Rad);
-
-    public static float Angle(PointF sp, PointF ep) => GetAngle(sp.X, sp.Y, ep.X, ep.Y);
 
     #endregion
 }

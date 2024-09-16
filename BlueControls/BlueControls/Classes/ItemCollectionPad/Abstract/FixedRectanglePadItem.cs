@@ -60,6 +60,13 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         _pr = new PointM(this, "R", 0, 0);
         _po = new PointM(this, "O", 0, 0);
         _pu = new PointM(this, "U", 0, 0);
+
+
+        _po.MoveXByMouse = false;
+        _pu.MoveXByMouse = false;
+        _pl.MoveYByMouse = false;
+        _pr.MoveYByMouse = false;
+
         MovablePoint.Add(_pLo);
         MovablePoint.Add(_pRo);
         MovablePoint.Add(_pLu);
@@ -86,15 +93,17 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
-        var x = 0f;
-        var y = 0f;
+        if (sender is not PointM point) { return; }
 
-        var point = (PointM)sender;
-
-        if (point != null) {
-            x = point.X;
-            y = point.Y;
+        if (JointPoints.Contains(point)) {
+            base.PointMoved(sender, e);
+            return;
         }
+
+        var x =  point.X;
+        var y = point.Y;
+
+   
 
         if (point == _pLo) {
             _pRu.Y = y + Size.Height;
@@ -133,13 +142,13 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         if (point == _pl) {
-            CalculateJointMiddle(_pl, _pr);
+
             _pLo.X = x;
             _pLu.X = x;
         }
 
         if (point == _pr) {
-            CalculateJointMiddle(_pl, _pr);
+   
             _pRo.X = x;
             _pRu.X = x;
         }
@@ -148,14 +157,15 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         base.PointMoved(sender, e);
     }
 
-    public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y);
+    public void SetLeftTopPoint(float x, float y) => _pLo.SetTo(x, y, false);
 
     public void SizeChanged() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
-        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
-        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
+        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
+        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
+        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y, false);
+        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y, false);
+        CalculateJointMiddle(_pl, _pr);
     }
 
     protected override RectangleF CalculateUsedArea() {

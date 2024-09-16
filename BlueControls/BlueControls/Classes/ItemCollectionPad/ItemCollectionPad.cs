@@ -978,10 +978,10 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         var rl = (float)Math.Round(MmToPixel(_randinMm.Left, Dpi), 1, MidpointRounding.AwayFromZero);
         var ro = (float)Math.Round(MmToPixel(_randinMm.Top, Dpi), 1, MidpointRounding.AwayFromZero);
         var ru = (float)Math.Round(MmToPixel(_randinMm.Bottom, Dpi), 1, MidpointRounding.AwayFromZero);
-        _prLo.SetTo(rl, ro);
-        _prRo.SetTo(ssw - rr, ro);
-        _prRu.SetTo(ssw - rr, ssh - ru);
-        _prLu.SetTo(rl, ssh - ru);
+        _prLo.SetTo(rl, ro, false);
+        _prRo.SetTo(ssw - rr, ro, false);
+        _prRu.SetTo(ssw - rr, ssh - ru, false);
+        _prLu.SetTo(rl, ssh - ru, false);
     }
 
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
