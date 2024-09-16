@@ -33,10 +33,6 @@ namespace BlueControls.ItemCollectionPad;
 
 public class DynamicSymbolPadItem : RectanglePadItem {
 
-    public override string ReadableText() => "Bild";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
-
     #region Fields
 
     private string _script = string.Empty;
@@ -126,6 +122,10 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         return base.ParseThis(key, value);
     }
 
+    public override string ReadableText() => "Dynamisches Symbol";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
+
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
@@ -134,7 +134,6 @@ public class DynamicSymbolPadItem : RectanglePadItem {
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-
         Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Enums.Design.TextBox, Enums.States.Standard, BlueDatabase.Enums.TranslationType.Original_Anzeigen, Alignment.Left, zoom);
 
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);

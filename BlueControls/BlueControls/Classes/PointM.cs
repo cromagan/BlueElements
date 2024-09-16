@@ -112,7 +112,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         }
     }
 
-
     public float X {
         get => _x;
         set {
@@ -154,9 +153,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
     public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Design type, States state) {
-        var tx = (_x * zoom) - shiftX + (zoom / 2);
-        var ty = (_y * zoom) - shiftY + (zoom / 2);
-        Rectangle r = new((int)(tx - 4), (int)(ty - 4), 9, 9);
+        var t = ZoomAndMove(zoom, shiftX, shiftY);
+        Rectangle r = new((int)(t.X - 4), (int)(t.Y - 4), 9, 9);
         Skin.Draw_Back(gr, type, state, r, null, false);
         Skin.Draw_Border(gr, type, state, r);
     }

@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -46,8 +45,6 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     #endregion
 
     #region Constructors
-
-    public TabFormulaPadItem() : this(Generic.GetUniqueKey(), null) { }
 
     public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         if (ParentFormula != null) {
@@ -239,19 +236,11 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override string ReadableText() {
         const string txt = "Formulare: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
     public override string ToParseableString() {

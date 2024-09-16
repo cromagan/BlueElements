@@ -274,7 +274,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         da.TableEnd();
         da.AddFoot();
-        da.Save(TempFile("", "Spaltenliste.html"), true);
+        da.Save(TempFile(string.Empty, "Spaltenliste.html"), true);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();

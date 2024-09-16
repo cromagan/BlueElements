@@ -34,13 +34,10 @@ namespace BlueControls.ItemCollectionPad;
 
 public class DimensionPadItem : AbstractPadItem {
 
-    public override string ReadableText() => "Bild";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
-
     #region Fields
 
     private readonly PointM _bezugslinie1 = new(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
+
     private readonly PointM _bezugslinie2 = new(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
 
     /// <summary>
@@ -54,6 +51,7 @@ public class DimensionPadItem : AbstractPadItem {
     private readonly PointM _point2 = new(null, "Punkt 2", 0, 0);
 
     private readonly PointM _schnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
+
     private readonly PointM _schnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
 
     /// <summary>
@@ -62,7 +60,9 @@ public class DimensionPadItem : AbstractPadItem {
     private readonly PointM _textPoint = new(null, "Mitte Text", 0, 0);
 
     private float _länge;
+
     private string _textOben = string.Empty;
+
     private float _winkel;
 
     #endregion
@@ -111,9 +111,13 @@ public class DimensionPadItem : AbstractPadItem {
     #region Properties
 
     public static string ClassId => "DIMENSION";
+
     public override string Description => string.Empty;
+
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
+
     public override string MyClassId => ClassId;
+
     public int Nachkommastellen { get; set; }
 
     public string Präfix { get; set; } = string.Empty;
@@ -239,10 +243,14 @@ public class DimensionPadItem : AbstractPadItem {
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) { 
+    public override void PointMoved(object sender, MoveEventArgs e) {
         CalculateOtherPoints();
         base.PointMoved(sender, e);
     }
+
+    public override string ReadableText() => "Bemaßung";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

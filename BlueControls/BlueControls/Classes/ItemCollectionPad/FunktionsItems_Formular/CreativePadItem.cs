@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -43,8 +42,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     #endregion
 
     #region Constructors
-
-    public CreativePadItem() : this(string.Empty, null) { }
 
     public CreativePadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
@@ -134,19 +131,11 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     public override string ReadableText() {
         const string txt = "Layout-Generator: ";
 
-        if (this.IsOk()) {
-            return txt + _formular;
-        }
-
-        return txt + ErrorReason();
+        return txt + _formular;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
     public override string ToParseableString() {

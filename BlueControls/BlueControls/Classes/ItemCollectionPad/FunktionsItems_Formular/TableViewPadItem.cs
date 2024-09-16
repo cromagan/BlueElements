@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -50,8 +49,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     #endregion
 
     #region Constructors
-
-    public TableViewPadItem() : this(string.Empty) { }
 
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
@@ -146,21 +143,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public override string ReadableText() {
         const string txt = "Tabellenansicht: ";
 
-        if (this.IsOk() && DatabaseOutput != null) {
-            return txt + DatabaseOutput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-
-            //return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
     public override string ToParseableString() {

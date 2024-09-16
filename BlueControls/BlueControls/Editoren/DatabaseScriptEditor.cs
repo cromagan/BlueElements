@@ -73,7 +73,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 " ",
                 Database.ScriptNeedFix
             };
-            l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
+            l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
         }
 
         Database.ScriptNeedFix = string.Empty;
@@ -324,7 +324,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
         }
         // Schreiben der Liste in eine temporäre Datei
-        l.WriteAllText(TempFile("", "Scrip.txt"), Win1252, true);
+        l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
     }
 
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {

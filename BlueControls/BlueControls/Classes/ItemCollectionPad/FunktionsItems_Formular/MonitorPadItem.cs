@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -32,8 +31,6 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
-
-    public MonitorPadItem() : this(string.Empty) { }
 
     public MonitorPadItem(string keyName) : this(keyName, null) { }
 
@@ -70,18 +67,11 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public override string ReadableText() {
         const string txt = "Monitor: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Textdatei, 16);
-        }
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Textdatei, 16);
     }
 
     public override string ToParseableString() {

@@ -102,6 +102,7 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
         if (!CFormula.ConnectedFormula.LockEditing()) { return; }
 
         using var x = new ConnectedFormulaEditor(CFormula.ConnectedFormula.Filename, null);
+        if (x.IsClosed || x.IsDisposed) { return; }
         x.ShowDialog();
         CFormula.ConnectedFormula.UnlockEditing();
         CFormula.InvalidateView();

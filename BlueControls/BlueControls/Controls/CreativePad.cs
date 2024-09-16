@@ -407,6 +407,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
+                        foreach (var thisPoint in bpi.JointPoints) {
+                            if (Lenght(thisPoint, p) < 5f / Zoom) {
+                                SelectItem(thisPoint, false);
+                                return;
+                            }
+                        }
+
+
                         foreach (var thisPoint in bpi.MovablePoint) {
                             if (Lenght(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
@@ -529,6 +537,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     foreach (var p in bpi.MovablePoint) {
                         p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                     }
+                    foreach (var p in bpi.JointPoints) {
+                        p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Joint, States.Standard);
+           
+                        var t = p.ZoomAndMove(Zoom, ShiftX, ShiftY);
+                        Rectangle r = new((int)(t.X+ 5), (int)(t.Y+0),200, 200);
+                        Skin.Draw_FormatedText(gr, p.KeyName, Design.Button_EckpunktSchieber_Joint, States.Standard, null, Alignment.Top_Left, r, null, false, false);
+
+                    }
+
                 }
                 if (thisItem is PointM p2) {
                     if (p2.Parent is AbstractPadItem bpi2) {

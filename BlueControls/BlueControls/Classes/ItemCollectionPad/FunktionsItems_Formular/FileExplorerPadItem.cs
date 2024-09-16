@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -44,8 +43,6 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     #endregion
 
     #region Constructors
-
-    public FileExplorerPadItem() : this(string.Empty) { }
 
     public FileExplorerPadItem(string keyName) : this(keyName, null) { }
 
@@ -189,19 +186,11 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     public override string ReadableText() {
         const string txt = "Dateisystem: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
     public override string ToParseableString() {

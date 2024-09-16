@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -48,8 +47,6 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     #endregion
 
     #region Constructors
-
-    public DropDownSelectRowPadItem() : this(string.Empty) { }
 
     public DropDownSelectRowPadItem(string keyName) : this(keyName, null, null) { }
 
@@ -163,19 +160,11 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     public override string ReadableText() {
         const string txt = "Zeilenauswahl: ";
 
-        if (this.IsOk() && DatabaseOutput != null) {
-            return txt + DatabaseOutput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
     public override string ToParseableString() {

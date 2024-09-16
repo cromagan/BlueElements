@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -46,8 +45,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     #endregion
 
     #region Constructors
-
-    public FilterConverterElementPadItem() : this(string.Empty) { }
 
     public FilterConverterElementPadItem(string keyName) : this(keyName, null, null) { }
 
@@ -228,23 +225,17 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override string ReadableText() {
-        const string txt = "Filter: ";
+        const string txt = "Filter-Konvertierer: ";
 
-        if (this.IsOk() && DatabaseOutput != null) {
-            return txt + DatabaseOutput.Caption;
-        }
+    
+            return txt + DatabaseOutput?.Caption;
 
-        return txt + ErrorReason();
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
+
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-            //return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
     public override string ToParseableString() {

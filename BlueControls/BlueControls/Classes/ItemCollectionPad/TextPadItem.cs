@@ -32,15 +32,10 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 using static BlueBasics.Converter;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls.ItemCollectionPad;
 
 public class TextPadItem : RectanglePadItem, ICanHaveVariables {
-
-    public override string ReadableText() => "Text";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
     #region Fields
 
@@ -75,7 +70,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         InvalidateText();
     }
 
-
     #endregion
 
     #region Properties
@@ -94,6 +88,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     public override string Description => string.Empty;
+
     public override string MyClassId => ClassId;
 
     //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
@@ -169,6 +164,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override void ProcessStyleChange() => InvalidateText();
 
+    public override string ReadableText() => "Text";
+
     /// <summary>
     /// Löst die angegebene Variable in _text_replaced auf, falls diese (noch) vorhanden ist.
     /// </summary>
@@ -198,6 +195,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         base.SizeChanged();
         InvalidateText();
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

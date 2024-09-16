@@ -779,6 +779,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         using var x = new ConnectedFormulaEditor(db.FormulaFileName(), null);
+
+        if (x.IsClosed || x.IsDisposed) { return; }
+
         x.ShowDialog();
     }
 

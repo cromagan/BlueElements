@@ -1135,7 +1135,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return Database.Export_CSV(firstRow, l, RowsVisibleUnique());
     }
 
-    public void Export_HTML(string filename = "", bool execute = true) {
+    public void Export_HTML(string filename ="", bool execute = true) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 

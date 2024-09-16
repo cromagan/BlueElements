@@ -54,7 +54,7 @@ namespace BlueControls.Forms {
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabRightSide = new BlueControls.Controls.TabControl();
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
-            this.btnWeitere = new BlueControls.Controls.Button();
+            this.btnWeitereAllItem = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -163,7 +163,7 @@ namespace BlueControls.Forms {
             // 
             this.grpKomponenteHinzufügen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpKomponenteHinzufügen.CausesValidation = false;
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitere);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitereAllItem);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDynamicSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddPhsyik);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
@@ -398,15 +398,15 @@ namespace BlueControls.Forms {
             this.tabElementEigenschaften.TabIndex = 0;
             this.tabElementEigenschaften.Text = "Element-Eigenschaften";
             // 
-            // btnWeitere
+            // btnWeitereAllItem
             // 
-            this.btnWeitere.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnWeitere.Location = new System.Drawing.Point(192, 46);
-            this.btnWeitere.Name = "btnWeitere";
-            this.btnWeitere.Size = new System.Drawing.Size(88, 22);
-            this.btnWeitere.TabIndex = 12;
-            this.btnWeitere.Text = "weitere...";
-            this.btnWeitere.Click += new System.EventHandler(this.btnWeitere_Click);
+            this.btnWeitereAllItem.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitereAllItem.Location = new System.Drawing.Point(192, 46);
+            this.btnWeitereAllItem.Name = "btnWeitereAllItem";
+            this.btnWeitereAllItem.Size = new System.Drawing.Size(88, 22);
+            this.btnWeitereAllItem.TabIndex = 12;
+            this.btnWeitereAllItem.Text = "weitere...";
+            this.btnWeitereAllItem.Click += new System.EventHandler(this.btnWeitereAllItem_Click);
             // 
             // PadEditor
             // 
@@ -456,6 +456,6 @@ namespace BlueControls.Forms {
         private TabPage tabElementEigenschaften;
         protected TabControl tabRightSide;
         private Button btnAddDynamicSymbol;
-        private Button btnWeitere;
+        private Button btnWeitereAllItem;
     }
 }

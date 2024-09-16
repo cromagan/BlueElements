@@ -409,7 +409,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
                 " ",
                scf.ProtocolText
             };
-                l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
+                l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
             }
 
             return "Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText;

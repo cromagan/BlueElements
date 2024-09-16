@@ -37,8 +37,6 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     #region Constructors
 
-    public RowEntryPadItem() : this(string.Empty) { }
-
     public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     public RowEntryPadItem(string keyName) : this(keyName, null, null) { }
@@ -76,19 +74,11 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     public override string ReadableText() {
         const string txt = "Eingangs-Zeile: ";
 
-        if (this.IsOk() && DatabaseOutput != null) {
-            return txt + DatabaseOutput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
     public override string ToParseableString() {

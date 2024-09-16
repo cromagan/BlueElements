@@ -38,16 +38,16 @@ namespace BlueControls.ItemCollectionPad;
 
 public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariables {
 
-    public override string ReadableText() => "Unterstufe";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Pfeil_Oben, 16);
-
     #region Fields
 
     public readonly string Seite;
+
     public readonly List<AbstractPadItem>? ZoomItems;
+
     private string _name;
+
     private CreativePad? _padInternal;
+
     private Bitmap? _tmpBmp;
 
     #endregion
@@ -71,6 +71,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     #region Properties
 
     public static string ClassId => "CHILDPAD";
+
     public override string Description => string.Empty;
 
     [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
@@ -103,7 +104,9 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public Color Randfarbe { get; set; }
+
     public Alignment Textlage { get; set; }
+
     protected override int SaveOrder => 1000;
 
     #endregion
@@ -219,6 +222,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         PadInternal.Items.SheetStyleScale = Parent.SheetStyleScale;
     }
 
+    public override string ReadableText() => "Unterstufe";
+
     public bool ReplaceVariable(Variable variable) {
         if (IsDisposed) { return false; }
         if (PadInternal?.Items == null) { return false; }
@@ -234,6 +239,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         if (b) { OnPropertyChanged(); }
         return b;
     }
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Pfeil_Oben, 16);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

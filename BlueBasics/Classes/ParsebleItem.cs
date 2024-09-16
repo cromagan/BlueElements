@@ -40,7 +40,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
     #region Methods
 
-    public static T? NewByParsing<T>(string toParse) where T : ParsebleItem {
+    public static T? NewByParsing<T>(string toParse, params object[] args) where T : ParsebleItem {
         var typeName = string.Empty;
 
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
@@ -56,35 +56,37 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
             }
         }
 
-        var ni = NewByTypeName<T>(typeName);
+        var ni = NewByTypeName<T>(typeName, args);
         if (ni == null) { return default; }
         ni.Parse(toParse);
         return ni;
     }
 
-    public static T? NewByTypeName<T>(string typname) where T : ParsebleItem {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="typname"></param>
+    /// <param name="args">Ein Array von Argumenten, das bezüglich Anzahl, Reihenfolge und Typ mit den Parametern
+    /// des aufzurufenden Konstruktors übereinstimmt. Wenn args ein leeres Array oder
+    /// null ist, wird der Konstruktor aufgerufen, der keine Parameter akzeptiert, d.   h. der Standardkonstruktor.
+    //</param>
+    /// <returns></returns>
+    public static T? NewByTypeName<T>(string typname, params object[] args) where T : ParsebleItem {
         var types = Generic.GetEnumerableOfType<T>();
 
-        if (types.Count == 0) {
-            return default;
-        }
+        if (types.Count == 0) { return default; }
 
         if (string.IsNullOrEmpty(typname)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Typ unbekannt: " + typname);
             return default;
         }
 
-        //if (string.IsNullOrEmpty(name)) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Name unbekannt: " + name);
-        //    return default;
-        //}
-
         foreach (var thist in types) {
             if (thist != null) {
                 var v = thist.GetProperty("ClassId")?.GetValue(null, null);
-
                 if (v is string tn && tn.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
-                    var ni = (T)Activator.CreateInstance(thist);
+                    var ni = (T)Activator.CreateInstance(thist, args);
                     return ni;
                 }
             }

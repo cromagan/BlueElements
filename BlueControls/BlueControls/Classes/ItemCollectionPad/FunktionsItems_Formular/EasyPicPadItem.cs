@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -40,8 +39,6 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     #endregion
 
     #region Constructors
-
-    public EasyPicPadItem() : this(string.Empty) { }
 
     public EasyPicPadItem(string keyName) : this(keyName, null) { }
 
@@ -111,21 +108,13 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     }
 
     public override string ReadableText() {
-        const string txt = "Bild: ";
+        const string txt = "Bild-Editor: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
     public override string ToParseableString() {

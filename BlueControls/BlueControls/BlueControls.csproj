@@ -110,6 +110,7 @@
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
     <Compile Include="Editoren\DynamicSymbolScriptEditor.cs">
       <SubType>Form</SubType>
@@ -492,7 +493,6 @@
     <Compile Include="Classes\ItemConnection.cs" />
     <Compile Include="Classes\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
-    <Compile Include="Classes\ItemCollectionPad\GenericPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_ColumnArrangement_Editor\ColumnPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\Abstract\RectanglePadItem.cs" />

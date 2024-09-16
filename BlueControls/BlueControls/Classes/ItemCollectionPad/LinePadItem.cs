@@ -147,6 +147,10 @@ public class LinePadItem : AbstractPadItem {
         base.PointMoved(sender, e);
     }
 
+    public override string ReadableText() => "Line";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
+
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
@@ -516,11 +520,6 @@ public class LinePadItem : AbstractPadItem {
         }
         return false;
     }
-
-    public override string ReadableText() => "Line";
-
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
 
     #endregion
 }

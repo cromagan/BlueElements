@@ -49,6 +49,7 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnWeitereCF = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -73,6 +74,10 @@ namespace BlueControls.Forms {
             // grpDesign
             // 
             this.grpDesign.Visible = false;
+            // 
+            // tabHintergrund
+            // 
+            this.tabHintergrund.Size = new System.Drawing.Size(1267, 81);
             // 
             // tabRightSide
             // 
@@ -121,6 +126,7 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1275, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -138,7 +144,7 @@ namespace BlueControls.Forms {
             this.tabEditorStd.Location = new System.Drawing.Point(4, 25);
             this.tabEditorStd.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditorStd.Name = "tabEditorStd";
-            this.tabEditorStd.Size = new System.Drawing.Size(876, 81);
+            this.tabEditorStd.Size = new System.Drawing.Size(1267, 81);
             this.tabEditorStd.TabIndex = 4;
             this.tabEditorStd.Text = "Editor-Std.";
             // 
@@ -169,6 +175,7 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnWeitereCF);
             this.grpFelder.Controls.Add(this.btnRegionAdd);
             this.grpFelder.Controls.Add(this.btnButton);
             this.grpFelder.Controls.Add(this.btnBild);
@@ -366,7 +373,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(1267, 81);
+            this.tabFile.Size = new System.Drawing.Size(876, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -469,6 +476,16 @@ namespace BlueControls.Forms {
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
             // 
+            // btnWeitereCF
+            // 
+            this.btnWeitereCF.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitereCF.Location = new System.Drawing.Point(144, 46);
+            this.btnWeitereCF.Name = "btnWeitereCF";
+            this.btnWeitereCF.Size = new System.Drawing.Size(104, 22);
+            this.btnWeitereCF.TabIndex = 8;
+            this.btnWeitereCF.Text = "weitere...";
+            this.btnWeitereCF.Click += new System.EventHandler(this.btnWeitereCF_Click);
+            // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -527,5 +544,6 @@ namespace BlueControls.Forms {
         private GroupBox grpArbeitsbereich;
         private Button btnArbeitsbereich;
         private Button btnRegionAdd;
+        private Button btnWeitereCF;
     }
 }

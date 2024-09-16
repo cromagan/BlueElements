@@ -395,7 +395,7 @@ public abstract class Method : IReadableTextWithKey {
         for (var z = 0; z < Args.Count; z++) {
             var a = Args[z].JoinWith(", ");
             if (a.Contains("*")) {
-                a = a.Replace("*", "") + " (muss eine vorhandene Variable sein)";
+                a = a.Replace("*", string.Empty) + " (muss eine vorhandene Variable sein)";
             }
 
             co = co + "  - Argument " + (z + 1) + ": " + a;

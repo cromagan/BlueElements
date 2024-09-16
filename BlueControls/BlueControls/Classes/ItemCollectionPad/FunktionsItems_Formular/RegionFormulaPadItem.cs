@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -47,8 +46,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     #endregion
 
     #region Constructors
-
-    public RegionFormulaPadItem() : this(string.Empty) { }
 
     public RegionFormulaPadItem(string keyName) : this(keyName, null) { }
 
@@ -173,19 +170,11 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override string ReadableText() {
         const string txt = "Unterformular: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
     public override string ToParseableString() {

@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
@@ -218,10 +217,10 @@ public partial class PadEditor : PadEditorReadOnly {
 
     #endregion
 
-    protected virtual void btnWeitere_Click(object sender, System.EventArgs e) {
+    private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
 
 
-        var l = Generic.GetInstaceOfType<AbstractPadItem>(string.Empty);
+        var l = Generic.GetInstaceOfType<AbstractPadItem>();
 
         if (l.Count == 0) { return; }
 

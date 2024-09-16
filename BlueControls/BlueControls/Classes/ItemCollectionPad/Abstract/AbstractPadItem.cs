@@ -339,9 +339,20 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// <returns></returns>
     public virtual List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
-        [   new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
+        [
+            new FlexiControl("Allgemein:", widthOfControl, true),
+
+            new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
             new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         ];
+
+        if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
+            result.Add(new FlexiControlForDelegate(Verbindungspunkt_hinzu, "Verbindungspunkt hinzu", ImageCode.PlusZeichen));
+
+            //new FlexiControl("Verbindungspunkte:", widthOfControl, true),
+            //d
+        }
+
         return result;
     }
 
@@ -498,6 +509,12 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         result.ParseableAdd("Tags", Tags, false);
 
         return result.Parseable(base.ToParseableString());
+    }
+
+    public void Verbindungspunkt_hinzu() {
+        var p = new PointM("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
+        JointPoints.Add(p);
+        OnPropertyChanged();
     }
 
     //public void Parse(List<KeyValuePair<string, string>> toParse, string parsestring) {

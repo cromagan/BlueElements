@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -52,8 +51,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     #endregion
 
     #region Constructors
-
-    public EditFieldPadItem() : this(string.Empty) { }
 
     public EditFieldPadItem(string keyName) : this(keyName, null) { }
 
@@ -229,21 +226,13 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override string ReadableText() {
         const string txt = "Zelle: ";
 
-        if (this.IsOk() && Column != null) {
-            return txt + Column.Caption;
-        }
-
-        return txt + ErrorReason();
+    
+            return txt + Column?.Caption;
+  
     }
 
     public override QuickImage? SymbolForReadableText() {
-        if (this.IsOk() && Column != null) {
-            return Column.SymbolForReadableText();
-
-            //return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Stift, 16);
     }
 
     public override string ToParseableString() {

@@ -37,15 +37,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor
 /// </summary>
 public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
-    public override string ReadableText() => "Spalte";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
-
     #region Constructors
-
-    public ColumnPadItem() : this(string.Empty) { }
-
-    public ColumnPadItem(string keyName) : base(keyName) { }
 
     public ColumnPadItem(ColumnItem c, bool permanent, Renderer_Abstract? renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
         Column = c;
@@ -62,10 +54,13 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     #region Properties
 
     public static string ClassId => "FI-Column";
+
     public ColumnItem? Column { get; }
 
     public string Datenbank => IsDisposed || Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
+
     public override string Description => string.Empty;
+
     public override string MyClassId => ClassId;
 
     //        _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
@@ -81,15 +76,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     protected override int SaveOrder => 999;
 
     #endregion
-
-    ///// <summary>
-    ///// Für FlexOptions
-    ///// </summary>
-    //public bool Permanent {
-    //    get => _viewType == ViewType.PermanentColumn;
-    //    set {
-    //        if (!PermanentPossible() && Permanent) { return; }
-    //        if (!NonPermanentPossible() && !value) { return; }
 
     #region Methods
 
@@ -119,6 +105,18 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         return result;
     }
 
+    public override string ReadableText() => "Spalte";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
+
+    ///// <summary>
+    ///// Für FlexOptions
+    ///// </summary>
+    //public bool Permanent {
+    //    get => _viewType == ViewType.PermanentColumn;
+    //    set {
+    //        if (!PermanentPossible() && Permanent) { return; }
+    //        if (!NonPermanentPossible() && !value) { return; }
     //public void Spalte_bearbeiten() {
     //    if (Column is not { IsDisposed: not true }) { return; }
     //    TableView.OpenColumnEditor(Column, null, null);

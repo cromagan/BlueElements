@@ -83,7 +83,7 @@ public partial class FontSelectDialog {
         //FName.Item.Sort();
         FSize.ItemAddRange(_fsList);
         //FSize.Item.Sort();
-        Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
+        Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", string.Empty, False)
         UpdateSampleText();
     }
 

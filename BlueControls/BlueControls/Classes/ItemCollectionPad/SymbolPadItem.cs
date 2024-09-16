@@ -34,10 +34,6 @@ namespace BlueControls.ItemCollectionPad;
 
 public class SymbolPadItem : RectanglePadItem {
 
-    public override string ReadableText() => "Symbol";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
-
     #region Constructors
 
     public SymbolPadItem() : base(string.Empty) {
@@ -52,12 +48,19 @@ public class SymbolPadItem : RectanglePadItem {
     #region Properties
 
     public static string ClassId => "Symbol";
+
     public override string Description => string.Empty;
+
     public Color Hintergrundfarbe { get; set; }
+
     public override string MyClassId => ClassId;
+
     public float Randdicke { get; set; }
+
     public Color Randfarbe { get; set; }
+
     public Symbol Symbol { get; set; }
+
     protected override int SaveOrder => 999;
 
     #endregion
@@ -108,6 +111,10 @@ public class SymbolPadItem : RectanglePadItem {
         }
         return base.ParseThis(key, value);
     }
+
+    public override string ReadableText() => "Symbol";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }

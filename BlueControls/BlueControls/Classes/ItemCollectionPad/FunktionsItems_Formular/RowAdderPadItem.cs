@@ -65,8 +65,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     #region Constructors
 
-    public RowAdderPadItem() : this(string.Empty) { }
-
     public RowAdderPadItem(string keyName) : this(keyName, null, null) { }
 
     public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
@@ -267,21 +265,11 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override string ReadableText() {
         const string txt = "Zeilengenerator: ";
 
-        if (this.IsOk() && DatabaseOutput is { IsDisposed: false } dbout) {
-            return txt + dbout.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-
-            //return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
     public override string ToParseableString() {

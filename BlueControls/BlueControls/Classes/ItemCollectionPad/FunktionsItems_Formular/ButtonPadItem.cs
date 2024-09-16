@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
@@ -72,8 +71,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
     #endregion
 
     #region Constructors
-
-    public ButtonPadItem() : this(string.Empty) { }
 
     public ButtonPadItem(string keyName) : this(keyName, null) { }
 
@@ -450,21 +447,13 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
     }
 
     public override string ReadableText() {
-        const string txt = "Knopf ";
+        const string txt = "Knopf: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
-        }
-
-        return txt + ErrorReason();
+        return txt + DatabaseInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (this.IsOk()) {
-            return QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
-        }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
+        return QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
     public override string ToParseableString() {

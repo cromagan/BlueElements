@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using BlueBasics;
 using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;

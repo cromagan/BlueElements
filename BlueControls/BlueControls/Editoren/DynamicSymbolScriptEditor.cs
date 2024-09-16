@@ -54,7 +54,7 @@ public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar {
         //        "Parallel dazu kann die Variable Infos erstellt werden.",
         //        "Freie Texte."
         //    };
-        //l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
+        //l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
 
         FormManager.RegisterForm(this);
     }
