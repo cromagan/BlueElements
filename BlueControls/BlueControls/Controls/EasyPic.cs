@@ -153,7 +153,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
     }
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        e.HotItem = null;
         if (_bitmap != null) {
             e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", "ExF"));
         }
@@ -218,7 +217,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, this, e);
         }
     }
 

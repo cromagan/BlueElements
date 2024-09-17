@@ -140,10 +140,4 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #endregion
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new EasyPicPadItem(name);
-    //    }
-    //    return null;
-    //}
 }

@@ -424,7 +424,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused();
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        e.HotItem = e.Mouse == null ? null : MouseOverNode(e.Mouse.X, e.Mouse.Y);
         OnContextMenuInit(e);
     }
 
@@ -879,7 +878,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 break;
 
             case System.Windows.Forms.MouseButtons.Right:
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, MouseOverNode(e.X, e.Y), e);
                 break;
         }
     }

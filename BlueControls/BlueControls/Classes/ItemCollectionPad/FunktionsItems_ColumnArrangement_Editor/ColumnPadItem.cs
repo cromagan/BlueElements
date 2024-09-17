@@ -181,12 +181,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         GeneratedBitmap = bmp;
     }
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new ColumnPadItem(name);
-    //    }
-    //    return null;
-    //}
 
     private void Column_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

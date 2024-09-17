@@ -248,7 +248,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
+        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this,this, e); }
     }
 
     private static bool QuickModePossible(string text, SteuerelementVerhalten textAnzeigeverhalten) {

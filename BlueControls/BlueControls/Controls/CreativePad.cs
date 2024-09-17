@@ -319,7 +319,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         if (e.HotItem is AbstractPadItem bpi) {
             LastClickedItem = bpi;
-            e.HotItem = bpi;
             e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
             e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
             e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
@@ -335,7 +334,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         LastClickedItem = null;
 
         if (e.HotItem is PointM pm) {
-            e.HotItem = pm;
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
         }
@@ -569,7 +567,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
             case MouseButtons.Right:
                 if (!ContextMenuAllowed) { return; }
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, GetHotItem(e), e);
                 break;
         }
         Invalidate();

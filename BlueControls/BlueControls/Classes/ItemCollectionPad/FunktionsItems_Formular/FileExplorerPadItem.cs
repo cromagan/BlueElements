@@ -224,10 +224,4 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #endregion
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new FileExplorerPadItem(name);
-    //    }
-    //    return null;
-    //}
 }

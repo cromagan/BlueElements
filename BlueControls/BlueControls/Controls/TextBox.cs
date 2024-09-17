@@ -368,19 +368,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        e.HotItem = null;
+
         AbortSpellChecking();
 
         if (e.Mouse != null) {
-            var tmp = Cursor_PosAt(e.Mouse.X, e.Mouse.Y);
-            var tmpWord = _eTxt.Word(tmp);
 
-            var tags = new List<string>();
-            tags.TagSet("MarkStart", _markStart.ToString());
-            tags.TagSet("MarkEnd", _markEnd.ToString());
-            tags.TagSet("Cursorpos", _cursorCharPos.ToString());
-            tags.TagSet("Word", tmpWord);
-            e.HotItem = tags;
+            if(e.HotItem is not List<string> tags) {  return; }
+            var tmpWord = tags.TagGet("word");
 
             if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
                 e.ContextMenu.Add(ItemOf("Rechtschreibprüfung", true));
@@ -792,17 +786,26 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (_mouseValue == 9999) {
                 //es Wurde Doppelgeklickt
             } else {
+
+                var tmp = Cursor_PosAt(e.X, e.Y);
+                var tmpWord = _eTxt.Word(tmp);
+                var tags = new List<string>();
+                tags.TagSet("MarkStart", _markStart.ToString());
+                tags.TagSet("MarkEnd", _markEnd.ToString());
+                tags.TagSet("Cursorpos", _cursorCharPos.ToString());
+                tags.TagSet("Word", tmpWord);
+
                 if (_markStart == _markEnd || _markEnd < 0) {
                     _cursorCharPos = Cursor_PosAt(e.X, e.Y);
                     MarkClear();
                     if (e.Button == MouseButtons.Right) {
-                        FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                        FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags, e);
                     }
                 } else {
                     CursorClear();
                     Selection_Repair(true);
                     if (e.Button == MouseButtons.Right) {
-                        FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                        FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags,  e);
                     }
                 }
             }

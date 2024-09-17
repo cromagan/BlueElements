@@ -227,12 +227,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new TabFormulaPadItem(name);
-    //    }
-    //    return null;
-    //}
 
     //private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
 

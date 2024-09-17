@@ -1208,12 +1208,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        e.HotItem = null;
-        if (e.Mouse != null) {
-            if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
-            CellOnCoordinate(ca, e.Mouse.X, e.Mouse.Y, out _mouseOverColumn, out _mouseOverRow);
-            e.HotItem = CellCollection.KeyOfCell(_mouseOverColumn?.Column, _mouseOverRow?.Row);
-        }
         OnContextMenuInit(e);
     }
 
@@ -2052,7 +2046,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
 
             if (e.Button == MouseButtons.Right) {
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, CellCollection.KeyOfCell(_mouseOverColumn?.Column, _mouseOverRow?.Row),  e);
             }
         }
     }

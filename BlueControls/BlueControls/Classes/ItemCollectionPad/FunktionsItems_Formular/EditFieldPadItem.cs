@@ -278,12 +278,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     //        OnPropertyChanged();
     //        return true;
     //    }
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new EditFieldPadItem(name);
-    //    }
-    //    return null;
-    //}
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~BitmapPadItem()

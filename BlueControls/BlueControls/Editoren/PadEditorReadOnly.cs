@@ -24,7 +24,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
-public partial class PadEditorReadOnly : FormWithStatusBar {
+public abstract partial class PadEditorReadOnly : FormWithStatusBar {
 
     #region Constructors
 

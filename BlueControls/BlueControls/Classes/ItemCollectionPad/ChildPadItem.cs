@@ -333,14 +333,6 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     private void _Pad_DoInvalidate(object sender, System.EventArgs e) => OnPropertyChanged();
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new ChildPadItem(name);
-    //    }
-    //    return null;
-    //}
     private void RemovePic() {
         if (_tmpBmp != null) {
             _tmpBmp?.Dispose();

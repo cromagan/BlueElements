@@ -338,15 +338,6 @@ public class DimensionPadItem : AbstractPadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals("blueelements.clsitemimage", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals("blueelements.imageitem", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new DimensionPadItem(name);
-    //    }
-    //    return null;
-    //}
-
     private void CalculateOtherPoints() {
         var tmppW = -90;
         var mhlAb = MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.Dpi); // Den Abstand der Maßhilsfline, in echten MM

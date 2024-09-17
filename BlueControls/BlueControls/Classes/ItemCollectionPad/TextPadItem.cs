@@ -231,15 +231,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals("blueelements.clsitemtext", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals("blueelements.textitem", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new TextPadItem(name);
-    //    }
-    //    return null;
-    //}
-
     private void InvalidateText() => _txt = null;
 
     private void MakeNewETxt() {

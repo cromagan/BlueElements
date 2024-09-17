@@ -73,13 +73,13 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Methods
 
-    public static void ContextMenuShow(IContextMenu control, MouseEventArgs? e) {
+    public static void ContextMenuShow(IContextMenu control, object? hotItem, MouseEventArgs e) {
         Close(ListBoxAppearance.KontextMenu);
         Close(control);
 
         var thisContextMenu = new List<AbstractListItem>();
 
-        var ce = new ContextMenuInitEventArgs(null, thisContextMenu, e);
+        var ce = new ContextMenuInitEventArgs(hotItem, thisContextMenu, e);
 
         control.GetContextMenuItems(ce);
 

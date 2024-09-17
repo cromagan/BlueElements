@@ -95,7 +95,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
             e.ContextMenu.Add(ItemOf("Variableninhalt kopieren"));
         }
 
-        e.HotItem = _lastWord;
+
 
         OnContextMenuInit(e);
     }
@@ -146,7 +146,7 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _lastWord, e);
         }
     }
 

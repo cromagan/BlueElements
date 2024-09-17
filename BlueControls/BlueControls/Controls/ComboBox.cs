@@ -408,7 +408,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         _ = Focus();
     }
 
-    private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+    private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
 
         if (e.Item is { } bli) {

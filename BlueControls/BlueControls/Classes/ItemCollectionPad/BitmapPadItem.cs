@@ -52,10 +52,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
-    public BitmapPadItem(string keyName, Bitmap? bmp) : this(keyName, bmp, Size.Empty) { }
-
-    public BitmapPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
-
     public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
         Bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
@@ -317,10 +313,4 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     #endregion
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new BitmapPadItem(name);
-    //    }
-    //    return null;
-    //}
 }

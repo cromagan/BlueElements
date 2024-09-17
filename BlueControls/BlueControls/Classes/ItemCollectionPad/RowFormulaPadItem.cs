@@ -219,13 +219,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         }
     }
 
-    //protected override AbstractPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new RowFormulaPadItem(name);
-    //    }
-    //    return null;
-    //}
-
     private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         RemovePic();

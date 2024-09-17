@@ -905,7 +905,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                     break;
 
                 case "item":
-                    var i = ParsebleItem.NewByParsing<AbstractPadItem>(pair.Value, Generic.GetUniqueKey());
+                    var i = ParsebleItem.NewByParsing<AbstractPadItem>(pair.Value);
                     if (i != null) { Add(i); }
                     break;
 

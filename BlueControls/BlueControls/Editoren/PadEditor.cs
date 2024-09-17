@@ -33,7 +33,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class PadEditor : PadEditorReadOnly {
+public abstract partial class PadEditor : PadEditorReadOnly {
 
     #region Constructors
 
@@ -91,7 +91,7 @@ public partial class PadEditor : PadEditorReadOnly {
     }
 
     private void btnAddImage_Click(object sender, System.EventArgs e) {
-        BitmapPadItem b = new(QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
+        BitmapPadItem b = new(string.Empty, QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
         Pad.AddCentered(b);
     }
 
