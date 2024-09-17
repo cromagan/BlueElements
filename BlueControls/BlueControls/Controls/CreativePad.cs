@@ -39,6 +39,7 @@ using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
+using System.IO;
 
 namespace BlueControls.Controls;
 
@@ -193,6 +194,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
+
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
 
 
@@ -215,9 +217,27 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     return;
 
                 case "#duplicate":
-                    var n = (AbstractPadItem)((ICloneable)item).Clone();
-                    n.KeyName = Generic.GetUniqueKey();
-                    _items?.Add(n);
+                    var cloned = item.Clone();
+                    if (cloned is AbstractPadItem clonedapi) {
+                        clonedapi.KeyName = Generic.GetUniqueKey();
+                        _items?.Add(clonedapi);
+                    }
+                    return;
+
+                case "#export":
+                    if (item is IParseable ps) {
+                        using SaveFileDialog f = new();
+                        f.CheckFileExists = false;
+                        f.CheckPathExists = true;
+                        if (!string.IsNullOrEmpty(IO.LastFilePath)) { f.InitialDirectory = IO.LastFilePath; }
+                        f.AddExtension = true;
+                        f.DefaultExt = "bcs";
+                        f.Title = "Speichern:";
+                        _ = f.ShowDialog();
+                        if (string.IsNullOrEmpty(f.FileName)) { return; }
+                        File.WriteAllText(f.FileName, ps.ToParseableString(), Constants.Win1252);
+                        IO.LastFilePath = f.FileName.FilePath();
+                    }
                     return;
             }
         }
@@ -294,14 +314,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         if (!EditAllowed) { return; }
 
-        var hotitem = GetHotItem(e.Mouse);
+        //var hotitem = GetHotItem(e.Mouse);
 
 
-        if (hotitem is AbstractPadItem bpi) {
+        if (e.HotItem is AbstractPadItem bpi) {
             LastClickedItem = bpi;
             e.HotItem = bpi;
             e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
             e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
+            e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
             e.ContextMenu.Add(Separator());
             e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
             e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
@@ -313,10 +334,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         LastClickedItem = null;
 
-        if (hotitem is PointM pm) {
+        if (e.HotItem is PointM pm) {
             e.HotItem = pm;
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen)); 
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
         }
 
 

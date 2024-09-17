@@ -36,13 +36,14 @@ public static class IO {
 
     #region Fields
 
-    private const int CanWriteTryintervall = 10;
-    private static readonly List<string> NoWriteAccess = [];
-    private static readonly List<string> WriteAccess = [];
+    private const int _canWriteTryintervall = 10;
+    private static readonly List<string> _noWriteAccess = [];
+    private static readonly List<string> _writeAccess = [];
     private static DateTime _canWriteLastCheck = DateTime.UtcNow.Subtract(new TimeSpan(10, 10, 10));
     private static string _canWriteLastFile = string.Empty;
     private static bool _canWriteLastResult;
-    private static string _lastFilePath = string.Empty;
+
+    public static string LastFilePath = string.Empty;
 
     #endregion
 
@@ -67,7 +68,7 @@ public static class IO {
         var s = DateTime.UtcNow;
         while (true) {
             if (CanWrite(filename)) { return true; }
-            if (tryItForSeconds < CanWriteTryintervall) { return false; }
+            if (tryItForSeconds < _canWriteTryintervall) { return false; }
             if (DateTime.UtcNow.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
         }
     }
@@ -103,14 +104,14 @@ public static class IO {
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
         var dirUpper = directory.ToUpperInvariant();
-        if (WriteAccess.Contains(dirUpper)) { return true; }
-        if (NoWriteAccess.Contains(dirUpper)) { return false; }
+        if (_writeAccess.Contains(dirUpper)) { return true; }
+        if (_noWriteAccess.Contains(dirUpper)) { return false; }
         try {
             using (_ = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
-            _ = WriteAccess.AddIfNotExists(dirUpper); // Multitasking
+            _ = _writeAccess.AddIfNotExists(dirUpper); // Multitasking
             return true;
         } catch {
-            _ = NoWriteAccess.AddIfNotExists(dirUpper); // Multitasking
+            _ = _noWriteAccess.AddIfNotExists(dirUpper); // Multitasking
             return false;
         }
     }
@@ -335,9 +336,9 @@ public static class IO {
     }
 
     public static List<string>? GetFilesWithFileSelector(string defaultpath, bool multi) {
-        if (string.IsNullOrEmpty(_lastFilePath)) {
+        if (string.IsNullOrEmpty(LastFilePath)) {
             if (!string.IsNullOrEmpty(defaultpath)) {
-                _lastFilePath = defaultpath;
+                LastFilePath = defaultpath;
             }
         }
 
@@ -345,7 +346,7 @@ public static class IO {
         f.CheckFileExists = true;
         f.CheckPathExists = true;
         f.Multiselect = multi;
-        f.InitialDirectory = _lastFilePath;
+        f.InitialDirectory = LastFilePath;
         f.Title = "Datei hinzufügen:";
         _ = f.ShowDialog();
         if (f.FileNames == null) { return null; }
@@ -354,7 +355,7 @@ public static class IO {
         var x = new List<string>();
         x.AddRange(f.FileNames);
         if (f.FileNames != null && f.FileNames.GetUpperBound(0) > 0) {
-            _lastFilePath = f.FileNames[0].FilePath();
+            LastFilePath = f.FileNames[0].FilePath();
         }
 
         return x;
@@ -454,7 +455,7 @@ public static class IO {
         // Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
         // http://www.vbarchiv.net/tipps/tipp_1281.html
         if (_canWriteLastResult) { _canWriteLastFile = string.Empty; }
-        if (DateTime.UtcNow.Subtract(_canWriteLastCheck).TotalSeconds > CanWriteTryintervall) { _canWriteLastFile = string.Empty; }
+        if (DateTime.UtcNow.Subtract(_canWriteLastCheck).TotalSeconds > _canWriteTryintervall) { _canWriteLastFile = string.Empty; }
         if (_canWriteLastFile != file.ToUpperInvariant()) {
             var startTime = DateTime.UtcNow;
             if (FileExists(file)) {
