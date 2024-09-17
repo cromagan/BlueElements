@@ -50,9 +50,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     #region Constructors
 
+    public TableViewPadItem() : this(string.Empty, null, null) { }
+
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
-    public TableViewPadItem(string keyName) : this(keyName, null, null) { }
+ 
 
     #endregion
 

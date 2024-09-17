@@ -46,13 +46,13 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     #region Constructors
 
+    public TabFormulaPadItem() : this(string.Empty, null) { }
+
     public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         if (ParentFormula != null) {
             ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
         }
     }
-
-    public TabFormulaPadItem(string keyName) : this(keyName, null) { }
 
     #endregion
 

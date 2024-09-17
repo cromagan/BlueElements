@@ -52,7 +52,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     #region Constructors
 
-    public EditFieldPadItem(string keyName) : this(keyName, null) { }
+    public EditFieldPadItem() : this(string.Empty, null) { }
 
     public EditFieldPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 

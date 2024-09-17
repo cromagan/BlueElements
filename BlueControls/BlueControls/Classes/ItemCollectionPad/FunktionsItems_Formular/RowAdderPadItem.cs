@@ -65,7 +65,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     #region Constructors
 
-    public RowAdderPadItem(string keyName) : this(keyName, null, null) { }
+    public RowAdderPadItem() : this(string.Empty, null, null) { }
 
     public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 

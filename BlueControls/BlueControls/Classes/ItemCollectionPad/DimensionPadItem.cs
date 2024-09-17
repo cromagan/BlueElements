@@ -26,7 +26,6 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;

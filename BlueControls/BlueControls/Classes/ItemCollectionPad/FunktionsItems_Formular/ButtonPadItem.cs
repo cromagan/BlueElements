@@ -72,7 +72,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     #region Constructors
 
-    public ButtonPadItem(string keyName) : this(keyName, null) { }
+    public ButtonPadItem() : this(string.Empty, null) { }
 
     public ButtonPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 

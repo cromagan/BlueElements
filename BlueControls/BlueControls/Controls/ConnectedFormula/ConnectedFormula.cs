@@ -435,7 +435,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 }
             }
             if (found == null) {
-                found = new RowEntryPadItem(string.Empty);
+                found = new RowEntryPadItem();
 
                 PadData.Add(found);
             }

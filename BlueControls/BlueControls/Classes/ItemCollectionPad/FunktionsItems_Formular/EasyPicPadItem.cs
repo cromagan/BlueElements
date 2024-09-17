@@ -40,7 +40,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Constructors
 
-    public EasyPicPadItem(string keyName) : this(keyName, null) { }
+    public EasyPicPadItem() : this(string.Empty, null) { }
 
     public EasyPicPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
 

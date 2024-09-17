@@ -50,25 +50,25 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     public ConnectedFormulaEditor(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         InitializeComponent();
 
-        GenQuickInfo(btnFeldHinzu, new EditFieldPadItem(string.Empty));
+        GenQuickInfo(btnFeldHinzu, new EditFieldPadItem());
 
-        GenQuickInfo(btnButton, new ButtonPadItem(string.Empty));
+        GenQuickInfo(btnButton, new ButtonPadItem());
 
-        GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem(string.Empty));
+        GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem());
 
-        GenQuickInfo(btnFileExplorer, new FileExplorerPadItem(string.Empty));
+        GenQuickInfo(btnFileExplorer, new FileExplorerPadItem());
 
-        GenQuickInfo(btnBild, new EasyPicPadItem(string.Empty));
+        GenQuickInfo(btnBild, new EasyPicPadItem());
 
-        GenQuickInfo(btnTable, new TableViewPadItem(string.Empty));
+        GenQuickInfo(btnTable, new TableViewPadItem());
 
-        GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem(string.Empty));
+        GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem());
 
-        GenQuickInfo(btnFilterConverter, new FilterConverterElementPadItem(string.Empty));
+        GenQuickInfo(btnFilterConverter, new FilterConverterElementPadItem());
 
-        GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem(string.Empty));
+        GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem());
 
-        GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem(string.Empty));
+        GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem());
 
         if (!string.IsNullOrWhiteSpace(filename) && !FormulaSet(filename, notAllowedchilds)) {
             Close();
@@ -167,32 +167,32 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {
-        var x = new OutputFilterPadItem(string.Empty);
+        var x = new OutputFilterPadItem();
         AddCentered(x);
     }
 
     private void btnBild_Click(object sender, System.EventArgs e) {
-        var x = new EasyPicPadItem(string.Empty);
+        var x = new EasyPicPadItem();
         AddCentered(x);
     }
 
     private void btnButton_Click(object sender, System.EventArgs e) {
-        var x = new ButtonPadItem(string.Empty);
+        var x = new ButtonPadItem();
         AddCentered(x);
     }
 
     private void btnDropdownmenu_Click(object sender, System.EventArgs e) {
-        var x = new DropDownSelectRowPadItem(string.Empty);
+        var x = new DropDownSelectRowPadItem();
         AddCentered(x);
     }
 
     private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
-        var x = new EditFieldPadItem(string.Empty);
+        var x = new EditFieldPadItem();
         AddCentered(x);
     }
 
     private void btnFilterConverter_Click(object sender, System.EventArgs e) {
-        var x = new FilterConverterElementPadItem(string.Empty);
+        var x = new FilterConverterElementPadItem();
         AddCentered(x);
     }
 
@@ -246,7 +246,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var it = new RowEntryPadItem(string.Empty) {
+        var it = new RowEntryPadItem() {
             Page = n
         };
         Pad.Items?.Add(it);
@@ -273,7 +273,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnTable_Click(object sender, System.EventArgs e) {
-        var x = new TableViewPadItem(string.Empty);
+        var x = new TableViewPadItem();
         AddCentered(x);
     }
 
@@ -394,7 +394,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {
-        var x = new FileExplorerPadItem(string.Empty);
+        var x = new FileExplorerPadItem();
 
         AddCentered(x);
     }
