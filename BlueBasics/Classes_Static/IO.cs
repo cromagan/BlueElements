@@ -417,7 +417,7 @@ public static class IO {
         if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }
         wunschname = wunschname.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
 
-        if (wunschname.Length > 30) { wunschname = wunschname.Substring(0, 30); }
+        if (wunschname.Length > 80) { wunschname = wunschname.Substring(0, 80); }
 
         string? filename;
         do {
