@@ -18,11 +18,20 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls.EventArgs;
-using System.ComponentModel;
-using System.Windows.Forms;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.Temporär;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.IO;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -40,10 +49,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #endregion
 
-    /// <summary>
-    /// löscht den kompletten Inhalt des Pads auch die ID und setzt es auf Disabled
-    /// </summary>
-
     #region Methods
 
     /// <summary>
@@ -58,9 +63,62 @@ public partial class PadEditorWithFileAccess : PadEditor {
         _lastFileName = fileName;
     }
 
+    /// <summary>
+    /// löscht den kompletten Inhalt des Pads auch die ID und setzt es auf Disabled
+    /// </summary>
     protected override void OnFormClosing(FormClosingEventArgs e) {
         CheckSave();
         base.OnFormClosing(e);
+    }
+
+    private void btnAddDimension_Click(object sender, System.EventArgs e) {
+        DimensionPadItem b = new(new PointF(300, 300), new PointF(400, 300), 30);
+        Pad.AddCentered(b);
+    }
+
+    private void btnAddDynamicSymbol_Click(object sender, System.EventArgs e) {
+        DynamicSymbolPadItem b = new();
+        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        Pad.AddCentered(b);
+    }
+
+    private void btnAddImage_Click(object sender, System.EventArgs e) {
+        BitmapPadItem b = new(string.Empty, QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
+        Pad.AddCentered(b);
+    }
+
+    private void btnAddLine_Click(object sender, System.EventArgs e) {
+        var p = Pad.MiddleOfVisiblesScreen();
+        var w = (int)(300 / Pad.Zoom);
+        LinePadItem b = new(PadStyles.Style_Standard, p with { X = p.X - w }, p with { X = p.X + w });
+        Pad.AddCentered(b);
+    }
+
+    private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
+        PhysicPadItem b = new();
+        //b.SetCoordinates(new RectangleF(100, 100, 300, 300));
+        Pad.AddCentered(b);
+    }
+
+    private void btnAddSymbol_Click(object sender, System.EventArgs e) {
+        SymbolPadItem b = new();
+        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        Pad.AddCentered(b);
+    }
+
+    private void btnAddText_Click(object sender, System.EventArgs e) {
+        TextPadItem b = new() {
+            Text = string.Empty,
+            Stil = PadStyles.Style_Standard
+        };
+        Pad.AddCentered(b);
+        b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
+    }
+
+    private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
+        ChildPadItem b = new();
+        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        Pad.AddCentered(b);
     }
 
     private void btnLastFiles_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadFile(e.Item.KeyName);
@@ -79,6 +137,38 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
+    private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
+        if (!string.IsNullOrEmpty(IO.LastFilePath)) { LoadSymbol.InitialDirectory = IO.LastFilePath; }
+
+        LoadSymbol.ShowDialog();
+    }
+
+    private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
+        var l = Generic.GetInstaceOfType<AbstractPadItem>();
+
+        if (l.Count == 0) { return; }
+
+        var i = new List<AbstractListItem>();
+
+        foreach (var thisl in l) {
+            i.Add(ItemOf(thisl));
+        }
+
+        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
+
+        if (x is not { Count: 1 }) { return; }
+
+        var toadd = i.Get(x[0]);
+
+        if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
+
+        //if (toadd is not AbstractPadItem api) {  return; }
+
+        //var x = new FileExplorerPadItem(string.Empty);
+
+        Pad.AddCentered(api);
+    }
+
     private void CheckSave() {
         if (string.IsNullOrWhiteSpace(_lastFileName)) { return; }
         if (Pad?.Items is not { IsSaved: not true }) { return; }
@@ -89,6 +179,25 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         var t = Pad.Items.ToParseableString();
         WriteAllText(_lastFileName, t, Constants.Win1252, false);
+    }
+
+    private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
+        if (Pad.Items == null) { return; }
+
+        if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
+        var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        IO.LastFilePath = LoadSymbol.FileName.FilePath();
+
+        var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);
+        i?.Parse(x);
+
+        if (i is not AbstractPadItem api) { return; }
+
+        if (Pad.Items[api.KeyName] != null) {
+            i.KeyName = Generic.GetUniqueKey();
+        }
+
+        Pad.Items.Add(i);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName);

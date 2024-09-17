@@ -39,28 +39,36 @@ namespace BlueControls.Forms {
             this.btnDruckerDialog = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.grpDesign.SuspendLayout();
-            this.tabHintergrund.SuspendLayout();
+            this.btnWeitereAllItem = new BlueControls.Controls.Button();
+            this.btnAddDynamicSymbol = new BlueControls.Controls.Button();
+            this.btnAddPhsyik = new BlueControls.Controls.Button();
+            this.btnAddSymbol = new BlueControls.Controls.Button();
+            this.btnAddUnterStufe = new BlueControls.Controls.Button();
+            this.btnAddText = new BlueControls.Controls.Button();
+            this.btnAddImage = new BlueControls.Controls.Button();
+            this.btnAddDimension = new BlueControls.Controls.Button();
+            this.btnAddLine = new BlueControls.Controls.Button();
+            this.LoadSymbol = new System.Windows.Forms.OpenFileDialog();
+            this.btnSymbolLaden = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.grpKomponenteHinzufügen.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
+            this.grpDesign.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tabRightSide
-            // 
-            this.tabRightSide.Size = new System.Drawing.Size(372, 201);
-            // 
             // Pad
             // 
-            this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.Size = new System.Drawing.Size(512, 201);
+            this.Pad.Size = new System.Drawing.Size(659, 225);
             // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
+            this.Ribbon.Size = new System.Drawing.Size(1031, 110);
             this.Ribbon.TabDefault = this.tabDatei;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Datei",
@@ -72,6 +80,41 @@ namespace BlueControls.Forms {
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabStart, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabDatei, 0);
+            // 
+            // tabStart
+            // 
+            this.tabStart.Size = new System.Drawing.Size(1023, 81);
+            // 
+            // tabSeiten
+            // 
+            this.tabSeiten.Size = new System.Drawing.Size(1031, 26);
+            // 
+            // grpKomponenteHinzufügen
+            // 
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnSymbolLaden);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitereAllItem);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDynamicSymbol);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddPhsyik);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddImage);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDimension);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
+            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(368, 81);
+            // 
+            // tabRightSide
+            // 
+            this.tabRightSide.Location = new System.Drawing.Point(659, 136);
+            // 
+            // capStatusBar
+            // 
+            this.capStatusBar.Size = new System.Drawing.Size(659, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
+            // 
+            // pnlStatusBar
+            // 
+            this.pnlStatusBar.Size = new System.Drawing.Size(659, 24);
             // 
             // tabDatei
             // 
@@ -124,6 +167,7 @@ namespace BlueControls.Forms {
             this.btnLastFiles.Location = new System.Drawing.Point(136, 2);
             this.btnLastFiles.Name = "btnLastFiles";
             this.btnLastFiles.Regex = null;
+            this.btnLastFiles.SettingsLoaded = false;
             this.btnLastFiles.Size = new System.Drawing.Size(104, 66);
             this.btnLastFiles.TabIndex = 11;
             this.btnLastFiles.Text = "zuletzt geöffnete Dateien";
@@ -185,19 +229,136 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datei wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveTab_FileOk);
             // 
+            // btnWeitereAllItem
+            // 
+            this.btnWeitereAllItem.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitereAllItem.Location = new System.Drawing.Point(192, 46);
+            this.btnWeitereAllItem.Name = "btnWeitereAllItem";
+            this.btnWeitereAllItem.Size = new System.Drawing.Size(88, 22);
+            this.btnWeitereAllItem.TabIndex = 12;
+            this.btnWeitereAllItem.Text = "weitere...";
+            this.btnWeitereAllItem.Click += new System.EventHandler(this.btnWeitereAllItem_Click);
+            // 
+            // btnAddDynamicSymbol
+            // 
+            this.btnAddDynamicSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddDynamicSymbol.ImageCode = "Variable|16";
+            this.btnAddDynamicSymbol.Location = new System.Drawing.Point(96, 46);
+            this.btnAddDynamicSymbol.Name = "btnAddDynamicSymbol";
+            this.btnAddDynamicSymbol.Size = new System.Drawing.Size(96, 22);
+            this.btnAddDynamicSymbol.TabIndex = 11;
+            this.btnAddDynamicSymbol.Text = "Dyn. Symbol";
+            this.btnAddDynamicSymbol.Click += new System.EventHandler(this.btnAddDynamicSymbol_Click);
+            // 
+            // btnAddPhsyik
+            // 
+            this.btnAddPhsyik.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddPhsyik.ImageCode = "Formel|16";
+            this.btnAddPhsyik.Location = new System.Drawing.Point(192, 24);
+            this.btnAddPhsyik.Name = "btnAddPhsyik";
+            this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
+            this.btnAddPhsyik.TabIndex = 10;
+            this.btnAddPhsyik.Text = "Physik";
+            this.btnAddPhsyik.Click += new System.EventHandler(this.btnAddUnterStufe_Click);
+            // 
+            // btnAddSymbol
+            // 
+            this.btnAddSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddSymbol.ImageCode = "Stern|16|||||137|0";
+            this.btnAddSymbol.Location = new System.Drawing.Point(8, 46);
+            this.btnAddSymbol.Name = "btnAddSymbol";
+            this.btnAddSymbol.Size = new System.Drawing.Size(80, 22);
+            this.btnAddSymbol.TabIndex = 9;
+            this.btnAddSymbol.Text = "Symbol";
+            this.btnAddSymbol.Click += new System.EventHandler(this.btnAddSymbol_Click);
+            // 
+            // btnAddUnterStufe
+            // 
+            this.btnAddUnterStufe.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddUnterStufe.ImageCode = "Datei|16";
+            this.btnAddUnterStufe.Location = new System.Drawing.Point(192, 2);
+            this.btnAddUnterStufe.Name = "btnAddUnterStufe";
+            this.btnAddUnterStufe.Size = new System.Drawing.Size(88, 22);
+            this.btnAddUnterStufe.TabIndex = 8;
+            this.btnAddUnterStufe.Text = "Unterstufe";
+            this.btnAddUnterStufe.Click += new System.EventHandler(this.btnAddUnterStufe_Click);
+            // 
+            // btnAddText
+            // 
+            this.btnAddText.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddText.ImageCode = "Textfeld|16";
+            this.btnAddText.Location = new System.Drawing.Point(8, 2);
+            this.btnAddText.Name = "btnAddText";
+            this.btnAddText.Size = new System.Drawing.Size(80, 22);
+            this.btnAddText.TabIndex = 4;
+            this.btnAddText.Text = "Text";
+            this.btnAddText.Click += new System.EventHandler(this.btnAddText_Click);
+            // 
+            // btnAddImage
+            // 
+            this.btnAddImage.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddImage.ImageCode = "Bild|16";
+            this.btnAddImage.Location = new System.Drawing.Point(8, 24);
+            this.btnAddImage.Name = "btnAddImage";
+            this.btnAddImage.Size = new System.Drawing.Size(80, 22);
+            this.btnAddImage.TabIndex = 2;
+            this.btnAddImage.Text = "Bild";
+            this.btnAddImage.Click += new System.EventHandler(this.btnAddImage_Click);
+            // 
+            // btnAddDimension
+            // 
+            this.btnAddDimension.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddDimension.ImageCode = "Bemaßung|16";
+            this.btnAddDimension.Location = new System.Drawing.Point(96, 2);
+            this.btnAddDimension.Name = "btnAddDimension";
+            this.btnAddDimension.Size = new System.Drawing.Size(72, 22);
+            this.btnAddDimension.TabIndex = 6;
+            this.btnAddDimension.Text = "Maß";
+            this.btnAddDimension.Click += new System.EventHandler(this.btnAddDimension_Click);
+            // 
+            // btnAddLine
+            // 
+            this.btnAddLine.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAddLine.ImageCode = "Linie|16";
+            this.btnAddLine.Location = new System.Drawing.Point(96, 24);
+            this.btnAddLine.Name = "btnAddLine";
+            this.btnAddLine.Size = new System.Drawing.Size(72, 22);
+            this.btnAddLine.TabIndex = 7;
+            this.btnAddLine.Text = "Linie";
+            this.btnAddLine.Click += new System.EventHandler(this.btnAddLine_Click);
+            // 
+            // LoadSymbol
+            // 
+            this.LoadSymbol.DefaultExt = "BCS";
+            this.LoadSymbol.Filter = "*.BCS Symbol-Datei|*.BCS|*.* Alle Dateien|*";
+            this.LoadSymbol.Title = "Bitte Datei zum Importieren wählen:";
+            this.LoadSymbol.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadSymbol_FileOk);
+            // 
+            // btnSymbolLaden
+            // 
+            this.btnSymbolLaden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnSymbolLaden.ImageCode = "Ordner|16";
+            this.btnSymbolLaden.Location = new System.Drawing.Point(288, 2);
+            this.btnSymbolLaden.Name = "btnSymbolLaden";
+            this.btnSymbolLaden.Size = new System.Drawing.Size(72, 66);
+            this.btnSymbolLaden.TabIndex = 13;
+            this.btnSymbolLaden.Text = "Symbol laden";
+            this.btnSymbolLaden.Click += new System.EventHandler(this.btnSymbolLaden_Click);
+            // 
             // PadEditorWithFileAccess
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(884, 361);
+            this.ClientSize = new System.Drawing.Size(784, 361);
             this.Name = "PadEditorWithFileAccess";
             this.Text = "PadEditorWithFileAccess";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.grpDesign.ResumeLayout(false);
-            this.tabHintergrund.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.grpKomponenteHinzufügen.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
@@ -217,5 +378,16 @@ namespace BlueControls.Forms {
         private SaveFileDialog SaveTab;
         protected Button btnImport;
         protected Button btnSpeichern;
+        private Button btnWeitereAllItem;
+        private Button btnAddDynamicSymbol;
+        private Button btnAddPhsyik;
+        private Button btnAddSymbol;
+        private Button btnAddUnterStufe;
+        private Button btnAddText;
+        private Button btnAddImage;
+        private Button btnAddDimension;
+        private Button btnAddLine;
+        private Button btnSymbolLaden;
+        private OpenFileDialog LoadSymbol;
     }
 }

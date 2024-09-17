@@ -18,14 +18,9 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.Temporär;
-using BlueControls.ItemCollectionPad;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -70,68 +65,22 @@ public partial class PadEditor : FormWithStatusBar {
 
     #endregion
 
+    //public void ItemChanged() {
+    //    Pad.ZoomFit();
+
+    //    if (Pad?.Items?.SheetStyle != null) {
+    //        PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
+    //        cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
+    //    }
+    //}
+
     #region Methods
 
-    public void ItemChanged() {
-        Pad.ZoomFit();
-
-        if (Pad?.Items?.SheetStyle != null) {
-            PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
-            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
-        }
-    }
-
-    private void btnAddDimension_Click(object sender, System.EventArgs e) {
-        DimensionPadItem b = new(new PointF(300, 300), new PointF(400, 300), 30);
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddDynamicSymbol_Click(object sender, System.EventArgs e) {
-        DynamicSymbolPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddImage_Click(object sender, System.EventArgs e) {
-        BitmapPadItem b = new(string.Empty, QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddLine_Click(object sender, System.EventArgs e) {
-        var p = Pad.MiddleOfVisiblesScreen();
-        var w = (int)(300 / Pad.Zoom);
-        LinePadItem b = new(PadStyles.Style_Standard, p with { X = p.X - w }, p with { X = p.X + w });
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
-        PhysicPadItem b = new();
-        //b.SetCoordinates(new RectangleF(100, 100, 300, 300));
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddSymbol_Click(object sender, System.EventArgs e) {
-        SymbolPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddText_Click(object sender, System.EventArgs e) {
-        TextPadItem b = new() {
-            Text = string.Empty,
-            Stil = PadStyles.Style_Standard
-        };
-        Pad.AddCentered(b);
-        b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
-    }
-
-    private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-        ChildPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
-        Pad.AddCentered(b);
-    }
+    private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
 
     private void btnArbeitsbreichSetup_Click(object sender, System.EventArgs e) => Pad.ShowWorkingAreaSetup();
+
+    private void btnDruckerDialog_Click(object sender, System.EventArgs e) => Pad.Print();
 
     private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
         if (Pad?.Items == null) { return; }
@@ -149,123 +98,6 @@ public partial class PadEditor : FormWithStatusBar {
         Pad.Invalidate();
     }
 
-    private void cbxSchriftGröße_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Items == null) { return; }
-        Pad.Items.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
-    }
-
-    private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
-        if (Pad?.Items == null) { return; }
-        Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
-    }
-
-    private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
-
-    private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
-        // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
-        // einem Parent zugeordnet werden.
-        // Deswegen müssen die Element einzigartig sein (also extra für das Menü generiert werden)
-        // Und deswegen können sie auch disposed werden.
-
-        if (Pad.LastClickedItem != null) {
-            Pad.LastClickedItem.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
-        }
-
-        LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
-    }
-
-    private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
-        if (Pad.LastClickedItem != null) {
-            Pad.LastClickedItem.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
-        }
-    }
-
-    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
-        btnVorschauModus.Checked = Pad.ShowInPrintMode;
-
-        DoPages();
-
-
-        ckbRaster.Enabled = Pad.Items != null;
-        txbRasterAnzeige.Enabled = Pad.Items != null;
-        txbRasterFangen.Enabled = Pad.Items != null;
-
-        if (Pad.Items != null) {
-            ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
-            txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
-            txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
-            if (Pad.Items.SheetStyle != null) {
-                PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
-            }
-
-            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
-        }
-    }
-
-    private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Items != null && Skin.StyleDb?.Row != null) {
-            Pad.Items.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
-        }
-    }
-
-    private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
-        if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
-        if (!txbRasterAnzeige.Visible) { return; }
-        if (Pad?.Items == null) { return; }
-        Pad.Items.GridShow = FloatParse(txbRasterAnzeige.Text);
-    }
-
-    private void txbRasterFangen_TextChanged(object sender, System.EventArgs e) {
-        if (!txbRasterFangen.Text.IsNumeral()) { return; }
-        if (!txbRasterFangen.Visible) { return; }
-        if (Pad?.Items == null) { return; }
-        Pad.Items.GridSnap = FloatParse(txbRasterFangen.Text);
-    }
-
-    #endregion
-
-    private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
-
-
-        var l = Generic.GetInstaceOfType<AbstractPadItem>();
-
-        if (l.Count == 0) { return; }
-
-        var i = new List<AbstractListItem>();
-
-        foreach (var thisl in l) {
-            i.Add(ItemOf(thisl));
-        }
-
-        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
-
-        if (x is not { Count: 1 }) { return; }
-
-        var toadd = i.Get(x[0]);
-
-        if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
-
-        //if (toadd is not AbstractPadItem api) {  return; }
-
-        //var x = new FileExplorerPadItem(string.Empty);
-
-        Pad.AddCentered(api);
-
-
-    }
-
-
-    #region Constructors
-
-
-    #endregion
-
-    #region Methods
-
-    private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
-
-    private void btnDruckerDialog_Click(object sender, System.EventArgs e) => Pad.Print();
-
     private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
 
     private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
@@ -275,6 +107,16 @@ public partial class PadEditor : FormWithStatusBar {
     private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom = 1f;
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
+
+    private void cbxSchriftGröße_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        if (Pad?.Items == null) { return; }
+        Pad.Items.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
+    }
+
+    private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
+        if (Pad?.Items == null) { return; }
+        Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
+    }
 
     private void DoPages() {
         if (InvokeRequired) {
@@ -330,13 +172,53 @@ public partial class PadEditor : FormWithStatusBar {
         } catch { }
     }
 
+    private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
+
+    private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+        // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
+        // einem Parent zugeordnet werden.
+        // Deswegen müssen die Element einzigartig sein (also extra für das Menü generiert werden)
+        // Und deswegen können sie auch disposed werden.
+
+        if (Pad.LastClickedItem != null) {
+            Pad.LastClickedItem.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
+        }
+
+        LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
+    }
+
+    private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
+        if (Pad.LastClickedItem != null) {
+            Pad.LastClickedItem.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
+        }
+    }
+
     private void Pad_DrawModChanged(object sender, System.EventArgs e) {
         btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
         DoPages();
     }
 
+    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
+        btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
+        DoPages();
+
+        ckbRaster.Enabled = Pad.Items != null;
+        txbRasterAnzeige.Enabled = Pad.Items != null;
+        txbRasterFangen.Enabled = Pad.Items != null;
+
+        if (Pad.Items != null) {
+            ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
+            txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
+            txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
+            if (Pad.Items.SheetStyle != null) {
+                PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
+            }
+
+            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
+        }
+    }
 
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
@@ -344,6 +226,12 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     private void Pad_PropertyChanged(object sender, System.EventArgs e) => DoPages();
+
+    private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        if (Pad?.Items != null && Skin.StyleDb?.Row != null) {
+            Pad.Items.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
+        }
+    }
 
     private void tabSeiten_Selected(object sender, TabControlEventArgs e) {
         var s = string.Empty;
@@ -353,6 +241,20 @@ public partial class PadEditor : FormWithStatusBar {
         }
 
         Pad.CurrentPage = s;
+    }
+
+    private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
+        if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
+        if (!txbRasterAnzeige.Visible) { return; }
+        if (Pad?.Items == null) { return; }
+        Pad.Items.GridShow = FloatParse(txbRasterAnzeige.Text);
+    }
+
+    private void txbRasterFangen_TextChanged(object sender, System.EventArgs e) {
+        if (!txbRasterFangen.Text.IsNumeral()) { return; }
+        if (!txbRasterFangen.Visible) { return; }
+        if (Pad?.Items == null) { return; }
+        Pad.Items.GridSnap = FloatParse(txbRasterFangen.Text);
     }
 
     #endregion

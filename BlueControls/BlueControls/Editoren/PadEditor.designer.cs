@@ -30,15 +30,6 @@ namespace BlueControls.Forms {
             this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabStart = new System.Windows.Forms.TabPage();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
-            this.btnWeitereAllItem = new BlueControls.Controls.Button();
-            this.btnAddDynamicSymbol = new BlueControls.Controls.Button();
-            this.btnAddPhsyik = new BlueControls.Controls.Button();
-            this.btnAddSymbol = new BlueControls.Controls.Button();
-            this.btnAddUnterStufe = new BlueControls.Controls.Button();
-            this.btnAddText = new BlueControls.Controls.Button();
-            this.btnAddImage = new BlueControls.Controls.Button();
-            this.btnAddDimension = new BlueControls.Controls.Button();
-            this.btnAddLine = new BlueControls.Controls.Button();
             this.grpAssistent = new BlueControls.Controls.GroupBox();
             this.capRasterFangen = new BlueControls.Controls.Caption();
             this.capRasterAnzeige = new BlueControls.Controls.Caption();
@@ -71,7 +62,6 @@ namespace BlueControls.Forms {
             this.pnlStatusBar.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
-            this.grpKomponenteHinzufügen.SuspendLayout();
             this.grpAssistent.SuspendLayout();
             this.grpZoom.SuspendLayout();
             this.tabExport.SuspendLayout();
@@ -134,6 +124,8 @@ namespace BlueControls.Forms {
             this.Pad.Size = new System.Drawing.Size(512, 225);
             this.Pad.TabIndex = 0;
             this.Pad.Zoom = 1F;
+            this.Pad.ClickedItemChanged += new System.EventHandler(this.Pad_ClickedItemChanged);
+            this.Pad.ClickedItemChanging += new System.EventHandler(this.Pad_ClickedItemChanging);
             this.Pad.DrawModeChanged += new System.EventHandler(this.Pad_DrawModChanged);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             this.Pad.PropertyChanged += new System.EventHandler(this.Pad_PropertyChanged);
@@ -170,15 +162,6 @@ namespace BlueControls.Forms {
             // 
             this.grpKomponenteHinzufügen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpKomponenteHinzufügen.CausesValidation = false;
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitereAllItem);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDynamicSymbol);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddPhsyik);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddImage);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDimension);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
             this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(504, 0);
@@ -187,104 +170,6 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.TabIndex = 2;
             this.grpKomponenteHinzufügen.TabStop = false;
             this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
-            // 
-            // btnWeitereAllItem
-            // 
-            this.btnWeitereAllItem.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnWeitereAllItem.Location = new System.Drawing.Point(192, 46);
-            this.btnWeitereAllItem.Name = "btnWeitereAllItem";
-            this.btnWeitereAllItem.Size = new System.Drawing.Size(88, 22);
-            this.btnWeitereAllItem.TabIndex = 12;
-            this.btnWeitereAllItem.Text = "weitere...";
-            this.btnWeitereAllItem.Click += new System.EventHandler(this.btnWeitereAllItem_Click);
-            // 
-            // btnAddDynamicSymbol
-            // 
-            this.btnAddDynamicSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddDynamicSymbol.ImageCode = "Variable|16";
-            this.btnAddDynamicSymbol.Location = new System.Drawing.Point(96, 46);
-            this.btnAddDynamicSymbol.Name = "btnAddDynamicSymbol";
-            this.btnAddDynamicSymbol.Size = new System.Drawing.Size(96, 22);
-            this.btnAddDynamicSymbol.TabIndex = 11;
-            this.btnAddDynamicSymbol.Text = "Dyn. Symbol";
-            this.btnAddDynamicSymbol.Click += new System.EventHandler(this.btnAddDynamicSymbol_Click);
-            // 
-            // btnAddPhsyik
-            // 
-            this.btnAddPhsyik.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddPhsyik.ImageCode = "Formel|16";
-            this.btnAddPhsyik.Location = new System.Drawing.Point(192, 24);
-            this.btnAddPhsyik.Name = "btnAddPhsyik";
-            this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
-            this.btnAddPhsyik.TabIndex = 10;
-            this.btnAddPhsyik.Text = "Physik";
-            this.btnAddPhsyik.Click += new System.EventHandler(this.btnAddUnterStufe_Click);
-            // 
-            // btnAddSymbol
-            // 
-            this.btnAddSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddSymbol.ImageCode = "Stern|16|||||137|0";
-            this.btnAddSymbol.Location = new System.Drawing.Point(8, 46);
-            this.btnAddSymbol.Name = "btnAddSymbol";
-            this.btnAddSymbol.Size = new System.Drawing.Size(80, 22);
-            this.btnAddSymbol.TabIndex = 9;
-            this.btnAddSymbol.Text = "Symbol";
-            this.btnAddSymbol.Click += new System.EventHandler(this.btnAddSymbol_Click);
-            // 
-            // btnAddUnterStufe
-            // 
-            this.btnAddUnterStufe.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddUnterStufe.ImageCode = "Datei|16";
-            this.btnAddUnterStufe.Location = new System.Drawing.Point(192, 2);
-            this.btnAddUnterStufe.Name = "btnAddUnterStufe";
-            this.btnAddUnterStufe.Size = new System.Drawing.Size(88, 22);
-            this.btnAddUnterStufe.TabIndex = 8;
-            this.btnAddUnterStufe.Text = "Unterstufe";
-            this.btnAddUnterStufe.Click += new System.EventHandler(this.btnAddUnterStufe_Click);
-            // 
-            // btnAddText
-            // 
-            this.btnAddText.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddText.ImageCode = "Textfeld|16";
-            this.btnAddText.Location = new System.Drawing.Point(8, 2);
-            this.btnAddText.Name = "btnAddText";
-            this.btnAddText.Size = new System.Drawing.Size(80, 22);
-            this.btnAddText.TabIndex = 4;
-            this.btnAddText.Text = "Text";
-            this.btnAddText.Click += new System.EventHandler(this.btnAddText_Click);
-            // 
-            // btnAddImage
-            // 
-            this.btnAddImage.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddImage.ImageCode = "Bild|16";
-            this.btnAddImage.Location = new System.Drawing.Point(8, 24);
-            this.btnAddImage.Name = "btnAddImage";
-            this.btnAddImage.Size = new System.Drawing.Size(80, 22);
-            this.btnAddImage.TabIndex = 2;
-            this.btnAddImage.Text = "Bild";
-            this.btnAddImage.Click += new System.EventHandler(this.btnAddImage_Click);
-            // 
-            // btnAddDimension
-            // 
-            this.btnAddDimension.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddDimension.ImageCode = "Bemaßung|16";
-            this.btnAddDimension.Location = new System.Drawing.Point(96, 2);
-            this.btnAddDimension.Name = "btnAddDimension";
-            this.btnAddDimension.Size = new System.Drawing.Size(72, 22);
-            this.btnAddDimension.TabIndex = 6;
-            this.btnAddDimension.Text = "Maß";
-            this.btnAddDimension.Click += new System.EventHandler(this.btnAddDimension_Click);
-            // 
-            // btnAddLine
-            // 
-            this.btnAddLine.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddLine.ImageCode = "Linie|16";
-            this.btnAddLine.Location = new System.Drawing.Point(96, 24);
-            this.btnAddLine.Name = "btnAddLine";
-            this.btnAddLine.Size = new System.Drawing.Size(72, 22);
-            this.btnAddLine.TabIndex = 7;
-            this.btnAddLine.Text = "Linie";
-            this.btnAddLine.Click += new System.EventHandler(this.btnAddLine_Click);
             // 
             // grpAssistent
             // 
@@ -643,7 +528,6 @@ namespace BlueControls.Forms {
             this.pnlStatusBar.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
-            this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
             this.grpZoom.ResumeLayout(false);
             this.tabExport.ResumeLayout(false);
@@ -673,15 +557,6 @@ namespace BlueControls.Forms {
         protected Button btnVorschauModus;
         protected TabControl tabSeiten;
         protected GroupBox grpKomponenteHinzufügen;
-        private Button btnWeitereAllItem;
-        private Button btnAddDynamicSymbol;
-        private Button btnAddPhsyik;
-        private Button btnAddSymbol;
-        private Button btnAddUnterStufe;
-        private Button btnAddText;
-        private Button btnAddImage;
-        private Button btnAddDimension;
-        private Button btnAddLine;
         private Caption capRasterFangen;
         private Caption capRasterAnzeige;
         private Controls.TextBox txbRasterFangen;

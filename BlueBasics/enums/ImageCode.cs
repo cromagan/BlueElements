@@ -42,7 +42,6 @@ public enum ImageCode {
     Datei,
     Datenbank,
     Diskette,
-    Doppelkreis,
     DrehenLinks,
     DrehenRechts,
     Drucker,

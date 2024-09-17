@@ -44,16 +44,16 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     /// <summary>
-    /// Soll es gedruckt werden?
-    /// </summary>
-    /// <remarks></remarks>
-    private bool _beiExportSichtbar = true;
-
-    /// <summary>
     /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
     /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
     /// </summary>
     private readonly PointM _jointMiddle;
+
+    /// <summary>
+    /// Soll es gedruckt werden?
+    /// </summary>
+    /// <remarks></remarks>
+    private bool _beiExportSichtbar = true;
 
     /// <summary>
     /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
@@ -430,6 +430,14 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
                 return true;
 
+            case "jointpoint":
+                if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
+
+                var p = new PointM(this, value);
+                JointPoints.Add(p);
+
+                return true;
+
             case "format": // = Textformat!!!
             case "design":
             case "style":
@@ -476,10 +484,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public virtual void PointMoved(object sender, MoveEventArgs e) {
         if (sender is not PointM p) { return; }
 
-
         if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
             if (e.ByMouse && JointPoints.Contains(p)) {
-
                 p.Distance = GetLenght(_jointMiddle, p);
                 p.Angle = GetAngle(_jointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
             }
