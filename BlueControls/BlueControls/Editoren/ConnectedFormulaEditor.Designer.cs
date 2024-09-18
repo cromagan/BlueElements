@@ -24,6 +24,8 @@ namespace BlueControls.Forms {
             this.grpVorschau = new BlueControls.Controls.GroupBox();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnSymbolLaden = new BlueControls.Controls.Button();
+            this.btnWeitereCF = new BlueControls.Controls.Button();
             this.btnRegionAdd = new BlueControls.Controls.Button();
             this.btnButton = new BlueControls.Controls.Button();
             this.btnBild = new BlueControls.Controls.Button();
@@ -49,13 +51,13 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.btnWeitereCF = new BlueControls.Controls.Button();
-            this.grpDesign.SuspendLayout();
-            this.tabHintergrund.SuspendLayout();
+            this.LoadSymbol = new System.Windows.Forms.OpenFileDialog();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
             this.tabSeiten.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
+            this.grpDesign.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.tabEditorStd.SuspendLayout();
             this.grpVorschau.SuspendLayout();
@@ -67,34 +69,16 @@ namespace BlueControls.Forms {
             this.grpDatei.SuspendLayout();
             this.SuspendLayout();
             // 
-            // grpKomponenteHinzufügen
-            // 
-            this.grpKomponenteHinzufügen.Visible = false;
-            // 
-            // grpDesign
-            // 
-            this.grpDesign.Visible = false;
-            // 
-            // tabHintergrund
-            // 
-            this.tabHintergrund.Size = new System.Drawing.Size(1267, 81);
-            // 
-            // tabRightSide
-            // 
-            this.tabRightSide.Location = new System.Drawing.Point(903, 136);
-            this.tabRightSide.Size = new System.Drawing.Size(372, 339);
-            // 
             // Pad
             // 
-            this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.Size = new System.Drawing.Size(903, 339);
+            this.Pad.Size = new System.Drawing.Size(412, 425);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabEditorStd);
             this.Ribbon.Controls.Add(this.tabFile);
-            this.Ribbon.Size = new System.Drawing.Size(1275, 110);
+            this.Ribbon.Size = new System.Drawing.Size(784, 110);
             this.Ribbon.TabDefault = this.tabFile;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Datei",
@@ -121,17 +105,29 @@ namespace BlueControls.Forms {
             // tabSeiten
             // 
             this.tabSeiten.Controls.Add(this.tabPage1);
-            this.tabSeiten.Size = new System.Drawing.Size(1275, 26);
+            this.tabSeiten.Size = new System.Drawing.Size(784, 26);
+            // 
+            // grpKomponenteHinzufügen
+            // 
+            this.grpKomponenteHinzufügen.Visible = false;
+            // 
+            // grpDesign
+            // 
+            this.grpDesign.Visible = false;
+            // 
+            // tabRightSide
+            // 
+            this.tabRightSide.Location = new System.Drawing.Point(412, 136);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 425);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(1275, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
+            this.capStatusBar.Size = new System.Drawing.Size(412, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 475);
-            this.pnlStatusBar.Size = new System.Drawing.Size(1275, 24);
+            this.pnlStatusBar.Location = new System.Drawing.Point(0, 537);
+            this.pnlStatusBar.Size = new System.Drawing.Size(412, 24);
             // 
             // tabEditorStd
             // 
@@ -144,7 +140,7 @@ namespace BlueControls.Forms {
             this.tabEditorStd.Location = new System.Drawing.Point(4, 25);
             this.tabEditorStd.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditorStd.Name = "tabEditorStd";
-            this.tabEditorStd.Size = new System.Drawing.Size(1267, 81);
+            this.tabEditorStd.Size = new System.Drawing.Size(776, 81);
             this.tabEditorStd.TabIndex = 4;
             this.tabEditorStd.Text = "Editor-Std.";
             // 
@@ -154,7 +150,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(760, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(848, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(88, 81);
             this.grpVorschau.TabIndex = 1;
@@ -175,6 +171,7 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnSymbolLaden);
             this.grpFelder.Controls.Add(this.btnWeitereCF);
             this.grpFelder.Controls.Add(this.btnRegionAdd);
             this.grpFelder.Controls.Add(this.btnButton);
@@ -185,10 +182,31 @@ namespace BlueControls.Forms {
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpFelder.Location = new System.Drawing.Point(504, 0);
             this.grpFelder.Name = "grpFelder";
-            this.grpFelder.Size = new System.Drawing.Size(256, 81);
+            this.grpFelder.Size = new System.Drawing.Size(344, 81);
             this.grpFelder.TabIndex = 0;
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
+            // 
+            // btnSymbolLaden
+            // 
+            this.btnSymbolLaden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnSymbolLaden.ImageCode = "Ordner|16";
+            this.btnSymbolLaden.Location = new System.Drawing.Point(256, 2);
+            this.btnSymbolLaden.Name = "btnSymbolLaden";
+            this.btnSymbolLaden.Size = new System.Drawing.Size(72, 66);
+            this.btnSymbolLaden.TabIndex = 14;
+            this.btnSymbolLaden.Text = "Symbol laden";
+            this.btnSymbolLaden.Click += new System.EventHandler(this.btnSymbolLaden_Click);
+            // 
+            // btnWeitereCF
+            // 
+            this.btnWeitereCF.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnWeitereCF.Location = new System.Drawing.Point(144, 46);
+            this.btnWeitereCF.Name = "btnWeitereCF";
+            this.btnWeitereCF.Size = new System.Drawing.Size(104, 22);
+            this.btnWeitereCF.TabIndex = 8;
+            this.btnWeitereCF.Text = "weitere...";
+            this.btnWeitereCF.Click += new System.EventHandler(this.btnWeitereCF_Click);
             // 
             // btnRegionAdd
             // 
@@ -472,34 +490,31 @@ namespace BlueControls.Forms {
             this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(1267, 0);
+            this.tabPage1.Size = new System.Drawing.Size(776, 0);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
             // 
-            // btnWeitereCF
+            // LoadSymbol
             // 
-            this.btnWeitereCF.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnWeitereCF.Location = new System.Drawing.Point(144, 46);
-            this.btnWeitereCF.Name = "btnWeitereCF";
-            this.btnWeitereCF.Size = new System.Drawing.Size(104, 22);
-            this.btnWeitereCF.TabIndex = 8;
-            this.btnWeitereCF.Text = "weitere...";
-            this.btnWeitereCF.Click += new System.EventHandler(this.btnWeitereCF_Click);
+            this.LoadSymbol.DefaultExt = "BCS";
+            this.LoadSymbol.Filter = "*.BCS Symbol-Datei|*.BCS|*.* Alle Dateien|*";
+            this.LoadSymbol.Title = "Bitte Datei zum Importieren wählen:";
+            this.LoadSymbol.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadSymbol_FileOk);
             // 
             // ConnectedFormulaEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1275, 499);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Name = "ConnectedFormulaEditor";
             this.Text = "ConnectedFormula";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.grpDesign.ResumeLayout(false);
-            this.tabHintergrund.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
             this.tabSeiten.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.tabEditorStd.ResumeLayout(false);
             this.grpVorschau.ResumeLayout(false);
@@ -545,5 +560,7 @@ namespace BlueControls.Forms {
         private Button btnArbeitsbereich;
         private Button btnRegionAdd;
         private Button btnWeitereCF;
+        private Button btnSymbolLaden;
+        private OpenFileDialog LoadSymbol;
     }
 }

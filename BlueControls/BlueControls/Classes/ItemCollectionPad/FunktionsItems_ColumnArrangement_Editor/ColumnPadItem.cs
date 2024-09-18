@@ -88,7 +88,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         List<GenericControl> result = [];
 
-        result.Add(new FlexiControlForDelegate(Column.Database.Edit, "Tabelle: " + Datenbank, ImageCode.Datenbank));
+        result.Add(new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Datenbank));
         result.Add(new FlexiControlForDelegate(Column.Edit, "Spalte: " + Column.Caption, ImageCode.Spalte));
         result.Add(new FlexiControl());
         result.Add(new FlexiControlForProperty<bool>(() => Permanent));

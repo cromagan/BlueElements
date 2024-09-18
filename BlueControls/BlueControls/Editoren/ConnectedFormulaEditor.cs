@@ -263,6 +263,12 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.SaveAll(true);
 
+    private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
+        if (!string.IsNullOrEmpty(IO.LastFilePath)) { LoadSymbol.InitialDirectory = IO.LastFilePath; }
+
+        LoadSymbol.ShowDialog();
+    }
+
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (CFormula == null) { return; }
 
@@ -318,9 +324,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             //CheckButtons();
             return false;
         }
-
-
-
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
@@ -397,6 +400,25 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var x = new FileExplorerPadItem();
 
         AddCentered(x);
+    }
+
+    private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
+        if (Pad.Items == null) { return; }
+
+        if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
+        var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        IO.LastFilePath = LoadSymbol.FileName.FilePath();
+
+        var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(x);
+        i?.Parse(x);
+
+        if (i is not ReciverControlPadItem api) { return; }
+
+        api.KeyName = Generic.GetUniqueKey();
+
+        api.Page = InputBox.Show("Welcher Tab:", api.Page, BlueBasics.FormatHolder.SystemName);
+
+        Pad.Items.Add(api);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);

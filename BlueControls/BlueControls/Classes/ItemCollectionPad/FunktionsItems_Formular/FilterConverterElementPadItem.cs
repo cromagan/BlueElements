@@ -55,7 +55,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     #region Properties
 
     public static string ClassId => "FI-FilterConverterElement";
-    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
 
     public override bool DatabaseInputMustMatchOutputDatabase => false;
@@ -225,7 +225,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override string ReadableText() {
-        const string txt = "Filter-Konvertierer: ";
+        const string txt = "Filter-Generator: ";
 
     
             return txt + DatabaseOutput?.Caption;

@@ -26,6 +26,9 @@ using System.Collections.ObjectModel;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.ItemCollectionList;
+using BlueBasics.Enums;
+using BlueControls.Enums;
+using BlueControls.Forms;
 using static BlueDatabase.Database;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -169,6 +172,11 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     public override string ErrorReason() {
         if (DatabaseOutput is not { IsDisposed: false }) {
+
+            if(DatabaseInputMustMatchOutputDatabase) {
+                return "Eingehendes Objekt nicht gewählt.";
+            }
+
             return "Ausgehende Datenbank nicht angegeben.";
         }
 
@@ -191,7 +199,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         }
         if (!enableOutput) {
             if (outp != null) {
-                result.Add(new FlexiControl($"Ausgangsdatenbank: {outp.Caption}", widthOfControl, false));
+                outp.Editor = typeof(DatabaseHeadEditor);
+                 result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Datenbank));
+            } else {
+              result.Add(new FlexiControl("<ImageCode=Information|16> Ausgangsdatenbank wird über den Eingang gewählt.", widthOfControl, false));
             }
         } else {
             result.Add(new FlexiControlForProperty<Database?>(() => DatabaseOutput, AllAvailableTables()));

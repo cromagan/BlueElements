@@ -23,7 +23,9 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
@@ -78,6 +80,16 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     #region Properties
 
+    [Description("Die Breite des Objekts in mm.")]
+    public float Breite {
+        get => (float)Math.Round((double)PixelToMm(UsedArea.Width, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero);
+        set {
+            if (IsDisposed) { return; }
+            if (Breite == value) { return; }
+            _pRu.X = _pLo.X + MmToPixel(value, ItemCollectionPad.Dpi);
+        }
+    }
+
     public int Drehwinkel {
         get => _drehwinkel;
         set {
@@ -85,6 +97,16 @@ public abstract class RectanglePadItem : AbstractPadItem {
             if (_drehwinkel == value) { return; }
             _drehwinkel = value;
             OnPropertyChanged();
+        }
+    }
+
+    [Description("Die Höhe des Objekts in mm.")]
+    public float Höhe {
+        get => (float)Math.Round((double)PixelToMm(UsedArea.Height, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero);
+        set {
+            if (IsDisposed) { return; }
+            if (Höhe == value) { return; }
+            _pRu.Y = _pLo.Y + MmToPixel(value, ItemCollectionPad.Dpi);
         }
     }
 
@@ -96,6 +118,8 @@ public abstract class RectanglePadItem : AbstractPadItem {
         List<GenericControl> result =
         [   .. base.GetProperties(widthOfControl),
             new FlexiControl(),
+            new FlexiControlForProperty<float>(() => Breite),
+            new FlexiControlForProperty<float>(() => Höhe),
             new FlexiControlForProperty<int>(() => Drehwinkel),
 
         ];
@@ -124,9 +148,9 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
-        if(JointPoints.Contains(point)) {
+        if (JointPoints.Contains(point)) {
             base.PointMoved(sender, e);
-            return; 
+            return;
         }
 
         var x = point.X;

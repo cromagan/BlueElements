@@ -236,6 +236,16 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
         }
 
+        var p = GetFilterFromGet();
+
+        if (AllowedInputFilter == AllowedInputFilter.None) {
+            if (p.Count > 0) { return "Keine Parents erlaubt."; }
+        } else if (AllowedInputFilter == AllowedInputFilter.One) {
+            if (p.Count != 1) { return "Es muss genau ein Parent gewählt werden."; }
+        } else if (!AllowedInputFilter.HasFlag(AllowedInputFilter.None)) {
+            if (p.Count == 0) { return "Parents müssen gewählt werden."; }
+        }
+
         return string.Empty;
     }
 
@@ -273,44 +283,44 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             outp = iiss.DatabaseOutput;
         }
 
-        if (DatabaseInputMustMatchOutputDatabase && outp == null) {
-            result.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl, false));
-        } else {
-            var x = new List<AbstractListItem>();
+        //if (DatabaseInputMustMatchOutputDatabase && outp == null) {
+        //    result.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl, false));
+        //} else {
+        var x = new List<AbstractListItem>();
 
-            // Die Items, die man noch wählen könnte
-            foreach (var thisR in Parent) {
-                if (thisR.IsOnPage(Page) && thisR is ReciverSenderControlPadItem rfp) {
-                    //if (outp == null || outp == rfp.DatabaseOutput) {
-                    if (rfp != this) {
-                        x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
-                    }
+        // Die Items, die man noch wählen könnte
+        foreach (var thisR in Parent) {
+            if (thisR.IsOnPage(Page) && thisR is ReciverSenderControlPadItem rfp) {
+                //if (outp == null || outp == rfp.DatabaseOutput) {
+                if (rfp != this) {
+                    x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                 }
             }
-
-            switch (AllowedInputFilter) {
-                case AllowedInputFilter.One:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                    break;
-
-                case AllowedInputFilter.More:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                    break;
-
-                case AllowedInputFilter.More | AllowedInputFilter.None:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                    break;
-
-                case AllowedInputFilter.One | AllowedInputFilter.None:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                    break;
-
-                default:
-
-                    //case AllowedInputFilter.None:
-                    break;
-            }
         }
+
+        switch (AllowedInputFilter) {
+            case AllowedInputFilter.One:
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                break;
+
+            case AllowedInputFilter.More:
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                break;
+
+            case AllowedInputFilter.More | AllowedInputFilter.None:
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                break;
+
+            case AllowedInputFilter.One | AllowedInputFilter.None:
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                break;
+
+            default:
+
+                //case AllowedInputFilter.None:
+                break;
+        }
+        //}
 
         if (Bei_Export_sichtbar) {
             result.Add(new FlexiControl("Sichtbarkeit:", widthOfControl, true));

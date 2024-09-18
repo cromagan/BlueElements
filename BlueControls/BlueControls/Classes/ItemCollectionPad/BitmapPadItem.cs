@@ -92,6 +92,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
             if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).CloneOfBitmap();
+        OnPropertyChanged();
     }
 
     public void Datei_laden() {
@@ -108,6 +109,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
         if (!FileExists(e.FileName)) { return; }
         Bitmap = (Bitmap?)Image_FromFile(e.FileName);
+        OnPropertyChanged();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

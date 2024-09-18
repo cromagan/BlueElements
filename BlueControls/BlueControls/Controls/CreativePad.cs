@@ -194,10 +194,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
-
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-
-
         if (e.HotItem is AbstractPadItem item) {
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "#vordergrund":
@@ -243,7 +240,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
 
         if (e.HotItem is PointM pm) {
-
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "löschen":
                     if (pm.Parent is AbstractPadItem api) {
@@ -260,9 +256,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     return;
             }
         }
-
-
-
 
         OnContextMenuItemClicked(e);
     }
@@ -311,34 +304,30 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        if (EditAllowed) {
+            //var hotitem = GetHotItem(e.Mouse);
 
-        if (!EditAllowed) { return; }
+            if (e.HotItem is AbstractPadItem bpi) {
+                LastClickedItem = bpi;
+                e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
+                e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
+                e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
+                e.ContextMenu.Add(Separator());
+                e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
+                e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
+                e.ContextMenu.Add(ItemOf("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));
+                e.ContextMenu.Add(ItemOf("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten));
 
-        //var hotitem = GetHotItem(e.Mouse);
+                return;
+            }
 
+            LastClickedItem = null;
 
-        if (e.HotItem is AbstractPadItem bpi) {
-            LastClickedItem = bpi;
-            e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
-            e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
-            e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
-            e.ContextMenu.Add(Separator());
-            e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
-            e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));
-            e.ContextMenu.Add(ItemOf("Eine Ebene nach vorne", "#Vorne", ImageCode.EbeneNachVorne));
-            e.ContextMenu.Add(ItemOf("Eine Ebene nach hinten", "#Hinten", ImageCode.EbeneNachHinten));
-
-            return;
+            if (e.HotItem is PointM pm) {
+                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
+                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
+            }
         }
-
-        LastClickedItem = null;
-
-        if (e.HotItem is PointM pm) {
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
-        }
-
-
 
         OnContextMenuInit(e);
     }
@@ -460,14 +449,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
+                            if (GetLenght(thisPoint, p) < 5f) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
+                            if (GetLenght(thisPoint, p) < 5f) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -478,6 +467,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
             if (hotitem is IMoveable imv) {
                 SelectItem(imv, ModifierKeys.HasFlag(Keys.Control));
+            } else {
+                Unselect();
             }
 
             if (hotitem is AbstractPadItem api) {
@@ -485,8 +476,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             } else {
                 LastClickedItem = null;
             }
-
-
         }
     }
 
@@ -520,7 +509,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
             _lastQuickInfo = string.Empty;
 
-
             if (hotitem is AbstractPadItem bpi && e.Button == MouseButtons.None) {
                 if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
                     _lastQuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
@@ -528,7 +516,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     _lastQuickInfo = bpi.Description;
                 }
             }
-
         }
 
         if (e.Button == MouseButtons.Left) {
@@ -610,7 +597,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                         var t = p.ZoomAndMove(Zoom, ShiftX, ShiftY);
                         Rectangle r = new((int)(t.X + 5), (int)(t.Y + 0), 200, 200);
                         Skin.Draw_FormatedText(gr, p.KeyName, Design.Button_EckpunktSchieber_Joint, States.Standard, null, Alignment.Top_Left, r, null, false, false);
-
                     }
 
                     if (bpi.JointPoints.Count > 0) {
@@ -623,11 +609,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                             p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
                         }
 
-
                         foreach (var p in bpi2.MovablePoint) {
                             p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
                         }
-
                     }
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
@@ -685,14 +669,24 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnItemRemoving(e);
     }
 
+    private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
+
+    private void DruckerDokument_EndPrint(object sender, PrintEventArgs e) => OnEndPrint(e);
+
+    private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
+        e.HasMorePages = false;
+        OnPrintPage(e);
+        var i = _items?.ToBitmap(3, string.Empty);
+        if (i == null) { return; }
+        e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
+    }
+
     private object? GetHotItem(MouseEventArgs? e) {
         if (e == null) { return null; }
-
 
         var l = HotItems(e);
         var mina = long.MaxValue;
         object? tmp = null;
-
 
         foreach (var thisItem in l) {
             var a = (long)Math.Abs(thisItem.UsedArea.Width) * (long)Math.Abs(thisItem.UsedArea.Height);
@@ -704,38 +698,16 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
 
         if (LastClickedItem is AbstractPadItem bpi) {
-
             foreach (var thisPoint in bpi.JointPoints) {
                 Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
 
-
-                if (GetLenght(thisPoint.X, thisPoint.Y, p.X, p.Y) < 5f / Zoom) {
+                if (GetLenght(thisPoint.X, thisPoint.Y, p.X, p.Y) < 5f) {
                     tmp = thisPoint;
                 }
-
             }
-
-
         }
 
-
-
-
         return tmp;
-
-
-    }
-
-    private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
-
-    private void DruckerDokument_EndPrint(object sender, PrintEventArgs e) => OnEndPrint(e);
-
-    private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
-        e.HasMorePages = false;
-        OnPrintPage(e);
-        var i = _items?.ToBitmap(3, string.Empty);
-        if (i == null) { return; }
-        e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
     private void Items_PropertyChanged(object sender, System.EventArgs e) {

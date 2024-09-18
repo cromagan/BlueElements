@@ -164,7 +164,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public static PointM Empty() => new(0f, 0f);
 
-    public static implicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
+    public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
     public static implicit operator PointF(PointM p) => new(p.X, p.Y);
 
