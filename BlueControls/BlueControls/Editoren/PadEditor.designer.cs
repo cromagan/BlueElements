@@ -540,7 +540,7 @@ namespace BlueControls.Forms {
         }
         public Button btnZoomOut;
         private Button btnAuswahl;
-        protected CreativePad Pad;
+        public CreativePad Pad;
         protected RibbonBar Ribbon;
         protected TabPage tabStart;
         protected TabPage tabExport;

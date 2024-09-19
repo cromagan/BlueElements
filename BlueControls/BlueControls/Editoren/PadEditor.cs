@@ -34,7 +34,7 @@ public partial class PadEditor : FormWithStatusBar {
 
     #region Constructors
 
-    protected PadEditor() : base() {
+    public PadEditor() : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

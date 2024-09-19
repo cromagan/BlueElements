@@ -17,54 +17,63 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueControls.Forms;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_AddPadItem : Method {
+public class Method_ShowForm : BlueScript.Methods.Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], [VariableItemPadItem.ShortName_Variable]];
-    public override string Command => "addpaditem";
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable]];
+    public override string Command => "showform";
     public override List<string> Constants => [];
-    public override string Description => "Fügt einer ItemCollectionPad ein PadItem hinzu.";
+    public override string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override int LastArgMinCount => 0;
+    public override MethodType MethodType =>  MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
+    public override string Returns => VariableFloat.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "AddPadItem(Collection, PadItem);";
+    public override string Syntax => "ShowForm(Inhalt);";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+
+
 
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
         if (icp.ValuePad is not { IsDisposed: true } icpv) { return DoItFeedback.InternerFehler(ld); }
 
+        var c = new PadEditor();
+        c.Pad.Items = icpv;
+        c.Show();
 
-        if (attvar.Attributes[1] is not VariableItemPadItem ici) { return DoItFeedback.InternerFehler(ld); }
-        if (ici.ValuePadItem is not { IsDisposed: true } iciv) { return DoItFeedback.InternerFehler(ld); }
+        //var txt = attvar.ValueStringGet(0);
 
+        //var img = attvar.ValueStringGet(1);
+        //var pic = ImageCode.Information;
 
-        if (iciv.Parent != null) { return new DoItFeedback(ld, "Das Item gehört breits einer Collection an"); }
+        //if (Enum.TryParse(img, out ImageCode type)) { pic = type; }
 
+        //List<string> buttons = [];
+        //for (var z = 2; z < attvar.Attributes.Count; z++) {
+        //    buttons.Add(attvar.ValueStringGet(z));
+        //}
 
-        icpv.Add(iciv);
+        //if (buttons.Count == 0) { buttons.Add("Ok"); }
 
-
+        //var l = MessageBox.Show(txt, pic, true, buttons.ToArray());
 
         return DoItFeedback.Null();
     }
