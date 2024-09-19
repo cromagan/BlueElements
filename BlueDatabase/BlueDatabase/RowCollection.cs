@@ -179,9 +179,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
+
+        var t = Stopwatch.StartNew();
+
         do {
             if (DidRows.Count > 0) { return; }
             if (InvalidatedRows.Count == 0) { return; }
+            if(t.Elapsed.TotalMinutes >5 ) { return; }
             Generic.Pause(1, true);
         } while (Database.ExecutingScriptAnyDatabase != 0);
 
@@ -197,24 +201,26 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             n++;
-            try {
-                var r = InvalidatedRows[0];
-                InvalidatedRows.RemoveAt(0);
+            RowItem? r = null;
 
-                if (r is { IsDisposed: false, Database.IsDisposed: false } && !DidRows.Contains(r)) {
-                    DidRows.Add(r);
-                    if (r.NeedsRowUpdate(false, true)) {
-                        if (masterRow?.Database != null) {
-                            r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
-                            masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
-                        } else {
-                            r.UpdateRow(extendedAllowed, true, "Normales Update");
-                        }
+            try {
+                r = InvalidatedRows[0];
+                InvalidatedRows.RemoveAt(0);
+            } catch { }
+
+
+            if (r is { IsDisposed: false, Database.IsDisposed: false } && !DidRows.Contains(r)) {
+                DidRows.Add(r);
+                if (r.NeedsRowUpdate(false, true)) {
+                    if (masterRow?.Database != null) {
+                        r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
+                        masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                    } else {
+                        r.UpdateRow(extendedAllowed, true, "Normales Update");
                     }
                 }
-            } catch { }
+            }
         }
-
         DidRows.Clear();
         masterRow?.OnDropMessage(FehlerArt.Info, "Updates abgearbeitet");
     }

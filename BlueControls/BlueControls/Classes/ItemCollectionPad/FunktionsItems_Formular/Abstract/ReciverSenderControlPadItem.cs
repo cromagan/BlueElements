@@ -83,7 +83,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     public Database? DatabaseOutput {
         get {
-            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return DatabaseInput; }
+            if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is {IsDisposed: false }) { return DatabaseInput; }
 
             if (_databaseOutputLoaded) { return _databaseOutput; }
 
@@ -251,7 +251,13 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
         List<string> result = [];
 
-        result.ParseableAdd("OutputDatabase", _databaseOutputName);
+        if(DatabaseInputMustMatchOutputDatabase && DatabaseInput is {IsDisposed: false } db) {
+            result.ParseableAdd("OutputDatabase", db.KeyName);
+        } else {
+            result.ParseableAdd("OutputDatabase", _databaseOutputName);
+        }
+
+
         result.ParseableAdd("SentToChildIds", _childIds, false);
 
         return result.Parseable(base.ToParseableString());
