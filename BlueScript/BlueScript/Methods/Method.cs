@@ -291,8 +291,6 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="generateVariable"></param>
     /// <returns></returns>
     public static DoItFeedback VariablenBerechnung(VariableCollection varCol, LogData ld, ScriptProperties scp, string newcommand, bool generateVariable) {
-        //if (s.BerechneVariable == null) { return new DoItFeedback(infos.LogData, s, "Interner Fehler"); }
-
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
         if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(ld, "Fehler mit = - Zeichen"); }
@@ -329,13 +327,13 @@ public abstract class Method : IReadableTextWithKey {
 
             if (vari == null) {
                 // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
-                return new DoItFeedback(ld, "Interner Fehler");
+                return DoItFeedback.InternerFehler(ld);
             }
 
             return vari.GetValueFrom(v, ld);
         }
         // attvar.Attributes[0] müsste immer eine Variable sein...
-        return new DoItFeedback(ld, "Interner Fehler");
+        return DoItFeedback.InternerFehler(ld);
     }
 
     public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {

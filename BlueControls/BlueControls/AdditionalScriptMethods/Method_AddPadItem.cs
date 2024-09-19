@@ -18,51 +18,55 @@
 #nullable enable
 
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using static BlueBasics.Extensions;
 
-namespace BlueScript.Methods;
+namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_CountString : Method {
+internal class Method_AddPadItem : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], StringVal];
-    public override string Command => "countstring";
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], [VariableItemPadItem.ShortName_Variable]];
+    public override string Command => "addpaditem";
     public override List<string> Constants => [];
-
-    public override string Description => "Ist das erste Argument ein Text, wird gezählt, wie oft der Suchstring im Text vorkommt.\r\n" +
-        "Ist es eine Liste, wird gezählt, wie oft ein Listeneintrag dem Text entspricht.\r\n" +
-        "Achtung: Groß/Kleinschreibung wird beachtet!";
-
+    public override string Description => "Fügt einer ItemCollectionPad ein PadItem hinzu.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFloat.ShortName_Plain;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "CountString(Text/Liste, Suchstring)";
+    public override string Syntax => "AddPadItem(Collection, PadItem);";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        switch (attvar.Attributes[0]) {
-            case VariableString vs:
-                return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
-            case VariableListString vl:
-                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)));
-        }
+        if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
+        if (icp.ValuePad is not { IsDisposed: true } icpv) { return DoItFeedback.InternerFehler(ld); }
 
-        return DoItFeedback.InternerFehler(ld);
+
+        if (attvar.Attributes[1] is not VariableItemPadItem ici) { return DoItFeedback.InternerFehler(ld); }
+        if (ici.ValuePadItem is not { IsDisposed: true } iciv) { return DoItFeedback.InternerFehler(ld); }
+
+
+        if (iciv.Parent != null) { return new DoItFeedback(ld, "Das Item gehört breits einer  Collection an"); }
+
+
+        icpv.Add(iciv);
+
+
+
+        return DoItFeedback.Null();
     }
 
     #endregion

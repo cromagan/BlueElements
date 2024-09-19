@@ -51,7 +51,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
+        if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
         if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
         if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }

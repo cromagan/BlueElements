@@ -63,7 +63,7 @@ public class Method_SetError : Method_Database {
         //if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         var r = MyRow(scp);
-        if (r is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Interner Fehler, Zeile nicht gefunden"); }
+        if (r is not { IsDisposed: not true }) { return DoItFeedback.InternerFehler(ld); }
 
         r.LastCheckedRowFeedback ??= [];
 

@@ -102,6 +102,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptMethods\Method_AddPadItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_DrawLine.cs" />
     <Compile Include="AdditionalScriptMethods\Method_mm.cs" />
@@ -109,6 +110,8 @@
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
+    <Compile Include="AdditionalScriptMethods\VariableItemPadItem.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
@@ -712,6 +715,7 @@
     <Compile Include="Editoren\VariableEditor.Designer.cs">
       <DependentUpon>VariableEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaButton.resx">

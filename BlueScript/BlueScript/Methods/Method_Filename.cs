@@ -17,53 +17,38 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_CountString : Method {
+internal class Method_Filename : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], StringVal];
-    public override string Command => "countstring";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "filename";
     public override List<string> Constants => [];
-
-    public override string Description => "Ist das erste Argument ein Text, wird gezählt, wie oft der Suchstring im Text vorkommt.\r\n" +
-        "Ist es eine Liste, wird gezählt, wie oft ein Listeneintrag dem Text entspricht.\r\n" +
-        "Achtung: Groß/Kleinschreibung wird beachtet!";
-
+    public override string Description => "Gibt den Dateinaamen ohne Pfad und ohne Suffix zurück";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "CountString(Text/Liste, Suchstring)";
+    public override string Syntax => "Filename(FilePathAndName)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        switch (attvar.Attributes[0]) {
-            case VariableString vs:
-                return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
-
-            case VariableListString vl:
-                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)));
-        }
-
-        return DoItFeedback.InternerFehler(ld);
-    }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).FileNameWithoutSuffix());
 
     #endregion
 }

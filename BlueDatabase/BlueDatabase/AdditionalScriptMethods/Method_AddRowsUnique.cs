@@ -59,7 +59,7 @@ public class Method_AddRowsUnique : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
+        if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }

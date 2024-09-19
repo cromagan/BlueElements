@@ -207,7 +207,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
         if (posa > -1) {
             var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
-            if (pose <= posa) { return DoItFeedback.Klammerfehler(ld); }
+            if (pose <= posa) { return DoItFeedback.KlammerFehler(ld); }
 
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {

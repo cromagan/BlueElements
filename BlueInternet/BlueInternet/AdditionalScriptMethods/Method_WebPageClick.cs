@@ -28,28 +28,28 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_WebPageClick : Method_WebPage {
+internal class Method_AddSymbol : Method_WebPage {
 
     #region Properties
 
     public override List<List<string>> Args => [WebPageVal, StringVal];
-    public override string Command => "webpageclick";
+    public override string Command => "addsymbol";
     public override List<string> Constants => [];
-    public override string Description => "Drückt einen Button, Klasse oder Link in der Webpage und wartet, bis die Seite geladen ist.";
+    public override string Description => "Fügt ein Pad-Item-Symbol einer Collection hinzu";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "WebPageClick(WebPageVariable, id)";
+    public override string Syntax => "AddSymbol(Collection, id)";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(ld, "Interner Fehler"); }
+        if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
         if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
         if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }

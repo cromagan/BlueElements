@@ -197,9 +197,18 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
         }
 
-        if (AdditionalInfoColumn is { IsDisposed: false, Function: not ColumnFunction.Schlüsselspalte }) {
+        if (AdditionalInfoColumn is not { IsDisposed: false } aci) {
+            return "Spalte, in der die Zusatzinfo geschrieben werden soll, fehlt";
+        }
+
+        if (aci.Function != ColumnFunction.Schlüsselspalte) {
             return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
         }
+
+
+        //if (AdditionalInfoColumn is { IsDisposed: false, Function: not ColumnFunction.Schlüsselspalte }) {
+        //    return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
+        //}
 
         if (string.IsNullOrEmpty(Script)) {
             return "Kein Skript definiert.";

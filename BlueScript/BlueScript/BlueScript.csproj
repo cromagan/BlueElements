@@ -57,6 +57,7 @@
     <Compile Include="Methods\Method_SaveText.cs" />
     <Compile Include="Methods\Method_Compare.cs" />
     <Compile Include="Methods\Method_SplitWords.cs" />
+    <Compile Include="Methods\Method_Filename.cs" />
     <Compile Include="ScriptDescription.cs" />
     <Compile Include="Enums\MethodType.cs" />
     <Compile Include="Enums\ScriptIssueType.cs" />

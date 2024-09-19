@@ -91,7 +91,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
+        if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null || allFi.Count == 0) {

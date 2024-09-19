@@ -84,7 +84,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
         //}
 
         var mydb = MyDatabase(scp);
-        if (mydb == null) { return new DoItFeedback(ld, "Interner Fehler"); }
+        if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
         var d = attvar.ValueNumGet(1);
 

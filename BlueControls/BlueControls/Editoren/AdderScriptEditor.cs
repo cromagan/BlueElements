@@ -53,7 +53,7 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
 
         var l = new List<string> {
                 "In die Variable MENU muss das Menu erstellt werden.",
-                "Dies muss folgendens Format sein:",
+                "Dies muss folgendes Format sein:",
                 "Backen",
                 "Backen\\Zutaten",
                 "Backen\\Zutaten\\Mehl",
