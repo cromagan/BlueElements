@@ -70,7 +70,7 @@ public partial class ConnectedCreativePad : GenericControlReciver {
             pad.Items = null;
 
             if (!string.IsNullOrEmpty(LoadAtRowChange)) {
-                if (LoadAtRowChange.FileType() is not FileFormat.BlueCreativeFile) {
+                if (LoadAtRowChange.FileType() is FileFormat.BlueCreativeFile) {
                     pad.Items = new ItemCollectionPad.ItemCollectionPad(LoadAtRowChange);
                     pad.Items.ResetVariables();
                     pad.Items.ReplaceVariables(_lastRow);
