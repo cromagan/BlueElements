@@ -431,7 +431,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
 
             r = Database?.Row[txbTestZeile.Text];
-            if (r is not { IsDisposed: not true }) {
+            if (r is not { IsDisposed: false }) {
                 e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
                 return;
             }
@@ -530,7 +530,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void WriteInfosBack() {
         if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database is not
             {
-                IsDisposed: not true
+                IsDisposed: false
             }) { return; }
 
         if (_item != null) {

@@ -80,7 +80,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (DatabaseOutput is not { IsDisposed: false } dbout) { return null; }
 
             var c = dbout.Column[_additinalInfoColumnName];
-            return c is not { IsDisposed: not true } ? null : c;
+            return c is not { IsDisposed: false } ? null : c;
         }
     }
 
@@ -136,7 +136,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (DatabaseOutput is not { IsDisposed: false } dbout) { return null; }
 
             var c = dbout.Column[_originIdColumnName];
-            return c is not { IsDisposed: not true } ? null : c;
+            return c is not { IsDisposed: false } ? null : c;
         }
     }
 
@@ -204,7 +204,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         if (aci.Function != ColumnFunction.Schlüsselspalte) {
             return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
         }
-
 
         //if (AdditionalInfoColumn is { IsDisposed: false, Function: not ColumnFunction.Schlüsselspalte }) {
         //    return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";

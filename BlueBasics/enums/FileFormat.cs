@@ -41,5 +41,6 @@ public enum FileFormat {
     ProgrammingCode,
     Link,
     BlueCreativeFile,
-    CSV
+    CSV,
+    BlueCreativeSymbol
 }

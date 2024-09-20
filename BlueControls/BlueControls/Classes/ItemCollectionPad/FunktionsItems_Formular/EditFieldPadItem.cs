@@ -101,7 +101,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public ColumnItem? Column {
         get {
             var c = DatabaseInput?.Column[_columnName];
-            return c is not { IsDisposed: not true } ? null : c;
+            return c is not { IsDisposed: false } ? null : c;
         }
     }
 
@@ -141,7 +141,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     //public enSizeModes Bild_Modus { get; set; }
     public static List<AbstractListItem> GetAllowedEditTypes(ColumnItem? column) {
         var l = new List<AbstractListItem>();
-        if (column is not { IsDisposed: not true }) { return l; }
+        if (column is not { IsDisposed: false }) { return l; }
         var t = typeof(EditTypeFormula);
 
         foreach (int z1 in Enum.GetValues(t)) {
@@ -167,7 +167,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     }
 
     public override string ErrorReason() {
-        if (Column is not { IsDisposed: not true }) { return "Spalte fehlt"; }
+        if (Column is not { IsDisposed: false }) { return "Spalte fehlt"; }
 
         return base.ErrorReason();
     }
@@ -184,7 +184,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
         result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
-        if (Column is not { IsDisposed: not true }) { return result; }
+        if (Column is not { IsDisposed: false }) { return result; }
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(CaptionPosition)));
@@ -226,9 +226,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override string ReadableText() {
         const string txt = "Zelle: ";
 
-    
-            return txt + Column?.Caption;
-  
+        return txt + Column?.Caption;
     }
 
     public override QuickImage? SymbolForReadableText() {

@@ -68,7 +68,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 
-        if (row is not { IsDisposed: not true }) {
+        if (row is not { IsDisposed: false }) {
             return new DoItFeedback(ld, "Zeile nicht gefunden");
         }
 

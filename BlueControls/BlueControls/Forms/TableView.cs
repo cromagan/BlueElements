@@ -214,7 +214,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "ZeileLöschen":
                 if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
                 if (!db.IsAdministrator()) { return; }
-                if (row is not { IsDisposed: not true }) { return; }
+                if (row is not { IsDisposed: false }) { return; }
 
                 if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
                     _ = db.Row.Remove(row, "Benutzer: löschen Befehl");
@@ -331,9 +331,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
-        if (column is not { IsDisposed: not true }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
 
-        if (row is not { IsDisposed: not true }) {
+        if (row is not { IsDisposed: false }) {
             OpenColumnEditor(column, tableview);
             return;
         }
@@ -370,7 +370,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
-        if (column is not { IsDisposed: not true }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
         column.Editor = typeof(ColumnEditor);
 
         using ColumnEditor w = new(column, tableview);
@@ -394,7 +394,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     public static void OpenScriptEditor(Database? db) {
-        if (db is not { IsDisposed: not true }) { return; }
+        if (db is not { IsDisposed: false }) { return; }
 
         var se = new DatabaseScriptEditor(db);
         _ = se.ShowDialog();
@@ -1159,7 +1159,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Table.Invalidate();
         lstAufgaben.ItemClear();
 
-        if (db is not { IsDisposed: not true } || !string.IsNullOrEmpty(db.FreezedReason)) {
+        if (db is not { IsDisposed: false } || !string.IsNullOrEmpty(db.FreezedReason)) {
             lstAufgaben.Enabled = false;
             return;
         }

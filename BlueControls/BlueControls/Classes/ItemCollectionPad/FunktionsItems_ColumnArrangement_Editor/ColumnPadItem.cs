@@ -118,7 +118,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //        if (!PermanentPossible() && Permanent) { return; }
     //        if (!NonPermanentPossible() && !value) { return; }
     //public void Spalte_bearbeiten() {
-    //    if (Column is not { IsDisposed: not true }) { return; }
+    //    if (Column is not { IsDisposed: false }) { return; }
     //    TableView.OpenColumnEditor(Column, null, null);
     //}
 
@@ -143,7 +143,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     }
 
     protected override void GeneratePic() {
-        if (Column is not { IsDisposed: not true }) {
+        if (Column is not { IsDisposed: false }) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
@@ -180,7 +180,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         GeneratedBitmap = bmp;
     }
-
 
     private void Column_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

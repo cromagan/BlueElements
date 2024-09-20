@@ -328,7 +328,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void GenerateQickInfoText(FilterItem? filterSingle) {
-        if (FilterSingleColumn is not { IsDisposed: not true }) {
+        if (FilterSingleColumn is not { IsDisposed: false }) {
             QuickInfo = string.Empty;
             return;
         }
@@ -388,7 +388,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         #region Wenn keine Spalte vorhanden, Fehler machen
 
-        if (FilterSingleColumn is not { IsDisposed: not true }) {
+        if (FilterSingleColumn is not { IsDisposed: false }) {
             f.DisabledReason = "Bezug zum Filter verloren.";
             f.Caption = "?";
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;

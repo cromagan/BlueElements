@@ -93,7 +93,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Items?[what] != null) { return null; }
         var r = db.Row[what];
-        if (r is not { IsDisposed: not true }) {
+        if (r is not { IsDisposed: false }) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
@@ -314,7 +314,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //}
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
-        if (Pad.Items is not { IsDisposed: not true }) { return; }
+        if (Pad.Items is not { IsDisposed: false }) { return; }
         if (_column == null) { return; }
 
         FolderBrowserDialog fl = new();

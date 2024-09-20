@@ -105,6 +105,7 @@
     <Compile Include="AdditionalScriptMethods\Method_AddPadItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_DrawLine.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_LoadPadItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_mm.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ShowForm.cs" />
     <Compile Include="AdditionalScriptMethods\Method_MsgBox.cs" />
@@ -112,7 +113,7 @@
     <Compile Include="AdditionalScriptMethods\Method_RowNext.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
-    <Compile Include="AdditionalScriptMethods\VariableItemPadItem.cs" />
+    <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />

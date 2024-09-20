@@ -103,7 +103,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override string QuickInfo {
         get {
             var r = Row;
-            if (r is not { IsDisposed: not true }) { return string.Empty; }
+            if (r is not { IsDisposed: false }) { return string.Empty; }
             if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
             _lastQuickInfo = r.QuickInfo;
             _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + r.CellFirstString() + "]</b>");

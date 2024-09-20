@@ -2462,7 +2462,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (type.IsColumnTag()) {
-            if (column is not { IsDisposed: not true } || Column.IsDisposed) {
+            if (column is not { IsDisposed: false } || Column.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
                 return (string.Empty, null, null);
@@ -3218,12 +3218,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.SearchByKey(rowKey);
-                        if (row is not { IsDisposed: not true }) {
+                        if (row is not { IsDisposed: false }) {
                             _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
                             row = Row.SearchByKey(rowKey);
                         }
 
-                        if (row is not { IsDisposed: not true }) {
+                        if (row is not { IsDisposed: false }) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
                             Freeze("Zeile hinzufügen Fehler");
                             return;
@@ -3254,7 +3254,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     if (!string.IsNullOrEmpty(columname)) {
                         column = Column[columname];
-                        if (column is not { IsDisposed: not true }) {
+                        if (column is not { IsDisposed: false }) {
                             if (command != DatabaseDataType.ColumnName) {
                                 Develop.DebugPrint(command + " an erster Stelle!");
                             }
@@ -3263,7 +3263,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                             column = Column[columname];
                         }
 
-                        if (column is not { IsDisposed: not true }) {
+                        if (column is not { IsDisposed: false }) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
                             Freeze("Spalte hinzufügen Fehler");
                             return;

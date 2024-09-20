@@ -32,7 +32,7 @@ internal class Method_AddPadItem : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], [VariableItemPadItem.ShortName_Variable]];
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], [VariablePadItem.ShortName_Variable]];
     public override string Command => "addpaditem";
     public override List<string> Constants => [];
     public override string Description => "Fügt einer ItemCollectionPad ein PadItem hinzu.";
@@ -52,19 +52,14 @@ internal class Method_AddPadItem : Method {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        if (icp.ValuePad is not { IsDisposed: true } icpv) { return DoItFeedback.InternerFehler(ld); }
+        if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
 
-
-        if (attvar.Attributes[1] is not VariableItemPadItem ici) { return DoItFeedback.InternerFehler(ld); }
-        if (ici.ValuePadItem is not { IsDisposed: true } iciv) { return DoItFeedback.InternerFehler(ld); }
-
+        if (attvar.Attributes[1] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
+        if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
         if (iciv.Parent != null) { return new DoItFeedback(ld, "Das Item gehört breits einer Collection an"); }
 
-
         icpv.Add(iciv);
-
-
 
         return DoItFeedback.Null();
     }

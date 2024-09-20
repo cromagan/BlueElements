@@ -76,7 +76,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public ColumnItem? Column {
         get {
             var c = DatabaseOutput?.Column[_columnName];
-            return c is not { IsDisposed: not true } ? null : c;
+            return c is not { IsDisposed: false } ? null : c;
         }
     }
 
@@ -140,7 +140,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     }
 
     public override string ErrorReason() {
-        if (Column is not { IsDisposed: not true }) {
+        if (Column is not { IsDisposed: false }) {
             return "Spalte fehlt";
         }
 

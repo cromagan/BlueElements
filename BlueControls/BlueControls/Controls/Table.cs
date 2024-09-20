@@ -530,8 +530,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, FormatHolder.Text);
 
     public static void DoUndo(ColumnItem? column, RowItem? row) {
-        if (column is not { IsDisposed: not true }) { return; }
-        if (row is not { IsDisposed: not true }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
+        if (row is not { IsDisposed: false }) { return; }
         if (column.Function == ColumnFunction.Virtuelle_Spalte) { return; }
 
         if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
@@ -775,7 +775,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Database? database, string showingKey) {
-        if (columnArrangementSelector is not { IsDisposed: not true }) { return; }
+        if (columnArrangementSelector is not { IsDisposed: false }) { return; }
 
         columnArrangementSelector.AutoSort = false;
 
@@ -1135,7 +1135,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return Database.Export_CSV(firstRow, l, RowsVisibleUnique());
     }
 
-    public void Export_HTML(string filename ="", bool execute = true) {
+    public void Export_HTML(string filename = "", bool execute = true) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
@@ -1245,7 +1245,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!Database.IsAdministrator()) { return; }
 
-        if (_searchAndReplaceInCells is not { IsDisposed: not true } || !_searchAndReplaceInCells.Visible) {
+        if (_searchAndReplaceInCells is not { IsDisposed: false } || !_searchAndReplaceInCells.Visible) {
             _searchAndReplaceInCells = new SearchAndReplaceInCells(this);
             _searchAndReplaceInCells.Show();
         }
@@ -1254,7 +1254,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public void OpenSearchAndReplaceInDBScripts() {
         if (!Generic.IsAdministrator()) { return; }
 
-        if (_searchAndReplaceInDBScripts is not { IsDisposed: not true } || !_searchAndReplaceInDBScripts.Visible) {
+        if (_searchAndReplaceInDBScripts is not { IsDisposed: false } || !_searchAndReplaceInDBScripts.Visible) {
             _searchAndReplaceInDBScripts = new SearchAndReplaceInDBScripts();
             _searchAndReplaceInDBScripts.Show();
         }
@@ -1275,14 +1275,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public void PinAdd(RowItem? row) {
-        if (row is not { IsDisposed: not true }) { return; }
+        if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Add(row);
         Invalidate_SortedRowData();
         OnPinnedChanged();
     }
 
     public void PinRemove(RowItem? row) {
-        if (row is not { IsDisposed: not true }) { return; }
+        if (row is not { IsDisposed: false }) { return; }
         _ = PinnedRows.Remove(row);
         Invalidate_SortedRowData();
         OnPinnedChanged();
@@ -1426,7 +1426,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public RowData? View_NextRow(RowData? row) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
-        if (row is not { IsDisposed: not true }) { return null; }
+        if (row is not { IsDisposed: false }) { return null; }
 
         if (RowsFilteredAndPinned() is not { } sr) { return null; }
 
@@ -1436,7 +1436,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public RowData? View_PreviousRow(RowData? row) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
-        if (row is not { IsDisposed: not true }) { return null; }
+        if (row is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned() is not { } sr) { return null; }
         var rowNr = sr.IndexOf(row);
         return rowNr < 1 ? null : sr[rowNr - 1];
@@ -2046,7 +2046,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
 
             if (e.Button == MouseButtons.Right) {
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, CellCollection.KeyOfCell(_mouseOverColumn?.Column, _mouseOverRow?.Row),  e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, CellCollection.KeyOfCell(_mouseOverColumn?.Column, _mouseOverRow?.Row), e);
             }
         }
     }
@@ -3246,7 +3246,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void Invalidate_DrawWidth(ColumnItem? column) {
-        if (column is not { IsDisposed: not true }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
 
         //foreach (var thisArr in db.ColumnArrangements) {
         CurrentArrangement?[column]?.Invalidate_DrawWidth();

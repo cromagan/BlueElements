@@ -24,7 +24,6 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -38,11 +37,12 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     #region Fields
 
     private string _formular = string.Empty;
+    private string _skript = string.Empty;
+    private string _typ = "Load";
 
     #endregion
 
     #region Constructors
-
 
     public CreativePadItem() : base(string.Empty, null) { }
 
@@ -71,8 +71,31 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     public override bool InputMustBeOneRow => true;
+
     public override bool MustBeInDrawingArea => true;
+
     public override string MyClassId => ClassId;
+
+    public string Skript {
+        get => _skript;
+        set {
+            if (IsDisposed) { return; }
+            if (_skript == value) { return; }
+            _skript = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Typ {
+        get => _typ;
+        set {
+            if (IsDisposed) { return; }
+            if (_typ == value) { return; }
+            _typ = value;
+            OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
+        }
+    }
 
     protected override int SaveOrder => 1000;
 
@@ -81,12 +104,16 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     #region Methods
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
-        ConnectedCreativePad? con;
+        var con = new ConnectedCreativePad();
 
-        if (_formular.EndsWith(".bcr", StringComparison.OrdinalIgnoreCase)) {
-            con = new ConnectedCreativePad(new ItemCollectionPad(_formular));
-        } else {
-            con = new ConnectedCreativePad();
+        switch (_typ.ToLower()) {
+            case "load":
+                con.LoadAtRowChange = _formular;
+                break;
+
+            case "script":
+                con.ExecuteAtRowChange = _skript;
+                break;
         }
 
         con.DoDefaultSettings(parent, this, mode);
@@ -95,56 +122,123 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     public override string ErrorReason() {
-        if (string.IsNullOrEmpty(_formular)) {
-            return "Kein Layout gewählt.";
+        switch (_typ.ToLower()) {
+            case "load":
+
+                if (string.IsNullOrEmpty(_formular)) { return "Kein Layout gewählt."; }
+                break;
+
+            case "script":
+
+                if (string.IsNullOrEmpty(_skript)) { return "Kein Skript gewählt."; }
+                break;
         }
 
         return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var cl = new List<AbstractListItem>();
+        var layouts = new List<AbstractListItem>();
+        var scripte = new List<AbstractListItem>();
 
         if (DatabaseInput is { IsDisposed: false } db) {
+
+            #region Verfügbare Layouts ermitteln
+
             if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
                 var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
 
-                cl.AddRange(ItemsOf(f));
+                layouts.AddRange(ItemsOf(f));
             }
+
+            #endregion
+
+            #region Verfügbare Skripte ermitteln
+
+            foreach (var thise in db.EventScript) {
+                if (!thise.ChangeValues && thise.NeedRow) {
+                    scripte.Add(ItemOf(thise));
+                }
+            }
+
+            //if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
+            //    var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
+
+            //    layouts.AddRange(ItemsOf(f));
+            //}
+
+            #endregion
         }
+
+        #region Verfügbare Typen ermitteln
+
+        var comms = new List<AbstractListItem>();
+        comms.Add(ItemOf("Layout Datei laden", "Load", QuickImage.Get("Ordner|24")));
+        comms.Add(ItemOf("Per Skript erzeugen", "Script", QuickImage.Get("Skript|24")));
+
+        #endregion
 
         List<GenericControl> result =
             [.. base.GetProperties(widthOfControl),
                 new FlexiControl("Einstellungen:", widthOfControl, true),
-                new FlexiControlForProperty<string>(() => Formular, cl),
-            ];
+                  new FlexiControlForProperty<string>(() => Typ, comms)
+
+];
+
+        switch (_typ.ToLower()) {
+            case "load":
+                result.Add(new FlexiControl("Lädt folgendes Skript vom Dateisystem und ersetzt die Variablen", widthOfControl, false));
+                result.Add(new FlexiControlForProperty<string>(() => Formular, layouts));
+                result.Add(new FlexiControlForDelegate(Skripte_Bearbeiten, "Skripte bearbeiten", ImageCode.Skript));
+                result.Add(new FlexiControl("Info: Es wird zuvor das Skript 'Export' ausgeführt. Auch die Variablen aus dem Skript können benutzt werden.", widthOfControl, false));
+                break;
+
+            case "script":
+                result.Add(new FlexiControl("Ein leeres Blatt, das durch das folgende Skript befüllt wird.", widthOfControl, false));
+                result.Add(new FlexiControlForProperty<string>(() => Skript, scripte));
+                result.Add(new FlexiControlForDelegate(Skripte_Bearbeiten, "Skripte bearbeiten", ImageCode.Skript));
+                result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPad();", widthOfControl, false));
+                break;
+        }
 
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
+            case "typ":
+                _typ = value.FromNonCritical();
+                return true;
+
             case "formula":
+            case "formulafile":
                 _formular = value.FromNonCritical();
+                return true;
+
+            case "scriptname":
+                _skript = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() {
-        const string txt = "Layout-Generator: ";
+    public override string ReadableText() => "Layout-Generator";
 
-        return txt + _formular;
+    public void Skripte_Bearbeiten() {
+        if (DatabaseInput is { IsDisposed: false } db) {
+            Forms.TableView.OpenScriptEditor(db);
+        }
+        OnDoUpdateSideOptionMenu();
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Layout, 16, Skin.IdColor(InputColorId), Color.Transparent);
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [];
-        result.ParseableAdd("Formula", _formular);
+        result.ParseableAdd("Typ", _typ);
+        result.ParseableAdd("FormulaFile", _formular);
+        result.ParseableAdd("ScriptName", _skript);
         return result.Parseable(base.ToParseableString());
     }
 

@@ -36,14 +36,13 @@ public static class IO {
 
     #region Fields
 
+    public static string LastFilePath = string.Empty;
     private const int _canWriteTryintervall = 10;
     private static readonly List<string> _noWriteAccess = [];
     private static readonly List<string> _writeAccess = [];
     private static DateTime _canWriteLastCheck = DateTime.UtcNow.Subtract(new TimeSpan(10, 10, 10));
     private static string _canWriteLastFile = string.Empty;
     private static bool _canWriteLastResult;
-
-    public static string LastFilePath = string.Empty;
 
     #endregion
 
@@ -300,6 +299,7 @@ public static class IO {
             "DB" or "MDB" or "BDB" or "MBDB" => FileFormat.Database,
             "LNK" or "URL" => FileFormat.Link,
             "BCR" => FileFormat.BlueCreativeFile,
+            "BCS" => FileFormat.BlueCreativeSymbol,
             _ => FileFormat.Unknown
         };
 

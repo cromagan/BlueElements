@@ -17,8 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueDatabase;
+using BlueScript.Variables;
 using System.ComponentModel;
 
 namespace BlueControls.Controls;
@@ -52,6 +55,8 @@ public partial class ConnectedCreativePad : GenericControlReciver {
 
     #region Properties
 
+    public string ExecuteAtRowChange { get; internal set; }
+
     public RowItem? LastRow {
         get => _lastRow;
 
@@ -59,17 +64,33 @@ public partial class ConnectedCreativePad : GenericControlReciver {
             if (value?.Database == null || value.IsDisposed) { value = null; }
 
             if (_lastRow == value) { return; }
-            if (pad.Items == null) { return; }
-
-            pad.Items.ResetVariables();
 
             _lastRow = value;
 
-            pad.Items.ReplaceVariables(_lastRow);
+            pad.Items = null;
+
+            if (!string.IsNullOrEmpty(LoadAtRowChange)) {
+                if (LoadAtRowChange.FileType() is not FileFormat.BlueCreativeFile) {
+                    pad.Items = new ItemCollectionPad.ItemCollectionPad(LoadAtRowChange);
+                    pad.Items.ResetVariables();
+                    pad.Items.ReplaceVariables(_lastRow);
+                }
+            } else if (!string.IsNullOrEmpty(ExecuteAtRowChange)) {
+                if (_lastRow != null) {
+                    var script = _lastRow.ExecuteScript(null, ExecuteAtRowChange, true, 1, null, true, true);
+                    if (script.AllOk) {
+                        if (script.Variables.Get("PAD") is VariableItemCollectionPad icp && icp.ValueItemCollection is { } item) {
+                            pad.Items = item;
+                        }
+                    }
+                }
+            }
 
             pad.ZoomFit();
         }
     }
+
+    public string LoadAtRowChange { get; internal set; }
 
     #endregion
 
@@ -97,24 +118,6 @@ public partial class ConnectedCreativePad : GenericControlReciver {
         DoRows();
 
         LastRow = RowSingleOrNull();
-
-        //base.HandleChangesNow();
-
-        //if (IsDisposed) { return; }
-        //if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
-        //DoInputFilter(FilterOutput.Database, false);
-        //DoRows();
-
-        //if (RowSingleOrNull() is { IsDisposed: false } r) {
-        //    FilterOutput.ChangeTo(new FilterItem(r));
-
-        //    pad.Visible = r.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.ScriptNeedFix);
-
-        //    if (pad.Visible) { pad.BringToFront(); }
-        //} else {
-        //    FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
-        //}
     }
 
     #endregion

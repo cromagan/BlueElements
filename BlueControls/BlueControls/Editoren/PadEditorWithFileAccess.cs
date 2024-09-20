@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionList;
@@ -189,8 +188,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
         IO.LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);
-        i?.Parse(x);
-
         if (i is not AbstractPadItem api) { return; }
 
         if (Pad.Items[api.KeyName] != null) {

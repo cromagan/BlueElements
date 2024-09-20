@@ -406,13 +406,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     private void RegisterEvents() {
-        if (FilterInput is not { IsDisposed: not true }) { return; }
+        if (FilterInput is not { IsDisposed: false }) { return; }
         FilterInput.RowsChanged += FilterInput_RowsChanged;
         FilterInput.DisposingEvent += FilterInput_DispodingEvent;
     }
 
     private void UnRegisterFilterInputAndDispose() {
-        if (FilterInput is not { IsDisposed: not true }) { return; }
+        if (FilterInput is not { IsDisposed: false }) { return; }
         FilterInput.RowsChanged -= FilterInput_RowsChanged;
         FilterInput.DisposingEvent -= FilterInput_DispodingEvent;
 

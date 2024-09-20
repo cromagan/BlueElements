@@ -17,12 +17,10 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
 using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -38,7 +36,7 @@ public class Method_ShowForm : BlueScript.Methods.Method {
     public override string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType =>  MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableFloat.ShortName_Variable;
     public override string StartSequence => "(";
@@ -49,11 +47,8 @@ public class Method_ShowForm : BlueScript.Methods.Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
-
-
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        if (icp.ValuePad is not { IsDisposed: true } icpv) { return DoItFeedback.InternerFehler(ld); }
+        if (icp.ValueItemCollection is not { IsDisposed: true } icpv) { return DoItFeedback.InternerFehler(ld); }
 
         var c = new PadEditor();
         c.Pad.Items = icpv;

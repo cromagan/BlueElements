@@ -183,7 +183,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     #region Methods
 
     public void CopyPrinterSettingsToWorkingArea() {
-        if (_items is not { IsDisposed: not true }) { return; }
+        if (_items is not { IsDisposed: false }) { return; }
         if (DruckerDokument.DefaultPageSettings.Landscape) {
             _items.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
             _items.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));

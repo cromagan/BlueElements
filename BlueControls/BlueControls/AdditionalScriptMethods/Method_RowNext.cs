@@ -54,10 +54,10 @@ public class Method_RowNext : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mr = MyRow(scp);
-        if (mr is not { IsDisposed: not true }) { return DoItFeedback.InternerFehler(ld); }
+        if (mr is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 
         var column = Column(scp, attvar, 0);
-        if (column is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         if (mr.Database != column.Database) { return DoItFeedback.InternerFehler(ld); }
 

@@ -23,7 +23,7 @@ using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 
-public class VariableItemPadItem : Variable {
+public class VariablePadItem : Variable {
 
     #region Fields
 
@@ -33,15 +33,15 @@ public class VariableItemPadItem : Variable {
 
     #region Constructors
 
-    public VariableItemPadItem(string name, AbstractPadItem? value, bool ronly, string comment) : base(name, ronly, comment) => _item = value;
+    public VariablePadItem(string name, AbstractPadItem? value, bool ronly, string comment) : base(name, ronly, comment) => _item = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableItemPadItem(string name) : this(name, null, true, string.Empty) { }
+    public VariablePadItem(string name) : this(name, null, true, string.Empty) { }
 
-    public VariableItemPadItem(AbstractPadItem? value) : this(DummyName(), value, true, string.Empty) { }
+    public VariablePadItem(AbstractPadItem? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion
 
@@ -69,7 +69,7 @@ public class VariableItemPadItem : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableItemPadItem(KeyName);
+        var v = new VariablePadItem(KeyName);
         v.Parse(ToString());
         return v;
     }
@@ -77,7 +77,7 @@ public class VariableItemPadItem : Variable {
     public override void DisposeContent() => _item?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableItemPadItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (variable is not VariablePadItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValuePadItem = v.ValuePadItem;
         return DoItFeedback.Null();

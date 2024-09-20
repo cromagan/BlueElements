@@ -38,7 +38,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
 
     public Database? Database {
         get {
-            if (ToEdit is not FilterCollection { IsDisposed: not true } fc) { return null; }
+            if (ToEdit is not FilterCollection { IsDisposed: false } fc) { return null; }
             return fc.Database;
         }
     }
@@ -53,7 +53,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
     }
 
     public AbstractListItem? NewChild() {
-        if (ToEdit is not FilterCollection { IsDisposed: not true, Database: { IsDisposed: false } db } fc) { return null; }
+        if (ToEdit is not FilterCollection { IsDisposed: false, Database: { IsDisposed: false } db } fc) { return null; }
 
         var l = new FilterItem(db, FilterType.Istgleich_GroßKleinEgal, "?");
         l.Editor = typeof(FilterEditor);
@@ -64,7 +64,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
     protected override void InitializeComponentDefaultValues() => lstFilter.AddMethod = NewChild;
 
     protected override bool SetValuesToFormula(IEditable? toEdit) {
-        if (toEdit is not FilterCollection { IsDisposed: not true, Database: { IsDisposed: false } db } fc) { return false; }
+        if (toEdit is not FilterCollection { IsDisposed: false, Database: { IsDisposed: false } db } fc) { return false; }
 
         capDatabase.Text = "Datenbank: " + db.Caption;
 
@@ -77,7 +77,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
     }
 
     private void lstFilter_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (ToEdit is not FilterCollection { IsDisposed: not true } fc) { return; }
+        if (ToEdit is not FilterCollection { IsDisposed: false } fc) { return; }
         if (e.Item is ReadableListItem { Item: FilterItem fi }) {
             fc.Remove(fi);
         }

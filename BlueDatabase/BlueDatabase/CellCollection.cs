@@ -97,8 +97,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public CellItem? this[ColumnItem? column, RowItem? row] {
         get {
             if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
-            if (column is not { IsDisposed: not true }) { return null; }
-            if (row is not { IsDisposed: not true }) { return null; }
+            if (column is not { IsDisposed: false }) { return null; }
+            if (row is not { IsDisposed: false }) { return null; }
 
             if (column.Database != row.Database || column.Database != Database) { return null; }
 
@@ -199,7 +199,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="varcol">Wird eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
     /// <returns></returns>
     public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Database? linkedDatabase, ColumnItem column, RowItem? row, VariableCollection? varcol) {
-        if (linkedDatabase is not { IsDisposed: not true }) { return (null, "Verlinkte Datenbank verworfen."); }
+        if (linkedDatabase is not { IsDisposed: false }) { return (null, "Verlinkte Datenbank verworfen."); }
         if (column.Database is not { IsDisposed: false } || column.IsDisposed) { return (null, "Datenbank verworfen."); }
 
         var fi = new List<FilterItem>();
@@ -311,8 +311,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public static bool IsInCache(ColumnItem? column, RowItem? row) {
-        if (column is not { IsDisposed: not true }) { return false; }
-        if (row is not { IsDisposed: not true }) { return false; }
+        if (column is not { IsDisposed: false }) { return false; }
+        if (row is not { IsDisposed: false }) { return false; }
         if (column.Database is not { IsDisposed: false }) { return false; }
         return column.IsInCache != null || row.IsInCache != null;
     }
@@ -346,7 +346,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, null, "Format ist nicht LinkedCell.", false); }
 
         var linkedDatabase = column.LinkedDatabase;
-        if (linkedDatabase is not { IsDisposed: not true }) { return (null, null, "Verlinkte Datenbank nicht gefunden.", false); }
+        if (linkedDatabase is not { IsDisposed: false }) { return (null, null, "Verlinkte Datenbank nicht gefunden.", false); }
 
         if (repairLinkedValue) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
 
@@ -379,11 +379,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
 
         var db = column.Database;
-        if (db is not { IsDisposed: not true }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
+        if (db is not { IsDisposed: false }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
 
         if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
 
-        if (row is not { IsDisposed: not true }) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
+        if (row is not { IsDisposed: false }) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
 
         targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
@@ -471,13 +471,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return string.Empty;
             }
 
-            if (column is not { IsDisposed: not true }) {
+            if (column is not { IsDisposed: false }) {
                 Database?.DevelopWarnung("Spalte ungültig!");
                 Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + Database?.TableName);
                 return string.Empty;
             }
 
-            if (row is not { IsDisposed: not true }) {
+            if (row is not { IsDisposed: false }) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database.TableName);
                 return string.Empty;
             }
@@ -497,8 +497,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public bool IsNullOrEmpty(ColumnItem? column, RowItem? row) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return true; }
-        if (column is not { IsDisposed: not true }) { return true; }
-        if (row is not { IsDisposed: not true }) { return true; }
+        if (column is not { IsDisposed: false }) { return true; }
+        if (row is not { IsDisposed: false }) { return true; }
         if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
             return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
@@ -510,9 +510,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank ungültig!"; }
 
-        if (column is not { IsDisposed: not true }) { return "Spalte ungültig!"; }
+        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
 
-        if (row is not { IsDisposed: not true }) { return "Zeile ungültig!"; }
+        if (row is not { IsDisposed: false }) { return "Zeile ungültig!"; }
 
         if (db != row.Database || db != column.Database) { return "Datenbank ungültig!"; }
 
@@ -638,8 +638,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, IEnumerable<string> newBz) {
-        if (row is not { IsDisposed: not true }) { return; }
-        if (column is not { IsDisposed: not true }) { return; }
+        if (row is not { IsDisposed: false }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
 
         //// Dann die neuen Erstellen
         foreach (var t in newBz) {
@@ -675,7 +675,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     private string ChangeTextFromRowId(string completeRelationText) {
         var dbtmp = Database;
-        if (dbtmp is not { IsDisposed: not true }) { return completeRelationText; }
+        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
 
         foreach (var rowItem in dbtmp.Row) {
             if (rowItem != null) {
@@ -687,7 +687,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, string keyOfCHangedRow) {
         var dbtmp = Database;
-        if (dbtmp is not { IsDisposed: not true }) { return completeRelationText; }
+        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
 
         var c = dbtmp.Column.First();
         if (c == null) { return completeRelationText; }

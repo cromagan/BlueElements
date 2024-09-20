@@ -146,7 +146,7 @@ public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar {
         //}
 
         //RowItem? r = Database?.Row[txbTestZeile.Text];
-        //if (r is not { IsDisposed: not true }) {
+        //if (r is not { IsDisposed: false }) {
         //    e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         //    return;
         //}

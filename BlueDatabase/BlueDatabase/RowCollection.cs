@@ -298,7 +298,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich"); }
         }
 
-        if (db2 is not { IsDisposed: not true }) { return (null, "Datenbanken verworfen"); }
+        if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen"); }
 
         var f = db2.EditableErrorReason(EditableErrorReasonType.EditNormaly);
         if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f); }
@@ -571,7 +571,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, FilterCollection? fc, bool fullprocessing, string comment) {
         var db = Database;
-        if (db is not { IsDisposed: not true }) {
+        if (db is not { IsDisposed: false }) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
             throw new Exception();
         }
@@ -696,7 +696,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool Remove(string key, string comment) {
         var r = SearchByKey(key);
 
-        if (r is not { IsDisposed: not true }) { return false; }
+        if (r is not { IsDisposed: false }) { return false; }
         return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, key, Generic.UserName, DateTime.UtcNow, comment));
     }
 
@@ -898,7 +898,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
-        if (e.Argument is not RowItem { IsDisposed: not true } r) { return; }
+        if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
         _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, 10, null, true, false);
     }
 

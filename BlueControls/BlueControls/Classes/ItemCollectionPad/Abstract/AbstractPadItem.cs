@@ -251,7 +251,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         var x = ToParseableString();
 
         var i = NewByParsing<AbstractPadItem>(x);
-        i?.Parse(x);
 
         return i;
     }

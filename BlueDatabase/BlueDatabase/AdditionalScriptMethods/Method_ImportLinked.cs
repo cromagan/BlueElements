@@ -65,7 +65,7 @@ public class Method_ImportLinked : Method_Database {
             if (thisColumn.Function is not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
-            if (linkedDatabase is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
+            if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
 
             var targetColumn = linkedDatabase.Column[thisColumn.LinkedCell_ColumnNameOfLinkedDatabase];
             if (targetColumn == null) { return new DoItFeedback(ld, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }

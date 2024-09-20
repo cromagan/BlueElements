@@ -115,7 +115,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         var feh = string.Empty;
 
         //// Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
-        if (_column is not { IsDisposed: not true }) {
+        if (_column is not { IsDisposed: false }) {
             feh = "Spalte verworfen!";
         } else {
             if (!txbName.Text.StartsWith("SYS_")) {
@@ -303,7 +303,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// <param name="e"></param>
 
     private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
-        if (_column is not { IsDisposed: not true }) { return; }
+        if (_column is not { IsDisposed: false }) { return; }
 
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
@@ -358,7 +358,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
     private void Column_DatenAuslesen() {
-        if (_column is not { IsDisposed: not true }) { return; }
+        if (_column is not { IsDisposed: false }) { return; }
 
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
@@ -558,14 +558,14 @@ internal sealed partial class ColumnEditor : IIsEditor {
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
-            if (vis is not { IsDisposed: not true }) { return; }
+            if (vis is not { IsDisposed: false }) { return; }
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
-            if (sp is not { IsDisposed: not true }) { return; }
+            if (sp is not { IsDisposed: false }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
-            if (b is not { IsDisposed: not true }) { return; }
+            if (b is not { IsDisposed: false }) { return; }
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
@@ -659,7 +659,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     private void SetLinkedCellFilter() {
         if (IsDisposed || tblFilterliste.Database is not { IsDisposed: false } db) { return; }
-        if (_column is not { IsDisposed: not true }) { return; }
+        if (_column is not { IsDisposed: false }) { return; }
 
         foreach (var thisr in db.Row) {
             thisr.CellSet("Such", string.Empty, string.Empty);

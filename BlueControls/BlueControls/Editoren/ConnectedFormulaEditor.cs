@@ -406,12 +406,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var toparse = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         IO.LastFilePath = LoadSymbol.FileName.FilePath();
 
-        var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(x);
-        i?.Parse(x);
-
+        var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);
         if (i is not ReciverControlPadItem api) { return; }
 
         api.KeyName = Generic.GetUniqueKey();

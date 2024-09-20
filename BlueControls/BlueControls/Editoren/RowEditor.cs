@@ -35,7 +35,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
 
     public Database? Database {
         get {
-            if (ToEdit is not RowItem { IsDisposed: not true } r) { return null; }
+            if (ToEdit is not RowItem { IsDisposed: false } r) { return null; }
             return r.Database;
         }
     }

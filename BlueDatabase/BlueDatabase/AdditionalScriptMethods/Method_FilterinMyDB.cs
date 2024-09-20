@@ -56,7 +56,7 @@ public class Method_FilterInMyDB : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 0);
-        if (column is not { IsDisposed: not true }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         #region Typ ermitteln
 

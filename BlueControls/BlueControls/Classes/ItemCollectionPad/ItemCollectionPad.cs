@@ -415,6 +415,24 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
+    public void InDenHintergrund(AbstractPadItem thisItem) {
+        if (IndexOf(thisItem) == 0) { return; }
+        var g1 = thisItem.Gruppenzugehörigkeit;
+        thisItem.Gruppenzugehörigkeit = string.Empty;
+        Remove(thisItem);
+        Insert(0, thisItem);
+        thisItem.Gruppenzugehörigkeit = g1;
+    }
+
+    public void InDenVordergrund(AbstractPadItem thisItem) {
+        if (IndexOf(thisItem) == Count - 1) { return; }
+        var g1 = thisItem.Gruppenzugehörigkeit;
+        thisItem.Gruppenzugehörigkeit = string.Empty;
+        Remove(thisItem);
+        Add(thisItem);
+        thisItem.Gruppenzugehörigkeit = g1;
+    }
+
     public List<AbstractPadItem> ItemsOnPage(string page) {
         var l = new List<AbstractPadItem>();
 
@@ -600,7 +618,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     }
 
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
-        if (row is not { IsDisposed: not true }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
+        if (row is not { IsDisposed: false }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
         var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
         if (!script.AllOk) { return script; }
@@ -763,24 +781,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return -1;
     }
 
-    public void InDenHintergrund(AbstractPadItem thisItem) {
-        if (IndexOf(thisItem) == 0) { return; }
-        var g1 = thisItem.Gruppenzugehörigkeit;
-        thisItem.Gruppenzugehörigkeit = string.Empty;
-        Remove(thisItem);
-        Insert(0, thisItem);
-        thisItem.Gruppenzugehörigkeit = g1;
-    }
-
-    public void InDenVordergrund(AbstractPadItem thisItem) {
-        if (IndexOf(thisItem) == Count - 1) { return; }
-        var g1 = thisItem.Gruppenzugehörigkeit;
-        thisItem.Gruppenzugehörigkeit = string.Empty;
-        Remove(thisItem);
-        Add(thisItem);
-        thisItem.Gruppenzugehörigkeit = g1;
-    }
-
     internal RectangleF MaxBounds(string page) => MaxBounds(ItemsOnPage(page));
 
     internal RectangleF MaxBounds(List<AbstractPadItem>? zoomItems) {
@@ -933,7 +933,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     private bool DrawItems(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
         try {
-            if ( SheetStyleScale < 0.1d) { return true; }
+            if (SheetStyleScale < 0.1d) { return true; }
 
             foreach (var thisItem in items) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;

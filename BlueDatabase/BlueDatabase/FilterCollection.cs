@@ -335,7 +335,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <returns></returns>
     public string InitValue(ColumnItem column, bool firstToo) {
         if (Count == 0) { return string.Empty; }
-        if (column is not { IsDisposed: not true }) { return string.Empty; }
+        if (column is not { IsDisposed: false }) { return string.Empty; }
         if (IsDisposed || Database is not { IsDisposed: false } db) { return string.Empty; }
 
         if (column.Function is not ColumnFunction.Normal

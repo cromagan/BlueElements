@@ -71,7 +71,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     #region Methods
 
     public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
-        if (column is not { IsDisposed: not true }) { return []; }
+        if (column is not { IsDisposed: false }) { return []; }
 
         if (fc is not { Count: >= 0 }) { return column.Contents(); }
         var fc2 = (FilterCollection)fc.Clone("autofilter");

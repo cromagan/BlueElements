@@ -178,7 +178,7 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
         }
 
         var r = Database?.Row[txbTestZeile.Text];
-        if (r is not { IsDisposed: not true }) {
+        if (r is not { IsDisposed: false }) {
             e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             return;
         }

@@ -17,35 +17,39 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
+using BlueControls.ItemCollectionPad.Abstract;
+using static BlueBasics.IO;
 
-namespace BlueScript.Methods;
+
+namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_LoadTextFile : Method {
+internal class Method_LoadPadItem : BlueScript.Methods.Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
-    public override string Command => "loadtextfile";
-    public override List<string> Constants => ["UTF8", "WIN1252"];
-    public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
+    public override List<List<string>> Args => [StringVal];
+
+    public override string Command => "loadpaditem";
+
+    public override List<string> Constants => [];
+    public override string Description => "Lädt ein Pad-Item aus dem Dateisystem";
+
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Variable;
+    public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";
+    public override string Syntax => "LoadPadItem(Filename)";
 
     #endregion
 
@@ -54,33 +58,42 @@ internal class Method_LoadTextFile : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filen = attvar.ValueStringGet(0);
 
-        if (filen.FileType() is not FileFormat.Textdocument and not FileFormat.CSV) {
-            return new DoItFeedback(ld, "Datei ist kein Textformat: " + filen);
+
+        if (filen.FileType() is not FileFormat.BlueCreativeSymbol) {
+            return new DoItFeedback(ld, "Datei ist kein Symbol: " +filen);
         }
 
         if (!IO.FileExists(filen)) {
-            return new DoItFeedback(ld, "Datei nicht gefunden: " + filen);
+            return new DoItFeedback(ld, "Datei nicht gefunden: " +filen);
         }
 
         try {
-            string importText;
-            switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
-                case "UTF8":
-                    importText = File.ReadAllText(filen, Encoding.UTF8);
-                    break;
 
-                case "WIN1252":
-                    importText = File.ReadAllText(filen, BlueBasics.Constants.Win1252);
-                    break;
+            var toparse = System.IO.File.ReadAllText(filen, BlueBasics.Constants.Win1252);
 
-                default:
-                    return new DoItFeedback(ld, "Import-Format unbekannt.");
+            var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
+  
+
+            if (i is not AbstractPadItem api) {
+                return new DoItFeedback(ld, "Datei fehlerhaft: " + filen);
+
             }
 
-            return new DoItFeedback(importText);
+            api.KeyName = Generic.GetUniqueKey();
+
+            //api.Page = InputBox.Show("Welcher Tab:", api.Page, BlueBasics.FormatHolder.SystemName);
+
+
+
+
+
+
+            return new DoItFeedback(new VariablePadItem( api));
         } catch {
-            return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " + filen);
+            return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " +filen);
         }
+
+
     }
 
     #endregion

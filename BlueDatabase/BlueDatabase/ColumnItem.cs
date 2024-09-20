@@ -904,7 +904,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool preverDropDown) {
-        if (column is not { IsDisposed: not true }) { return EditTypeTable.None; }
+        if (column is not { IsDisposed: false }) { return EditTypeTable.None; }
         return UserEditDialogTypeInTable(column.Function, preverDropDown && column.DropdownBearbeitungErlaubt, column.TextBearbeitungErlaubt, column.MultiLine);
     }
 

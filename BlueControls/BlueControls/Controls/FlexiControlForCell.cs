@@ -270,7 +270,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (IsDisposed || !Visible || !Enabled) { return; }
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
-        if (_column is not { IsDisposed: not true }) { return; }
+        if (_column is not { IsDisposed: false }) { return; }
         if (_column.Function != ColumnFunction.RelationText) { return; }
         Marker.RunWorkerAsync();
     }
@@ -611,7 +611,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         //control.Enabled = Enabled;
         //control.ItemClear();
         control.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column is not { IsDisposed: not true }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
@@ -665,7 +665,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         //control.Enabled = Enabled;
         //control.UnCheck();
         control.SuggestionsClear();
-        if (column is not { IsDisposed: not true }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
 
         var r = Renderer_Abstract.RendererOf(column);
 
@@ -695,7 +695,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (f.IsFilling) { return; }
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
-        if (_column is not { IsDisposed: not true }) { return; }
+        if (_column is not { IsDisposed: false }) { return; }
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 

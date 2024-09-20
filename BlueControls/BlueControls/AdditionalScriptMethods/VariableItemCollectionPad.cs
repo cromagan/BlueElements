@@ -27,13 +27,13 @@ public class VariableItemCollectionPad : Variable {
 
     #region Fields
 
-    private ItemCollectionPad? _pad;
+    private ItemCollectionPad? _itemCol;
 
     #endregion
 
     #region Constructors
 
-    public VariableItemCollectionPad(string name, ItemCollectionPad? value, bool ronly, string comment) : base(name, ronly, comment) => _pad = value;
+    public VariableItemCollectionPad(string name, ItemCollectionPad? value, bool ronly, string comment) : base(name, ronly, comment) => _itemCol = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -51,16 +51,16 @@ public class VariableItemCollectionPad : Variable {
     public static string ShortName_Variable => "*icp";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
-    public override bool IsNullOrEmpty => _pad == null;
+    public override bool IsNullOrEmpty => _itemCol == null;
     public override string MyClassId => ClassId;
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
-    public ItemCollectionPad? ValuePad {
-        get => _pad;
+    public ItemCollectionPad? ValueItemCollection {
+        get => _itemCol;
         set {
             if (ReadOnly) { return; }
-            _pad = value;
+            _itemCol = value;
         }
     }
 
@@ -74,12 +74,12 @@ public class VariableItemCollectionPad : Variable {
         return v;
     }
 
-    public override void DisposeContent() => _pad?.Dispose();
+    public override void DisposeContent() => _itemCol?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableItemCollectionPad v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
-        ValuePad = v.ValuePad;
+        ValueItemCollection = v.ValueItemCollection;
         return DoItFeedback.Null();
     }
 
