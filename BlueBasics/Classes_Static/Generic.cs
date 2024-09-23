@@ -44,6 +44,7 @@ public static class Generic {
 
     public static string UserGroup = Constants.Everybody;
 
+    private static List<Type>? _allTypes = null;
     private static int _getUniqueKeyCount;
 
     private static string _getUniqueKeyLastTime = "InitialDummy";
@@ -53,6 +54,24 @@ public static class Generic {
     #endregion
 
     #region Properties
+
+    public static List<Type> AllTypes {
+        get {
+            if (_allTypes != null) return _allTypes;
+
+            _allTypes = [];
+            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+                try {
+                    foreach (var thist in thisas.GetTypes()) {
+                        if (thist is { IsClass: true, IsAbstract: false }) {
+                            _allTypes.Add(thist);
+                        }
+                    }
+                } catch { }
+            }
+            return _allTypes;
+        }
+    }
 
     public static string UserName {
         get {
@@ -171,15 +190,23 @@ public static class Generic {
     }
 
     public static List<Type> GetEnumerableOfType<T>() where T : class {
+        //List<Type> l = [];
+        //foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+        //    try {
+        //        foreach (var thist in thisas.GetTypes()) {
+        //            if (thist is { IsClass: true, IsAbstract: false } && thist.IsSubclassOf(typeof(T))) {
+        //                l.Add(thist);
+        //            }
+        //        }
+        //    } catch { }
+        //}
+        //return l;
+
         List<Type> l = [];
-        foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-            try {
-                foreach (var thist in thisas.GetTypes()) {
-                    if (thist is { IsClass: true, IsAbstract: false } && thist.IsSubclassOf(typeof(T))) {
-                        l.Add(thist);
-                    }
-                }
-            } catch { }
+        foreach (var thist in AllTypes) {
+            if (thist.IsSubclassOf(typeof(T))) {
+                l.Add(thist);
+            }
         }
         return l;
     }
@@ -197,17 +224,25 @@ public static class Generic {
     }
 
     public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
+        //List<T> l = [];
+        //foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+        //    try {
+        //        foreach (var thist in thisas.GetTypes()) {
+        //            try {
+        //                if (thist is { IsClass: true, IsAbstract: false } && typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
+        //                    l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+        //                }
+        //            } catch { }
+        //        }
+        //    } catch { }
+        //}
+        //return l;
+
         List<T> l = [];
-        foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-            try {
-                foreach (var thist in thisas.GetTypes()) {
-                    try {
-                        if (thist is { IsClass: true, IsAbstract: false } && typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
-                            l.Add((T)Activator.CreateInstance(thist, constructorArgs));
-                        }
-                    } catch { }
-                }
-            } catch { }
+        foreach (var thist in AllTypes) {
+            if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
+                l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+            }
         }
         return l;
     }

@@ -229,7 +229,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         //----------EditCurrently, Save------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.EditCurrently) || mode.HasFlag(EditableErrorReasonType.Save)) {
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-            if (!AmIBlocker(true)) { return "Ein anderer Benutzer bearbeitet aktuell die Datei."; }
             if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
         }
 

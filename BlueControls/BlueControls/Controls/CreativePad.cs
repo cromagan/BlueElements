@@ -221,6 +221,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     }
                     return;
 
+                case "#page":
+                    item.Page = InputBox.Show("Seite:", item.Page, BlueBasics.FormatHolder.SystemName);
+                    Unselect();
+                    return;
+
                 case "#export":
                     if (item is IParseable ps) {
                         using SaveFileDialog f = new();
@@ -312,6 +317,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
                 e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
                 e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
+                e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", "#Page", ImageCode.Datei, e.HotItem is IParseable));
                 e.ContextMenu.Add(Separator());
                 e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
                 e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));

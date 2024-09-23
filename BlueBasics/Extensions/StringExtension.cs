@@ -905,6 +905,13 @@ public static partial class Extensions {
 
     public static string TrimCr(this string tXt) => string.IsNullOrEmpty(tXt) ? string.Empty : tXt.Trim("\r");
 
+    /// <summary>
+    ///  Entfernt den angegebenen Text am Ende des Strings. Wenn mehrfach vorgandenn, wird er mehrfach entfernt.
+    ///  Groß/Kleinschreibung wird ignoriert.
+    /// </summary>
+    /// <param name="tXt"></param>
+    /// <param name="was"></param>
+    /// <returns></returns>
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
@@ -915,6 +922,15 @@ public static partial class Extensions {
         return tXt;
     }
 
+
+
+    /// <summary>
+    ///  Entfernt den angegebenen Text am Anfang des Strings. Wenn mehrfach vorgandenn, wird er mehrfach entfernt.
+    ///  Groß/Kleinschreibung wird ignoriert.
+    /// </summary>
+    /// <param name="tXt"></param>
+    /// <param name="was"></param>
+    /// <returns></returns>
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }

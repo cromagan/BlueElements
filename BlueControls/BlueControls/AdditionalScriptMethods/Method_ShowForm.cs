@@ -48,7 +48,7 @@ public class Method_ShowForm : BlueScript.Methods.Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        if (icp.ValueItemCollection is not { IsDisposed: true } icpv) { return DoItFeedback.InternerFehler(ld); }
+        if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
 
         var c = new PadEditor();
         c.Pad.Items = icpv;

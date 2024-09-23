@@ -471,21 +471,14 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         UpdateScripts(Table.Database);
     }
 
-    protected void ChangeDatabaseInTab(ConnectionInfo? connectionId, TabPage? xtab) {
-        if (xtab == null || connectionId == null) { return; }
+    protected void ChangeDatabaseInTab(ConnectionInfo? connectionId, TabPage? tabpage, string settings) {
+        if (tabpage == null || connectionId == null) { return; }
+        tabpage.Text = connectionId.TableName.ToTitleCase();
 
-        tbcDatabaseSelector.Enabled = false;
-        Table.Enabled = false;
-        Table.ShowWaitScreen = true;
-        Table.Refresh();
-
-        var s = (List<object>)xtab.Tag;
+        var s = (List<object>)tabpage.Tag;
         s[0] = connectionId;
-        s[1] = string.Empty;
-        xtab.Tag = s;
-        tbcDatabaseSelector_Selected(null,
-            new TabControlEventArgs(xtab, tbcDatabaseSelector.TabPages.IndexOf(xtab),
-                TabControlAction.Selected));
+        s[1] = settings;
+        tabpage.Tag = s;
     }
 
     protected void CheckButtons() {
@@ -1104,7 +1097,18 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tbcDatabaseSelector_Selected(object? sender, TabControlEventArgs e) {
+    private void tbcDatabaseSelector_Selected(object? sender, TabControlEventArgs e) => ShowTab(e.TabPage);
+
+
+    protected void ShowTab(TabPage tabPage) {
+
+
+        if (tabPage != tbcDatabaseSelector.SelectedTab) {
+            tbcDatabaseSelector.SelectTab(tabPage);
+            return;
+        }
+
+
         Table.ShowWaitScreen = true;
         tbcDatabaseSelector.Enabled = false;
         Table.Enabled = false;
@@ -1113,13 +1117,13 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
-        if (e.TabPage == null) { return; }
+        if (tabPage == null) { return; }
 
-        var s = (List<object>)e.TabPage.Tag;
+        var s = (List<object>)tabPage.Tag;
 
         var ci = (ConnectionInfo)s[0];
         if (ci == null) {
-            e.TabPage.Text = "FEHLER";
+            tabPage.Text = "FEHLER";
             UpdateScripts(null);
             DatabaseSet(null, string.Empty);
             return;
@@ -1139,20 +1143,29 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         #endregion
 
         if (Database.GetById(ci, false, Table.Database_NeedPassword, true) is { IsDisposed: false } db) {
-            if (!string.IsNullOrEmpty(db.Filename)) {
-                btnLetzteDateien.AddFileName(db.Filename, db.TableName);
-                LoadTab.FileName = db.Filename;
-            } else {
-                btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
+
+            if (btnLetzteDateien.Parent.Parent.Visible) {
+
+                if (!string.IsNullOrEmpty(db.Filename)) {
+                    btnLetzteDateien.AddFileName(db.Filename, db.TableName);
+                    LoadTab.FileName = db.Filename;
+                } else {
+                    btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
+                }
+
             }
-            e.TabPage.Text = db.TableName.ToTitleCase();
+            tabPage.Text = db.TableName.ToTitleCase();
             UpdateScripts(db);
             DatabaseSet(db, (string)s[1]);
         } else {
-            e.TabPage.Text = "FEHLER";
+            tabPage.Text = "FEHLER";
             UpdateScripts(null);
             DatabaseSet(null, string.Empty);
         }
+
+
+
+
     }
 
     private void UpdateScripts(Database? db) {

@@ -60,7 +60,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     #region Properties
 
     public static string ClassId => "FI-RegionFormula";
-    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More ;
     public bool AutoSizeableHeight => true;
 
     public string Child {

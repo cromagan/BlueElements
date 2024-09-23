@@ -98,6 +98,10 @@ public static class HasSettings {
         settings.LoadSettingsFromDisk(false);
 
         s = s.Replace("\r", string.Empty).Replace("\n", string.Empty);
+
+        if(settings.Settings.IndexOf(s) == 0) { return; }
+
+
         if (settings.Settings.Count > 0) { settings.Settings.RemoveString(s, false); }
         settings.Settings.Add(s);
 

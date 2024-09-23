@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -28,12 +30,20 @@ using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_Row : Method {
+public class Method_Row : Method, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [FilterVar];
+
+    public List<List<string>> ArgsForButton => [];
+
+    public List<string> ArgsForButtonDescription => [];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
+
     public override string Command => "row";
+
     public override List<string> Constants => [];
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
@@ -43,11 +53,19 @@ public class Method_Row : Method {
                                           "Alternative: Der Befehl RowUnique kümmert sich darum, das immer eine Zeile zurückgegeben wird.";
 
     public override bool GetCodeBlockAfter => false;
+
     public override int LastArgMinCount => 1;
+
     public override MethodType MethodType => MethodType.Standard;
+
     public override bool MustUseReturnValue => true;
+
+    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen - auf jeden Fall!";
+
     public override string Returns => VariableRowItem.ShortName_Variable;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "Row(Filter, ...)";
 
     #endregion
@@ -72,6 +90,8 @@ public class Method_Row : Method {
 
         return RowToObjectFeedback(r[0]);
     }
+
+    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;
 
     #endregion
 }

@@ -371,9 +371,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return false; }
         if (fc == this) { return false; }
 
-        if (fc is { IsDisposed: true }) { fc = null; }
-
-        if (fc == null) { return true; }
+        if (fc is not { IsDisposed: false }) { return true; }
 
         if (fc.Count != Count) { return true; }
 
