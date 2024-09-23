@@ -151,6 +151,9 @@ public sealed partial class ExportDialog : IHasDatabase {
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
         var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
 
+        var offx = (druckB.Width - (oneItem.Width * maxX) - abstand * (maxX - 1))/2;
+        var offy = (druckB.Height - (oneItem.Height * maxY) - abstand * (maxY - 1))/2;
+
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
                 var it = new ChildPadItem(new CreativePad(layoutFileName, rowsForExport[startNr]));
@@ -159,7 +162,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                 }
 
                 pad.Items.Add(it);
-                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand), Y = druckB.Top + y * (oneItem.Height + abstand) }, true);
+                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand)  + offy }, true);
 
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
@@ -206,7 +209,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
 
     private void btnEinstellung_Click(object sender, System.EventArgs e) {
-        switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "Cricut Maker", "Abbrechen")) {
+        switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "Cricut Maker", "A4 Printer", "Abbrechen")) {
             case 0:
                 flxBreite.ValueSet("210", true);
                 flxHöhe.ValueSet("297", true);
@@ -217,6 +220,12 @@ public sealed partial class ExportDialog : IHasDatabase {
                 flxBreite.ValueSet("171,1", true);
                 flxHöhe.ValueSet("234,9", true);
                 flxAbstand.ValueSet("2", true);
+                break;
+
+            case 2:
+                flxBreite.ValueSet("190", true);
+                flxHöhe.ValueSet("277", true);
+                flxAbstand.ValueSet("1", true);
                 break;
         }
     }
