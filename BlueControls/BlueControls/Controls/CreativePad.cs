@@ -40,6 +40,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 using System.IO;
+using BlueScript.Structures;
 
 namespace BlueControls.Controls;
 
@@ -226,6 +227,16 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     Unselect();
                     return;
 
+                case "#connect":
+                    foreach (var pt in item.JointPoints) {
+                        var p = Items.GetJointPoint(pt.KeyName, item);
+                        if (p != null) {
+                            item.ConnectJointPoint(pt, p);
+                            return;
+                       }
+                    }
+                    return;
+
                 case "#export":
                     if (item is IParseable ps) {
                         using SaveFileDialog f = new();
@@ -318,6 +329,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
                 e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
                 e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", "#Page", ImageCode.Datei, e.HotItem is IParseable));
+                e.ContextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", "#Connect", ImageCode.HäkchenDoppelt, e.HotItem is IParseable));
                 e.ContextMenu.Add(Separator());
                 e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
                 e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));

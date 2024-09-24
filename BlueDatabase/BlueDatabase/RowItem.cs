@@ -360,9 +360,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     LastCheckedMessage = LastCheckedMessage + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
                 }
             }
+        } else {
+            LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
         }
 
-        LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
 
         if (db?.Column.SysCorrect is { IsDisposed: false } sc) {
             if (IsNullOrEmpty(sc) || cols.Count == 0 != CellGetBoolean(db.Column.SysCorrect)) {
@@ -755,7 +756,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return false;
             }
 
-            if (!ok.AllOk) { return false; }
+            if (!ok.AllOk) {
+                LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
+                return false; }
 
             if (!RepairAllLinks()) { return false; }
 

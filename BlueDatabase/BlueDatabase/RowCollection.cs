@@ -179,13 +179,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
-
         var t = Stopwatch.StartNew();
 
         do {
             if (DidRows.Count > 0) { return; }
             if (InvalidatedRows.Count == 0) { return; }
-            if(t.Elapsed.TotalMinutes >5 ) { return; }
+            if (t.Elapsed.TotalMinutes > 5) { return; }
             Generic.Pause(1, true);
         } while (Database.ExecutingScriptAnyDatabase != 0);
 
@@ -207,7 +206,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 r = InvalidatedRows[0];
                 InvalidatedRows.RemoveAt(0);
             } catch { }
-
 
             if (r is { IsDisposed: false, Database.IsDisposed: false } && !DidRows.Contains(r)) {
                 DidRows.Add(r);
@@ -277,7 +275,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public static (RowItem? newrow, string message) GenerateAndAdd(FilterCollection fc, string comment) {
+    public static (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(FilterCollection fc, string comment) {
         IReadOnlyCollection<string>? first = null;
 
         Database? db2 = null;
@@ -285,30 +283,30 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisfi in fc) {
             if (thisfi.FilterType is not FilterType.Istgleich
                 and not FilterType.Istgleich_GroßKleinEgal
-                 and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt"); }
-            if (thisfi.Column == null) { return (null, "Leere Spalte angekommen"); }
-            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich"); }
+                 and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt", true); }
+            if (thisfi.Column == null) { return (null, "Leere Spalte angekommen", true); }
+            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich", true); }
             db2 ??= db1;
 
             if (db1.Column.First() == thisfi.Column) {
-                if (first != null) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler"); }
+                if (first != null) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
                 first = thisfi.SearchValue;
             }
 
-            if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich"); }
+            if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich", true); }
         }
 
-        if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen"); }
+        if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
 
         var f = db2.EditableErrorReason(EditableErrorReasonType.EditNormaly);
-        if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f); }
+        if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f, true); }
 
-        if (first == null) { return (null, "Der Wert für die erste Spalte fehlt"); }
+        if (first == null || string.IsNullOrEmpty(first.JoinWithCr())) { return (null, "Der Wert für die erste Spalte fehlt", true); }
 
         var s = db2.NextRowKey();
-        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
+        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
 
-        return (db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment), string.Empty);
+        return (db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment), string.Empty, false);
 
         //foreach (var thisfi in fc) {
         //    if (thisfi.Column is ColumnItem c) {
@@ -413,15 +411,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } while (true);
     }
 
-    public static (RowItem? newrow, string message) UniqueRow(FilterCollection filter, string coment) {
-        if (filter.Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen"); }
+    public static (RowItem? newrow, string message, bool stoptrying) UniqueRow(FilterCollection filter, string coment) {
+        if (filter.Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen", true); }
 
-        if (filter.Count < 1) { return (null, "Kein Filter angekommen."); }
+        if (filter.Count < 1) { return (null, "Kein Filter angekommen.", true); }
 
         var r = filter.Rows;
 
         if (r.Count > 5) {
-            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText());
+            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText(), true);
         }
 
         if (r.Count > 1) {
@@ -429,7 +427,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             r[0].Database?.Row.RemoveYoungest(r, true);
             r = filter.Rows;
             if (r.Count != 1) {
-                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText());
+                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText(), false);
             }
             if (db.Column.SysRowState is { IsDisposed: false } srs) {
                 r[0].CellSet(srs, string.Empty, "'UniqueRow' Aufräumen mehrerer Zeilen.");
@@ -439,14 +437,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message) = GenerateAndAdd(filter, coment);
-            if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message); }
+            var (newrow, message, stoptrying) = GenerateAndAdd(filter, coment);
+            if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message, stoptrying); }
             myRow = newrow;
         } else {
             myRow = r[0];
         }
 
-        return (myRow, string.Empty);
+        return (myRow, string.Empty, false);
     }
 
     public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
@@ -791,12 +789,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    public (RowItem? newrow, string message) UniqueRow(string value, string comment) {
-        if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen"); }
+    public (RowItem? newrow, string message, bool stoptrying) UniqueRow(string value, string comment) {
+        if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
 
-        if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen"); }
+        if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen", true); }
 
-        if (db.Column.First() is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden"); }
+        if (db.Column.First() is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
 
         using var fic = new FilterCollection(db, "UnqiueRow");
 

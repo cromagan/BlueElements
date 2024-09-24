@@ -102,6 +102,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptMethods\Method_ConnectPointWithSameName.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AddPadItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Export.cs" />
     <Compile Include="AdditionalScriptMethods\Method_DrawLine.cs" />

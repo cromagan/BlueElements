@@ -662,5 +662,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         OnPropertyChanged();
     }
 
+    internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {    
+        if(!JointPoints.Contains(myPoint)) {return; }
+        Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
+    }
+
     #endregion
 }

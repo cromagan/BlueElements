@@ -1068,5 +1068,24 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
+    internal PointM? GetJointPoint(string pointName, AbstractPadItem notOfMe) {
+
+        foreach (var thisIt in Items) {
+
+            if (thisIt != notOfMe) {
+
+                foreach (var thisPt in thisIt.JointPoints) {
+
+                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
+
+                }
+
+            }
+        }
+
+        return null;
+
+    }
+
     #endregion
 }
