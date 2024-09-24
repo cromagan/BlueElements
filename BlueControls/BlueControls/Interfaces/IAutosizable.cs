@@ -51,8 +51,6 @@ public static class AutosizableExtension {
 
     #endregion
 
-    //MmToPixel(4f, ItemCollectionPad.Dpi);
-
     #region Methods
 
     public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) => item.AutoSizeableHeight && heightinPixel > MinHeigthCapAndBox;

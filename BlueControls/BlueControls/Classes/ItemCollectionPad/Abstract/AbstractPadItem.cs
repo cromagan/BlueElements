@@ -31,6 +31,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
@@ -601,11 +602,22 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                     gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
                     gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
                 }
-            }
 
-            if (!_beiExportSichtbar) {
-                var q = QuickImage.Get("Drucker|16||1");
-                gr.DrawImage(q, positionModified.X, positionModified.Y);
+                if (!_beiExportSichtbar) {
+                    var q = QuickImage.Get("Drucker|16||1");
+                    gr.DrawImage(q, positionModified.X, positionModified.Y);
+                }
+
+                if (this is IErrorCheckable iec) {
+                    var r = iec.ErrorReason();
+
+                    if (!string.IsNullOrEmpty(r)) {
+                        using var brush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
+                        gr.FillRectangle(brush, positionModified);
+                        var q = QuickImage.Get("Kritisch|32||1");
+                        gr.DrawImage(q, positionModified.X, positionModified.Y);
+                    }
+                }
             }
         } catch { }
     }

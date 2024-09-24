@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
+using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
@@ -58,6 +58,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     private ReadOnlyCollection<ReciverSenderControlPadItem>? _getFilterFrom;
     private List<int> _inputColorId = [];
     private ReadOnlyCollection<string> _visibleFor = new([]);
+
+    private XPosition _X_Position = XPosition.frei;
 
     #endregion
 
@@ -104,6 +106,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public abstract bool InputMustBeOneRow { get; }
+
+    public override bool MoveXByMouse {
+        get {
+            if (_X_Position != XPosition.frei) { return false; }
+            return base.MoveXByMouse;
+        }
+    }
+
     public abstract bool MustBeInDrawingArea { get; }
 
     [DefaultValue(null)]
@@ -167,6 +177,22 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
     }
 
+    public XPosition X_Position {
+        get {
+            return _X_Position;
+        }
+
+        set {
+            if (_X_Position == value) { return; }
+            _X_Position = value;
+            OnPropertyChanged();
+
+            if (_X_Position != XPosition.frei) {
+                PointMoved(_pLo, new MoveEventArgs(0, 0, false));
+            }
+        }
+    }
+
     protected override int SaveOrder => 3;
 
     #endregion
@@ -180,28 +206,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         foreach (var thiss in l) {
             thiss.DoChilds();
         }
-        OnPropertyChanged();
-    }
-
-    public void Breite_berechnen() {
-        var li = new List<AbstractListItem>();
-        for (var br = 1; br <= 20; br++) {
-            li.Add(ItemOf(br + " Spalte(n)", br.ToString(), true, br.ToStringInt3() + Constants.FirstSortChar));
-
-            for (var pos = 1; pos <= br; pos++) {
-                li.Add(ItemOf(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToStringInt3() + Constants.SecondSortChar + pos.ToStringInt3()));
-            }
-        }
-
-        var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, CheckBehavior.SingleSelection, null, AddType.None);
-
-        if (x2 is not { Count: 1 }) { return; }
-
-        var doit = x2[0].SplitBy(";");
-
-        var anzbr = IntParse(doit[0]);
-        var npos = IntParse(doit[1]);
-        SetXPosition(anzbr, npos);
         OnPropertyChanged();
     }
 
@@ -323,9 +327,13 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         //}
 
         if (Bei_Export_sichtbar) {
+            var u = new List<AbstractListItem>();
+            u.AddRange(ItemsOf(typeof(XPosition)));
+
             result.Add(new FlexiControl("Sichtbarkeit:", widthOfControl, true));
-            result.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
-            result.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
+            result.Add(new FlexiControlForProperty<XPosition>(() => X_Position, u));
+            //result.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
+            //result.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
@@ -387,6 +395,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
                 VisibleFor = Database.RepairUserGroups(tmpv).AsReadOnly();
                 return true;
 
+            case "xlock":
+                _X_Position = (XPosition)IntParse(value);
+                return true;
+
             case "getvaluefrom":
             case "getvaluefromkey":
             case "getfilterfromkeys":
@@ -401,29 +413,42 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         return base.ParseThis(key, value);
     }
 
+    public override void PointMoved(object sender, MoveEventArgs e) {
+        if (_X_Position == XPosition.frei ||
+            Parent == null) {
+            base.PointMoved(sender, e);
+            return;
+        }
 
-    public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition) {
-        if (Parent == null) { return; }
+        var anzahlSpaltenImFormular = (int)_X_Position / 100;
+        var aufXPosition = (int)(_X_Position - anzahlSpaltenImFormular * 100);
 
-        var x = UsedArea;
-        x.Width = (Parent.SheetSizeInPix.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-        x.X = (x.Width * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
-        SetCoordinates(x, true);
+        var wi = (Parent.SheetSizeInPix.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
+
+        _pLo.X = xpos;
+        _pl.X = xpos;
+        _pLu.X = xpos;
+
+        _pRu.X = xpos + wi;
+        _pr.X = xpos + wi;
+        _pRu.X = xpos + wi;
+
+        base.PointMoved(sender, e);
     }
 
-    public void Standardhöhe_setzen() {
-        var x = UsedArea;
+    //public void Standardhöhe_setzen() {
+    //    var x = UsedArea;
 
-        var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPad.Dpi);
-        var he1 = MmToPixel(1, ItemCollectionPad.Dpi);
-        x.Height = (int)(x.Height / he) * he;
-        x.Height = (int)((x.Height / he1) + 0.99) * he1;
+    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPad.Dpi);
+    //    var he1 = MmToPixel(1, ItemCollectionPad.Dpi);
+    //    x.Height = (int)(x.Height / he) * he;
+    //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
 
-        if (x.Height < he) { x.Height = he; }
-        SetCoordinates(x, true);
-        OnPropertyChanged();
-    }
-
+    //    if (x.Height < he) { x.Height = he; }
+    //    SetCoordinates(x, true);
+    //    OnPropertyChanged();
+    //}
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
@@ -435,6 +460,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         if (MustBeInDrawingArea) {
             result.ParseableAdd("VisibleFor", VisibleFor, false);
         }
+
+        result.ParseableAdd("XLock", _X_Position);
 
         result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);

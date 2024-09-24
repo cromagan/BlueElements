@@ -649,6 +649,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
+    protected override void OnSizeChanged(System.EventArgs e) {
+        Unselect();
+        base.OnSizeChanged(e);
+    }
+
     private void _Items_ItemAdded(object sender, ListEventArgs e) {
         if (IsDisposed) { return; }
         if (_items is not { Count: not 0 } || Fitting) { ZoomFit(); }
