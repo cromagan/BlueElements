@@ -97,15 +97,15 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     public string QuickInfo {
         get => _quickInfo;
         set {
+            value = value.Trim().Trim("<br>").Trim();
             if (_quickInfo != value) {
                 Forms.QuickInfo.Close();
                 _quickInfo = value;
                 OnQuickInfoChanged();
+                DoQuickInfo();
             }
         }
     }
-
-    protected virtual string QuickInfoText => _quickInfo;
 
     protected override bool ScaleChildren => false;
 
@@ -247,15 +247,12 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     public void DoQuickInfo() {
-        if (string.IsNullOrEmpty(_quickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
-            Forms.QuickInfo.Close();
-        } else {
-            if (ContainsMouse()) {
-                Forms.QuickInfo.Show(QuickInfoText);
-            } else {
-                Forms.QuickInfo.Close();
-            }
+        if (!string.IsNullOrEmpty(_quickInfo) && ContainsMouse()) {
+            Forms.QuickInfo.Show(_quickInfo);
+            return;
         }
+        Forms.QuickInfo.Close();
+
     }
 
     public new void Invalidate() {
@@ -388,12 +385,14 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     protected override void OnMouseDown(MouseEventArgs e) {
         lock (this) {
+            Forms.QuickInfo.Close();
+
             if (_pform == null) { CheckBack(); }
 
             if (!DoDrawings()) { return; }
             if (_mousePressing) { return; }
             _mousePressing = true;
-            Forms.QuickInfo.Close();
+
             if (Enabled) {
                 if (GetStyle(ControlStyles.Selectable) && Focus()) { _ = Focus(); }
             }
@@ -402,32 +401,40 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     protected override void OnMouseEnter(System.EventArgs e) {
+        DoQuickInfo();
+
         if (_pform == null) { CheckBack(); }
         if (!DoDrawings()) { return; }
 
         base.OnMouseEnter(e);
-        if (!string.IsNullOrEmpty(_quickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
+
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
+        DoQuickInfo();
+
         if (_pform == null) { CheckBack(); }
 
         if (!DoDrawings()) { return; }
         base.OnMouseLeave(e);
-        DoQuickInfo();
+
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
         lock (this) {
+            DoQuickInfo();
+
             if (_pform == null) { CheckBack(); }
 
             if (!DoDrawings()) { return; }
             base.OnMouseMove(e);
-            DoQuickInfo();
+
         }
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
+        Forms.QuickInfo.Close();
+
         if (_pform == null) { CheckBack(); }
 
         if (!DoDrawings()) { return; }

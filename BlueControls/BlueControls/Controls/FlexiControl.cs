@@ -992,6 +992,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             }
 
             if (control is IInputFormat inf) { inf.GetStyleFrom(this); }
+
+            if(control is TextBox txb) { txb.Suffix = _suffix; }
+
         }
     }
 

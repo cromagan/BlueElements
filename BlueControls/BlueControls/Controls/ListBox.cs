@@ -262,22 +262,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
-    protected override string QuickInfoText {
-        get {
-            var t1 = base.QuickInfoText;
-            var t2 = string.Empty;
-            if (_mouseOverItem != null) { t2 = _mouseOverItem.QuickInfo; }
-            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
-                return string.Empty;
-            }
-
-            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
-                return t1 + "<br><hr><br>" + t2;
-            }
-
-            return t1 + t2; // Eins davon ist leer
-        }
-    }
 
     #endregion
 
@@ -1053,7 +1037,12 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             isInForm = false;
         }
 
-        var showAdd = AddAllowed != AddType.None && isInForm;
+
+
+        QuickInfo = nd?.QuickInfo ?? string.Empty;
+
+
+    var showAdd = AddAllowed != AddType.None && isInForm;
 
         showAdd = (showAdd && (Math.Abs(SliderY.Value - SliderY.Maximum) < Constants.IntTolerance || _mousemoved));
 

@@ -70,7 +70,7 @@ namespace BeCreative {
         }
 
         private void btnFormularAnsicht_Click(object sender, EventArgs e) {
-            DoForm(new ConnectedFormulaView());
+            DoForm(new ConnectedFormulaForm());
         }
 
         private void btnHierachie_Click(object sender, EventArgs e) {

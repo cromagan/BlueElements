@@ -90,10 +90,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private bool _isinMouseDown;
 
-    private bool _isinMouseEnter;
-
-    private bool _isinMouseLeave;
-
     private bool _isinMouseMove;
 
     private bool _isinMouseWheel;
@@ -108,8 +104,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private ColumnViewItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
-
-    private string _mouseOverText = string.Empty;
 
     private Progressbar? _pg;
 
@@ -331,22 +325,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public long VisibleRowCount { get; private set; }
 
-    protected override string QuickInfoText {
-        get {
-            var t1 = base.QuickInfoText;
-            var t2 = _mouseOverText;
-            //if (_MouseOverItem != null) { t2 = _MouseOverItem.QuickInfo; }
-            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
-                return string.Empty;
-            }
-
-            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
-                return t1 + "<br><hr><br>" + t2;
-            }
-
-            return t1 + t2; // Eins davon ist leer
-        }
-    }
 
     #endregion
 
@@ -841,7 +819,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var sameRow = CursorPosRow == row;
 
         if (CursorPosColumn == column && CursorPosRow == row) { return; }
-        _mouseOverText = string.Empty;
+        QuickInfo = string.Empty;
         CursorPosColumn = column;
         CursorPosRow = row;
 
@@ -1294,7 +1272,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         PinnedRows.Clear();
         _collapsed.Clear();
 
-        _mouseOverText = string.Empty;
+        QuickInfo = string.Empty;
         _sortDefinitionTemporary = null;
         _mouseOverColumn = null;
         _mouseOverRow = null;
@@ -1925,27 +1903,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    protected override void OnMouseEnter(System.EventArgs e) {
-        base.OnMouseEnter(e);
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        lock (_lockUserAction) {
-            if (_isinMouseEnter) { return; }
-            _isinMouseEnter = true;
-            Forms.QuickInfo.Close();
-            _isinMouseEnter = false;
-        }
-    }
 
-    protected override void OnMouseLeave(System.EventArgs e) {
-        base.OnMouseLeave(e);
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        lock (_lockUserAction) {
-            if (_isinMouseLeave) { return; }
-            _isinMouseLeave = true;
-            Forms.QuickInfo.Close();
-            _isinMouseLeave = false;
-        }
-    }
+
 
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
@@ -1957,7 +1916,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (_isinMouseMove) { return; }
 
             _isinMouseMove = true;
-            _mouseOverText = string.Empty;
+
             CellOnCoordinate(ca, e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
 
             Develop.SetUserDidSomething();
@@ -1967,7 +1926,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 //_database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             } else {
                 if (e.Y < ca.HeadSize(_columnFont)) {
-                    _mouseOverText = c.QuickInfoText(string.Empty);
+                    QuickInfo = c.QuickInfoText(string.Empty);
                 } else if (_mouseOverRow != null) {
                     if (c.Function.NeedTargetDatabase()) {
                         if (c.LinkedDatabase != null) {
@@ -1976,11 +1935,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
 
                                     var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, false);
-                                    if (lcolumn != null) { _mouseOverText = lcolumn.QuickInfoText(c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
+                                    if (lcolumn != null) { QuickInfo = lcolumn.QuickInfoText(c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                                     if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
-                                        if (string.IsNullOrEmpty(_mouseOverText)) { _mouseOverText += "\r\n"; }
-                                        _mouseOverText = "Verlinkungs-Status: " + info;
+                                        if (string.IsNullOrEmpty(QuickInfo)) { QuickInfo += "\r\n"; }
+                                        QuickInfo = "Verlinkungs-Status: " + info;
                                     }
 
                                     break;
@@ -1993,15 +1952,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                     break;
                             }
                         } else {
-                            _mouseOverText = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
+                            QuickInfo = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                         }
                     } else if (db.IsAdministrator()) {
-                        _mouseOverText = Database.UndoText(_mouseOverColumn?.Column, _mouseOverRow?.Row);
+                        QuickInfo = Database.UndoText(_mouseOverColumn?.Column, _mouseOverRow?.Row);
                     }
                 }
-                _mouseOverText = _mouseOverText.Trim();
-                _mouseOverText = _mouseOverText.Trim("<br>");
-                _mouseOverText = _mouseOverText.Trim();
+
             }
             _isinMouseMove = false;
         }
@@ -2013,12 +1970,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         lock (_lockUserAction) {
             if (Database is not { IsDisposed: false } || CurrentArrangement is not { IsDisposed: false } ca) {
-                Forms.QuickInfo.Close();
                 return;
             }
 
             CellOnCoordinate(ca, e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
-            if (CursorPosColumn != _mouseOverColumn || CursorPosRow != _mouseOverRow) { Forms.QuickInfo.Close(); }
             // TXTBox_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder gschlossen wird
             // AutoFilter_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder geschlossen wird
             FloatingForm.Close(this, Design.Form_KontextMenu);
@@ -2737,7 +2692,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             ca._wiederHolungsSpaltenWidth = 0;
 
-            _mouseOverText = string.Empty;
+            QuickInfo = string.Empty;
             var wdh = true;
             var maxX = 0;
 

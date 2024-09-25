@@ -74,7 +74,19 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Properties
 
-    public string Caption { get => f.Caption; set => f.Caption = value; }
+    public string Caption {
+        get {
+            _column ??= GetTmpColumn();
+
+            if (_column != null) {
+                return _column.ReadableText() + ":";
+            } else if (!string.IsNullOrEmpty(_columnName)) {
+                return _columnName + ":";
+            }
+
+            return "[?]";
+        }
+    }
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; set => f.CaptionPosition = value; }
 
@@ -546,18 +558,16 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private void StyleControls(ColumnItem? column, RowItem? row) {
         var realColumn = GetRealColumn(column, row);
+        f.Caption = Caption;
 
         if (realColumn != null) {
-            f.Caption = realColumn.ReadableText() + ":";
             QuickInfo = realColumn.QuickInfoText(string.Empty);
-            f.GetStyleFrom(realColumn);
-            //Suffix = realColumn.Suffix;
-            //Regex = realColumn.Regex;
-            //AllowedChars = realColumn.AllowedChars;
-            //MaxTextLenght = realColumn.MaxTextLenght;
-        } else {
-            QuickInfo = string.Empty;
 
+            f.GetStyleFrom(realColumn);
+            if (Renderer_Abstract.RendererOf(realColumn) is Renderer_TextOneLine r) {
+                f.Suffix = r.Suffix;
+            }
+        } else {
             if (string.IsNullOrEmpty(_columnName)) {
                 f.Caption = "[?]";
             } else {

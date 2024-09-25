@@ -55,7 +55,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private IMouseAndKeyHandle? _givesMouseCommandsTo;
     private ItemCollectionPad.ItemCollectionPad? _items;
     private AbstractPadItem? _lastClickedItem;
-    private string _lastQuickInfo = string.Empty;
     private bool _repairPrinterDataPrepaired;
     private bool _showInPrintMode;
 
@@ -177,7 +176,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
-    protected override string QuickInfoText => _lastQuickInfo;
 
     #endregion
 
@@ -233,7 +231,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                         if (p != null) {
                             item.ConnectJointPoint(pt, p);
                             return;
-                       }
+                        }
                     }
                     return;
 
@@ -453,7 +451,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         var hotitem = GetHotItem(e);
 
-        _lastQuickInfo = string.Empty;
+        QuickInfo = string.Empty;
         if (hotitem is IMouseAndKeyHandle ho2) {
             if (ho2.MouseDown(e, Zoom, ShiftX, ShiftY)) {
                 _givesMouseCommandsTo = ho2;
@@ -525,19 +523,19 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 }
             }
 
-            _lastQuickInfo = string.Empty;
+            QuickInfo = string.Empty;
 
             if (hotitem is AbstractPadItem bpi && e.Button == MouseButtons.None) {
                 if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
-                    _lastQuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
+                    QuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
                 } else {
-                    _lastQuickInfo = bpi.Description;
+                    QuickInfo = bpi.Description;
                 }
             }
         }
 
         if (e.Button == MouseButtons.Left) {
-            _lastQuickInfo = string.Empty;
+            QuickInfo = string.Empty;
             MoveItemsWithMouse();
             Refresh(); // Ansonsten werden einige Redraws übersprungen
         }
