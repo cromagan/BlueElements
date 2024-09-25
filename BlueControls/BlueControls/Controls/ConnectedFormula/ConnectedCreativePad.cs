@@ -19,15 +19,17 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
-using BlueScript.Variables;
 using System.ComponentModel;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedCreativePad : GenericControlReciver {
+public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEditor {
 
     #region Fields
 
@@ -57,7 +59,6 @@ public partial class ConnectedCreativePad : GenericControlReciver {
 
     public string ExecuteScriptAtRowChange { get; internal set; }
 
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -82,7 +83,6 @@ public partial class ConnectedCreativePad : GenericControlReciver {
             } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
                 pad.Items = new ItemCollectionPad.ItemCollectionPad();
 
-
                 if (_lastRow != null) {
                     pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, _lastRow);
                 }
@@ -105,6 +105,26 @@ public partial class ConnectedCreativePad : GenericControlReciver {
     #endregion
 
     #region Methods
+    public void OpenScriptEditor(bool dialog) {
+        if (IsDisposed || GeneratedFrom is not CreativePadItem { IsDisposed: false } it) { return; }
+
+        var se = new CreativePadScriptEditor(it, LastRow);
+        se.Database = DatabaseInput;
+
+
+        if (dialog) {
+            _ = se.ShowDialog();
+        } else {
+            se.Show();
+        }
+
+
+
+    }
+
+
+
+
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.

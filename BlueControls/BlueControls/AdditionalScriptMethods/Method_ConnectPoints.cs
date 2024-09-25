@@ -23,7 +23,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Windows.Automation.Peers;
 
 namespace BlueControls.AdditionalScriptMethods;
 

@@ -17,20 +17,15 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
-using System.Collections.Generic;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.IO;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueBasics.MultiUserFile;
-using BlueControls.Controls;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -46,10 +41,20 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
     #region Constructors
 
-    public CreativePadScriptEditor() {
+    public CreativePadScriptEditor(CreativePadItem item, RowItem? row) {
+
+
+
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         eventScriptEditor.Enabled = false;
+
+        Item = item;
+
+
+        txbTestZeile.Text = row?.CellFirstString() ?? string.Empty;
+        Database = row?.Database;
+
 
         //var l = new List<string> {
         //        "In die Variable MENU muss das Menu erstellt werden.",

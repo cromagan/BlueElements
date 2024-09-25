@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -36,6 +37,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     #region Fields
 
     private AbstractPadItem? _lastItem;
+    private IOpenScriptEditor? _lastObject;
 
     #endregion
 
@@ -119,6 +121,26 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         MultiUserFile.SaveAll(false);
         Database.ForceSaveAll();
         _ = LoadTab.ShowDialog();
+    }
+
+    private void btnScript_Click(object sender, System.EventArgs e) {
+        DebugPrint_InvokeRequired(InvokeRequired, true);
+        if (CFormula.ConnectedFormula == null) { return; }
+        if (!Generic.IsAdministrator()) { return; }
+
+        if (_lastObject is not { } api) { return; }
+
+        Database.ForceSaveAll();
+        MultiUserFile.SaveAll(false);
+
+        if (!CFormula.ConnectedFormula.LockEditing()) { return; }
+
+        api.OpenScriptEditor(true);
+
+        MultiUserFile.SaveAll(true);
+        CFormula.ConnectedFormula.UnlockEditing();
+        Database.ForceSaveAll();
+        CFormula.InvalidateView();
     }
 
     private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);
@@ -211,10 +233,16 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void SetItem(object? control) {
         if (control is GenericControlReciver grc) {
             _lastItem = grc.GeneratedFrom;
+            if (control is IOpenScriptEditor ose) {
+                _lastObject = ose;
+            } else {
+                _lastObject = null;
+            }
         } else if (control is Control c) {
             SetItem(c.Parent);
             return;
         } else {
+            _lastObject = null;
             _lastItem = null;
         }
 
@@ -229,6 +257,8 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
             capClicked.Text = "-";
             btnElementBearbeiten.Enabled = false;
         }
+
+        btnScript.Enabled = _lastObject is { };
     }
 
     #endregion

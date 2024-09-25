@@ -37,11 +37,31 @@ using System.Windows.Forms;
 using BlueControls.CellRenderer;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueControls.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : GenericControlReciver {
+public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEditor {
+
+
+    public void OpenScriptEditor(bool dialog) {
+        if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
+
+        var se = new DatabaseScriptEditor(db);
+
+        if (dialog) {
+            _ = se.ShowDialog();
+        } else {
+            se.Show();
+        }
+
+
+
+    }
+
+
 
     #region Fields
 

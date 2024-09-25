@@ -56,7 +56,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControlReciverSender, IContextMenu, ITranslateable, IHasDatabase {
+public partial class Table : GenericControlReciverSender, IContextMenu, ITranslateable, IHasDatabase, IOpenScriptEditor {
 
     #region Fields
 
@@ -324,7 +324,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public long VisibleRowCount { get; private set; }
-
 
     #endregion
 
@@ -1218,6 +1217,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
+    public void OpenScriptEditor(bool dialog) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+
+        var se = new DatabaseScriptEditor(db);
+
+        if (dialog) {
+            _ = se.ShowDialog();
+        } else {
+            se.Show();
+        }
+    }
+
     public void OpenSearchAndReplaceInCells() {
         if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditCurrently) || Database == null) { return; }
 
@@ -1903,9 +1914,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-
-
-
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
 
@@ -1958,7 +1966,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                         QuickInfo = Database.UndoText(_mouseOverColumn?.Column, _mouseOverRow?.Row);
                     }
                 }
-
             }
             _isinMouseMove = false;
         }

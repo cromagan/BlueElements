@@ -19,10 +19,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -37,7 +40,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
-public partial class RowAdder : GenericControlReciverSender // System.Windows.Forms.UserControl//,
+public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor // System.Windows.Forms.UserControl//,
     {
     #region Fields
 
@@ -134,6 +137,18 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         //if (ucase) { nt = nt.ToUpper(); }
         nt = nt.RemoveChars(Constants.Char_PfadSonderZeichen);
         return nt;
+    }
+
+    public void OpenScriptEditor(bool dialog) {
+        if (IsDisposed || GeneratedFrom is not RowAdderPadItem { IsDisposed: false } it) { return; }
+
+        var se = new AdderScriptEditor(it, _lastRow);
+
+        if (dialog) {
+            _ = se.ShowDialog();
+        } else {
+            se.Show();
+        }
     }
 
     public void Fehler(string txt, ImageCode symbol) {

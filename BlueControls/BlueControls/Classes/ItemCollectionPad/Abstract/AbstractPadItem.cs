@@ -236,6 +236,18 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     #region Methods
 
+    public static void DrawPoints(Graphics gr, ObservableCollection<PointM> points, float zoom, float shiftX, float shiftY, Design design, States state, bool showName) {
+        foreach (var p in points) {
+            p.Draw(gr, zoom, shiftX, shiftY, design, state);
+
+            if (showName) {
+                var t = p.ZoomAndMove(zoom, shiftX, shiftY);
+                Rectangle r = new((int)(t.X + 5), (int)(t.Y + 0), 200, 200);
+                Skin.Draw_FormatedText(gr, p.KeyName, design, state, null, Alignment.Top_Left, r, null, false, false);
+            }
+        }
+    }
+
     public virtual void AddedToCollection() { }
 
     public void AddJointPointAbsolute(string name, float x, float y) {
@@ -292,7 +304,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         GC.SuppressFinalize(this);
     }
 
-    public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
+    public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
         if (_parent == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert");
             return;
@@ -304,6 +316,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
         if (IsInDrawingArea(positionModified, sizeOfParentControl)) {
             DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+            if (showJointPoints) {
+                DrawPoints(gr, JointPoints, zoom, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+            }
         }
 
         #region Verknüpfte Pfeile Zeichnen
@@ -535,16 +551,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
     }
 
-    //public void Parse(List<KeyValuePair<string, string>> toParse, string parsestring) {
-    //    foreach (var pair in toParse) {
-    //        if (!ParseThis(pair.Key, pair.Value)) {
-    //            Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
-    //        }
-    //    }
-    //private void AddJointPointCartesian(string name, float lenghtToMiddle, float angleToMiddle) {
-    //    var p = new PointM(this, name, 0, 0);
-    //    p.SetTo(JointParentPoint, lenghtToMiddle, angleToMiddle);
-    //    JointPoints.Add(p);
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
     /// </summary>

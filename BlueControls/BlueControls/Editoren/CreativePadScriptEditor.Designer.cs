@@ -44,7 +44,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1297, 24);
-            this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
+            this.capStatusBar.Text = "<imagecode=Information|16> 14:41:21 Überprüfe auf Veränderungen von 2 Datenbanken" +
+    " des Typs \'Database\'";
             // 
             // pnlStatusBar
             // 
@@ -198,10 +199,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cpad.Dock = System.Windows.Forms.DockStyle.Right;
             this.cpad.Location = new System.Drawing.Point(840, 110);
             this.cpad.Name = "cpad";
+            this.cpad.ShiftX = 0F;
+            this.cpad.ShiftY = 0F;
+            this.cpad.ShowJointPoint = true;
             this.cpad.Size = new System.Drawing.Size(457, 543);
             this.cpad.TabIndex = 0;
             this.cpad.TabStop = false;
             this.cpad.Text = "connectedCreativePad1";
+            this.cpad.Zoom = 1F;
             // 
             // CreativePadScriptEditor
             // 

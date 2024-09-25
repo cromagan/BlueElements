@@ -46,7 +46,7 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
 
     #region Constructors
 
-    public AdderScriptEditor() {
+    public AdderScriptEditor(RowAdderPadItem item, RowItem? row) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         eventScriptEditor.Enabled = false;
@@ -64,6 +64,12 @@ public sealed partial class AdderScriptEditor : FormWithStatusBar, IHasDatabase 
                 "Freie Texte."
             };
         l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
+
+        Item = item;
+
+        txbTestZeile.Text = row?.CellFirstString() ?? string.Empty;
+
+        Database = row?.Database;
 
         FormManager.RegisterForm(this);
     }

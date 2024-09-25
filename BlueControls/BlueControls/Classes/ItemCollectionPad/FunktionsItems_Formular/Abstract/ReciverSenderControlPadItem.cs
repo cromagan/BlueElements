@@ -22,7 +22,6 @@ using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.ItemCollectionList;

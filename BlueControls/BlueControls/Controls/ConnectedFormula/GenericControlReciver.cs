@@ -356,7 +356,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_FilterInput();
     }
 
-    protected RowItem? RowSingleOrNull() {
+    public RowItem? RowSingleOrNull() {
         if (IsDisposed) { return null; }
         if (DesignMode) { return null; }
 

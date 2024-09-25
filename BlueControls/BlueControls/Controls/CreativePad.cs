@@ -40,7 +40,6 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 using System.IO;
-using BlueScript.Structures;
 
 namespace BlueControls.Controls;
 
@@ -57,7 +56,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private AbstractPadItem? _lastClickedItem;
     private bool _repairPrinterDataPrepaired;
     private bool _showInPrintMode;
-
+    private bool _showJointPoints;
     #endregion
 
     #region Constructors
@@ -171,6 +170,17 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         set {
             if (_showInPrintMode == value) { return; }
             _showInPrintMode = value;
+            OnDrawModeChanged();
+            Unselect();
+        }
+    }
+
+    [DefaultValue(false)]
+    public bool ShowJointPoint {
+        get => _showJointPoints;
+        set {
+            if (_showJointPoints == value) { return; }
+            _showJointPoints = value;
             OnDrawModeChanged();
             Unselect();
         }
@@ -589,6 +599,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         base.Dispose(disposing);
     }
 
+
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
 
@@ -598,36 +610,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         gr.FillRectangle(lgb, ClientRectangle);
         if (_items != null) {
             var l = _items.ItemsOnPage(_currentPage);
-            _ = _items.DrawCreativePadTo(gr, l, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, state);
+            _ = _items.DrawCreativePadTo(gr, l, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, _showJointPoints, state);
+
+  
 
             #region Dann die selektierten Punkte
 
             foreach (var thisItem in _itemsToMove) {
                 if (thisItem is AbstractPadItem bpi) {
-                    foreach (var p in bpi.MovablePoint) {
-                        p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
-                    }
-                    foreach (var p in bpi.JointPoints) {
-                        p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Joint, States.Standard);
-
-                        var t = p.ZoomAndMove(Zoom, ShiftX, ShiftY);
-                        Rectangle r = new((int)(t.X + 5), (int)(t.Y + 0), 200, 200);
-                        Skin.Draw_FormatedText(gr, p.KeyName, Design.Button_EckpunktSchieber_Joint, States.Standard, null, Alignment.Top_Left, r, null, false, false);
-                    }
-
-                    if (bpi.JointPoints.Count > 0) {
-                        bpi.JointMiddle.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
-                    }
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint,  Zoom, ShiftX, ShiftY,  Design.Button_EckpunktSchieber, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, ShiftX, ShiftY,  Design.Button_EckpunktSchieber_Joint, States.Standard, true);
                 }
+
                 if (thisItem is PointM p2) {
                     if (p2.Parent is AbstractPadItem bpi2) {
-                        foreach (var p in bpi2.JointPoints) {
-                            p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
-                        }
-
-                        foreach (var p in bpi2.MovablePoint) {
-                            p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
-                        }
+                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
+                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
                     }
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }

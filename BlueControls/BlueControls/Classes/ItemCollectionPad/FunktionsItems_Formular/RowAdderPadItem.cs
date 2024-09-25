@@ -301,8 +301,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     }
 
     private void Skript_Bearbeiten() {
-        var x = new AdderScriptEditor();
-        x.Item = this;
+        var x = new AdderScriptEditor(this, null);
         x.Database = DatabaseInput;
         x.ShowDialog();
     }

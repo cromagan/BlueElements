@@ -317,7 +317,8 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         GC.SuppressFinalize(this);
     }
 
-    public bool DrawCreativePadTo(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, States state) {
+
+    public bool DrawCreativePadTo(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, bool showJointPoints, States state) {
         try {
             gr.PixelOffsetMode = PixelOffsetMode.None;
 
@@ -383,14 +384,21 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
             #region Items selbst
 
-            if (!DrawItems(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode)) {
-                return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, state);
+            if (!DrawItems(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints)) {
+                return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
             }
 
             #endregion
+
+
+
+
+
+
+
         } catch {
             Develop.CheckStackForOverflow();
-            return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, state);
+            return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
         }
         return true;
     }
@@ -398,7 +406,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, string page) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        _ = DrawCreativePadTo(gr, ItemsOnPage(page), zoomf, x, y, bmp.Size, true, vState);
+        _ = DrawCreativePadTo(gr, ItemsOnPage(page), zoomf, x, y, bmp.Size, true, false, vState);
         gr.Dispose();
     }
 
@@ -700,7 +708,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         using var gr = Graphics.FromImage(I);
         gr.Clear(BackColor);
-        if (!DrawCreativePadTo(gr, l, scale, r.Left * scale, r.Top * scale, I.Size, true, States.Standard)) {
+        if (!DrawCreativePadTo(gr, l, scale, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
             return ToBitmap(scale, page);
         }
 
@@ -932,13 +940,13 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         Connections.RemoveAll();
     }
 
-    private bool DrawItems(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
+    private bool DrawItems(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
         try {
             if (SheetStyleScale < 0.1d) { return true; }
 
             foreach (var thisItem in items) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
+                thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting, showJointPoints);
             }
             return true;
         } catch {
@@ -1091,7 +1099,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
 
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-        var vars = rowIn.Database?.CreateVariableCollection(rowIn,true, false, true, false) ?? new VariableCollection();
+        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? new VariableCollection();
 
 
         //var vars = new VariableCollection();
@@ -1106,7 +1114,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser) ;
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
 
         var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, 0);
 

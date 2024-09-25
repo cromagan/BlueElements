@@ -133,6 +133,7 @@
       <DependentUpon>DynamicSymbolScriptEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\XPosition.cs" />
+    <Compile Include="Interfaces\IOpenScriptEditor.cs" />
     <Compile Include="Renderer\Renderer_Abstract.cs" />
     <Compile Include="Renderer\Renderer_DynamicSymbol.cs" />
     <Compile Include="Renderer\Renderer_Button.cs" />
