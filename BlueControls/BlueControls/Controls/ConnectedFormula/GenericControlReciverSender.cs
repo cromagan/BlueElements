@@ -55,18 +55,18 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.Database = source.DatabaseOutput;
         base.DoDefaultSettings(parentFormula, source, mode);
 
-        if (parentFormula == null) { return; }
+        //if (parentFormula == null) { return; }
 
-        foreach (var thisKey in source.ChildIds) {
-            var it = source.Parent?[thisKey];
+        //foreach (var thisKey in source.ChildIds) {
+        //    var it = source.Parent?[thisKey];
 
-            if (it is IItemToControl itc) {
-                var parentCon = parentFormula.SearchOrGenerate(itc, true, mode);
-                if (parentCon is GenericControlReciver exitingChild) {
-                    ChildIsBorn(exitingChild);
-                }
-            }
-        }
+        //    if (it is IItemToControl itc) {
+        //        var parentCon = parentFormula.SearchOrGenerate(itc, true, mode);
+        //        if (parentCon is GenericControlReciver exitingChild) {
+        //            ChildIsBorn(exitingChild);
+        //        }
+        //    }
+        //}
     }
 
     internal void ChildIsBorn(GenericControlReciver child) {

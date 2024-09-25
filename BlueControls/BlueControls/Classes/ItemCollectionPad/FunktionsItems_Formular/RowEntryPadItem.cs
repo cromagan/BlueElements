@@ -46,7 +46,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     #region Properties
 
     public static string ClassId => "FI-RowEntryElement";
-    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One | AllowedInputFilter.None;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None;
 
     public override bool DatabaseInputMustMatchOutputDatabase => true;
 

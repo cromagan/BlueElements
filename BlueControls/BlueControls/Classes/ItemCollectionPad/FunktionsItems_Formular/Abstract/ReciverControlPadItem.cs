@@ -74,6 +74,13 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     #region Properties
 
+
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        CalculateColorIds();
+    }
+
+
     public abstract AllowedInputFilter AllowedInputFilter { get; }
 
     /// <summary>
@@ -130,12 +137,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         get => new(_getFilterFromKeys);
 
         set {
-            var g = GetFilterFromGet();
-
-            // Zuerst die gaanzen Verknüpfungen auflösen.
-            foreach (var thisItem in g) {
-                thisItem.RemoveChild(this);
-            }
 
             // Dann die Collection leeren
             _getFilterFrom = null;
@@ -143,12 +144,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
             // Die Collection befüllen
             _getFilterFromKeys.AddRange(value);
-
-            // Und den Eltern bescheid geben, dass ein neues Kind da ist
-            g = GetFilterFromGet();
-            foreach (var thisItem in g) {
-                thisItem.AddChild(this);
-            }
 
             CalculateInputColorIds();
             OnPropertyChanged();
@@ -201,11 +196,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     public override void AddedToCollection() {
         base.AddedToCollection();
-        var l = GetFilterFromGet();
-
-        foreach (var thiss in l) {
-            thiss.DoChilds();
-        }
+        CalculateColorIds();
         OnPropertyChanged();
     }
 
@@ -275,11 +266,12 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        if (Parent is null) { return []; }
+        List<GenericControl> result = [];
 
-        List<GenericControl> result = [
-            new FlexiControl("Eingang:", widthOfControl, true)
-        ];
+
+        if (Parent is null) { return result; }
+
+
 
         Database? outp = null;
 
@@ -287,44 +279,46 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             outp = iiss.DatabaseOutput;
         }
 
-        //if (DatabaseInputMustMatchOutputDatabase && outp == null) {
-        //    result.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl, false));
-        //} else {
-        var x = new List<AbstractListItem>();
 
-        // Die Items, die man noch wählen könnte
-        foreach (var thisR in Parent) {
-            if (thisR.IsOnPage(Page) && thisR is ReciverSenderControlPadItem rfp) {
-                //if (outp == null || outp == rfp.DatabaseOutput) {
-                if (rfp != this) {
-                    x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
+        if (AllowedInputFilter != AllowedInputFilter.None) {
+
+            result.Add(new FlexiControl("Eingang:", widthOfControl, true));
+
+
+            var x = new List<AbstractListItem>();
+
+            // Die Items, die man noch wählen könnte
+            foreach (var thisR in Parent) {
+                if (thisR.IsOnPage(Page) && thisR is ReciverSenderControlPadItem rfp) {
+                    if (rfp != this) {
+                        x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
+                    }
                 }
             }
+
+            switch (AllowedInputFilter) {
+                case AllowedInputFilter.One:
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    break;
+
+                case AllowedInputFilter.More:
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    break;
+
+                case AllowedInputFilter.More | AllowedInputFilter.None:
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    break;
+
+                case AllowedInputFilter.One | AllowedInputFilter.None:
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    break;
+
+                default:
+
+                    //case AllowedInputFilter.None:
+                    break;
+            }
         }
-
-        switch (AllowedInputFilter) {
-            case AllowedInputFilter.One:
-                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                break;
-
-            case AllowedInputFilter.More:
-                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                break;
-
-            case AllowedInputFilter.More | AllowedInputFilter.None:
-                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                break;
-
-            case AllowedInputFilter.One | AllowedInputFilter.None:
-                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                break;
-
-            default:
-
-                //case AllowedInputFilter.None:
-                break;
-        }
-        //}
 
         if (Bei_Export_sichtbar) {
             var u = new List<AbstractListItem>();

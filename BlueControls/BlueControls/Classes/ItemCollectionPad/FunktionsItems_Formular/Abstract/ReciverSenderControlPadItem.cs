@@ -66,21 +66,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     #region Properties
 
-    public ReadOnlyCollection<string> ChildIds {
-        get => new(_childIds);
-
-        set {
-            if (IsDisposed) { return; }
-
-            if (!_childIds.IsDifferentTo(value)) { return; }
-
-            _childIds.Clear();
-            _childIds.AddRange(value);
-            DoChilds();
-            OnPropertyChanged();
-        }
-    }
-
     public Database? DatabaseOutput {
         get {
             if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is {IsDisposed: false }) { return DatabaseInput; }
@@ -104,7 +89,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
             _databaseOutput = value;
             _databaseOutputName = value?.KeyName ?? string.Empty;
             _databaseOutputLoaded = true;
-            DoChilds();
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
@@ -137,14 +121,14 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         return ld2;
     }
 
-    public void AddChild(IHasKeyName add) {
-        var l = new List<string>();
-        l.AddRange(ChildIds);
-        l.Add(add.KeyName);
-        l = l.SortedDistinctList();
+    //public void AddChild(IHasKeyName add) {
+    //    var l = new List<string>();
+    //    l.AddRange(ChildIds);
+    //    l.Add(add.KeyName);
+    //    l = l.SortedDistinctList();
 
-        ChildIds = l.AsReadOnly();
-    }
+    //    ChildIds = l.AsReadOnly();
+    //}
 
     public override void AddedToCollection() {
         if (IsDisposed) { return; }
@@ -154,21 +138,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
             OutputColorId = -1;
             OutputColorId = Parent.GetFreeColorId(Page);
         }
-        DoChilds();
         OnPropertyChanged();
     }
 
-    public void DoChilds() {
-        if (Parent == null) { return; }
 
-        foreach (var thisChild in ChildIds) {
-            var item2 = Parent[thisChild];
-
-            if (item2 is ReciverControlPadItem ias) {
-                ias.CalculateInputColorIds();
-            }
-        }
-    }
 
     public override string ErrorReason() {
         if (DatabaseOutput is not { IsDisposed: false }) {
@@ -225,26 +198,19 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
                 return true;
 
             case "senttochildids":
-                value = value.Replace("\r", "|");
+                //value = value.Replace("\r", "|");
 
-                var tmp = value.FromNonCritical().SplitBy("|");
-                _childIds.Clear();
-                foreach (var thiss in tmp) {
-                    _childIds.Add(thiss.FromNonCritical());
-                }
+                //var tmp = value.FromNonCritical().SplitBy("|");
+                //_childIds.Clear();
+                //foreach (var thiss in tmp) {
+                //    _childIds.Add(thiss.FromNonCritical());
+                //}
                 return true;
         }
         return base.ParseThis(key, value);
     }
 
-    public void RemoveChild(ReciverControlPadItem remove) {
-        var l = new List<string>();
-        l.AddRange(_childIds);
-        _ = l.Remove(remove.KeyName);
 
-        ChildIds = l.AsReadOnly();
-        remove.CalculateInputColorIds();
-    }
 
     public override string ToParseableString() {
         if (IsDisposed) { return string.Empty; }
@@ -258,7 +224,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         }
 
 
-        result.ParseableAdd("SentToChildIds", _childIds, false);
+        //result.ParseableAdd("SentToChildIds", _childIds, false);
 
         return result.Parseable(base.ToParseableString());
     }

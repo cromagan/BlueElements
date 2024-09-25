@@ -35,7 +35,7 @@ internal class Method_AddPadItem : Method {
     public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], [VariablePadItem.ShortName_Variable]];
     public override string Command => "addpaditem";
     public override List<string> Constants => [];
-    public override string Description => "Fügt einer ItemCollectionPad ein PadItem hinzu.";
+    public override string Description => "Fügt einer ItemCollectionPad ein PadItem hinzu.\r\nAnschließend wird es mit JointPoints ausgerichtet.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
@@ -60,6 +60,18 @@ internal class Method_AddPadItem : Method {
         if (iciv.Parent != null) { return new DoItFeedback(ld, "Das Item gehört breits einer Collection an"); }
 
         icpv.Add(iciv);
+
+        if (iciv.JointPoints.Count == 0) { return new DoItFeedback(ld, "Das Item hat keine Jointpoints."); }
+
+
+        foreach (var pt in iciv.JointPoints) {
+            var p = icpv.GetJointPoint(pt.KeyName, iciv);
+            if (p != null) {
+                iciv.ConnectJointPoint(pt, p);
+                return DoItFeedback.Null();
+            }
+        }
+
 
         return DoItFeedback.Null();
     }

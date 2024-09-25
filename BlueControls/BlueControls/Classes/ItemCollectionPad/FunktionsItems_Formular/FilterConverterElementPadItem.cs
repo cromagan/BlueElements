@@ -94,7 +94,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filtertype) { return; }
             _filtertype = value;
-            DoChilds();
             OnPropertyChanged();
         }
     }
@@ -107,7 +106,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filterSpalte) { return; }
             _filterSpalte = value;
-            DoChilds();
             OnPropertyChanged();
         }
     }
@@ -120,7 +118,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filterwert) { return; }
             _filterwert = value;
-            DoChilds();
             OnPropertyChanged();
         }
     }

@@ -479,19 +479,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        //if (!forPrinting) {
-        //    DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
-        //}
-
-        //if (!forPrinting) {
-        //    DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
-        //}
-
-        //if (Column  ==null || Column .IsDisposed) {
-        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
-        //} else {
-        //DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
-        //}
 
         _eTxt ??= new ExtText(Design.Button, States.Standard);
         Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _anzeige, positionModified.ToRect(), false);
@@ -500,11 +487,10 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, true);
         }
 
-        //base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
 
-        //base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
     #endregion
