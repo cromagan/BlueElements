@@ -7,7 +7,7 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms {
-    partial class ConnectedFormulaView {
+    partial class ConnectedFormulaForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>

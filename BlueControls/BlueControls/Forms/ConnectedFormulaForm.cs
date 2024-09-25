@@ -31,7 +31,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public partial class ConnectedFormulaView : FormWithStatusBar {
+public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     #region Fields
 
@@ -41,9 +41,9 @@ public partial class ConnectedFormulaView : FormWithStatusBar {
 
     #region Constructors
 
-    public ConnectedFormulaView() => InitializeComponent();
+    public ConnectedFormulaForm() => InitializeComponent();
 
-    public ConnectedFormulaView(string filename, string mode) : this() {
+    public ConnectedFormulaForm(string filename, string mode) : this() {
         btnEingehendeDatenbank.Enabled = false;
         btnAusgehendeDatenbank.Enabled = false;
 
