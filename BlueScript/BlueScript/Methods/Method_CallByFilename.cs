@@ -72,7 +72,7 @@ public class Method_CallByFilename : Method {
     /// <param name="addMe"></param>
     /// <param name="varCol"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, List<string>? attributes) {
+    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {

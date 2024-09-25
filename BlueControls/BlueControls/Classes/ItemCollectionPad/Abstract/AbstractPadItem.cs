@@ -556,6 +556,27 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         return x;
     }
 
+    internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
+        if (!JointPoints.Contains(myPoint)) { return; }
+        Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
+    }
+
+    internal void ConnectJointPoint(AbstractPadItem itemToConnect, string pointnameInItem, string otherPointName, bool connectX, bool connectY) {
+        var myPoint = itemToConnect.JointPoints.Get(pointnameInItem);
+        if (myPoint == null) { return; }
+
+        var otherPoint = itemToConnect.Parent?.GetJointPoint(otherPointName, itemToConnect);
+        if (otherPoint == null) { return; }
+
+        if (connectX && connectY) {
+            Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
+        } else if (connectX) {
+            Move(otherPoint.X - myPoint.X, myPoint.Y, false);
+        } else {
+            Move(myPoint.X, otherPoint.Y - myPoint.Y, false);
+        }
+    }
+
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
         if (_jointReferenceFirst == null) { _jointReferenceFirst = firstPoint; }
         if (_jointReferenceSecond == null) { _jointReferenceSecond = secondPoint; }
@@ -660,11 +681,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
 
         OnPropertyChanged();
-    }
-
-    internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {    
-        if(!JointPoints.Contains(myPoint)) {return; }
-        Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
     }
 
     #endregion

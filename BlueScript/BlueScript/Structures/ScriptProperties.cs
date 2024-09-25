@@ -51,7 +51,7 @@ public class ScriptProperties {
 
     public string ScriptName { get; }
     public int Stufe { get; }
-    internal List<Method> AllowedMethods { get; }
+    public List<Method> AllowedMethods { get; }
 
     #endregion
 }

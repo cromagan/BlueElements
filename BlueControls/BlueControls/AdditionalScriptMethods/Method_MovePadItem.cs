@@ -28,21 +28,21 @@ namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_ConnectPointWithSameName : Method {
+internal class Method_MovePadItem : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], [VariablePadItem.ShortName_Variable]];
-    public override string Command => "connectpointwithsamename";
+    public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable], FloatVal, FloatVal];
+    public override string Command => "movepaditem";
     public override List<string> Constants => [];
-    public override string Description => "Verschiebt das vorhanden PadItem indem es versucht, gleiche Punktnamen herauszufinden.";
+    public override string Description => "Verschiebt das vorhanden PadItem um die angegebenen Pixel.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "ConnectPointWithSameName(Collection, PadItem);";
+    public override string Syntax => "MovePadItem(PadItem, X, Y);";
 
     #endregion
 
@@ -51,34 +51,21 @@ internal class Method_ConnectPointWithSameName : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
-        if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
+        //if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
+        //if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[1] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
+        if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent != icpv) { return new DoItFeedback(ld, "Das Item gehört einer anderen Collection an"); }
-
-
-        if(iciv.JointPoints.Count == 0) { return new DoItFeedback(ld, "Das Item hat keine Jointpoints."); }
-
-
-        foreach (var pt in iciv.JointPoints) {
-
-            var p = icpv.GetJointPoint(pt.KeyName, iciv);
-            if (p != null) {
-
-                iciv.ConnectJointPoint(pt, p);
-                return DoItFeedback.Null();
-            }
+        if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
 
 
+        iciv.Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2), false);
 
-        }
+        return DoItFeedback.Null();
 
 
-        return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");
 
 
     }

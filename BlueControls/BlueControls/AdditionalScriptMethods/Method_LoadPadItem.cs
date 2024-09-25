@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueControls.ItemCollectionPad.Abstract;
 using static BlueBasics.IO;
+using BlueControls.ItemCollectionPad;
 
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -41,7 +42,7 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
     public override string Command => "loadpaditem";
 
     public override List<string> Constants => [];
-    public override string Description => "Lädt ein Pad-Item aus dem Dateisystem";
+    public override string Description => "Lädt ein Pad-Item aus dem Dateisystem. \r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, wird ein Dummy-Symbol erzeugt.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -55,6 +56,14 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
 
     #region Methods
 
+    public static TextPadItem DummyItem() {
+        var t = new TextPadItem();
+        t.Text = "FEHLER!";
+        t.SetCoordinates(new System.Drawing.RectangleF(0, 0, 100, 100), true);
+
+        return t;
+}
+
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filen = attvar.ValueStringGet(0);
 
@@ -64,7 +73,10 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
         }
 
         if (!IO.FileExists(filen)) {
-            return new DoItFeedback(ld, "Datei nicht gefunden: " +filen);
+            //return new DoItFeedback(ld, "Datei nicht gefunden: " +filen);
+
+            return new DoItFeedback(new VariablePadItem(DummyItem()));
+
         }
 
         try {
@@ -81,16 +93,10 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
 
             api.KeyName = Generic.GetUniqueKey();
 
-            //api.Page = InputBox.Show("Welcher Tab:", api.Page, BlueBasics.FormatHolder.SystemName);
-
-
-
-
-
-
             return new DoItFeedback(new VariablePadItem( api));
         } catch {
-            return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " +filen);
+            //return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " +filen);
+            return new DoItFeedback(new VariablePadItem(DummyItem()));
         }
 
 
