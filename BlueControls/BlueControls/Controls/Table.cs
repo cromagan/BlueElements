@@ -180,7 +180,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     #region Properties
 
-    [DefaultValue(1)]
+    [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
         get => _arrangement;

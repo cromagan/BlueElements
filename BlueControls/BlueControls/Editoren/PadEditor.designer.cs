@@ -115,9 +115,7 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Pad.Item = null;
             this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.Mode = "";
             this.Pad.Name = "Pad";
             this.Pad.ShiftX = 0F;
             this.Pad.ShiftY = 0F;

@@ -210,7 +210,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void SetItem(object? control) {
         if (control is GenericControlReciver grc) {
-            _lastItem = grc.Item;
+            _lastItem = grc.GeneratedFrom;
         } else if (control is Control c) {
             SetItem(c.Parent);
             return;

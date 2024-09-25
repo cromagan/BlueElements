@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -29,7 +30,7 @@ using static BlueBasics.Constants;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ZoomPad : GenericControlReciver {
+public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Fields
 

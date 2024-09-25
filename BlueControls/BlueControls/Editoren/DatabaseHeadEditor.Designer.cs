@@ -545,7 +545,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tblUndo
             // 
-            this.tblUndo.Arrangement = "";
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";

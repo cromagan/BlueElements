@@ -243,24 +243,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
                 _entityId = value.FromNonCritical();
                 return true;
 
-            case "entityidcolumnname":
-                return true;
-
-            case "textkeycolumnname":
-                return true;
-
             case "originidcolumnname":
                 _originIdColumnName = value;
                 return true;
 
             case "additionalinfocolumnname":
                 _additinalInfoColumnName = value;
-                return true;
-
-            case "counter":
-                return true;
-
-            case "adders":
                 return true;
 
             case "script":

@@ -42,11 +42,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tblUndo
             // 
-            this.tblUndo.Arrangement = "";
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblUndo.Item = null;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
-            this.tblUndo.Mode = "";
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.Size = new System.Drawing.Size(853, 416);
             this.tblUndo.TabIndex = 97;

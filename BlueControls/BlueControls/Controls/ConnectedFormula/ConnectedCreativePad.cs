@@ -55,8 +55,12 @@ public partial class ConnectedCreativePad : GenericControlReciver {
 
     #region Properties
 
-    public string ExecuteAtRowChange { get; internal set; }
+    public string ExecuteScriptAtRowChange { get; internal set; }
 
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowItem? LastRow {
         get => _lastRow;
 
@@ -75,15 +79,21 @@ public partial class ConnectedCreativePad : GenericControlReciver {
                     pad.Items.ResetVariables();
                     pad.Items.ReplaceVariables(_lastRow);
                 }
-            } else if (!string.IsNullOrEmpty(ExecuteAtRowChange)) {
+            } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
+                pad.Items = new ItemCollectionPad.ItemCollectionPad();
+
+
                 if (_lastRow != null) {
-                    var script = _lastRow.ExecuteScript(null, ExecuteAtRowChange, true, 1, null, true, true);
-                    if (script.AllOk) {
-                        if (script.Variables.Get("PAD") is VariableItemCollectionPad icp && icp.ValueItemCollection is { } item) {
-                            pad.Items = item;
-                        }
-                    }
+                    pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, _lastRow);
                 }
+                //if (_lastRow != null) {
+                //    var script = _lastRow.ExecuteScript(null, ExecuteAtRowChange, true, 1, null, true, true);
+                //    if (script.AllOk) {
+                //        if (script.Variables.Get("PAD") is VariableItemCollectionPad icp && icp.ValueItemCollection is { } item) {
+                //            pad.Items = item;
+                //        }
+                //    }
+                //}
             }
 
             pad.ZoomFit();

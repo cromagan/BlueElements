@@ -796,9 +796,7 @@ namespace BlueControls.Forms {
             this.FilterLeiste.CausesValidation = false;
             this.FilterLeiste.Dock = System.Windows.Forms.DockStyle.Top;
             this.FilterLeiste.Filtertypes = BlueControls.Enums.FilterTypesToShow.AktuelleAnsicht_AktiveFilter;
-            this.FilterLeiste.Item = null;
             this.FilterLeiste.Location = new System.Drawing.Point(0, 0);
-            this.FilterLeiste.Mode = "";
             this.FilterLeiste.Name = "FilterLeiste";
             this.FilterLeiste.Size = new System.Drawing.Size(972, 40);
             this.FilterLeiste.TabIndex = 22;
@@ -806,11 +804,8 @@ namespace BlueControls.Forms {
             // 
             // Table
             // 
-            this.Table.Arrangement = "";
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.Item = null;
             this.Table.Location = new System.Drawing.Point(0, 64);
-            this.Table.Mode = "";
             this.Table.Name = "Table";
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
@@ -873,7 +868,6 @@ namespace BlueControls.Forms {
             this.CFO.CausesValidation = false;
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFO.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
-            this.CFO.Item = null;
             this.CFO.Location = new System.Drawing.Point(0, 0);
             this.CFO.Mode = null;
             this.CFO.Name = "CFO";

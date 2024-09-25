@@ -165,9 +165,7 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.padVorschau.EditAllowed = false;
-            this.padVorschau.Item = null;
             this.padVorschau.Location = new System.Drawing.Point(232, 80);
-            this.padVorschau.Mode = "";
             this.padVorschau.Name = "padVorschau";
             this.padVorschau.ShiftX = 0F;
             this.padVorschau.ShiftY = 0F;
@@ -343,9 +341,7 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.padPrint.EditAllowed = false;
-            this.padPrint.Item = null;
             this.padPrint.Location = new System.Drawing.Point(5, 60);
-            this.padPrint.Mode = "";
             this.padPrint.Name = "padPrint";
             this.padPrint.ShiftX = 0F;
             this.padPrint.ShiftY = 0F;
@@ -445,9 +441,7 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.padSchachteln.EditAllowed = false;
-            this.padSchachteln.Item = null;
             this.padSchachteln.Location = new System.Drawing.Point(8, 40);
-            this.padSchachteln.Mode = "";
             this.padSchachteln.Name = "padSchachteln";
             this.padSchachteln.ShiftX = 0F;
             this.padSchachteln.ShiftY = 0F;

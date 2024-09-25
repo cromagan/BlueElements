@@ -40,7 +40,6 @@ namespace BlueControls {
             this.tableVariablen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableVariablen.Arrangement = "";
             this.tableVariablen.Location = new System.Drawing.Point(8, 64);
             this.tableVariablen.Name = "tableVariablen";
             this.tableVariablen.Size = new System.Drawing.Size(483, 303);

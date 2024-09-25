@@ -28,6 +28,7 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
@@ -1085,6 +1086,33 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         return null;
 
+    }
+
+    internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
+
+        //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
+        var vars = rowIn.Database?.CreateVariableCollection(rowIn,true, false, true, false) ?? new VariableCollection();
+
+
+        //var vars = new VariableCollection();
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        //vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
+        //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
+        //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
+        //vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
+        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
+
+        vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
+
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser) ;
+
+        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, 0);
+
+        var sc = new BlueScript.Script(vars, scp);
+        sc.ScriptText = scripttext;
+        return sc.Parse(0, "Main", null);
     }
 
     #endregion

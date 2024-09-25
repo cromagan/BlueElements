@@ -120,6 +120,12 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
+    <Compile Include="Editoren\CreativePadScriptEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editoren\CreativePadScriptEditor.Designer.cs">
+      <DependentUpon>CreativePadScriptEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editoren\DynamicSymbolScriptEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -736,6 +742,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectedFormula\RowAdder.resx">
       <DependentUpon>RowAdder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editoren\CreativePadScriptEditor.resx">
+      <DependentUpon>CreativePadScriptEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\DynamicSymbolScriptEditor.resx">
       <DependentUpon>DynamicSymbolScriptEditor.cs</DependentUpon>

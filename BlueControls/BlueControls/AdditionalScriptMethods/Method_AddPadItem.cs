@@ -49,7 +49,7 @@ internal class Method_AddPadItem : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
+        //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
         if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
@@ -61,7 +61,7 @@ internal class Method_AddPadItem : Method {
 
         icpv.Add(iciv);
 
-        if (iciv.JointPoints.Count == 0) { return new DoItFeedback(ld, "Das Item hat keine Jointpoints."); }
+        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null();  }
 
 
         foreach (var pt in iciv.JointPoints) {

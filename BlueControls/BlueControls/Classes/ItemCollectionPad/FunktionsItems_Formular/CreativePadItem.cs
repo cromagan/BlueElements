@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -37,7 +38,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     #region Fields
 
     private string _formular = string.Empty;
-    private string _skript = string.Empty;
+    private string _script = string.Empty;
     private string _typ = "Load";
 
     #endregion
@@ -76,12 +77,12 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override string MyClassId => ClassId;
 
-    public string Skript {
-        get => _skript;
+    public string Script {
+        get => _script;
+
         set {
-            if (IsDisposed) { return; }
-            if (_skript == value) { return; }
-            _skript = value;
+            if (value == _script) { return; }
+            _script = value;
             OnPropertyChanged();
         }
     }
@@ -112,7 +113,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 break;
 
             case "script":
-                con.ExecuteAtRowChange = _skript;
+                con.ExecuteScriptAtRowChange = _script;
                 break;
         }
 
@@ -130,7 +131,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             case "script":
 
-                if (string.IsNullOrEmpty(_skript)) { return "Kein Skript gewählt."; }
+                if (string.IsNullOrEmpty(_script)) { return "Kein Skript angegeben."; }
                 break;
         }
 
@@ -195,9 +196,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             case "script":
                 result.Add(new FlexiControl("Ein leeres Blatt, das durch das folgende Skript befüllt wird.", widthOfControl, false));
-                result.Add(new FlexiControlForProperty<string>(() => Skript, scripte));
-                result.Add(new FlexiControlForDelegate(Skripte_Bearbeiten, "Skripte bearbeiten", ImageCode.Skript));
-                result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPad();", widthOfControl, false));
+                result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+                //result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPad();", widthOfControl, false));
                 break;
         }
 
@@ -215,8 +215,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 _formular = value.FromNonCritical();
                 return true;
 
-            case "scriptname":
-                _skript = value.FromNonCritical();
+            case "script":
+                _script = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);
@@ -224,6 +224,9 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override string ReadableText() => "Layout-Generator";
 
+    /// <summary>
+    /// Skripte der Datenbank
+    /// </summary>
     public void Skripte_Bearbeiten() {
         if (DatabaseInput is { IsDisposed: false } db) {
             Forms.TableView.OpenScriptEditor(db);
@@ -238,7 +241,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         List<string> result = [];
         result.ParseableAdd("Typ", _typ);
         result.ParseableAdd("FormulaFile", _formular);
-        result.ParseableAdd("ScriptName", _skript);
+        result.ParseableAdd("Script", _script);
         return result.Parseable(base.ToParseableString());
     }
 
@@ -272,6 +275,16 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+    }
+
+    /// <summary>
+    /// Internes Skript
+    /// </summary>
+    public void Skript_Bearbeiten() {
+        var x = new CreativePadScriptEditor();
+        x.Item = this;
+        x.Database = DatabaseInput;
+        x.ShowDialog();
     }
 
     #endregion

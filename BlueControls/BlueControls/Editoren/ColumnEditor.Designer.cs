@@ -1370,10 +1370,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tblFilterliste.Arrangement = "";
-            this.tblFilterliste.Item = null;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
-            this.tblFilterliste.Mode = "";
             this.tblFilterliste.Name = "tblFilterliste";
             this.tblFilterliste.Size = new System.Drawing.Size(1073, 504);
             this.tblFilterliste.TabIndex = 39;

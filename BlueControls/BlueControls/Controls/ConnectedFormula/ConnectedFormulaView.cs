@@ -292,7 +292,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                 return null;
             }
 
-            if (c is GenericControlReciver gci && gci.Item != thisit) {
+            if (c is GenericControlReciver gci && gci.GeneratedFrom != thisit) {
                 Develop.DebugPrint("Item muss gesetzt werden!");
                 return null;
             }
