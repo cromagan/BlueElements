@@ -713,10 +713,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
       
         KeyName = Generic.GetUniqueKey();
 
-        foreach (var thispoint in JointPoints) {
-            thispoint.KeyName = Generic.GetUniqueKey();
+        //foreach (var thispoint in JointPoints) {
+        //    thispoint.KeyName = Generic.GetUniqueKey();
 
-        }
+        //}
 
         foreach (var thispoint in MovablePoint) {
             thispoint.KeyName = Generic.GetUniqueKey();

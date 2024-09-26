@@ -102,7 +102,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalScriptMethods\Method_AddDimension.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Dimension.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SendToBack.cs" />
     <Compile Include="AdditionalScriptMethods\Method_DeletePoints.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ConnectPoints.cs" />

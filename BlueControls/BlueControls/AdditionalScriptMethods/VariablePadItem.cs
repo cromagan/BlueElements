@@ -74,7 +74,7 @@ public class VariablePadItem : Variable {
         return v;
     }
 
-    public override void DisposeContent() => _item?.Dispose();
+    public override void DisposeContent() => _item = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariablePadItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

@@ -57,6 +57,8 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
     #region Properties
 
+    public string DefaultDesign { get; set; }
+    public float DefaultScale { get; set; }
     public string ExecuteScriptAtRowChange { get; internal set; }
 
     [Browsable(false)]
@@ -82,6 +84,11 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
                 }
             } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
                 pad.Items = new ItemCollectionPad.ItemCollectionPad();
+                pad.Items.SheetStyleScale = DefaultScale;
+
+                if (Skin.StyleDb?.Row != null) {
+                    pad.Items.SheetStyle = Skin.StyleDb.Row[DefaultDesign];
+                }
 
                 if (_lastRow != null) {
                     pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, _lastRow);
@@ -105,22 +112,14 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     #endregion
 
     #region Methods
+
     public void OpenScriptEditor() {
         if (IsDisposed || GeneratedFrom is not CreativePadItem { IsDisposed: false } it) { return; }
 
         var se = IUniqueWindowExtension.ShowOrCreate<CreativePadScriptEditor>(it);
 
         se.Row = LastRow;
-
-
-
-
-
     }
-
-
-
-
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.

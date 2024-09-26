@@ -29,21 +29,21 @@ namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_AddDimension: Method {
+internal class Method_Dimension: Method {
 
     #region Properties
 
     public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal];
-    public override string Command => "adddimension";
+    public override string Command => "dimension";
     public override List<string> Constants => [];
-    public override string Description => "Fügt einer ItemCollectionPad eine Bemaßung hinzu.\r\nmit den angegebenen JointPoings hinzu.";
+    public override string Description => "Erstellt eine Bemaßung hinzu mitt den angegebenen JointPoings.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
+    public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "AddDimensiom(Collection, Punkt1, Punkt2, AbstandinMM);";
+    public override string Syntax => "Dimensiom(Collection, Punkt1, Punkt2, AbstandinMM);";
 
     #endregion
 
@@ -60,9 +60,8 @@ internal class Method_AddDimension: Method {
         var p2 = icpv.GetJointPoint(attvar.ValueStringGet(2), null);
         var abmm = attvar.ValueNumGet(3);
 
-        var iciv = new DimensionPadItem(p1, p2, (float)abmm);
-        icpv.Add(iciv);
-        return DoItFeedback.Null();
+
+        return new DoItFeedback(new VariablePadItem(new DimensionPadItem(p1, p2, (float)abmm)));
     }
 
     #endregion

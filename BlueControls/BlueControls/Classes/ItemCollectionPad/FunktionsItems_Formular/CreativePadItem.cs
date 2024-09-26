@@ -25,9 +25,12 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -37,7 +40,9 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Fields
 
+    private string _design = string.Empty;
     private string _formular = string.Empty;
+    private float _scale = 1f;
     private string _script = string.Empty;
     private string _typ = "Load";
 
@@ -61,6 +66,16 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override string Description => "Ein Steuerelement, das ein generiertes optisches Dokument anzeigt.";
 
+    public string Design {
+        get => _design;
+        set {
+            if (IsDisposed) { return; }
+            if (_design == value) { return; }
+            _design = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string Formular {
         get => _formular;
         set {
@@ -76,6 +91,20 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     public override bool MustBeInDrawingArea => true;
 
     public override string MyClassId => ClassId;
+
+    public float Scale {
+        get => _scale;
+        set {
+            if (IsDisposed) { return; }
+            value = Math.Max(value, 0.3f);
+            value = Math.Min(value, 20f);
+            value = (float)Math.Round(value, 2, MidpointRounding.AwayFromZero);
+
+            if (_scale == value) { return; }
+            _scale = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string Script {
         get => _script;
@@ -114,6 +143,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             case "script":
                 con.ExecuteScriptAtRowChange = _script;
+                con.DefaultScale = _scale;
+                con.DefaultDesign = _design;
                 break;
         }
 
@@ -195,8 +226,13 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 break;
 
             case "script":
-                result.Add(new FlexiControl("Ein leeres Blatt, das durch das folgende Skript befüllt wird.", widthOfControl, false));
+                result.Add(new FlexiControl("Erstellt ein leeres Blatt, das durch das folgende Skript befüllt wird.", widthOfControl, false));
                 result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+                var art = new List<AbstractListItem>();
+                art.AddRange(ItemsOf(Skin.AllStyles()));
+                result.Add(new FlexiControlForProperty<string>(() => Design, art));
+                result.Add(new FlexiControlForProperty<float>(() => Scale));
+
                 //result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPad();", widthOfControl, false));
                 break;
         }
@@ -218,11 +254,27 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             case "script":
                 _script = value.FromNonCritical();
                 return true;
+
+            case "scale":
+                _scale = FloatParse(value.FromNonCritical());
+                return true;
+
+            case "design":
+                _design = value.FromNonCritical();
+                return true;
         }
         return base.ParseThis(key, value);
     }
 
     public override string ReadableText() => "Layout-Generator";
+
+    /// <summary>
+    /// Internes Skript
+    /// </summary>
+    public void Skript_Bearbeiten() {
+        var se = IUniqueWindowExtension.ShowOrCreate<CreativePadScriptEditor>(this);
+        se.Database = DatabaseInput;
+    }
 
     /// <summary>
     /// Skripte der Datenbank
@@ -242,6 +294,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         result.ParseableAdd("Typ", _typ);
         result.ParseableAdd("FormulaFile", _formular);
         result.ParseableAdd("Script", _script);
+        result.ParseableAdd("Design", _design);
+        result.ParseableAdd("Scale", _scale);
         return result.Parseable(base.ToParseableString());
     }
 
@@ -275,14 +329,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
-    }
-
-    /// <summary>
-    /// Internes Skript
-    /// </summary>
-    public void Skript_Bearbeiten() {
-        var se = IUniqueWindowExtension.ShowOrCreate<CreativePadScriptEditor>(this);
-        se.Database = DatabaseInput;
     }
 
     #endregion

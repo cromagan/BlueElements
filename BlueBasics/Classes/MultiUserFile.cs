@@ -53,6 +53,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private bool _isSaved = true;
     private bool _isSaving;
     private string _lastSaveCode;
+    private int _lockCount = 0;
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -177,9 +178,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             }
         }
     }
+
     public static void UnlockAllHard() {
-
-
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
             thisFile?.UnlockHard();
@@ -190,15 +190,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             }
         }
     }
-
-    private void UnlockHard() {
-        if (DeleteFile(Blockdateiname(), false)) {
-            _inhaltBlockdatei = string.Empty;
-            _lockCount = 0;
-        }
-    }
-
-
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() {
@@ -342,11 +333,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
-    private int _lockCount = 0;
-
-
     public bool LockEditing() {
-
         if (_lockCount > 0) { return true; }
 
         if (!IsAdministrator()) { return false; }
@@ -646,6 +633,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             _ = DeleteFile(tmpFileName, false);
             if (removeSaving) { _isSaving = false; }
             return txt;
+        }
+    }
+
+    private void UnlockHard() {
+        if (DeleteFile(Blockdateiname(), false)) {
+            _inhaltBlockdatei = string.Empty;
+            _lockCount = 0;
         }
     }
 
