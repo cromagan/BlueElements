@@ -262,10 +262,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public object? Clone() {
         var x = ToParseableString();
-
         var i = NewByParsing<AbstractPadItem>(x);
-        i.GetNewIdsForEverything();
-
         return i;
     }
 
@@ -718,15 +715,15 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
         //}
 
-        foreach (var thispoint in MovablePoint) {
-            thispoint.KeyName = Generic.GetUniqueKey();
+        //foreach (var thispoint in MovablePoint) {
+        //    thispoint.KeyName = Generic.GetUniqueKey();
 
-        }
+        //}
 
-        //Doppelt gemoppelt
-        foreach (var thispoint in PointsForSuccesfullyMove) {
-            thispoint.KeyName = Generic.GetUniqueKey();
-        }
+        ////Doppelt gemoppelt
+        //foreach (var thispoint in PointsForSuccesfullyMove) {
+        //    thispoint.KeyName = Generic.GetUniqueKey();
+        //}
 
         ////Doppelt gemoppelt
         //_jointMiddle.KeyName = Generic.GetUniqueKey();

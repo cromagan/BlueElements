@@ -417,7 +417,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);
         if (i is not ReciverControlPadItem api) { return; }
 
-        api.KeyName = Generic.GetUniqueKey();
+        api.GetNewIdsForEverything();
 
         api.Page = InputBox.Show("Welcher Tab:", api.Page, BlueBasics.FormatHolder.SystemName);
 

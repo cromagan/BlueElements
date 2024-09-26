@@ -127,6 +127,11 @@ public static class AbstractListItemExtension {
                 symbol = QuickImage.Get(ImageCode.Kreuz);
                 break;
 
+            case ContextMenuCommands.Verschieben:
+                readableText = "Verschieben";
+                symbol = QuickImage.Get(ImageCode.Mauspfeil);
+                break;
+
             case ContextMenuCommands.Umbenennen:
                 readableText = "Umbenennen";
                 symbol = QuickImage.Get(ImageCode.Stift);

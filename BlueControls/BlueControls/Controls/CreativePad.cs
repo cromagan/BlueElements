@@ -225,7 +225,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 case "#duplicate":
                     var cloned = item.Clone();
                     if (cloned is AbstractPadItem clonedapi) {
-                        clonedapi.KeyName = Generic.GetUniqueKey();
+                        clonedapi.GetNewIdsForEverything();
                         _items?.Add(clonedapi);
                     }
                     return;
@@ -237,7 +237,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
                 case "#connect":
                     foreach (var pt in item.JointPoints) {
-                        var p = Items.GetJointPoint(pt.KeyName, item);
+                        var p = Items?.GetJointPoint(pt.KeyName, item);
                         if (p != null) {
                             item.ConnectJointPoint(pt, p);
                             return;
@@ -278,6 +278,30 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                         pm.KeyName = t;
                     }
                     return;
+
+                case "verschieben":
+
+
+
+
+                    var tn = Forms.InputBox.Show("Zu welchem Punkt:", pm.KeyName, BlueBasics.FormatHolder.SystemName);
+                    if (!string.IsNullOrEmpty(tn)) {
+                        if (pm.Parent is AbstractPadItem api2) {
+                            var p = Items?.GetJointPoint(tn,api2);
+                           if(p!= null) {
+                                pm.SetTo(p.X,p.Y, true);
+                            }
+
+
+                        
+                        }
+                    }
+
+       
+                    return;
+
+
+
             }
         }
 
@@ -351,6 +375,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
             if (e.HotItem is PointM pm) {
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
+                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Verschieben));
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
             }
         }
