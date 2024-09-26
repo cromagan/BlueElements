@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
@@ -28,21 +29,21 @@ namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_MovePadItem : Method {
+internal class Method_AddDimension: Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable], FloatVal, FloatVal];
-    public override string Command => "movepaditem";
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal];
+    public override string Command => "adddimension";
     public override List<string> Constants => [];
-    public override string Description => "Verschiebt das vorhandene PadItem um die angegebenen Pixel.";
+    public override string Description => "Fügt einer ItemCollectionPad eine Bemaßung hinzu.\r\nmit den angegebenen JointPoings hinzu.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "MovePadItem(PadItem, X, Y);";
+    public override string Syntax => "AddDimensiom(Collection, Punkt1, Punkt2, AbstandinMM);";
 
     #endregion
 
@@ -51,23 +52,17 @@ internal class Method_MovePadItem : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
-        //if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        //if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
-
-        if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
-        if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
-
-        if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+        if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
+        if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
 
 
+        var p1 = icpv.GetJointPoint(attvar.ValueStringGet(1), null);
+        var p2 = icpv.GetJointPoint(attvar.ValueStringGet(2), null);
+        var abmm = attvar.ValueNumGet(3);
 
-        iciv.Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2), false);
-
+        var iciv = new DimensionPadItem(p1, p2, (float)abmm);
+        icpv.Add(iciv);
         return DoItFeedback.Null();
-
-
-
-
     }
 
     #endregion

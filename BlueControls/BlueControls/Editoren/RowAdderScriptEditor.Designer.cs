@@ -7,7 +7,7 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
-    public sealed partial class AdderScriptEditor  {
+    public sealed partial class RowAdderScriptEditor  {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {

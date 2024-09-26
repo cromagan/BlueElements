@@ -42,6 +42,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Fields
 
+   
+
     public const float StandardHöhe = 1.75f;
 
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
@@ -386,6 +388,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 UnRegisterPadDataEvents();
                 _padData = new ItemCollectionPad.ItemCollectionPad();
                 _padData.Parse(value.FromNonCritical());
+                _padData.Parent = this;
                 RegisterPadDataEvents();
                 return true;
 

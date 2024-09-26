@@ -139,16 +139,14 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         return nt;
     }
 
-    public void OpenScriptEditor(bool dialog) {
+    public void OpenScriptEditor() {
         if (IsDisposed || GeneratedFrom is not RowAdderPadItem { IsDisposed: false } it) { return; }
 
-        var se = new AdderScriptEditor(it, _lastRow);
 
-        if (dialog) {
-            _ = se.ShowDialog();
-        } else {
-            se.Show();
-        }
+        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(it);
+        se.Row = _lastRow;
+
+
     }
 
     public void Fehler(string txt, ImageCode symbol) {

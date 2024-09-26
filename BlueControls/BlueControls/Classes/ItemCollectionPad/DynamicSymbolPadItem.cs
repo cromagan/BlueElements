@@ -28,6 +28,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using BlueControls.CellRenderer;
+using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -181,11 +182,8 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    private void Skript_Bearbeiten() {
-        var x = new DynamicSymbolScriptEditor();
-        x.Item = this;
-        x.ShowDialog();
-    }
+    private void Skript_Bearbeiten() => IUniqueWindowExtension.ShowOrCreate<DynamicSymbolScriptEditor>(this);
+
 
     #endregion
 }

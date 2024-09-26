@@ -28,44 +28,64 @@ namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_MovePadItem : Method {
+internal class Method_DeletePoints : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable], FloatVal, FloatVal];
-    public override string Command => "movepaditem";
+    public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable, VariableItemCollectionPad.ShortName_Variable], StringVal];
+    public override string Command => "deletepoints";
     public override List<string> Constants => [];
-    public override string Description => "Verschiebt das vorhandene PadItem um die angegebenen Pixel.";
+    public override string Description => "Löscht die angegebenen Punkte zu verbinden.\r\nWird keine Name angegeben, werden alle Punkte gelöscht.\r\nWird keinen Fehler auslösen.";
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => 0;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "MovePadItem(PadItem, X, Y);";
+    public override string Syntax => "DeletePoints(PadItem/Collection, PointName, ...);";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
-
-        //if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        //if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
-
-        if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
-        if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
-
-        if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
 
 
-        iciv.Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2), false);
+        List<string> names = [];
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
+            names.Add(attvar.ValueStringGet(z));
+        }
+
+
+        if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
+            if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
+            icpv.DeleteJointPoints(names);
+
+
+        }
+        
+
+        if (attvar.Attributes[0] is VariablePadItem ici) {
+            if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
+            if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+            iciv.DeleteJointPoints(names);
+
+
+        }
+
+
+
+
+
+
+
+
+
 
         return DoItFeedback.Null();
 
-
+   
 
 
     }

@@ -300,11 +300,17 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
 
-    private void Skript_Bearbeiten() {
-        var x = new AdderScriptEditor(this, null);
-        x.Database = DatabaseInput;
-        x.ShowDialog();
+
+    /// <summary>
+    /// Internes Skript
+    /// </summary>
+    public void Skript_Bearbeiten() {
+        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(this);
+        se.Database = DatabaseInput;
     }
+
+
+
 
     #endregion
 }

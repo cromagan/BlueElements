@@ -264,6 +264,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         var x = ToParseableString();
 
         var i = NewByParsing<AbstractPadItem>(x);
+        i.GetNewIdsForEverything();
 
         return i;
     }
@@ -577,9 +578,9 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         if (connectX && connectY) {
             Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
         } else if (connectX) {
-            Move(otherPoint.X - myPoint.X, myPoint.Y, false);
+            Move(otherPoint.X - myPoint.X, 0, false);
         } else {
-            Move(myPoint.X, otherPoint.Y - myPoint.Y, false);
+            Move(0, otherPoint.Y - myPoint.Y, false);
         }
     }
 
@@ -687,6 +688,52 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
 
         OnPropertyChanged();
+    }
+
+
+    /// <summary>
+    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
+    /// </summary>
+    /// <param name="names"></param>
+    internal void DeleteJointPoints(List<string> names) {
+
+        var j = new List<PointM>();
+        j.AddRange(JointPoints);
+
+
+        foreach (var thispoint in j) {
+            if (names.Count == 0 || names.Contains(thispoint.KeyName, false)) {
+                JointPoints.Remove(thispoint);
+            }
+
+        }
+    }
+
+    internal void GetNewIdsForEverything() {
+      
+        KeyName = Generic.GetUniqueKey();
+
+        foreach (var thispoint in JointPoints) {
+            thispoint.KeyName = Generic.GetUniqueKey();
+
+        }
+
+        foreach (var thispoint in MovablePoint) {
+            thispoint.KeyName = Generic.GetUniqueKey();
+
+        }
+
+        //Doppelt gemoppelt
+        foreach (var thispoint in PointsForSuccesfullyMove) {
+            thispoint.KeyName = Generic.GetUniqueKey();
+        }
+
+        ////Doppelt gemoppelt
+        //_jointMiddle.KeyName = Generic.GetUniqueKey();
+        //_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();
+        //_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
+
+
     }
 
     #endregion

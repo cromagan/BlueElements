@@ -188,12 +188,8 @@ public partial class PadEditorWithFileAccess : PadEditor {
         IO.LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);
-        if (i is not AbstractPadItem api) { return; }
-
-        if (Pad.Items[api.KeyName] != null) {
-            i.KeyName = Generic.GetUniqueKey();
-        }
-
+        if (i is not { }) { return; }
+        i.GetNewIdsForEverything();
         Pad.Items.Add(i);
     }
 

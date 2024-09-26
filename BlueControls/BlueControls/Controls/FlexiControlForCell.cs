@@ -46,18 +46,11 @@ namespace BlueControls.Controls;
 public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEditor {
 
 
-    public void OpenScriptEditor(bool dialog) {
+    public void OpenScriptEditor() {
         if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
 
-        var se = new DatabaseScriptEditor(db);
-
-        if (dialog) {
-            _ = se.ShowDialog();
-        } else {
-            se.Show();
-        }
-
-
+        var se = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        se.Row = _lastrow;
 
     }
 
@@ -68,7 +61,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private ColumnItem? _column;
     private string _columnName = string.Empty;
 
-    private RowItem? _row;
+    private RowItem? _lastrow;
 
     #endregion
 
@@ -182,7 +175,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                 return;
             }
 
-            if (e.Row != _row) { return; }
+            if (e.Row != _lastrow) { return; }
 
             if (e.Column == _column) {
                 SetValueFromCell(_column, e.Row);
@@ -227,7 +220,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     protected override void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if (e.Row != _row) { return; }
+        if (e.Row != _lastrow) { return; }
         if (e.ColumnsWithErrors == null) {
             f.InfoText = string.Empty;
             return;
@@ -268,16 +261,16 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         DoInputFilter(null, false);
         DoRows();
 
-        _row = RowSingleOrNull();
+        _lastrow = RowSingleOrNull();
         _column ??= GetTmpColumn();
 
-        StyleControls(_column, _row);
-        SetValueFromCell(_column, _row);
-        CheckEnabledState(_column, _row);
+        StyleControls(_column, _lastrow);
+        SetValueFromCell(_column, _lastrow);
+        CheckEnabledState(_column, _lastrow);
 
-        _row?.CheckRowDataIfNeeded();
+        _lastrow?.CheckRowDataIfNeeded();
 
-        if (_row?.LastCheckedEventArgs is { } rce) {
+        if (_lastrow?.LastCheckedEventArgs is { } rce) {
             DatabaseInput_RowChecked(this, rce);
         }
     }
@@ -466,7 +459,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if (_row is not { IsDisposed: false } row) { return; }
+        if (_lastrow is not { IsDisposed: false } row) { return; }
         if (Marker.CancellationPending) { return; }
 
         var col = db.Column.First();
@@ -729,7 +722,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
-        if (_row is not { IsDisposed: false } row) { return; }
+        if (_lastrow is not { IsDisposed: false } row) { return; }
 
         var oldVal = row.CellGetString(_column);
         var newValue = f.Value;

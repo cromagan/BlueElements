@@ -70,9 +70,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem());
 
-        if (!string.IsNullOrWhiteSpace(filename) && !FormulaSet(filename, notAllowedchilds)) {
-            Close();
-        }
+        FormulaSet(filename, notAllowedchilds);
 
         //MultiUserFile.SaveAll(false);
         //Database.ForceSaveAll();
@@ -330,28 +328,35 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
         if (tmpFormula == null) { return false; }
 
-        if (!tmpFormula.LockEditing()) { return false; }
-
         FormulaSet(tmpFormula, notAllowedchilds);
 
         return true;
     }
 
+
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
+        base.OnFormClosing(e);
+    }
+
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
-        if (!Generic.IsAdministrator()) { return; }
-        if (_cFormula == formular) { return; }
+
 
         if (_cFormula != null) {
             _cFormula.Editing -= _cFormula_Editing;
             _cFormula.UnlockEditing();
         }
 
+        if (!Generic.IsAdministrator()) { formular = null; }
+        if (formular != null && !formular.LockEditing()) { formular = null; }
+
+        if (_cFormula == formular) { return; }
+
         _cFormula = formular;
         var editable = false;
 
         if (_cFormula != null) {
             _cFormula.Editing += _cFormula_Editing;
-            editable = _cFormula.LockEditing();
         }
 
         if (notAllowedchilds != null && CFormula != null && editable) {

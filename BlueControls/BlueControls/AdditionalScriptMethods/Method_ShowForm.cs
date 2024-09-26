@@ -35,7 +35,7 @@ public class Method_ShowForm : BlueScript.Methods.Method {
     public override List<string> Constants => [];
     public override string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 0;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableFloat.ShortName_Variable;

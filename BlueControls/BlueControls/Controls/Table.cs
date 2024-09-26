@@ -1217,16 +1217,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public void OpenScriptEditor(bool dialog) {
+    public void OpenScriptEditor() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        var se = new DatabaseScriptEditor(db);
 
-        if (dialog) {
-            _ = se.ShowDialog();
-        } else {
-            se.Show();
-        }
+        var se = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        se.Row = CursorPosRow?.Row;
+
     }
 
     public void OpenSearchAndReplaceInCells() {

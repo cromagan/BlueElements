@@ -101,10 +101,11 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (CFormula.ConnectedFormula == null) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
+
         if (!CFormula.ConnectedFormula.LockEditing()) { return; }
 
         using var x = new ConnectedFormulaEditor(CFormula.ConnectedFormula.Filename, null);
-        if (x.IsClosed || x.IsDisposed) { return; }
+
         x.ShowDialog();
         CFormula.ConnectedFormula.UnlockEditing();
         CFormula.InvalidateView();
@@ -129,18 +130,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (!Generic.IsAdministrator()) { return; }
 
         if (_lastObject is not { } api) { return; }
-
-        Database.ForceSaveAll();
-        MultiUserFile.SaveAll(false);
-
-        if (!CFormula.ConnectedFormula.LockEditing()) { return; }
-
-        api.OpenScriptEditor(true);
-
-        MultiUserFile.SaveAll(true);
-        CFormula.ConnectedFormula.UnlockEditing();
-        Database.ForceSaveAll();
-        CFormula.InvalidateView();
+        api.OpenScriptEditor();
     }
 
     private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);

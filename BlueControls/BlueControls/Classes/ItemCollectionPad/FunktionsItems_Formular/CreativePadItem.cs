@@ -281,9 +281,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     /// Internes Skript
     /// </summary>
     public void Skript_Bearbeiten() {
-        var x = new CreativePadScriptEditor(this, null);
-        x.Database = DatabaseInput;
-        x.ShowDialog();
+        var se = IUniqueWindowExtension.ShowOrCreate<CreativePadScriptEditor>(this);
+        se.Database = DatabaseInput;
     }
 
     #endregion

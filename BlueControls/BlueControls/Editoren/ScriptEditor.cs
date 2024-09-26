@@ -95,8 +95,6 @@ public sealed partial class ScriptEditor : UserControl, IContextMenu, IDisposabl
             e.ContextMenu.Add(ItemOf("Variableninhalt kopieren"));
         }
 
-
-
         OnContextMenuInit(e);
     }
 

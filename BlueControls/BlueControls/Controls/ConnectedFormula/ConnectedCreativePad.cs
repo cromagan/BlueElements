@@ -105,18 +105,14 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     #endregion
 
     #region Methods
-    public void OpenScriptEditor(bool dialog) {
+    public void OpenScriptEditor() {
         if (IsDisposed || GeneratedFrom is not CreativePadItem { IsDisposed: false } it) { return; }
 
-        var se = new CreativePadScriptEditor(it, LastRow);
-        se.Database = DatabaseInput;
+        var se = IUniqueWindowExtension.ShowOrCreate<CreativePadScriptEditor>(it);
+
+        se.Row = LastRow;
 
 
-        if (dialog) {
-            _ = se.ShowDialog();
-        } else {
-            se.Show();
-        }
 
 
 

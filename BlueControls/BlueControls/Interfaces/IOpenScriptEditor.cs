@@ -23,7 +23,7 @@ public interface IOpenScriptEditor {
 
     #region Methods
 
-    public void OpenScriptEditor(bool dialog);
+    public void OpenScriptEditor();
 
 
     #endregion

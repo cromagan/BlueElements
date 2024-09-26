@@ -91,7 +91,8 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
 
             }
 
-            api.KeyName = Generic.GetUniqueKey();
+            api.GetNewIdsForEverything();
+
 
             return new DoItFeedback(new VariablePadItem( api));
         } catch {

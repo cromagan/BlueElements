@@ -58,7 +58,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public const int Dpi = 300;
 
     public static List<AbstractPadItem>? PadItemTypes;
-
     public new EventHandler? PropertyChanged;
     internal string Caption;
 
@@ -131,7 +130,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
-
     public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     /// <summary>
@@ -168,6 +166,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public bool IsSaved { get; set; }
 
     public string KeyName => Caption;
+    public object? Parent { get; set; }
 
     public Padding RandinMm {
         get => _randinMm;
@@ -317,7 +316,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         GC.SuppressFinalize(this);
     }
 
-
     public bool DrawCreativePadTo(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, bool showJointPoints, States state) {
         try {
             gr.PixelOffsetMode = PixelOffsetMode.None;
@@ -389,13 +387,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             }
 
             #endregion
-
-
-
-
-
-
-
         } catch {
             Develop.CheckStackForOverflow();
             return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
@@ -771,9 +762,44 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return Database.RepairUserGroups(l);
     }
 
+    /// <summary>
+    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
+    /// </summary>
+    /// <param name="names"></param>
+    internal void DeleteJointPoints(List<string> names) {
+        foreach (var thisItem in Items) {
+            thisItem.DeleteJointPoints(names);
+        }
+    }
+
     internal Rectangle DruckbereichRect() =>
-                _prLo == null || _prRu == null ? Rectangle.Empty :
+                    _prLo == null || _prRu == null ? Rectangle.Empty :
                                                  new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
+
+    internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
+        //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
+        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? new VariableCollection();
+
+        //var vars = new VariableCollection();
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        //vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
+        //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
+        //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
+        //vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
+        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
+
+        vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
+
+        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
+
+        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, 0);
+
+        var sc = new BlueScript.Script(vars, scp);
+        sc.ScriptText = scripttext;
+        return sc.Parse(0, "Main", null);
+    }
 
     internal int GetFreeColorId(string page) {
         var usedids = new List<int>();
@@ -788,6 +814,18 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (!usedids.Contains(c)) { return c; }
         }
         return -1;
+    }
+
+    internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
+        foreach (var thisIt in Items) {
+            if (thisIt != notOfMe) {
+                foreach (var thisPt in thisIt.JointPoints) {
+                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
+                }
+            }
+        }
+
+        return null;
     }
 
     internal RectangleF MaxBounds(string page) => MaxBounds(ItemsOnPage(page));
@@ -1075,52 +1113,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
                     break;
             }
         }
-    }
-
-    internal PointM? GetJointPoint(string pointName, AbstractPadItem notOfMe) {
-
-        foreach (var thisIt in Items) {
-
-            if (thisIt != notOfMe) {
-
-                foreach (var thisPt in thisIt.JointPoints) {
-
-                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
-
-                }
-
-            }
-        }
-
-        return null;
-
-    }
-
-    internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
-
-        //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? new VariableCollection();
-
-
-        //var vars = new VariableCollection();
-        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-        //vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
-        //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
-        //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
-        //vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
-        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
-
-        vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
-
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
-
-        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, 0);
-
-        var sc = new BlueScript.Script(vars, scp);
-        sc.ScriptText = scripttext;
-        return sc.Parse(0, "Main", null);
     }
 
     #endregion

@@ -26,10 +26,11 @@ using BlueScript.Structures;
 using System.Windows.Forms;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueBasics.MultiUserFile;
+using BlueControls.Interfaces;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDatabase {
+public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDatabase, IUniqueWindow {
 
     #region Fields
 
@@ -41,7 +42,7 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
     #region Constructors
 
-    public CreativePadScriptEditor(CreativePadItem item, RowItem? row) {
+    public CreativePadScriptEditor() {
 
 
 
@@ -49,11 +50,9 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
         InitializeComponent();
         eventScriptEditor.Enabled = false;
 
-        Item = item;
 
 
-        txbTestZeile.Text = row?.CellFirstString() ?? string.Empty;
-        Database = row?.Database;
+
 
 
         //var l = new List<string> {
@@ -71,6 +70,18 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
         //l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
 
         FormManager.RegisterForm(this);
+    }
+
+
+
+    /// <summary>
+    /// Nur zum setzen der Zeile zum Testen.
+    /// </summary>
+    public RowItem? Row {
+        set {
+            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
+            Database = value?.Database;
+        }
     }
 
     #endregion
@@ -94,29 +105,33 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
         }
     }
 
-    public CreativePadItem? Item {
+    public object? Object {
         get {
             if (IsDisposed) { return null; }
 
             return _item;
         }
         set {
+
+            if(value is not CreativePadItem) { value = null; }
             if (_item == value) { return; }
 
             WriteInfosBack();
 
-            _item = null; // Um keine werte zurück zu Schreiben werden des anzeigen
+            _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
 
-            if (value != null) {
+            if (value is CreativePadItem cpi) {
                 eventScriptEditor.Enabled = true;
-                eventScriptEditor.Script = value.Script;
-                _item = value;
+                eventScriptEditor.Script = cpi.Script;
+                _item = cpi;
             } else {
                 eventScriptEditor.Enabled = false;
                 eventScriptEditor.Script = string.Empty;
             }
         }
     }
+
+   
 
     #endregion
 
@@ -133,7 +148,7 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
         base.OnFormClosing(e);
 
-        Item = null; // erst das Item!
+        Object = null; // erst das Item!
     }
 
     protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}

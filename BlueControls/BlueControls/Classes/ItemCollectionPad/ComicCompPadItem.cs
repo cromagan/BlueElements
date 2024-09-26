@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-
 #nullable enable
 
 using BlueBasics;
@@ -58,25 +57,6 @@ public class ComicCompPadItem : AbstractPadItem {
 
     #endregion
 
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        //List<GenericControl> result =
-        //[new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript),
-        //.. base.GetProperties(widthOfControl),
-        //];
-        //return result;
-
-        List<GenericControl> result =
-[
-
-            //new FlexiControl("Einstellungen:", widthOfControl, true),
-            new FlexiControlForProperty<int>(() => Width),
-                .. base.GetProperties(widthOfControl),
-
-        ];
-        return result;
-
-    }
-
     #region Constructors
 
     public ComicCompPadItem() : this(string.Empty, null) { }
@@ -110,14 +90,23 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override string Description => string.Empty;
+
     public override string MyClassId => ClassId;
+
+    public int Width {
+        get => _width;
+        set {
+            if (_width == value) { return; }
+            _width = value;
+            OnPropertyChanged();
+        }
+    }
+
     protected override int SaveOrder => 999;
 
     #endregion
 
     #region Methods
-
-
 
     public override bool Contains(PointF value, float zoomfactor) {
         var ne = 5 / zoomfactor;
@@ -128,16 +117,13 @@ public class ComicCompPadItem : AbstractPadItem {
         return false;
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
-
-        if (sender == P1 || sender == P2) {
-           CalculateJointMiddle(P1,P2);
-        }
-
-        base.PointMoved(sender, e);
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        List<GenericControl> result =[
+            new FlexiControlForProperty<int>(() => Width),
+                .. base.GetProperties(widthOfControl),
+        ];
+        return result;
     }
-
-
 
     public Bitmap GetTransformedBitmap() {
         var r = UsedArea;
@@ -172,34 +158,32 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(x + (width / 2), y + height, false);
     }
 
-
-
-
-
     public override bool ParseThis(string tag, string value) {
         Develop.DebugPrint_NichtImplementiert(true);
         return true;
+    }
+
+    public override void PointMoved(object sender, MoveEventArgs e) {
+        if (sender == P1 || sender == P2) {
+            CalculateJointMiddle(P1, P2);
+        }
+
+        base.PointMoved(sender, e);
     }
 
     public override void ProcessStyleChange() {
         // Keine Variablen zum Reseten, ein Invalidate reicht
     }
 
-
-    public int Width {
-        get => _width;
-        set {
-            if (_width == value) { return; }
-            _width = value;
-            OnPropertyChanged();
-        }
-    }
+    public override string ReadableText() => "Bewegliches Element";
 
     public void SetCoordinates(Rectangle r) {
         _width = r.Width;
         P1.SetTo(r.PointOf(Alignment.Top_HorizontalCenter), false);
         P2.SetTo(r.PointOf(Alignment.Bottom_HorizontalCenter), false);
     }
+
+    public override QuickImage? SymbolForReadableText() => null;
 
     public override string ToParseableString() => string.Empty;
 
@@ -252,9 +236,6 @@ public class ComicCompPadItem : AbstractPadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-
-
-
     private void ImageChanged() {
         P1.X = 0f;
         P1.Y = 0f;
@@ -268,9 +249,5 @@ public class ComicCompPadItem : AbstractPadItem {
         OnPropertyChanged();
     }
 
-    public override string ReadableText() => "Bewegliches Element";
-    public override QuickImage? SymbolForReadableText() => null;
-
     #endregion
-
 }

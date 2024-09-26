@@ -310,8 +310,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnSkripte_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        var se = new DatabaseScriptEditor(db);
-        _ = se.ShowDialog();
+        IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        //var se = new_DatabaseScriptEditor(db);
+        //_ = se.ShowDialog();
     }
 
     private void btnSpaltenAnordnungen_Click(object sender, System.EventArgs e) {

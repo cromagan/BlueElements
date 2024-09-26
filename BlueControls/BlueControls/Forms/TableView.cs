@@ -396,8 +396,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     public static void OpenScriptEditor(Database? db) {
         if (db is not { IsDisposed: false }) { return; }
 
-        var se = new DatabaseScriptEditor(db);
-        _ = se.ShowDialog();
+       IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+
     }
 
     /// <summary>

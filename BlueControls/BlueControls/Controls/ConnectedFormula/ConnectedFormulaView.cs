@@ -376,8 +376,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Database is not { IsDisposed: false } db) { return; }
 
-            var se = new DatabaseScriptEditor(db);
-            _ = se.ShowDialog();
+            IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+
+            //var se = new_DatabaseScriptEditor(db);
+            //_ = se.ShowDialog();
         } else {
             Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }

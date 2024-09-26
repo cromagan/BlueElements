@@ -177,6 +177,28 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             }
         }
     }
+    public static void UnlockAllHard() {
+
+
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
+            thisFile?.UnlockHard();
+            if (x != AllFiles.Count) {
+                // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                UnlockAllHard();
+                return;
+            }
+        }
+    }
+
+    private void UnlockHard() {
+        if (DeleteFile(Blockdateiname(), false)) {
+            _inhaltBlockdatei = string.Empty;
+            _lockCount = 0;
+        }
+    }
+
+
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() {
@@ -320,7 +342,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    private int _lockCount = 0;
+
+
     public bool LockEditing() {
+
+        if (_lockCount > 0) { return true; }
+
         if (!IsAdministrator()) { return false; }
 
         if (AgeOfBlockDatei is < 0 or > 3600) {
@@ -340,12 +368,21 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             Pause(1, false);
         }
 
-        return AmIBlocker(false);
+        _lockCount++;
+        return true;
     }
 
     public void OnPropertyChanged() {
         if (IsDisposed) { return; }
         if (_isSaving || _isLoading) { return; }
+
+        if (_lockCount < 1) {
+            if (!LockEditing()) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Änderungen nicht möglich!");
+                return;
+            }
+        }
+
         //Develop.CheckStackForOverflow();
         _isSaved = false;
         PropertyChanged?.Invoke(this, System.EventArgs.Empty);
@@ -419,9 +456,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         Save(true);
 
-        if (DeleteFile(Blockdateiname(), false)) {
-            _inhaltBlockdatei = string.Empty;
-        }
+        _lockCount--;
+
+        if (_lockCount > 0) { return; }
+
+        UnlockAllHard();
     }
 
     internal bool AmIBlocker(bool silent) {

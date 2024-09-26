@@ -36,16 +36,33 @@ using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
 using System;
 using BlueControls.Controls;
+using BlueControls.Interfaces;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DatabaseScriptEditor : IHasDatabase {
+public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
 
     #region Fields
 
+
+
+    /// <summary>
+    /// Nur zum setzen der Zeile zum Testen.
+    /// </summary>
+    public RowItem? Row {
+        set {
+            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
+            Database = value?.Database;
+        }
+    }
+
+
     public static Befehlsreferenz? _befehlsReferenz;
+
     private bool _allowTemporay;
+
     private Database? _database;
+
     private DatabaseScriptDescription? _item;
 
     private bool _testmode = true;
@@ -54,29 +71,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Constructors
 
-    public DatabaseScriptEditor(Database database) {
+    public DatabaseScriptEditor() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         tbcScriptEigenschaften.Enabled = false;
         eventScriptEditor.Enabled = false;
-        Database = database;
-
-        if (!string.IsNullOrEmpty(Database.ScriptNeedFix)) {
-            var l = new List<string> {
-                "### ACHTUNG - EINMALIGE ANZEIGE ###",
-                "Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
-                "Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                "Datenbank: " + Database.Caption,
-                " ",
-                " ",
-                "Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
-                " ",
-                Database.ScriptNeedFix
-            };
-            l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
-        }
-
-        Database.ScriptNeedFix = string.Empty;
 
         FormManager.RegisterForm(this);
     }
@@ -100,6 +99,23 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (_database != null) {
                 _database.DisposingEvent += _database_Disposing;
                 _database.CanDoScript += Database_CanDoScript;
+
+                if (!string.IsNullOrEmpty(_database.ScriptNeedFix)) {
+                    var l = new List<string> {
+                "### ACHTUNG - EINMALIGE ANZEIGE ###",
+                "Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+                "Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                "Datenbank: " + _database.Caption,
+                " ",
+                " ",
+                "Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+                " ",
+                _database.ScriptNeedFix
+            };
+                    l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
+                }
+
+                _database.ScriptNeedFix = string.Empty;
             }
         }
     }
@@ -171,6 +187,17 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
 
             _item_PropertyChanged(null, System.EventArgs.Empty);
+        }
+    }
+
+    public object? Object {
+        get => Database;
+        set {
+            if (value is Database db) {
+                Database = db;
+            } else {
+                Database = null;
+            }
         }
     }
 
