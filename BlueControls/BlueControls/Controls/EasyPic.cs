@@ -36,7 +36,8 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBackgroundNone {
+public sealed partial class EasyPic :  GenericControlReciver, IContextMenu, IBackgroundNone //  UserControl //
+                                                  {
 
     #region Fields
 
@@ -198,7 +199,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         base.OnEnabledChanged(e);
         if (!Enabled) {
             EditPanelFrame.Visible = false;
-            _PanelMover.Enabled = false;
+            _panelMover.Enabled = false;
             _panelMoveDirection = 0;
         }
     }
@@ -206,12 +207,12 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
         _panelMoveDirection = 1;
-        _PanelMover.Enabled = true;
+        _panelMover.Enabled = true;
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        _PanelMover.Enabled = true;
+        _panelMover.Enabled = true;
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
@@ -237,10 +238,10 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
 
     private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
 
-    private void EditPanel_Tick(object sender, System.EventArgs e) {
+    private void _paneMover_Tick(object sender, System.EventArgs e) {
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {
-                _PanelMover.Enabled = false;
+                _panelMover.Enabled = false;
                 return;
             }
         }
@@ -323,7 +324,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
 
     private void ZoomFitInvalidateAndCheckButtons() {
         _panelMoveDirection = -1;
-        _PanelMover.Enabled = true;
+        _panelMover.Enabled = true;
         if (_bitmap == null) {
             btnDeleteImage.Enabled = false;
             Invalidate();

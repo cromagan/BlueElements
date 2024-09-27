@@ -302,6 +302,15 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         GC.SuppressFinalize(this);
     }
 
+    public void DoJointPoint(PointM p) {
+        if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
+            if (JointPoints.Contains(p)) {
+                p.Distance = GetLenght(_jointMiddle, p);
+                p.Angle = GetAngle(_jointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
+            }
+        }
+    }
+
     public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
         if (_parent == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert");
@@ -368,6 +377,11 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
             //new FlexiControl("Verbindungspunkte:", widthOfControl, true),
             //d
+        }
+
+        if (this is IMirrorable) {
+            result.Add(new FlexiControlForDelegate(Spiegeln_Vertikal, "Vertikal", ImageCode.SpiegelnVertikal));
+            result.Add(new FlexiControlForDelegate(Spiegeln_Horizontal, "Horizontal", ImageCode.SpiegelnHorizontal));
         }
 
         return result;
@@ -498,11 +512,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public virtual void PointMoved(object sender, MoveEventArgs e) {
         if (sender is not PointM p) { return; }
 
-        if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
-            if (e.ByMouse && JointPoints.Contains(p)) {
-                p.Distance = GetLenght(_jointMiddle, p);
-                p.Angle = GetAngle(_jointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
-            }
+        if (e.ByMouse) {
+            DoJointPoint(p);
         }
 
         OnPropertyChanged();
@@ -579,6 +590,45 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         } else {
             Move(0, otherPoint.Y - myPoint.Y, false);
         }
+    }
+
+    /// <summary>
+    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
+    /// </summary>
+    /// <param name="names"></param>
+    internal void DeleteJointPoints(List<string> names) {
+        var j = new List<PointM>();
+        j.AddRange(JointPoints);
+
+        foreach (var thispoint in j) {
+            if (names.Count == 0 || names.Contains(thispoint.KeyName, false)) {
+                JointPoints.Remove(thispoint);
+            }
+        }
+    }
+
+    internal void GetNewIdsForEverything() {
+        KeyName = Generic.GetUniqueKey();
+
+        //foreach (var thispoint in JointPoints) {
+        //    thispoint.KeyName = Generic.GetUniqueKey();
+
+        //}
+
+        //foreach (var thispoint in MovablePoint) {
+        //    thispoint.KeyName = Generic.GetUniqueKey();
+
+        //}
+
+        ////Doppelt gemoppelt
+        //foreach (var thispoint in PointsForSuccesfullyMove) {
+        //    thispoint.KeyName = Generic.GetUniqueKey();
+        //}
+
+        ////Doppelt gemoppelt
+        //_jointMiddle.KeyName = Generic.GetUniqueKey();
+        //_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();
+        //_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
     }
 
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
@@ -687,50 +737,16 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         OnPropertyChanged();
     }
 
-
-    /// <summary>
-    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
-    /// </summary>
-    /// <param name="names"></param>
-    internal void DeleteJointPoints(List<string> names) {
-
-        var j = new List<PointM>();
-        j.AddRange(JointPoints);
-
-
-        foreach (var thispoint in j) {
-            if (names.Count == 0 || names.Contains(thispoint.KeyName, false)) {
-                JointPoints.Remove(thispoint);
-            }
-
+    private void Spiegeln_Horizontal() {
+        if (this is IMirrorable m) {
+            m.Mirror(null, false, true);
         }
     }
 
-    internal void GetNewIdsForEverything() {
-      
-        KeyName = Generic.GetUniqueKey();
-
-        //foreach (var thispoint in JointPoints) {
-        //    thispoint.KeyName = Generic.GetUniqueKey();
-
-        //}
-
-        //foreach (var thispoint in MovablePoint) {
-        //    thispoint.KeyName = Generic.GetUniqueKey();
-
-        //}
-
-        ////Doppelt gemoppelt
-        //foreach (var thispoint in PointsForSuccesfullyMove) {
-        //    thispoint.KeyName = Generic.GetUniqueKey();
-        //}
-
-        ////Doppelt gemoppelt
-        //_jointMiddle.KeyName = Generic.GetUniqueKey();
-        //_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();
-        //_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
-
-
+    private void Spiegeln_Vertikal() {
+        if (this is IMirrorable m) {
+            m.Mirror(null, true, false);
+        }
     }
 
     #endregion

@@ -40,6 +40,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Fields
 
+    private int _autoRefresh = 1;
+    private float _defaultCopyScale = 1f;
     private string _design = string.Empty;
     private string _formular = string.Empty;
     private float _scale = 1f;
@@ -60,9 +62,37 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public static string ClassId => "FI-CreativePad";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+
+    public int AutoRefresh {
+        get => _autoRefresh;
+        set {
+            if (IsDisposed) { return; }
+            value = Math.Max(value, 0);
+            value = Math.Min(value, 600);
+
+            if (_autoRefresh == value) { return; }
+            _autoRefresh = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool AutoSizeableHeight => true;
 
     public override bool DatabaseInputMustMatchOutputDatabase => false;
+
+    public float DefaultCopyScale {
+        get => _defaultCopyScale;
+        set {
+            if (IsDisposed) { return; }
+            value = Math.Max(value, 0.3f);
+            value = Math.Min(value, 20f);
+            value = (float)Math.Round(value, 2, MidpointRounding.AwayFromZero);
+
+            if (_defaultCopyScale == value) { return; }
+            _defaultCopyScale = value;
+            OnPropertyChanged();
+        }
+    }
 
     public override string Description => "Ein Steuerelement, das ein generiertes optisches Dokument anzeigt.";
 
@@ -148,6 +178,9 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 break;
         }
 
+        con.DefaultCopyScale = DefaultCopyScale;
+        con.AutoRefresh = AutoRefresh;
+
         con.DoDefaultSettings(parent, this, mode);
 
         return con;
@@ -213,9 +246,10 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         List<GenericControl> result =
             [.. base.GetProperties(widthOfControl),
                 new FlexiControl("Einstellungen:", widthOfControl, true),
-                  new FlexiControlForProperty<string>(() => Typ, comms)
-
-];
+                new FlexiControlForProperty<string>(() => Typ, comms),
+                new FlexiControlForProperty<float>(() => DefaultCopyScale),
+                new FlexiControlForProperty<int>(() => AutoRefresh)
+            ];
 
         switch (_typ.ToLower()) {
             case "load":
@@ -259,6 +293,14 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 _scale = FloatParse(value.FromNonCritical());
                 return true;
 
+            case "copyscale":
+                _defaultCopyScale = FloatParse(value.FromNonCritical());
+                return true;
+
+            case "autorefresh":
+                _autoRefresh = IntParse(value.FromNonCritical());
+                return true;
+
             case "design":
                 _design = value.FromNonCritical();
                 return true;
@@ -296,6 +338,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         result.ParseableAdd("Script", _script);
         result.ParseableAdd("Design", _design);
         result.ParseableAdd("Scale", _scale);
+        result.ParseableAdd("CopyScale", _defaultCopyScale);
+        result.ParseableAdd("AutoRefresh", _autoRefresh);
         return result.Parseable(base.ToParseableString());
     }
 

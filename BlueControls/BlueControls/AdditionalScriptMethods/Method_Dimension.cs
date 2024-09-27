@@ -29,11 +29,11 @@ namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_Dimension: Method {
+internal class Method_Dimension : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal];
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, StringVal, StringVal, FloatVal, BoolVal, BoolVal];
     public override string Command => "dimension";
     public override List<string> Constants => [];
     public override string Description => "Erstellt eine Bemaßung hinzu mitt den angegebenen JointPoings.";
@@ -43,7 +43,7 @@ internal class Method_Dimension: Method {
     public override bool MustUseReturnValue => false;
     public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "Dimensiom(Collection, Punkt1, Punkt2, AbstandinMM);";
+    public override string Syntax => "Dimensiom(Collection, TextOben, TextUnten, Punkt1, Punkt2, AbstandinMM, UseXofPoint1, UseYOfPoint1);";
 
     #endregion
 
@@ -55,13 +55,20 @@ internal class Method_Dimension: Method {
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
         if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
 
+        var p1 = icpv.GetJointPoint(attvar.ValueStringGet(3), null);
+        var p2 = icpv.GetJointPoint(attvar.ValueStringGet(4), null);
+        var abmm = attvar.ValueNumGet(5);
 
-        var p1 = icpv.GetJointPoint(attvar.ValueStringGet(1), null);
-        var p2 = icpv.GetJointPoint(attvar.ValueStringGet(2), null);
-        var abmm = attvar.ValueNumGet(3);
+        if (p1 != null && p2 != null) {
+            if (attvar.ValueBoolGet(6)) { p2 = new PointM(p1.X, p2.Y); }
+            if (attvar.ValueBoolGet(7)) { p2 = new PointM(p2.X, p1.Y); }
+        }
+        var d = new DimensionPadItem(p1, p2, (float)abmm);
 
+        d.Text_Oben = attvar.ValueStringGet(1);
+        d.Text_Unten = attvar.ValueStringGet(2);
 
-        return new DoItFeedback(new VariablePadItem(new DimensionPadItem(p1, p2, (float)abmm)));
+        return new DoItFeedback(new VariablePadItem(d));
     }
 
     #endregion

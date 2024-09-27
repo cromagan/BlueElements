@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class DimensionPadItem : AbstractPadItem {
+public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     #region Fields
 
@@ -193,6 +194,19 @@ public class DimensionPadItem : AbstractPadItem {
         _point1.SetTo(x, y + height, false);
         _point2.SetTo(x + width, y + height, false);
         _textPoint.SetTo(x + (width / 2), y, false);
+    }
+
+    public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
+        if (p == null) { p = new PointM(_textPoint); }
+
+        _point1.Mirror(p, vertical, horizontal);
+        _point2.Mirror(p, vertical, horizontal);
+        _textPoint.Mirror(p, vertical, horizontal);
+
+        foreach (var thisP in JointPoints) {
+            thisP.Mirror(p, vertical, horizontal);
+            DoJointPoint(thisP);
+        }
     }
 
     public override void ParseFinished(string parsed) {

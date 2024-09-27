@@ -58,6 +58,12 @@ public static class MathFormulaParser {
     private static double? ErgebnisCore(string formel) {
         // var TMP = 0;
         formel = formel.Trim(KlammernRund);
+        formel = formel.Replace("++", "+");
+        formel = formel.Replace("--", "+");
+        formel = formel.Replace("-+", "-");
+        formel = formel.Replace("+-", "-");
+        formel = formel.TrimStart("+");
+
         // Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
         if (formel.Contains("(")) {
             // --------------------------------------------------------------------------------------------------------------------------------

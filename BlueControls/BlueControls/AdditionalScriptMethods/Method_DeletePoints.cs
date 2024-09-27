@@ -49,45 +49,23 @@ internal class Method_DeletePoints : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
-
-
         List<string> names = [];
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             names.Add(attvar.ValueStringGet(z));
         }
 
-
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
             icpv.DeleteJointPoints(names);
-
-
         }
-        
 
         if (attvar.Attributes[0] is VariablePadItem ici) {
             if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
             if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
             iciv.DeleteJointPoints(names);
-
-
         }
 
-
-
-
-
-
-
-
-
-
         return DoItFeedback.Null();
-
-   
-
-
     }
 
     #endregion

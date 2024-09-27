@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -38,13 +39,20 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
+public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirrorable {
 
     #region Fields
 
     public readonly List<QuickImage> Overlays;
 
     public int Padding;
+
+    private SizeModes _bild_Modus;
+
+    private Bitmap? _bitmap;
+
+    [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
+    private string _platzhalter_Für_Layout;
 
     #endregion
 
@@ -68,9 +76,21 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     public static string ClassId => "IMAGE";
 
-    public SizeModes Bild_Modus { get; set; }
+    public SizeModes Bild_Modus {
+        get => _bild_Modus; set {
+            if (_bild_Modus == value) { return; }
+            _bild_Modus = value;
+            OnPropertyChanged();
+        }
+    }
 
-    public Bitmap? Bitmap { get; set; }
+    public Bitmap? Bitmap {
+        get => _bitmap; set {
+            if (_bitmap == value) { return; }
+            _bitmap = value;
+            OnPropertyChanged();
+        }
+    }
 
     public override string Description => string.Empty;
 
@@ -78,8 +98,13 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override string MyClassId => ClassId;
 
-    [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-    public string Platzhalter_Für_Layout { get; set; } = string.Empty;
+    public string Platzhalter_Für_Layout {
+        get => _platzhalter_Für_Layout; set {
+            if (_platzhalter_Für_Layout == value) { return; }
+            _platzhalter_Für_Layout = value;
+            OnPropertyChanged();
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -138,13 +163,28 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         return result;
     }
 
+    public override void Mirror(PointM? p, bool vertical, bool horizontal) {
+        if (p == null) { p = new PointM(JointMiddle); }
+
+        base.Mirror(p, vertical, horizontal);
+
+        if (horizontal == vertical || _bitmap == null) { return; }
+
+        if (vertical) {
+            _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
+        }
+
+        if (horizontal) {
+            _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+        }
+
+        OnPropertyChanged();
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
-            case "stretchallowed": // ALT
-                return true;
-
             case "modus":
-                Bild_Modus = (SizeModes)IntParse(value);
+                _bild_Modus = (SizeModes)IntParse(value);
                 return true;
 
             case "whiteback":
@@ -156,11 +196,11 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
                 return true;
 
             case "image":
-                Bitmap = Base64ToBitmap(value);
+                _bitmap = Base64ToBitmap(value);
                 return true;
 
             case "placeholder":
-                Platzhalter_Für_Layout = value.FromNonCritical();
+                _platzhalter_Für_Layout = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);
@@ -314,5 +354,4 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     #endregion
-
 }

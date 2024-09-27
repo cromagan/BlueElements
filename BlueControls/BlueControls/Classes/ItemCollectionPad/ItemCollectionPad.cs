@@ -51,14 +51,16 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.ItemCollectionPad;
 
 //TODO: IParseable implementieren
-public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable, ICanHaveVariables {
+public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable, ICanHaveVariables, IMirrorable {
 
     #region Fields
 
     public const int Dpi = 300;
 
     public static List<AbstractPadItem>? PadItemTypes;
+
     public new EventHandler? PropertyChanged;
+
     internal string Caption;
 
     /// <summary>
@@ -67,15 +69,25 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     private readonly int _idCount;
 
     private float _gridShow = 10;
+
     private float _gridsnap = 1;
+
     private PointM? _prLo;
+
     private PointM? _prLu;
+
     private PointM? _prRo;
+
     private PointM? _prRu;
+
     private Padding _randinMm = Padding.Empty;
+
     private SizeF _sheetSizeInMm = SizeF.Empty;
+
     private RowItem? _sheetStyle;
+
     private float _sheetStyleScale;
+
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -130,6 +142,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
+
     public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     /// <summary>
@@ -166,6 +179,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public bool IsSaved { get; set; }
 
     public string KeyName => Caption;
+
     public object? Parent { get; set; }
 
     public Padding RandinMm {
@@ -445,6 +459,20 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
 
         return l;
+    }
+
+    public void Mirror(PointM? p, bool vertical, bool horizontal) {
+        foreach (var thisItem in this) {
+            if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
+        }
+    }
+
+    public void Move(float x, float y) {
+        if (x == 0 && y == 0) { return; }
+
+        foreach (var thisItem in this) {
+            thisItem.Move(x, y, false);
+        }
     }
 
     public void OnPropertyChanged() {
@@ -798,7 +826,15 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         var sc = new BlueScript.Script(vars, scp);
         sc.ScriptText = scripttext;
-        return sc.Parse(0, "Main", null);
+
+        var t = sc.Parse(0, "Main", null);
+
+        if (!t.Successful || !t.AllOk) {
+            var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
+
+            this.Add(ep);
+        }
+        return t;
     }
 
     internal int GetFreeColorId(string page) {

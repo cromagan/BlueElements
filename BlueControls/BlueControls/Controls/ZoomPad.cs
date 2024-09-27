@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -98,6 +99,15 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     #endregion
+
+
+    public static bool ScaleWarnung() {
+        if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
+        BlueControls.Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
+        return true;
+    }
+
+
 
     #region Methods
 

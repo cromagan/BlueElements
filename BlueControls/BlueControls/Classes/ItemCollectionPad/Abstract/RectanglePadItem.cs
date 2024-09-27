@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,17 +30,17 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class RectanglePadItem : AbstractPadItem {
+public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     #region Fields
 
-    protected readonly PointM _pLo;
-    protected readonly PointM _pRu;
     protected readonly PointM _pl;
+    protected readonly PointM _pLo;
     protected readonly PointM _pLu;
     protected readonly PointM _po;
     protected readonly PointM _pr;
     protected readonly PointM _pRo;
+    protected readonly PointM _pRu;
     protected readonly PointM _pu;
     private int _drehwinkel;
 
@@ -127,6 +128,18 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height), true);
+
+    public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
+        if (p == null) { p = new PointM(JointMiddle); }
+
+        foreach (var thisP in JointPoints) {
+            thisP.Mirror(p, vertical, horizontal);
+            DoJointPoint(thisP);
+        }
+
+        _pLo.Mirror(p, vertical, horizontal);
+        _pRu.Mirror(p, vertical, horizontal);
+    }
 
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
