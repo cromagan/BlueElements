@@ -23,6 +23,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using System;
@@ -44,7 +45,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
     #region Constructors
 
-    public ConnectedCreativePad(ItemCollectionPad.ItemCollectionPad? itemCollectionPad) : base(false, false) {
+    public ConnectedCreativePad(ItemCollectionPadItem? itemCollectionPad) : base(false, false) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
@@ -223,12 +224,12 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
         if (!string.IsNullOrEmpty(LoadAtRowChange)) {
             if (LoadAtRowChange.FileType() is FileFormat.BlueCreativeFile) {
-                pad.Items = new ItemCollectionPad.ItemCollectionPad(LoadAtRowChange);
+                pad.Items = new ItemCollectionPadItem(LoadAtRowChange);
                 pad.Items.ResetVariables();
                 pad.Items.ReplaceVariables(_lastRow);
             }
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
-            pad.Items = new ItemCollectionPad.ItemCollectionPad();
+            pad.Items = new ItemCollectionPadItem();
             pad.Items.SheetStyleScale = DefaultScale;
 
             if (Skin.StyleDb?.Row != null) {

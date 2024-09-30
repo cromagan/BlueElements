@@ -92,7 +92,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     public override string MyClassId => ClassId;
 
     //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-    // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, ItemCollectionPad.Dpi)
+    // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, ItemCollectionPadItem.Dpi)
     public float Skalierung { get; set; } = 3.07f;
 
     /// <summary>

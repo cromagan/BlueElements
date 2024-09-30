@@ -25,6 +25,7 @@ using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System;
@@ -48,7 +49,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     private readonly List<string> _notAllowedChilds = [];
 
-    private ItemCollectionPad.ItemCollectionPad? _pages;
+    private ItemCollectionPadItem? _pages;
 
     #endregion
 
@@ -65,9 +66,9 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var page in _pages.Items) {
-                if (page is ItemCollectionPad.ItemCollectionPad icp) {
-                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
-                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+                if (page is ItemCollectionPadItem icp) {
+                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
                 }
             }
         }
@@ -94,7 +95,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
     }
 
-    public ItemCollectionPad.ItemCollectionPad? Pages {
+    public ItemCollectionPadItem? Pages {
         get => _pages;
         private set {
             if (_pages == value) { return; }
@@ -170,7 +171,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
             case "paditemdata":
                 UnRegisterPadDataEvents();
-                _pages = new ItemCollectionPad.ItemCollectionPad();
+                _pages = new ItemCollectionPadItem();
                 _pages.Parse(value.FromNonCritical());
                 _pages.Parent = null;
                 RegisterPadDataEvents();
@@ -192,7 +193,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public void Repair() {
-        Pages ??= new ItemCollectionPad.ItemCollectionPad();
+        Pages ??= new ItemCollectionPadItem();
 
         Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
@@ -208,7 +209,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         //pg.AddIfNotExists("Head");
 
         foreach (var thisP in Pages.Items) {
-            if (thisP is ItemCollectionPad.ItemCollectionPad icp) {
+            if (thisP is ItemCollectionPadItem icp) {
                 RowEntryPadItem? found = null;
 
                 foreach (var thisit in icp.Items) {
@@ -260,7 +261,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var thisf in _pages.Items) {
-                if (thisf is ItemCollectionPad.ItemCollectionPad icp) {
+                if (thisf is ItemCollectionPadItem icp) {
                     if (!notAllowedChilds.Contains(icp.KeyName) && !string.Equals("Head", icp.Caption, StringComparison.OrdinalIgnoreCase)) {
                         list.Add(ItemOf(icp));
                     }
@@ -279,7 +280,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages == null || Pages.Items.Count == 0) { return false; }
 
         foreach (var thisItem in Pages.Items) {
-            if (thisItem is ItemCollectionPad.ItemCollectionPad icp) {
+            if (thisItem is ItemCollectionPadItem icp) {
                 if (string.IsNullOrEmpty(page) ||
                     string.IsNullOrEmpty(icp.Caption) ||
                     page.Equals(icp.Caption, StringComparison.OrdinalIgnoreCase)) {

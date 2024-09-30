@@ -27,13 +27,13 @@ public class VariableItemCollectionPad : Variable {
 
     #region Fields
 
-    private ItemCollectionPad? _itemCol;
+    private ItemCollectionPadItem? _itemCol;
 
     #endregion
 
     #region Constructors
 
-    public VariableItemCollectionPad(string name, ItemCollectionPad? value, bool ronly, string comment) : base(name, ronly, comment) => _itemCol = value;
+    public VariableItemCollectionPad(string name, ItemCollectionPadItem? value, bool ronly, string comment) : base(name, ronly, comment) => _itemCol = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
@@ -41,7 +41,7 @@ public class VariableItemCollectionPad : Variable {
     /// <param name="name"></param>
     public VariableItemCollectionPad(string name) : this(name, null, true, string.Empty) { }
 
-    public VariableItemCollectionPad(ItemCollectionPad? value) : this(DummyName(), value, true, string.Empty) { }
+    public VariableItemCollectionPad(ItemCollectionPadItem? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion
 
@@ -56,7 +56,7 @@ public class VariableItemCollectionPad : Variable {
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
-    public ItemCollectionPad? ValueItemCollection {
+    public ItemCollectionPadItem? ValueItemCollection {
         get => _itemCol;
         set {
             if (ReadOnly) { return; }

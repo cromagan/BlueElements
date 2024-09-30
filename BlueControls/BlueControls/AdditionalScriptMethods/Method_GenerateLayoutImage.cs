@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionPad;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -70,7 +71,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #endregion
 
-        var l = new ItemCollectionPad.ItemCollectionPad(ind);
+        var l = new ItemCollectionPadItem(ind);
         l.ResetVariables();
         var scx = l.ReplaceVariables(r);
 

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueDatabase;
 using System;
+using BlueControls.ItemCollectionPad;
 
 namespace BlueControls.Forms;
 
@@ -174,7 +175,7 @@ public partial class Voting : System.Windows.Forms.Form {
             return;
         }
 
-        var p1 = new ItemCollectionPad.ItemCollectionPad(_filename);
+        var p1 = new ItemCollectionPadItem(_filename);
         p1.ResetVariables();
         p1.ReplaceVariables(_fr1);
 
@@ -182,7 +183,7 @@ public partial class Voting : System.Windows.Forms.Form {
         Pad1.ShowInPrintMode = true;
         Pad1.ZoomFit();
 
-        var p2 = new ItemCollectionPad.ItemCollectionPad(_filename);
+        var p2 = new ItemCollectionPadItem(_filename);
         p2.ResetVariables();
         p2.ReplaceVariables(_fr2);
 

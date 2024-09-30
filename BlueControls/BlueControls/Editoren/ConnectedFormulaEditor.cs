@@ -36,6 +36,7 @@ using BlueBasics.Interfaces;
 using BlueBasics.EventArgs;
 using System.Windows.Forms;
 using System;
+using BlueControls.ItemCollectionPad;
 
 namespace BlueControls.Forms;
 
@@ -106,7 +107,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var p = new List<string>();
 
         foreach (var thisp in _cFormula.Pages.Items) {
-            if (thisp is ItemCollectionPad.ItemCollectionPad icp) {
+            if (thisp is ItemCollectionPadItem icp) {
                 _ = p.AddIfNotExists(icp.Caption);
             }
         }
@@ -270,7 +271,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var p = new ItemCollectionPad.ItemCollectionPad();
+        var p = new ItemCollectionPadItem();
         p.Caption = n;
 
         var it = new RowEntryPadItem();
@@ -441,7 +442,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
 
         foreach (var thisp in CFormula.Pages.Items) {
-            if (thisp is ItemCollectionPad.ItemCollectionPad icp && icp.Caption.ToLower() == "head") {
+            if (thisp is ItemCollectionPadItem icp && icp.Caption.ToLower() == "head") {
                 Pad.Items = icp; break;
             }
         }
@@ -509,7 +510,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
 
         foreach (var thisp in _cFormula.Pages.Items) {
-            if (thisp is ItemCollectionPad.ItemCollectionPad icp) {
+            if (thisp is ItemCollectionPadItem icp) {
                 if (s == icp.Caption) {
                     Pad.Items = icp;
                     break;

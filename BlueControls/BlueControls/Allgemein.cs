@@ -77,7 +77,7 @@ public static class Allgemein {
     //    e.Handled = true;
     //    if (e?.Row?.Database is not Database db) { return; }
 
-    //    var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
+    //    var pad = new ItemCollectionPadItem(e.LayoutId, e.Row.Database, e.Row.Key);
     //    pad.SaveAsBitmap(e.Filename);
     //}
 }

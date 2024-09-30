@@ -219,7 +219,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
                     result.ParseableAdd("ParentName", item.KeyName);
                     break;
 
-                //case ItemCollectionPad:
+                //case ItemCollectionPadItem:
                 case CreativePad:
                     result.ParseableAdd("ParentType", "Main");
                     break;

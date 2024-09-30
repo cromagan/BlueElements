@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -128,7 +129,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         var mb = MaxBounds();
         var x = AvailablePaintArea();
         x.Inflate(-16, -16);
-        _zoomFit = ItemCollectionPad.ItemCollectionPad.ZoomFitValue(mb, x.Size);
+        _zoomFit = ItemCollectionPadItem.ZoomFitValue(mb, x.Size);
         Zoom = _zoomFit;
     }
 
@@ -149,7 +150,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     ///// <param name="newzoom"></param>
     //protected void CalculateZoomFitAndSliders(float newzoom) {
     //    var mb = MaxBounds();
-    //    _ZoomFit = ItemCollectionPad.ZoomFitValue(mb, SliderY.Width + 32, SliderX.Height + 32, Size);
+    //    _ZoomFit = ItemCollectionPadItem.ZoomFitValue(mb, SliderY.Width + 32, SliderX.Height + 32, Size);
     //    if (newzoom >= 0) {
     //        Zoom = newzoom;
 
@@ -168,8 +169,8 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         var maxBounds = MaxBounds();
 
         if (maxBounds.Width == 0) { return; }
-        var p = ItemCollectionPad.ItemCollectionPad.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
-        var sliderv = ItemCollectionPad.ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
+        var p = ItemCollectionPadItem.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
+        var sliderv = ItemCollectionPadItem.SliderValues(maxBounds, Zoom, p);
         if (p.X < 0) {
             SliderX.Enabled = true;
             SliderX.Minimum = (float)((maxBounds.Left * Zoom) - (Width * 0.6d));

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
@@ -43,14 +44,14 @@ public class Method_ItemCollectionPad : Method {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableItemCollectionPad.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "ItemCollectionPad()";
+    public override string Syntax => "ItemCollectionPadItem()";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        return new DoItFeedback(new VariableItemCollectionPad(new ItemCollectionPad.ItemCollectionPad()));
+        return new DoItFeedback(new VariableItemCollectionPad(new ItemCollectionPadItem()));
     }
 
     #endregion

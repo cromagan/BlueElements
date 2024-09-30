@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueBasics.MultiUserFile;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -203,7 +204,7 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
             return;
         }
 
-        var p = new ItemCollectionPad.ItemCollectionPad();
+        var p = new ItemCollectionPadItem();
         e.Feedback = p.ExecuteScript(_item.Script, "Testmodus", r);
 
         cpad.Items = p;

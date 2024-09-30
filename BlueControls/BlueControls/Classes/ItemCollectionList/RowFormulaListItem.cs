@@ -24,6 +24,7 @@ using BlueDatabase;
 using System;
 using System.Drawing;
 using BlueControls.CellRenderer;
+using BlueControls.ItemCollectionPad;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -140,7 +141,7 @@ public class RowFormulaListItem : AbstractListItem {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
-        ItemCollectionPad.ItemCollectionPad pad = new(_layoutFileName);
+        ItemCollectionPadItem pad = new(_layoutFileName);
         pad.ResetVariables();
         var l = pad.ReplaceVariables(Row);
         if (!l.AllOk) {
@@ -159,9 +160,9 @@ public class RowFormulaListItem : AbstractListItem {
         internalZoom = Math.Min(1, internalZoom);
 
         _tmpBmp ??= new Bitmap(mb.Width * internalZoom, mb.Height * internalZoom);
-        var zoomv = ItemCollectionPad.ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
-        var centerpos = ItemCollectionPad.ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);
-        var slidervalues = ItemCollectionPad.ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
+        var zoomv = ItemCollectionPadItem.ZoomFitValue(mb, _tmpBmp.Size);
+        var centerpos = ItemCollectionPadItem.CenterPos(mb, _tmpBmp.Size, zoomv);
+        var slidervalues = ItemCollectionPadItem.SliderValues(mb, zoomv, centerpos);
         //pad.ShowInPrintMode = true;
         //pad.Unselect();
         pad.DrawTo(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y);

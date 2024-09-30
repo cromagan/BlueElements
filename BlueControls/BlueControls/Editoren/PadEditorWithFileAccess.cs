@@ -57,7 +57,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     public void LoadFile(string fileName) {
         CheckSave();
         Pad.Enabled = true;
-        Pad.Items = new ItemCollectionPad.ItemCollectionPad(fileName);
+        Pad.Items = new ItemCollectionPadItem(fileName);
         btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
         _lastFileName = fileName;
         Pad?.ZoomFit();
@@ -116,7 +116,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-        ItemCollectionPad.ItemCollectionPad b = new();
+        ItemCollectionPadItem b = new();
         b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
         Pad.AddCentered(b);
     }

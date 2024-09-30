@@ -22,6 +22,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -167,8 +168,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
         if (ConnectedFormula?.Pages != null) {
             foreach (var thisP in ConnectedFormula?.Pages.Items) {
-                if (thisP is ItemCollectionPad.ItemCollectionPad icp) {
-                    var l = ItemCollectionPad.ItemCollectionPad.ResizeControls(icp, Width - x1 - x2, Height - y1 - y2, Mode);
+                if (thisP is ItemCollectionPadItem icp) {
+                    var l = ItemCollectionPadItem.ResizeControls(icp, Width - x1 - x2, Height - y1 - y2, Mode);
                     var autoc = new List<FlexiControlForCell>();
 
                     foreach (var thisit in icp.Items) {

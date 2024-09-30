@@ -475,8 +475,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         //}
     }
 
-    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPad.Dpi);
-    //    var he1 = MmToPixel(1, ItemCollectionPad.Dpi);
+    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPadItem.Dpi);
+    //    var he1 = MmToPixel(1, ItemCollectionPadItem.Dpi);
     //    x.Height = (int)(x.Height / he) * he;
     //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
     protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, bool forPrinting, List<int>? colorId) {

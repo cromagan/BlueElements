@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -51,7 +52,7 @@ internal class Method_mm : BlueScript.Methods.Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPad.ItemCollectionPad.Dpi));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPadItem.Dpi));
 
     #endregion
 }

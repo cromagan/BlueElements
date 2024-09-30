@@ -83,11 +83,11 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     [Description("Die Breite des Objekts in mm.")]
     public float Breite {
-        get => (float)Math.Round((double)PixelToMm(UsedArea.Width, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round((double)PixelToMm(UsedArea.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
             if (Breite == value) { return; }
-            _pRu.X = _pLo.X + MmToPixel(value, ItemCollectionPad.Dpi);
+            _pRu.X = _pLo.X + MmToPixel(value, ItemCollectionPadItem.Dpi);
         }
     }
 
@@ -103,11 +103,11 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     [Description("Die Höhe des Objekts in mm.")]
     public float Höhe {
-        get => (float)Math.Round((double)PixelToMm(UsedArea.Height, ItemCollectionPad.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round((double)PixelToMm(UsedArea.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
             if (Höhe == value) { return; }
-            _pRu.Y = _pLo.Y + MmToPixel(value, ItemCollectionPad.Dpi);
+            _pRu.Y = _pLo.Y + MmToPixel(value, ItemCollectionPadItem.Dpi);
         }
     }
 

@@ -64,7 +64,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     private string _keyName;
 
-    private ItemCollectionPad? _parent;
+    private ItemCollectionPadItem? _parent;
 
     private PadStyles _style = PadStyles.Style_Standard;
 
@@ -152,7 +152,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
-    public ItemCollectionPad? Parent {
+    public ItemCollectionPadItem? Parent {
         get => _parent;
         set {
             if (_parent == null || _parent == value) {
@@ -242,8 +242,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         return i;
     }
 
-    //    if (ItemCollectionPad.PadItemTypes != null) {
-    //        foreach (var thisType in ItemCollectionPad.PadItemTypes) {
+    //    if (ItemCollectionPadItem.PadItemTypes != null) {
+    //        foreach (var thisType in ItemCollectionPadItem.PadItemTypes) {
     //            var i = thisType.TryCreate(ding, name);
     //            if (i != null) { return i; }
     //        }

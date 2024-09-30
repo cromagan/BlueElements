@@ -79,7 +79,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         if (point2 != null) { _point2.SetTo(point2.X, point2.Y, false); }
         ComputeData();
 
-        var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPad.Dpi), _winkel - 90f);
+        var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPadItem.Dpi), _winkel - 90f);
         _textPoint.SetTo(_point1, _länge / 2, _winkel, false);
         _textPoint.X += a.X;
         _textPoint.Y += a.Y;
@@ -115,7 +115,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     public override string Description => string.Empty;
 
-    public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
+    public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPadItem.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
     public override string MyClassId => ClassId;
 
@@ -353,7 +353,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     private void CalculateOtherPoints() {
         var tmppW = -90;
-        var mhlAb = MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.Dpi); // Den Abstand der Maßhilsfline, in echten MM
+        var mhlAb = MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
         ComputeData();
 
         //Gegeben sind:

@@ -50,7 +50,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPad : RectanglePadItem, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
 
     #region Fields
 
@@ -91,7 +91,7 @@ public sealed class ItemCollectionPad : RectanglePadItem, IDisposableExtended, I
 
     #region Constructors
 
-    public ItemCollectionPad() : base(string.Empty) {
+    public ItemCollectionPadItem() : base(string.Empty) {
         BindingOperations.EnableCollectionSynchronization(Items, new object());
 
         PadItemTypes ??= GetInstaceOfType<AbstractPadItem>("NAME");
@@ -109,7 +109,7 @@ public sealed class ItemCollectionPad : RectanglePadItem, IDisposableExtended, I
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutFileName) : this() {
+    public ItemCollectionPadItem(string layoutFileName) : this() {
         this.Parse(File.ReadAllText(layoutFileName, Win1252));
         IsSaved = true;
     }
@@ -118,7 +118,7 @@ public sealed class ItemCollectionPad : RectanglePadItem, IDisposableExtended, I
 
     #region Destructors
 
-    ~ItemCollectionPad() {
+    ~ItemCollectionPadItem() {
         Dispose(false);
     }
 
@@ -487,7 +487,7 @@ public sealed class ItemCollectionPad : RectanglePadItem, IDisposableExtended, I
         RectangleF PositioOf(int no) => new(newX[no], newY[no], newW[no], newH[no]);
     }
 
-    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string mode) {
+    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPadItem padData, float newWidthPixel, float newhHeightPixel, string mode) {
 
         #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
 

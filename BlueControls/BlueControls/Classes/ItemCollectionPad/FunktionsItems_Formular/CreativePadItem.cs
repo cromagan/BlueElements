@@ -267,7 +267,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 result.Add(new FlexiControlForProperty<string>(() => Design, art));
                 result.Add(new FlexiControlForProperty<float>(() => Scale));
 
-                //result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPad();", widthOfControl, false));
+                //result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPadItem();", widthOfControl, false));
                 break;
         }
 

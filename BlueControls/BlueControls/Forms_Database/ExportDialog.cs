@@ -36,6 +36,7 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
+using BlueControls.ItemCollectionPad;
 
 namespace BlueControls.Forms;
 
@@ -131,7 +132,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         if (rowsForExport is not { Count: >= 1 }) { return -1; }
 
-        var tmp = new ItemCollectionPad.ItemCollectionPad(layoutFileName);
+        var tmp = new ItemCollectionPadItem(layoutFileName);
         tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
@@ -145,7 +146,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         tmp.Dispose();
 
         var druckB = pad.Items.DruckbereichRect();
-        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), MidpointRounding.AwayFromZero);
+        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPadItem.Dpi), MidpointRounding.AwayFromZero);
 
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
         var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
@@ -155,7 +156,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
-                var it = new ItemCollectionPad.ItemCollectionPad(layoutFileName);
+                var it = new ItemCollectionPadItem(layoutFileName);
 
                 if (it.Items is { }) {
                     it.ReplaceVariables(rowsForExport[startNr]);
@@ -272,7 +273,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             padVorschau.Items?.Clear();
         } else {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Items = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text);
+            padVorschau.Items = new ItemCollectionPadItem(cbxLayoutWahl.Text);
             padVorschau.Items.ResetVariables();
             padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();

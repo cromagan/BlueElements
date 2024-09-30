@@ -131,7 +131,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         if (Row?.Database is { IsDisposed: false } db) {
             var layouts = new List<AbstractListItem>();
             foreach (var thisLayouts in db.GetAllLayoutsFileNames()) {
-                ItemCollectionPad p = new(thisLayouts);
+                ItemCollectionPadItem p = new(thisLayouts);
                 layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }
             result.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
@@ -198,7 +198,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             return;
         }
 
-        CreativePad pad = new(new ItemCollectionPad(_layoutFileName));
+        CreativePad pad = new(new ItemCollectionPadItem(_layoutFileName));
         if (pad.Items is { IsDisposed: false } icp) {
             icp.ResetVariables();
             icp.ReplaceVariables(db, _rowKey);
@@ -208,9 +208,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
 
             var mb = icp.MaxBounds();
-            var zoomv = ItemCollectionPad.ZoomFitValue(mb, generatedBitmap.Size);
-            var centerpos = ItemCollectionPad.CenterPos(mb, generatedBitmap.Size, zoomv);
-            var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
+            var zoomv = ItemCollectionPadItem.ZoomFitValue(mb, generatedBitmap.Size);
+            var centerpos = ItemCollectionPadItem.CenterPos(mb, generatedBitmap.Size, zoomv);
+            var slidervalues = ItemCollectionPadItem.SliderValues(mb, zoomv, centerpos);
             pad.ShowInPrintMode = true;
             pad.Unselect();
             if (Parent?.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
