@@ -209,6 +209,18 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         }
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Text1", Text_Oben);
+        result.ParseableAdd("Text2", Text_Unten);
+        result.ParseableAdd("Decimal", Nachkommastellen);
+        result.ParseableAdd("refix", Präfix);
+        result.ParseableAdd("Suffix", Suffix);
+        result.ParseableAdd("AdditionalScale", Skalierung);
+        return result;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         CalculateOtherPoints();
@@ -272,18 +284,6 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
     public override string ReadableText() => "Bemaßung";
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Text1", Text_Oben);
-        result.ParseableAdd("Text2", Text_Unten);
-        result.ParseableAdd("Decimal", Nachkommastellen);
-        result.ParseableAdd("refix", Präfix);
-        result.ParseableAdd("Suffix", Suffix);
-        result.ParseableAdd("AdditionalScale", Skalierung);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override RectangleF CalculateUsedArea() {
         if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }

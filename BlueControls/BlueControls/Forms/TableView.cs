@@ -396,8 +396,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     public static void OpenScriptEditor(Database? db) {
         if (db is not { IsDisposed: false }) { return; }
 
-       IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
-
+        IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
     }
 
     /// <summary>
@@ -592,6 +591,64 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         InitView();
     }
 
+    protected void ShowTab(TabPage tabPage) {
+        if (tabPage != tbcDatabaseSelector.SelectedTab) {
+            tbcDatabaseSelector.SelectTab(tabPage);
+            return;
+        }
+
+        Table.ShowWaitScreen = true;
+        tbcDatabaseSelector.Enabled = false;
+        Table.Enabled = false;
+        Table.Refresh();
+
+        Database.ForceSaveAll();
+        MultiUserFile.SaveAll(false);
+
+        if (tabPage == null) { return; }
+
+        var s = (List<object>)tabPage.Tag;
+
+        var ci = (ConnectionInfo)s[0];
+        if (ci == null) {
+            tabPage.Text = "FEHLER";
+            UpdateScripts(null);
+            DatabaseSet(null, string.Empty);
+            return;
+        }
+
+        #region Status-Meldung updaten?
+
+        var maybeok = false;
+        foreach (var thisdb in Database.AllFiles) {
+            if (thisdb.TableName.Equals(ci.TableName, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
+        }
+
+        if (!maybeok) {
+            UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
+        }
+
+        #endregion
+
+        if (Database.GetById(ci, false, Table.Database_NeedPassword, true) is { IsDisposed: false } db) {
+            if (btnLetzteDateien.Parent.Parent.Visible) {
+                if (!string.IsNullOrEmpty(db.Filename)) {
+                    btnLetzteDateien.AddFileName(db.Filename, db.TableName);
+                    LoadTab.FileName = db.Filename;
+                } else {
+                    btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
+                }
+            }
+            tabPage.Text = db.TableName.ToTitleCase();
+            UpdateScripts(db);
+            DatabaseSet(db, (string)s[1]);
+        } else {
+            tabPage.Text = "FEHLER";
+            UpdateScripts(null);
+            DatabaseSet(null, string.Empty);
+        }
+    }
+
     /// <summary>
     /// Sucht den Tab mit der angegebenen Datenbank.
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
@@ -722,7 +779,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);
         result.ParseableAdd("TableView", Table.ViewToString());
 
-        return result.Parseable();
+        return result.FinishParseable();
     }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
@@ -1098,75 +1155,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void tbcDatabaseSelector_Selected(object? sender, TabControlEventArgs e) => ShowTab(e.TabPage);
-
-
-    protected void ShowTab(TabPage tabPage) {
-
-
-        if (tabPage != tbcDatabaseSelector.SelectedTab) {
-            tbcDatabaseSelector.SelectTab(tabPage);
-            return;
-        }
-
-
-        Table.ShowWaitScreen = true;
-        tbcDatabaseSelector.Enabled = false;
-        Table.Enabled = false;
-        Table.Refresh();
-
-        Database.ForceSaveAll();
-        MultiUserFile.SaveAll(false);
-
-        if (tabPage == null) { return; }
-
-        var s = (List<object>)tabPage.Tag;
-
-        var ci = (ConnectionInfo)s[0];
-        if (ci == null) {
-            tabPage.Text = "FEHLER";
-            UpdateScripts(null);
-            DatabaseSet(null, string.Empty);
-            return;
-        }
-
-        #region Status-Meldung updaten?
-
-        var maybeok = false;
-        foreach (var thisdb in Database.AllFiles) {
-            if (thisdb.TableName.Equals(ci.TableName, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
-        }
-
-        if (!maybeok) {
-            UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
-        }
-
-        #endregion
-
-        if (Database.GetById(ci, false, Table.Database_NeedPassword, true) is { IsDisposed: false } db) {
-
-            if (btnLetzteDateien.Parent.Parent.Visible) {
-
-                if (!string.IsNullOrEmpty(db.Filename)) {
-                    btnLetzteDateien.AddFileName(db.Filename, db.TableName);
-                    LoadTab.FileName = db.Filename;
-                } else {
-                    btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
-                }
-
-            }
-            tabPage.Text = db.TableName.ToTitleCase();
-            UpdateScripts(db);
-            DatabaseSet(db, (string)s[1]);
-        } else {
-            tabPage.Text = "FEHLER";
-            UpdateScripts(null);
-            DatabaseSet(null, string.Empty);
-        }
-
-
-
-
-    }
 
     private void UpdateScripts(Database? db) {
         Table.Invalidate();

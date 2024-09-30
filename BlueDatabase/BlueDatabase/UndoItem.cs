@@ -81,6 +81,21 @@ public class UndoItem : IParseable {
 
     #region Methods
 
+    public List<string> ParseableItems() {
+        List<string> result = [];
+
+        result.ParseableAdd("T", TableName);
+        result.ParseableAdd("CO", Command);
+        result.ParseableAdd("D", DateTimeUtc, "yyyy-MM-dd HH:mm:ss.fff");
+        result.ParseableAdd("U", User);
+        result.ParseableAdd("CN", ColName);
+        result.ParseableAdd("RK", RowKey);
+        result.ParseableAdd("P", PreviousValue);
+        result.ParseableAdd("C", ChangedTo);
+        result.ParseableAdd("CMT", Comment);
+        return result;
+    }
+
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
@@ -145,21 +160,6 @@ public class UndoItem : IParseable {
         }
 
         return false;
-    }
-
-    public string ToParseableString() {
-        List<string> result = [];
-
-        result.ParseableAdd("T", TableName);
-        result.ParseableAdd("CO", Command);
-        result.ParseableAdd("D", DateTimeUtc, "yyyy-MM-dd HH:mm:ss.fff");
-        result.ParseableAdd("U", User);
-        result.ParseableAdd("CN", ColName);
-        result.ParseableAdd("RK", RowKey);
-        result.ParseableAdd("P", PreviousValue);
-        result.ParseableAdd("C", ChangedTo);
-        result.ParseableAdd("CMT", Comment);
-        return result.Parseable();
     }
 
     public string UndoTextTableMouseOver() {

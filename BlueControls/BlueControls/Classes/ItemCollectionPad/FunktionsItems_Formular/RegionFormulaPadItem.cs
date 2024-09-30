@@ -60,7 +60,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     #region Properties
 
     public static string ClassId => "FI-RegionFormula";
-    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More ;
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
 
     public string Child {
@@ -147,6 +147,16 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
+        result.ParseableAdd("Child", _child);
+        result.ParseableAdd("BorderStyle", _rahmenStil);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
@@ -175,16 +185,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
-        result.ParseableAdd("Child", _child);
-        result.ParseableAdd("BorderStyle", _rahmenStil);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {
@@ -226,7 +226,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
-
 
     //private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
 

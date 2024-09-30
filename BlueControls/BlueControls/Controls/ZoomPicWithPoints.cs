@@ -329,7 +329,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         var s = string.Empty;
         foreach (var thisP in _points) {
             s = s + thisP.KeyName + "|";
-            Tags.TagSet(thisP.KeyName, thisP.ToParseableString());
+            Tags.TagSet(thisP.KeyName, thisP.ParseableItems().FinishParseable());
         }
         Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
     }

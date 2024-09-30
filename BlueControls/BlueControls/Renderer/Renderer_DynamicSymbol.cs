@@ -58,7 +58,6 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-
         if (drawarea.Width > 4 && drawarea.Height > 4) {
             using var bmp = new Bitmap(drawarea.Width, drawarea.Height);
 
@@ -69,13 +68,21 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
                 gr2.DrawImage(QuickImage.Get(ImageCode.Warnung, 16), 0, 0);
             }
 
-        gr.DrawImage(bmp, drawarea.X, drawarea.Y);
+            gr.DrawImage(bmp, drawarea.X, drawarea.Y);
         }
-
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
+        return result;
+    }
+
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
+
+        //result.ParseableAdd("ShowPic", _bild_anzeigen);
+        //result.ParseableAdd("ShowText", _text_anzeigen);
+        //result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
         return result;
     }
 
@@ -99,15 +106,6 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
     public override string ReadableText() => "Skript als Symbol anzeigen";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
-
-    public override string ToParseableString() {
-        List<string> result = [];
-
-        //result.ParseableAdd("ShowPic", _bild_anzeigen);
-        //result.ParseableAdd("ShowText", _text_anzeigen);
-        //result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
         //var font = Skin.DesignOf(design, state).BFont?.Font();

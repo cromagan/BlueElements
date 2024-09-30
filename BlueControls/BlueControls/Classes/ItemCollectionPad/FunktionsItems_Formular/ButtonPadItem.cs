@@ -388,6 +388,28 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Caption", _anzeige);
+        result.ParseableAdd("Image", _image);
+
+        result.ParseableAdd("Arg1", _arg1);
+        result.ParseableAdd("Arg2", _arg2);
+        result.ParseableAdd("Arg3", _arg3);
+        result.ParseableAdd("Arg4", _arg4);
+        result.ParseableAdd("Arg5", _arg5);
+        result.ParseableAdd("Arg6", _arg6);
+        result.ParseableAdd("Arg7", _arg7);
+        result.ParseableAdd("Arg8", _arg8);
+
+        result.ParseableAdd("QuickInfo", _quickinfo);
+        result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
+        result.ParseableAdd("Action", _action);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "caption":
@@ -456,30 +478,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         return QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Caption", _anzeige);
-        result.ParseableAdd("Image", _image);
-
-        result.ParseableAdd("Arg1", _arg1);
-        result.ParseableAdd("Arg2", _arg2);
-        result.ParseableAdd("Arg3", _arg3);
-        result.ParseableAdd("Arg4", _arg4);
-        result.ParseableAdd("Arg5", _arg5);
-        result.ParseableAdd("Arg6", _arg6);
-        result.ParseableAdd("Arg7", _arg7);
-        result.ParseableAdd("Arg8", _arg8);
-
-        result.ParseableAdd("QuickInfo", _quickinfo);
-        result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
-        result.ParseableAdd("Action", _action);
-        return result.Parseable(base.ToParseableString());
-    }
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-
         _eTxt ??= new ExtText(Design.Button, States.Standard);
         Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _anzeige, positionModified.ToRect(), false);
 
@@ -490,7 +489,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
-
     }
 
     #endregion

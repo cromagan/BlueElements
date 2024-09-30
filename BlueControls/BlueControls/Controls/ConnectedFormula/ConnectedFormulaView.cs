@@ -165,54 +165,58 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             y2 = Skin.Padding;
         }
 
-        if (ConnectedFormula?.PadData != null) {
-            var l = ResizeControls(ConnectedFormula.PadData, Width - x1 - x2, Height - y1 - y2, Page, Mode);
-            var autoc = new List<FlexiControlForCell>();
+        if (ConnectedFormula?.Pages != null) {
+            foreach (var thisP in ConnectedFormula?.Pages.Items) {
+                if (thisP is ItemCollectionPad.ItemCollectionPad icp) {
+                    var l = ItemCollectionPad.ItemCollectionPad.ResizeControls(icp, Width - x1 - x2, Height - y1 - y2, Mode);
+                    var autoc = new List<FlexiControlForCell>();
 
-            foreach (var thisit in ConnectedFormula.PadData) {
-                if (thisit is IItemToControl thisitco && thisit.IsOnPage(Page)) {
-                    var con = SearchOrGenerate(thisitco, false, Mode);
+                    foreach (var thisit in icp.Items) {
+                        if (thisit is IItemToControl thisitco) {
+                            var con = SearchOrGenerate(thisitco, false, Mode);
 
-                    if (con != null) {
-                        _ = unused.Remove(con);
+                            if (con != null) {
+                                _ = unused.Remove(con);
 
-                        if (thisit is ReciverControlPadItem cspi) {
-                            con.Visible = cspi.IsVisibleForMe(Mode, true);
-                        } else {
-                            con.Visible = true;
-                        }
-
-                        if (thisit is IAutosizable) {
-                            foreach (var (item, newpos) in l) {
-                                if (item == thisit) {
-                                    con.Left = (int)newpos.Left + x1;
-                                    con.Top = (int)newpos.Top + y1;
-                                    con.Width = (int)newpos.Width;
-                                    con.Height = (int)newpos.Height;
+                                if (thisit is ReciverControlPadItem cspi) {
+                                    con.Visible = cspi.IsVisibleForMe(Mode, true);
+                                } else {
+                                    con.Visible = true;
                                 }
+
+                                if (thisit is IAutosizable) {
+                                    foreach (var (item, newpos) in l) {
+                                        if (item == thisit) {
+                                            con.Left = (int)newpos.Left + x1;
+                                            con.Top = (int)newpos.Top + y1;
+                                            con.Width = (int)newpos.Width;
+                                            con.Height = (int)newpos.Height;
+                                        }
+                                    }
+                                }
+
+                                if (thisit is RowEntryPadItem rep) {
+                                    DoDefaultSettings(null, rep, Mode);
+                                }
+
+                                if (thisit is TabFormulaPadItem tabItem) {
+                                    tabItem.CreateTabs((TabControl)con, this, Mode);
+                                }
+
+                                if (con.Visible && con is FlexiControlForCell fo &&
+                                    thisit is EditFieldPadItem {
+                                        AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
+                                        CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                                    }) { autoc.Add(fo); }
                             }
                         }
-
-                        if (thisit is RowEntryPadItem rep) {
-                            DoDefaultSettings(null, rep, Mode);
-                        }
-
-                        if (thisit is TabFormulaPadItem tabItem) {
-                            tabItem.CreateTabs((TabControl)con, this, Mode);
-                        }
-
-                        if (con.Visible && con is FlexiControlForCell fo &&
-                            thisit is EditFieldPadItem {
-                                AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
-                                CaptionPosition.Links_neben_dem_Feld_unsichtbar
-                            }) { autoc.Add(fo); }
                     }
+
+                    DoAutoX(autoc);
+
+                    _generated = true;
                 }
             }
-
-            DoAutoX(autoc);
-
-            _generated = true;
         }
 
         foreach (var thisc in unused) {

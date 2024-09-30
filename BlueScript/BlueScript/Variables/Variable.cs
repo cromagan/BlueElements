@@ -32,24 +32,12 @@ namespace BlueScript.Variables;
 
 public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName, IPropertyChangedFeedback {
 
-    private string _keyName = string.Empty;
-
-    public string KeyName {
-        get => _keyName;
-        set {
-            if (_keyName == value) { return; }
-            _keyName = value;
-            OnPropertyChanged();
-        }
-    }
-
-
     #region Fields
 
     private static long _dummyCount;
     private static List<Variable>? _varTypes;
-
     private string _comment = string.Empty;
+    private string _keyName = string.Empty;
 
     private bool _readOnly;
 
@@ -58,11 +46,9 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     #region Constructors
 
     protected Variable(string name, bool ronly, string comment) : base() {
-
         if (string.IsNullOrEmpty(name)) { name = Generic.GetUniqueKey(); }
 
         KeyName = name.ToLowerInvariant();
-
 
         ReadOnly = ronly;
         Comment = comment;
@@ -98,9 +84,19 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     }
 
     public string CompareKey => CheckOrder.ToStringInt3() + "|" + KeyName.ToUpperInvariant();
+
     public abstract bool GetFromStringPossible { get; }
 
     public abstract bool IsNullOrEmpty { get; }
+
+    public string KeyName {
+        get => _keyName;
+        set {
+            if (_keyName == value) { return; }
+            _keyName = value;
+            OnPropertyChanged();
+        }
+    }
 
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
@@ -261,6 +257,18 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public abstract DoItFeedback GetValueFrom(Variable variable, LogData ld);
 
+    public new List<string> ParseableItems() {
+        if (!ToStringPossible) { return []; }
+
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Key", KeyName);
+        result.ParseableAdd("Value", ValueForReplace);
+        result.ParseableAdd("Comment", Comment);
+        result.ParseableAdd("ReadOnly", ReadOnly);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "key":
@@ -272,7 +280,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             case "classid":
             case "type":
                 return value.ToNonCritical() == MyClassId;
-
 
             case "value":
                 ValueForReplace = value.FromNonCritical();
@@ -297,17 +304,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     public string ReplaceInText(string txt) {
         if (!txt.ToLowerInvariant().Contains("~" + KeyName.ToLowerInvariant() + "~")) { return txt; }
         return txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
-    }
-
-    public new string ToParseableString() {
-        if (!ToStringPossible) { return string.Empty; }
-
-        List<string> result = [];
-        result.ParseableAdd("Key", KeyName);
-        result.ParseableAdd("Value", ValueForReplace);
-        result.ParseableAdd("Comment", Comment);
-        result.ParseableAdd("ReadOnly", ReadOnly);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected abstract Variable? NewWithThisValue(object? x);

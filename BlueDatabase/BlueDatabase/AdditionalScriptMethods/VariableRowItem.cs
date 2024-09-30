@@ -92,7 +92,7 @@ public class VariableRowItem : Variable {
 
     public override object Clone() {
         var v = new VariableRowItem(KeyName);
-        v.Parse(ToParseableString());
+        v.Parse(ParseableItems().FinishParseable());
         return v;
     }
 

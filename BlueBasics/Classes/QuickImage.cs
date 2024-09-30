@@ -34,7 +34,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueBasics;
 
-public sealed class QuickImage : IReadableText, IStringable, IEditable {
+public sealed class QuickImage : IReadableText, IEditable {
 
     #region Fields
 
@@ -296,8 +296,6 @@ public sealed class QuickImage : IReadableText, IStringable, IEditable {
     }
 
     public QuickImage SymbolForReadableText() => this;
-
-    public string ToParseableString() => Code;
 
     /// <summary>
     /// Gibt den ImageCode zurück

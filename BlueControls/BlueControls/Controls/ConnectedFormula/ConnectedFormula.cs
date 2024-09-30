@@ -42,15 +42,13 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Fields
 
-   
-
     public const float StandardHöhe = 1.75f;
 
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
 
     private readonly List<string> _notAllowedChilds = [];
 
-    private ItemCollectionPad.ItemCollectionPad? _padData;
+    private ItemCollectionPad.ItemCollectionPad? _pages;
 
     #endregion
 
@@ -65,10 +63,13 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             Load(filename, true);
         }
 
-        if (_padData != null) {
-            //_padData.SheetSizeInMm = new SizeF(PixelToMm(500, ItemCollectionPad.Dpi), PixelToMm(850, ItemCollectionPad.Dpi));
-            _padData.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
-            _padData.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+        if (_pages != null) {
+            foreach (var page in _pages.Items) {
+                if (page is ItemCollectionPad.ItemCollectionPad icp) {
+                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+                }
+            }
         }
         Repair();
     }
@@ -93,13 +94,13 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
     }
 
-    public ItemCollectionPad.ItemCollectionPad? PadData {
-        get => _padData;
+    public ItemCollectionPad.ItemCollectionPad? Pages {
+        get => _pages;
         private set {
-            if (_padData == value) { return; }
+            if (_pages == value) { return; }
             UnRegisterPadDataEvents();
 
-            _padData = value;
+            _pages = value;
 
             RegisterPadDataEvents();
 
@@ -134,247 +135,30 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     // 0.50 seit 08.03.2024
-    public static List<RectangleF> ResizeControls(List<IAutosizable> its, float newWidth, float newHeight, float currentWidth, float currentHeight) {
-        var scaleY = newHeight / currentHeight;
-        var scaleX = newWidth / currentWidth;
-
-        #region Alle Items an die neue gedachte Y-Position schieben (newY), neue bevorzugte Höhe berechnen (newH), und auch newX und newW
-
-        List<float> newX = [];
-        List<float> newW = [];
-        List<float> newY = [];
-        List<float> newH = [];
-        foreach (var thisIt in its) {
-
-            #region  newY
-
-            newY.Add(thisIt.UsedArea.Y * scaleY);
-
-            #endregion
-
-            #region  newX
-
-            newX.Add(thisIt.UsedArea.X * scaleX);
-
-            #endregion
-
-            #region  newH
-
-            var nh = thisIt.UsedArea.Height * scaleY;
-
-            if (thisIt.AutoSizeableHeight) {
-                if (!thisIt.CanChangeHeightTo(nh)) {
-                    nh = AutosizableExtension.MinHeigthCapAndBox;
-                }
-            } else {
-                nh = thisIt.UsedArea.Height;
-            }
-
-            newH.Add(nh);
-
-            #endregion
-
-            #region  newW
-
-            newW.Add(thisIt.UsedArea.Width * scaleX);
-
-            #endregion
-        }
-
-        #endregion
-
-        #region  Alle Items von unten nach oben auf Überlappungen (auch dem Rand) prüfen.
-
-        // Alle prüfen
-
-        for (var tocheck = its.Count - 1; tocheck >= 0; tocheck--) {
-            var pos = PositioOf(tocheck);
-
-            #region Unterer Rand
-
-            if (pos.Bottom > newHeight) {
-                newY[tocheck] = newHeight - pos.Height;
-                pos = PositioOf(tocheck);
-            }
-
-            #endregion
-
-            for (var coll = its.Count - 1; coll > tocheck; coll--) {
-                var poscoll = PositioOf(coll);
-                if (pos.IntersectsWith(poscoll)) {
-                    newY[tocheck] = poscoll.Top - pos.Height;
-                    pos = PositioOf(tocheck);
-                }
-            }
-        }
-
-        #endregion
-
-        #region  Alle UNveränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen.
-
-        // Und von oben nach unten muss sein, weil man ja oben bündig haben will
-        // Wichtig, das CanScaleHeightTo nochmal geprüft wird.
-        // Nur so kann festgestellt werden, ob es eigentlich veränerlich wäre, aber durch die Mini-Größe doch als unveränderlich gilt
-
-        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
-            if (!its[tocheck].CanScaleHeightTo(scaleY)) {
-                var pos = PositioOf(tocheck);
-
-                #region Oberer Rand
-
-                if (pos.Y < 0) {
-                    newY[tocheck] = 0;
-                    pos = PositioOf(tocheck);
-                }
-
-                #endregion
-
-                for (var coll = 0; coll < tocheck; coll++) {
-                    if (!its[tocheck].CanScaleHeightTo(scaleY)) {
-                        var poscoll = PositioOf(coll);
-                        if (pos.IntersectsWith(poscoll)) {
-                            newY[tocheck] = poscoll.Top + poscoll.Height;
-                            pos = PositioOf(tocheck);
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Alle Items, den Abstand stutzen, wenn der vorgänger unveränderlich ist - nur bei ScaleY >1
-
-        if (scaleY > 1) {
-            for (var tocheck = 0; tocheck < its.Count; tocheck++) {
-                if (!its[tocheck].CanScaleHeightTo(scaleY)) {
-                    //var pos = PositioOf(tocheck);
-
-                    for (var coll = tocheck + 1; coll < its.Count; coll++) {
-                        //var poscoll = PositioOf(coll);
-
-                        if (its[coll].UsedArea.Y >= its[tocheck].UsedArea.Bottom && its[coll].UsedArea.IntersectsVericalyWith(its[tocheck].UsedArea)) {
-                            newY[coll] = newY[tocheck] + newH[tocheck] + its[coll].UsedArea.Top - its[tocheck].UsedArea.Bottom;
-                            //pos = PositioOf(tocheck);
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Y-Wert.
-
-        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
-            if (its[tocheck].CanScaleHeightTo(scaleY)) {
-                var pos = PositioOf(tocheck);
-
-                #region Oberer Rand
-
-                if (pos.Y < 0) {
-                    newY[tocheck] = 0;
-                    pos = PositioOf(tocheck);
-                }
-
-                #endregion
-
-                for (var coll = 0; coll < tocheck; coll++) {
-                    var poscoll = PositioOf(coll);
-                    if (pos.IntersectsWith(poscoll)) {
-                        newY[tocheck] = poscoll.Top + poscoll.Height;
-                        pos = PositioOf(tocheck);
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Height-Wert stutzen.
-
-        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
-            if (its[tocheck].CanScaleHeightTo(scaleY)) {
-                var pos = PositioOf(tocheck);
-
-                #region  Unterer Rand
-
-                if (pos.Bottom > newHeight) {
-                    newH[tocheck] = newHeight - pos.Y;
-                    pos = PositioOf(tocheck);
-                }
-
-                #endregion
-
-                #region  Alle Items stimmen mit dem Y-Wert, also ALLE prüfen, NACH dem Item
-
-                for (var coll = tocheck + 1; coll < its.Count; coll++) {
-                    var poscoll = PositioOf(coll);
-                    if (pos.IntersectsWith(poscoll)) {
-                        newH[tocheck] = poscoll.Top - pos.Top;
-                        pos = PositioOf(tocheck);
-                    }
-                }
-
-                #endregion
-            }
-        }
-
-        #endregion
-
-        #region Feedback-Liste erstellen (p)
-
-        var p = new List<RectangleF>();
-        for (var ite = 0; ite < its.Count; ite++) {
-            p.Add(PositioOf(ite));
-        }
-
-        #endregion
-
-        return p;
-
-        RectangleF PositioOf(int no) => new(newX[no], newY[no], newW[no], newH[no]);
-    }
-
-    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad.ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page, string mode) {
-
-        #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
-
-        List<IAutosizable> its = [];
-
-        foreach (var thisc in padData) {
-            if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                thisc.IsOnPage(page) &&
-                thisc.IsInDrawingArea(thisc.UsedArea, padData.SheetSizeInPix.ToSize())) {
-                its.Add(aas);
-            }
-        }
-
-        its.Sort((it1, it2) => it1.UsedArea.Y.CompareTo(it2.UsedArea.Y));
-
-        #endregion
-
-        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.SheetSizeInPix.Width, padData.SheetSizeInPix.Height);
-
-        var erg = new List<(IAutosizable item, RectangleF newpos)>();
-
-        for (var x = 0; x < its.Count; x++) {
-            erg.Add((its[x], p[x]));
-        }
-
-        return erg;
-    }
 
     public static List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
         foreach (var thisCf in AllFiles) {
-            if (thisCf is { IsDisposed: false, PadData: { IsDisposed: false } icp }) {
+            if (thisCf is { IsDisposed: false, _pages: { IsDisposed: false } icp }) {
                 l.AddRange(icp.VisibleFor_AllUsed());
             }
         }
 
         return l.SortedDistinctList();
+    }
+
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
+
+        if (Pages != null) {
+            result.ParseableAdd("Page", Pages as IStringable);
+        }
+
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {
@@ -386,9 +170,9 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
             case "paditemdata":
                 UnRegisterPadDataEvents();
-                _padData = new ItemCollectionPad.ItemCollectionPad();
-                _padData.Parse(value.FromNonCritical());
-                _padData.Parent = this;
+                _pages = new ItemCollectionPad.ItemCollectionPad();
+                _pages.Parse(value.FromNonCritical());
+                _pages.Parent = null;
                 RegisterPadDataEvents();
                 return true;
 
@@ -408,44 +192,39 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public void Repair() {
-        PadData ??= [];
+        Pages ??= new ItemCollectionPad.ItemCollectionPad();
 
-        PadData.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
+        Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
-        foreach (var thisCon in PadData.Connections) {
-            thisCon.Bei_Export_sichtbar = false;
-        }
+        //foreach (var thisIt in Pages.Items) {
+        //    Develop.DebugPrint_NichtImplementiert();
+        //    if (thisIt is ReciverControlPadItem itcf) {
+        //        itcf.ParentFormula = this;
+        //    }
+        //}
 
-        foreach (var thisIt in PadData) {
-            if (string.IsNullOrEmpty(thisIt.Page)) {
-                thisIt.Page = "Head";
-            }
+        Develop.DebugPrint_NichtImplementiert(true); // TODO: Head erstellen
+        //var pg = Pages.AllPages();
+        //pg.AddIfNotExists("Head");
 
-            if (thisIt is ReciverControlPadItem itcf) {
-                itcf.ParentFormula = this;
-            }
-        }
+        foreach (var thisP in Pages.Items) {
+            if (thisP is ItemCollectionPad.ItemCollectionPad icp) {
+                RowEntryPadItem? found = null;
 
-        var pg = PadData.AllPages();
-        pg.AddIfNotExists("Head");
-
-        foreach (var thisP in pg) {
-            RowEntryPadItem? found = null;
-
-            foreach (var thisit in PadData) {
-                if (thisit is RowEntryPadItem repi) {
-                    if (string.Equals(thisP, repi.Page, StringComparison.OrdinalIgnoreCase)) { found = repi; break; }
+                foreach (var thisit in icp.Items) {
+                    if (thisit is RowEntryPadItem repi) {
+                        found = repi; break;
+                    }
                 }
-            }
-            if (found == null) {
-                found = new RowEntryPadItem();
 
-                PadData.Add(found);
-            }
+                if (found == null) {
+                    found = new RowEntryPadItem();
+                    icp.Add(found);
+                }
 
-            found.SetCoordinates(new RectangleF((PadData.SheetSizeInPix.Width / 2) - 150, -30, 300, 30), true);
-            found.Page = thisP;
-            found.Bei_Export_sichtbar = false;
+                found.SetCoordinates(new RectangleF((icp.SheetSizeInPix.Width / 2) - 150, -30, 300, 30), true);
+                found.Bei_Export_sichtbar = false;
+            }
         }
     }
 
@@ -453,19 +232,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-
-        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
-
-        if (PadData != null) {
-            result.ParseableAdd("PadItemData", PadData.ToParseableString());
-        }
-
-        return result.Parseable(base.ToParseableString());
     }
 
     /// <summary>
@@ -492,10 +258,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             }
         }
 
-        if (PadData != null) {
-            foreach (var thisf in PadData.AllPages()) {
-                if (!notAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
-                    list.Add(ItemOf(thisf, ImageCode.Register));
+        if (_pages != null) {
+            foreach (var thisf in _pages.Items) {
+                if (thisf is ItemCollectionPad.ItemCollectionPad icp) {
+                    if (!notAllowedChilds.Contains(icp.KeyName) && !string.Equals("Head", icp.Caption, StringComparison.OrdinalIgnoreCase)) {
+                        list.Add(ItemOf(icp));
+                    }
                 }
             }
         }
@@ -508,14 +276,16 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
     internal bool HasVisibleItemsForMe(string page, string mode) {
-        if (_padData == null) { return false; }
+        if (Pages == null || Pages.Items.Count == 0) { return false; }
 
-        foreach (var thisItem in _padData) {
-            if (string.IsNullOrEmpty(page) ||
-                string.IsNullOrEmpty(thisItem.Page) ||
-                page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
-                if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
-                    if (cspi.IsVisibleForMe(mode, false)) { return true; }
+        foreach (var thisItem in Pages.Items) {
+            if (thisItem is ItemCollectionPad.ItemCollectionPad icp) {
+                if (string.IsNullOrEmpty(page) ||
+                    string.IsNullOrEmpty(icp.Caption) ||
+                    page.Equals(icp.Caption, StringComparison.OrdinalIgnoreCase)) {
+                    if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
+                        if (cspi.IsVisibleForMe(mode, false)) { return true; }
+                    }
                 }
             }
         }
@@ -531,29 +301,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return e.Editing;
     }
 
-    internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls, string mode) {
-        if (PadData == null) { return; }
-
-        if (changeControls) {
-            //var newWidthPixel = MmToPixel(newwidthinmm, ItemCollectionPad.Dpi);
-            //var newhHeightPixel = MmToPixel(newheightinmm, ItemCollectionPad.Dpi);
-
-            foreach (var thisPage in PadData.AllPages()) {
-                var x = ResizeControls(PadData, newWidthPixel, newhHeightPixel, thisPage, mode);
-
-                #region Die neue Position in die Items schreiben
-
-                foreach (var (item, newpos) in x) {
-                    item.SetCoordinates(newpos, true);
-                }
-
-                #endregion
-            }
-        }
-
-        PadData.SheetSizeInMm = new SizeF(PixelToMm(newWidthPixel, ItemCollectionPad.ItemCollectionPad.Dpi), PixelToMm(newhHeightPixel, ItemCollectionPad.ItemCollectionPad.Dpi));
-    }
-
     protected override void OnLoaded(object sender, System.EventArgs e) {
         Repair();
         base.OnLoaded(sender, e);
@@ -562,14 +309,14 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     private void PadData_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
     private void RegisterPadDataEvents() {
-        if (_padData != null) {
-            _padData.PropertyChanged += PadData_PropertyChanged;
+        if (_pages != null) {
+            _pages.PropertyChanged += PadData_PropertyChanged;
         }
     }
 
     private void UnRegisterPadDataEvents() {
-        if (_padData != null) {
-            _padData.PropertyChanged -= PadData_PropertyChanged;
+        if (_pages != null) {
+            _pages.PropertyChanged -= PadData_PropertyChanged;
         }
     }
 

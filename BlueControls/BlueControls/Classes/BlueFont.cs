@@ -30,7 +30,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
-public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IParseable, IEditable {
+public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IEditable, IParseable {
 
     #region Fields
 
@@ -109,7 +109,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
 
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower));
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower).FinishParseable());
 
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower);
 
@@ -118,9 +118,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         if (FontsAll.Get(toParse.Replace(" ", string.Empty).ToUpperInvariant()) is { } found) { return found; }
 
-        var f = new BlueFont();
-
         toParse = toParse.Replace(",", ", "); // TODO: vor 01.10.2021 Entferen wenn inv bei den exports repariert wurde
+        var f = new BlueFont();
 
         f.Parse(toParse);
 
@@ -274,7 +273,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
-        var n = "FontName-" + ToParseableString();
+        var n = "FontName-" + ParseableItems();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
@@ -282,6 +281,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
 
     public void ParseFinished(string parsed) {
         KeyName = parsed.Replace(" ", string.Empty).ToUpperInvariant();
@@ -443,7 +444,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
-        var n = "Font-" + ToParseableString();
+        var n = "Font-" + ParseableItems();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
@@ -460,14 +461,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             gr.DrawLine(Pen(1f), 3, 4, 29, 8);
         }
 
-        var n = "Line-" + ToParseableString();
+        var n = "Line-" + ParseableItems();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
     }
-
-    public string ToParseableString() => ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
 
     internal SizeF CharSize(char c) {
         if (c <= _charSize.GetUpperBound(0)) {
@@ -505,8 +504,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     internal float Oberlänge(float scale) => _oberlänge * scale;
 
-    private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
-        var result = new List<string>();
+    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
+        List<string> result = [];
 
         result.ParseableAdd("Name", fontName);
         result.ParseableAdd("Size", fontSize);
@@ -522,7 +521,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             result.ParseableAdd("OutlineColor", colorOutline);
         }
         if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
-        return result.Parseable();
+        return result;
     }
 
     private Pen GeneratePen(float scale) {

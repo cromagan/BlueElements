@@ -192,7 +192,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             if (ZoomPad.ScaleWarnung()) { return; }
             //GenerateBottleFromRow(tblAlleBehaelter.CursorPosRow.Row);
             //var sk = FloatParse(GetSetting("Solid Edge Skalierung").Replace(".", ","));
-            var i = pad?.Items?.ToBitmap(DefaultCopyScale, string.Empty);
+            var i = pad?.Items?.ToBitmap(DefaultCopyScale);
             System.Windows.Forms.Clipboard.SetImage(i);
             Notification.Show("Kopiert!", ImageCode.Smiley);
         } catch {

@@ -176,6 +176,27 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
+    public virtual List<string> ParseableItems() {
+        try {
+            if (IsDisposed) { return []; }
+            List<string> result = [];
+
+            result.ParseableAdd("Name", _keyName);
+            result.ParseableAdd("Script", _script);
+            //result.ParseableAdd("ManualExecutable", _manualexecutable);
+            result.ParseableAdd("ChangeValues", _changeValues);
+            result.ParseableAdd("QuickInfo", _quickinfo);
+            result.ParseableAdd("AdminInfo", _admininfo);
+            result.ParseableAdd("Image", _image);
+            result.ParseableAdd("UserGroups", _usergroups, false);
+
+            return result;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ParseableItems();
+        }
+    }
+
     public void ParseFinished(string parsed) { }
 
     public virtual bool ParseThis(string key, string value) {
@@ -244,28 +265,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         return null;
     }
 
-    public virtual string ToParseableString() {
-        try {
-            if (IsDisposed) { return string.Empty; }
-            List<string> result = [];
-
-            result.ParseableAdd("Name", _keyName);
-            result.ParseableAdd("Script", _script);
-            //result.ParseableAdd("ManualExecutable", _manualexecutable);
-            result.ParseableAdd("ChangeValues", _changeValues);
-            result.ParseableAdd("QuickInfo", _quickinfo);
-            result.ParseableAdd("AdminInfo", _admininfo);
-            result.ParseableAdd("Image", _image);
-            result.ParseableAdd("UserGroups", _usergroups, false);
-
-            return result.Parseable();
-        } catch {
-            Develop.CheckStackForOverflow();
-            return ToParseableString();
-        }
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {

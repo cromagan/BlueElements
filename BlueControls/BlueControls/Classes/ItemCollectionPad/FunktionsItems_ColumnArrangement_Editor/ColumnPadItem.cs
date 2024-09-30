@@ -105,6 +105,16 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Database", Column?.Database);
+        result.ParseableAdd("ColumnName", Column);
+
+        return result;
+    }
+
     public override string ReadableText() => "Spalte";
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
@@ -121,17 +131,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //    if (Column is not { IsDisposed: false }) { return; }
     //    TableView.OpenColumnEditor(Column, null, null);
     //}
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Database", Column?.Database);
-        result.ParseableAdd("ColumnName", Column);
-
-        return result.Parseable(base.ToParseableString());
-    }
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {

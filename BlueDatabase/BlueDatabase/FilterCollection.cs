@@ -246,7 +246,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Clear();
 
         if (fc != null) {
-            var reallydifferent = fc.ToParseableString() != ToParseableString();
+            var reallydifferent = fc.ParseableItems().FinishParseable() != ParseableItems().FinishParseable();
             foreach (var thisf in fc) {
                 if (!Exists(thisf) && thisf.IsOk() && thisf.Clone() is FilterItem nfi) { AddAndRegisterEvents(nfi); }
             }
@@ -418,6 +418,18 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         RowsChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
+
+        foreach (var thisFilterItem in _internal) {
+            if (thisFilterItem is { IsDisposed: false } && thisFilterItem.IsOk()) {
+                result.ParseableAdd("Filter", thisFilterItem as IStringable);
+            }
+        }
+        return result;
+    }
+
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
@@ -564,19 +576,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public List<FilterItem> ToList() => _internal;
 
-    public string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        foreach (var thisFilterItem in _internal) {
-            if (thisFilterItem is { IsDisposed: false } && thisFilterItem.IsOk()) {
-                result.ParseableAdd("Filter", thisFilterItem as IStringable);
-            }
-        }
-        return result.Parseable();
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
         if (_rows == null) { return; }

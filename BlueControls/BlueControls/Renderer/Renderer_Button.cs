@@ -140,6 +140,15 @@ public class Renderer_Button : Renderer_Abstract {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("ShowPic", _bild_anzeigen);
+        result.ParseableAdd("ShowText", _text_anzeigen);
+        result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key.ToLower()) {
             case "showpic":
@@ -160,15 +169,6 @@ public class Renderer_Button : Renderer_Abstract {
     public override string ReadableText() => "Als Knopf anzeigen";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
-
-    public override string ToParseableString() {
-        List<string> result = [];
-
-        result.ParseableAdd("ShowPic", _bild_anzeigen);
-        result.ParseableAdd("ShowText", _text_anzeigen);
-        result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
         var font = Skin.DesignOf(design, state).BFont?.Font();

@@ -135,7 +135,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         return s;
     }
 
-    public object Clone() => new DatabaseScriptDescription(Database, ToParseableString());
+    public object Clone() => new DatabaseScriptDescription(Database, ParseableItems().FinishParseable());
 
     public override int CompareTo(object obj) {
         if (obj is DatabaseScriptDescription v) {
@@ -198,6 +198,19 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         return base.ErrorReason();
     }
 
+    public override List<string> ParseableItems() {
+        try {
+            if (IsDisposed) { return []; }
+            List<string> result = [.. base.ParseableItems()];
+            result.ParseableAdd("NeedRow", _needRow);
+            result.ParseableAdd("Events", _eventTypes);
+            return result;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ParseableItems();
+        }
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "needrow":
@@ -240,19 +253,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         return QuickImage.Get(symb, 16, c, Color.Transparent, h);
-    }
-
-    public override string ToParseableString() {
-        try {
-            if (IsDisposed) { return string.Empty; }
-            List<string> result = [];
-            result.ParseableAdd("NeedRow", _needRow);
-            result.ParseableAdd("Events", _eventTypes);
-            return result.Parseable(base.ToParseableString());
-        } catch {
-            Develop.CheckStackForOverflow();
-            return ToParseableString();
-        }
     }
 
     protected override void Dispose(bool disposing) {

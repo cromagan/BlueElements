@@ -102,7 +102,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public string ToParseableString() {
+    public List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("Item1", Item1.KeyName);
         result.ParseableAdd("Arrow1", ArrowOnItem1);
@@ -111,7 +111,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
         result.ParseableAdd("Arrow2", ArrowOnItem2);
         result.ParseableAdd("Type2", Item2Type);
         result.ParseableAdd("Print", _beiExportSichtbar);
-        return result.Parseable();
+        return result;
     }
 
     #endregion

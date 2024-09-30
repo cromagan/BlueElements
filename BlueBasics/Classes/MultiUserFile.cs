@@ -375,6 +375,17 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    public virtual List<string> ParseableItems() {
+        List<string> result = [];
+
+        result.ParseableAdd("Type", Type);
+        result.ParseableAdd("Version", Version);
+        result.ParseableAdd("CreateDate", CreateDate);
+        result.ParseableAdd("CreateName", Creator);
+
+        return result;
+    }
+
     public virtual void ParseFinished(string parsed) { }
 
     public virtual bool ParseThis(string key, string value) {
@@ -425,17 +436,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         tim.Stop();
         _isInSaveingLoop = false;
-    }
-
-    public virtual string ToParseableString() {
-        var result = new List<string>();
-
-        result.ParseableAdd("Type", Type);
-        result.ParseableAdd("Version", Version);
-        result.ParseableAdd("CreateDate", CreateDate);
-        result.ParseableAdd("CreateName", Creator);
-
-        return result.Parseable();
     }
 
     public void UnlockEditing() {
@@ -600,7 +600,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f, true); }
 
-        var lb = ToParseableString();
+        var lb = ParseableItems().FinishParseable();
         if (dataUncompressed != lb) { return Feedback("Daten wurden inzwischen verändert.", true); }
 
         // OK, nun gehts rund: Zuerst das Backup löschen
@@ -697,7 +697,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (!string.IsNullOrEmpty(f)) { }
 
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
-            dataUncompressed = ToParseableString();
+            dataUncompressed = ParseableItems().FinishParseable();
 
             if (dataUncompressed.Length > 0) {
                 tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());

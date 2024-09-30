@@ -198,6 +198,17 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("ColumnName", _columnName);
+        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("AutoDistance", _autoX);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "column":
@@ -231,17 +242,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public override QuickImage? SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Stift, 16);
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("ColumnName", _columnName);
-        result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschriftanordung);
-        result.ParseableAdd("AutoDistance", _autoX);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

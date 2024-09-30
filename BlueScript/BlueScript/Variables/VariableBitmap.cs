@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Structures;
 using System.Drawing;
 using static BlueBasics.Interfaces.ParseableExtension;
@@ -70,7 +71,7 @@ public class VariableBitmap : Variable {
 
     public override object Clone() {
         var v = new VariableBitmap(KeyName);
-        v.Parse(ToParseableString());
+        v.Parse(ParseableItems().FinishParseable());
         return v;
     }
 

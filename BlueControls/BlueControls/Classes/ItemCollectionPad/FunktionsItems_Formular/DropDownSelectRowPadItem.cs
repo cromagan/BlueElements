@@ -132,6 +132,19 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("CaptionText", _überschrift);
+        result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("Caption", _überschriftanordung);
+        //result.ParseableAdd("ID", ColorId);
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
@@ -165,19 +178,6 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("CaptionText", _überschrift);
-        result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschriftanordung);
-        //result.ParseableAdd("ID", ColorId);
-
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

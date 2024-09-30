@@ -116,7 +116,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-        ChildPadItem b = new();
+        ItemCollectionPad.ItemCollectionPad b = new();
         b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
         Pad.AddCentered(b);
     }
@@ -177,7 +177,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
-        var t = Pad.Items.ToParseableString();
+        var t = Pad.Items.ParseableItems().FinishParseable();
         WriteAllText(_lastFileName, t, Constants.Win1252, false);
     }
 
@@ -199,7 +199,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {
         if (Pad?.Items == null) { return; }
 
-        var t = Pad.Items.ToParseableString();
+        var t = Pad.Items.ParseableItems().FinishParseable();
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         _lastFileName = SaveTab.FileName;

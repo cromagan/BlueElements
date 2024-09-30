@@ -237,6 +237,16 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("EntityID", _entityId);
+        result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
+        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
+        result.ParseableAdd("Script", _script);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "entityid":
@@ -264,18 +274,16 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return txt + DatabaseOutput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
+    /// <summary>
+    /// Internes Skript
+    /// </summary>
+    public void Skript_Bearbeiten() {
+        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(this);
+        se.Database = DatabaseInput;
     }
 
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("EntityID", _entityId);
-        result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
-        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
-        result.ParseableAdd("Script", _script);
-        return result.Parseable(base.ToParseableString());
+    public override QuickImage SymbolForReadableText() {
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
@@ -299,18 +307,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
         DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
     }
-
-
-    /// <summary>
-    /// Internes Skript
-    /// </summary>
-    public void Skript_Bearbeiten() {
-        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(this);
-        se.Database = DatabaseInput;
-    }
-
-
-
 
     #endregion
 }

@@ -103,14 +103,14 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
     public override void OnPropertyChanged() {
-        _lastCode = ToParseableString();
+        _lastCode = ParseableItems().FinishParseable();
 
         base.OnPropertyChanged();
     }
 
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
-        _lastCode = ToParseableString();
+        _lastCode = ParseableItems().FinishParseable();
     }
 
     public abstract string ReadableText();

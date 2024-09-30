@@ -18,56 +18,46 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
-using System.Linq;
 using System;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.Windows.Input;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement sich selbst zeichnet und nicht als Container vorgesehen ist.
 /// </summary>
-public interface IUniqueWindow: IDisposableExtended {
+public interface IUniqueWindow : IDisposableExtended {
 
-    public void Show();
-    public object? Object { get;set; }
+    #region Properties
+
+    public object? Object { get; set; }
+
+    #endregion
+
+    #region Methods
 
     public void BringToFront();
 
+    public void Show();
+
+    #endregion
 }
 
-
-
 public static class IUniqueWindowExtension {
-
     //public void ShowOrCreate<T>(T window, object o ) where T : IUniqueWindow {
-
-
     //    foreach(var thisT in FormManager.Forms) {
-
-    //        if (thisT is typeof(window){ IsDisposed: false } form) { 
-
+    //        if (thisT is typeof(window){ IsDisposed: false } form) {
     //            if(o == form.Object) {
     //                form.BringToFront();
     //                return;
     //            }
 
-
     //        }
-
-
-
 
     //    }
 
     //}
 
-
-
     //public void ShowOrCreate<T>(T window, object o) where T : IUniqueWindow {
-
     //    foreach (var form in FormManager.Forms.OfType<T>()) {
     //        if (!form.IsDisposed && form.Object.Equals(o)) {
     //            form.BringToFront();
@@ -94,9 +84,10 @@ public static class IUniqueWindowExtension {
     //    if (Activator.CreateInstance(windowType) is T newWindow) {
     //        newWindow.Object = o;
     //        newWindow.Show();
-    //    } 
+    //    }
     //}
 
+    #region Methods
 
     public static T ShowOrCreate<T>(object o) where T : IUniqueWindow, new() {
         Type windowType = typeof(T);
@@ -117,4 +108,5 @@ public static class IUniqueWindowExtension {
         return newWindow;
     }
 
+    #endregion
 }

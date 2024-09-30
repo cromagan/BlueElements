@@ -45,12 +45,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     /// <summary>
-    /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
-    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
-    /// </summary>
-    private readonly PointM _jointMiddle;
-
-    /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
     /// <remarks></remarks>
@@ -70,8 +64,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     private string _keyName;
 
-    private string _page = string.Empty;
-
     private ItemCollectionPad? _parent;
 
     private PadStyles _style = PadStyles.Style_Standard;
@@ -88,8 +80,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         _keyName = keyName;
         if (string.IsNullOrEmpty(_keyName)) { _keyName = Generic.GetUniqueKey(); }
 
-        _jointMiddle = new PointM("JointMiddle", 0, 0);
-        _jointMiddle.Moved += _jointMiddle_Moved;
+        JointMiddle = new PointM("JointMiddle", 0, 0);
+        JointMiddle.Moved += JointMiddle_Moved;
 
         MovablePoint.CollectionChanged += Point_CollectionChanged;
         JointPoints.CollectionChanged += Point_CollectionChanged;
@@ -119,19 +111,13 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     //public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
     public abstract string Description { get; }
 
-    /// <summary>
-    /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
-    /// </summary>
-    [Description("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.")]
-    public string Gruppenzugehörigkeit { get; set; } = string.Empty;
-
     public bool IsDisposed { get; private set; }
 
-    public PointM JointMiddle {
-        get {
-            return _jointMiddle;
-        }
-    }
+    /// <summary>
+    /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
+    /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
+    /// </summary>
+    public PointM JointMiddle { get; private set; }
 
     /// <summary>
     /// Diese Punket sind Verbindungspunkte.
@@ -159,16 +145,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public virtual bool MoveXByMouse => true;
 
     public virtual bool MoveYByMouse => true;
-
-    [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
-    public string Page {
-        get => _page;
-        set {
-            if (_page == value) { return; }
-            _page = value;
-            OnPropertyChanged();
-        }
-    }
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~AbstractPadItem()
@@ -254,15 +230,15 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
 
         var p = new PointM(name, x, y);
-        p.Distance = GetLenght(_jointMiddle, p);
-        p.Angle = GetAngle(_jointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
+        p.Distance = GetLenght(JointMiddle, p);
+        p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
         p.Parent = this;
         JointPoints.Add(p);
     }
 
     public object? Clone() {
-        var x = ToParseableString();
-        var i = NewByParsing<AbstractPadItem>(x);
+        var x = ParseableItems();
+        var i = NewByParsing<AbstractPadItem>(x.FinishParseable());
         return i;
     }
 
@@ -305,18 +281,13 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public void DoJointPoint(PointM p) {
         if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
             if (JointPoints.Contains(p)) {
-                p.Distance = GetLenght(_jointMiddle, p);
-                p.Angle = GetAngle(_jointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
+                p.Distance = GetLenght(JointMiddle, p);
+                p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
             }
         }
     }
 
     public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
-        if (_parent == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert");
-            return;
-        }
-
         if (forPrinting && !_beiExportSichtbar) { return; }
 
         var positionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
@@ -335,18 +306,20 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             var line = 1f;
             if (zoom > 1) { line = zoom; }
 
-            foreach (var thisV in _parent.Connections) {
-                if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
-                    if (_parent.Contains(thisV.Item2) && thisV.Item2 != this) {
-                        if (thisV.Item2.Bei_Export_sichtbar) {
-                            var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
-                            var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
+            if (Parent is { }) {
+                foreach (var thisV in Parent.Connections) {
+                    if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
+                        if (Parent.Items.Contains(thisV.Item2) && thisV.Item2 != this) {
+                            if (thisV.Item2.Bei_Export_sichtbar) {
+                                var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
+                                var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
 
-                            if (GetLenght(t1, t2) > 1) {
-                                gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                                var wi = GetAngle(t1, t2);
-                                if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
-                                if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                                if (GetLenght(t1, t2) > 1) {
+                                    gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
+                                    var wi = GetAngle(t1, t2);
+                                    if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
+                                    if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                                }
                             }
                         }
                     }
@@ -368,7 +341,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         [
             new FlexiControl("Allgemein:", widthOfControl, true),
 
-            new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
             new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         ];
 
@@ -402,12 +374,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         sizeOfParentControl.Height == 0 ||
         drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
-    public bool IsOnPage(string page) {
-        if (string.IsNullOrEmpty(_page)) { return true; }
-
-        return string.Equals(_page, page, StringComparison.OrdinalIgnoreCase);
-    }
-
     public void Move(float x, float y, bool isMouse) {
         if (x == 0 && y == 0) { return; }
         foreach (var t in PointsForSuccesfullyMove) {
@@ -424,6 +390,28 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public override void OnPropertyChanged() {
         _usedArea = default;
         base.OnPropertyChanged();
+    }
+
+    //}
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Key", KeyName);
+        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("Print", _beiExportSichtbar);
+        result.ParseableAdd("QuickInfo", QuickInfo);
+        result.ParseableAdd("ZoomPadding", _zoomPadding);
+
+        foreach (var thisPoint in MovablePoint) {
+            result.ParseableAdd("Point", thisPoint as IStringable);
+        }
+        foreach (var thisPoint in JointPoints) {
+            result.ParseableAdd("JointPoint", thisPoint as IStringable);
+        }
+
+        result.ParseableAdd("Tags", Tags, false);
+
+        return result;
     }
 
     public override bool ParseThis(string key, string value) {
@@ -476,8 +464,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 //RemoveToo.AddRange(value.FromNonCritical().SplitAndCutByCr());
                 return true;
 
-            case "removetoogroup":
-                Gruppenzugehörigkeit = value.FromNonCritical();
+            case "removetoogroup":// TODO: Alt, löschen, 30.09.2024
                 return true;
 
             case "key":
@@ -495,7 +482,9 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 return true;
 
             case "page":
-                _page = value.FromNonCritical();
+                Develop.DebugPrint_NichtImplementiert(true);
+                // TODO: Neue  Collection Erstellen oder suchen
+
                 return true;
 
             case "tags":
@@ -528,33 +517,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public abstract string ReadableText();
 
     public abstract QuickImage? SymbolForReadableText();
-
-    //}
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Key", KeyName);
-        result.ParseableAdd("Style", _style);
-        result.ParseableAdd("Page", _page);
-        result.ParseableAdd("Print", _beiExportSichtbar);
-        result.ParseableAdd("QuickInfo", QuickInfo);
-        result.ParseableAdd("ZoomPadding", _zoomPadding);
-
-        foreach (var thisPoint in MovablePoint) {
-            result.ParseableAdd("Point", thisPoint as IStringable);
-        }
-        foreach (var thisPoint in JointPoints) {
-            result.ParseableAdd("JointPoint", thisPoint as IStringable);
-        }
-
-        if (!string.IsNullOrEmpty(Gruppenzugehörigkeit)) {
-            result.ParseableAdd("RemoveTooGroup", Gruppenzugehörigkeit);
-        }
-
-        result.ParseableAdd("Tags", Tags, false);
-
-        return result.Parseable(base.ToParseableString());
-    }
 
     public void Verbindungspunkt_hinzu() {
         AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
@@ -656,7 +618,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
-            _jointMiddle.Moved -= _jointMiddle_Moved;
+            JointMiddle.Moved -= JointMiddle_Moved;
             MovablePoint.CollectionChanged -= Point_CollectionChanged;
             JointPoints.CollectionChanged -= Point_CollectionChanged;
             MovablePoint.RemoveAll();
@@ -699,7 +661,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
-    private void _jointMiddle_Moved(object sender, MoveEventArgs e) {
+    private void JointMiddle_Moved(object sender, MoveEventArgs e) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
 
         if (JointPoints.Count > 0) {
@@ -707,7 +669,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
             foreach (var thisPoint in JointPoints) {
                 foreach (var thispoint in JointPoints) {
-                    thispoint.SetTo(_jointMiddle, thispoint.Distance, thispoint.Angle + angle, false);
+                    thispoint.SetTo(JointMiddle, thispoint.Distance, thispoint.Angle + angle, false);
                 }
             }
         }

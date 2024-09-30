@@ -318,6 +318,28 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+
+        try {
+            // Für FlexiForFilter werden auch "ungültige" Filter benötigt
+            // z.B. Instr ohn Text
+            //if (!this.IsOk()) { return string.Empty; }
+
+            List<string> result = [];
+            result.ParseableAdd("ID", KeyName);
+            result.ParseableAdd("Type", _filterType);
+            result.ParseableAdd("Database", Database);
+            result.ParseableAdd("ColumnName", _column);
+            result.ParseableAdd("Values", _searchValue, false);
+            result.ParseableAdd("Origin", _origin);
+            return result;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ParseableItems();
+        }
+    }
+
     public void ParseFinished(string parsed) {
         if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
     }
@@ -456,29 +478,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-
-        try {
-            // Für FlexiForFilter werden auch "ungültige" Filter benötigt
-            // z.B. Instr ohn Text
-            //if (!this.IsOk()) { return string.Empty; }
-
-            List<string> result = [];
-            result.ParseableAdd("ID", KeyName);
-            result.ParseableAdd("Type", _filterType);
-            result.ParseableAdd("Database", Database);
-            result.ParseableAdd("ColumnName", _column);
-            result.ParseableAdd("Values", _searchValue, false);
-            result.ParseableAdd("Origin", _origin);
-            return result.Parseable();
-        } catch {
-            Develop.CheckStackForOverflow();
-            return ToParseableString();
-        }
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

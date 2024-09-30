@@ -62,6 +62,12 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     #region Methods
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id": // TODO: 29.03.2023
@@ -79,12 +85,6 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

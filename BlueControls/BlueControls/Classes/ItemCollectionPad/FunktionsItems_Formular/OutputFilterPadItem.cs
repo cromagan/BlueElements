@@ -174,6 +174,20 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("ColumnName", _columnName);
+        //result.ParseableAdd("CaptionText", _überschrift);
+        //result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
+        result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
@@ -215,20 +229,6 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Trichter, 16);
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("ColumnName", _columnName);
-        //result.ParseableAdd("CaptionText", _überschrift);
-        //result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("Caption", _überschriftanordung);
-        result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
-        result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
-
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

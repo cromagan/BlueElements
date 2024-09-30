@@ -188,6 +188,25 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Value", _filterwert);
+        //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
+        result.ParseableAdd("OutputColumn", _filterSpalte);
+        result.ParseableAdd("Filter", _filtertype);
+        result.ParseableAdd("errortext", _fehlerText);
+
+        //if (DatabaseInput is not Database dbin || dbin.IsDisposed) {
+        //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+        //}
+
+        //result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
@@ -224,34 +243,11 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public override string ReadableText() {
         const string txt = "Filter-Generator: ";
 
-    
-            return txt + DatabaseOutput?.Caption;
-
+        return txt + DatabaseOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() {
-
-            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Value", _filterwert);
-        //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
-        result.ParseableAdd("OutputColumn", _filterSpalte);
-        result.ParseableAdd("Filter", _filtertype);
-        result.ParseableAdd("errortext", _fehlerText);
-
-        //if (DatabaseInput is not Database dbin || dbin.IsDisposed) {
-        //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-        //}
-
-        //result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
-
-        return result.Parseable(base.ToParseableString());
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

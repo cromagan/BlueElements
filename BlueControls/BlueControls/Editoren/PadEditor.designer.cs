@@ -126,7 +126,6 @@ namespace BlueControls.Forms {
             this.Pad.ClickedItemChanging += new System.EventHandler(this.Pad_ClickedItemChanging);
             this.Pad.DrawModeChanged += new System.EventHandler(this.Pad_DrawModChanged);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
-            this.Pad.PropertyChanged += new System.EventHandler(this.Pad_PropertyChanged);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
@@ -485,7 +484,6 @@ namespace BlueControls.Forms {
             this.tabSeiten.TabDefault = null;
             this.tabSeiten.TabDefaultOrder = null;
             this.tabSeiten.TabIndex = 3;
-            this.tabSeiten.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabSeiten_Selected);
             // 
             // tabRightSide
             // 

@@ -27,7 +27,6 @@ using BlueBasics;
 using System.Drawing;
 using System;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -71,7 +70,6 @@ public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar, IUniq
             return _item;
         }
         set {
-
             if (value is not DynamicSymbolPadItem) { value = null; }
             if (_item == value) { return; }
 
@@ -89,10 +87,6 @@ public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar, IUniq
             }
         }
     }
-
-
-
-
 
     #endregion
 

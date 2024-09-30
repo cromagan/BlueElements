@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueScript.Structures;
@@ -80,7 +81,7 @@ public class VariableFilterItem : Variable {
 
     public override object Clone() {
         var v = new VariableFilterItem(KeyName);
-        v.Parse(ToParseableString());
+        v.Parse(ParseableItems().FinishParseable());
         return v;
     }
 

@@ -86,7 +86,7 @@ public class VariableUnknown : Variable {
 
     public override object Clone() {
         var v = new VariableUnknown(KeyName);
-        v.Parse(ToParseableString());
+        v.Parse(ParseableItems().FinishParseable());
         return v;
     }
 

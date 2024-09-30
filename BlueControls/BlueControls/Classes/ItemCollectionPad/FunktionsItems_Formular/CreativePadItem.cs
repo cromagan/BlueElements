@@ -274,6 +274,19 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Typ", _typ);
+        result.ParseableAdd("FormulaFile", _formular);
+        result.ParseableAdd("Script", _script);
+        result.ParseableAdd("Design", _design);
+        result.ParseableAdd("Scale", _scale);
+        result.ParseableAdd("CopyScale", _defaultCopyScale);
+        result.ParseableAdd("AutoRefresh", _autoRefresh);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "typ":
@@ -329,19 +342,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Layout, 16, Skin.IdColor(InputColorId), Color.Transparent);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Typ", _typ);
-        result.ParseableAdd("FormulaFile", _formular);
-        result.ParseableAdd("Script", _script);
-        result.ParseableAdd("Design", _design);
-        result.ParseableAdd("Scale", _scale);
-        result.ParseableAdd("CopyScale", _defaultCopyScale);
-        result.ParseableAdd("AutoRefresh", _autoRefresh);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         DrawColorScheme(gr, positionModified, zoom, null, false, false, false);

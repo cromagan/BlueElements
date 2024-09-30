@@ -97,6 +97,14 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("ImageName", _bild_Dateiname);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "imagename":
@@ -117,14 +125,6 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("ImageName", _bild_Dateiname);
-        return result.Parseable(base.ToParseableString());
-    }
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         //var id = GetRowFrom?.OutputColorId ?? - 1;
 
@@ -139,5 +139,4 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     }
 
     #endregion
-
 }

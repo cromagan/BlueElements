@@ -235,6 +235,31 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("ShowPic", _bild_anzeigen);
+        result.ParseableAdd("ShowText", _text_anzeigen);
+
+        // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
+        if (_text_anzeigen) {
+            result.ParseableAdd("TextReplace", _opticalReplace, true);
+        }
+
+        // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
+        if (_bild_anzeigen) {
+            result.ParseableAdd("ImagePrefix", _imgpräfix);
+
+            result.ParseableAdd("ImageReplace", _imagereplacement, true);
+
+            result.ParseableAdd("ImageWidth", _constantWidth);
+            result.ParseableAdd("ImageHeight", _constantHeight);
+            result.ParseableAdd("DefaultImage", _defaultImage);
+        }
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key.ToLower()) {
             case "defaultimage":
@@ -276,31 +301,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public override string ReadableText() => "Standard";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
-
-    public override string ToParseableString() {
-        List<string> result = [];
-
-        result.ParseableAdd("ShowPic", _bild_anzeigen);
-        result.ParseableAdd("ShowText", _text_anzeigen);
-
-        // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
-        if (_text_anzeigen) {
-            result.ParseableAdd("TextReplace", _opticalReplace, true);
-        }
-
-        // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
-        if (_bild_anzeigen) {
-            result.ParseableAdd("ImagePrefix", _imgpräfix);
-
-            result.ParseableAdd("ImageReplace", _imagereplacement, true);
-
-            result.ParseableAdd("ImageWidth", _constantWidth);
-            result.ParseableAdd("ImageHeight", _constantHeight);
-            result.ParseableAdd("DefaultImage", _defaultImage);
-        }
-
-        return result.Parseable(base.ToParseableString());
-    }
 
     /// <summary>
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.

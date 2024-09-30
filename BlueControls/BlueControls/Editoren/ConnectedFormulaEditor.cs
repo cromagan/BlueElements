@@ -34,12 +34,16 @@ using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using BlueBasics.Interfaces;
 using BlueBasics.EventArgs;
+using System.Windows.Forms;
+using System;
 
 namespace BlueControls.Forms;
 
 public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
+
+    private string _caption = string.Empty;
 
     private ConnectedFormula.ConnectedFormula? _cFormula;
 
@@ -98,6 +102,18 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Methods
 
+    public List<string> AllPages() {
+        var p = new List<string>();
+
+        foreach (var thisp in _cFormula.Pages.Items) {
+            if (thisp is ItemCollectionPad.ItemCollectionPad icp) {
+                _ = p.AddIfNotExists(icp.Caption);
+            }
+        }
+
+        return p;
+    }
+
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
@@ -108,6 +124,16 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             components?.Dispose();
         }
         base.Dispose(disposing);
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e) {
+        FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
+        base.OnFormClosing(e);
+    }
+
+    protected override void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
+        base.Pad_GotNewItemCollection(sender, e);
+        DoPages();
     }
 
     private void _cFormula_Editing(object sender, EditingEventArgs e) {
@@ -143,15 +169,15 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {
-        if (CFormula?.PadData == null) { return; }
+        if (Pad?.Items is not { } pi) { return; }
 
-        var oldw = CFormula.PadData.SheetSizeInPix.Width / AutosizableExtension.GridSize;
+        var oldw = pi.SheetSizeInPix.Width / AutosizableExtension.GridSize;
 
         var wi = InputBox.Show("Breite in Kästchen:", oldw.ToStringFloat1(), FormatHolder.LongPositive);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 
-        var oldh = CFormula.PadData.SheetSizeInPix.Height / AutosizableExtension.GridSize;
+        var oldh = pi.SheetSizeInPix.Height / AutosizableExtension.GridSize;
 
         var he = InputBox.Show("Höhe in Kästchen:", oldh.ToStringFloat1(), FormatHolder.LongPositive);
 
@@ -161,7 +187,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (op == 2) { return; }
 
-        CFormula.Resize(FloatParse(wi) * AutosizableExtension.GridSize, FloatParse(he) * AutosizableExtension.GridSize, op == 0, string.Empty);
+        pi.Resize(FloatParse(wi) * AutosizableExtension.GridSize, FloatParse(he) * AutosizableExtension.GridSize, op == 0, string.Empty);
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {
@@ -244,10 +270,15 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var it = new RowEntryPadItem() {
-            Page = n
-        };
-        Pad.Items?.Add(it);
+        var p = new ItemCollectionPad.ItemCollectionPad();
+        p.Caption = n;
+
+        var it = new RowEntryPadItem();
+        p.Add(it);
+
+        CFormula.Pages.Add(p);
+
+        Pad.Items = p;
         CFormula?.Repair();
 
         //it.Datenbank_wählen();
@@ -313,6 +344,56 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void CheckButtons() { }
 
+    private void DoPages() {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(DoPages));
+            return;
+        }
+
+        try {
+            if (IsDisposed) { return; }
+
+            var x = AllPages();
+
+            TabPage? later = null;
+
+            if (x.Count == 1 && string.IsNullOrEmpty(x[0])) { x.Clear(); }
+
+            if (x.Count > 0) {
+                tabSeiten.Visible = true;
+
+                foreach (var thisTab in tabSeiten.TabPages) {
+                    var tb = (TabPage)thisTab;
+
+                    if (!x.Contains(tb.Text)) {
+                        tabSeiten.TabPages.Remove(tb);
+                        DoPages();
+                        return;
+                    }
+
+                    _ = x.Remove(tb.Text);
+                    if (Pad != null && tb.Text == Pad.Items.Caption) { later = tb; }
+                }
+
+                foreach (var thisn in x) {
+                    var t = new TabPage(thisn) {
+                        Name = "Seite_" + thisn
+                    };
+                    tabSeiten.TabPages.Add(t);
+
+                    if (Pad != null && t.Text == Pad.Items.Caption) { later = t; }
+                }
+            } else {
+                tabSeiten.Visible = false;
+                if (tabSeiten.TabPages.Count > 0) {
+                    tabSeiten.TabPages.Clear();
+                }
+            }
+
+            tabSeiten.SelectedTab = later;
+        } catch { }
+    }
+
     private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
@@ -333,15 +414,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         return true;
     }
 
-
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
-        base.OnFormClosing(e);
-    }
-
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
-
-
         if (_cFormula != null) {
             _cFormula.Editing -= _cFormula_Editing;
             _cFormula.UnlockEditing();
@@ -367,7 +440,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             CFormula.NotAllowedChilds = l.AsReadOnly();
         }
 
-        Pad.Items = CFormula?.PadData;
+        foreach (var thisp in CFormula.Pages.Items) {
+            if (thisp is ItemCollectionPad.ItemCollectionPad icp && icp.Caption.ToLower() == "head") {
+                Pad.Items = icp; break;
+            }
+        }
 
         CheckButtons();
     }
@@ -419,14 +496,27 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         api.GetNewIdsForEverything();
 
-        api.Page = InputBox.Show("Welcher Tab:", api.Page, BlueBasics.FormatHolder.SystemName);
-
         Pad.Items.Add(api);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
-    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) => Pad.CurrentPage = "Head";
+    private void tabSeiten_Selected(object sender, TabControlEventArgs e) {
+        var s = string.Empty;
+
+        if (tabSeiten.SelectedTab != null) {
+            s = tabSeiten.SelectedTab.Text;
+        }
+
+        foreach (var thisp in _cFormula.Pages.Items) {
+            if (thisp is ItemCollectionPad.ItemCollectionPad icp) {
+                if (s == icp.Caption) {
+                    Pad.Items = icp;
+                    break;
+                }
+            }
+        }
+    }
 
     #endregion
 }

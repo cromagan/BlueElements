@@ -74,7 +74,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(Controls.ConnectedFormulaView parent, string mode) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TabControl();
         con.Name = this.DefaultItemToControlName(ParentFormula?.Filename);
         // Die Input-Settings werden direkt auf das erzeugte
@@ -83,7 +83,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return con;
     }
 
-    public void CreateTabs(TabControl tabctrl, Controls.ConnectedFormulaView parentView, string mode) {
+    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -125,7 +125,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
             if (cf != null) {
                 if (cf.HasVisibleItemsForMe(pgvis, mode)) {
-                    Controls.ConnectedFormulaView? cc;
+                    ConnectedFormulaView? cc;
 
                     if (existTab == null) {
 
@@ -137,7 +137,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                         };
                         tabctrl.TabPages.Add(t);
 
-                        cc = new Controls.ConnectedFormulaView(mode, pg);
+                        cc = new ConnectedFormulaView(mode, pg);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.DatabaseInput);
@@ -154,7 +154,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                         #region ConnectedFormulaView (cc) im Tab Suchen
 
                         foreach (var thisControl in existTab.Controls) {
-                            if (thisControl is Controls.ConnectedFormulaView cctmp) {
+                            if (thisControl is ConnectedFormulaView cctmp) {
                                 cc = cctmp;
                                 break;
                             }
@@ -162,11 +162,6 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
                         #endregion
                     }
-
-                    //if (cc != null) {
-                    //    cc.UserGroup = myGroup;
-                    //    cc.UserName = myName;
-                    //}
                 } else {
                     if (existTab != null) {
 
@@ -207,6 +202,15 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
+        result.ParseableAdd("Childs", _childs, false);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
@@ -241,15 +245,6 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
-        result.ParseableAdd("Childs", _childs, false);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void Dispose(bool disposing) {

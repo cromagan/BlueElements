@@ -24,7 +24,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Web.UI.Design;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -51,11 +50,6 @@ internal class Method_MirrorPadItem : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
-      
-
-
-
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
             var p1 = icpv.GetJointPoint(attvar.ValueStringGet(1), null);
@@ -70,11 +64,9 @@ internal class Method_MirrorPadItem : Method {
             if (iciv is IMirrorable m) {
                 m.Mirror(p1, attvar.ValueBoolGet(2), attvar.ValueBoolGet(3));
             }
-
         }
 
         return DoItFeedback.Null();
-
     }
 
     #endregion

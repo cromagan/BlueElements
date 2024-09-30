@@ -18,12 +18,26 @@
 #nullable enable
 
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Forms;
 
 namespace BlueControls.Interfaces;
 
 public interface IMouseAndKeyHandle {
+
+    #region Properties
+
+    public ObservableCollection<AbstractPadItem> Items { get; }
+
+    IMouseAndKeyHandle? Parent { get; set; }
+
+    public RowItem? SheetStyle { get; set; }
+
+    public float SheetStyleScale { get; set; }
+
+    #endregion
 
     #region Methods
 

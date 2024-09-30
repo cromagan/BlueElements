@@ -76,6 +76,13 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Methods
 
+    public List<string> ParseableItems() {
+        List<string> result = [];
+        result.ParseableAdd("Reverse", Reverse);
+        result.ParseableAdd("Columns", Columns, true);
+        return result;
+    }
+
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
@@ -125,14 +132,7 @@ public sealed class RowSortDefinition : IParseable {
         }
     }
 
-    public string ToParseableString() {
-        var result = new List<string>();
-        result.ParseableAdd("Reverse", Reverse);
-        result.ParseableAdd("Columns", Columns, true);
-        return result.Parseable();
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     public bool UsedForRowSort(ColumnItem? vcolumn) {
         if (Columns.Count == 0) { return false; }

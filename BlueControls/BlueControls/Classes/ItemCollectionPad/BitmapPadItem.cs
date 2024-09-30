@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -181,6 +180,21 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         OnPropertyChanged();
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Modus", Bild_Modus);
+        result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
+        result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
+        //result.ParseableAdd("Overlays", "Overlay", Overlays);
+
+        result.ParseableAdd("Padding", Padding);
+        result.ParseableAdd("Image", Bitmap);
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "modus":
@@ -248,21 +262,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
     }
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Modus", Bild_Modus);
-        result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
-        result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
-        result.ParseableAdd("Overlays", "Overlay", Overlays);
-
-        result.ParseableAdd("Padding", Padding);
-        result.ParseableAdd("Image", Bitmap);
-
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);

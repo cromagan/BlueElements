@@ -50,8 +50,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-//TODO: IParseable implementieren
-public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable, ICanHaveVariables, IMirrorable {
+public sealed class ItemCollectionPad : RectanglePadItem, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
 
     #region Fields
 
@@ -59,14 +58,12 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public static List<AbstractPadItem>? PadItemTypes;
 
-    public new EventHandler? PropertyChanged;
-
-    internal string Caption;
-
     /// <summary>
     /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
     /// </summary>
     private readonly int _idCount;
+
+    private string _caption = string.Empty;
 
     private float _gridShow = 10;
 
@@ -94,8 +91,8 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     #region Constructors
 
-    public ItemCollectionPad() : base() {
-        BindingOperations.EnableCollectionSynchronization(this, new object());
+    public ItemCollectionPad() : base(string.Empty) {
+        BindingOperations.EnableCollectionSynchronization(Items, new object());
 
         PadItemTypes ??= GetInstaceOfType<AbstractPadItem>("NAME");
 
@@ -103,7 +100,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         SheetSizeInMm = Size.Empty;
         RandinMm = Padding.Empty;
         _idCount++;
-        Caption = "#" + DateTime.UtcNow.ToString1() + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
+        //Caption = "#" + DateTime.UtcNow.ToString1() + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         _sheetStyle = null;
         _sheetStyleScale = 1f;
@@ -113,10 +110,8 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     }
 
     public ItemCollectionPad(string layoutFileName) : this() {
-        Parse(File.ReadAllText(layoutFileName, Win1252));
+        this.Parse(File.ReadAllText(layoutFileName, Win1252));
         IsSaved = true;
-
-        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
     #endregion
@@ -143,7 +138,19 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public Color BackColor { get; set; } = Color.White;
 
+    [DefaultValue(false)]
+    public string Caption {
+        get => _caption;
+        set {
+            if (_caption == value) { return; }
+            _caption = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ObservableCollection<ItemConnection> Connections { get; } = [];
+
+    public override string Description => "Eine Sammlung von Anzeige-Objekten";
 
     /// <summary>
     /// in mm
@@ -173,14 +180,14 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
-    public bool IsDisposed { get; private set; }
-
     [DefaultValue(true)]
     public bool IsSaved { get; set; }
 
-    public string KeyName => Caption;
+    public ObservableCollection<AbstractPadItem> Items { get; } = new ObservableCollection<AbstractPadItem>();
 
-    public object? Parent { get; set; }
+    public override string MyClassId => "PadCollection";
+
+    IMouseAndKeyHandle? IMouseAndKeyHandle.Parent { get; set; }
 
     public Padding RandinMm {
         get => _randinMm;
@@ -247,15 +254,19 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
+    protected override int SaveOrder => 1000;
+
     #endregion
 
     #region Indexers
 
-    public AbstractPadItem? this[string keyName] => this.Get(keyName);
+    public AbstractPadItem? this[string keyName] => Items.Get(keyName);
+
+    public AbstractPadItem? this[int nr] => Items[nr];
 
     public List<AbstractPadItem> this[int x, int y] => this[new Point(x, y)];
 
-    public List<AbstractPadItem> this[Point p] => this.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
+    public List<AbstractPadItem> this[Point p] => Items.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
 
     #endregion
 
@@ -274,6 +285,236 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return new Point((int)w, (int)h);
     }
 
+    public static List<RectangleF> ResizeControls(List<IAutosizable> its, float newWidth, float newHeight, float currentWidth, float currentHeight) {
+        var scaleY = newHeight / currentHeight;
+        var scaleX = newWidth / currentWidth;
+
+        #region Alle Items an die neue gedachte Y-Position schieben (newY), neue bevorzugte Höhe berechnen (newH), und auch newX und newW
+
+        List<float> newX = [];
+        List<float> newW = [];
+        List<float> newY = [];
+        List<float> newH = [];
+        foreach (var thisIt in its) {
+
+            #region  newY
+
+            newY.Add(thisIt.UsedArea.Y * scaleY);
+
+            #endregion
+
+            #region  newX
+
+            newX.Add(thisIt.UsedArea.X * scaleX);
+
+            #endregion
+
+            #region  newH
+
+            var nh = thisIt.UsedArea.Height * scaleY;
+
+            if (thisIt.AutoSizeableHeight) {
+                if (!thisIt.CanChangeHeightTo(nh)) {
+                    nh = AutosizableExtension.MinHeigthCapAndBox;
+                }
+            } else {
+                nh = thisIt.UsedArea.Height;
+            }
+
+            newH.Add(nh);
+
+            #endregion
+
+            #region  newW
+
+            newW.Add(thisIt.UsedArea.Width * scaleX);
+
+            #endregion
+        }
+
+        #endregion
+
+        #region  Alle Items von unten nach oben auf Überlappungen (auch dem Rand) prüfen.
+
+        // Alle prüfen
+
+        for (var tocheck = its.Count - 1; tocheck >= 0; tocheck--) {
+            var pos = PositioOf(tocheck);
+
+            #region Unterer Rand
+
+            if (pos.Bottom > newHeight) {
+                newY[tocheck] = newHeight - pos.Height;
+                pos = PositioOf(tocheck);
+            }
+
+            #endregion
+
+            for (var coll = its.Count - 1; coll > tocheck; coll--) {
+                var poscoll = PositioOf(coll);
+                if (pos.IntersectsWith(poscoll)) {
+                    newY[tocheck] = poscoll.Top - pos.Height;
+                    pos = PositioOf(tocheck);
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Alle UNveränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen.
+
+        // Und von oben nach unten muss sein, weil man ja oben bündig haben will
+        // Wichtig, das CanScaleHeightTo nochmal geprüft wird.
+        // Nur so kann festgestellt werden, ob es eigentlich veränerlich wäre, aber durch die Mini-Größe doch als unveränderlich gilt
+
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (!its[tocheck].CanScaleHeightTo(scaleY)) {
+                var pos = PositioOf(tocheck);
+
+                #region Oberer Rand
+
+                if (pos.Y < 0) {
+                    newY[tocheck] = 0;
+                    pos = PositioOf(tocheck);
+                }
+
+                #endregion
+
+                for (var coll = 0; coll < tocheck; coll++) {
+                    if (!its[tocheck].CanScaleHeightTo(scaleY)) {
+                        var poscoll = PositioOf(coll);
+                        if (pos.IntersectsWith(poscoll)) {
+                            newY[tocheck] = poscoll.Top + poscoll.Height;
+                            pos = PositioOf(tocheck);
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Alle Items, den Abstand stutzen, wenn der vorgänger unveränderlich ist - nur bei ScaleY >1
+
+        if (scaleY > 1) {
+            for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+                if (!its[tocheck].CanScaleHeightTo(scaleY)) {
+                    //var pos = PositioOf(tocheck);
+
+                    for (var coll = tocheck + 1; coll < its.Count; coll++) {
+                        //var poscoll = PositioOf(coll);
+
+                        if (its[coll].UsedArea.Y >= its[tocheck].UsedArea.Bottom && its[coll].UsedArea.IntersectsVericalyWith(its[tocheck].UsedArea)) {
+                            newY[coll] = newY[tocheck] + newH[tocheck] + its[coll].UsedArea.Top - its[tocheck].UsedArea.Bottom;
+                            //pos = PositioOf(tocheck);
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Y-Wert.
+
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (its[tocheck].CanScaleHeightTo(scaleY)) {
+                var pos = PositioOf(tocheck);
+
+                #region Oberer Rand
+
+                if (pos.Y < 0) {
+                    newY[tocheck] = 0;
+                    pos = PositioOf(tocheck);
+                }
+
+                #endregion
+
+                for (var coll = 0; coll < tocheck; coll++) {
+                    var poscoll = PositioOf(coll);
+                    if (pos.IntersectsWith(poscoll)) {
+                        newY[tocheck] = poscoll.Top + poscoll.Height;
+                        pos = PositioOf(tocheck);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Height-Wert stutzen.
+
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (its[tocheck].CanScaleHeightTo(scaleY)) {
+                var pos = PositioOf(tocheck);
+
+                #region  Unterer Rand
+
+                if (pos.Bottom > newHeight) {
+                    newH[tocheck] = newHeight - pos.Y;
+                    pos = PositioOf(tocheck);
+                }
+
+                #endregion
+
+                #region  Alle Items stimmen mit dem Y-Wert, also ALLE prüfen, NACH dem Item
+
+                for (var coll = tocheck + 1; coll < its.Count; coll++) {
+                    var poscoll = PositioOf(coll);
+                    if (pos.IntersectsWith(poscoll)) {
+                        newH[tocheck] = poscoll.Top - pos.Top;
+                        pos = PositioOf(tocheck);
+                    }
+                }
+
+                #endregion
+            }
+        }
+
+        #endregion
+
+        #region Feedback-Liste erstellen (p)
+
+        var p = new List<RectangleF>();
+        for (var ite = 0; ite < its.Count; ite++) {
+            p.Add(PositioOf(ite));
+        }
+
+        #endregion
+
+        return p;
+
+        RectangleF PositioOf(int no) => new(newX[no], newY[no], newW[no], newH[no]);
+    }
+
+    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string mode) {
+
+        #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
+
+        List<IAutosizable> its = [];
+
+        foreach (var thisc in padData.Items) {
+            if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
+                thisc.IsInDrawingArea(thisc.UsedArea, padData.SheetSizeInPix.ToSize())) {
+                its.Add(aas);
+            }
+        }
+
+        its.Sort((it1, it2) => it1.UsedArea.Y.CompareTo(it2.UsedArea.Y));
+
+        #endregion
+
+        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.SheetSizeInPix.Width, padData.SheetSizeInPix.Height);
+
+        var erg = new List<(IAutosizable item, RectangleF newpos)>();
+
+        for (var x = 0; x < its.Count; x++) {
+            erg.Add((its[x], p[x]));
+        }
+
+        return erg;
+    }
+
     public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) => new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
             (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
 
@@ -286,12 +527,12 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public new void Add(AbstractPadItem? item) {
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
-        if (Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
+        if (Items.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
         if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
 
         if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
 
-        base.Add(item);
+        Items.Add(item);
         item.Parent = this;
 
         IsSaved = false;
@@ -303,34 +544,17 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
-    public List<string> AllPages() {
-        var p = new List<string>();
-
-        foreach (var thisp in this) {
-            if (!string.IsNullOrEmpty(thisp.Page)) {
-                _ = p.AddIfNotExists(thisp.Page);
-            }
-        }
-
-        return p;
-    }
-
-    public new void Clear() {
-        var l = new List<AbstractPadItem>(this);
+    public void Clear() {
+        var l = new List<AbstractPadItem>(Items);
 
         foreach (var thisit in l) {
             Remove(thisit);
         }
 
-        base.Clear();
+        Items.Clear();
     }
 
-    public void Dispose() {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    public bool DrawCreativePadTo(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, bool showJointPoints, States state) {
+    public bool DrawTo(Graphics gr, float scale, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, bool showJointPoints, States state) {
         try {
             gr.PixelOffsetMode = PixelOffsetMode.None;
 
@@ -339,16 +563,16 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             if (_prLo != null && _prRu != null) {
                 if (BackColor.A > 0) {
                     var p = SheetSizeInPix;
-                    var rLo2 = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
-                    var rRu2 = new PointM(p.Width, p.Height).ZoomAndMove(zoom, shiftX, shiftY);
+                    var rLo2 = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
+                    var rRu2 = new PointM(p.Width, p.Height).ZoomAndMove(scale, shiftX, shiftY);
                     Rectangle rr2 = new((int)rLo2.X, (int)rLo2.Y, (int)(rRu2.X - rLo2.X), (int)(rRu2.Y - rLo2.Y));
 
                     gr.FillRectangle(new SolidBrush(BackColor), rr2);
                     if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr2); }
                 }
 
-                var rLo = _prLo.ZoomAndMove(zoom, shiftX, shiftY);
-                var rRu = _prRu.ZoomAndMove(zoom, shiftX, shiftY);
+                var rLo = _prLo.ZoomAndMove(scale, shiftX, shiftY);
+                var rRu = _prRu.ZoomAndMove(scale, shiftX, shiftY);
                 Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X), (int)(rRu.Y - rLo.Y));
                 if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr); }
             } else {
@@ -360,17 +584,17 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
             #region Grid
 
             if (_gridShow > 0.1) {
-                var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
+                var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
 
                 var tmpgrid = _gridShow;
 
-                while (MmToPixel(tmpgrid, Dpi) * zoom < 5) { tmpgrid *= 2; }
+                while (MmToPixel(tmpgrid, Dpi) * scale < 5) { tmpgrid *= 2; }
 
                 var p = new Pen(Color.FromArgb(10, 0, 0, 0));
                 float ex = 0;
 
                 do {
-                    var mo = MmToPixel(ex * tmpgrid, Dpi) * zoom;
+                    var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
 
                     gr.DrawLine(p, po.X + (int)mo, 0, po.X + (int)mo, sizeOfParentControl.Height);
                     gr.DrawLine(p, 0, po.Y + (int)mo, sizeOfParentControl.Width, po.Y + (int)mo);
@@ -396,234 +620,220 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
             #region Items selbst
 
-            if (!DrawItems(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints)) {
-                return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
+            if (!DrawItems(gr, scale, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints)) {
+                return DrawTo(gr, scale, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
             }
 
             #endregion
         } catch {
             Develop.CheckStackForOverflow();
-            return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
+            return DrawTo(gr, scale, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
         }
         return true;
     }
 
-    public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, string page) {
+    public void DrawTo(Bitmap? bmp, States state, float scale, float shiftX, float shiftY) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        _ = DrawCreativePadTo(gr, ItemsOnPage(page), zoomf, x, y, bmp.Size, true, false, vState);
+        _ = DrawTo(gr, scale, shiftX, shiftY, bmp.Size, true, false, state);
         gr.Dispose();
     }
 
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 != null) {
-            Swap(IndexOf(bpi), IndexOf(i2));
+            Swap(Items.IndexOf(bpi), Items.IndexOf(i2));
         }
     }
 
     public void EineEbeneNachVorne(AbstractPadItem bpi) {
         var i2 = Next(bpi);
         if (i2 != null) {
-            Swap(IndexOf(bpi), IndexOf(i2));
+            Swap(Items.IndexOf(bpi), Items.IndexOf(i2));
         }
     }
 
-    public void InDenHintergrund(AbstractPadItem thisItem) {
-        if (IndexOf(thisItem) == 0) { return; }
-        var g1 = thisItem.Gruppenzugehörigkeit;
-        thisItem.Gruppenzugehörigkeit = string.Empty;
-        Remove(thisItem);
-        Insert(0, thisItem);
-        thisItem.Gruppenzugehörigkeit = g1;
-    }
+    /// <summary>
+    /// Prüft, ob das Formular sichtbare Elemente hat.
+    /// Zeilenselectionen werden dabei ignoriert.
+    /// </summary>
+    /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
+    /// <returns></returns>
+    public bool HasVisibleItemsForMe(string mode) {
+        if (Items == null || Items.Count == 0) { return false; }
 
-    public void InDenVordergrund(AbstractPadItem thisItem) {
-        if (IndexOf(thisItem) == Count - 1) { return; }
-        var g1 = thisItem.Gruppenzugehörigkeit;
-        thisItem.Gruppenzugehörigkeit = string.Empty;
-        Remove(thisItem);
-        Add(thisItem);
-        thisItem.Gruppenzugehörigkeit = g1;
-    }
-
-    public List<AbstractPadItem> ItemsOnPage(string page) {
-        var l = new List<AbstractPadItem>();
-
-        foreach (var thisItem in this) {
-            if (thisItem != null) {
-                if (string.IsNullOrEmpty(page) || thisItem.Page.Equals(page, StringComparison.OrdinalIgnoreCase)) {
-                    l.Add(thisItem);
-                }
+        foreach (var thisItem in Items) {
+            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
+                if (cspi.IsVisibleForMe(mode, false)) { return true; }
             }
         }
 
-        return l;
+        return false;
     }
 
-    public void Mirror(PointM? p, bool vertical, bool horizontal) {
-        foreach (var thisItem in this) {
+    public List<AbstractPadItem> HotItems(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+        throw new NotImplementedException();
+    }
+
+    public void InDenHintergrund(AbstractPadItem thisItem) {
+        if (Items.IndexOf(thisItem) == 0) { return; }
+        Remove(thisItem);
+        Items.Insert(0, thisItem);
+    }
+
+    public void InDenVordergrund(AbstractPadItem thisItem) {
+        if (Items.IndexOf(thisItem) == Items.Count - 1) { return; }
+        Remove(thisItem);
+        Add(thisItem);
+    }
+
+    public bool KeyUp(KeyEventArgs e, float zoom, float shiftX, float shiftY) {
+        throw new NotImplementedException();
+    }
+
+    public override void Mirror(PointM? p, bool vertical, bool horizontal) {
+        foreach (var thisItem in Items) {
             if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
         }
+    }
+
+    public bool MouseDown(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+        throw new NotImplementedException();
+    }
+
+    public bool MouseMove(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+        throw new NotImplementedException();
+    }
+
+    public bool MouseUp(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+        throw new NotImplementedException();
     }
 
     public void Move(float x, float y) {
         if (x == 0 && y == 0) { return; }
 
-        foreach (var thisItem in this) {
+        foreach (var thisItem in Items) {
             thisItem.Move(x, y, false);
         }
     }
 
-    public void OnPropertyChanged() {
+    public override void OnPropertyChanged() {
         IsSaved = false;
-        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+        base.OnPropertyChanged();
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="toParse"></param>
-    public void Parse(string? toParse) {
-        if (toParse == null || string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
-        if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
-        //Caption = useThisKeyName;
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLowerInvariant()) {
-                case "sheetsize":
-                    _sheetSizeInMm = pair.Value.SizeFParse();
-                    GenPoints();
-                    break;
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
 
-                case "printarea":
-                    _randinMm = pair.Value.PaddingParse();
-                    GenPoints();
-                    break;
-                //case "items":
-                //    Parse(pvalue);
-                //    break;
-                case "relation": // TODO: Entfernt, 24.05.2021
-                    //AllRelations.Add(new clsPointRelation(this, null, pair.Value));
-                    break;
+        List<string> result = [.. base.ParseableItems()];
 
-                case "caption":
-                    if (string.IsNullOrEmpty(Caption)) { Caption = pair.Value.FromNonCritical(); }
-                    break;
+        result.ParseableAdd("Style", SheetStyle?.CellFirstString());
 
-                case "backcolor":
-                    BackColor = Color.FromArgb(IntParse(pair.Value));
-                    break;
+        result.ParseableAdd("BackColor", BackColor.ToArgb());
+        if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
+            result.ParseableAdd("FontScale", SheetStyleScale);
+        }
 
-                //case "scriptname":
-                //    _scriptName = pair.Value;
-                //    break;
-                case "keyName":
-                case "id":
-                    //if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
-                    break;
+        if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
+            result.ParseableAdd("SheetSize", SheetSizeInMm);
+            result.ParseableAdd("PrintArea", RandinMm.ToString());
+        }
 
-                case "style":
-                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
-                    _sheetStyle ??= Skin.StyleDb?.Row.First();// Einfach die Erste nehmen
-                    break;
+        result.ParseableAdd("Item", Items as IStringable);
 
-                case "fontscale":
-                    _sheetStyleScale = FloatParse(pair.Value);
-                    break;
+        result.ParseableAdd("SnapMode", _snapMode);
+        result.ParseableAdd("GridShow", _gridShow);
+        result.ParseableAdd("GridSnap", _gridsnap);
 
-                case "snapmode":
-                    _snapMode = (SnapMode)IntParse(pair.Value);
-                    break;
-
-                case "grid":
-                    //_Grid = pair.Value.FromPlusMinus();
-                    break;
-
-                case "gridshow":
-                    _gridShow = FloatParse(pair.Value);
-                    break;
-
-                case "gridsnap":
-                    _gridsnap = FloatParse(pair.Value);
-                    break;
-
-                case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), DataFormat)
-                    break;
-
-                case "items":
-                    CreateItems(pair.Value); // im ersten Step nur die items erzeugen....
-                    ParseItems(pair.Value);// ...im zweiten können nun auch Beziehungen erstellt werden!
-
-                    break;
-
-                case "connection":
-                    CreateConnection(pair.Value);
-                    break;
-
-                case "connections": // TODO: Obsolet ab 07.02.2023
-                    ParseConnections(pair.Value);
-                    break;
-
-                case "dpi":
-                    if (IntParse(pair.Value) != Dpi) {
-                        Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
-                    }
-                    break;
-
-                case "sheetstyle":
-                    if (Skin.StyleDb == null) { Skin.InitStyles(); }
-                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
-                    break;
-
-                case "sheetstylescale":
-                    _sheetStyleScale = FloatParse(pair.Value);
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
+        foreach (var thisCon in Connections) {
+            if (thisCon?.Item1 != null) {
+                result.ParseableAdd("Connection", thisCon.ToString());
             }
         }
+
+        return result;
     }
 
-    //public List<string> Permission_AllUsed() {
-    //    var l = new List<string>();
+    public override bool ParseThis(string key, string value) {
+        switch (key.ToLowerInvariant()) {
+            case "sheetsize":
+                _sheetSizeInMm = value.SizeFParse();
+                GenPoints();
+                return true;
 
-    //    foreach (var thisIt in this) {
-    //        if (thisIt is FakeControlPadItem csi) {
-    //            l.AddRange(csi.VisibleFor);
-    //        }
-    //    }
+            case "printarea":
+                _randinMm = value.PaddingParse();
+                GenPoints();
+                return true;
 
-    //    l.Add(Everybody);
-    //    l.Add("#User: " + UserName);
+            case "caption":
+                _caption = value.FromNonCritical();
+                return true;
 
-    //    l = RepairUserGroups(l);
+            case "backcolor":
+                BackColor = Color.FromArgb(IntParse(value));
+                return true;
 
-    //    return l.SortedDistinctList();
-    //}
+            case "style":
+                _sheetStyle = Skin.StyleDb?.Row[value];
+                _sheetStyle ??= Skin.StyleDb?.Row.First();// Einfach die Erste nehmen
+                return true;
+
+            case "fontscale":
+                _sheetStyleScale = FloatParse(value);
+                return true;
+
+            case "snapmode":
+                _snapMode = (SnapMode)IntParse(value);
+                return true;
+
+            case "gridshow":
+                _gridShow = FloatParse(value);
+                return true;
+
+            case "gridsnap":
+                _gridsnap = FloatParse(value);
+                return true;
+
+            case "items":
+                CreateItems(value); // im ersten Step nur die items erzeugen....
+                ParseItems(value);// ...im zweiten können nun auch Beziehungen erstellt werden!
+                return true;
+
+            case "connection":
+                CreateConnection(value);
+                return true;
+
+            case "dpi":
+                if (IntParse(value) != Dpi) {
+                    Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + value);
+                }
+                return true;
+
+            case "sheetstyle":
+                if (Skin.StyleDb == null) { Skin.InitStyles(); }
+                _sheetStyle = Skin.StyleDb?.Row[value];
+                return true;
+
+            case "sheetstylescale":
+                _sheetStyleScale = FloatParse(value);
+                return true;
+        }
+
+        return base.ParseThis(key, value);
+    }
+
+    public override string ReadableText() => _caption;
 
     public void Remove(string keyName) => Remove(this[keyName]);
 
-    public new void Remove(AbstractPadItem? item) {
+    public void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
-        if (item == null || !Contains(item)) { return; }
+        if (item == null || !Items.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
-        //item.CheckedChanged -= Item_CheckedChanged;
-        //item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         OnItemRemoving(item);
-        _ = base.Remove(item);
+        _ = Items.Remove(item);
         OnItemRemoved();
-
-        if (!string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) {
-            foreach (var thisToo in this) {
-                if (string.Equals(item.Gruppenzugehörigkeit, thisToo.Gruppenzugehörigkeit, StringComparison.OrdinalIgnoreCase)) {
-                    Remove(thisToo);
-                    return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
-                }
-            }
-        }
-
         OnPropertyChanged();
     }
 
@@ -637,7 +847,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public bool ReplaceVariable(Variable variable) {
         var did = false;
-        foreach (var thisItem in this) {
+        foreach (var thisItem in Items) {
             if (thisItem is ICanHaveVariables variables) {
                 if (variables.ReplaceVariable(variable)) { did = true; }
             }
@@ -661,7 +871,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
         var did = false;
-        foreach (var thisItem in this) {
+        foreach (var thisItem in Items) {
             if (thisItem is ICanHaveVariables variables) {
                 if (variables.ResetVariables()) { did = true; }
             }
@@ -670,9 +880,10 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return did;
     }
 
-    public void SaveAsBitmap(string filename, string page) {
-        var i = ToBitmap(1, page);
+    public void SaveAsBitmap(string filename) {
+        var i = ToBitmap(1);
         if (i == null) { return; }
+
         switch (filename.FileSuffix().ToUpperInvariant()) {
             case "JPG":
             case "JPEG":
@@ -696,17 +907,14 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     public void Swap(int index1, int index2) {
         if (IsDisposed) { return; }
         if (index1 == index2) { return; }
-        //var l = ItemOrder.ToList();
-        (this[index1], this[index2]) = (this[index2], this[index1]);
-        //_maxNeededItemSize = Size.Empty;
-        //_itemOrder = null;
-        //OnPropertyChanged();
+        (Items[index1], Items[index2]) = (Items[index2], Items[index1]);
+        OnPropertyChanged();
     }
 
-    public Bitmap? ToBitmap(float scale, string page) {
-        var l = ItemsOnPage(page);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Register);
 
-        var r = MaxBounds(l);
+    public Bitmap? ToBitmap(float scale) {
+        var r = MaxBounds();
         if (r.Width == 0) { return null; }
 
         CollectGarbage();
@@ -727,55 +935,17 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         using var gr = Graphics.FromImage(I);
         gr.Clear(BackColor);
-        if (!DrawCreativePadTo(gr, l, scale, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
-            return ToBitmap(scale, page);
+        if (!DrawTo(gr, scale, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
+            return ToBitmap(scale);
         }
 
         return I;
     }
 
-    public string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        //result.ParseableAdd("ID", KeyName);
-        result.ParseableAdd("Caption", Caption);
-        result.ParseableAdd("Style", SheetStyle?.CellFirstString());
-
-        result.ParseableAdd("BackColor", BackColor.ToArgb());
-        if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
-            result.ParseableAdd("FontScale", SheetStyleScale);
-        }
-
-        if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
-            result.ParseableAdd("SheetSize", SheetSizeInMm);
-            result.ParseableAdd("PrintArea", RandinMm.ToString());
-        }
-
-        result.ParseableAdd("Items", "Item", this.ToList());
-
-        //result.ParseableAdd("ScriptName", _scriptName);
-
-        result.ParseableAdd("SnapMode", _snapMode);
-        result.ParseableAdd("GridShow", _gridShow);
-        result.ParseableAdd("GridSnap", _gridsnap);
-
-        var tmp = result.Parseable();
-
-        result.Clear();
-
-        foreach (var thisCon in Connections) {
-            if (thisCon?.Item1 != null) {
-                result.ParseableAdd("Connection", thisCon.ToString());
-            }
-        }
-
-        return result.Parseable(tmp);
-    }
-
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
-        foreach (var thisIt in this) {
+        foreach (var thisIt in Items) {
             if (thisIt is ReciverControlPadItem csi) {
                 l.AddRange(csi.VisibleFor);
             }
@@ -837,11 +1007,11 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return t;
     }
 
-    internal int GetFreeColorId(string page) {
+    internal int GetFreeColorId() {
         var usedids = new List<int>();
 
-        foreach (var thisIt in this) {
-            if (thisIt is ReciverSenderControlPadItem hci && thisIt.IsOnPage(page)) {
+        foreach (var thisIt in Items) {
+            if (thisIt is ReciverSenderControlPadItem hci) {
                 usedids.Add(hci.OutputColorId);
             }
         }
@@ -864,10 +1034,8 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return null;
     }
 
-    internal RectangleF MaxBounds(string page) => MaxBounds(ItemsOnPage(page));
-
-    internal RectangleF MaxBounds(List<AbstractPadItem>? zoomItems) {
-        var r = MaximumBounds(zoomItems);
+    internal RectangleF MaxBounds() {
+        var r = MaximumBounds();
         if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
             var x1 = Math.Min(r.Left, 0);
             var y1 = Math.Min(r.Top, 0);
@@ -879,28 +1047,62 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     }
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
-        var itemCount = IndexOf(bpi);
+        var itemCount = Items.IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount++;
-            if (itemCount >= Count) { return null; }
-            if (this[itemCount] != null) { return this[itemCount]; }
+            if (itemCount >= Items.Count) { return null; }
+            if (Items[itemCount] != null) { return Items[itemCount]; }
         } while (true);
     }
 
     internal AbstractPadItem? Previous(AbstractPadItem bpi) {
-        var itemCount = IndexOf(bpi);
+        var itemCount = Items.IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount--;
             if (itemCount < 0) { return null; }
-            if (this[itemCount] != null) { return this[itemCount]; }
+            if (Items[itemCount] != null) { return Items[itemCount]; }
         } while (true);
+    }
+
+    internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls, string mode) {
+        if (Items == null || Items.Count == 0) { return; }
+
+        if (changeControls) {
+            var x = ResizeControls(this, newWidthPixel, newhHeightPixel, mode);
+
+            #region Die neue Position in die Items schreiben
+
+            foreach (var (item, newpos) in x) {
+                item.SetCoordinates(newpos, true);
+            }
+
+            #endregion
+        }
+
+        SheetSizeInMm = new SizeF(PixelToMm(newWidthPixel, Dpi), PixelToMm(newhHeightPixel, Dpi));
+    }
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+
+        foreach (var thisIt in Items) {
+            thisIt.PropertyChanged -= Item_PropertyChanged;
+            thisIt.Dispose();
+        }
+
+        if (disposing) {
+            _sheetStyle = null;
+        }
+
+        Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
+        Connections.RemoveAll();
     }
 
     private void ApplyDesignToItems() {
         if (IsDisposed) { return; }
-        foreach (var thisItem in this) {
+        foreach (var thisItem in Items) {
             thisItem?.ProcessStyleChange();
         }
         OnPropertyChanged();
@@ -999,26 +1201,11 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
-    private void Dispose(bool disposing) {
-        IsDisposed = true;
-        foreach (var thisIt in this) {
-            thisIt.PropertyChanged -= Item_PropertyChanged;
-            thisIt.Dispose();
-        }
-
-        if (disposing) {
-            _sheetStyle = null;
-        }
-
-        Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
-        Connections.RemoveAll();
-    }
-
-    private bool DrawItems(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
+    private bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
         try {
             if (SheetStyleScale < 0.1d) { return true; }
 
-            foreach (var thisItem in items) {
+            foreach (var thisItem in Items) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
                 thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting, showJointPoints);
             }
@@ -1069,22 +1256,20 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
-    private RectangleF MaximumBounds(IEnumerable<AbstractPadItem>? zoomItems) {
+    private RectangleF MaximumBounds() {
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;
         var y2 = float.MinValue;
         var done = false;
-        foreach (var thisItem in this) {
+        foreach (var thisItem in Items) {
             if (thisItem != null) {
-                if (zoomItems == null || zoomItems.Contains(thisItem)) {
-                    var ua = thisItem.ZoomToArea();
-                    x1 = Math.Min(x1, ua.Left);
-                    y1 = Math.Min(y1, ua.Top);
-                    x2 = Math.Max(x2, ua.Right);
-                    y2 = Math.Max(y2, ua.Bottom);
-                    done = true;
-                }
+                var ua = thisItem.ZoomToArea();
+                x1 = Math.Min(x1, ua.Left);
+                y1 = Math.Min(y1, ua.Top);
+                x2 = Math.Max(x2, ua.Right);
+                y2 = Math.Max(y2, ua.Bottom);
+                done = true;
             }
         }
         return !done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);

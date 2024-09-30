@@ -67,7 +67,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     public Database? DatabaseOutput {
         get {
-            if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is {IsDisposed: false }) { return DatabaseInput; }
+            if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is { IsDisposed: false }) { return DatabaseInput; }
 
             if (_databaseOutputLoaded) { return _databaseOutput; }
 
@@ -135,17 +135,14 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
         if (Parent != null) {
             OutputColorId = -1;
-            OutputColorId = Parent.GetFreeColorId(Page);
+            OutputColorId = Parent.GetFreeColorId();
         }
         OnPropertyChanged();
     }
 
-
-
     public override string ErrorReason() {
         if (DatabaseOutput is not { IsDisposed: false }) {
-
-            if(DatabaseInputMustMatchOutputDatabase) {
+            if (DatabaseInputMustMatchOutputDatabase) {
                 return "Eingehendes Objekt nicht gewählt.";
             }
 
@@ -172,13 +169,28 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         if (!enableOutput) {
             if (outp != null) {
                 outp.Editor = typeof(DatabaseHeadEditor);
-                 result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Datenbank));
+                result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Datenbank));
             } else {
-              result.Add(new FlexiControl("<ImageCode=Information|16> Ausgangsdatenbank wird über den Eingang gewählt.", widthOfControl, false));
+                result.Add(new FlexiControl("<ImageCode=Information|16> Ausgangsdatenbank wird über den Eingang gewählt.", widthOfControl, false));
             }
         } else {
             result.Add(new FlexiControlForProperty<Database?>(() => DatabaseOutput, AllAvailableTables()));
         }
+
+        return result;
+    }
+
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is { IsDisposed: false } db) {
+            result.ParseableAdd("OutputDatabase", db.KeyName);
+        } else {
+            result.ParseableAdd("OutputDatabase", _databaseOutputName);
+        }
+
+        //result.ParseableAdd("SentToChildIds", _childIds, false);
 
         return result;
     }
@@ -207,25 +219,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
                 return true;
         }
         return base.ParseThis(key, value);
-    }
-
-
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-
-        List<string> result = [];
-
-        if(DatabaseInputMustMatchOutputDatabase && DatabaseInput is {IsDisposed: false } db) {
-            result.ParseableAdd("OutputDatabase", db.KeyName);
-        } else {
-            result.ParseableAdd("OutputDatabase", _databaseOutputName);
-        }
-
-
-        //result.ParseableAdd("SentToChildIds", _childIds, false);
-
-        return result.Parseable(base.ToParseableString());
     }
 
     #endregion

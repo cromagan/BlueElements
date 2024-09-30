@@ -117,6 +117,16 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Prefix", _präfix);
+
+        result.ParseableAdd("Suffix", _suffix);
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key.ToLower()) {
             case "prefix":
@@ -133,16 +143,6 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     public override string ReadableText() => "Einzeiliger Text";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
-
-    public override string ToParseableString() {
-        List<string> result = [];
-
-        result.ParseableAdd("Prefix", _präfix);
-
-        result.ParseableAdd("Suffix", _suffix);
-
-        return result.Parseable(base.ToParseableString());
-    }
 
     /// <summary>
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.

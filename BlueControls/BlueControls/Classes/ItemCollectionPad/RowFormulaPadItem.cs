@@ -140,6 +140,16 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("LayoutFileName", _layoutFileName);
+        result.ParseableAdd("Database", Database);
+        if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
+        if (Row is { IsDisposed: false } r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "layoutfilename":
@@ -182,16 +192,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("LayoutFileName", _layoutFileName);
-        result.ParseableAdd("Database", Database);
-        if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
-        if (Row is { IsDisposed: false } r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
-        return result.Parseable(base.ToParseableString());
-    }
-
     protected override void GeneratePic() {
         if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Database is not { IsDisposed: false } db) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
@@ -203,18 +203,18 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             icp.ResetVariables();
             icp.ReplaceVariables(db, _rowKey);
 
-            var re = icp.MaxBounds(string.Empty);
+            var re = icp.MaxBounds();
 
             var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
 
-            var mb = icp.MaxBounds(string.Empty);
+            var mb = icp.MaxBounds();
             var zoomv = ItemCollectionPad.ZoomFitValue(mb, generatedBitmap.Size);
             var centerpos = ItemCollectionPad.CenterPos(mb, generatedBitmap.Size, zoomv);
             var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
             pad.ShowInPrintMode = true;
             pad.Unselect();
             if (Parent?.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
-            pad.Items.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, string.Empty);
+            pad.Items.DrawTo(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y);
             GeneratedBitmap = generatedBitmap;
         }
     }

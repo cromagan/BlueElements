@@ -135,6 +135,15 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("ReadableText", _textOriginal);
+        result.ParseableAdd("Alignment", _ausrichtung);
+        result.ParseableAdd("AdditionalScale", Skalierung);
+        return result;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         InvalidateText();
@@ -197,15 +206,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("ReadableText", _textOriginal);
-        result.ParseableAdd("Alignment", _ausrichtung);
-        result.ParseableAdd("AdditionalScale", Skalierung);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (Stil != PadStyles.Undefiniert) {

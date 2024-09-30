@@ -156,6 +156,18 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Path", _pfad);
+        result.ParseableAdd("PathMin", _mindest_pfad);
+        result.ParseableAdd("Filter", _filter);
+        result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
+        result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "path":
@@ -193,18 +205,6 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        result.ParseableAdd("Path", _pfad);
-        result.ParseableAdd("PathMin", _mindest_pfad);
-        result.ParseableAdd("Filter", _filter);
-        result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
-        result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
-        return result.Parseable(base.ToParseableString());
-    }
-
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
@@ -223,5 +223,4 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     }
 
     #endregion
-
 }

@@ -86,6 +86,16 @@ public class SymbolPadItem : RectanglePadItem {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Symbol", Symbol);
+        result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
+        result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
+        result.ParseableAdd("BorderWidth", Randdicke);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "symbol":
@@ -115,16 +125,6 @@ public class SymbolPadItem : RectanglePadItem {
     public override string ReadableText() => "Symbol";
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Symbol", Symbol);
-        result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
-        result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
-        result.ParseableAdd("BorderWidth", Randdicke);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);

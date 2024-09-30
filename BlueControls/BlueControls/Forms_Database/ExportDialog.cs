@@ -24,7 +24,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System;
@@ -137,7 +136,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
 
-        var oneItem = tmp.MaxBounds(string.Empty);
+        var oneItem = tmp.MaxBounds();
         pad.Items.SheetStyle = tmp.SheetStyle;
         pad.Items.SheetStyleScale = tmp.SheetStyleScale;
         pad.ShowInPrintMode = true;
@@ -151,18 +150,19 @@ public sealed partial class ExportDialog : IHasDatabase {
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
         var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
 
-        var offx = (druckB.Width - (oneItem.Width * maxX) - abstand * (maxX - 1))/2;
-        var offy = (druckB.Height - (oneItem.Height * maxY) - abstand * (maxY - 1))/2;
+        var offx = (druckB.Width - (oneItem.Width * maxX) - abstand * (maxX - 1)) / 2;
+        var offy = (druckB.Height - (oneItem.Height * maxY) - abstand * (maxY - 1)) / 2;
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
-                var it = new ChildPadItem(new CreativePad(layoutFileName, rowsForExport[startNr]));
-                if (it.PadInternal?.Items is { }) {
-                    it.PadInternal.Items.GridShow = -1;
-                }
+                var it = new ItemCollectionPad.ItemCollectionPad(layoutFileName);
 
+                if (it.Items is { }) {
+                    it.ReplaceVariables(rowsForExport[startNr]);
+                    it.GridShow = -1;
+                }
                 pad.Items.Add(it);
-                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand)  + offy }, true);
+                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy }, true);
 
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }
@@ -247,7 +247,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
             var x = TempFile(_zielPfad, _rowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
             padSchachteln.Items.BackColor = Color.Transparent;
-            padSchachteln.Items.SaveAsBitmap(x, string.Empty);
+            padSchachteln.Items.SaveAsBitmap(x);
             l.Add(x);
             if (nr == _itemNrForPrint) { break; }
             if (_itemNrForPrint >= _rowsForExport.Count) { break; }

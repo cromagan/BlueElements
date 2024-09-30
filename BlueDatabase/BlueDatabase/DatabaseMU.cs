@@ -374,7 +374,7 @@ public class DatabaseMu : Database {
 
         try {
             lock (_writer) {
-                _writer.WriteLine(l.ToParseableString());
+                _writer.WriteLine(l.ParseableItems().FinishParseable());
             }
         } catch {
             Freeze("Netzwerkfehler!");
@@ -441,7 +441,7 @@ public class DatabaseMu : Database {
         _writer.WriteLine("- User " + UserName);
 
         var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
-        _writer.WriteLine(l.ToParseableString());
+        _writer.WriteLine(l.ParseableItems().FinishParseable());
         _writer.Flush();
     }
 

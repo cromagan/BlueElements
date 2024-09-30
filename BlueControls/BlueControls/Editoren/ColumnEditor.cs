@@ -140,7 +140,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
     private void btnCalculateMaxCellLenght_Click(object sender, System.EventArgs e) {
@@ -244,7 +244,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
     private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(Table.ColumnUseage(_column));
@@ -389,8 +389,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         txbName.AllowedChars = Constants.AllowedCharsVariableName;
         txbCaption.Text = _column.Caption;
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToParseableString();
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).ToParseableString();
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).Code;
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).Code;
         btnMultiline.Checked = _column.MultiLine;
         cbxFunction.Text = ((int)_column.Function).ToString();
         cbxRandLinks.Text = ((int)_column.LineLeft).ToString();
@@ -524,7 +524,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
         _column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
         _column.DefaultRenderer = cbxRenderer.Text;
-        _column.RendererSettings = _renderer?.ToParseableString() ?? string.Empty;
+        _column.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
         _column.Invalidate_ColumAndContent();
@@ -584,13 +584,11 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
             b.DropDownItems = dd.AsReadOnly();
 
-           b.DefaultRenderer = Renderer_ImageAndText.ClassId;
+            b.DefaultRenderer = Renderer_ImageAndText.ClassId;
 
             var s = new Renderer_ImageAndText();
             s.Text_ersetzen = or.JoinWithCr();
             b.RendererSettings = s.ReadableText();
-
-    
 
             db.RepairAfterParse();
             var tcvc = ColumnViewCollection.ParseAll(db);

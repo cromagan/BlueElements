@@ -132,6 +132,13 @@ public class LinePadItem : AbstractPadItem {
         _point2.SetTo(x + width, y + (height / 2), false);
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Connection", Linien_Verhalten);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "connection":
@@ -157,13 +164,6 @@ public class LinePadItem : AbstractPadItem {
     public override string ReadableText() => "Line";
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Connection", Linien_Verhalten);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override RectangleF CalculateUsedArea() {
         if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return RectangleF.Empty; }
@@ -236,7 +236,7 @@ public class LinePadItem : AbstractPadItem {
     }
 
     private void CalcTempPoints() {
-        var newCode = _point1 + _point2.ToParseableString();
+        var newCode = _point1 + _point2.ParseableItems().FinishParseable();
         if (_calcTempPointsCode != newCode) {
             _calcTempPointsCode = newCode;
             _tempPoints = null;
@@ -293,7 +293,7 @@ public class LinePadItem : AbstractPadItem {
     private bool IsVerdeckt(float x, float y) {
         if (Parent == null) { return false; }
 
-        foreach (var thisBasicItem in Parent) {
+        foreach (var thisBasicItem in Parent.Items) {
             if (thisBasicItem is { } and not LinePadItem) {
                 var a = thisBasicItem.UsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
@@ -322,7 +322,7 @@ public class LinePadItem : AbstractPadItem {
         if (Parent == null) { return false; }
         PointM p1 = new(x1, y1);
         PointM p2 = new(x2, y2);
-        return Parent.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
+        return Parent.Items.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
     }
 
     private bool Vereinfache(int p1) {
@@ -382,7 +382,7 @@ public class LinePadItem : AbstractPadItem {
         if (_tempPoints.Count > 100) { return false; }
         if (p1 >= _tempPoints.Count - 1) { return false; }
         //   If _TempPoints.Count > 4 Then Return False
-        foreach (var thisItemBasic in Parent) {
+        foreach (var thisItemBasic in Parent.Items) {
             if (thisItemBasic is { } and not LinePadItem)
             //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
             {

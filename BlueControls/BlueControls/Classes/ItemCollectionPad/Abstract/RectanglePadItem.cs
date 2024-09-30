@@ -141,6 +141,13 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
         _pRu.Mirror(p, vertical, horizontal);
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Rotation", Drehwinkel);
+        return result;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         SizeChanged();
@@ -232,13 +239,6 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
         _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y, false);
         _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y, false);
         CalculateJointMiddle(_pl, _pr);
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Rotation", Drehwinkel);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override RectangleF CalculateUsedArea() => new(Math.Min(_pLo.X, _pRu.X),

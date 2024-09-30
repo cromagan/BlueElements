@@ -54,8 +54,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
- 
-
     #endregion
 
     #region Properties
@@ -130,6 +128,13 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("DefaultArrangement", _defaultArrangement);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
@@ -150,13 +155,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("DefaultArrangement", _defaultArrangement);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

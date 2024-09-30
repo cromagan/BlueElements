@@ -17,16 +17,13 @@
 
 #nullable enable
 
-using System.Drawing;
-
 namespace BlueControls.Interfaces;
 
 public interface IMirrorable {
 
+    #region Methods
+
     public void Mirror(PointM? p, bool vertical, bool horizontal);
 
-
+    #endregion
 }
-
-  
-

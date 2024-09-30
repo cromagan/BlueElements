@@ -118,7 +118,7 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result =[
+        List<GenericControl> result = [
             new FlexiControlForProperty<int>(() => Width),
                 .. base.GetProperties(widthOfControl),
         ];
@@ -158,6 +158,8 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(x + (width / 2), y + height, false);
     }
 
+    public override List<string> ParseableItems() => [];
+
     public override bool ParseThis(string tag, string value) {
         Develop.DebugPrint_NichtImplementiert(true);
         return true;
@@ -184,8 +186,6 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override QuickImage? SymbolForReadableText() => null;
-
-    public override string ToParseableString() => string.Empty;
 
     protected override RectangleF CalculateUsedArea() {
         //var wp12 = AngleOfMiddleLine();

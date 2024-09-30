@@ -96,11 +96,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
     public virtual void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public virtual void ParseFinished(string parsed) { }
-
-    public abstract bool ParseThis(string key, string value);
-
-    public virtual string ToParseableString() {
+    public virtual List<string> ParseableItems() {
         List<string> result = [];
 
         var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
@@ -108,10 +104,14 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
             result.ParseableAdd("ClassId", ci);
         }
 
-        return result.Parseable();
+        return result;
     }
 
-    public override string ToString() => ToParseableString();
+    public virtual void ParseFinished(string parsed) { }
+
+    public abstract bool ParseThis(string key, string value);
+
+    public override string ToString() => ParseableItems().FinishParseable();
 
     #endregion
 }

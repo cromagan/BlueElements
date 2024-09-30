@@ -107,8 +107,8 @@ public partial class FontSelectDialog {
             fUnterstrichen.Checked = value.Underline;
             fDurchge.Checked = value.StrikeOut;
             fOutline.Checked = value.Outline;
-            cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorMain).ToParseableString();
-            cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorOutline).ToParseableString();
+            cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorMain).Code;
+            cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, value.ColorOutline).Code;
             fKap.Checked = value.Kapitälchen;
             OnlyLow.Checked = value.OnlyLower;
             OnlyUpper.Checked = value.OnlyUpper;
@@ -124,14 +124,14 @@ public partial class FontSelectDialog {
     private void cFarbe_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();
-        cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
+        cFarbe.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         UpdateSampleText();
     }
 
     private void cRandF_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();
-        cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToParseableString();
+        cRandF.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         UpdateSampleText();
     }
 

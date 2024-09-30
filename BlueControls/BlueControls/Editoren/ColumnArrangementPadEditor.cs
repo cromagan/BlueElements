@@ -216,7 +216,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (mitVorlage && ca != null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            tcvc.Add(new ColumnViewCollection(db, ca.ToParseableString(), newname));
+            tcvc.Add(new ColumnViewCollection(db, ca.ParseableItems().FinishParseable(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
@@ -476,7 +476,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         ColumnPadItem? found = null;
 
-        foreach (var thisIt in Pad.Items) {
+        foreach (var thisIt in Pad.Items.Items) {
             if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
                 if (fi.Column?.Database == db) {
                     if (found == null || fi.UsedArea.X < found.UsedArea.X) {
@@ -556,14 +556,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                                 databItem = new TextPadItem(toCheckCombi, nam);
                                 Pad.Items.Add(databItem);
                                 if (it != null) {
-
                                     var r = new RectangleF(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width),
                                                             600,
-                                                           (int)(anyitem.UsedArea.Height / 2), 
+                                                           (int)(anyitem.UsedArea.Height / 2),
                                                            (int)anyitem.UsedArea.Height);
 
-
-                                    databItem.SetCoordinates(r, true );
+                                    databItem.SetCoordinates(r, true);
                                 }
                                 kx = databItem.UsedArea.Right;
                             }

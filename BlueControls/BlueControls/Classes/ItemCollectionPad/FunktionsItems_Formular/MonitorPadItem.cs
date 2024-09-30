@@ -64,6 +64,16 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return con;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        //result.ParseableAdd("Pfad", _pfad);
+        //result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
+        //result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
+        return result;
+    }
+
     public override string ReadableText() {
         const string txt = "Monitor: ";
 
@@ -72,16 +82,6 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Textdatei, 16);
-    }
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-
-        //result.ParseableAdd("Pfad", _pfad);
-        //result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
-        //result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
-        return result.Parseable(base.ToParseableString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {

@@ -79,7 +79,7 @@ public class Method_GenerateLayoutImage : Method_Database {
             return new DoItFeedback(ld, "Generierung fehlgeschlagen");
         }
 
-        var bmp = l.ToBitmap((float)sc, string.Empty);
+        var bmp = l.ToBitmap((float)sc);
 
         if (bmp == null) { return new DoItFeedback(ld, "Generierung fehlgeschlagen"); }
 

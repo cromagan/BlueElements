@@ -91,7 +91,7 @@ public class VariableBool : Variable {
 
     public override object Clone() {
         var v = new VariableBool(KeyName);
-        v.Parse(ToParseableString());
+        v.Parse(ParseableItems().FinishParseable());
         return v;
     }
 

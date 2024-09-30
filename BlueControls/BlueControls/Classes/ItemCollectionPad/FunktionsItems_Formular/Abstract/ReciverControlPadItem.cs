@@ -74,13 +74,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     #region Properties
 
-
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        CalculateColorIds();
-    }
-
-
     public abstract AllowedInputFilter AllowedInputFilter { get; }
 
     /// <summary>
@@ -137,7 +130,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         get => new(_getFilterFromKeys);
 
         set {
-
             // Dann die Collection leeren
             _getFilterFrom = null;
             _getFilterFromKeys.Clear();
@@ -268,10 +260,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
 
-
         if (Parent is null) { return result; }
-
-
 
         Database? outp = null;
 
@@ -279,17 +268,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             outp = iiss.DatabaseOutput;
         }
 
-
         if (AllowedInputFilter != AllowedInputFilter.None) {
-
             result.Add(new FlexiControl("Eingang:", widthOfControl, true));
-
 
             var x = new List<AbstractListItem>();
 
             // Die Items, die man noch wählen könnte
-            foreach (var thisR in Parent) {
-                if (thisR.IsOnPage(Page) && thisR is ReciverSenderControlPadItem rfp) {
+            foreach (var thisR in Parent.Items) {
+                if (thisR is ReciverSenderControlPadItem rfp) {
                     if (rfp != this) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
                     }
@@ -376,6 +362,24 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         this.RaiseVersion();
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+
+        result.ParseableAdd("Version", Version);
+
+        if (MustBeInDrawingArea) {
+            result.ParseableAdd("VisibleFor", VisibleFor, false);
+        }
+
+        result.ParseableAdd("XLock", _X_Position);
+
+        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
+        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
+
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "version":
@@ -431,38 +435,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         base.PointMoved(sender, e);
     }
 
-    //public void Standardhöhe_setzen() {
-    //    var x = UsedArea;
-
-    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPad.Dpi);
-    //    var he1 = MmToPixel(1, ItemCollectionPad.Dpi);
-    //    x.Height = (int)(x.Height / he) * he;
-    //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
-
     //    if (x.Height < he) { x.Height = he; }
     //    SetCoordinates(x, true);
     //    OnPropertyChanged();
     //}
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-
-        List<string> result = [];
-
-        result.ParseableAdd("Version", Version);
-
-        if (MustBeInDrawingArea) {
-            result.ParseableAdd("VisibleFor", VisibleFor, false);
-        }
-
-        result.ParseableAdd("XLock", _X_Position);
-
-        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
-        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
-
-        return result.Parseable(base.ToParseableString());
-    }
-
     protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, int colorId, Alignment al, float valueArrow, float xmod) {
         var p = positionModified.PointOf(al);
         var width = (int)(zoom * 25);
@@ -499,6 +475,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         //}
     }
 
+    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPad.Dpi);
+    //    var he1 = MmToPixel(1, ItemCollectionPad.Dpi);
+    //    x.Height = (int)(x.Height / he) * he;
+    //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
     protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, bool forPrinting, List<int>? colorId) {
         if (forPrinting) { return; }
 
@@ -518,6 +498,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
     }
 
+    //public void Standardhöhe_setzen() {
+    //    var x = UsedArea;
     protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
         var arrowY = (int)(zoom * 12) * 0.45f;
@@ -560,6 +542,11 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         } else if (drawText) {
             Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         }
+    }
+
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        CalculateColorIds();
     }
 
     protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {

@@ -189,6 +189,20 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate();
     }
 
+    public RowItem? RowSingleOrNull() {
+        if (IsDisposed) { return null; }
+        if (DesignMode) { return null; }
+
+        if (!RowsInputManualSeted) {
+            if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
+            if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
+        }
+
+        if (RowsInput is not { Count: 1 }) { return null; }
+        RowsInput[0].CheckRowDataIfNeeded();
+        return RowsInput[0];
+    }
+
     public void SetToRow(RowItem? row) {
         if (IsDisposed) { return; }
         if (Parents.Count > 0) {
@@ -313,7 +327,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         var fn = (FilterCollection)fc.Clone("Normalize");
         fn.Normalize();
 
-        var n = "F" + fn.ToParseableString().GetHashString();
+        var n = "F" + fn.ParseableItems().FinishParseable().GetHashString();
         fn.Dispose();
 
         return n;
@@ -354,20 +368,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
         Invalidate_FilterInput();
-    }
-
-    public RowItem? RowSingleOrNull() {
-        if (IsDisposed) { return null; }
-        if (DesignMode) { return null; }
-
-        if (!RowsInputManualSeted) {
-            if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
-            if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
-        }
-
-        if (RowsInput is not { Count: 1 }) { return null; }
-        RowsInput[0].CheckRowDataIfNeeded();
-        return RowsInput[0];
     }
 
     private void FilterInput_DispodingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();

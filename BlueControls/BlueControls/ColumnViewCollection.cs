@@ -183,7 +183,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             : new ColumnViewItem(column, ViewType.Column, this));
     }
 
-    public object Clone() => new ColumnViewCollection(Database, ToParseableString());
+    public object Clone() => new ColumnViewCollection(Database, ParseableItems().FinishParseable());
 
     public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
@@ -276,6 +276,21 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (viewItemNo >= _internal.Count) { return null; }
             if (_internal[viewItemNo]?.Column != null) { return _internal[viewItemNo]; }
         } while (true);
+    }
+
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
+
+        result.ParseableAdd("Name", this as IHasKeyName);
+        result.ParseableAdd("ShowHead", ShowHead);
+        result.ParseableAdd("Column", _internal as IHasKeyName);
+
+        var tmp = PermissionGroups_Show.SortedDistinctList();
+        tmp.RemoveString(Administrator, false);
+        result.ParseableAdd("Permissiongroups", tmp, true);
+
+        return result;
     }
 
     public void ParseFinished(string parsed) { }
@@ -389,22 +404,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-
-        var result = new List<string>();
-        result.ParseableAdd("Name", (IHasKeyName)this);
-        result.ParseableAdd("ShowHead", ShowHead);
-        result.ParseableAdd("Columns", "Column", _internal);
-
-        var tmp = PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString(Administrator, false);
-        result.ParseableAdd("Permissiongroups", tmp, true);
-
-        return result.Parseable();
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 

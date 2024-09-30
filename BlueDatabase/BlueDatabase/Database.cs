@@ -404,8 +404,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         set {
             var alt = string.Empty;
             var neu = string.Empty;
-            if (_sortDefinition != null) { alt = _sortDefinition.ToParseableString(); }
-            if (value != null) { neu = value.ToParseableString(); }
+            if (_sortDefinition != null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
+            if (value != null) { neu = value.ParseableItems().FinishParseable(); }
             if (alt == neu) { return; }
             _ = ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu, UserName, DateTime.UtcNow, string.Empty);
 
@@ -916,7 +916,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //Row.SaveToByteList(l);
             //SaveToByteList(l, db.Cell, db);
             // Ganz neue Datenbank
-            SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ToParseableString());
+            SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
             //SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
@@ -936,10 +936,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             foreach (var thisWorkItem in db.Undo) {
                 if (thisWorkItem != null) {
                     if (thisWorkItem.Command != DatabaseDataType.Value_withoutSizeData) {
-                        works2.Add(thisWorkItem.ToParseableString());
+                        works2.Add(thisWorkItem.ParseableItems().FinishParseable());
                     } else {
                         if (thisWorkItem.LogsUndo(db)) {
-                            works2.Add(thisWorkItem.ToParseableString());
+                            works2.Add(thisWorkItem.ParseableItems().FinishParseable());
                         }
                     }
                 }
@@ -1156,9 +1156,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         GlobalScale = sourceDatabase.GlobalScale;
         GlobalShowPass = sourceDatabase.GlobalShowPass;
         //RulesScript = sourceDatabase.RulesScript;
-        if (SortDefinition == null || SortDefinition.ToParseableString() != sourceDatabase.SortDefinition?.ToParseableString()) {
+        if (SortDefinition == null || SortDefinition.ParseableItems().FinishParseable() != sourceDatabase.SortDefinition?.ParseableItems().FinishParseable()) {
             if (sourceDatabase.SortDefinition != null) {
-                SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ToParseableString());
+                SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ParseableItems().FinishParseable());
             }
         }
 
@@ -3101,7 +3101,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.UpdateChanges);
 
                     if (!string.IsNullOrEmpty(error)) {
-                        Freeze("Datenbank-Fehler: " + error + " " + thisWork.ToParseableString());
+                        Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
                         //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
                         DoingChanges--;
                         return;

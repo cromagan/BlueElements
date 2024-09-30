@@ -114,6 +114,13 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         return result;
     }
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Script", _script);
+        return result;
+    }
+
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "script":
@@ -126,13 +133,6 @@ public class DynamicSymbolPadItem : RectanglePadItem {
     public override string ReadableText() => "Dynamisches Symbol";
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
-
-    public override string ToParseableString() {
-        if (IsDisposed) { return string.Empty; }
-        List<string> result = [];
-        result.ParseableAdd("Script", _script);
-        return result.Parseable(base.ToParseableString());
-    }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Enums.Design.TextBox, Enums.States.Standard, BlueDatabase.Enums.TranslationType.Original_Anzeigen, Alignment.Left, zoom);
@@ -183,7 +183,6 @@ public class DynamicSymbolPadItem : RectanglePadItem {
     }
 
     private void Skript_Bearbeiten() => IUniqueWindowExtension.ShowOrCreate<DynamicSymbolScriptEditor>(this);
-
 
     #endregion
 }

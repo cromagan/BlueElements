@@ -76,6 +76,8 @@ public static partial class Extensions {
         return l2;
     }
 
+    public static string FinishParseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
+
     public static List<string> FromNonCritical(this ICollection<string> col) {
         var l = new List<string>();
         if (col.Count == 0) { return l; }
@@ -128,41 +130,39 @@ public static partial class Extensions {
             Develop.DebugPrint(FehlerArt.Fehler, "Basestringfehler!");
         }
 
-        if(col.Count ==0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
+        if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
 
         return baseToString.Substring(0, baseToString.Length - 1) + ", " + col.JoinWith(", ") + "}";
     }
-
-    public static string Parseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
         if (value == null || string.IsNullOrEmpty(value)) { return; }
         col.Add(tagname + "=" + value.ToNonCriticalWithQuote());
     }
 
-    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {
-        if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
+    //public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {
+    //    if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
-        if (value is IStringable) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Stringable Collection nicht möglich!");
-        }
+    //    if (value is IStringable) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Stringable Collection nicht möglich!");
+    //    }
 
-        if (value.Count < 1) { return; }
+    //    if (value.Count < 1) { return; }
 
-        var txt = tagname + "={";
+    //    var txt = tagname + "={";
 
-        foreach (var item in value) {
-            var tmp2 = string.Empty;
-            if (item != null) { tmp2 = item.ToParseableString(); }
-            if (!string.IsNullOrEmpty(tmp2)) {
-                txt = txt + nameofeveryItem + "=" + tmp2.ToNonCritical() + ", ";
-            }
-        }
+    //    foreach (var item in value) {
+    //        var tmp2 = string.Empty;
+    //        if (item != null) { tmp2 = item.ToParseableString(); }
+    //        if (!string.IsNullOrEmpty(tmp2)) {
+    //            txt = txt + nameofeveryItem + "=" + tmp2.ToNonCritical() + ", ";
+    //        }
+    //    }
 
-        txt = txt.TrimEnd(", ") + "}";
+    //    txt = txt.TrimEnd(", ") + "}";
 
-        col.Add(txt);
-    }
+    //    col.Add(txt);
+    //}
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
         if (value == null) { return; }
@@ -253,7 +253,7 @@ public static partial class Extensions {
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
         if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
-        col.Add(tagname + "=" + value.ToParseableString().ToNonCritical());
+        col.Add(tagname + "=" + value.ParseableItems().FinishParseable().ToNonCritical());
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
@@ -443,7 +443,7 @@ public static partial class Extensions {
         var tmp = string.Empty;
         foreach (var item in l) {
             var tmp2 = string.Empty;
-            if (item != null) { tmp2 = item.ToParseableString(); }
+            if (item != null) { tmp2 = item.ParseableItems().FinishParseable(); }
             if (tmp2.Contains("\r")) { Develop.DebugPrint(FehlerArt.Fehler, "List.Tostring hat einen Zeilenumbruch gefunden."); }
             if (!removeEmpty || !string.IsNullOrEmpty(tmp2)) {
                 tmp = tmp + tmp2 + "\r";

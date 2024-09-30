@@ -50,28 +50,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     #region Fields
 
     private readonly List<IMoveable> _itemsToMove = [];
-    private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseCommandsTo;
     private ItemCollectionPad.ItemCollectionPad? _items;
     private AbstractPadItem? _lastClickedItem;
     private bool _repairPrinterDataPrepaired;
     private bool _showInPrintMode;
     private bool _showJointPoints;
+
     #endregion
 
     #region Constructors
 
-    public CreativePad(ItemCollectionPad.ItemCollectionPad itemCollectionPad) : this(itemCollectionPad, null) { }
-
-    public CreativePad(string layoutFileName, RowItem? row) : this(new ItemCollectionPad.ItemCollectionPad(layoutFileName), row) { }
+    public CreativePad(ItemCollectionPad.ItemCollectionPad page) : this(page, null) { }
 
     public CreativePad(string layoutFileName) : this(new ItemCollectionPad.ItemCollectionPad(layoutFileName), null) { }
 
-    public CreativePad(ItemCollectionPad.ItemCollectionPad itemCollectionPad, RowItem? row) : base() {
+    public CreativePad(ItemCollectionPad.ItemCollectionPad page, RowItem? row) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
-        Items = itemCollectionPad;
+        Items = page;
         Unselect();
         MouseHighlight = false;
 
@@ -81,7 +79,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
-    public CreativePad() : this([]) { }
+    public CreativePad() : this(string.Empty) { }
 
     #endregion
 
@@ -119,17 +117,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     [DefaultValue(true)]
     public bool ContextMenuAllowed { get; set; } = true;
-
-    [DefaultValue("")]
-    public string CurrentPage {
-        get => _currentPage;
-        set {
-            if (_currentPage == value) { return; }
-            _currentPage = value;
-            OnDrawModeChanged();
-            Unselect();
-        }
-    }
 
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
@@ -186,7 +173,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
     }
 
-
     #endregion
 
     #region Methods
@@ -230,10 +216,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     }
                     return;
 
-                case "#page":
-                    item.Page = InputBox.Show("Seite:", item.Page, BlueBasics.FormatHolder.SystemName);
-                    Unselect();
-                    return;
+                //case "#page":
+                //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder.SystemName);
+                //    Unselect();
+                //    return;
 
                 case "#connect":
                     foreach (var pt in item.JointPoints) {
@@ -256,7 +242,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                         f.Title = "Speichern:";
                         _ = f.ShowDialog();
                         if (string.IsNullOrEmpty(f.FileName)) { return; }
-                        File.WriteAllText(f.FileName, ps.ToParseableString(), Constants.Win1252);
+                        File.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252);
                         IO.LastFilePath = f.FileName.FilePath();
                     }
                     return;
@@ -281,27 +267,17 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
                 case "verschieben":
 
-
-
-
                     var tn = Forms.InputBox.Show("Zu welchem Punkt:", pm.KeyName, BlueBasics.FormatHolder.SystemName);
                     if (!string.IsNullOrEmpty(tn)) {
                         if (pm.Parent is AbstractPadItem api2) {
-                            var p = Items?.GetJointPoint(tn,api2);
-                           if(p!= null) {
-                                pm.SetTo(p.X,p.Y, true);
+                            var p = Items?.GetJointPoint(tn, api2);
+                            if (p != null) {
+                                pm.SetTo(p.X, p.Y, true);
                             }
-
-
-                        
                         }
                     }
 
-       
                     return;
-
-
-
             }
         }
 
@@ -360,7 +336,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
                 e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
                 e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
-                e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", "#Page", ImageCode.Datei, e.HotItem is IParseable));
+                //e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", "#Page", ImageCode.Datei, e.HotItem is IParseable));
                 e.ContextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", "#Connect", ImageCode.HäkchenDoppelt, e.HotItem is IParseable));
                 e.ContextMenu.Add(Separator());
                 e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
@@ -391,8 +367,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
 
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
-        return _items.Where(thisItem => thisItem != null &&
-                                        thisItem.IsOnPage(CurrentPage) &&
+        return _items.Items.Where(thisItem => thisItem != null &&
                                         thisItem.Contains(p, Zoom)).ToList();
     }
 
@@ -624,8 +599,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         base.Dispose(disposing);
     }
 
-
-
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
 
@@ -634,17 +607,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
         if (_items != null) {
-            var l = _items.ItemsOnPage(_currentPage);
-            _ = _items.DrawCreativePadTo(gr, l, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, _showJointPoints, state);
-
-  
+            _ = _items.DrawTo(gr, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, _showJointPoints, state);
 
             #region Dann die selektierten Punkte
 
             foreach (var thisItem in _itemsToMove) {
                 if (thisItem is AbstractPadItem bpi) {
-                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint,  Zoom, ShiftX, ShiftY,  Design.Button_EckpunktSchieber, States.Standard, false);
-                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, ShiftX, ShiftY,  Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
                 }
 
                 if (thisItem is PointM p2) {
@@ -672,7 +642,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         // Ganz wichtig diese Routine!
         keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
-    protected override RectangleF MaxBounds() => _items?.MaxBounds(_currentPage) ?? new RectangleF(0, 0, 0, 0);
+    protected override RectangleF MaxBounds() => _items?.MaxBounds() ?? new RectangleF(0, 0, 0, 0);
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 
@@ -689,13 +659,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     private void _Items_ItemAdded(object sender, ListEventArgs e) {
         if (IsDisposed) { return; }
-        if (_items is not { Count: not 0 } || Fitting) { ZoomFit(); }
+        if (_items is not { Items.Count: not 0 } || Fitting) { ZoomFit(); }
         Invalidate();
-
-        var it = (AbstractPadItem)e.Item;
-
-        if (string.IsNullOrEmpty(it.Page)) { it.Page = CurrentPage; }
-
         OnItemAdded(e);
     }
 
@@ -720,7 +685,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
         e.HasMorePages = false;
         OnPrintPage(e);
-        var i = _items?.ToBitmap(3, string.Empty);
+        var i = _items?.ToBitmap(3);
         if (i == null) { return; }
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
@@ -817,7 +782,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     private void PicsSave_FileOk(object sender, CancelEventArgs e) {
         if (e.Cancel || _items == null) { return; }
-        _items.SaveAsBitmap(PicsSave.FileName, CurrentPage);
+        _items.SaveAsBitmap(PicsSave.FileName);
     }
 
     private void RegisterEvents() {

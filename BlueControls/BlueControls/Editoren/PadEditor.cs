@@ -21,8 +21,6 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -65,16 +63,26 @@ public partial class PadEditor : FormWithStatusBar {
 
     #endregion
 
-    //public void ItemChanged() {
-    //    Pad.ZoomFit();
-
-    //    if (Pad?.Items?.SheetStyle != null) {
-    //        PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
-    //        cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
-    //    }
-    //}
-
     #region Methods
+
+    protected virtual void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
+        btnVorschauModus.Checked = Pad.ShowInPrintMode;
+
+        ckbRaster.Enabled = Pad.Items != null;
+        txbRasterAnzeige.Enabled = Pad.Items != null;
+        txbRasterFangen.Enabled = Pad.Items != null;
+
+        if (Pad.Items != null) {
+            ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
+            txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
+            txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
+            if (Pad.Items.SheetStyle != null) {
+                PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
+            }
+
+            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
+        }
+    }
 
     private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
 
@@ -118,60 +126,6 @@ public partial class PadEditor : FormWithStatusBar {
         Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
     }
 
-    private void DoPages() {
-        if (InvokeRequired) {
-            _ = Invoke(new Action(DoPages));
-            return;
-        }
-
-        try {
-            if (IsDisposed) { return; }
-
-            var x = new List<string>();
-
-            if (Pad?.Items != null) { x.AddRange(Pad.Items.AllPages()); }
-
-            if (Pad != null) { _ = x.AddIfNotExists(Pad.CurrentPage); }
-
-            TabPage? later = null;
-
-            if (x.Count == 1 && string.IsNullOrEmpty(x[0])) { x.Clear(); }
-
-            if (x.Count > 0) {
-                tabSeiten.Visible = true;
-
-                foreach (var thisTab in tabSeiten.TabPages) {
-                    var tb = (TabPage)thisTab;
-
-                    if (!x.Contains(tb.Text)) {
-                        tabSeiten.TabPages.Remove(tb);
-                        DoPages();
-                        return;
-                    }
-
-                    _ = x.Remove(tb.Text);
-                    if (Pad != null && tb.Text == Pad.CurrentPage) { later = tb; }
-                }
-
-                foreach (var thisn in x) {
-                    var t = new TabPage(thisn) {
-                        Name = "Seite_" + thisn
-                    };
-                    tabSeiten.TabPages.Add(t);
-
-                    if (Pad != null && t.Text == Pad.CurrentPage) { later = t; }
-                }
-            } else {
-                tabSeiten.Visible = false;
-                if (tabSeiten.TabPages.Count > 0) {
-                    tabSeiten.TabPages.Clear();
-                }
-            }
-
-            tabSeiten.SelectedTab = later;
-        } catch { }
-    }
-
     private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
 
     private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
@@ -195,29 +149,6 @@ public partial class PadEditor : FormWithStatusBar {
 
     private void Pad_DrawModChanged(object sender, System.EventArgs e) {
         btnVorschauModus.Checked = Pad.ShowInPrintMode;
-
-        DoPages();
-    }
-
-    private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
-        btnVorschauModus.Checked = Pad.ShowInPrintMode;
-
-        DoPages();
-
-        ckbRaster.Enabled = Pad.Items != null;
-        txbRasterAnzeige.Enabled = Pad.Items != null;
-        txbRasterFangen.Enabled = Pad.Items != null;
-
-        if (Pad.Items != null) {
-            ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
-            txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
-            txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
-            if (Pad.Items.SheetStyle != null) {
-                PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
-            }
-
-            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
-        }
     }
 
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
@@ -225,22 +156,10 @@ public partial class PadEditor : FormWithStatusBar {
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }
 
-    private void Pad_PropertyChanged(object sender, System.EventArgs e) => DoPages();
-
     private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (Pad?.Items != null && Skin.StyleDb?.Row != null) {
             Pad.Items.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
         }
-    }
-
-    private void tabSeiten_Selected(object sender, TabControlEventArgs e) {
-        var s = string.Empty;
-
-        if (tabSeiten.SelectedTab != null) {
-            s = tabSeiten.SelectedTab.Text;
-        }
-
-        Pad.CurrentPage = s;
     }
 
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {

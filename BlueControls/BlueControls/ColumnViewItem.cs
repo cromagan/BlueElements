@@ -175,6 +175,20 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
+        result.ParseableAdd("Type", ViewType);
+        result.ParseableAdd("ColumnName", _column);
+
+        if (_column is not { } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
+            result.ParseableAdd("Renderer", Renderer);
+            result.ParseableAdd("RendererSettings", RendererSettings);
+        }
+
+        return result;
+    }
+
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
@@ -219,20 +233,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
 
-    public string ToParseableString() {
-        var result = new List<string>();
-        result.ParseableAdd("Type", ViewType);
-        result.ParseableAdd("ColumnName", _column);
-
-        if (_column is not { } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
-            result.ParseableAdd("Renderer", Renderer);
-            result.ParseableAdd("RendererSettings", RendererSettings);
-        }
-
-        return result.Parseable();
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     private void _column_PropertyChanged(object sender, System.EventArgs e) { _drawWidth = null; }
 

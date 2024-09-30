@@ -17,13 +17,15 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+
 namespace BlueBasics.Interfaces;
 
 public interface IStringable {
 
     #region Methods
 
-    string ToParseableString();
+    List<string> ParseableItems();
 
     #endregion
 }

@@ -105,7 +105,7 @@ public class VariableListString : Variable {
 
     public override object Clone() {
         var v = new VariableListString(KeyName);
-        v.Parse(ToParseableString());
+        v.Parse(ParseableItems().FinishParseable());
         return v;
     }
 

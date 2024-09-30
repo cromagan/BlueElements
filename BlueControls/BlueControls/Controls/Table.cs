@@ -297,7 +297,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public RowSortDefinition? SortDefinitionTemporary {
         get => _sortDefinitionTemporary;
         set {
-            if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ToParseableString() == value.ToParseableString()) { return; }
+            if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ParseableItems().FinishParseable() == value.ParseableItems().FinishParseable()) { return; }
             if (_sortDefinitionTemporary == value) { return; }
             _sortDefinitionTemporary = value;
             _Database_SortParameterChanged(this, System.EventArgs.Empty);
@@ -1220,10 +1220,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public void OpenScriptEditor() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-
         var se = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
         se.Row = CursorPosRow?.Row;
-
     }
 
     public void OpenSearchAndReplaceInCells() {
@@ -1451,7 +1449,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns(), false);
         result.ParseableAdd("TempSort", _sortDefinitionTemporary);
         result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row));
-        return result.Parseable();
+        return result.FinishParseable();
     }
 
     internal static bool RepairColumnArrangements(Database db) {

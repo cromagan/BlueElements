@@ -210,6 +210,34 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
+    public List<string> ParseableItems() {
+        List<string> result = [];
+
+        if (_parent != null) {
+            switch (_parent) {
+                case IHasKeyName item:
+                    result.ParseableAdd("ParentName", item.KeyName);
+                    break;
+
+                //case ItemCollectionPad:
+                case CreativePad:
+                    result.ParseableAdd("ParentType", "Main");
+                    break;
+
+                default:
+                    result.ParseableAdd("ParentType", _parent.GetType().FullName);
+                    break;
+            }
+        }
+        result.ParseableAdd("Name", KeyName);
+        result.ParseableAdd("X", _x);
+        result.ParseableAdd("Y", _y);
+        result.ParseableAdd("Distance", _distance);
+        result.ParseableAdd("Angle", _angle);
+        //result.ParseableAdd("Tag", _tag);
+        return result;
+    }
+
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
@@ -282,35 +310,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public void SetTo(int x, int y, bool byMouse) => SetTo(x, (float)y, byMouse);
 
-    public string ToParseableString() {
-        List<string> result = [];
-
-        if (_parent != null) {
-            switch (_parent) {
-                case IHasKeyName item:
-                    result.ParseableAdd("ParentName", item.KeyName);
-                    break;
-
-                //case ItemCollectionPad:
-                case CreativePad:
-                    result.ParseableAdd("ParentType", "Main");
-                    break;
-
-                default:
-                    result.ParseableAdd("ParentType", _parent.GetType().FullName);
-                    break;
-            }
-        }
-        result.ParseableAdd("Name", KeyName);
-        result.ParseableAdd("X", _x);
-        result.ParseableAdd("Y", _y);
-        result.ParseableAdd("Distance", _distance);
-        result.ParseableAdd("Angle", _angle);
-        //result.ParseableAdd("Tag", _tag);
-        return result.Parseable();
-    }
-
-    public override string ToString() => ToParseableString();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
