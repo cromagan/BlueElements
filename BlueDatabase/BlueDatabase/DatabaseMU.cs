@@ -366,7 +366,7 @@ public class DatabaseMu : Database {
         HasPendingChanges = false; // Datenbank kann keine Pendings haben
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
-   
+        return "XXX";
         if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
