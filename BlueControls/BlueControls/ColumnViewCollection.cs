@@ -284,7 +284,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
-        result.ParseableAdd("Column", _internal as IHasKeyName);
+        result.ParseableAdd("Column", _internal);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
         tmp.RemoveString(Administrator, false);
@@ -301,9 +301,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 KeyName = value;
                 return true;
 
+            case "column":
             case "columndata":
 
-                _internal.Add(new ColumnViewItem(this, value)); // BAse, um Events zu vermeiden
+                _internal.Add(new ColumnViewItem(this, value.FromNonCritical())); // BAse, um Events zu vermeiden
 
                 return true;
 

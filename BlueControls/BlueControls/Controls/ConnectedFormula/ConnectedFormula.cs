@@ -26,6 +26,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System;
@@ -36,6 +37,7 @@ using System.IO;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -111,6 +113,10 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     public string QuickInfo => string.Empty;
     public override string Type => "ConnectedFormula";
+
+    /// <summary>
+    // 0.50 seit 08.03.2024
+    /// </summary>
     public override string Version => "0.50";
 
     #endregion
@@ -135,8 +141,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return !FileExists(filename) ? null : new ConnectedFormula(filename);
     }
 
-    // 0.50 seit 08.03.2024
-
     public static List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
@@ -147,6 +151,19 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
 
         return l.SortedDistinctList();
+    }
+
+    public List<string> AllPages() {
+        var p = new List<string>();
+        if (Pages == null) { return p; }
+
+        foreach (var thisp in Pages.Items) {
+            if (thisp is ItemCollectionPadItem icp) {
+                _ = p.AddIfNotExists(icp.Caption);
+            }
+        }
+
+        return p;
     }
 
     public override List<string> ParseableItems() {
@@ -160,6 +177,37 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
 
         return result;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+
+        var l = new List<AbstractPadItem>();
+        l.AddRange(Pages.Items);
+
+        foreach (var thisIt in l) {
+            if (thisIt is not ItemCollectionPadItem) {
+                ItemCollectionPadItem? found = null;
+
+                if (string.IsNullOrEmpty(thisIt.Page)) { thisIt.Page = "Head"; }
+
+                foreach (var thisP in Pages.Items) {
+                    if (thisP is ItemCollectionPadItem icp2 && icp2.Caption == thisIt.Page) {
+                        found = icp2;
+                        break;
+                    }
+                }
+
+                if (found == null) {
+                    found = new ItemCollectionPadItem();
+                    found.Caption = thisIt.Page;
+                    Pages.Add(found);
+                }
+
+                Pages.Remove(thisIt);
+                found.Add(thisIt);
+            }
+        }
     }
 
     public override bool ParseThis(string key, string value) {
@@ -197,16 +245,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
-        //foreach (var thisIt in Pages.Items) {
-        //    Develop.DebugPrint_NichtImplementiert();
-        //    if (thisIt is ReciverControlPadItem itcf) {
-        //        itcf.ParentFormula = this;
-        //    }
-        //}
-
-        Develop.DebugPrint_NichtImplementiert(true); // TODO: Head erstellen
-        //var pg = Pages.AllPages();
-        //pg.AddIfNotExists("Head");
+        if (!AllPages().Contains("Head", false)) {
+            var h = new ItemCollectionPadItem();
+            h.Caption = "Head";
+            Pages.Add(h);
+        }
+        RepairReciver(Pages);
 
         foreach (var thisP in Pages.Items) {
             if (thisP is ItemCollectionPadItem icp) {
@@ -312,6 +356,18 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     private void RegisterPadDataEvents() {
         if (_pages != null) {
             _pages.PropertyChanged += PadData_PropertyChanged;
+        }
+    }
+
+    private void RepairReciver(ItemCollectionPadItem icpi) {
+        foreach (var thisIt in icpi.Items) {
+            if (thisIt is ItemCollectionPadItem icp2) {
+                RepairReciver(icp2);
+            }
+
+            if (thisIt is ReciverControlPadItem itcf) {
+                itcf.ParentFormula = this;
+            }
         }
     }
 

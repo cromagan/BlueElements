@@ -103,18 +103,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Methods
 
-    public List<string> AllPages() {
-        var p = new List<string>();
-
-        foreach (var thisp in _cFormula.Pages.Items) {
-            if (thisp is ItemCollectionPadItem icp) {
-                _ = p.AddIfNotExists(icp.Caption);
-            }
-        }
-
-        return p;
-    }
-
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
@@ -354,7 +342,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         try {
             if (IsDisposed) { return; }
 
-            var x = AllPages();
+            var x = _cFormula.AllPages();
 
             TabPage? later = null;
 

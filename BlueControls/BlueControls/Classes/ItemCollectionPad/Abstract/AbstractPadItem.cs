@@ -44,6 +44,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
+    public string Page = string.Empty;
+
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -158,6 +160,11 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             if (_parent == null || _parent == value) {
                 _parent = value;
                 //OnParentChanged();
+                return;
+            }
+
+            if (value == null) {
+                _parent = null;
                 return;
             }
 
@@ -482,9 +489,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 return true;
 
             case "page":
-                Develop.DebugPrint_NichtImplementiert(true);
-                // TODO: Neue  Collection Erstellen oder suchen
-
+                Page = value.FromNonCritical();
                 return true;
 
             case "tags":

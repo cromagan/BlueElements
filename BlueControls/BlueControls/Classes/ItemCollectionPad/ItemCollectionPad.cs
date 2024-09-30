@@ -56,8 +56,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
     public const int Dpi = 300;
 
-    public static List<AbstractPadItem>? PadItemTypes;
-
     /// <summary>
     /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
     /// </summary>
@@ -93,8 +91,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
     public ItemCollectionPadItem() : base(string.Empty) {
         BindingOperations.EnableCollectionSynchronization(Items, new object());
-
-        PadItemTypes ??= GetInstaceOfType<AbstractPadItem>("NAME");
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         SheetSizeInMm = Size.Empty;
@@ -833,6 +829,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         item.PropertyChanged -= Item_PropertyChanged;
         OnItemRemoving(item);
         _ = Items.Remove(item);
+        item.Parent = null;
         OnItemRemoved();
         OnPropertyChanged();
     }
