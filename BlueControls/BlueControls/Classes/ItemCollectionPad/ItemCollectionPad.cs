@@ -106,7 +106,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
     }
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
-        this.Parse(File.ReadAllText(layoutFileName, Win1252));
+        if(IO.FileExists(layoutFileName)) {
+            this.Parse(File.ReadAllText(layoutFileName, Win1252));
+        }
         IsSaved = true;
     }
 

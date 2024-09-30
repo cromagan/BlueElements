@@ -201,6 +201,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 if (found == null) {
                     found = new ItemCollectionPadItem();
                     found.Caption = thisIt.Page;
+                    found.SheetSizeInMm = Pages.SheetSizeInMm;
+                    found.SheetStyle = Pages.SheetStyle;
+                    found.RandinMm = Pages.RandinMm;
+                    found.GridShow  = Pages.GridShow;
+                    found.GridSnap = Pages.GridSnap;
+                    found.Stil = Pages.Stil;
                     Pages.Add(found);
                 }
 
@@ -248,6 +254,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (!AllPages().Contains("Head", false)) {
             var h = new ItemCollectionPadItem();
             h.Caption = "Head";
+            h.SheetSizeInMm = Pages.SheetSizeInMm;
+            h.SheetStyle = Pages.SheetStyle;
+            h.RandinMm = Pages.RandinMm;
+            h.GridShow = Pages.GridShow;
+            h.GridSnap = Pages.GridSnap;
+            h.Stil = Pages.Stil;
             Pages.Add(h);
         }
         RepairReciver(Pages);
