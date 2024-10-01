@@ -69,8 +69,6 @@ public class Renderer_Button : Renderer_Abstract {
 
     public override string Description => "Text wird immer einzeilig dargestellt.";
 
-    public override string MyClassId => ClassId;
-
     public bool Text_anzeigen {
         get => _text_anzeigen;
         set {

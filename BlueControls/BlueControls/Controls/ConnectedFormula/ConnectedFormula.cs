@@ -37,7 +37,6 @@ using System.IO;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -183,20 +182,19 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         base.ParseFinished(parsed);
 
         var l = new List<AbstractPadItem>();
+
+        if (Pages == null) {
+            Pages = new ItemCollectionPadItem();
+            Pages.SheetSizeInMm = new SizeF(100, 100);
+        }
+
         l.AddRange(Pages.Items);
 
         foreach (var thisIt in l) {
             if (thisIt is not ItemCollectionPadItem) {
-                ItemCollectionPadItem? found = null;
-
                 if (string.IsNullOrEmpty(thisIt.Page)) { thisIt.Page = "Head"; }
 
-                foreach (var thisP in Pages.Items) {
-                    if (thisP is ItemCollectionPadItem icp2 && icp2.Caption == thisIt.Page) {
-                        found = icp2;
-                        break;
-                    }
-                }
+                var found = GetPage(thisIt.Page);
 
                 if (found == null) {
                     found = new ItemCollectionPadItem();
@@ -204,7 +202,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                     found.SheetSizeInMm = Pages.SheetSizeInMm;
                     found.SheetStyle = Pages.SheetStyle;
                     found.RandinMm = Pages.RandinMm;
-                    found.GridShow  = Pages.GridShow;
+                    found.GridShow = Pages.GridShow;
                     found.GridSnap = Pages.GridSnap;
                     found.Stil = Pages.Stil;
                     Pages.Add(found);
@@ -223,6 +221,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCrToList());
                 return true;
 
+            case "page":
             case "paditemdata":
                 UnRegisterPadDataEvents();
                 _pages = new ItemCollectionPadItem();
@@ -333,17 +332,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
     internal bool HasVisibleItemsForMe(string page, string mode) {
-        if (Pages == null || Pages.Items.Count == 0) { return false; }
+        var pg = GetPage(page);
+        if (pg == null) { return false; }
 
-        foreach (var thisItem in Pages.Items) {
-            if (thisItem is ItemCollectionPadItem icp) {
-                if (string.IsNullOrEmpty(page) ||
-                    string.IsNullOrEmpty(icp.Caption) ||
-                    page.Equals(icp.Caption, StringComparison.OrdinalIgnoreCase)) {
-                    if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
-                        if (cspi.IsVisibleForMe(mode, false)) { return true; }
-                    }
-                }
+        foreach (var thisItem in pg.Items) {
+            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
+                if (cspi.IsVisibleForMe(mode, false)) { return true; }
             }
         }
 
@@ -361,6 +355,19 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     protected override void OnLoaded(object sender, System.EventArgs e) {
         Repair();
         base.OnLoaded(sender, e);
+    }
+
+    private ItemCollectionPadItem? GetPage(string caption) {
+        if (Pages?.Items is not { Count: > 0 } pg) { return null; }
+
+        foreach (var thisP in pg) {
+            if (thisP is ItemCollectionPadItem icp2 &&
+                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase)) {
+                return icp2;
+            }
+        }
+
+        return null;
     }
 
     private void PadData_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();

@@ -124,7 +124,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
-    public override string MyClassId => ClassId;
 
     //public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
     //    get => _standard_bei_keiner_Eingabe;

@@ -131,7 +131,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     #endregion
 

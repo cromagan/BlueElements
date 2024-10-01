@@ -63,12 +63,13 @@ namespace BlueControls.Forms {
             // 
             // Pad
             // 
-            this.Pad.Size = new System.Drawing.Size(659, 225);
+            this.Pad.Location = new System.Drawing.Point(0, 110);
+            this.Pad.Size = new System.Drawing.Size(412, 227);
             // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
-            this.Ribbon.Size = new System.Drawing.Size(1031, 110);
+            this.Ribbon.Size = new System.Drawing.Size(784, 110);
             this.Ribbon.TabDefault = this.tabDatei;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Datei",
@@ -83,11 +84,7 @@ namespace BlueControls.Forms {
             // 
             // tabStart
             // 
-            this.tabStart.Size = new System.Drawing.Size(1023, 81);
-            // 
-            // tabSeiten
-            // 
-            this.tabSeiten.Size = new System.Drawing.Size(1031, 26);
+            this.tabStart.Size = new System.Drawing.Size(776, 81);
             // 
             // grpKomponenteHinzufügen
             // 
@@ -105,16 +102,15 @@ namespace BlueControls.Forms {
             // 
             // tabRightSide
             // 
-            this.tabRightSide.Location = new System.Drawing.Point(659, 136);
+            this.tabRightSide.Location = new System.Drawing.Point(412, 110);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(659, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
+            this.capStatusBar.Size = new System.Drawing.Size(412, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Size = new System.Drawing.Size(659, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(412, 24);
             // 
             // tabDatei
             // 

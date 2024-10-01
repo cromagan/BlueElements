@@ -58,7 +58,7 @@ public class VariableFloat : Variable {
     public override int CheckOrder => 1;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
-    public override string MyClassId => ClassId;
+  
 
     /// <summary>
     /// Der Zahlenwert mit maximal 5 Kommastellen (0.#####)

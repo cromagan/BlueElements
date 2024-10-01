@@ -55,7 +55,6 @@ public class VariableRowItem : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => _row == null;
-    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Gibt den Text "Row: CellFirstString" zurück.

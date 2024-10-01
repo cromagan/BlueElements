@@ -65,7 +65,7 @@ public class VariableListString : Variable {
     public override int CheckOrder => 3;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => _list.Count == 0;
-    public override string MyClassId => ClassId;
+  
 
     /// <summary>
     /// Die Liste als Text formatiert. z.B. ["A", "B", "C"]

@@ -39,7 +39,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     public List<Kraft> Kraft { get; } = [];
 
-    public override string MyClassId => ClassId;
+  
 
     protected override int SaveOrder => 999;
 

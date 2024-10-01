@@ -91,7 +91,7 @@ public class ComicCompPadItem : AbstractPadItem {
 
     public override string Description => string.Empty;
 
-    public override string MyClassId => ClassId;
+  
 
     public int Width {
         get => _width;

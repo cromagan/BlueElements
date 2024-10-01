@@ -120,8 +120,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override bool MustBeInDrawingArea => true;
 
-    public override string MyClassId => ClassId;
-
     public float Scale {
         get => _scale;
         set {

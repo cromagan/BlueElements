@@ -49,8 +49,6 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     public override string Description => "Kann spezielle Skripte als Symbol rendern";
 
-    public override string MyClassId => ClassId;
-
     #endregion
 
     #region Methods

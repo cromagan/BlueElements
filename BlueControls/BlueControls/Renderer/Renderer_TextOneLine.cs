@@ -53,7 +53,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public override string Description => "Text wird immer einzeilig dargestellt.";
 
-    public override string MyClassId => ClassId;
+  
 
     public string Präfix {
         get => _präfix;

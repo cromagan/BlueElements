@@ -69,8 +69,6 @@ public class VariableFilterItem : Variable {
 
     public override bool IsNullOrEmpty => _filter == null || !_filter.IsOk();
 
-    public override string MyClassId => ClassId;
-
     public override string ReadableText => _lastText;
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;

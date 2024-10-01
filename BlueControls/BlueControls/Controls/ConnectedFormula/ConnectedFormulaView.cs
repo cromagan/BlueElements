@@ -166,8 +166,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             y2 = Skin.Padding;
         }
 
-        if (ConnectedFormula?.Pages != null) {
-            foreach (var thisP in ConnectedFormula?.Pages.Items) {
+        if (_connectedFormula?.Pages?.Items is { } items) {
+            foreach (var thisP in items) {
                 if (thisP is ItemCollectionPadItem icp && string.Equals(icp.Caption, Page, StringComparison.OrdinalIgnoreCase)) {
                     var l = ItemCollectionPadItem.ResizeControls(icp, Width - x1 - x2, Height - y1 - y2, Mode);
                     var autoc = new List<FlexiControlForCell>();

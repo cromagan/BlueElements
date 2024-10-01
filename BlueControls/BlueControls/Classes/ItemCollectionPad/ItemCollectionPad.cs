@@ -106,7 +106,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
     }
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
-        if(IO.FileExists(layoutFileName)) {
+        if (IO.FileExists(layoutFileName)) {
             this.Parse(File.ReadAllText(layoutFileName, Win1252));
         }
         IsSaved = true;
@@ -134,6 +134,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
     #region Properties
 
+    public static string ClassId => "ITEMCOLLECTION";
     public Color BackColor { get; set; } = Color.White;
 
     [DefaultValue(false)]
@@ -182,9 +183,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
     public bool IsSaved { get; set; }
 
     public ObservableCollection<AbstractPadItem> Items { get; } = new ObservableCollection<AbstractPadItem>();
-
-    public override string MyClassId => "PadCollection";
-
     IMouseAndKeyHandle? IMouseAndKeyHandle.Parent { get; set; }
 
     public Padding RandinMm {
@@ -725,19 +723,21 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Style", SheetStyle?.CellFirstString());
+        result.ParseableAdd("Caption", _caption);
+
+        result.ParseableAdd("Style", _sheetStyle?.CellFirstString());
 
         result.ParseableAdd("BackColor", BackColor.ToArgb());
         if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
-            result.ParseableAdd("FontScale", SheetStyleScale);
+            result.ParseableAdd("FontScale", _sheetStyleScale);
         }
 
         if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
-            result.ParseableAdd("SheetSize", SheetSizeInMm);
-            result.ParseableAdd("PrintArea", RandinMm.ToString());
+            result.ParseableAdd("SheetSize", _sheetSizeInMm);
+            result.ParseableAdd("PrintArea", _randinMm.ToString());
         }
 
-        result.ParseableAdd("Item", Items as IStringable);
+        result.ParseableAdd("Item", Items);
 
         result.ParseableAdd("SnapMode", _snapMode);
         result.ParseableAdd("GridShow", _gridShow);
@@ -798,6 +798,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
                 ParseItems(value);// ...im zweiten können nun auch Beziehungen erstellt werden!
                 return true;
 
+            case "item":
+                var i = ParsebleItem.NewByParsing<AbstractPadItem>(value.FromNonCritical());
+                if (i != null) { Add(i); }
+                return true;
+
             case "connection":
                 CreateConnection(value);
                 return true;
@@ -816,6 +821,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
             case "sheetstylescale":
                 _sheetStyleScale = FloatParse(value);
                 return true;
+
         }
 
         return base.ParseThis(key, value);

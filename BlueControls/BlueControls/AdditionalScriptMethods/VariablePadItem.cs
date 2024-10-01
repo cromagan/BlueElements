@@ -52,7 +52,7 @@ public class VariablePadItem : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _item == null;
-    public override string MyClassId => ClassId;
+  
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 

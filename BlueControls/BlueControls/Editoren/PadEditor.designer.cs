@@ -55,7 +55,6 @@ namespace BlueControls.Forms {
             this.capSchriftgröße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.capDesign = new BlueControls.Controls.Caption();
-            this.tabSeiten = new BlueControls.Controls.TabControl();
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabRightSide = new BlueControls.Controls.TabControl();
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
@@ -115,11 +114,11 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Pad.Location = new System.Drawing.Point(0, 136);
+            this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
             this.Pad.ShiftX = 0F;
             this.Pad.ShiftY = 0F;
-            this.Pad.Size = new System.Drawing.Size(512, 225);
+            this.Pad.Size = new System.Drawing.Size(512, 227);
             this.Pad.TabIndex = 0;
             this.Pad.Zoom = 1F;
             this.Pad.ClickedItemChanged += new System.EventHandler(this.Pad_ClickedItemChanged);
@@ -473,27 +472,15 @@ namespace BlueControls.Forms {
             this.capDesign.Text = "Design:";
             this.capDesign.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
-            // tabSeiten
-            // 
-            this.tabSeiten.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tabSeiten.HotTrack = true;
-            this.tabSeiten.Location = new System.Drawing.Point(0, 110);
-            this.tabSeiten.Name = "tabSeiten";
-            this.tabSeiten.SelectedIndex = 0;
-            this.tabSeiten.Size = new System.Drawing.Size(884, 26);
-            this.tabSeiten.TabDefault = null;
-            this.tabSeiten.TabDefaultOrder = null;
-            this.tabSeiten.TabIndex = 3;
-            // 
             // tabRightSide
             // 
             this.tabRightSide.Controls.Add(this.tabElementEigenschaften);
             this.tabRightSide.Dock = System.Windows.Forms.DockStyle.Right;
             this.tabRightSide.HotTrack = true;
-            this.tabRightSide.Location = new System.Drawing.Point(512, 136);
+            this.tabRightSide.Location = new System.Drawing.Point(512, 110);
             this.tabRightSide.Name = "tabRightSide";
             this.tabRightSide.SelectedIndex = 0;
-            this.tabRightSide.Size = new System.Drawing.Size(372, 225);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 251);
             this.tabRightSide.TabDefault = null;
             this.tabRightSide.TabDefaultOrder = null;
             this.tabRightSide.TabIndex = 4;
@@ -503,7 +490,7 @@ namespace BlueControls.Forms {
             this.tabElementEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabElementEigenschaften.Location = new System.Drawing.Point(4, 25);
             this.tabElementEigenschaften.Name = "tabElementEigenschaften";
-            this.tabElementEigenschaften.Size = new System.Drawing.Size(364, 196);
+            this.tabElementEigenschaften.Size = new System.Drawing.Size(364, 222);
             this.tabElementEigenschaften.TabIndex = 0;
             this.tabElementEigenschaften.Text = "Element-Eigenschaften";
             // 
@@ -513,14 +500,12 @@ namespace BlueControls.Forms {
             this.ClientSize = new System.Drawing.Size(884, 361);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.tabRightSide);
-            this.Controls.Add(this.tabSeiten);
             this.Controls.Add(this.Ribbon);
             this.Name = "PadEditor";
             this.Controls.SetChildIndex(this.Ribbon, 0);
-            this.Controls.SetChildIndex(this.tabSeiten, 0);
             this.Controls.SetChildIndex(this.tabRightSide, 0);
-            this.Controls.SetChildIndex(this.Pad, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
+            this.Controls.SetChildIndex(this.Pad, 0);
             this.pnlStatusBar.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
@@ -551,7 +536,6 @@ namespace BlueControls.Forms {
         private GroupBox grpDrucken;
         private Button btnPageSetup;
         protected Button btnVorschauModus;
-        protected TabControl tabSeiten;
         protected GroupBox grpKomponenteHinzufügen;
         private Caption capRasterFangen;
         private Caption capRasterAnzeige;

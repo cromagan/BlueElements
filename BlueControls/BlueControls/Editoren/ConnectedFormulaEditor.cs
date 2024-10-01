@@ -342,7 +342,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         try {
             if (IsDisposed) { return; }
 
-            var x = _cFormula.AllPages();
+            var x = _cFormula?.AllPages() ?? [];
 
             TabPage? later = null;
 
@@ -361,7 +361,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
                     }
 
                     _ = x.Remove(tb.Text);
-                    if (Pad != null && tb.Text == Pad.Items.Caption) { later = tb; }
+                    if (Pad?.Items != null && tb.Text == Pad.Items.Caption) { later = tb; }
                 }
 
                 foreach (var thisn in x) {
@@ -370,7 +370,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
                     };
                     tabSeiten.TabPages.Add(t);
 
-                    if (Pad != null && t.Text == Pad.Items.Caption) { later = t; }
+                    if (Pad?.Items != null && t.Text == Pad.Items.Caption) { later = t; }
                 }
             } else {
                 tabSeiten.Visible = false;
@@ -429,10 +429,16 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             CFormula.NotAllowedChilds = l.AsReadOnly();
         }
 
-        foreach (var thisp in CFormula.Pages.Items) {
-            if (thisp is ItemCollectionPadItem icp && icp.Caption.ToLower() == "head") {
-                Pad.Items = icp; break;
+        if (_cFormula?.Pages is { } pg) {
+
+            foreach (var thisp in pg.Items) {
+                if (thisp is ItemCollectionPadItem icp && icp.Caption.ToLower() == "head") {
+                    Pad.Items = icp;
+                    break;
+                }
             }
+        } else {
+            Pad.Items = null;
         }
 
         CheckButtons();
@@ -497,13 +503,18 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             s = tabSeiten.SelectedTab.Text;
         }
 
-        foreach (var thisp in _cFormula.Pages.Items) {
-            if (thisp is ItemCollectionPadItem icp) {
-                if (s == icp.Caption) {
-                    Pad.Items = icp;
-                    break;
+        if (_cFormula?.Pages is { } pg) {
+
+            foreach (var thisp in pg.Items) {
+                if (thisp is ItemCollectionPadItem icp) {
+                    if (s == icp.Caption) {
+                        Pad.Items = icp;
+                        break;
+                    }
                 }
             }
+        } else {
+            Pad.Items = null;
         }
     }
 

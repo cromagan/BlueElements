@@ -95,7 +95,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
-    public override string MyClassId => ClassId;
+  
 
     public string Platzhalter_Für_Layout {
         get => _platzhalter_Für_Layout; set {

@@ -132,7 +132,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         }
     }
 
-    public override string MyClassId => ClassId;
+  
 
     public string Standard_Bild {
         get => _defaultImage;

@@ -69,7 +69,6 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     protected override int SaveOrder => 4;
 

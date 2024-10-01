@@ -54,7 +54,6 @@ public class VariableUnknown : Variable {
     public override int CheckOrder => 100;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
-    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Gleichgesetzt mit ValueString

@@ -66,7 +66,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
+  
 
     protected override int SaveOrder => 1000;
 

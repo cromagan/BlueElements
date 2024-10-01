@@ -87,7 +87,6 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     public string Überschrift {
         get => _überschrift;

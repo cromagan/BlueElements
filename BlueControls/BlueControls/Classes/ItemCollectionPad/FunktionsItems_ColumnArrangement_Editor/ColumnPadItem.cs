@@ -61,8 +61,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override string Description => string.Empty;
 
-    public override string MyClassId => ClassId;
-
     //        _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
     //    }
     //}

@@ -130,12 +130,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         set {
             if (_items == value) { return; }
 
+            Unselect();
+
             UnRegisterEvents();
 
             _items = value;
 
             RegisterEvents();
 
+            ZoomFit();
             Invalidate();
             OnGotNewItemCollection();
         }

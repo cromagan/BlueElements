@@ -45,11 +45,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxInternalColumnArrangementSelector = new BlueControls.Controls.ComboBox();
             this.btnNeueAnsichtErstellen = new BlueControls.Controls.Button();
             this.btnAktuelleAnsichtLoeschen = new BlueControls.Controls.Button();
-            this.grpDesign.SuspendLayout();
-            this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
+            this.grpDesign.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.tabAnsichten.SuspendLayout();
             this.grpSpalten.SuspendLayout();
@@ -57,16 +57,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAnsichtsVerwaltung.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tabRightSide
-            // 
-            this.tabRightSide.Location = new System.Drawing.Point(612, 136);
-            this.tabRightSide.Size = new System.Drawing.Size(372, 290);
-            // 
             // Pad
             // 
             this.Pad.ContextMenuAllowed = false;
-            this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.Size = new System.Drawing.Size(612, 290);
+            this.Pad.Location = new System.Drawing.Point(0, 110);
+            this.Pad.Size = new System.Drawing.Size(612, 316);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
@@ -87,22 +82,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabStart.Size = new System.Drawing.Size(976, 81);
             // 
-            // tabExport
+            // tabRightSide
             // 
-            this.tabExport.Size = new System.Drawing.Size(976, 81);
-            // 
-            // tabSeiten
-            // 
-            this.tabSeiten.Size = new System.Drawing.Size(984, 26);
+            this.tabRightSide.Location = new System.Drawing.Point(612, 110);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 340);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(984, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(612, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 426);
-            this.pnlStatusBar.Size = new System.Drawing.Size(984, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(612, 24);
             // 
             // tabAnsichten
             // 
@@ -112,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnsichten.Controls.Add(this.grpAnsichtsVerwaltung);
             this.tabAnsichten.Location = new System.Drawing.Point(4, 25);
             this.tabAnsichten.Name = "tabAnsichten";
-            this.tabAnsichten.Size = new System.Drawing.Size(976, 81);
+            this.tabAnsichten.Size = new System.Drawing.Size(876, 81);
             this.tabAnsichten.TabIndex = 4;
             this.tabAnsichten.Text = "Ansichten";
             // 
@@ -293,11 +285,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Name = "ColumnArrangementPadEditor";
             this.Text = "Spalten-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.grpDesign.ResumeLayout(false);
-            this.tabHintergrund.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.tabAnsichten.ResumeLayout(false);
             this.grpSpalten.ResumeLayout(false);

@@ -418,8 +418,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (_isInSaveingLoop) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
 
-        _isSaved = true; //"XXX";
-        return;
         var tim = Stopwatch.StartNew();
 
         while (!_isSaved) {
@@ -592,7 +590,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <returns></returns>
     private string SaveRoutine(string tmpFileName, string fileInfoBeforeSaving, string dataUncompressed) {
         if (_isSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen.", false); }
-        return "XXX";
 
         _isSaving = true;
 

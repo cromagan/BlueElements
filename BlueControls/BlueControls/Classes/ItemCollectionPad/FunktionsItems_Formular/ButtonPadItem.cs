@@ -237,7 +237,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     protected override int SaveOrder => 1;
 

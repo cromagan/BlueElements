@@ -78,7 +78,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle RahmenStil {

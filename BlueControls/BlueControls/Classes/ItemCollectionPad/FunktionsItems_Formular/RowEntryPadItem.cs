@@ -54,7 +54,6 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     public new List<int> InputColorId => [OutputColorId];
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
-    public override string MyClassId => ClassId;
 
     protected override int SaveOrder => 1;
 

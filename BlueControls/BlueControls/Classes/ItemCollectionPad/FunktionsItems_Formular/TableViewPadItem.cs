@@ -78,7 +78,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
+  
 
     [DefaultValue("")]
     public string Standard_Ansicht {

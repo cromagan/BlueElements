@@ -49,7 +49,6 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     protected override int SaveOrder => 5;
 

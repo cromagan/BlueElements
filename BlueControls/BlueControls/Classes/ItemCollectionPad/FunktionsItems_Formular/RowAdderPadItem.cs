@@ -123,7 +123,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-    public override string MyClassId => ClassId;
 
     /// <summary>
     /// Eine Spalte in der Ziel-Datenbank.

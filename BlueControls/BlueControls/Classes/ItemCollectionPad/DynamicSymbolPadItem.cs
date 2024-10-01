@@ -57,7 +57,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
     public override string Description => string.Empty;
 
-    public override string MyClassId => ClassId;
+  
 
     public string Script {
         get => _script;

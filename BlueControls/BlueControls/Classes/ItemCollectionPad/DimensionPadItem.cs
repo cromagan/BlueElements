@@ -117,7 +117,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPadItem.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
-    public override string MyClassId => ClassId;
+  
 
     public int Nachkommastellen { get; set; }
 

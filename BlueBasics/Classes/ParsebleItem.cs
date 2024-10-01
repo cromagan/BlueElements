@@ -32,9 +32,21 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
     #endregion
 
+    //public abstract string MyClassId { get; }
+
     #region Properties
 
-    public abstract string MyClassId { get; }
+    public string MyClassId {
+        get {
+            var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
+            if (ci != null) {
+                return ci;
+            } else {
+                Develop.DebugPrint(FehlerArt.Fehler, "ClassID nicht gefunden!");
+            }
+            return string.Empty;
+        }
+    }
 
     #endregion
 
@@ -98,12 +110,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
     public virtual List<string> ParseableItems() {
         List<string> result = [];
-
-        var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
-        if (ci != null) {
-            result.ParseableAdd("ClassId", ci);
-        }
-
+        result.ParseableAdd("ClassId", MyClassId);
         return result;
     }
 
