@@ -479,7 +479,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
         foreach (var thisc in padData.Items) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                thisc.IsInDrawingArea(thisc.UsedArea, padData.UsedArea)) {
+                thisc.IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
                 its.Add(aas);
             }
         }
@@ -538,18 +538,22 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         Items.Clear();
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
 
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
+        var d = !_sheetSizeInMm.IsEmpty ? UsedArea.ToRect() : visibleArea;
+        var ds = !_sheetSizeInMm.IsEmpty ? positionModified : visibleArea;
+
+
         if (BackColor.A > 0) {
-            gr.FillRectangle(new SolidBrush(BackColor), positionModified);
+            gr.FillRectangle(new SolidBrush(BackColor), d);
+
         }
 
         #region Grid
 
         if (_gridShow > 0.1) {
-            var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
 
             var tmpgrid = _gridShow;
 
@@ -558,27 +562,33 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
             var p = new Pen(Color.FromArgb(10, 0, 0, 0));
             float ex = 0;
 
+            var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
+            float dxp, dyp, dxm, dym;
+
+
             do {
                 var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
 
-                gr.DrawLine(p, po.X + (int)mo, 0, po.X + (int)mo, positionModified.Height);
-                gr.DrawLine(p, 0, po.Y + (int)mo, positionModified.Width, po.Y + (int)mo);
+                 dxp = po.X + mo;
+                 dxm = po.X - mo;
+                 dyp = po.Y + mo;
+                 dym = po.Y - mo;
+
+                if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
+                if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
 
                 if (ex > 0) {
                     // erste Linie nicht doppelt zeichnen
-                    gr.DrawLine(p, po.X - (int)mo, 0, po.X - (int)mo, positionModified.Height);
-                    gr.DrawLine(p, 0, po.Y - (int)mo, positionModified.Width, po.Y - (int)mo);
+                    if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
+                    if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
                 }
 
                 ex++;
 
-                if (po.X - mo < 0 &&
-                    po.Y - mo < 0 &&
-                    po.X + mo > positionModified.Width &&
-                    po.Y + mo > positionModified.Height) {
-                    break;
-                }
-            } while (true);
+            } while (!(dxm < ds.Left &&
+                    dxm < ds.Top &&
+                    dxp > ds.Right &&
+                    dxp > ds.Bottom));
         }
 
         #endregion
@@ -589,7 +599,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         if (SheetStyleScale > 0.1) {
             foreach (var thisItem in Items) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+                thisItem.Draw(gr, positionModified.ToRect(), scale, shiftX, shiftY, forPrinting, showJointPoints);
             }
 
 
@@ -599,7 +609,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         #endregion
 
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
     }
 

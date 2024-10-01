@@ -341,7 +341,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Layout, 16, Skin.IdColor(InputColorId), Color.Transparent);
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         DrawColorScheme(gr, positionModified, scale, null, false, false, false);
         //var headh = 25 * zoom;
         //var headb = 70 * zoom;
@@ -368,7 +368,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         //    DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         //}
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
         DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }

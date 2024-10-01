@@ -219,7 +219,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     public virtual string ErrorReason() {
         if (Parent == null) { return "Keiner Ansicht zugeordnet."; }
 
-        if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, Parent.UsedArea)) {
+        if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, Parent.UsedArea.ToRect())) {
             return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
         }
 
@@ -544,8 +544,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
         CalculateColorIds();
     }
 

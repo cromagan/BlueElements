@@ -79,7 +79,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
         #region Bild zeichnen
@@ -99,7 +99,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
         #endregion
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     protected abstract void GeneratePic();

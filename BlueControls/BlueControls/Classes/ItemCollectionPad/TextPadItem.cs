@@ -207,7 +207,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         if (Stil != PadStyles.Undefiniert) {
             gr.SetClip(positionModified);
             var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -228,7 +228,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             gr.ResetClip();
         }
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     private void InvalidateText() => _txt = null;

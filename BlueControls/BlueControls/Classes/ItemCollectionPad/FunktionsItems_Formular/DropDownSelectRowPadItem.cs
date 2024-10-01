@@ -179,7 +179,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, scale, forPrinting, OutputColorId);
             DrawFakeControl(gr, positionModified, scale, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
@@ -188,7 +188,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
             DrawFakeControl(gr, positionModified, scale, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, true, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, true, showJointPoints);
         DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 

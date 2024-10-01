@@ -303,7 +303,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         return x;
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         if (Stil != PadStyles.Undefiniert) {
             var geszoom = Parent?.SheetStyleScale * Skalierung * scale ?? scale;
             var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
@@ -348,7 +348,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
             f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
         }
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     private void CalculateOtherPoints() {

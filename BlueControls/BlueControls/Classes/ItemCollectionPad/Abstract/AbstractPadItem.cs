@@ -135,7 +135,9 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public void DrawToBitmap(Bitmap? bmp, float scale, float shiftX, float shiftY) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        DrawExplicit(gr, new RectangleF(0, 0, bmp.Width, bmp.Height), scale, shiftX, shiftY, true, false);
+        var r = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);    
+
+        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), r, scale, shiftX, shiftY, true, false);
         gr.Dispose();
     }
 
@@ -328,13 +330,13 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    public void Draw(Graphics gr, RectangleF parentpositionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    public void Draw(Graphics gr, Rectangle visibleArea, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         if (forPrinting && !_beiExportSichtbar) { return; }
 
         var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
 
-        if (IsInDrawingArea(positionModified, parentpositionModified)) {
-            DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        if (IsInDrawingArea(positionModified, visibleArea)) {
+            DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
             if (showJointPoints) {
                 DrawPoints(gr, JointPoints, scale, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
@@ -409,7 +411,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
-    public bool IsInDrawingArea(RectangleF drawingKoordinates, RectangleF visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
+    public bool IsInDrawingArea(RectangleF drawingKoordinates, Rectangle visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
 
     public void Move(float x, float y, bool isMouse) {
         if (x == 0 && y == 0) { return; }
@@ -654,7 +656,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected virtual void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         try {
             if (!forPrinting) {
                 if (positionModified is { Width: > 1, Height: > 1 }) {

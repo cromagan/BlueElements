@@ -674,7 +674,7 @@
     <Compile Include="Classes\ItemCollectionList\TextListItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\BitmapPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DimensionPadItem.cs" />
-    <Compile Include="Classes\ItemCollectionPad\ItemCollectionPad.cs" />
+    <Compile Include="Classes\ItemCollectionPad\ItemCollectionPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\LinePadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\RowFormulaPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\TextPadItem.cs" />

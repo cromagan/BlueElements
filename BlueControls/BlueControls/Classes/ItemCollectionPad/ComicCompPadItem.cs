@@ -217,7 +217,7 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         var lOt = _ber_Lo.ZoomAndMove(scale, shiftX, shiftY);
         var rOt = _ber_Ro.ZoomAndMove(scale, shiftX, shiftY);
         var rUt = _ber_Ru.ZoomAndMove(scale, shiftX, shiftY);
@@ -233,7 +233,7 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawLine(ZoomPad.PenGray, lUt, lOt);
             gr.DrawLine(ZoomPad.PenGray, P1.ZoomAndMove(scale, shiftX, shiftY), P2.ZoomAndMove(scale, shiftX, shiftY));
         }
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     private void ImageChanged() {

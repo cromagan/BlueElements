@@ -204,7 +204,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
@@ -217,7 +217,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
         DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 

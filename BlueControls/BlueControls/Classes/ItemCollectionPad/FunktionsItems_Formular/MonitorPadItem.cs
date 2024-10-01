@@ -83,7 +83,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return QuickImage.Get(ImageCode.Textdatei, 16);
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
@@ -96,7 +96,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
         DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 
