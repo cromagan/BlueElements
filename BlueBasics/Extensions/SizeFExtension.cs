@@ -32,5 +32,11 @@ public static partial class Extensions {
         return new SizeF(FloatParse(w[0]), FloatParse(w[1]));
     }
 
+    public static Size SizeParse(this string toParse) {
+        toParse = toParse.FromNonCritical().RemoveChars("{}Widtheg= ");
+        var w = toParse.SplitBy(",H");
+        return new Size(IntParse(w[0]), IntParse(w[1]));
+    }
+
     #endregion
 }

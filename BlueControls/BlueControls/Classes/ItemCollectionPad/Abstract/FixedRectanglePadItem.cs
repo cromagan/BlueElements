@@ -17,7 +17,10 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
+using BlueBasics;
 using BlueControls.EventArgs;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
@@ -26,14 +29,33 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     #region Fields
 
-    protected Size Size = Size.Empty;
+    /// <summary>
+    /// Die fixe Größe in Pixel
+    /// </summary>
+    protected Size _size = Size.Empty;
 
+    /// <summary>
+    /// Die fixe Größe in Pixel
+    /// </summary>
+    public Size Size {
+
+        get {
+            return _size;
+        }
+        set {
+
+            if (_size.Width == _size.Width && _size.Height == value.Height) { return; }
+            _size = value;
+            OnPropertyChanged();
+
+        }
+    }
     private readonly PointM _pl;
 
     /// <summary>
     /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
     /// </summary>
-    private readonly PointM _pLo;
+    protected readonly PointM _pLo;
 
     private readonly PointM _pLu;
 
@@ -91,6 +113,29 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         base.ParseFinished(parsed);
         SizeChanged();
     }
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Size", _size);
+
+
+        return result;
+
+
+    }
+
+
+    public override bool ParseThis(string key, string value) {
+        switch (key.ToLowerInvariant()) {
+            case "size":
+                _size = value.SizeParse();
+                return true;
+
+        }
+
+        return base.ParseThis(key, value);
+    }
+
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
@@ -100,24 +145,24 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
             return;
         }
 
-        var x =  point.X;
+        var x = point.X;
         var y = point.Y;
 
-   
+
 
         if (point == _pLo) {
-            _pRu.Y = y + Size.Height;
+            _pRu.Y = y + _size.Height;
             _po.Y = y;
 
-            _pRu.X = x + Size.Width;
+            _pRu.X = x + _size.Width;
             _pl.X = x;
         }
 
         if (point == _pRu) {
-            _pLo.X = x - Size.Width;
+            _pLo.X = x - _size.Width;
             _pr.X = x;
 
-            _pLo.Y = y - Size.Height;
+            _pLo.Y = y - _size.Height;
             _pu.Y = y;
         }
 
@@ -148,7 +193,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         if (point == _pr) {
-   
+
             _pRo.X = x;
             _pRu.X = x;
         }

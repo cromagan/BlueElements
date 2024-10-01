@@ -137,7 +137,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
 
-        var oneItem = tmp.MaxBounds();
+        var oneItem = tmp.UsedArea;
         pad.Items.SheetStyle = tmp.SheetStyle;
         pad.Items.SheetStyleScale = tmp.SheetStyleScale;
         pad.ShowInPrintMode = true;
@@ -145,7 +145,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         pad.Items.BackColor = Color.LightGray;
         tmp.Dispose();
 
-        var druckB = pad.Items.DruckbereichRect();
+        var druckB = pad.Items.UsedArea;
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPadItem.Dpi), MidpointRounding.AwayFromZero);
 
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
@@ -163,7 +163,9 @@ public sealed partial class ExportDialog : IHasDatabase {
                     it.GridShow = -1;
                 }
                 pad.Items.Add(it);
-                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy }, true);
+                //it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy }, true);
+
+                it.SetLeftTopPoint(druckB.Left + x * (oneItem.Width + abstand) + offx, druckB.Top + y * (oneItem.Height + abstand) + offy);
 
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }

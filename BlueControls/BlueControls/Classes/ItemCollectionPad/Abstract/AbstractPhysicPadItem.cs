@@ -408,15 +408,15 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         return new RectangleF(minx, miny, maxx - minx, maxy - miny);
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         if (MovablePoint.Count > 0) {
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {
-                gr.DrawLine(Pens.Black, lastP.ZoomAndMove(zoom, shiftX, shiftY), thisP.ZoomAndMove(zoom, shiftX, shiftY));
+                gr.DrawLine(Pens.Black, lastP.ZoomAndMove(scale, shiftX, shiftY), thisP.ZoomAndMove(scale, shiftX, shiftY));
                 lastP = thisP;
             }
         }
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     // Return the dot product AB · BC.

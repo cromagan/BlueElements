@@ -285,26 +285,26 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        DrawArrowOutput(gr, positionModified, zoom, forPrinting, OutputColorId);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+        DrawArrowOutput(gr, positionModified, scale, forPrinting, OutputColorId);
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
         }
 
         //if (Column  ==null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        //DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        //DrawFakeControl(gr, positionModified, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
-        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 
     #endregion

@@ -126,7 +126,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
@@ -154,7 +154,7 @@ public class SymbolPadItem : RectanglePadItem {
                 break;
 
             case Symbol.Rechteck_gerundet:
-                p = Poly_RoundRec(d2.ToRect(), (int)(20 * zoom));
+                p = Poly_RoundRec(d2.ToRect(), (int)(20 * scale));
                 break;
 
             default:
@@ -164,12 +164,12 @@ public class SymbolPadItem : RectanglePadItem {
 
         if (p != null && Parent != null) {
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-            gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * Parent.SheetStyleScale), p);
+            gr.DrawPath(new Pen(Randfarbe, Randdicke * scale * Parent.SheetStyleScale), p);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     #endregion

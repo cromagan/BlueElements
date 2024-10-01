@@ -611,7 +611,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
         if (_items != null) {
-            _ = _items.DrawTo(gr, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, _showJointPoints, state);
+            
+
+
+            _items.Draw(gr, ClientRectangle, Zoom, ShiftX, ShiftY, _showInPrintMode, _showJointPoints);
 
             #region Dann die selektierten Punkte
 
@@ -646,7 +649,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         // Ganz wichtig diese Routine!
         keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
-    protected override RectangleF MaxBounds() => _items?.MaxBounds() ?? new RectangleF(0, 0, 0, 0);
+    protected override RectangleF MaxBounds() => _items?.UsedArea ?? new RectangleF(0, 0, 0, 0);
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
 

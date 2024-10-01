@@ -272,16 +272,16 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            if (Bitmap != null) {
-                Bitmap?.Dispose();
-                Bitmap = null;
+            if (_bitmap != null) {
+                _bitmap?.Dispose();
+                _bitmap = null;
             }
 
             //IsDisposed = true;
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         positionModified.Inflate(-Padding, -Padding);
         RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
             positionModified.Width - (Padding * 2), positionModified.Height - (Padding * 2));
@@ -296,17 +296,17 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
                     }
 
                 case SizeModes.BildAbschneiden: {
-                        var scale = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-                        var tmpw = (positionModified.Width - (Padding * 2)) / scale;
-                        var tmph = (positionModified.Height - (Padding * 2)) / scale;
+                        var scale2 = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                        var tmpw = (positionModified.Width - (Padding * 2)) / scale2;
+                        var tmph = (positionModified.Height - (Padding * 2)) / scale2;
                         r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
                         r2 = r1;
                         break;
                     }
                 default: // Is = enSizeModes.WeißerRand
                 {
-                        var scale = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-                        r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale)) / 2) + positionModified.Top, Bitmap.Width * scale, Bitmap.Height * scale);
+                        var scale2 = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                        r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale2)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale2)) / 2) + positionModified.Top, Bitmap.Width * scale2, Bitmap.Height * scale2);
                         break;
                     }
             }
@@ -335,7 +335,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         }
         if (Stil != PadStyles.Undefiniert) {
             if (Parent is { SheetStyle: not null, SheetStyleScale: > 0 }) {
-                gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
+                gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), r1);
             }
         }
         foreach (var thisQi in Overlays) {
@@ -349,7 +349,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
                 BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
             }
         }
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     #endregion

@@ -207,7 +207,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         if (Stil != PadStyles.Undefiniert) {
             gr.SetClip(positionModified);
             var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -220,7 +220,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
                 _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
-                    _txt.Draw(gr, zoom * Skalierung * Parent.SheetStyleScale);
+                    _txt.Draw(gr, scale * Skalierung * Parent.SheetStyleScale);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -228,7 +228,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             gr.ResetClip();
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     private void InvalidateText() => _txt = null;

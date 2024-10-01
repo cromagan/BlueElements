@@ -50,7 +50,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
+public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
 
     #region Fields
 
@@ -67,13 +67,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
     private float _gridsnap = 1;
 
-    private PointM? _prLo;
-
-    private PointM? _prLu;
-
-    private PointM? _prRo;
-
-    private PointM? _prRu;
 
     private Padding _randinMm = Padding.Empty;
 
@@ -189,7 +182,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         get => _randinMm;
         set {
             _randinMm = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
-            GenPoints();
+            OnPropertyChanged();
         }
     }
 
@@ -200,20 +193,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
             if (Math.Abs(value.Width - _sheetSizeInMm.Width) < DefaultTolerance &&
                 Math.Abs(value.Height - _sheetSizeInMm.Height) < DefaultTolerance) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
-            GenPoints();
+
+            Size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
+
+
             OnPropertyChanged();
         }
     }
 
-    public SizeF SheetSizeInPix {
-        get {
-            if (_sheetSizeInMm.Width < 0.01 || _sheetSizeInMm.Height < 0.01) {
-                return SizeF.Empty;
-            }
 
-            return new(MmToPixel(_sheetSizeInMm.Width, Dpi), MmToPixel(_sheetSizeInMm.Height, Dpi));
-        }
-    }
 
     public RowItem? SheetStyle {
         get => _sheetStyle;
@@ -491,7 +479,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
         foreach (var thisc in padData.Items) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                thisc.IsInDrawingArea(thisc.UsedArea, padData.SheetSizeInPix.ToSize())) {
+                thisc.IsInDrawingArea(thisc.UsedArea, padData.UsedArea)) {
                 its.Add(aas);
             }
         }
@@ -500,7 +488,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
         #endregion
 
-        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.SheetSizeInPix.Width, padData.SheetSizeInPix.Height);
+        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.Size.Width, padData.Size.Height);
 
         var erg = new List<(IAutosizable item, RectangleF newpos)>();
 
@@ -521,7 +509,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
             sizeOfPaintArea.Height / maxBounds.Height);
     }
 
-    public new void Add(AbstractPadItem? item) {
+    public void Add(AbstractPadItem? item) {
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
         if (Items.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
         if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
@@ -550,90 +538,71 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         Items.Clear();
     }
 
-    public bool DrawTo(Graphics gr, float scale, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, bool showJointPoints, States state) {
-        try {
-            gr.PixelOffsetMode = PixelOffsetMode.None;
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
 
-            #region Hintergrund und evtl. Zeichenbereich
+        gr.PixelOffsetMode = PixelOffsetMode.None;
 
-            if (_prLo != null && _prRu != null) {
-                if (BackColor.A > 0) {
-                    var p = SheetSizeInPix;
-                    var rLo2 = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
-                    var rRu2 = new PointM(p.Width, p.Height).ZoomAndMove(scale, shiftX, shiftY);
-                    Rectangle rr2 = new((int)rLo2.X, (int)rLo2.Y, (int)(rRu2.X - rLo2.X), (int)(rRu2.Y - rLo2.Y));
+        if (BackColor.A > 0) {
+            gr.FillRectangle(new SolidBrush(BackColor), positionModified);
+        }
 
-                    gr.FillRectangle(new SolidBrush(BackColor), rr2);
-                    if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr2); }
+        #region Grid
+
+        if (_gridShow > 0.1) {
+            var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
+
+            var tmpgrid = _gridShow;
+
+            while (MmToPixel(tmpgrid, Dpi) * scale < 5) { tmpgrid *= 2; }
+
+            var p = new Pen(Color.FromArgb(10, 0, 0, 0));
+            float ex = 0;
+
+            do {
+                var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
+
+                gr.DrawLine(p, po.X + (int)mo, 0, po.X + (int)mo, positionModified.Height);
+                gr.DrawLine(p, 0, po.Y + (int)mo, positionModified.Width, po.Y + (int)mo);
+
+                if (ex > 0) {
+                    // erste Linie nicht doppelt zeichnen
+                    gr.DrawLine(p, po.X - (int)mo, 0, po.X - (int)mo, positionModified.Height);
+                    gr.DrawLine(p, 0, po.Y - (int)mo, positionModified.Width, po.Y - (int)mo);
                 }
 
-                var rLo = _prLo.ZoomAndMove(scale, shiftX, shiftY);
-                var rRu = _prRu.ZoomAndMove(scale, shiftX, shiftY);
-                Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X), (int)(rRu.Y - rLo.Y));
-                if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr); }
-            } else {
-                if (BackColor.A > 0) { gr.Clear(BackColor); }
-            }
+                ex++;
 
-            #endregion
-
-            #region Grid
-
-            if (_gridShow > 0.1) {
-                var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
-
-                var tmpgrid = _gridShow;
-
-                while (MmToPixel(tmpgrid, Dpi) * scale < 5) { tmpgrid *= 2; }
-
-                var p = new Pen(Color.FromArgb(10, 0, 0, 0));
-                float ex = 0;
-
-                do {
-                    var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
-
-                    gr.DrawLine(p, po.X + (int)mo, 0, po.X + (int)mo, sizeOfParentControl.Height);
-                    gr.DrawLine(p, 0, po.Y + (int)mo, sizeOfParentControl.Width, po.Y + (int)mo);
-
-                    if (ex > 0) {
-                        // erste Linie nicht doppelt zeichnen
-                        gr.DrawLine(p, po.X - (int)mo, 0, po.X - (int)mo, sizeOfParentControl.Height);
-                        gr.DrawLine(p, 0, po.Y - (int)mo, sizeOfParentControl.Width, po.Y - (int)mo);
-                    }
-
-                    ex++;
-
-                    if (po.X - mo < 0 &&
-                        po.Y - mo < 0 &&
-                        po.X + mo > sizeOfParentControl.Width &&
-                        po.Y + mo > sizeOfParentControl.Height) {
-                        break;
-                    }
-                } while (true);
-            }
-
-            #endregion
-
-            #region Items selbst
-
-            if (!DrawItems(gr, scale, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints)) {
-                return DrawTo(gr, scale, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
-            }
-
-            #endregion
-        } catch {
-            Develop.CheckStackForOverflow();
-            return DrawTo(gr, scale, shiftX, shiftY, sizeOfParentControl, showinprintmode, showJointPoints, state);
+                if (po.X - mo < 0 &&
+                    po.Y - mo < 0 &&
+                    po.X + mo > positionModified.Width &&
+                    po.Y + mo > positionModified.Height) {
+                    break;
+                }
+            } while (true);
         }
-        return true;
+
+        #endregion
+
+        #region Items selbst
+
+
+        if (SheetStyleScale > 0.1) {
+            foreach (var thisItem in Items) {
+                gr.PixelOffsetMode = PixelOffsetMode.None;
+                thisItem.Draw(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+            }
+
+
+        }
+
+
+        #endregion
+
+
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+
     }
 
-    public void DrawTo(Bitmap? bmp, States state, float scale, float shiftX, float shiftY) {
-        if (bmp == null) { return; }
-        var gr = Graphics.FromImage(bmp);
-        _ = DrawTo(gr, scale, shiftX, shiftY, bmp.Size, true, false, state);
-        gr.Dispose();
-    }
 
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
@@ -687,7 +656,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         throw new NotImplementedException();
     }
 
-    public override void Mirror(PointM? p, bool vertical, bool horizontal) {
+    public void Mirror(PointM? p, bool vertical, bool horizontal) {
         foreach (var thisItem in Items) {
             if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
         }
@@ -756,12 +725,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         switch (key.ToLowerInvariant()) {
             case "sheetsize":
                 _sheetSizeInMm = value.SizeFParse();
-                GenPoints();
+                _size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
                 return true;
 
             case "printarea":
                 _randinMm = value.PaddingParse();
-                GenPoints();
                 return true;
 
             case "caption":
@@ -918,34 +886,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Register);
 
-    public Bitmap? ToBitmap(float scale) {
-        var r = MaxBounds();
-        if (r.Width == 0) { return null; }
 
-        CollectGarbage();
-
-        do {
-            if ((int)(r.Width * scale) > 15000) {
-                scale *= 0.8f;
-            } else if ((int)(r.Height * scale) > 15000) {
-                scale *= 0.8f;
-            } else if ((int)(r.Height * scale) * (int)(r.Height * scale) > 90000000) {
-                scale *= 0.8f;
-            } else {
-                break;
-            }
-        } while (true);
-
-        Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
-
-        using var gr = Graphics.FromImage(I);
-        gr.Clear(BackColor);
-        if (!DrawTo(gr, scale, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
-            return ToBitmap(scale);
-        }
-
-        return I;
-    }
 
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
@@ -969,15 +910,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
     /// </summary>
     /// <param name="names"></param>
-    internal void DeleteJointPoints(List<string> names) {
+    internal override void DeleteJointPoints(List<string> names) {
         foreach (var thisItem in Items) {
             thisItem.DeleteJointPoints(names);
         }
+        base.DeleteJointPoints(names);
     }
 
-    internal Rectangle DruckbereichRect() =>
-                    _prLo == null || _prRu == null ? Rectangle.Empty :
-                                                 new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
 
     internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
@@ -1039,17 +978,37 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         return null;
     }
 
-    internal RectangleF MaxBounds() {
-        var r = MaximumBounds();
-        if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
-            var x1 = Math.Min(r.Left, 0);
-            var y1 = Math.Min(r.Top, 0);
-            var x2 = Math.Max(r.Right, MmToPixel(SheetSizeInMm.Width, Dpi));
-            var y2 = Math.Max(r.Bottom, MmToPixel(SheetSizeInMm.Height, Dpi));
-            return new RectangleF(x1, y1, x2 - x1, y2 - y1);
+
+    protected override RectangleF CalculateUsedArea() {
+
+        if (_sheetSizeInMm is { Width: > 0, Height: > 0 }) {
+            //var x1 = Math.Min(r.Left, 0);
+            //var y1 = Math.Min(r.Top, 0);
+            //var x2 = Math.Max(r.Right, MmToPixel(SheetSizeInMm.Width, Dpi));
+            //var y2 = Math.Max(r.Bottom, MmToPixel(SheetSizeInMm.Height, Dpi));
+            //return new RectangleF(x1, y1, x2 - x1, y2 - y1);
+            return base.CalculateUsedArea();
         }
-        return r;
+
+        var x1 = float.MaxValue;
+        var y1 = float.MaxValue;
+        var x2 = float.MinValue;
+        var y2 = float.MinValue;
+        var done = false;
+        foreach (var thisItem in Items) {
+            if (thisItem != null) {
+                var ua = thisItem.UsedArea;
+                x1 = Math.Min(x1, ua.Left);
+                y1 = Math.Min(y1, ua.Top);
+                x2 = Math.Max(x2, ua.Right);
+                y2 = Math.Max(y2, ua.Bottom);
+                done = true;
+            }
+        }
+        return !done ? RectangleF.Empty : new RectangleF(_pLo.X + x1, _pLo.Y + y1, x2 - x1, y2 - y1);
     }
+
+
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
         var itemCount = Items.IndexOf(bpi);
@@ -1206,79 +1165,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IDisposableExtende
         }
     }
 
-    private bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
-        try {
-            if (SheetStyleScale < 0.1d) { return true; }
 
-            foreach (var thisItem in Items) {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting, showJointPoints);
-            }
-            return true;
-        } catch {
-            CollectGarbage();
-            return false;
-        }
-    }
 
-    private void GenPoints() {
-        if (Math.Abs(_sheetSizeInMm.Width) < DefaultTolerance || Math.Abs(_sheetSizeInMm.Height) < DefaultTolerance) {
-            if (_prLo != null) {
-                _prLo.Parent = null;
-                _prLo = null;
-            }
-            if (_prRo != null) {
-                _prRo.Parent = null;
-                _prRo = null;
-            }
-            if (_prRu != null) {
-                _prRu.Parent = null;
-                _prRu = null;
-            }
-            if (_prLu != null) {
-                _prLu.Parent = null;
-                _prLu = null;
-            }
-            return;
-        }
 
-        _prLo ??= new PointM(this, "Druckbereich LO", 0, 0);
-        _prRo ??= new PointM(this, "Druckbereich RO", 0, 0);
-        _prRu ??= new PointM(this, "Druckbereich RU", 0, 0);
-        _prLu ??= new PointM(this, "Druckbereich LU", 0, 0);
-
-        var ssw = (float)Math.Round(MmToPixel(_sheetSizeInMm.Width, Dpi), 1, MidpointRounding.AwayFromZero);
-        var ssh = (float)Math.Round(MmToPixel(_sheetSizeInMm.Height, Dpi), 1, MidpointRounding.AwayFromZero);
-        var rr = (float)Math.Round(MmToPixel(_randinMm.Right, Dpi), 1, MidpointRounding.AwayFromZero);
-        var rl = (float)Math.Round(MmToPixel(_randinMm.Left, Dpi), 1, MidpointRounding.AwayFromZero);
-        var ro = (float)Math.Round(MmToPixel(_randinMm.Top, Dpi), 1, MidpointRounding.AwayFromZero);
-        var ru = (float)Math.Round(MmToPixel(_randinMm.Bottom, Dpi), 1, MidpointRounding.AwayFromZero);
-        _prLo.SetTo(rl, ro, false);
-        _prRo.SetTo(ssw - rr, ro, false);
-        _prRu.SetTo(ssw - rr, ssh - ru, false);
-        _prLu.SetTo(rl, ssh - ru, false);
-    }
 
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
-    private RectangleF MaximumBounds() {
-        var x1 = float.MaxValue;
-        var y1 = float.MaxValue;
-        var x2 = float.MinValue;
-        var y2 = float.MinValue;
-        var done = false;
-        foreach (var thisItem in Items) {
-            if (thisItem != null) {
-                var ua = thisItem.ZoomToArea();
-                x1 = Math.Min(x1, ua.Left);
-                y1 = Math.Min(y1, ua.Top);
-                x2 = Math.Max(x2, ua.Right);
-                y2 = Math.Max(y2, ua.Bottom);
-                done = true;
-            }
-        }
-        return !done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);
-    }
+
 
     private void OnItemAdded(AbstractPadItem item) {
         if (IsDisposed) { return; }

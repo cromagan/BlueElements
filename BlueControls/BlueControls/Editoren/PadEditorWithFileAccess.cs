@@ -117,7 +117,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
         ItemCollectionPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        b.SetLeftTopPoint(100,100);
         Pad.AddCentered(b);
     }
 

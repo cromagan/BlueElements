@@ -35,10 +35,45 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
+using BlueDatabase;
+using static BlueBasics.Generic;
+
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
 public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
+
+    public Bitmap? ToBitmap(float scale) {
+        var r = UsedArea;
+        if (r.Width == 0) { return null; }
+
+        CollectGarbage();
+
+        do {
+            if ((int)(r.Width * scale) > 15000) {
+                scale *= 0.8f;
+            } else if ((int)(r.Height * scale) > 15000) {
+                scale *= 0.8f;
+            } else if ((int)(r.Height * scale) * (int)(r.Height * scale) > 90000000) {
+                scale *= 0.8f;
+            } else {
+                break;
+            }
+        } while (true);
+
+        Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
+
+        DrawToBitmap(I, scale, 0, 0);
+
+
+        //using var gr = Graphics.FromImage(I);
+        //gr.Clear(BackColor);
+        //if (!DrawToBitmap(gr, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
+        //    return ToBitmap(scale);
+        //}
+
+        return I;
+    }
 
     #region Fields
 
@@ -72,8 +107,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     private RectangleF _usedArea;
 
-    private int _zoomPadding;
-
     #endregion
 
     #region Constructors
@@ -96,6 +129,15 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public event EventHandler? DoUpdateSideOptionMenu;
 
     #endregion
+
+
+
+    public void DrawToBitmap(Bitmap? bmp, float scale, float shiftX, float shiftY) {
+        if (bmp == null) { return; }
+        var gr = Graphics.FromImage(bmp);
+        DrawExplicit(gr, new RectangleF(0, 0, bmp.Width, bmp.Height), scale, shiftX, shiftY, true, false);
+        gr.Dispose();
+    }
 
     #region Properties
 
@@ -204,14 +246,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    public int ZoomPadding {
-        get => _zoomPadding;
-        set {
-            if (_zoomPadding == value) { return; }
-            _zoomPadding = value;
-            OnPropertyChanged();
-        }
-    }
 
     protected abstract int SaveOrder { get; }
 
@@ -294,16 +328,16 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, bool showJointPoints) {
+    public void Draw(Graphics gr, RectangleF parentpositionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         if (forPrinting && !_beiExportSichtbar) { return; }
 
-        var positionModified = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+        var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
 
-        if (IsInDrawingArea(positionModified, sizeOfParentControl)) {
-            DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        if (IsInDrawingArea(positionModified, parentpositionModified)) {
+            DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
             if (showJointPoints) {
-                DrawPoints(gr, JointPoints, zoom, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                DrawPoints(gr, JointPoints, scale, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
             }
         }
 
@@ -311,21 +345,21 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
         if (!forPrinting) {
             var line = 1f;
-            if (zoom > 1) { line = zoom; }
+            if (scale > 1) { line = scale; }
 
             if (Parent is { }) {
                 foreach (var thisV in Parent.Connections) {
                     if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
                         if (Parent.Items.Contains(thisV.Item2) && thisV.Item2 != this) {
                             if (thisV.Item2.Bei_Export_sichtbar) {
-                                var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
-                                var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
+                                var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(scale, shiftX, shiftY);
+                                var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(scale, shiftX, shiftY);
 
                                 if (GetLenght(t1, t2) > 1) {
                                     gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
                                     var wi = GetAngle(t1, t2);
-                                    if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
-                                    if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                                    if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, scale * 20); }
+                                    if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, scale * 20); }
                                 }
                             }
                         }
@@ -375,11 +409,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
-    public bool IsInDrawingArea(RectangleF drawingKoordinates, Size sizeOfParentControl) =>
-        sizeOfParentControl.IsEmpty ||
-        sizeOfParentControl.Width == 0 ||
-        sizeOfParentControl.Height == 0 ||
-        drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
+    public bool IsInDrawingArea(RectangleF drawingKoordinates, RectangleF visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
 
     public void Move(float x, float y, bool isMouse) {
         if (x == 0 && y == 0) { return; }
@@ -407,7 +437,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         result.ParseableAdd("Style", _style);
         result.ParseableAdd("Print", _beiExportSichtbar);
         result.ParseableAdd("QuickInfo", QuickInfo);
-        result.ParseableAdd("ZoomPadding", _zoomPadding);
+        //result.ParseableAdd("ZoomPadding", _zoomPadding);
 
         foreach (var thisPoint in MovablePoint) {
             result.ParseableAdd("Point", thisPoint as IStringable);
@@ -481,7 +511,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 return true;
 
             case "zoompadding":
-                _zoomPadding = IntParse(value);
+                //_zoomPadding = IntParse(value);
                 return true;
 
             case "quickinfo":
@@ -527,16 +557,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
     }
 
-    /// <summary>
-    /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
-    /// </summary>
-    /// <remarks></remarks>
-    public RectangleF ZoomToArea() {
-        var x = UsedArea;
-        if (_zoomPadding == 0) { return x; }
-        x.Inflate(-ZoomPadding, -ZoomPadding);
-        return x;
-    }
 
     internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
         if (!JointPoints.Contains(myPoint)) { return; }
@@ -563,7 +583,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
     /// </summary>
     /// <param name="names"></param>
-    internal void DeleteJointPoints(List<string> names) {
+    internal virtual void DeleteJointPoints(List<string> names) {
         var j = new List<PointM>();
         j.AddRange(JointPoints);
 
@@ -634,11 +654,11 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
         try {
             if (!forPrinting) {
                 if (positionModified is { Width: > 1, Height: > 1 }) {
-                    gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionModified);
+                    gr.DrawRectangle(scale > 1 ? new Pen(Color.Gray, scale) : ZoomPad.PenGray, positionModified);
                 }
                 if (positionModified is { Width: < 1, Height: < 1 }) {
                     gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);

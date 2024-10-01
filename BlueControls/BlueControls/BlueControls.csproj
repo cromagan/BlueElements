@@ -122,6 +122,7 @@
     <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
     <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
     <Compile Include="Editoren\CreativePadScriptEditor.cs">

@@ -149,7 +149,7 @@ public class RowFormulaListItem : AbstractListItem {
             return;
         }
 
-        var mb = pad.MaxBounds().ToRect();
+        var mb = pad.UsedArea.ToRect();
         if (_tmpBmp != null) {
             if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {
                 RemovePic();
@@ -165,7 +165,7 @@ public class RowFormulaListItem : AbstractListItem {
         var slidervalues = ItemCollectionPadItem.SliderValues(mb, zoomv, centerpos);
         //pad.ShowInPrintMode = true;
         //pad.Unselect();
-        pad.DrawTo(_tmpBmp, States.Standard, zoomv, slidervalues.X, slidervalues.Y);
+        pad.DrawToBitmap(_tmpBmp, zoomv, slidervalues.X, slidervalues.Y);
     }
 
     private void RemovePic() {

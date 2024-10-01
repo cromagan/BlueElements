@@ -240,7 +240,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             gr.DrawLine(Pen(scale), x - 1, (int)(y + (si.Height * 0.55)), (int)(x + 1 + si.Width), (int)(y + (si.Height * 0.55)));
         }
 
-        //if (_Size.Width < 1) {
+        //if (_size.Width < 1) {
         //    GR.DrawLine(new Pen(Color.Red), DrawX + 1, DrawY - 4, DrawX + 1, DrawY + 16);
         //}
     }

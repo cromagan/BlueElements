@@ -255,10 +255,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        DrawColorScheme(gr, positionModified, zoom, null, false, false, false);
-        var headh = 25 * zoom;
-        var headb = 70 * zoom;
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+        DrawColorScheme(gr, positionModified, scale, null, false, false, false);
+        var headh = 25 * scale;
+        var headb = 70 * scale;
 
         var body = positionModified with { Y = positionModified.Y + headh, Height = positionModified.Height - headh };
         var c = -1;
@@ -268,23 +268,23 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
-            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
-            gr.DrawRectangle(new Pen(Color.Black, zoom), it);
+            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(scale), false);
+            gr.DrawRectangle(new Pen(Color.Black, scale), it);
         }
 
         gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
-        gr.DrawRectangle(new Pen(Color.Black, zoom), body);
+        gr.DrawRectangle(new Pen(Color.Black, scale), body);
 
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         //Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
-        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 
     private ListBox Childs() {

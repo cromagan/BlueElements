@@ -194,8 +194,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        DrawColorScheme(gr, positionModified, zoom, null, false, false, false);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+        DrawColorScheme(gr, positionModified, scale, null, false, false, false);
         //var headh = 25 * zoom;
         //var headb = 70 * zoom;
 
@@ -218,12 +218,12 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         ////Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
         //if (!forPrinting) {
-        //    DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+        //    DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         //}
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
 
-        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 
     //private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));

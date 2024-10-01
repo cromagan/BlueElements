@@ -217,11 +217,11 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        var lOt = _ber_Lo.ZoomAndMove(zoom, shiftX, shiftY);
-        var rOt = _ber_Ro.ZoomAndMove(zoom, shiftX, shiftY);
-        var rUt = _ber_Ru.ZoomAndMove(zoom, shiftX, shiftY);
-        var lUt = _ber_Lu.ZoomAndMove(zoom, shiftX, shiftY);
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
+        var lOt = _ber_Lo.ZoomAndMove(scale, shiftX, shiftY);
+        var rOt = _ber_Ro.ZoomAndMove(scale, shiftX, shiftY);
+        var rUt = _ber_Ru.ZoomAndMove(scale, shiftX, shiftY);
+        var lUt = _ber_Lu.ZoomAndMove(scale, shiftX, shiftY);
         PointF[] destPara2 = { lOt, rOt, lUt };
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
@@ -231,9 +231,9 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawLine(ZoomPad.PenGray, rOt, rUt);
             gr.DrawLine(ZoomPad.PenGray, rUt, lUt);
             gr.DrawLine(ZoomPad.PenGray, lUt, lOt);
-            gr.DrawLine(ZoomPad.PenGray, P1.ZoomAndMove(zoom, shiftX, shiftY), P2.ZoomAndMove(zoom, shiftX, shiftY));
+            gr.DrawLine(ZoomPad.PenGray, P1.ZoomAndMove(scale, shiftX, shiftY), P2.ZoomAndMove(scale, shiftX, shiftY));
         }
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     private void ImageChanged() {

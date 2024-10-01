@@ -83,21 +83,21 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return QuickImage.Get(ImageCode.Textdatei, 16);
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
         }
 
-        //DrawFakeControl(gr, positionModified, zoom, CaptionPosition.Über_dem_Feld, "Monitor", EditTypeFormula.Listbox);
+        //DrawFakeControl(gr, positionModified, scale, CaptionPosition.Über_dem_Feld, "Monitor", EditTypeFormula.Listbox);
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 
     #endregion

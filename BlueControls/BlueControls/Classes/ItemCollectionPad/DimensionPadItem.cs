@@ -303,25 +303,25 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         return x;
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         if (Stil != PadStyles.Undefiniert) {
-            var geszoom = Parent?.SheetStyleScale * Skalierung * zoom ?? zoom;
+            var geszoom = Parent?.SheetStyleScale * Skalierung * scale ?? scale;
             var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
             var pfeilG = f.Font(geszoom).Size * 0.8f;
-            var pen2 = f.Pen(zoom);
+            var pen2 = f.Pen(scale);
 
             //DrawOutline(gr, zoom, shiftX, shiftY, Color.Red);
             //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Right).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
             //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Left).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
 
-            gr.DrawLine(pen2, _point1.ZoomAndMove(zoom, shiftX, shiftY), _bezugslinie1.ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
-            gr.DrawLine(pen2, _point2.ZoomAndMove(zoom, shiftX, shiftY), _bezugslinie2.ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 2
-            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY), _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY)); // Maßhilfslinie
-            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY), _textPoint.ZoomAndMove(zoom, shiftX, shiftY)); // Maßhilfslinie
+            gr.DrawLine(pen2, _point1.ZoomAndMove(scale, shiftX, shiftY), _bezugslinie1.ZoomAndMove(scale, shiftX, shiftY)); // Bezugslinie 1
+            gr.DrawLine(pen2, _point2.ZoomAndMove(scale, shiftX, shiftY), _bezugslinie2.ZoomAndMove(scale, shiftX, shiftY)); // Bezugslinie 2
+            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY), _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY)); // Maßhilfslinie
+            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY), _textPoint.ZoomAndMove(scale, shiftX, shiftY)); // Maßhilfslinie
             var sz1 = gr.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
             var sz2 = gr.MeasureString(Text_Unten, f.Font(geszoom));
-            var p1 = _schnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY);
-            var p2 = _schnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY);
+            var p1 = _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY);
+            var p2 = _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY);
             if (sz1.Width + (pfeilG * 2f) < GetLenght(p1, p2)) {
                 DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
                 DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
@@ -329,7 +329,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
                 DrawArrow(gr, p1, _winkel + 180, f.ColorMain, pfeilG);
                 DrawArrow(gr, p2, _winkel, f.ColorMain, pfeilG);
             }
-            var mitte = _textPoint.ZoomAndMove(zoom, shiftX, shiftY);
+            var mitte = _textPoint.ZoomAndMove(scale, shiftX, shiftY);
             var textWinkel = _winkel % 360;
             if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
@@ -348,7 +348,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
             f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
         }
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
     }
 
     private void CalculateOtherPoints() {

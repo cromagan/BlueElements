@@ -179,17 +179,17 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
-    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+    protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints){
         if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, zoom, forPrinting, OutputColorId);
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
-            DrawColorScheme(gr, positionModified, zoom, null, true, true, true);
+            DrawArrowOutput(gr, positionModified, scale, forPrinting, OutputColorId);
+            DrawFakeControl(gr, positionModified, scale, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawColorScheme(gr, positionModified, scale, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionModified, scale, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, true);
-        DrawArrorInput(gr, positionModified, zoom, forPrinting, InputColorId);
+        base.DrawExplicit(gr, positionModified, scale, shiftX, shiftY, true, showJointPoints);
+        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
     }
 
     #endregion
