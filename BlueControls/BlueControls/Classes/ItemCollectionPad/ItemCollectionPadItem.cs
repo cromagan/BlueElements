@@ -672,8 +672,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         if (tmp is ItemCollectionPadItem icpi) {
             var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
+            var newPt = new Point(newP.X + (int)(positionModified.X / scale), newP.Y + (int)(positionModified.Y / scale));
+            TODOP
+
             var (newS, newX, newY) = AlterView(positionModified, scale, shiftX, shiftY);
-            return icpi.HotItem(newP, false, newS, newX, newY);
+            Point newP2 = ZoomPad.CoordinatesUnscaled(p, 1/ newS, newX, newY);
+            return icpi.HotItem(newP2, false, 1, 0, 0);
         }
 
         return tmp;
