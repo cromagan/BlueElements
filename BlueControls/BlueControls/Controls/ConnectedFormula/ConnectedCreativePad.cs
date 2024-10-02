@@ -230,6 +230,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             }
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
             pad.Items = new ItemCollectionPadItem();
+            pad.Items.Endless = true;
             pad.Items.SheetStyleScale = DefaultScale;
 
             if (Skin.StyleDb?.Row != null) {

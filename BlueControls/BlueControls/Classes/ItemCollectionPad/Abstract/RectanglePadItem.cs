@@ -82,7 +82,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
     #region Properties
 
     [Description("Die Breite des Objekts in mm.")]
-    public float Breite {
+    public virtual float Breite {
         get => (float)Math.Round((double)PixelToMm(UsedArea.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
@@ -102,7 +102,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
     }
 
     [Description("Die Höhe des Objekts in mm.")]
-    public float Höhe {
+    public virtual float Höhe {
         get => (float)Math.Round((double)PixelToMm(UsedArea.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }

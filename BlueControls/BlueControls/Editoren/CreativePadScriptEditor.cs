@@ -44,17 +44,9 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
     #region Constructors
 
     public CreativePadScriptEditor() {
-
-
-
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         eventScriptEditor.Enabled = false;
-
-
-
-
-
 
         //var l = new List<string> {
         //        "In die Variable MENU muss das Menu erstellt werden.",
@@ -71,18 +63,6 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
         //l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
 
         FormManager.RegisterForm(this);
-    }
-
-
-
-    /// <summary>
-    /// Nur zum setzen der Zeile zum Testen.
-    /// </summary>
-    public RowItem? Row {
-        set {
-            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
-            Database = value?.Database;
-        }
     }
 
     #endregion
@@ -113,8 +93,7 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
             return _item;
         }
         set {
-
-            if(value is not CreativePadItem) { value = null; }
+            if (value is not CreativePadItem) { value = null; }
             if (_item == value) { return; }
 
             WriteInfosBack();
@@ -132,7 +111,15 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
         }
     }
 
-   
+    /// <summary>
+    /// Nur zum setzen der Zeile zum Testen.
+    /// </summary>
+    public RowItem? Row {
+        set {
+            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
+            Database = value?.Database;
+        }
+    }
 
     #endregion
 
@@ -205,11 +192,11 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
         }
 
         var p = new ItemCollectionPadItem();
+        p.Endless = true;
         e.Feedback = p.ExecuteScript(_item.Script, "Testmodus", r);
 
         cpad.Items = p;
         cpad.ZoomFit();
-
     }
 
     private void WriteInfosBack() {

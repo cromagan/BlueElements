@@ -185,7 +185,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (Pages == null) {
             Pages = new ItemCollectionPadItem();
-            Pages.SheetSizeInMm = new SizeF(100, 100);
+            Pages.Breite = 100;
+            Pages.Höhe = 100;
         }
 
         l.AddRange(Pages);
@@ -199,7 +200,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 if (found == null) {
                     found = new ItemCollectionPadItem();
                     found.Caption = thisIt.Page;
-                    found.SheetSizeInMm = Pages.SheetSizeInMm;
+                    found.Breite = Pages.Breite;
+                    found.Höhe = Pages.Höhe;
                     found.SheetStyle = Pages.SheetStyle;
                     found.RandinMm = Pages.RandinMm;
                     found.GridShow = Pages.GridShow;
@@ -253,7 +255,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (!AllPages().Contains("Head", false)) {
             var h = new ItemCollectionPadItem();
             h.Caption = "Head";
-            h.SheetSizeInMm = Pages.SheetSizeInMm;
+            h.Breite = Pages.Breite;
+            h.Höhe = Pages.Höhe;
             h.SheetStyle = Pages.SheetStyle;
             h.RandinMm = Pages.RandinMm;
             h.GridShow = Pages.GridShow;

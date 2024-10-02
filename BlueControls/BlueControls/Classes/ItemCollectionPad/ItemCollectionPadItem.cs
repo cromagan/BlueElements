@@ -65,13 +65,21 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private readonly int _idCount;
 
     private string _caption = string.Empty;
+
+    private bool _endless = false;
+
     private float _gridShow = 10;
+
     private float _gridsnap = 1;
+
     private ObservableCollection<AbstractPadItem> _internal = [];
+
     private Padding _randinMm = Padding.Empty;
-    private SizeF _sheetSizeInMm = SizeF.Empty;
+
     private RowItem? _sheetStyle;
+
     private float _sheetStyleScale;
+
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -82,7 +90,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         BindingOperations.EnableCollectionSynchronization(_internal, new object());
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
-        SheetSizeInMm = new SizeF(10, 10);
+        Breite = 10;
+        Höhe = 10;
+        _endless = false;
         RandinMm = Padding.Empty;
         _idCount++;
 
@@ -122,7 +132,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     #region Properties
 
     public static string ClassId => "ITEMCOLLECTION";
+
     public Color BackColor { get; set; } = Color.White;
+
+    public override float Breite {
+        get => base.Breite;
+        set {
+            base.Breite = value;
+            if (Breite > 0) { Endless = false; }
+        }
+    }
 
     [DefaultValue(false)]
     public string Caption {
@@ -137,6 +156,21 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
+
+    public bool Endless {
+        get {
+            if (Parent != null) { return false; }
+
+            return _endless;
+        }
+        internal set {
+            if (Parent != null) { value = false; }
+            if (value == _endless) { return; }
+
+            _endless = value;
+            OnPropertyChanged();
+        }
+    }
 
     public new bool ForPrinting { get; set; }
 
@@ -168,6 +202,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
+    public override float Höhe {
+        get => base.Höhe;
+        set {
+            base.Höhe = value;
+            if (Höhe > 0) { Endless = false; }
+        }
+    }
+
     [DefaultValue(true)]
     public bool IsSaved { get; set; }
 
@@ -179,19 +221,18 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    public SizeF SheetSizeInMm {
-        get => _sheetSizeInMm;
-        set {
-            if (IsDisposed) { return; }
-            if (Math.Abs(value.Width - _sheetSizeInMm.Width) < DefaultTolerance &&
-                Math.Abs(value.Height - _sheetSizeInMm.Height) < DefaultTolerance) { return; }
-            _sheetSizeInMm = new SizeF(value.Width, value.Height);
+    //public SizeF SheetSizeInMm {
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        //if (Math.Abs(value.Width - _sheetSizeInMm.Width) < DefaultTolerance &&
+    //        //    Math.Abs(value.Height - _sheetSizeInMm.Height) < DefaultTolerance) { return; }
+    //        //_sheetSizeInMm = new SizeF(value.Width, value.Height);
 
-            SetCoordinates(UsedArea with { Width = MmToPixel(_sheetSizeInMm.Width, Dpi), Height = MmToPixel(_sheetSizeInMm.Height, Dpi) });
+    //        SetCoordinates(UsedArea with { Width = MmToPixel(value.Width, Dpi), Height = MmToPixel(value.Height, Dpi) });
 
-            OnPropertyChanged();
-        }
-    }
+    //        //OnPropertyChanged();
+    //    }
+    //}
 
     public RowItem? SheetStyle {
         get => _sheetStyle;
@@ -568,7 +609,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             new FlexiControl(),
             new FlexiControlForProperty<float>(() => GridShow),
             new FlexiControlForProperty<bool>(() => AutoZoomFit),
-
         ];
         return result;
     }
@@ -624,10 +664,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             result.ParseableAdd("FontScale", _sheetStyleScale);
         }
 
-        if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
-            result.ParseableAdd("SheetSize", _sheetSizeInMm);
-            result.ParseableAdd("PrintArea", _randinMm.ToString());
-        }
+        //if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
+        //result.ParseableAdd("SheetSize", _sheetSizeInMm);
+        result.ParseableAdd("PrintArea", _randinMm.ToString());
+        //}
+
+        result.ParseableAdd("Endless", Endless);
 
         result.ParseableAdd("Item", _internal);
 
@@ -647,8 +689,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public override bool ParseThis(string key, string value) {
         switch (key.ToLowerInvariant()) {
             case "sheetsize":
-                _sheetSizeInMm = value.SizeFParse();
-                SetCoordinates(UsedArea with { Width = MmToPixel(_sheetSizeInMm.Width, Dpi), Height = MmToPixel(_sheetSizeInMm.Height, Dpi) });
+                //_sheetSizeInMm = value.SizeFParse();
+                //SetCoordinates(UsedArea with { Width = MmToPixel(_sheetSizeInMm.Width, Dpi), Height = MmToPixel(_sheetSizeInMm.Height, Dpi) });
 
                 //_size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
                 return true;
@@ -713,6 +755,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             case "sheetstylescale":
                 _sheetStyleScale = FloatParse(value);
+                return true;
+
+            case "endless":
+                _endless = value.FromPlusMinus();
                 return true;
         }
 
@@ -941,18 +987,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             #endregion
         }
 
-        SheetSizeInMm = new SizeF(PixelToMm(newWidthPixel, Dpi), PixelToMm(newhHeightPixel, Dpi));
+        Breite = PixelToMm(newWidthPixel, Dpi);
+        Höhe = PixelToMm(newhHeightPixel, Dpi);
     }
 
     protected override RectangleF CalculateUsedArea() {
-        if (_sheetSizeInMm is { Width: > 0, Height: > 0 }) {
-            //var x1 = Math.Min(r.Left, 0);
-            //var y1 = Math.Min(r.Top, 0);
-            //var x2 = Math.Max(r.Right, MmToPixel(SheetSizeInMm.Width, Dpi));
-            //var y2 = Math.Max(r.Bottom, MmToPixel(SheetSizeInMm.Height, Dpi));
-            //return new RectangleF(x1, y1, x2 - x1, y2 - y1);
-            return base.CalculateUsedArea();
-        }
+        if (!Endless) { return base.CalculateUsedArea(); }
 
         var f = UsedAreaOfItems();
         return new RectangleF(f.X + _pLo.X, f.Y + _pLo.Y, f.Width, f.Height);
@@ -977,8 +1017,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
-        var d = !_sheetSizeInMm.IsEmpty || Parent != null ? UsedArea.ToRect().ZoomAndMoveRect(scale, shiftX, shiftY, false) : visibleArea;
-        var ds = !_sheetSizeInMm.IsEmpty || Parent != null ? positionModified : visibleArea;
+        var d = !Endless ? UsedArea.ToRect().ZoomAndMoveRect(scale, shiftX, shiftY, false) : visibleArea;
+        var ds = !Endless ? positionModified : visibleArea;
 
         if (BackColor.A > 0) {
             gr.FillRectangle(new SolidBrush(BackColor), d);

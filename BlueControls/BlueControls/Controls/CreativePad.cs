@@ -183,13 +183,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     public void CopyPrinterSettingsToWorkingArea() {
         if (_items is not { IsDisposed: false }) { return; }
         if (DruckerDokument.DefaultPageSettings.Landscape) {
-            _items.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
+            _items.Breite = DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4f / 100f;
+            _items.Höhe = DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4f / 100f;
             _items.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
         } else {
             // Hochformat
-            _items.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+            _items.Breite = DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4f / 100f;
+            _items.Höhe = DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4f / 100f;
             _items.RandinMm = new Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
-        }
+        };
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
@@ -378,15 +380,21 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         PrintDocument oriD = new();
         oriD.DefaultPageSettings.Landscape = false;
-        oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_items.SheetSizeInMm.Width / 25.4 * 100), (int)(_items.SheetSizeInMm.Height / 25.4 * 100));
-        oriD.DefaultPageSettings.Margins.Top = (int)(_items.RandinMm.Top / 25.4 * 100);
-        oriD.DefaultPageSettings.Margins.Bottom = (int)(_items.RandinMm.Bottom / 25.4 * 100);
-        oriD.DefaultPageSettings.Margins.Left = (int)(_items.RandinMm.Left / 25.4 * 100);
-        oriD.DefaultPageSettings.Margins.Right = (int)(_items.RandinMm.Right / 25.4 * 100);
+        oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_items.Breite / 25.4 * 100), (int)(_items.Höhe / 25.4 * 100));
+        oriD.DefaultPageSettings.Margins.Top = (int)(_items.RandinMm.Top / 25.4f * 100f);
+        oriD.DefaultPageSettings.Margins.Bottom = (int)(_items.RandinMm.Bottom / 25.4f * 100f);
+        oriD.DefaultPageSettings.Margins.Left = (int)(_items.RandinMm.Left / 25.4f * 100f);
+        oriD.DefaultPageSettings.Margins.Right = (int)(_items.RandinMm.Right / 25.4f * 100f);
         var nOriD = PageSetupDialog.Show(oriD, true);
         if (nOriD == null) { return; }
-        _items.SheetSizeInMm = new SizeF((int)(nOriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(nOriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-        _items.RandinMm = new Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+
+        _items.Breite = nOriD.DefaultPageSettings.PaperSize.Width * 25.4f / 100f;
+        _items.Höhe = nOriD.DefaultPageSettings.PaperSize.Height * 25.4f / 100f;
+
+        _items.RandinMm = new Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4f / 100f),
+                                      (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4f / 100f), 
+                                      (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4f / 100f), 
+                                      (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4f / 100f));
     }
 
     public void Unselect() {
@@ -755,18 +763,18 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         DruckerDokument.DocumentName = _items.Caption;
         var done = false;
         foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes) {
-            if (ps.Width == (int)(_items.SheetSizeInMm.Width / 25.4 * 100) && ps.Height == (int)(_items.SheetSizeInMm.Height / 25.4 * 100)) {
+            if (ps.Width == (int)(_items.Breite / 25.4f * 100f) && ps.Height == (int)(_items.Höhe / 25.4f * 100f)) {
                 done = true;
                 DruckerDokument.DefaultPageSettings.PaperSize = ps;
                 break;
             }
         }
         if (!done) {
-            DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(_items.SheetSizeInMm.Width / 25.4 * 100), (int)(_items.SheetSizeInMm.Height / 25.4 * 100));
+            DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(_items.Breite/ 25.4f * 100f), (int)(_items.Höhe / 25.4f * 100f));
         }
         DruckerDokument.DefaultPageSettings.PrinterResolution = DruckerDokument.DefaultPageSettings.PrinterSettings.PrinterResolutions[0];
         DruckerDokument.OriginAtMargins = true;
-        DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_items.RandinMm.Left / 25.4 * 100), (int)(_items.RandinMm.Right / 25.4 * 100), (int)(_items.RandinMm.Top / 25.4 * 100), (int)(_items.RandinMm.Bottom / 25.4 * 100));
+        DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_items.RandinMm.Left / 25.4f * 100f), (int)(_items.RandinMm.Right / 25.4f * 100f), (int)(_items.RandinMm.Top / 25.4f * 100f), (int)(_items.RandinMm.Bottom / 25.4f * 100f));
     }
 
     private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {

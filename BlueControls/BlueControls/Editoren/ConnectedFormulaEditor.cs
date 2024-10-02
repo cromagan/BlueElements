@@ -261,6 +261,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var p = new ItemCollectionPadItem();
         p.Caption = n;
+        p.Breite = 100;
+        p.Höhe = 100;
 
         var it = new RowEntryPadItem();
         p.Add(it);

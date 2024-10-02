@@ -195,24 +195,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             return;
         }
 
-        CreativePad pad = new(new ItemCollectionPadItem(_layoutFileName));
-        if (pad.Items is { IsDisposed: false } icp) {
-            icp.ResetVariables();
-            icp.ReplaceVariables(db, _rowKey);
-
-            var re = icp.UsedArea.ToRect();
-
-            var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
-
-            var zoomv = ItemCollectionPadItem.ZoomFitValue(re, generatedBitmap.Size);
-            var centerpos = ItemCollectionPadItem.CenterPos(re, generatedBitmap.Size, zoomv);
-            var slidervalues = ItemCollectionPadItem.SliderValues(re, zoomv, centerpos);
-            pad.ShowInPrintMode = true;
-            pad.Unselect();
-            if (Parent?.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
-            pad.Items.DrawToBitmap(generatedBitmap, zoomv, slidervalues.X, slidervalues.Y);
-            GeneratedBitmap = generatedBitmap;
-        }
+        var icp = new ItemCollectionPadItem(_layoutFileName);
+        icp.ResetVariables();
+        icp.ReplaceVariables(db, _rowKey);
+        GeneratedBitmap = icp.ToBitmap(1);
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) {
