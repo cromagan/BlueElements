@@ -477,17 +477,17 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         return QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         _eTxt ??= new ExtText(Design.Button, States.Standard);
         Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _anzeige, positionModified.ToRect(), false);
 
-        if (!forPrinting) {
+        if (!ForPrinting) {
             DrawColorScheme(gr, positionModified, scale, InputColorId, false, false, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
 
-        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
     #endregion

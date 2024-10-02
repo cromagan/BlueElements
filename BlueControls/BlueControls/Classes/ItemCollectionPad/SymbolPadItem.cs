@@ -53,8 +53,6 @@ public class SymbolPadItem : RectanglePadItem {
 
     public Color Hintergrundfarbe { get; set; }
 
-  
-
     public float Randdicke { get; set; }
 
     public Color Randfarbe { get; set; }
@@ -126,7 +124,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
@@ -169,7 +167,7 @@ public class SymbolPadItem : RectanglePadItem {
 
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     #endregion

@@ -285,10 +285,10 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-        DrawArrowOutput(gr, positionModified, scale, forPrinting, OutputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        DrawArrowOutput(gr, positionModified, scale, ForPrinting, OutputColorId);
 
-        if (!forPrinting) {
+        if (!ForPrinting) {
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
         }
 
@@ -298,13 +298,13 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         //DrawFakeControl(gr, positionModified, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
-        if (!forPrinting) {
+        if (!ForPrinting) {
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
 
-        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
     #endregion

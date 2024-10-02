@@ -79,14 +79,14 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
         #region Bild zeichnen
 
         try {
             if (_generatedBitmap != null) {
-                if (forPrinting) {
+                if (ForPrinting) {
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;
                 } else {
@@ -99,7 +99,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
         #endregion
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     protected abstract void GeneratePic();

@@ -544,8 +544,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
         CalculateColorIds();
     }
 

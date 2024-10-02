@@ -230,14 +230,14 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return QuickImage.Get(ImageCode.Trichter, 16);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-        if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, scale, forPrinting, OutputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        if (!ForPrinting) {
+            DrawArrowOutput(gr, positionModified, scale, ForPrinting, OutputColorId);
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
-        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
+        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
     #endregion

@@ -62,20 +62,12 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     private readonly int _idCount;
 
     private string _caption = string.Empty;
-
     private float _gridShow = 10;
-
     private float _gridsnap = 1;
-
-
     private Padding _randinMm = Padding.Empty;
-
     private SizeF _sheetSizeInMm = SizeF.Empty;
-
     private RowItem? _sheetStyle;
-
     private float _sheetStyleScale;
-
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -141,8 +133,8 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     }
 
     public ObservableCollection<ItemConnection> Connections { get; } = [];
-
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
+    public new bool ForPrinting { get; set; }
 
     /// <summary>
     /// in mm
@@ -196,12 +188,9 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
             Size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
 
-
             OnPropertyChanged();
         }
     }
-
-
 
     public RowItem? SheetStyle {
         get => _sheetStyle;
@@ -226,6 +215,9 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
             OnPropertyChanged();
         }
     }
+
+    public new bool ShowAlways { get; set; }
+    public new bool ShowJointPoints { get; set; }
 
     [DefaultValue(false)]
     public SnapMode SnapMode {
@@ -538,82 +530,6 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         Items.Clear();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-
-        gr.PixelOffsetMode = PixelOffsetMode.None;
-
-        var d = !_sheetSizeInMm.IsEmpty ? UsedArea.ToRect() : visibleArea;
-        var ds = !_sheetSizeInMm.IsEmpty ? positionModified : visibleArea;
-
-
-        if (BackColor.A > 0) {
-            gr.FillRectangle(new SolidBrush(BackColor), d);
-
-        }
-
-        #region Grid
-
-        if (_gridShow > 0.1) {
-
-            var tmpgrid = _gridShow;
-
-            while (MmToPixel(tmpgrid, Dpi) * scale < 5) { tmpgrid *= 2; }
-
-            var p = new Pen(Color.FromArgb(10, 0, 0, 0));
-            float ex = 0;
-
-            var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
-            float dxp, dyp, dxm, dym;
-
-
-            do {
-                var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
-
-                 dxp = po.X + mo;
-                 dxm = po.X - mo;
-                 dyp = po.Y + mo;
-                 dym = po.Y - mo;
-
-                if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
-                if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
-
-                if (ex > 0) {
-                    // erste Linie nicht doppelt zeichnen
-                    if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
-                    if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
-                }
-
-                ex++;
-
-            } while (!(dxm < ds.Left &&
-                    dxm < ds.Top &&
-                    dxp > ds.Right &&
-                    dxp > ds.Bottom));
-        }
-
-        #endregion
-
-        #region Items selbst
-
-
-        if (SheetStyleScale > 0.1) {
-            foreach (var thisItem in Items) {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, positionModified.ToRect(), scale, shiftX, shiftY, forPrinting, showJointPoints);
-            }
-
-
-        }
-
-
-        #endregion
-
-
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
-
-    }
-
-
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 != null) {
@@ -799,7 +715,6 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
             case "sheetstylescale":
                 _sheetStyleScale = FloatParse(value);
                 return true;
-
         }
 
         return base.ParseThis(key, value);
@@ -896,8 +811,6 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Register);
 
-
-
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
@@ -926,7 +839,6 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         }
         base.DeleteJointPoints(names);
     }
-
 
     internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
@@ -988,38 +900,6 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         return null;
     }
 
-
-    protected override RectangleF CalculateUsedArea() {
-
-        if (_sheetSizeInMm is { Width: > 0, Height: > 0 }) {
-            //var x1 = Math.Min(r.Left, 0);
-            //var y1 = Math.Min(r.Top, 0);
-            //var x2 = Math.Max(r.Right, MmToPixel(SheetSizeInMm.Width, Dpi));
-            //var y2 = Math.Max(r.Bottom, MmToPixel(SheetSizeInMm.Height, Dpi));
-            //return new RectangleF(x1, y1, x2 - x1, y2 - y1);
-            return base.CalculateUsedArea();
-        }
-
-        var x1 = float.MaxValue;
-        var y1 = float.MaxValue;
-        var x2 = float.MinValue;
-        var y2 = float.MinValue;
-        var done = false;
-        foreach (var thisItem in Items) {
-            if (thisItem != null) {
-                var ua = thisItem.UsedArea;
-                x1 = Math.Min(x1, ua.Left);
-                y1 = Math.Min(y1, ua.Top);
-                x2 = Math.Max(x2, ua.Right);
-                y2 = Math.Max(y2, ua.Bottom);
-                done = true;
-            }
-        }
-        return !done ? RectangleF.Empty : new RectangleF(_pLo.X + x1, _pLo.Y + y1, x2 - x1, y2 - y1);
-    }
-
-
-
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
         var itemCount = Items.IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
@@ -1058,6 +938,34 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         SheetSizeInMm = new SizeF(PixelToMm(newWidthPixel, Dpi), PixelToMm(newhHeightPixel, Dpi));
     }
 
+    protected override RectangleF CalculateUsedArea() {
+        if (_sheetSizeInMm is { Width: > 0, Height: > 0 }) {
+            //var x1 = Math.Min(r.Left, 0);
+            //var y1 = Math.Min(r.Top, 0);
+            //var x2 = Math.Max(r.Right, MmToPixel(SheetSizeInMm.Width, Dpi));
+            //var y2 = Math.Max(r.Bottom, MmToPixel(SheetSizeInMm.Height, Dpi));
+            //return new RectangleF(x1, y1, x2 - x1, y2 - y1);
+            return base.CalculateUsedArea();
+        }
+
+        var x1 = float.MaxValue;
+        var y1 = float.MaxValue;
+        var x2 = float.MinValue;
+        var y2 = float.MinValue;
+        var done = false;
+        foreach (var thisItem in Items) {
+            if (thisItem != null) {
+                var ua = thisItem.UsedArea;
+                x1 = Math.Min(x1, ua.Left);
+                y1 = Math.Min(y1, ua.Top);
+                x2 = Math.Max(x2, ua.Right);
+                y2 = Math.Max(y2, ua.Bottom);
+                done = true;
+            }
+        }
+        return !done ? RectangleF.Empty : new RectangleF(_pLo.X + x1, _pLo.Y + y1, x2 - x1, y2 - y1);
+    }
+
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
@@ -1072,6 +980,69 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
         Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
         Connections.RemoveAll();
+    }
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        gr.PixelOffsetMode = PixelOffsetMode.None;
+
+        var d = !_sheetSizeInMm.IsEmpty ? UsedArea.ToRect().ZoomAndMoveRect(scale, shiftX, shiftY, false) : visibleArea;
+        var ds = !_sheetSizeInMm.IsEmpty ? positionModified : visibleArea;
+
+        if (BackColor.A > 0) {
+            gr.FillRectangle(new SolidBrush(BackColor), d);
+        }
+
+        #region Grid
+
+        if (_gridShow > 0.1) {
+            var tmpgrid = _gridShow;
+
+            while (MmToPixel(tmpgrid, Dpi) * scale < 5) { tmpgrid *= 2; }
+
+            var p = new Pen(Color.FromArgb(10, 0, 0, 0));
+            float ex = 0;
+
+            var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
+            float dxp, dyp, dxm, dym;
+
+            do {
+                var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
+
+                dxp = po.X + mo;
+                dxm = po.X - mo;
+                dyp = po.Y + mo;
+                dym = po.Y - mo;
+
+                if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
+                if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
+
+                if (ex > 0) {
+                    // erste Linie nicht doppelt zeichnen
+                    if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
+                    if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
+                }
+
+                ex++;
+            } while (!(dxm < ds.Left &&
+                    dxm < ds.Top &&
+                    dxp > ds.Right &&
+                    dxp > ds.Bottom));
+        }
+
+        #endregion
+
+        #region Items selbst
+
+        if (SheetStyleScale > 0.1) {
+            foreach (var thisItem in Items) {
+                gr.PixelOffsetMode = PixelOffsetMode.None;
+                thisItem.Draw(gr, positionModified.ToRect(), scale, shiftX, shiftY);
+            }
+        }
+
+        #endregion
+
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void ApplyDesignToItems() {
@@ -1175,13 +1146,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         }
     }
 
-
-
-
-
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
-
-
 
     private void OnItemAdded(AbstractPadItem item) {
         if (IsDisposed) { return; }

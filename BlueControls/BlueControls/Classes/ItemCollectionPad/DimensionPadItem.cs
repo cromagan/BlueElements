@@ -117,8 +117,6 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPadItem.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
-  
-
     public int Nachkommastellen { get; set; }
 
     public string Präfix { get; set; } = string.Empty;
@@ -303,7 +301,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         return x;
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (Stil != PadStyles.Undefiniert) {
             var geszoom = Parent?.SheetStyleScale * Skalierung * scale ?? scale;
             var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
@@ -348,7 +346,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
             f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void CalculateOtherPoints() {

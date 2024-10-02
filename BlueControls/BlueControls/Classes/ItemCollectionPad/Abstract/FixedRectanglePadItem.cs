@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
 using BlueBasics;
 using BlueControls.EventArgs;
 using System.Collections.Generic;
@@ -30,32 +29,16 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     #region Fields
 
     /// <summary>
+    /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
+    /// </summary>
+    protected readonly PointM _pLo;
+
+    /// <summary>
     /// Die fixe Größe in Pixel
     /// </summary>
     protected Size _size = Size.Empty;
 
-    /// <summary>
-    /// Die fixe Größe in Pixel
-    /// </summary>
-    public Size Size {
-
-        get {
-            return _size;
-        }
-        set {
-
-            if (_size.Width == _size.Width && _size.Height == value.Height) { return; }
-            _size = value;
-            OnPropertyChanged();
-
-        }
-    }
     private readonly PointM _pl;
-
-    /// <summary>
-    /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
-    /// </summary>
-    protected readonly PointM _pLo;
 
     private readonly PointM _pLu;
 
@@ -83,7 +66,6 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         _po = new PointM(this, "O", 0, 0);
         _pu = new PointM(this, "U", 0, 0);
 
-
         _po.MoveXByMouse = false;
         _pu.MoveXByMouse = false;
         _pl.MoveYByMouse = false;
@@ -102,6 +84,24 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     #endregion
 
+    #region Properties
+
+    /// <summary>
+    /// Die fixe Größe in Pixel
+    /// </summary>
+    public Size Size {
+        get {
+            return _size;
+        }
+        set {
+            if (_size.Width == _size.Width && _size.Height == value.Height) { return; }
+            _size = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
     #region Methods
 
     public override void InitialPosition(int x, int y, int width, int height) {
@@ -109,33 +109,28 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         SetLeftTopPoint(x - (ua.Width / 2) + (width / 2), y - (ua.Height / 2) + (height / 2));
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        SizeChanged();
-    }
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Size", _size);
 
-
         return result;
-
-
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        SizeChanged();
+    }
 
     public override bool ParseThis(string key, string value) {
         switch (key.ToLowerInvariant()) {
             case "size":
                 _size = value.SizeParse();
                 return true;
-
         }
 
         return base.ParseThis(key, value);
     }
-
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
@@ -147,8 +142,6 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
         var x = point.X;
         var y = point.Y;
-
-
 
         if (point == _pLo) {
             _pRu.Y = y + _size.Height;
@@ -187,13 +180,11 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         }
 
         if (point == _pl) {
-
             _pLo.X = x;
             _pLu.X = x;
         }
 
         if (point == _pr) {
-
             _pRo.X = x;
             _pRu.X = x;
         }

@@ -326,7 +326,6 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         return union;
     }
 
- 
     //http://csharphelper.com/blog/2014/07/determine-whether-a-point-is-inside-a-polygon-in-c/
     // Alternative:  https://stackoverflow.com/questions/4243042/c-sharp-point-in-polygon
     // Return True if the point is in the polygon.
@@ -408,7 +407,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         return new RectangleF(minx, miny, maxx - minx, maxy - miny);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (MovablePoint.Count > 0) {
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {
@@ -416,7 +415,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
                 lastP = thisP;
             }
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     // Return the dot product AB · BC.

@@ -89,8 +89,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override string Description => string.Empty;
 
-  
-
     //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
     // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, ItemCollectionPadItem.Dpi)
     public float Skalierung { get; set; } = 3.07f;
@@ -207,7 +205,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (Stil != PadStyles.Undefiniert) {
             gr.SetClip(positionModified);
             var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -219,7 +217,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             if (_txt != null && Parent != null) {
                 _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
-                if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
+                if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
                     _txt.Draw(gr, scale * Skalierung * Parent.SheetStyleScale);
                 }
             }
@@ -228,7 +226,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             gr.ResetClip();
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void InvalidateText() => _txt = null;

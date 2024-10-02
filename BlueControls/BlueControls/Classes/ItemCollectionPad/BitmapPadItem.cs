@@ -95,8 +95,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
-  
-
     public string Platzhalter_Für_Layout {
         get => _platzhalter_Für_Layout; set {
             if (_platzhalter_Für_Layout == value) { return; }
@@ -281,7 +279,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         positionModified.Inflate(-Padding, -Padding);
         RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
             positionModified.Width - (Padding * 2), positionModified.Height - (Padding * 2));
@@ -321,7 +319,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         }
         try {
             if (Bitmap != null) {
-                if (forPrinting) {
+                if (ForPrinting) {
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 } else {
@@ -343,13 +341,13 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         }
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
-        if (!forPrinting) {
+        if (!ForPrinting) {
             if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
                 Font f = new("Arial", 8);
                 BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
             }
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     #endregion

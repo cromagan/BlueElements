@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
@@ -97,8 +96,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             RemovePic();
         }
     }
-
-  
 
     public override string QuickInfo {
         get {
@@ -207,7 +204,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
             var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
 
-          
             var zoomv = ItemCollectionPadItem.ZoomFitValue(re, generatedBitmap.Size);
             var centerpos = ItemCollectionPadItem.CenterPos(re, generatedBitmap.Size, zoomv);
             var slidervalues = ItemCollectionPadItem.SliderValues(re, zoomv, centerpos);

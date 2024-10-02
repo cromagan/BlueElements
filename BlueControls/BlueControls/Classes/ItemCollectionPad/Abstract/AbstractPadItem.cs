@@ -38,42 +38,9 @@ using static BlueBasics.Geometry;
 using BlueDatabase;
 using static BlueBasics.Generic;
 
-
 namespace BlueControls.ItemCollectionPad.Abstract;
 
 public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
-
-    public Bitmap? ToBitmap(float scale) {
-        var r = UsedArea;
-        if (r.Width == 0) { return null; }
-
-        CollectGarbage();
-
-        do {
-            if ((int)(r.Width * scale) > 15000) {
-                scale *= 0.8f;
-            } else if ((int)(r.Height * scale) > 15000) {
-                scale *= 0.8f;
-            } else if ((int)(r.Height * scale) * (int)(r.Height * scale) > 90000000) {
-                scale *= 0.8f;
-            } else {
-                break;
-            }
-        } while (true);
-
-        Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
-
-        DrawToBitmap(I, scale, 0, 0);
-
-
-        //using var gr = Graphics.FromImage(I);
-        //gr.Clear(BackColor);
-        //if (!DrawToBitmap(gr, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
-        //    return ToBitmap(scale);
-        //}
-
-        return I;
-    }
 
     #region Fields
 
@@ -130,17 +97,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     #endregion
 
-
-
-    public void DrawToBitmap(Bitmap? bmp, float scale, float shiftX, float shiftY) {
-        if (bmp == null) { return; }
-        var gr = Graphics.FromImage(bmp);
-        var r = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);    
-
-        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), r, scale, shiftX, shiftY, true, false);
-        gr.Dispose();
-    }
-
     #region Properties
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
@@ -156,6 +112,14 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     //public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
     public abstract string Description { get; }
+
+    public bool ForPrinting {
+        get {
+            if (_parent is ItemCollectionPadItem icpi) { return icpi.ForPrinting; }
+
+            return false;
+        }
+    }
 
     public bool IsDisposed { get; private set; }
 
@@ -224,6 +188,22 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public virtual string QuickInfo { get; set; } = string.Empty;
 
+    public bool ShowAlways {
+        get {
+            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowAlways; }
+
+            return false;
+        }
+    }
+
+    public bool ShowJointPoints {
+        get {
+            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowJointPoints; }
+
+            return false;
+        }
+    }
+
     public PadStyles Stil {
         get => _style;
         set {
@@ -247,7 +227,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             return _usedArea;
         }
     }
-
 
     protected abstract int SaveOrder { get; }
 
@@ -330,22 +309,22 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    public void Draw(Graphics gr, Rectangle visibleArea, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-        if (forPrinting && !_beiExportSichtbar) { return; }
+    public void Draw(Graphics gr, Rectangle visibleArea, float scale, float shiftX, float shiftY) {
+        if (ForPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
 
         var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
 
-        if (IsInDrawingArea(positionModified, visibleArea)) {
-            DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        if (ShowAlways || IsInDrawingArea(positionModified, visibleArea)) {
+            DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
 
-            if (showJointPoints) {
+            if (ShowJointPoints) {
                 DrawPoints(gr, JointPoints, scale, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
             }
         }
 
         #region Verknüpfte Pfeile Zeichnen
 
-        if (!forPrinting) {
+        if (!ForPrinting) {
             var line = 1f;
             if (scale > 1) { line = scale; }
 
@@ -371,6 +350,15 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
 
         #endregion
+    }
+
+    public void DrawToBitmap(Bitmap? bmp, float scale, float shiftX, float shiftY) {
+        if (bmp == null) { return; }
+        var gr = Graphics.FromImage(bmp);
+        var r = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
+
+        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), r, scale, shiftX, shiftY);
+        gr.Dispose();
     }
 
     /// <summary>
@@ -555,10 +543,40 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public abstract QuickImage? SymbolForReadableText();
 
+    public Bitmap? ToBitmap(float scale) {
+        var r = UsedArea;
+        if (r.Width == 0) { return null; }
+
+        CollectGarbage();
+
+        do {
+            if ((int)(r.Width * scale) > 15000) {
+                scale *= 0.8f;
+            } else if ((int)(r.Height * scale) > 15000) {
+                scale *= 0.8f;
+            } else if ((int)(r.Height * scale) * (int)(r.Height * scale) > 90000000) {
+                scale *= 0.8f;
+            } else {
+                break;
+            }
+        } while (true);
+
+        Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
+
+        DrawToBitmap(I, scale, 0, 0);
+
+        //using var gr = Graphics.FromImage(I);
+        //gr.Clear(BackColor);
+        //if (!DrawToBitmap(gr, r.Left * scale, r.Top * scale, I.Size, true, false, States.Standard)) {
+        //    return ToBitmap(scale);
+        //}
+
+        return I;
+    }
+
     public void Verbindungspunkt_hinzu() {
         AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
     }
-
 
     internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
         if (!JointPoints.Contains(myPoint)) { return; }
@@ -656,9 +674,9 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    protected virtual void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected virtual void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         try {
-            if (!forPrinting) {
+            if (!ForPrinting) {
                 if (positionModified is { Width: > 1, Height: > 1 }) {
                     gr.DrawRectangle(scale > 1 ? new Pen(Color.Gray, scale) : ZoomPad.PenGray, positionModified);
                 }

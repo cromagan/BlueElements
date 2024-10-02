@@ -20,22 +20,10 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueScript.Variables;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Windows;
-using System.Windows.Forms;
-using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -43,36 +31,21 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
     #region Fields
 
-    private string _includedjointPoints = string.Empty;
-
-
-
-    public string IncludedJointPoints {
-        get {
-            return _includedjointPoints;
-        }
-
-
-        set {
-            if (_includedjointPoints != value) { return; }
-            _includedjointPoints = value;
-            OnPropertyChanged();
-        }
-    }
-
-
-
     private Bitmap? _bitmap;
-
+    private string _includedjointPoints = string.Empty;
 
     #endregion
 
     #region Constructors
 
     public ScaledViewPadItem() : base(string.Empty) {
-
-
     }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "SCALEDVIEW";
 
     //public ScaledViewPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
     //    Bitmap = bmp;
@@ -83,20 +56,19 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     //    Bild_Modus = SizeModes.EmptySpace;
     //    Stil = PadStyles.Undefiniert; // Kein Rahmen
     //}
-
-    #endregion
-
-    #region Properties
-
-    public static string ClassId => "SCALEDVIEW";
-
-
-
-
     public override string Description => string.Empty;
 
+    public string IncludedJointPoints {
+        get {
+            return _includedjointPoints;
+        }
 
-
+        set {
+            if (_includedjointPoints != value) { return; }
+            _includedjointPoints = value;
+            OnPropertyChanged();
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -104,14 +76,9 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
     #region Methods
 
-
-
-
     public override List<GenericControl> GetProperties(int widthOfControl) {
-
         List<GenericControl> result =
         [
-
 
                        new FlexiControlForProperty<string>(() => IncludedJointPoints, 5),
             new FlexiControl()
@@ -127,8 +94,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
         return result;
     }
-
-
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -147,9 +112,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     }
 
     public override string ReadableText() => "Skalierte Ansicht";
-
-
-
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.LupePlus, 16);
 
@@ -171,28 +133,23 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-      
-        if(Parent is not ItemCollectionPadItem icpi) { return; }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        if (Parent is not ItemCollectionPadItem icpi) { return; }
 
         var l = new List<PointM>();
 
-        foreach(var thiss in _includedjointPoints.SplitAndCutByCr()) {
-
+        foreach (var thiss in _includedjointPoints.SplitAndCutByCr()) {
             if (icpi.GetJointPoint(thiss, this) is PointM p) {
                 l.Add(p);
             }
-
         }
         var r = RectangleF.Empty;
 
-        if( l.Count >2) {  }
-
+        if (l.Count > 2) { }
 
         //if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
         //var geszoom = Parent?.SheetStyleScale * Skalierung ?? Skalierung;
         //var f2 = Skin.GetBlueFont(Stil, Parent?.SheetStyle).Font(geszoom);
-
 
         //var maxrad = Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height));
         //RectangleF x = new(_point1, new SizeF(0, 0));
@@ -203,18 +160,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
         //x.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
         //return x;
-
-
-
-
-
-
-
-
-
-
-
-
 
         //positionModified.Inflate(-Padding, -Padding);
         //RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
@@ -255,7 +200,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         //}
         //try {
         //    if (Bitmap != null) {
-        //        if (forPrinting) {
+        //        if (ForPrinting) {
         //            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
         //            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
         //        } else {
@@ -277,13 +222,13 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         //}
         //gr.TranslateTransform(-trp.X, -trp.Y);
         //gr.ResetTransform();
-        //if (!forPrinting) {
+        //if (!ForPrinting) {
         //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
         //        Font f = new("Arial", 8);
         //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
         //    }
         //}
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     #endregion

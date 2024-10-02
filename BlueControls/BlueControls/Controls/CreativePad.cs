@@ -611,10 +611,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
         if (_items != null) {
-            
+            _items.ShowJointPoints = _showJointPoints;
+            _items.ForPrinting = _showInPrintMode;
+            _items.ShowAlways = true;
 
-
-            _items.Draw(gr, ClientRectangle, Zoom, ShiftX, ShiftY, _showInPrintMode, _showJointPoints);
+            _items.Draw(gr, ClientRectangle, Zoom, ShiftX, ShiftY);
 
             #region Dann die selektierten Punkte
 

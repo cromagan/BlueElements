@@ -73,7 +73,7 @@ public class LinePadItem : AbstractPadItem {
     public static string ClassId => "LINE";
     public override string Description => string.Empty;
     public ConectorStyle Linien_Verhalten { get; set; }
-  
+
     protected override int SaveOrder => 999;
 
     #endregion
@@ -183,7 +183,7 @@ public class LinePadItem : AbstractPadItem {
         //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (Stil != PadStyles.Undefiniert) {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
@@ -191,7 +191,7 @@ public class LinePadItem : AbstractPadItem {
                 gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointM p1, PointM p2) {

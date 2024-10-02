@@ -341,7 +341,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Layout, 16, Skin.IdColor(InputColorId), Color.Transparent);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         DrawColorScheme(gr, positionModified, scale, null, false, false, false);
         //var headh = 25 * zoom;
         //var headb = 70 * zoom;
@@ -364,13 +364,13 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         ////Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         ////Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
-        //if (!forPrinting) {
+        //if (!ForPrinting) {
         //    DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         //}
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
 
-        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
     #endregion

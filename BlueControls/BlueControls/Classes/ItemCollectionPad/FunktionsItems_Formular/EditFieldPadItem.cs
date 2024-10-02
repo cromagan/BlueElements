@@ -243,8 +243,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         return QuickImage.Get(ImageCode.Stift, 16);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
-        if (!forPrinting) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        if (!ForPrinting) {
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
         }
 
@@ -254,13 +254,13 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         DrawFakeControl(gr, positionModified, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
-        if (!forPrinting) {
+        if (!ForPrinting) {
             DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
 
-        DrawArrorInput(gr, positionModified, scale, forPrinting, InputColorId);
+        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
     #endregion

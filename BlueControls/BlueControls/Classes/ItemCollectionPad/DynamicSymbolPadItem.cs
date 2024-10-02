@@ -57,8 +57,6 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
     public override string Description => string.Empty;
 
-  
-
     public string Script {
         get => _script;
 
@@ -134,7 +132,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY, bool forPrinting, bool showJointPoints) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Enums.Design.TextBox, Enums.States.Standard, BlueDatabase.Enums.TranslationType.Original_Anzeigen, Alignment.Left, scale);
 
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -179,7 +177,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
         //gr.TranslateTransform(-trp.X, -trp.Y);
         //gr.ResetTransform();
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY, forPrinting, showJointPoints);
+        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void Skript_Bearbeiten() => IUniqueWindowExtension.ShowOrCreate<DynamicSymbolScriptEditor>(this);
