@@ -278,7 +278,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                     icp.Add(found);
                 }
 
-                found.SetCoordinates(new RectangleF((icp.Size.Width / 2) - 150, -30, 300, 30), true);
+                found.SetCoordinates(new RectangleF((icp.UsedArea.Width / 2) - 150, -30, 300, 30));
                 found.Bei_Export_sichtbar = false;
             }
         }

@@ -23,9 +23,7 @@ public class MoveEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MoveEventArgs(float x, float y, bool byMouse) {
-        X = x;
-        Y = y;
+    public MoveEventArgs(bool byMouse) {
         ByMouse = byMouse;
     }
 
@@ -33,8 +31,7 @@ public class MoveEventArgs : System.EventArgs {
 
     #region Properties
 
-    public float X { get; }
-    public float Y { get; }
     public bool ByMouse { get; }
+
     #endregion
 }

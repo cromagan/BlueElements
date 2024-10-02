@@ -51,7 +51,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     #region Fields
 
     private readonly List<IMoveable> _itemsToMove = [];
-    private IMouseAndKeyHandle? _givesMouseCommandsTo;
     private ItemCollectionPadItem? _items;
     private AbstractPadItem? _lastClickedItem;
     private bool _repairPrinterDataPrepaired;
@@ -288,49 +287,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnContextMenuItemClicked(e);
     }
 
-    public void DoKeyUp(KeyEventArgs e, bool hasbase) {
-        // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
-        // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
-        if (hasbase) { base.OnKeyUp(e); }
-        if (!EditAllowed || _items == null) { return; }
-        if (_givesMouseCommandsTo != null) {
-            if (_givesMouseCommandsTo.KeyUp(e, Zoom, ShiftX, ShiftY)) { return; }
-        }
-        var multi = 1f;
-        if (_items.SnapMode == SnapMode.SnapToGrid) {
-            multi = Converter.MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
-        }
-        if (multi < 1) { multi = 1f; }
-        switch (e.KeyCode) {
-            case Keys.Delete:
-
-            case Keys.Back:
-                List<AbstractPadItem> itemsDoDelete = [];
-                foreach (var thisit in _itemsToMove) {
-                    if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
-                }
-                Unselect();
-                _items.RemoveRange(itemsDoDelete);
-                break;
-
-            case Keys.Up:
-                MoveItems(0, -1 * multi, false, false);
-                break;
-
-            case Keys.Down:
-                MoveItems(0, 1 * multi, false, false);
-                break;
-
-            case Keys.Left:
-                MoveItems(-1 * multi, 0, false, false);
-                break;
-
-            case Keys.Right:
-                MoveItems(1 * multi, 0, false, false);
-                break;
-        }
-    }
-
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (EditAllowed) {
             //var hotitem = GetHotItem(e.Mouse);
@@ -365,10 +321,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public List<AbstractPadItem> HotItems(MouseEventArgs? e) {
         if (e == null || _items == null) { return []; }
-
-        if (_givesMouseCommandsTo != null) {
-            return _givesMouseCommandsTo.HotItems(e, Zoom, ShiftX, ShiftY);
-        }
 
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
         return _items.Where(thisItem => thisItem != null &&
@@ -439,7 +391,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public void Unselect() {
         _itemsToMove.Clear();
-        _givesMouseCommandsTo = null;
         Invalidate();
     }
 
@@ -457,137 +408,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         it.InitialPosition(pos.X - (wid / 2), pos.Y - (he / 2), wid, he);
 
         Items?.Add(it);
-    }
-
-    internal void DoMouseDown(MouseEventArgs e) {
-        base.OnMouseDown(e);
-        if (!EditAllowed) { return; }
-
-        var hotitem = GetHotItem(e);
-
-        QuickInfo = string.Empty;
-        if (hotitem is IMouseAndKeyHandle ho2) {
-            if (ho2.MouseDown(e, Zoom, ShiftX, ShiftY)) {
-                _givesMouseCommandsTo = ho2;
-                return;
-            }
-        }
-
-        if (e.Button == MouseButtons.Left) {
-            var p = KoordinatesUnscaled(e);
-            if (_itemsToMove.Count > 0) {
-                foreach (var thisItem in _itemsToMove) {
-                    if (thisItem is AbstractPadItem bpi) {
-                        foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLenght(thisPoint, p) < 5f) {
-                                SelectItem(thisPoint, false);
-                                return;
-                            }
-                        }
-
-                        foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLenght(thisPoint, p) < 5f) {
-                                SelectItem(thisPoint, false);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (hotitem is IMoveable imv) {
-                SelectItem(imv, ModifierKeys.HasFlag(Keys.Control));
-            } else {
-                Unselect();
-            }
-
-            if (hotitem is AbstractPadItem api) {
-                LastClickedItem = api;
-            } else {
-                LastClickedItem = null;
-            }
-        }
-    }
-
-    internal void DoMouseMove(MouseEventArgs e) {
-        base.OnMouseMove(e);
-
-        var hotitem = GetHotItem(e);
-
-        if (!EditAllowed) { return; }
-
-        if (_givesMouseCommandsTo != null) {
-            if (e.Button == MouseButtons.None && hotitem != _givesMouseCommandsTo) {
-                _givesMouseCommandsTo = null;
-                Invalidate();
-            } else {
-                if (!_givesMouseCommandsTo.MouseMove(e, Zoom, ShiftX, ShiftY)) {
-                    _givesMouseCommandsTo = null;
-                    Invalidate();
-                } else {
-                    return;
-                }
-            }
-        } else {
-            if (hotitem is IMouseAndKeyHandle ho2) {
-                if (ho2.MouseMove(e, Zoom, ShiftX, ShiftY)) {
-                    _givesMouseCommandsTo = ho2;
-                    Invalidate();
-                    return;
-                }
-            }
-
-            QuickInfo = string.Empty;
-
-            if (hotitem is AbstractPadItem bpi && e.Button == MouseButtons.None) {
-                if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
-                    QuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
-                } else {
-                    QuickInfo = bpi.Description;
-                }
-            }
-        }
-
-        if (e.Button == MouseButtons.Left) {
-            QuickInfo = string.Empty;
-            MoveItemsWithMouse();
-            Refresh(); // Ansonsten werden einige Redraws übersprungen
-        }
-    }
-
-    internal void DoMouseUp(MouseEventArgs e) {
-        base.OnMouseUp(e);
-
-        switch (e.Button) {
-            case MouseButtons.Left:
-                if (!EditAllowed) { return; }
-
-                if (_givesMouseCommandsTo != null) {
-                    if (!_givesMouseCommandsTo.MouseUp(e, Zoom, ShiftX, ShiftY)) {
-                        _givesMouseCommandsTo = null;
-                    } else {
-                        return;
-                    }
-                }
-
-                // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
-                AbstractPadItem? select = null;
-                if (_itemsToMove.Count == 1 && _itemsToMove[0] is PointM thispoint) {
-                    if (thispoint.Parent is AbstractPadItem item) {
-                        select = item;
-                    }
-                } else {
-                    break; // sollen ja Items ein. Ansonsten wäre es immer ein Punkt
-                }
-                SelectItem(select, false);
-                break;
-
-            case MouseButtons.Right:
-                if (!ContextMenuAllowed) { return; }
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, GetHotItem(e), e);
-                break;
-        }
-        Invalidate();
     }
 
     internal Point MiddleOfVisiblesScreen() {
@@ -633,10 +453,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
-            if (_givesMouseCommandsTo is AbstractPadItem { IsDisposed: false } pa) {
-                var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
-                gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
-            }
 
             #endregion
         }
@@ -652,13 +468,141 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     protected override RectangleF MaxBounds() => _items?.UsedArea ?? new RectangleF(0, 0, 0, 0);
 
-    protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
+    protected override void OnKeyUp(KeyEventArgs e) {
+        // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
+        // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
+        base.OnKeyUp(e);
+        if (!EditAllowed || _items == null) { return; }
 
-    protected override void OnMouseDown(MouseEventArgs e) => DoMouseDown(e);
+        var multi = 1f;
+        if (_items.SnapMode == SnapMode.SnapToGrid) {
+            multi = Converter.MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
+        }
+        if (multi < 1) { multi = 1f; }
+        switch (e.KeyCode) {
+            case Keys.Delete:
 
-    protected override void OnMouseMove(MouseEventArgs e) => DoMouseMove(e);
+            case Keys.Back:
+                List<AbstractPadItem> itemsDoDelete = [];
+                foreach (var thisit in _itemsToMove) {
+                    if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
+                }
+                Unselect();
+                _items.RemoveRange(itemsDoDelete);
+                break;
 
-    protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
+            case Keys.Up:
+                MoveItems(0, -1 * multi, false, false);
+                break;
+
+            case Keys.Down:
+                MoveItems(0, 1 * multi, false, false);
+                break;
+
+            case Keys.Left:
+                MoveItems(-1 * multi, 0, false, false);
+                break;
+
+            case Keys.Right:
+                MoveItems(1 * multi, 0, false, false);
+                break;
+        }
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e) {
+        base.OnMouseDown(e);
+        if (!EditAllowed) { return; }
+
+        var hotitem = GetHotItem(e);
+
+        QuickInfo = string.Empty;
+
+        if (e.Button == MouseButtons.Left) {
+            var p = KoordinatesUnscaled(e);
+            if (_itemsToMove.Count > 0) {
+                foreach (var thisItem in _itemsToMove) {
+                    if (thisItem is AbstractPadItem bpi) {
+                        foreach (var thisPoint in bpi.JointPoints) {
+                            if (GetLenght(thisPoint, p) < 5f) {
+                                SelectItem(thisPoint, false);
+                                return;
+                            }
+                        }
+
+                        foreach (var thisPoint in bpi.MovablePoint) {
+                            if (GetLenght(thisPoint, p) < 5f) {
+                                SelectItem(thisPoint, false);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (hotitem is IMoveable imv) {
+                SelectItem(imv, ModifierKeys.HasFlag(Keys.Control));
+            } else {
+                Unselect();
+            }
+
+            if (hotitem is AbstractPadItem api) {
+                LastClickedItem = api;
+            } else {
+                LastClickedItem = null;
+            }
+        }
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e) {
+        base.OnMouseMove(e);
+
+        var hotitem = GetHotItem(e);
+
+        if (!EditAllowed) { return; }
+
+        QuickInfo = string.Empty;
+
+        if (hotitem is AbstractPadItem bpi && e.Button == MouseButtons.None) {
+            if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
+                QuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
+            } else {
+                QuickInfo = bpi.Description;
+            }
+        }
+
+        if (e.Button == MouseButtons.Left) {
+            QuickInfo = string.Empty;
+            MoveItemsWithMouse();
+            Refresh(); // Ansonsten werden einige Redraws übersprungen
+        }
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e) {
+        base.OnMouseUp(e);
+
+        switch (e.Button) {
+            case MouseButtons.Left:
+                if (!EditAllowed) { return; }
+
+                // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
+                AbstractPadItem? select = null;
+                if (_itemsToMove.Count == 1 && _itemsToMove[0] is PointM thispoint) {
+                    if (thispoint.Parent is AbstractPadItem item) {
+                        select = item;
+                    }
+                } else {
+                    break; // sollen ja Items ein. Ansonsten wäre es immer ein Punkt
+                }
+                SelectItem(select, false);
+                break;
+
+            case MouseButtons.Right:
+                if (!ContextMenuAllowed) { return; }
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, GetHotItem(e), e);
+                break;
+        }
+        Invalidate();
+    }
 
     protected override void OnSizeChanged(System.EventArgs e) {
         Unselect();

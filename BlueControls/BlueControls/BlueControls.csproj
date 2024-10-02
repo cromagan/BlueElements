@@ -664,7 +664,6 @@
     </Compile>
     <Compile Include="Interfaces\ICanHaveVariables.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
-    <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
     <Compile Include="Classes\ItemCollectionList\AbstractListItem.cs" />
     <Compile Include="Classes\ItemCollectionList\BitmapListItem.cs" />
     <Compile Include="Classes\ItemCollectionList\CellLikeListItem.cs" />

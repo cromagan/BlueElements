@@ -51,7 +51,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
     private Bitmap? _bitmap;
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-    private string _platzhalter_Für_Layout;
+    private string _platzhalter_Für_Layout = string.Empty;
 
     #endregion
 
@@ -61,7 +61,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
     public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
         Bitmap = bmp;
-        SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
+        SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
         Overlays = [];
         Hintergrund_Weiß_Füllen = true;
         Padding = 0;

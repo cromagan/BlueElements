@@ -18,9 +18,13 @@
 #nullable enable
 
 using BlueBasics;
+using BlueControls.Controls;
 using BlueControls.EventArgs;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
@@ -36,7 +40,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     /// <summary>
     /// Die fixe Größe in Pixel
     /// </summary>
-    protected Size _size = Size.Empty;
+    protected SizeF _size = SizeF.Empty;
 
     private readonly PointM _pl;
 
@@ -86,16 +90,37 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     #region Properties
 
+    [Description("Die Breite des Objekts in mm.")]
+    public float Breite {
+        get => (float)Math.Round((double)PixelToMm(_size.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        set {
+            if (IsDisposed) { return; }
+            if (Breite == value) { return; }
+            Size = new SizeF(MmToPixel(value, ItemCollectionPadItem.Dpi), _size.Height);
+        }
+    }
+
+    [Description("Die Höhe des Objekts in mm.")]
+    public float Höhe {
+        get => (float)Math.Round((double)PixelToMm(_size.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        set {
+            if (IsDisposed) { return; }
+            if (Höhe == value) { return; }
+            Size = new SizeF(_size.Width, MmToPixel(value, ItemCollectionPadItem.Dpi));
+        }
+    }
+
     /// <summary>
     /// Die fixe Größe in Pixel
     /// </summary>
-    public Size Size {
+    public SizeF Size {
         get {
             return _size;
         }
         set {
-            if (_size.Width == _size.Width && _size.Height == value.Height) { return; }
+            if (_size.Width == value.Width && _size.Height == value.Height) { return; }
             _size = value;
+            PointMoved(_pLo, new MoveEventArgs(false));
             OnPropertyChanged();
         }
     }
@@ -103,6 +128,17 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     #endregion
 
     #region Methods
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        List<GenericControl> result =
+        [   .. base.GetProperties(widthOfControl),
+            new FlexiControl(),
+            new FlexiControlForProperty<float>(() => Breite),
+            new FlexiControlForProperty<float>(() => Höhe),
+
+        ];
+        return result;
+    }
 
     public override void InitialPosition(int x, int y, int width, int height) {
         var ua = UsedArea;

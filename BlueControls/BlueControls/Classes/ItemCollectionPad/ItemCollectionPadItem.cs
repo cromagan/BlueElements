@@ -51,7 +51,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<AbstractPadItem>, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMouseAndKeyHandle {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables {
 
     #region Fields
 
@@ -76,42 +76,16 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
 
     #region Constructors
 
-
-
-
-
-
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result =
-        [   .. base.GetProperties(widthOfControl),
-            new FlexiControl(),
-            new FlexiControlForProperty<float>(() => GridShow),
-
-
-        ];
-        return result;
-    }
-
-
-
-
-
-
-
-
-
     public ItemCollectionPadItem() : base(string.Empty) {
         BindingOperations.EnableCollectionSynchronization(_internal, new object());
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
-        SheetSizeInMm = Size.Empty;
+        SheetSizeInMm = new SizeF(10, 10);
         RandinMm = Padding.Empty;
         _idCount++;
-        //Caption = "#" + DateTime.UtcNow.ToString1() + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
-        if (Skin.StyleDb == null) { Skin.InitStyles(); }
-        _sheetStyle = null;
+
+        _sheetStyle = Skin.StyleDb?.Row.First(); ;
         _sheetStyleScale = 1f;
-        if (Skin.StyleDb != null) { _sheetStyle = Skin.StyleDb.Row.First(); }
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
@@ -146,6 +120,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
     #region Properties
 
     public static string ClassId => "ITEMCOLLECTION";
+
     public Color BackColor { get; set; } = Color.White;
 
     [DefaultValue(false)]
@@ -159,7 +134,9 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
     }
 
     public ObservableCollection<ItemConnection> Connections { get; } = [];
+
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
+
     public new bool ForPrinting { get; set; }
 
     /// <summary>
@@ -209,7 +186,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
                 Math.Abs(value.Height - _sheetSizeInMm.Height) < DefaultTolerance) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
 
-            Size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
+            SetCoordinates(UsedArea with { Width = MmToPixel(_sheetSizeInMm.Width, Dpi), Height = MmToPixel(_sheetSizeInMm.Height, Dpi) });
 
             OnPropertyChanged();
         }
@@ -240,6 +217,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
     }
 
     public new bool ShowAlways { get; set; }
+
     public new bool ShowJointPoints { get; set; }
 
     [DefaultValue(false)]
@@ -503,7 +481,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
 
         #endregion
 
-        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.Size.Width, padData.Size.Height);
+        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.UsedArea.Width, padData.UsedArea.Height);
 
         var erg = new List<(IAutosizable item, RectangleF newpos)>();
 
@@ -581,6 +559,16 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
 
     IEnumerator IEnumerable.GetEnumerator() {
         return ((IEnumerable)_internal).GetEnumerator();
+    }
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        List<GenericControl> result =
+        [   .. base.GetProperties(widthOfControl),
+            new FlexiControl(),
+            new FlexiControlForProperty<float>(() => GridShow),
+
+        ];
+        return result;
     }
 
     /// <summary>
@@ -678,7 +666,9 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         switch (key.ToLowerInvariant()) {
             case "sheetsize":
                 _sheetSizeInMm = value.SizeFParse();
-                _size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
+                SetCoordinates(UsedArea with { Width = MmToPixel(_sheetSizeInMm.Width, Dpi), Height = MmToPixel(_sheetSizeInMm.Height, Dpi) });
+
+                //_size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
                 return true;
 
             case "printarea":
@@ -963,7 +953,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
             #region Die neue Position in die Items schreiben
 
             foreach (var (item, newpos) in x) {
-                item.SetCoordinates(newpos, true);
+                item.SetCoordinates(newpos);
             }
 
             #endregion
@@ -997,6 +987,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
                 done = true;
             }
         }
+
         return !done ? RectangleF.Empty : new RectangleF(_pLo.X + x1, _pLo.Y + y1, x2 - x1, y2 - y1);
     }
 
@@ -1019,8 +1010,8 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
-        var d = !_sheetSizeInMm.IsEmpty ? UsedArea.ToRect().ZoomAndMoveRect(scale, shiftX, shiftY, false) : visibleArea;
-        var ds = !_sheetSizeInMm.IsEmpty ? positionModified : visibleArea;
+        var d = !_sheetSizeInMm.IsEmpty || Parent != null ? UsedArea.ToRect().ZoomAndMoveRect(scale, shiftX, shiftY, false) : visibleArea;
+        var ds = !_sheetSizeInMm.IsEmpty || Parent != null ? positionModified : visibleArea;
 
         if (BackColor.A > 0) {
             gr.FillRectangle(new SolidBrush(BackColor), d);
@@ -1060,7 +1051,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
             } while (!(dxm < ds.Left &&
                     dxm < ds.Top &&
                     dxp > ds.Right &&
-                    dxp > ds.Bottom));
+                    dyp > ds.Bottom));
         }
 
         #endregion

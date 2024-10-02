@@ -78,7 +78,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnAddDynamicSymbol_Click(object sender, System.EventArgs e) {
         DynamicSymbolPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        b.SetCoordinates(new RectangleF(100, 100, 300, 300));
         Pad.AddCentered(b);
     }
 
@@ -102,7 +102,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnAddSymbol_Click(object sender, System.EventArgs e) {
         SymbolPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
+        b.SetCoordinates(new RectangleF(100, 100, 300, 300));
         Pad.AddCentered(b);
     }
 
@@ -112,13 +112,13 @@ public partial class PadEditorWithFileAccess : PadEditor {
             Stil = PadStyles.Style_Standard
         };
         Pad.AddCentered(b);
-        b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
+        b.SetCoordinates(new RectangleF(10, 10, 200, 200));
     }
 
     private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
         ItemCollectionPadItem b = new();
-        b.SetLeftTopPoint(100,100);
         Pad.AddCentered(b);
+        b.SetCoordinates(new RectangleF(10, 10, 200, 200));
     }
 
     private void btnLastFiles_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadFile(e.Item.KeyName);

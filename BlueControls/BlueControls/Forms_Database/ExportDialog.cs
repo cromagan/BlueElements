@@ -163,9 +163,9 @@ public sealed partial class ExportDialog : IHasDatabase {
                 //    it.GridShow = -1;
                 //}
                 pad.Items.Add(it);
-                //it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy }, true);
+                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy });
 
-                it.SetLeftTopPoint(druckB.Left + x * (oneItem.Width + abstand) + offx, druckB.Top + y * (oneItem.Height + abstand) + offy);
+                //it.SetLeftTopPoint(druckB.Left + x * (oneItem.Width + abstand) + offx, druckB.Top + y * (oneItem.Height + abstand) + offy);
 
                 startNr++;
                 if (startNr >= rowsForExport.Count) { break; }

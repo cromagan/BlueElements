@@ -290,10 +290,10 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         var my = (float)Math.Round(y - _y, 6);
 
         if (mx == 0 && my == 0) { return; }
-        OnMoving(new MoveEventArgs(mx, my, byMouse));
+        OnMoving(new MoveEventArgs(byMouse));
         _x = x;
         _y = y;
-        OnMoved(new MoveEventArgs(mx, my, byMouse));
+        OnMoved(new MoveEventArgs(byMouse));
         OnPropertyChanged();
     }
 

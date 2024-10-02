@@ -67,7 +67,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     protected ReciverControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula) : base(keyName) {
         ParentFormula = parentFormula;
-        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+        SetCoordinates(new RectangleF(0, 0, 50, 30));
     }
 
     #endregion
@@ -175,7 +175,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             OnPropertyChanged();
 
             if (_X_Position != XPosition.frei) {
-                PointMoved(_pLo, new MoveEventArgs(0, 0, false));
+                PointMoved(_pLo, new MoveEventArgs(false));
             }
         }
     }
@@ -421,7 +421,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
         var anzahlSpaltenImFormular = (int)_X_Position / 100;
         var aufXPosition = (int)(_X_Position - anzahlSpaltenImFormular * 100);
 
-        var wi = (Parent.Size.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        var wi = (Parent.UsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
 
         _pLo.X = xpos;

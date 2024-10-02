@@ -127,7 +127,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
         return result;
     }
 
-    public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height), true);
+    public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height));
 
     public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
         if (p == null) { p = new PointM(JointMiddle); }
@@ -150,7 +150,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
-        SizeChanged();
+        CalculateSlavePoints();
     }
 
     public override bool ParseThis(string key, string value) {
@@ -216,23 +216,16 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
             _pRu.X = x;
         }
 
-        SizeChanged();
+        CalculateSlavePoints();
         base.PointMoved(sender, e);
     }
 
-    public void SetCoordinates(RectangleF r, bool overrideFixedSize) {
-        if (!overrideFixedSize) {
-            var vr = r.PointOf(Alignment.Horizontal_Vertical_Center);
-            var ur = UsedArea;
-            _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2), false);
-            _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height, false);
-        } else {
-            _pLo.SetTo(r.PointOf(Alignment.Top_Left), false);
-            _pRu.SetTo(r.PointOf(Alignment.Bottom_Right), false);
-        }
+    public void SetCoordinates(RectangleF r) {
+        _pLo.SetTo(r.PointOf(Alignment.Top_Left), false);
+        _pRu.SetTo(r.PointOf(Alignment.Bottom_Right), false);
     }
 
-    public virtual void SizeChanged() {
+    private void CalculateSlavePoints() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
         _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
         _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);

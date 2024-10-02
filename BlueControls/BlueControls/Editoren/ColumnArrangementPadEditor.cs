@@ -561,7 +561,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                                                            (int)(anyitem.UsedArea.Height / 2),
                                                            (int)anyitem.UsedArea.Height);
 
-                                    databItem.SetCoordinates(r, true);
+                                    databItem.SetCoordinates(r);
                                 }
                                 kx = databItem.UsedArea.Right;
                             }

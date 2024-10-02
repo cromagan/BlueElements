@@ -34,7 +34,7 @@ public interface IAutosizable {
 
     public bool IsVisibleForMe(string mode, bool nowDrawing);
 
-    public void SetCoordinates(RectangleF r, bool overrideFixedSize);
+    public void SetCoordinates(RectangleF r);
 
     #endregion
 }

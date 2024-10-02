@@ -32,6 +32,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 
 using static BlueBasics.Converter;
+using BlueControls.EventArgs;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -105,7 +106,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             _textOriginal = value;
             _textReplaced = value;
             InvalidateText();
-            SizeChanged();
+            //CalculateSlavePoints();
             OnPropertyChanged();
         }
     }
@@ -169,6 +170,11 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         return base.ParseThis(key, value);
     }
 
+    public override void PointMoved(object sender, MoveEventArgs e) {
+        base.PointMoved(sender, e);
+        InvalidateText();
+    }
+
     public override void ProcessStyleChange() => InvalidateText();
 
     public override string ReadableText() => "Text";
@@ -198,10 +204,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         return true;
     }
 
-    public override void SizeChanged() {
-        base.SizeChanged();
-        InvalidateText();
-    }
+    //public override void CalculateSlavePoints() {
+    //    base.CalculateSlavePoints();
+    //    InvalidateText();
+    //}
 
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 

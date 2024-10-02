@@ -46,7 +46,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
         protected set {
             _generatedBitmap = value;
-            Size = _generatedBitmap?.Size ?? Size.Empty;
+            Size = _generatedBitmap?.Size ?? SizeF.Empty;
         }
     }
 

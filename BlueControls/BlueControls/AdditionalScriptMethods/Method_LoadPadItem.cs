@@ -59,7 +59,7 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
     public static TextPadItem DummyItem() {
         var t = new TextPadItem();
         t.Text = "FEHLER!";
-        t.SetCoordinates(new System.Drawing.RectangleF(0, 0, 100, 100), true);
+        t.SetCoordinates(new System.Drawing.RectangleF(0, 0, 100, 100));
 
         return t;
 }
