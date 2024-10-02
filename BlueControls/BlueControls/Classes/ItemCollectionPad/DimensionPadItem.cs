@@ -121,8 +121,6 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     public string Präfix { get; set; } = string.Empty;
 
-    //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-    // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, 300)
     public float Skalierung { get; set; } = 3.07f;
 
     public string Suffix { get; set; } = string.Empty;

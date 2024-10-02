@@ -100,6 +100,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         _sheetStyleScale = 1f;
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
+        IsSaved = true;
     }
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
@@ -160,10 +161,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public bool Endless {
         get {
             if (Parent != null) { return false; }
-
             return _endless;
         }
-        internal set {
+        set {
             if (Parent != null) { value = false; }
             if (value == _endless) { return; }
 
@@ -689,10 +689,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public override bool ParseThis(string key, string value) {
         switch (key.ToLowerInvariant()) {
             case "sheetsize":
-                //_sheetSizeInMm = value.SizeFParse();
-                //SetCoordinates(UsedArea with { Width = MmToPixel(_sheetSizeInMm.Width, Dpi), Height = MmToPixel(_sheetSizeInMm.Height, Dpi) });
-
-                //_size = new Size((int)MmToPixel(_sheetSizeInMm.Width, Dpi), (int)MmToPixel(_sheetSizeInMm.Height, Dpi));
+                var _sheetSizeInMm = value.SizeFParse();
+                Breite = _sheetSizeInMm.Width;
+                Höhe = _sheetSizeInMm.Height;
                 return true;
 
             case "printarea":

@@ -196,7 +196,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (h < 10) { h = 10; }
 
         if (padSchachteln.Items != null) {
-            padSchachteln.Items.SheetSizeInMm = new SizeF(b, h);
+            padSchachteln.Items.Breite = b;
+            padSchachteln.Items.Höhe = h;
             padSchachteln.Items.RandinMm = Padding.Empty;
             padSchachteln.Items.BackColor = Color.Transparent;
         }
@@ -240,7 +241,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
-        padSchachteln.Items.SheetSizeInMm = new SizeF(b, h);
+        padSchachteln.Items.Breite = b;
+        padSchachteln.Items.Höhe = h;
         padSchachteln.Items.RandinMm = Padding.Empty;
         List<string> l = [];
         _itemNrForPrint = 0;

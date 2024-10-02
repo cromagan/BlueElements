@@ -204,9 +204,9 @@ public static class Converter {
         return long.TryParse(s, out result);
     }
 
-    public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;
+    public static float MmToPixel(float mM, int dPi) => mM * (float)dPi / 25.4f;
 
-    public static float PixelToMm(float pixel, int dPi) => pixel / dPi * 25.4f;
+    public static float PixelToMm(float pixel, int dPi) => pixel * 25.4f / (float)dPi;
 
     public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 

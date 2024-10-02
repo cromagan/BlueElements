@@ -27,10 +27,6 @@ using BlueBasics.Enums;
 namespace BlueControls.ItemCollectionList;
 
 public class CellLikeListItem : AbstractListItem {
-    // Implements IReadableText
-    //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-    // Dim Ausgleich As Double = MmToPixel(1 / 72 * 25.4, 300)
-    //   Dim FixZoom As Single = 3.07F
 
     #region Fields
 
