@@ -109,7 +109,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     public RowFormulaPadItem? ItemOfRow(RowItem r) {
         if (Pad.Items != null) {
-            foreach (var thisItem in Pad.Items.Items) {
+            foreach (var thisItem in Pad.Items) {
                 if (thisItem is RowFormulaPadItem tempVar && tempVar.Row == r) {
                     return tempVar;
                 }
@@ -321,7 +321,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         _ = fl.ShowDialog();
 
         List<string> l = [];
-        foreach (var thisR in Pad.Items.Items) {
+        foreach (var thisR in Pad.Items) {
             if (thisR is RowFormulaPadItem { Row: { IsDisposed: false } r }) {
                 //_ = r.Row.ExecuteScript(true, true, "to be sure");
                 l.Add("#######################################################################");
@@ -356,7 +356,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (i is not { Count: 1 }) { return; }
 
         _ = AddOne(i[0], 0, 0, string.Empty);
-        if (Pad.Items.Items is { Count: < 10 }) {
+        if (Pad.Items.Count()  < 10) {
             Pad.ZoomFit();
         }
         //RepairLinesAndFullProcessing();

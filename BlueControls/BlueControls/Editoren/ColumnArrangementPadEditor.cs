@@ -472,11 +472,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private ColumnPadItem? LeftestItem(IEnumerable<AbstractPadItem> ignore) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
-        if (Pad?.Items == null) { return null; }
+        if (Pad?.Items is not { } ic) { return null; }
 
         ColumnPadItem? found = null;
 
-        foreach (var thisIt in Pad.Items.Items) {
+        foreach (var thisIt in ic) {
             if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
                 if (fi.Column?.Database == db) {
                     if (found == null || fi.UsedArea.X < found.UsedArea.X) {

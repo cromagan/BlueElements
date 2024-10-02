@@ -281,6 +281,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         return 0;
     }
 
+    public virtual bool Contains(AbstractPadItem item) => item.Contains(item);
+
     /// <summary>
     /// Prüft, ob die angegebenen Koordinaten das Element berühren.
     /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
@@ -331,7 +333,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             if (Parent is { }) {
                 foreach (var thisV in Parent.Connections) {
                     if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
-                        if (Parent.Items.Contains(thisV.Item2) && thisV.Item2 != this) {
+                        if (Parent.Contains(thisV.Item2) && thisV.Item2 != this) {
                             if (thisV.Item2.Bei_Export_sichtbar) {
                                 var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(scale, shiftX, shiftY);
                                 var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(scale, shiftX, shiftY);

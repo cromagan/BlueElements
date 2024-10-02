@@ -262,7 +262,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
-
     #endregion
 
     #region Indexers
@@ -922,7 +921,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
         if (_checkBehavior != CheckBehavior.AllSelected) {
             // Z.B. die Sktipt-Liste.
-            // Items können gewähltz werden, aber auch gelöscht
+            // Items können gewählt werden, aber auch gelöscht
             Remove(_mouseOverItem);
         }
     }
@@ -1037,12 +1036,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             isInForm = false;
         }
 
-
-
         QuickInfo = nd?.QuickInfo ?? string.Empty;
 
-
-    var showAdd = AddAllowed != AddType.None && isInForm;
+        var showAdd = AddAllowed != AddType.None && isInForm;
 
         showAdd = (showAdd && (Math.Abs(SliderY.Value - SliderY.Maximum) < Constants.IntTolerance || _mousemoved));
 

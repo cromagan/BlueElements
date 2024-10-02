@@ -371,7 +371,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
 
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
-        return _items.Items.Where(thisItem => thisItem != null &&
+        return _items.Where(thisItem => thisItem != null &&
                                         thisItem.Contains(p, Zoom)).ToList();
     }
 
@@ -667,7 +667,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     private void _Items_ItemAdded(object sender, ListEventArgs e) {
         if (IsDisposed) { return; }
-        if (_items is not { Items.Count: not 0 } || Fitting) { ZoomFit(); }
+        if (_items.Count() > 0 || Fitting) { ZoomFit(); }
         Invalidate();
         OnItemAdded(e);
     }

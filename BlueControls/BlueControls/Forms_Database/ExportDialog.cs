@@ -158,10 +158,10 @@ public sealed partial class ExportDialog : IHasDatabase {
             for (var x = 0; x < maxX; x++) {
                 var it = new ItemCollectionPadItem(layoutFileName);
 
-                if (it.Items is { }) {
+                //if (it._internal is { }) {
                     it.ReplaceVariables(rowsForExport[startNr]);
-                    it.GridShow = -1;
-                }
+                //    it.GridShow = -1;
+                //}
                 pad.Items.Add(it);
                 //it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy }, true);
 

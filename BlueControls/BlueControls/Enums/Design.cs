@@ -145,7 +145,7 @@ public enum Design {
     //UniPaint_Verhalten_ZoneObjektEditor = 9806
     //UniPaint_Verhalten_Kalender = 9820
     //UniPaint_Verhalten_WochenKalender = 9821
-    // Unipaint-Items 9900
+    // Unipaint-_internal 9900
     // UniPaint_Item_DateiKästchen = 9900
     // UniPaint_Item_TransparentZoneObject = 9901
     //  UniPaint_Item_Person = 9902

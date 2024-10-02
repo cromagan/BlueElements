@@ -27,18 +27,6 @@ namespace BlueControls.Interfaces;
 
 public interface IMouseAndKeyHandle {
 
-    #region Properties
-
-    public ObservableCollection<AbstractPadItem> Items { get; }
-
-    IMouseAndKeyHandle? Parent { get; set; }
-
-    public RowItem? SheetStyle { get; set; }
-
-    public float SheetStyleScale { get; set; }
-
-    #endregion
-
     #region Methods
 
     List<AbstractPadItem> HotItems(MouseEventArgs e, float zoom, float shiftX, float shiftY);

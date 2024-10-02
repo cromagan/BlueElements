@@ -32,6 +32,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -50,7 +51,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
+public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<AbstractPadItem>, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
 
     #region Fields
 
@@ -64,6 +65,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     private string _caption = string.Empty;
     private float _gridShow = 10;
     private float _gridsnap = 1;
+    private ObservableCollection<AbstractPadItem> _internal = [];
     private Padding _randinMm = Padding.Empty;
     private SizeF _sheetSizeInMm = SizeF.Empty;
     private RowItem? _sheetStyle;
@@ -75,7 +77,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     #region Constructors
 
     public ItemCollectionPadItem() : base(string.Empty) {
-        BindingOperations.EnableCollectionSynchronization(Items, new object());
+        BindingOperations.EnableCollectionSynchronization(_internal, new object());
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         SheetSizeInMm = Size.Empty;
@@ -167,9 +169,6 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     [DefaultValue(true)]
     public bool IsSaved { get; set; }
 
-    public ObservableCollection<AbstractPadItem> Items { get; } = new ObservableCollection<AbstractPadItem>();
-    IMouseAndKeyHandle? IMouseAndKeyHandle.Parent { get; set; }
-
     public Padding RandinMm {
         get => _randinMm;
         set {
@@ -236,13 +235,13 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
     #region Indexers
 
-    public AbstractPadItem? this[string keyName] => Items.Get(keyName);
+    public AbstractPadItem? this[string keyName] => _internal.Get(keyName);
 
-    public AbstractPadItem? this[int nr] => Items[nr];
+    public AbstractPadItem? this[int nr] => _internal[nr];
 
     public List<AbstractPadItem> this[int x, int y] => this[new Point(x, y)];
 
-    public List<AbstractPadItem> this[Point p] => Items.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
+    public List<AbstractPadItem> this[Point p] => _internal.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
 
     #endregion
 
@@ -469,7 +468,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
         List<IAutosizable> its = [];
 
-        foreach (var thisc in padData.Items) {
+        foreach (var thisc in padData._internal) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
                 thisc.IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
                 its.Add(aas);
@@ -503,12 +502,12 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
     public void Add(AbstractPadItem? item) {
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
-        if (Items.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
+        if (_internal.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
         if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
 
         if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
 
-        Items.Add(item);
+        _internal.Add(item);
         item.Parent = this;
 
         IsSaved = false;
@@ -521,27 +520,35 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     }
 
     public void Clear() {
-        var l = new List<AbstractPadItem>(Items);
+        var l = new List<AbstractPadItem>(_internal);
 
         foreach (var thisit in l) {
             Remove(thisit);
         }
 
-        Items.Clear();
+        _internal.Clear();
     }
 
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 != null) {
-            Swap(Items.IndexOf(bpi), Items.IndexOf(i2));
+            Swap(_internal.IndexOf(bpi), _internal.IndexOf(i2));
         }
     }
 
     public void EineEbeneNachVorne(AbstractPadItem bpi) {
         var i2 = Next(bpi);
         if (i2 != null) {
-            Swap(Items.IndexOf(bpi), Items.IndexOf(i2));
+            Swap(_internal.IndexOf(bpi), _internal.IndexOf(i2));
         }
+    }
+
+    public IEnumerator<AbstractPadItem> GetEnumerator() {
+        return ((IEnumerable<AbstractPadItem>)_internal).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+        return ((IEnumerable)_internal).GetEnumerator();
     }
 
     /// <summary>
@@ -551,9 +558,9 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
     public bool HasVisibleItemsForMe(string mode) {
-        if (Items == null || Items.Count == 0) { return false; }
+        if (_internal == null || _internal.Count == 0) { return false; }
 
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
                 if (cspi.IsVisibleForMe(mode, false)) { return true; }
             }
@@ -567,13 +574,13 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     }
 
     public void InDenHintergrund(AbstractPadItem thisItem) {
-        if (Items.IndexOf(thisItem) == 0) { return; }
+        if (_internal.IndexOf(thisItem) == 0) { return; }
         Remove(thisItem);
-        Items.Insert(0, thisItem);
+        _internal.Insert(0, thisItem);
     }
 
     public void InDenVordergrund(AbstractPadItem thisItem) {
-        if (Items.IndexOf(thisItem) == Items.Count - 1) { return; }
+        if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
         Remove(thisItem);
         Add(thisItem);
     }
@@ -583,7 +590,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     }
 
     public void Mirror(PointM? p, bool vertical, bool horizontal) {
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
         }
     }
@@ -603,7 +610,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     public void Move(float x, float y) {
         if (x == 0 && y == 0) { return; }
 
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             thisItem.Move(x, y, false);
         }
     }
@@ -632,7 +639,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
             result.ParseableAdd("PrintArea", _randinMm.ToString());
         }
 
-        result.ParseableAdd("Item", Items);
+        result.ParseableAdd("Item", _internal);
 
         result.ParseableAdd("SnapMode", _snapMode);
         result.ParseableAdd("GridShow", _gridShow);
@@ -720,16 +727,18 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() => _caption;
+    public override string ReadableText() {
+        if (!string.IsNullOrEmpty(_caption)) { return _caption; }
 
-    public void Remove(string keyName) => Remove(this[keyName]);
+        return "Unter-Gruppe";
+    }
 
     public void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
-        if (item == null || !Items.Contains(item)) { return; }
+        if (item == null || !_internal.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
         OnItemRemoving(item);
-        _ = Items.Remove(item);
+        _ = _internal.Remove(item);
         item.Parent = null;
         OnItemRemoved();
         OnPropertyChanged();
@@ -745,7 +754,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
     public bool ReplaceVariable(Variable variable) {
         var did = false;
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             if (thisItem is ICanHaveVariables variables) {
                 if (variables.ReplaceVariable(variable)) { did = true; }
             }
@@ -769,7 +778,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
         var did = false;
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             if (thisItem is ICanHaveVariables variables) {
                 if (variables.ResetVariables()) { did = true; }
             }
@@ -805,7 +814,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     public void Swap(int index1, int index2) {
         if (IsDisposed) { return; }
         if (index1 == index2) { return; }
-        (Items[index1], Items[index2]) = (Items[index2], Items[index1]);
+        (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
         OnPropertyChanged();
     }
 
@@ -814,7 +823,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
 
-        foreach (var thisIt in Items) {
+        foreach (var thisIt in _internal) {
             if (thisIt is ReciverControlPadItem csi) {
                 l.AddRange(csi.VisibleFor);
             }
@@ -829,12 +838,16 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         return Database.RepairUserGroups(l);
     }
 
+    internal bool Contains(AbstractPadItem item2) {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
     /// </summary>
     /// <param name="names"></param>
     internal override void DeleteJointPoints(List<string> names) {
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             thisItem.DeleteJointPoints(names);
         }
         base.DeleteJointPoints(names);
@@ -876,7 +889,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     internal int GetFreeColorId() {
         var usedids = new List<int>();
 
-        foreach (var thisIt in Items) {
+        foreach (var thisIt in _internal) {
             if (thisIt is ReciverSenderControlPadItem hci) {
                 usedids.Add(hci.OutputColorId);
             }
@@ -889,7 +902,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     }
 
     internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
-        foreach (var thisIt in Items) {
+        foreach (var thisIt in _internal) {
             if (thisIt != notOfMe) {
                 foreach (var thisPt in thisIt.JointPoints) {
                     if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
@@ -901,27 +914,27 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     }
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
-        var itemCount = Items.IndexOf(bpi);
+        var itemCount = _internal.IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount++;
-            if (itemCount >= Items.Count) { return null; }
-            if (Items[itemCount] != null) { return Items[itemCount]; }
+            if (itemCount >= _internal.Count) { return null; }
+            if (_internal[itemCount] != null) { return _internal[itemCount]; }
         } while (true);
     }
 
     internal AbstractPadItem? Previous(AbstractPadItem bpi) {
-        var itemCount = Items.IndexOf(bpi);
+        var itemCount = _internal.IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount--;
             if (itemCount < 0) { return null; }
-            if (Items[itemCount] != null) { return Items[itemCount]; }
+            if (_internal[itemCount] != null) { return _internal[itemCount]; }
         } while (true);
     }
 
     internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls, string mode) {
-        if (Items == null || Items.Count == 0) { return; }
+        if (_internal == null || _internal.Count == 0) { return; }
 
         if (changeControls) {
             var x = ResizeControls(this, newWidthPixel, newhHeightPixel, mode);
@@ -953,7 +966,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         var x2 = float.MinValue;
         var y2 = float.MinValue;
         var done = false;
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             if (thisItem != null) {
                 var ua = thisItem.UsedArea;
                 x1 = Math.Min(x1, ua.Left);
@@ -969,7 +982,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
-        foreach (var thisIt in Items) {
+        foreach (var thisIt in _internal) {
             thisIt.PropertyChanged -= Item_PropertyChanged;
             thisIt.Dispose();
         }
@@ -1034,7 +1047,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
         #region Items selbst
 
         if (SheetStyleScale > 0.1) {
-            foreach (var thisItem in Items) {
+            foreach (var thisItem in _internal) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
                 thisItem.Draw(gr, positionModified.ToRect(), scale, shiftX, shiftY);
             }
@@ -1047,7 +1060,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IDisposableEx
 
     private void ApplyDesignToItems() {
         if (IsDisposed) { return; }
-        foreach (var thisItem in Items) {
+        foreach (var thisItem in _internal) {
             thisItem?.ProcessStyleChange();
         }
         OnPropertyChanged();

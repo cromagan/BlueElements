@@ -273,8 +273,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
             var x = new List<AbstractListItem>();
 
-            // Die Items, die man noch wählen könnte
-            foreach (var thisR in Parent.Items) {
+            // Die _internal, die man noch wählen könnte
+            foreach (var thisR in Parent) {
                 if (thisR is ReciverSenderControlPadItem rfp) {
                     if (rfp != this) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));

@@ -57,7 +57,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
             var x = Show(items);
             return (x as RowFormulaListItem)?.Row;
         } catch (Exception ex) {
-            Develop.DebugPrint("Fehler beim Generieren des Items: " + layoutId, ex);
+            Develop.DebugPrint("Fehler beim Generieren des _internal: " + layoutId, ex);
             return null;
         }
     }

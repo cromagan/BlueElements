@@ -293,7 +293,7 @@ public class LinePadItem : AbstractPadItem {
     private bool IsVerdeckt(float x, float y) {
         if (Parent == null) { return false; }
 
-        foreach (var thisBasicItem in Parent.Items) {
+        foreach (var thisBasicItem in Parent) {
             if (thisBasicItem is { } and not LinePadItem) {
                 var a = thisBasicItem.UsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
@@ -322,7 +322,7 @@ public class LinePadItem : AbstractPadItem {
         if (Parent == null) { return false; }
         PointM p1 = new(x1, y1);
         PointM p2 = new(x2, y2);
-        return Parent.Items.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
+        return Parent.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
     }
 
     private bool Vereinfache(int p1) {
@@ -382,7 +382,7 @@ public class LinePadItem : AbstractPadItem {
         if (_tempPoints.Count > 100) { return false; }
         if (p1 >= _tempPoints.Count - 1) { return false; }
         //   If _TempPoints.Count > 4 Then Return False
-        foreach (var thisItemBasic in Parent.Items) {
+        foreach (var thisItemBasic in Parent) {
             if (thisItemBasic is { } and not LinePadItem)
             //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
             {

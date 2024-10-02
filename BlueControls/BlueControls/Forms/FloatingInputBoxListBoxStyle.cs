@@ -48,7 +48,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) : base(connectedControl, (Design)controlDesign) {
         InitializeComponent();
         Tag = hotitem;
-        // Design = Items.ControlDesign;
+        // Design = _internal.ControlDesign;
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
         Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort);
