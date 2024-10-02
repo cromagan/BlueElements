@@ -101,16 +101,25 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #endregion
 
+    #region Methods
+
+    /// <summary>
+    /// Berechnet Maus Koordinaten des Steuerelements in in Koordinaten um, als ob auf dem unscalierten Inhalt direkt gewählt werden würde.
+    /// Falls die Maus-Koordinaten ausserhalb der grenzen sind, wird nichts getrimmt.
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    public static Point CoordinatesUnscaled(MouseEventArgs e, float scale, float shiftX, float shiftY) => CoordinatesUnscaled(e.Location, scale, shiftX, shiftY);
+
+    public static Point CoordinatesUnscaled(Point e, float scale, float shiftX, float shiftY) =>
+    new((int)Math.Round(((e.X + shiftX) / scale) - 0.5d, 0, MidpointRounding.AwayFromZero),
+        (int)Math.Round(((e.Y + shiftY) / scale) - 0.5d, 0, MidpointRounding.AwayFromZero));
 
     public static bool ScaleWarnung() {
         if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
         BlueControls.Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
         return true;
     }
-
-
-
-    #region Methods
 
     /// <summary>
     /// Gibt den Zeichenbereich zurück. Entspricht der Control-Größe abzüglich der Slider-Breite/Höhe
@@ -200,24 +209,14 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    /// <summary>
-    /// Berechnet Maus Koordinaten des Steuerelements in in Koordinaten um, als ob auf dem unscalierten Inhalt direkt gewählt werden würde.
-    /// Falls die Maus-Koordinaten ausserhalb der grenzen sind, wird nichts getrimmt.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    protected Point KoordinatesUnscaled(MouseEventArgs e) =>
-        new((int)Math.Round(((e.X + _shiftX) / Zoom) - 0.5d, 0, MidpointRounding.AwayFromZero),
-            (int)Math.Round(((e.Y + _shiftY) / Zoom) - 0.5d, 0, MidpointRounding.AwayFromZero));
-
     protected virtual RectangleF MaxBounds() {
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
         return default;
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
-        MousePos11 = KoordinatesUnscaled(e);
-        MouseDownPos11 = KoordinatesUnscaled(e);
+        MousePos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
+        MouseDownPos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
         base.OnMouseDown(e);
     }
 
@@ -227,12 +226,12 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
-        MousePos11 = KoordinatesUnscaled(e);
+        MousePos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
         base.OnMouseMove(e);
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
-        MousePos11 = KoordinatesUnscaled(e);
+        MousePos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
         base.OnMouseUp(e);
         MouseDownPos11 = Point.Empty;
     }
@@ -240,7 +239,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         Fitting = false;
-        var m = KoordinatesUnscaled(e);
+        var m = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
         if (e.Delta > 0) {
             Zoom *= 1.5f;
         } else {

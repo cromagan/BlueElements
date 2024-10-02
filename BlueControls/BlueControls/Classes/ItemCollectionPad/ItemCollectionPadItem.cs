@@ -563,6 +563,23 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
+    public (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY) {
+        var newX = shiftX;
+        var newY = shiftY;
+        var newS = scale;
+
+        if (AutoZoomFit) {
+            var f = UsedAreaOfItems();
+            newS = ZoomFitValue(f, positionModified.ToRect().Size);
+            newX = -positionModified.X - positionModified.Width / 2;
+            newY = -positionModified.Y - positionModified.Height / 2;
+            newX = newX + (f.Left + f.Width / 2) * newS;
+            newY = newY + (f.Top + f.Height / 2) * newS;
+        }
+
+        return (newS, newX, newY);
+    }
+
     public void BringToFront(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
         Remove(thisItem);
@@ -629,6 +646,37 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         return false;
+    }
+
+    public AbstractPadItem? HotItem(Point p, bool topLevel, float scale, float shiftX, float shiftY) {
+        if (_internal == null) { return null; }
+
+        
+        Point newP = ZoomPad.CoordinatesUnscaled(p, scale, shiftX, shiftY);
+        var l = _internal.Where(thisItem => thisItem != null &&
+                                        thisItem.Contains(newP, scale)).ToList();
+
+        var mina = long.MaxValue;
+        AbstractPadItem? tmp = null;
+
+        foreach (var thisItem in l) {
+            var a = (long)Math.Abs(thisItem.UsedArea.Width) * (long)Math.Abs(thisItem.UsedArea.Height);
+            if (a <= mina) {
+                // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
+                mina = a;
+                tmp = thisItem;
+            }
+        }
+
+        if (topLevel) { return tmp; }
+
+        if (tmp is ItemCollectionPadItem icpi) {
+            var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
+            var (newS, newX, newY) = AlterView(positionModified, scale, shiftX, shiftY);
+            return icpi.HotItem(newP, false, newS, newX, newY);
+        }
+
+        return tmp;
     }
 
     public void MirrorAllItems(PointM? p, bool vertical, bool horizontal) {
@@ -1065,18 +1113,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         #region Items selbst
 
         if (SheetStyleScale > 0.1) {
-            var newX = shiftX;
-            var newY = shiftY;
-            var newS = scale;
-
-            if (AutoZoomFit) {
-                var f = UsedAreaOfItems();
-                newS = ZoomFitValue(f, positionModified.ToRect().Size);
-                newX = -positionModified.X - positionModified.Width / 2;
-                newY = -positionModified.Y - positionModified.Height / 2;
-                newX = newX + (f.Left + f.Width / 2) * newS;
-                newY = newY + (f.Top + f.Height / 2) * newS;
-            }
+            var (newS, newX, newY) = AlterView(positionModified, scale, shiftX, shiftY);
 
             foreach (var thisItem in _internal) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
