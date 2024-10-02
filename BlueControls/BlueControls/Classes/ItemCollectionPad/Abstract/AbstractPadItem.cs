@@ -281,7 +281,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         return 0;
     }
 
-    public virtual bool Contains(AbstractPadItem item) => item.Contains(item);
+
 
     /// <summary>
     /// Prüft, ob die angegebenen Koordinaten das Element berühren.
@@ -605,7 +605,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
     /// </summary>
     /// <param name="names"></param>
-    internal virtual void DeleteJointPoints(List<string> names) {
+    internal void DeleteJointPoints(List<string> names) {
         var j = new List<PointM>();
         j.AddRange(JointPoints);
 

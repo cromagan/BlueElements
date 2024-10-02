@@ -168,7 +168,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         //        break;
         //    }
         //}
-        //player.Move(playerTranslation);
+        //player.MoveAllItems(playerTranslation);
 
         #endregion Example
 
@@ -314,7 +314,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
                 curIndex = bestIndex1;
             } else {
                 // We didn't find an intersection.
-                // Move to the next point in this polygon.
+                // MoveAllItems to the next point in this polygon.
                 curPoint = nextPoint;
                 curIndex = nextIndex;
                 // If we've returned to the starting point, we're done.

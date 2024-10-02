@@ -80,7 +80,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     }
 
     public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Textdatei, 16);
+        return QuickImage.Get(ImageCode.Monitor, 16);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {

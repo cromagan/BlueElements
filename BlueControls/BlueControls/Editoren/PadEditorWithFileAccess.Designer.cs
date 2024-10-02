@@ -249,7 +249,7 @@ namespace BlueControls.Forms {
             // btnAddPhsyik
             // 
             this.btnAddPhsyik.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddPhsyik.ImageCode = "Formel|16";
+            this.btnAddPhsyik.ImageCode = "Apfel|16";
             this.btnAddPhsyik.Location = new System.Drawing.Point(192, 24);
             this.btnAddPhsyik.Name = "btnAddPhsyik";
             this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);

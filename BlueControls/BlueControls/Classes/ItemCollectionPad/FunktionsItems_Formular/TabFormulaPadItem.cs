@@ -237,7 +237,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     public override string ReadableText() {
-        const string txt = "Formulare: ";
+        const string txt = "Register-Karten: ";
 
         return txt + DatabaseInput?.Caption;
     }

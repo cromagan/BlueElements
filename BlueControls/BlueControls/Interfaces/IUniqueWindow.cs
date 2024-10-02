@@ -47,7 +47,7 @@ public static class IUniqueWindowExtension {
     //    foreach(var thisT in FormManager.Forms) {
     //        if (thisT is typeof(window){ IsDisposed: false } form) {
     //            if(o == form.Object) {
-    //                form.BringToFront();
+    //                form.SendToBack();
     //                return;
     //            }
 
@@ -60,7 +60,7 @@ public static class IUniqueWindowExtension {
     //public void ShowOrCreate<T>(T window, object o) where T : IUniqueWindow {
     //    foreach (var form in FormManager.Forms.OfType<T>()) {
     //        if (!form.IsDisposed && form.Object.Equals(o)) {
-    //            form.BringToFront();
+    //            form.SendToBack();
     //            return;
     //        }
     //    }
@@ -74,7 +74,7 @@ public static class IUniqueWindowExtension {
     //    foreach (var form in FormManager.Forms) {
     //        if (form.GetType() == windowType && form is T typedForm && !typedForm.IsDisposed) {
     //            if (typedForm.Object.Equals(o)) {
-    //                typedForm.BringToFront();
+    //                typedForm.SendToBack();
     //                return;
     //            }
     //        }

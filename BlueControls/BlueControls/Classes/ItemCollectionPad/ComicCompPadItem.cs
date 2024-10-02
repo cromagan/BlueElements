@@ -44,7 +44,7 @@ public class ComicCompPadItem : AbstractPadItem {
     public readonly PointM P2;
 
     /// <summary>
-    /// Diese Punkte bestimmen die gedrehten Eckpunkte des Bildes und werden von den Gelenkpunkten aus berechnet. Unskaliert und auch ohne Berücksichtigung der 'Move' Koordinaten
+    /// Diese Punkte bestimmen die gedrehten Eckpunkte des Bildes und werden von den Gelenkpunkten aus berechnet. Unskaliert und auch ohne Berücksichtigung der 'MoveAllItems' Koordinaten
     /// </summary>
     private readonly PointM _ber_Lo = new();
 
@@ -183,7 +183,7 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(r.PointOf(Alignment.Bottom_HorizontalCenter), false);
     }
 
-    public override QuickImage? SymbolForReadableText() => null;
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben,16);
 
     protected override RectangleF CalculateUsedArea() {
         //var wp12 = AngleOfMiddleLine();

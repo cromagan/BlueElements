@@ -60,7 +60,7 @@ internal class Method_SendToBack : Method {
 
         if (iciv.Parent is not ItemCollectionPadItem icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
-        icpv.InDenHintergrund(iciv);
+        icpv.SendToBack(iciv);
         return DoItFeedback.Null();
 
         //return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");

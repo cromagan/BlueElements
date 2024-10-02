@@ -102,7 +102,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         Pad?.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
-        //i2.InDenVordergrund();
+        //i2.BringToFront();
         //RelationsValid = false;
         return i2;
     }
@@ -278,7 +278,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //    //}
     //    //var i = new LinePadItem(id, PadStyles.Style_Standard, enConectorStyle.Ausweichenx, P1, P2);
     //    //Pad.Item.Add(i);
-    //    //i.InDenHintergrund();
+    //    //i.SendToBack();
     //    //Pad.Relation_Add(enRelationType.PositionZueinander, P1, i.Point1);
     //    //Pad.Relation_Add(enRelationType.PositionZueinander, P2, i.Point2);
     //}

@@ -51,7 +51,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     public override string ReadableText() => "Physik-Objekt";
 
-    public override QuickImage? SymbolForReadableText() => null;
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Apfel, 16);
 
     #endregion
 

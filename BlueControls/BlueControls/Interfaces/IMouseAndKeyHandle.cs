@@ -18,9 +18,7 @@
 #nullable enable
 
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows.Forms;
 
 namespace BlueControls.Interfaces;

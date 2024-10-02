@@ -183,7 +183,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     }
 
     public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
+        return QuickImage.Get(ImageCode.Groupbox);
     }
 
     protected override void Dispose(bool disposing) {

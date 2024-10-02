@@ -51,7 +51,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<AbstractPadItem>, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMirrorable, IMouseAndKeyHandle {
+public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<AbstractPadItem>, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables, IMouseAndKeyHandle {
 
     #region Fields
 
@@ -75,6 +75,30 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
     #endregion
 
     #region Constructors
+
+
+
+
+
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
+        List<GenericControl> result =
+        [   .. base.GetProperties(widthOfControl),
+            new FlexiControl(),
+            new FlexiControlForProperty<float>(() => GridShow),
+
+
+        ];
+        return result;
+    }
+
+
+
+
+
+
+
+
 
     public ItemCollectionPadItem() : base(string.Empty) {
         BindingOperations.EnableCollectionSynchronization(_internal, new object());
@@ -519,6 +543,12 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
+    public void BringToFront(AbstractPadItem thisItem) {
+        if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
+        Remove(thisItem);
+        Add(thisItem);
+    }
+
     public void Clear() {
         var l = new List<AbstractPadItem>(_internal);
 
@@ -528,6 +558,8 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
 
         _internal.Clear();
     }
+
+    public bool Contains(AbstractPadItem item) => _internal.Contains(item);
 
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
@@ -573,23 +605,11 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         throw new NotImplementedException();
     }
 
-    public void InDenHintergrund(AbstractPadItem thisItem) {
-        if (_internal.IndexOf(thisItem) == 0) { return; }
-        Remove(thisItem);
-        _internal.Insert(0, thisItem);
-    }
-
-    public void InDenVordergrund(AbstractPadItem thisItem) {
-        if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
-        Remove(thisItem);
-        Add(thisItem);
-    }
-
     public bool KeyUp(KeyEventArgs e, float zoom, float shiftX, float shiftY) {
         throw new NotImplementedException();
     }
 
-    public void Mirror(PointM? p, bool vertical, bool horizontal) {
+    public void MirrorAllItems(PointM? p, bool vertical, bool horizontal) {
         foreach (var thisItem in _internal) {
             if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
         }
@@ -607,7 +627,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         throw new NotImplementedException();
     }
 
-    public void Move(float x, float y) {
+    public void MoveAllItems(float x, float y) {
         if (x == 0 && y == 0) { return; }
 
         foreach (var thisItem in _internal) {
@@ -811,6 +831,12 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         }
     }
 
+    public void SendToBack(AbstractPadItem thisItem) {
+        if (_internal.IndexOf(thisItem) == 0) { return; }
+        Remove(thisItem);
+        _internal.Insert(0, thisItem);
+    }
+
     public void Swap(int index1, int index2) {
         if (IsDisposed) { return; }
         if (index1 == index2) { return; }
@@ -818,7 +844,7 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         OnPropertyChanged();
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Register);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Gruppe);
 
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
@@ -838,19 +864,14 @@ public sealed class ItemCollectionPadItem : FixedRectanglePadItem, IEnumerable<A
         return Database.RepairUserGroups(l);
     }
 
-    internal bool Contains(AbstractPadItem item2) {
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
     /// </summary>
     /// <param name="names"></param>
-    internal override void DeleteJointPoints(List<string> names) {
+    internal void DeleteJointPointsOfAllItems(List<string> names) {
         foreach (var thisItem in _internal) {
             thisItem.DeleteJointPoints(names);
         }
-        base.DeleteJointPoints(names);
     }
 
     internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
