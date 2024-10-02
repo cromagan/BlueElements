@@ -486,6 +486,7 @@ public static class IO {
     /// <param name="toBeSure">Stellt sicher, dass der Befehl ausgeführt wird. Ansonsten wird das Programm abgebrochen</param>
     /// <returns>True bei Erfolg</returns>
     private static bool ProcessFile(DoThis processMethod, string file1, string file2, int tries, bool toBeSure) {
+        if (Develop.AllReadOnly) { return true; }
         var mytry = 0;
         var startTime = DateTime.UtcNow;
         while (!processMethod(file1, file2)) {

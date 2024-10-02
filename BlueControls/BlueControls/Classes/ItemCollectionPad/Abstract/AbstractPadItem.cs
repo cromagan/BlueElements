@@ -116,8 +116,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public bool ForPrinting {
         get {
             if (_parent is ItemCollectionPadItem icpi) { return icpi.ForPrinting; }
-
-            return false;
+            if (this is ItemCollectionPadItem icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
+            return true;
         }
     }
 
@@ -191,7 +191,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public bool ShowAlways {
         get {
             if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowAlways; }
-
+            if (this is ItemCollectionPadItem icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
             return false;
         }
     }
@@ -199,7 +199,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public bool ShowJointPoints {
         get {
             if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowJointPoints; }
-
+            if (this is ItemCollectionPadItem icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
             return false;
         }
     }
@@ -281,8 +281,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         return 0;
     }
 
-
-
     /// <summary>
     /// Prüft, ob die angegebenen Koordinaten das Element berühren.
     /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
@@ -357,9 +355,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public void DrawToBitmap(Bitmap? bmp, float scale, float shiftX, float shiftY) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        var r = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
-
-        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), r, scale, shiftX, shiftY);
+        var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
+        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionModified, scale, shiftX, shiftY);
         gr.Dispose();
     }
 
@@ -565,7 +562,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
         Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
 
-        DrawToBitmap(I, scale, 0, 0);
+        DrawToBitmap(I, scale, r.Left * scale, r.Top * scale);
 
         //using var gr = Graphics.FromImage(I);
         //gr.Clear(BackColor);
