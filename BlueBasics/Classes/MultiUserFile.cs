@@ -220,6 +220,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
+        if (mode.HasFlag(EditableErrorReasonType.Save) && Develop.AllReadOnly) { return "Entwickler hat Speichern deaktiviert"; }
+
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datei eingefroren: " + FreezedReason; }
 
         //----------Load ------------------------------------------------------------------------
@@ -415,6 +417,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <param name="mustSave"></param>
     public void Save(bool mustSave) {
+        if (Develop.AllReadOnly) { _isSaved = true; return; }
+
         if (_isInSaveingLoop) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
 
@@ -683,6 +687,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <returns>Dateiname, Stand der Originaldatei, was gespeichert wurde</returns>
     private (string TMPFileName, string FileInfoBeforeSaving, string dataUncompressed) WriteTempFileToDisk() {
         if (IsDisposed) { return (string.Empty, string.Empty, string.Empty); }
+        if (Develop.AllReadOnly) { return (string.Empty, string.Empty, string.Empty); }
 
         string fileInfoBeforeSaving;
         string tmpFileName;

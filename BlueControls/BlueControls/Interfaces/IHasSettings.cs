@@ -62,6 +62,8 @@ public static class HasSettings {
     }
 
     public static void SaveSettingsToDisk(this IHasSettings settings) {
+        if (Develop.AllReadOnly) { return; }
+
         var pf = settings.SettingsFileName().FilePath().CheckPath();
 
         if (string.IsNullOrEmpty(pf)) { return; }
@@ -99,7 +101,7 @@ public static class HasSettings {
 
         s = s.Replace("\r", string.Empty).Replace("\n", string.Empty);
 
-        if(settings.Settings.IndexOf(s) == 0) { return; }
+        if (settings.Settings.IndexOf(s) == 0) { return; }
 
 
         if (settings.Settings.Count > 0) { settings.Settings.RemoveString(s, false); }

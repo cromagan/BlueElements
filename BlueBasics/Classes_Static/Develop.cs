@@ -71,6 +71,10 @@ public static class Develop {
     [DefaultValue(false)]
     public static bool ServiceStarted { get; private set; }
 
+
+
+    public static bool AllReadOnly = false;
+
     #endregion
 
     #region Methods

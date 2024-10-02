@@ -206,7 +206,7 @@ public class DatabaseMu : Database {
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
-        if (ChangesNotIncluded.Any() && AmITemporaryMaster(5, 55)) {
+        if (!Develop.AllReadOnly && ChangesNotIncluded.Any() && AmITemporaryMaster(5, 55)) {
             if (files.Count > 10 || ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
                 //var tmp = _fileStateUTCDate;
 
@@ -367,6 +367,8 @@ public class DatabaseMu : Database {
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
+        if (Develop.AllReadOnly) { return string.Empty; }
+
         if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
@@ -432,6 +434,8 @@ public class DatabaseMu : Database {
         //CheckSysUndoNow();
 
         _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
+
+        if (Develop.AllReadOnly) { return; }
 
         _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
 

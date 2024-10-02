@@ -2383,6 +2383,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (Develop.AllReadOnly) { return true; }
+
         var m = EditableErrorReason(EditableErrorReasonType.Save);
 
         if (!string.IsNullOrEmpty(m)) { return false; }
