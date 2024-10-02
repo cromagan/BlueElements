@@ -57,6 +57,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public const int Dpi = 300;
 
+    public bool AutoZoomFit = true;
+
     /// <summary>
     /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
     /// </summary>
@@ -120,7 +122,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     #region Properties
 
     public static string ClassId => "ITEMCOLLECTION";
-
     public Color BackColor { get; set; } = Color.White;
 
     [DefaultValue(false)]
@@ -566,6 +567,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         [   .. base.GetProperties(widthOfControl),
             new FlexiControl(),
             new FlexiControlForProperty<float>(() => GridShow),
+            new FlexiControlForProperty<bool>(() => AutoZoomFit),
 
         ];
         return result;
@@ -589,30 +591,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return false;
     }
 
-    public List<AbstractPadItem> HotItems(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        throw new NotImplementedException();
-    }
-
-    public bool KeyUp(KeyEventArgs e, float zoom, float shiftX, float shiftY) {
-        throw new NotImplementedException();
-    }
-
     public void MirrorAllItems(PointM? p, bool vertical, bool horizontal) {
         foreach (var thisItem in _internal) {
             if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
         }
-    }
-
-    public bool MouseDown(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        throw new NotImplementedException();
-    }
-
-    public bool MouseMove(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        throw new NotImplementedException();
-    }
-
-    public bool MouseUp(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
-        throw new NotImplementedException();
     }
 
     public void MoveAllItems(float x, float y) {
@@ -972,23 +954,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             return base.CalculateUsedArea();
         }
 
-        var x1 = float.MaxValue;
-        var y1 = float.MaxValue;
-        var x2 = float.MinValue;
-        var y2 = float.MinValue;
-        var done = false;
-        foreach (var thisItem in _internal) {
-            if (thisItem != null) {
-                var ua = thisItem.UsedArea;
-                x1 = Math.Min(x1, ua.Left);
-                y1 = Math.Min(y1, ua.Top);
-                x2 = Math.Max(x2, ua.Right);
-                y2 = Math.Max(y2, ua.Bottom);
-                done = true;
-            }
-        }
-
-        return !done ? RectangleF.Empty : new RectangleF(_pLo.X + x1, _pLo.Y + y1, x2 - x1, y2 - y1);
+        var f = UsedAreaOfItems();
+        return new RectangleF(f.X + _pLo.X, f.Y + _pLo.Y, f.Width, f.Height);
     }
 
     protected override void Dispose(bool disposing) {
@@ -1049,7 +1016,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
                 ex++;
             } while (!(dxm < ds.Left &&
-                    dxm < ds.Top &&
+                    dym < ds.Top &&
                     dxp > ds.Right &&
                     dyp > ds.Bottom));
         }
@@ -1059,9 +1026,22 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         #region Items selbst
 
         if (SheetStyleScale > 0.1) {
+            var newX = shiftX;
+            var newY = shiftY;
+            var newS = scale;
+
+            if (AutoZoomFit) {
+                var f = UsedAreaOfItems();
+                newS = ZoomFitValue(f, positionModified.ToRect().Size);
+                newX = -positionModified.X - positionModified.Width / 2;
+                newY = -positionModified.Y - positionModified.Height / 2;
+                newX = newX + (f.Left + f.Width / 2) * newS;
+                newY = newY + (f.Top + f.Height / 2) * newS;
+            }
+
             foreach (var thisItem in _internal) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, positionModified.ToRect(), scale, shiftX, shiftY);
+                thisItem.Draw(gr, positionModified.ToRect(), newS, newX, newY);
             }
         }
 
@@ -1232,6 +1212,26 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
             }
         }
+    }
+
+    private RectangleF UsedAreaOfItems() {
+        var x1 = float.MaxValue;
+        var y1 = float.MaxValue;
+        var x2 = float.MinValue;
+        var y2 = float.MinValue;
+        var done = false;
+        foreach (var thisItem in _internal) {
+            if (thisItem != null) {
+                var ua = thisItem.UsedArea;
+                x1 = Math.Min(x1, ua.Left);
+                y1 = Math.Min(y1, ua.Top);
+                x2 = Math.Max(x2, ua.Right);
+                y2 = Math.Max(y2, ua.Bottom);
+                done = true;
+            }
+        }
+
+        return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
     #endregion

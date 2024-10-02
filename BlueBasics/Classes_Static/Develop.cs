@@ -39,6 +39,7 @@ public static class Develop {
 
     #region Fields
 
+    public static bool AllReadOnly = false;
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
@@ -71,10 +72,6 @@ public static class Develop {
     [DefaultValue(false)]
     public static bool ServiceStarted { get; private set; }
 
-
-
-    public static bool AllReadOnly = false;
-
     #endregion
 
     #region Methods
@@ -101,7 +98,7 @@ public static class Develop {
     public static void CheckStackForOverflow() {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 100) {
-            DebugPrint(FehlerArt.Fehler, "Stack-Overflow abgefangen!"); 
+            DebugPrint(FehlerArt.Fehler, "Stack-Overflow abgefangen!");
         }
     }
 
@@ -234,8 +231,6 @@ public static class Develop {
         DebugPrint(fehler ? FehlerArt.Fehler : FehlerArt.Warnung, "Es wird von einem Unterthread zugegriffen.");
     }
 
-    public static void DebugPrint_ReadOnly() => DebugPrint(FehlerArt.Warnung, "Der Wert ist schreibgeschützt.");
-
     public static void DebugPrint_MissingCommand(string command) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
     public static void DebugPrint_NichtImplementiert(bool doend) {
@@ -245,6 +240,8 @@ public static class Develop {
             DebugPrint(FehlerArt.Warnung, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
         }
     }
+
+    public static void DebugPrint_ReadOnly() => DebugPrint(FehlerArt.Warnung, "Der Wert ist schreibgeschützt.");
 
     public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) {
         if (doend) {

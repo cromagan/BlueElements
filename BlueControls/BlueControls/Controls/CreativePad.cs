@@ -434,6 +434,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             _items.ShowJointPoints = _showJointPoints;
             _items.ForPrinting = _showInPrintMode;
             _items.ShowAlways = true;
+            _items.AutoZoomFit = false;
 
             _items.Draw(gr, ClientRectangle, Zoom, ShiftX, ShiftY);
 
@@ -523,14 +524,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLenght(thisPoint, p) < 5f) {
+                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLenght(thisPoint, p) < 5f) {
+                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -659,10 +660,12 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         }
 
         if (LastClickedItem is AbstractPadItem bpi) {
-            foreach (var thisPoint in bpi.JointPoints) {
-                Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
+            var p = KoordinatesUnscaled(e);
 
-                if (GetLenght(thisPoint.X, thisPoint.Y, p.X, p.Y) < 5f) {
+            foreach (var thisPoint in bpi.JointPoints) {
+                //Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
+
+                if (GetLenght(p, thisPoint) < 5f / Zoom) {
                     tmp = thisPoint;
                 }
             }
