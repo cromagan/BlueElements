@@ -910,7 +910,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         OnPropertyChanged();
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Gruppe);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Gruppe);
 
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
@@ -940,7 +940,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
+    internal ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
         var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? [];
 

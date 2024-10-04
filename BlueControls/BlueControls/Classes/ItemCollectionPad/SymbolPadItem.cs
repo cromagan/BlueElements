@@ -123,7 +123,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     public override string ReadableText() => "Symbol";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);

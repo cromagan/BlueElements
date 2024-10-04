@@ -1772,12 +1772,19 @@ public static class Skin {
         return BlueFont.Get(@string);
     }
 
-    private static GraphicsPath? Kontur(Kontur kon, Rectangle r) => kon switch {
-        Enums.Kontur.Rechteck => Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
-        Enums.Kontur.Rechteck_R4 => Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-        Enums.Kontur.Ohne => null,
-        _ => Poly_Rechteck(r) //  GR.SmoothingModex = Drawing2D.SmoothingMode.None
-    };
+    private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
+        switch (kon) {
+            case Enums.Kontur.Rechteck:
+                return Poly_Rechteck(r); // GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            case Enums.Kontur.Rechteck_R4:
+                return Poly_RoundRec(r, 4); // GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+            case Enums.Kontur.Ohne:
+                return null;
+
+            default:
+                return Poly_Rechteck(r); //  GR.SmoothingModex = Drawing2D.SmoothingMode.None
+        }
+    }
 
     #endregion
 }

@@ -39,8 +39,6 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     public List<Kraft> Kraft { get; } = [];
 
-  
-
     protected override int SaveOrder => 999;
 
     #endregion
@@ -51,8 +49,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     public override string ReadableText() => "Physik-Objekt";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Apfel, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Apfel, 16);
 
     #endregion
-
 }

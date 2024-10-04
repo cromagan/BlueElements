@@ -115,7 +115,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override string ReadableText() => "Spalte";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
 
     ///// <summary>
     ///// Für FlexOptions

@@ -239,7 +239,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         return txt + Column?.Caption;
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         return QuickImage.Get(ImageCode.Stift, 16);
     }
 

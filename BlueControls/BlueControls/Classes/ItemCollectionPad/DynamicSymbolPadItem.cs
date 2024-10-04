@@ -134,7 +134,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
     public override string ReadableText() => "Dynamisches Symbol";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Enums.Design.TextBox, Enums.States.Standard, BlueDatabase.Enums.TranslationType.Original_Anzeigen, Alignment.Left, scale);

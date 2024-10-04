@@ -237,8 +237,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public void Changeto(FilterType type, string searchvalue) => Changeto(type, (List<string>)[searchvalue]);
 
-    public object? Clone() {
-        if (!this.IsOk()) { return null; }
+    public object Clone() {
         var fi = new FilterItem(Database, _filterType, _searchValue);
         fi.Column = _column;
         fi.Origin = _origin;
@@ -414,11 +413,17 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         var nam = _column.ReadableText();
 
         if (SearchValue.Count > 1) {
-            return _filterType switch {
-                FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroﬂKleinEgal or FilterType.Istgleich_ODER_GroﬂKleinEgal => nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'",
-                FilterType.IstGleich_UND or FilterType.Istgleich_UND_GroﬂKleinEgal => nam + " - alle: '" + SearchValue.JoinWith("', '") + "'",
-                _ => nam + ": Spezial-Filter"
-            };
+            switch (_filterType) {
+                case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroﬂKleinEgal
+                    or FilterType.Istgleich_ODER_GroﬂKleinEgal:
+                    return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
+
+                case FilterType.IstGleich_UND or FilterType.Istgleich_UND_GroﬂKleinEgal:
+                    return nam + " - alle: '" + SearchValue.JoinWith("', '") + "'";
+
+                default:
+                    return nam + ": Spezial-Filter";
+            }
         }
 
         if (_column == Database?.Column.SysCorrect && _filterType.HasFlag(FilterType.Istgleich)) {

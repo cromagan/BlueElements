@@ -67,20 +67,19 @@ public static class Geometry {
 
     public static float GetAngle(PointF sp, PointF eP) => GetAngle(sp.X, sp.Y, eP.X, eP.Y);
 
-    public static float GetLenght(float x1, float y1, float x2, float y2) {
-        // Berechnet die Länge einer Strecke
-        float l1 = x1-x2;
-        float l2 = y1-y2;
-        // ^2 ist langsamer, laut Project Analyzer
-        return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
-    }
-
-
     public static float GetAngle(float x1, float y1, float x2, float y2) {
         // http://de.wikipedia.org/wiki/Polarkoordinaten
         var xa = x2 - x1;
         var ya = y2 - y1;
         return ya == 0f ? xa <= 0f ? 180f : 0f : ya < 0f ? 90f + ArcTangens(xa / ya) : 270f + ArcTangens(xa / ya);
+    }
+
+    public static float GetLenght(float x1, float y1, float x2, float y2) {
+        // Berechnet die Länge einer Strecke
+        float l1 = x1 - x2;
+        float l2 = y1 - y2;
+        // ^2 ist langsamer, laut Project Analyzer
+        return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
     }
 
     public static float GetLenght(Point sP, Point ep) {
@@ -183,14 +182,23 @@ public static class Geometry {
 
     public static PointF PolarToCartesian(float r, float winkel) {
         // http://de.wikipedia.org/wiki/Polarkoordinaten
-        winkel %= 360;
-        return winkel switch {
-            0 => new PointF(r, 0),
-            90 => new PointF(0, -r),
-            180 => new PointF(-r, 0),
-            270 => new PointF(0, r),
-            _ => new PointF(r * Cosinus(winkel), -r * Sinus(winkel))
-        };
+
+        switch (winkel % 360) {
+            case 0:
+                return new PointF(r, 0);
+
+            case 90:
+                return new PointF(0, -r);
+
+            case 180:
+                return new PointF(-r, 0);
+
+            case 270:
+                return new PointF(0, r);
+
+            default:
+                return new PointF(r * Cosinus(winkel), -r * Sinus(winkel));
+        }
     }
 
     public static float RadToDeg(float radAngle) => (float)(radAngle * (180 / Math.PI));

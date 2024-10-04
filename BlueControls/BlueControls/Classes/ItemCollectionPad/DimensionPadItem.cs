@@ -283,7 +283,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     public override string ReadableText() => "Bemaßung";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
     protected override RectangleF CalculateUsedArea() {
         if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }

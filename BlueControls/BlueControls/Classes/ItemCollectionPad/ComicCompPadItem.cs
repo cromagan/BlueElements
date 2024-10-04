@@ -183,7 +183,7 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(r.PointOf(Alignment.Bottom_HorizontalCenter), false);
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben, 16);
 
     protected override RectangleF CalculateUsedArea() {
         //var wp12 = AngleOfMiddleLine();

@@ -209,7 +209,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     //    InvalidateText();
     //}
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (Stil != PadStyles.Undefiniert) {

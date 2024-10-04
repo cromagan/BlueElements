@@ -187,7 +187,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public override string ReadableText() => "Zeile";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
     protected override void GeneratePic() {
         if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Database is not { IsDisposed: false } db) {

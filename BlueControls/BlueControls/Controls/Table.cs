@@ -1671,13 +1671,17 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    protected override bool IsInputKey(Keys keyData) =>
-                    // Ganz wichtig diese Routine!
-                    // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
-                    keyData switch {
-                        Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
-                        _ => false
-                    };
+    protected override bool IsInputKey(Keys keyData) {
+        // Ganz wichtig diese Routine!
+        // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+        switch (keyData) {
+            case Keys.Up or Keys.Down or Keys.Left or Keys.Right:
+                return true;
+
+            default:
+                return false;
+        }
+    }
 
     protected override void OnClick(System.EventArgs e) {
         base.OnClick(e);

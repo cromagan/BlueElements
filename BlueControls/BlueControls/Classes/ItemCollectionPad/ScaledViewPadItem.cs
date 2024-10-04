@@ -113,7 +113,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
     public override string ReadableText() => "Skalierte Ansicht";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.LupePlus, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.LupePlus, 16);
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);

@@ -99,24 +99,57 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         return true;
     }
 
-    private static double Inch1000ToMm(double inch) => inch switch {
-        8 => 2.0F,
-        16 => 4.0F,
-        20 => 5.0F,
-        39 => 10.0F,
-        79 => 20.0F,
-        98 => 25.0F,
-        394 => 100.0F,
-        413 => 105.0F,
-        432 => 110.0F,
-        583 => 148.0F,
-        591 => 150.0F,
-        787 => 200.0F,
-        827 => 210.0F,
-        1169 => 297.0F,
-        1654 => 420.0F,
-        _ => Math.Round(inch * 0.254, 1, MidpointRounding.AwayFromZero)
-    };
+    private static double Inch1000ToMm(double inch) {
+        switch (inch) {
+            case 8:
+                return 2.0F;
+
+            case 16:
+                return 4.0F;
+
+            case 20:
+                return 5.0F;
+
+            case 39:
+                return 10.0F;
+
+            case 79:
+                return 20.0F;
+
+            case 98:
+                return 25.0F;
+
+            case 394:
+                return 100.0F;
+
+            case 413:
+                return 105.0F;
+
+            case 432:
+                return 110.0F;
+
+            case 583:
+                return 148.0F;
+
+            case 591:
+                return 150.0F;
+
+            case 787:
+                return 200.0F;
+
+            case 827:
+                return 210.0F;
+
+            case 1169:
+                return 297.0F;
+
+            case 1654:
+                return 420.0F;
+
+            default:
+                return Math.Round(inch * 0.254, 1, MidpointRounding.AwayFromZero);
+        }
+    }
 
     private void Abmasse_TextChanged(object sender, System.EventArgs e) {
         if (_doing) { return; }

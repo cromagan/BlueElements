@@ -167,7 +167,7 @@ public class LinePadItem : AbstractPadItem {
 
     public override string ReadableText() => "Line";
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
 
     protected override RectangleF CalculateUsedArea() {
         if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return RectangleF.Empty; }

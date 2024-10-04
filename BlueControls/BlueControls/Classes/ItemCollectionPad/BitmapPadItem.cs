@@ -264,7 +264,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         return false;
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16);
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);

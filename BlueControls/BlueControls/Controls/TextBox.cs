@@ -638,14 +638,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected virtual Design GetDesign() => Design.TextBox;
 
-    protected override bool IsInputKey(Keys keyData) =>
+    protected override bool IsInputKey(Keys keyData) {
         // Ganz wichtig diese Routine!
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
-        keyData switch {
-            Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
-            _ => false
-        };
+        switch (keyData) {
+            case Keys.Up or Keys.Down or Keys.Left or Keys.Right:
+                return true;
+
+            default:
+                return false;
+        }
+    }
 
     protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
