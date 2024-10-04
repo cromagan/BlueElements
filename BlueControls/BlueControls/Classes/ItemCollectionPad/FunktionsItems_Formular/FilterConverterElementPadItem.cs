@@ -159,9 +159,11 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
-
-        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
+        List<GenericControl> result =
+        [
+            .. base.GetProperties(widthOfControl),
+            new FlexiControl("Einstellungen:", widthOfControl, true)
+        ];
 
         //if (DatabaseInput is Database dbin && !dbin.IsDisposed) {
         //    var u2 = new List<AbstractListItem>();

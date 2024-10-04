@@ -598,7 +598,7 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         #region  Buttons ausschalten
 
-        var feedBack = new List<object?> { "Buttons&Watcher", false };
+        List<object?> feedBack = ["Buttons&Watcher", false];
         ThumbGenerator.ReportProgress(0, feedBack);
 
         #endregion

@@ -235,9 +235,11 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
         #region Verfügbare Typen ermitteln
 
-        var comms = new List<AbstractListItem>();
-        comms.Add(ItemOf("Layout Datei laden", "Load", QuickImage.Get("Ordner|24")));
-        comms.Add(ItemOf("Per Skript erzeugen", "Script", QuickImage.Get("Skript|24")));
+        List<AbstractListItem> comms =
+        [
+            ItemOf("Layout Datei laden", "Load", QuickImage.Get("Ordner|24")),
+            ItemOf("Per Skript erzeugen", "Script", QuickImage.Get("Skript|24"))
+        ];
 
         #endregion
 

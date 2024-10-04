@@ -28,13 +28,13 @@ public static partial class Extensions {
     #region Methods
 
     public static PointF NearestCornerOf(this Rectangle r, Point p) {
-        var pl = new List<Point>
-        {
+        List<Point> pl =
+        [
             r.PointOf(Alignment.Top_Left),
             r.PointOf(Alignment.Top_Right),
             r.PointOf(Alignment.Bottom_Right),
             r.PointOf(Alignment.Bottom_Left)
-        };
+        ];
         return p.NearestPoint(pl);
     }
 

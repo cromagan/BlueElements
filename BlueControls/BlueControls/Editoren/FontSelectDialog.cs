@@ -45,7 +45,7 @@ public partial class FontSelectDialog {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         if (_fnList == null) {
-            _fnList = new List<AbstractListItem>();
+            _fnList = [];
             foreach (var f in FontFamily.Families) {
                 if (string.IsNullOrEmpty(f.Name)) {
                     continue;
@@ -60,23 +60,26 @@ public partial class FontSelectDialog {
                 }
             }
             //_fnList.Sort();
-            _fsList = new List<AbstractListItem>();
-            _fsList.Add(ItemOf("8", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("9", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("10", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("11", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("12", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("14", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("16", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("18", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("20", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("22", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("24", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("26", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("28", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("36", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("48", SortierTyp.ZahlenwertFloat));
-            _fsList.Add(ItemOf("72", SortierTyp.ZahlenwertFloat));
+            _fsList =
+            [
+                ItemOf("8", SortierTyp.ZahlenwertFloat),
+                ItemOf("9", SortierTyp.ZahlenwertFloat),
+                ItemOf("10", SortierTyp.ZahlenwertFloat),
+                ItemOf("11", SortierTyp.ZahlenwertFloat),
+                ItemOf("12", SortierTyp.ZahlenwertFloat),
+                ItemOf("14", SortierTyp.ZahlenwertFloat),
+                ItemOf("16", SortierTyp.ZahlenwertFloat),
+                ItemOf("18", SortierTyp.ZahlenwertFloat),
+                ItemOf("20", SortierTyp.ZahlenwertFloat),
+                ItemOf("22", SortierTyp.ZahlenwertFloat),
+                ItemOf("24", SortierTyp.ZahlenwertFloat),
+                ItemOf("26", SortierTyp.ZahlenwertFloat),
+                ItemOf("28", SortierTyp.ZahlenwertFloat),
+                ItemOf("36", SortierTyp.ZahlenwertFloat),
+                ItemOf("48", SortierTyp.ZahlenwertFloat),
+                ItemOf("72", SortierTyp.ZahlenwertFloat)
+                //_fsList.Sort();
+            ];
             //_fsList.Sort();
         }
         FName.ItemAddRange(_fnList);

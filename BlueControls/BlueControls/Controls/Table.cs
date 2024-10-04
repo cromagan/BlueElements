@@ -2539,7 +2539,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (cellInThisDatabaseRow?.Row is { IsDisposed: false } r) {
             colDia.Color = r.CellGetColor(viewItem.Column);
         }
-        colDia.Tag = new List<object?> { viewItem.Column, cellInThisDatabaseRow };
+        colDia.Tag = (List<object?>)[viewItem.Column, cellInThisDatabaseRow];
         List<int> colList = [];
         foreach (var thisRowItem in db.Row) {
             if (thisRowItem != null) {
@@ -2631,7 +2631,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         box.GetStyleFrom(contentHolderCellColumn);
 
-        box.Tag = new List<object?> { viewItem, cellInThisDatabaseRow };
+        box.Tag = (List<object?>)[viewItem, cellInThisDatabaseRow];
 
         if (box is ComboBox cbox) {
             cbox.ItemClear();

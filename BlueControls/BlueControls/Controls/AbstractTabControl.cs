@@ -54,7 +54,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         SetStyle(ControlStyles.UserPaint, true);
         UpdateStyles();
 
-        TabDefaultOrder = Array.Empty<string>();
+        TabDefaultOrder = [];
         HotTrack = true;
     }
 

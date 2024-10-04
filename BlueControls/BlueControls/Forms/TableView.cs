@@ -88,7 +88,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     #region Properties
 
     public static bool SettingsLoadedStatic { get; set; }
-    public static List<string> SettingsStatic { get; set; } = new();
+    public static List<string> SettingsStatic { get; set; } = [];
 
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
 
@@ -421,7 +421,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName.ToTitleCase(),
-            Tag = new List<object> { ci, settings }
+            Tag = (List<object>)[ci, settings]
         };
         tbcDatabaseSelector.Controls.Add(nTabPage);
     }

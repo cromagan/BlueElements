@@ -102,15 +102,20 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string entitiId, RowItem rowIn) {
         var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
-        var vars = new VariableCollection();
-        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-        vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
-        vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
-        //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
-        vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
-        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
+        VariableCollection vars =
+        [
+            new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
+            new VariableString("User", Generic.UserName, true,
+                "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
+
+            new VariableString("Usergroup", Generic.UserGroup, true,
+                "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
+            new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."),
+            new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."),
+            //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
+            new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
+            new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden.")
+        ];
 
         var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
 
@@ -139,16 +144,6 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         return nt;
     }
 
-    public void OpenScriptEditor() {
-        if (IsDisposed || GeneratedFrom is not RowAdderPadItem { IsDisposed: false } it) { return; }
-
-
-        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(it);
-        se.Row = _lastRow;
-
-
-    }
-
     public void Fehler(string txt, ImageCode symbol) {
         Enabled = false;
         _lastGeneratedEntityId = string.Empty;
@@ -157,6 +152,13 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         f.ItemAdd(ItemOf(txt, symbol));
         FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
         _ignoreCheckedChanged = false;
+    }
+
+    public void OpenScriptEditor() {
+        if (IsDisposed || GeneratedFrom is not RowAdderPadItem { IsDisposed: false } it) { return; }
+
+        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(it);
+        se.Row = _lastRow;
     }
 
     protected override void HandleChangesNow() {
@@ -231,7 +233,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                 ai.KeysAndInfo.Clear();
             }
             if (thisIT is DropDownListItem dli) {
-                dli.DDItems.Clear();
+                dli.DropDownItems.Clear();
             }
         }
 
@@ -266,7 +268,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                 #region das Item ist ein Objekt unter einem Dropdown und NICHT separat gewählt.
 
-                var vorhandenDD = dli.DDItems.Get(key);
+                var vorhandenDD = dli.DropDownItems.Get(key);
 
                 if (vorhandenDD is ReadableListItem rliDD) {
 
@@ -284,7 +286,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     naiDD.KeysAndInfo.Add(keyAndInfo[z]);
                     var itDD = ItemOf(naiDD);
 
-                    dli.DDItems.Add(itDD);
+                    dli.DropDownItems.Add(itDD);
                     dli.Enabled = !HasChildNode(selected, key);
                 }
                 olditems.Remove(dd_Name);
@@ -318,7 +320,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     #region ... als Dropdownmenu hinzufügen
 
                     var ndli = new DropDownListItem(dd_Name, true, string.Empty);
-                    ndli.DDItems.Add(it);
+                    ndli.DropDownItems.Add(it);
                     ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     f.ItemAdd(ndli);
                     olditems.Remove(dd_Name);
@@ -378,7 +380,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             var x = Cursor.Position.X - MousePos().X + dli.Pos.X + (dli.Indent * 20);
             var y = Cursor.Position.Y - MousePos().Y + dli.Pos.Bottom; //Identisch
 
-            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DDItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DropDownItems, CheckBehavior.SingleSelection, null, x, y, dli.Pos.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
             dropDownMenu.Cancel += DropDownMenu_Cancel;
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         }
@@ -404,24 +406,25 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     private string GenerateMenuItems(RowItem rowIn, string generatedentityID) {
         if (_menu != null) { return string.Empty; }
 
-        _infos = new List<string>();
+        _infos = [];
 
         var scf = ExecuteScript(Script, Mode, EntityID, rowIn);
 
         if (!scf.AllOk) {
             if (Generic.UserGroup == Constants.Administrator) {
-                var l = new List<string> {
-                "### ACHTUNG - EINMALIGE ANZEIGE ###",
-                generatedentityID,
-                //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
-                //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                //"Datenbank: " + Database.Caption,
-                " ",
-                " ",
-                //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
-                " ",
-               scf.ProtocolText
-            };
+                List<string> l =
+                [
+                    "### ACHTUNG - EINMALIGE ANZEIGE ###",
+                    generatedentityID,
+                    //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+                    //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                    //"Datenbank: " + Database.Caption,
+                    " ",
+                    " ",
+                    //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+                    " ",
+                    scf.ProtocolText
+                ];
                 l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
             }
 
@@ -441,7 +444,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             if (item.Contains("~")) { return "Interner Fehler: Menüpunkte dürfen kein ~ enthalten"; }
         }
 
-        var infos = scf.Variables?.GetList("Infos") ?? new List<string>();
+        var infos = scf.Variables?.GetList("Infos") ?? [];
 
         foreach (var item in infos) {
             if (item.Contains("*")) { return "Interner Fehler: Infos dürfen kein * enthalten"; }
@@ -488,7 +491,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     }
 
     private List<string> RepairMenu(List<string> menu, List<string>? infos) {
-        infos ??= new List<string>();
+        infos ??= [];
 
         while (infos.Count < menu.Count) { infos.Add(string.Empty); }
 

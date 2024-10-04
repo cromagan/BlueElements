@@ -59,7 +59,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
 
     public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
 
-    public List<string> Settings { get; } = new();
+    public List<string> Settings { get; } = [];
 
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;

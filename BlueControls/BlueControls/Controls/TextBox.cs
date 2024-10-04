@@ -368,12 +368,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-
         AbortSpellChecking();
 
         if (e.Mouse != null) {
-
-            if(e.HotItem is not List<string> tags) {  return; }
+            if (e.HotItem is not List<string> tags) { return; }
             var tmpWord = tags.TagGet("word");
 
             if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
@@ -786,7 +784,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (_mouseValue == 9999) {
                 //es Wurde Doppelgeklickt
             } else {
-
                 var tmp = Cursor_PosAt(e.X, e.Y);
                 var tmpWord = _eTxt.Word(tmp);
                 var tags = new List<string>();
@@ -805,7 +802,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     CursorClear();
                     Selection_Repair(true);
                     if (e.Button == MouseButtons.Right) {
-                        FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags,  e);
+                        FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags, e);
                     }
                 }
             }
@@ -846,24 +843,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = _cursorCharPos;
         DatabaseFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
-        var i = new List<AbstractListItem>();
-
-        //if (e.File is Database DB && DB.Bins.Count > 0) {
-        //    foreach (var bmp in DB.Bins) {
-        //        if (bmp.Picture != null) {
-        //            if (!string.IsNullOrEmpty(bmp.Name)) {
-        //                var crc = "DB_" + bmp.Name;
-        //                i.GenerateAndAdd(bmp.Name, crc, QuickImage.Get(crc, 20));
-        //            }
-        //        }
-        //    }
-        //    i.Add(AddSeparator());
-        //}
-        i.Add(ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)));
-        i.Add(ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)));
-        i.Add(ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)));
-        i.Add(ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)));
-        i.Add(ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20)));
+        List<AbstractListItem> i =
+        [
+            ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)),
+            ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)),
+            ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)),
+            ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)),
+            ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20))
+        ];
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
         _cursorCharPos = x;

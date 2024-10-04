@@ -31,8 +31,8 @@ public partial class Voting : System.Windows.Forms.Form {
 
     private readonly ColumnItem _column;
 
+    private readonly Dictionary<string, bool> _done = [];
     private readonly List<RowItem> _rows;
-    private Dictionary<string, bool> _done = new();
     private string _filename = string.Empty;
     private RowItem? _fr1;
     private RowItem? _fr2;

@@ -90,13 +90,13 @@ public partial class VariableEditor : EditorEasy {
         db.Column.GenerateAndAddSystem();
 
         if (Editabe) {
-            var l = new List<ColumnItem?> { na, inh, kom };
+            List<ColumnItem?> l = [na, inh, kom];
 
             foreach (var thisColumn2 in l) {
                 if (thisColumn2 != null) {
                     thisColumn2.TextBearbeitungErlaubt = true;
                     thisColumn2.MultiLine = false;
-                    thisColumn2.PermissionGroupsChangeCell = new(new List<string> { Constants.Everybody });
+                    thisColumn2.PermissionGroupsChangeCell = new((List<string>)[Constants.Everybody]);
                 }
             }
 
@@ -104,12 +104,10 @@ public partial class VariableEditor : EditorEasy {
             if (inh != null) { inh.Caption = "Inhalt"; }
             if (kom != null) { kom.Caption = "Kommentar"; }
 
-            db.PermissionGroupsNewRow = new(new List<string> { Constants.Everybody });
+            db.PermissionGroupsNewRow = new((List<string>)[Constants.Everybody]);
         }
 
-  
         var tcvc = ColumnViewCollection.ParseAll(db);
-
 
         //if (car != null) {
         if (Editabe) {

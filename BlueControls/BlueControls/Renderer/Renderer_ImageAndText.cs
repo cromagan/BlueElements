@@ -40,9 +40,9 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     private int _constantHeight = 16;
     private int _constantWidth = 16;
     private string _defaultImage = string.Empty;
-    private List<string> _imagereplacement = new();
+    private List<string> _imagereplacement = [];
     private string _imgpräfix = string.Empty;
-    private List<string> _opticalReplace = new();
+    private List<string> _opticalReplace = [];
     private bool _text_anzeigen = true;
 
     #endregion
@@ -131,8 +131,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             OnPropertyChanged();
         }
     }
-
-  
 
     public string Standard_Bild {
         get => _defaultImage;

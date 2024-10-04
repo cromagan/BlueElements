@@ -704,14 +704,14 @@ public static partial class Extensions {
     /// <param name="textToSplit"></param>
     /// <param name="trennzeichen"></param>
     /// <returns></returns>
-    public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? Array.Empty<string>() : textToSplit.Split([trennzeichen], StringSplitOptions.None);
+    public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? [] : textToSplit.Split([trennzeichen], StringSplitOptions.None);
 
     /// <summary>
     /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.
     /// </summary>
     /// <param name="textToSplit"></param>
     /// <returns></returns>
-    public static string[] SplitByCr(this string textToSplit) => string.IsNullOrEmpty(textToSplit) ? Array.Empty<string>() : textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
+    public static string[] SplitByCr(this string textToSplit) => string.IsNullOrEmpty(textToSplit) ? [] : textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
 
     /// <summary>
     /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird eine Liste mit der Länge 0 zurückgegeben.
@@ -922,8 +922,6 @@ public static partial class Extensions {
         return tXt;
     }
 
-
-
     /// <summary>
     ///  Entfernt den angegebenen Text am Anfang des Strings. Wenn mehrfach vorgandenn, wird er mehrfach entfernt.
     ///  Groß/Kleinschreibung wird ignoriert.
@@ -942,12 +940,12 @@ public static partial class Extensions {
     }
 
     public static byte[] UTF8_ToByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return Array.Empty<byte>(); }
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return []; }
         return Encoding.UTF8.GetBytes(tXt);
     }
 
     public static byte[] WIN1252_toByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return Array.Empty<byte>(); }
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return []; }
         return Encoding.GetEncoding(1252).GetBytes(tXt);
     }
 

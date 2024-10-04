@@ -39,7 +39,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     #region Fields
 
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = [];
-    private Bitmap _bitmap;
+    private readonly Bitmap _bitmap;
 
     #endregion
 

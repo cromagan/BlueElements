@@ -46,7 +46,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private readonly Accessor<T>? _accessor;
 
-    private Timer _checker;
+    private readonly Timer _checker;
 
     #endregion
 

@@ -65,13 +65,13 @@ public static partial class Extensions {
     public static bool IntersectsVericalyWith(this RectangleF r, RectangleF rect) => rect.X < r.X + r.Width && r.X < rect.X + rect.Width;
 
     public static PointF NearestCornerOf(this RectangleF r, PointF p) {
-        var pl = new List<PointF>
-        {
+        List<PointF> pl =
+        [
             r.PointOf(Alignment.Top_Left),
             r.PointOf(Alignment.Top_Right),
             r.PointOf(Alignment.Bottom_Right),
             r.PointOf(Alignment.Bottom_Left)
-        };
+        ];
         return p.NearestPoint(pl);
     }
 
@@ -82,13 +82,13 @@ public static partial class Extensions {
     /// <param name="p"></param>
     /// <returns></returns>
     public static PointF NearestLineMiddle(this RectangleF r, PointF p) {
-        var pl = new List<PointF>
-        {
+        List<PointF> pl =
+        [
             r.PointOf(Alignment.Bottom_HorizontalCenter),
             r.PointOf(Alignment.Top_HorizontalCenter),
             r.PointOf(Alignment.VerticalCenter_Left),
             r.PointOf(Alignment.VerticalCenter_Right)
-        };
+        ];
         return p.NearestPoint(pl);
     }
 

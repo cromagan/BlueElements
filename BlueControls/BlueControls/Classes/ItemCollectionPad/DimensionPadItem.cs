@@ -175,13 +175,17 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         List<GenericControl> result =
         [
             new FlexiControlForProperty<float>(() => Länge_In_Mm),
+
             new FlexiControlForProperty<string>(() => Text_Oben),
+
             new FlexiControlForProperty<string>(() => Suffix),
+
             new FlexiControlForProperty<string>(() => Text_Unten),
-            new FlexiControlForProperty<string>(() => Präfix)
+
+            new FlexiControlForProperty<string>(() => Präfix),
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(Parent?.SheetStyle)),
+            new FlexiControlForProperty<float>(() => Skalierung)
         ];
-        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(Parent?.SheetStyle)));
-        result.Add(new FlexiControlForProperty<float>(() => Skalierung));
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
     }

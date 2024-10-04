@@ -84,21 +84,21 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         db.Editor = typeof(DatabaseHeadEditor);
         Column.Editor = typeof(ColumnEditor);
 
-        List<GenericControl> result = [];
-
-        result.Add(new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Datenbank));
-        result.Add(new FlexiControlForDelegate(Column.Edit, "Spalte: " + Column.Caption, ImageCode.Spalte));
-        result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<bool>(() => Permanent));
-        result.Add(new FlexiControl());
-
-        result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup1));
-        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup2));
-        result.Add(new FlexiControlForProperty<string>(() => Column.CaptionGroup3));
-        result.Add(new FlexiControl());
-        result.Add(new FlexiControlForProperty<string>(() => Column.QuickInfo, 5));
-        result.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
+        List<GenericControl> result =
+        [
+            new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Datenbank),
+            new FlexiControlForDelegate(Column.Edit, "Spalte: " + Column.Caption, ImageCode.Spalte),
+            new FlexiControl(),
+            new FlexiControlForProperty<bool>(() => Permanent),
+            new FlexiControl(),
+            new FlexiControl(),
+            new FlexiControlForProperty<string>(() => Column.CaptionGroup1),
+            new FlexiControlForProperty<string>(() => Column.CaptionGroup2),
+            new FlexiControlForProperty<string>(() => Column.CaptionGroup3),
+            new FlexiControl(),
+            new FlexiControlForProperty<string>(() => Column.QuickInfo, 5),
+            new FlexiControlForProperty<string>(() => Column.AdminInfo, 5)
+        ];
 
         return result;
     }
@@ -161,11 +161,11 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             }
         }
 
-        gr.TranslateTransform(bmp.Width / 2, 50);
+        gr.TranslateTransform(bmp.Width / 2f, 50);
         gr.RotateTransform(-90);
         Skin.Draw_FormatedText(gr, Column.Caption, null, Alignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
 
-        gr.TranslateTransform(-bmp.Width / 2, -50);
+        gr.TranslateTransform(-bmp.Width / 2f, -50);
         gr.ResetTransform();
 
         gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);

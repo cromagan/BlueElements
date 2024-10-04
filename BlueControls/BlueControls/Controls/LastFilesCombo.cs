@@ -71,7 +71,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
     }
 
-    public List<string> Settings { get; } = new();
+    public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; } = false;
 
     /// <summary>

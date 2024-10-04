@@ -216,9 +216,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
+        List<GenericControl> result =
+        [
+            .. base.GetProperties(widthOfControl),
+            new FlexiControl("Einstellungen:", widthOfControl, true)
+        ];
 
-        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         var inr = GetFilterFromGet();
         if (inr.Count > 0 && inr[0].DatabaseOutput is { IsDisposed: false }) {
             result.Add(new FlexiControlForProperty<string>(() => EntityID));

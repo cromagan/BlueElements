@@ -116,18 +116,20 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var aursicht = new List<AbstractListItem>();
-        aursicht.Add(ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig));
-        aursicht.Add(ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren));
-        aursicht.Add(ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig));
+        List<AbstractListItem> aursicht =
+        [
+            ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig),
+            ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren),
+            ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig)
+        ];
 
         List<GenericControl> result =
         [
-            new FlexiControlForProperty<string>(() => Text, 5)
+            new FlexiControlForProperty<string>(() => Text, 5),
+            new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht),
+            new FlexiControlForProperty<float>(() => Skalierung),
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true))
         ];
-        result.Add(new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht));
-        result.Add(new FlexiControlForProperty<float>(() => Skalierung));
-        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true)));
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
     }

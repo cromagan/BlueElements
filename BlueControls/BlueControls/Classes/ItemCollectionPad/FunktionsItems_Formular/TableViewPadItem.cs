@@ -106,9 +106,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
-
-        result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
+        List<GenericControl> result =
+        [
+            .. base.GetProperties(widthOfControl),
+            new FlexiControl("Einstellungen:", widthOfControl, true)
+        ];
 
         if (DatabaseOutput is { IsDisposed: false } db) {
             var tcvc = ColumnViewCollection.ParseAll(db);

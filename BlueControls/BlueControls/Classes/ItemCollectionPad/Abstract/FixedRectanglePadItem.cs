@@ -142,7 +142,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     public override void InitialPosition(int x, int y, int width, int height) {
         var ua = UsedArea;
-        SetLeftTopPoint(x - (ua.Width / 2) + (width / 2), y - (ua.Height / 2) + (height / 2));
+        SetLeftTopPoint(x - (ua.Width / 2f) + (width / 2f), y - (ua.Height / 2f) + (height / 2f));
     }
 
     public override List<string> ParseableItems() {

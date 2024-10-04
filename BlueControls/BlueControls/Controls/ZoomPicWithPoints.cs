@@ -115,7 +115,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     public static List<string> LoadTags(string pathOfPicture) {
-        List<string> tags = new();
+        List<string> tags = [];
 
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {

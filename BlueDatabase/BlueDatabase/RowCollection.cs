@@ -38,13 +38,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Fields
 
-    public static readonly List<RowItem> DidRows = new();
-    public static readonly List<RowItem> FailedRows = new();
-    public static readonly List<RowItem> InvalidatedRows = new();
+    public static readonly List<RowItem> DidRows = [];
+    public static readonly List<RowItem> FailedRows = [];
+    public static readonly List<RowItem> InvalidatedRows = [];
     public static int WaitDelay;
+    private static readonly object Executingchangedrowslock = new();
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static bool _executingchangedrows;
-    private static object _executingchangedrowslock = new();
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
     private Database? _database;
 
@@ -230,7 +230,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         } catch { return; }
 
-        lock (_executingchangedrowslock) {
+        lock (Executingchangedrowslock) {
             if (_executingchangedrows) { return; }
             _executingchangedrows = true;
         }
@@ -261,7 +261,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (tim.ElapsedMilliseconds > 30000) { break; }
         }
 
-        lock (_executingchangedrowslock) {
+        lock (Executingchangedrowslock) {
             _executingchangedrows = false;
         }
     }
@@ -755,18 +755,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         #region Jüngste löschen
 
-        var ToDel = l.First();
+        var toDel = l.First();
 
         foreach (var thisR2 in l) {
-            if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(ToDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {
-                ToDel = thisR2;
+            if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(toDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {
+                toDel = thisR2;
             }
         }
 
-        db.Row.Remove(ToDel, "RowCleanUp");
+        db.Row.Remove(toDel, "RowCleanUp");
 
         if (reduceToOne) {
-            l.Remove(ToDel);
+            l.Remove(toDel);
             if (l.Count > 1) { RemoveYoungest(l, true); }
         }
 

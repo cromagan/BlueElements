@@ -99,7 +99,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     public bool SavesSettings { get; internal set; } = false;
 
-    public List<string> Settings { get; } = new();
+    public List<string> Settings { get; } = [];
 
     public bool SettingsLoaded { get; set; }
 
@@ -271,8 +271,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     private void F_ControlAdded(object sender, ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
-            var item2 = new List<AbstractListItem>();
-            item2.Add(ItemOf("Keine weiteren Einträge vorhanden", "|~"));
+            List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
 
             //var c = Filter.Column.Contents(null);
             //foreach (var thiss in c)

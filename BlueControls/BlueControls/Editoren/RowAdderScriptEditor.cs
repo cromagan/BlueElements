@@ -52,33 +52,22 @@ public sealed partial class RowAdderScriptEditor : FormWithStatusBar, IHasDataba
         InitializeComponent();
         eventScriptEditor.Enabled = false;
 
-        var l = new List<string> {
-                "In die Variable MENU muss das Menu erstellt werden.",
-                "Dies muss folgendes Format sein:",
-                "Backen",
-                "Backen\\Zutaten",
-                "Backen\\Zutaten\\Mehl",
-                " ",
-                "Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.",
-                " ",
-                "Parallel dazu kann die Variable Infos erstellt werden.",
-                "Freie Texte."
-            };
+        List<string> l =
+        [
+            "In die Variable MENU muss das Menu erstellt werden.",
+            "Dies muss folgendes Format sein:",
+            "Backen",
+            "Backen\\Zutaten",
+            "Backen\\Zutaten\\Mehl",
+            " ",
+            "Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.",
+            " ",
+            "Parallel dazu kann die Variable Infos erstellt werden.",
+            "Freie Texte."
+        ];
         l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
 
-
-
         FormManager.RegisterForm(this);
-    }
-
-    /// <summary>
-    /// Nur zum setzen der Zeile zum Testen.
-    /// </summary>
-    public RowItem? Row {
-        set {
-            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
-            Database = value?.Database;
-        }
     }
 
     #endregion
@@ -102,7 +91,6 @@ public sealed partial class RowAdderScriptEditor : FormWithStatusBar, IHasDataba
         }
     }
 
-
     public object? Object {
         get {
             if (IsDisposed) { return null; }
@@ -110,7 +98,6 @@ public sealed partial class RowAdderScriptEditor : FormWithStatusBar, IHasDataba
             return _item;
         }
         set {
-
             if (value is not RowAdderPadItem) { value = null; }
             if (_item == value) { return; }
 
@@ -129,7 +116,15 @@ public sealed partial class RowAdderScriptEditor : FormWithStatusBar, IHasDataba
         }
     }
 
-
+    /// <summary>
+    /// Nur zum setzen der Zeile zum Testen.
+    /// </summary>
+    public RowItem? Row {
+        set {
+            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
+            Database = value?.Database;
+        }
+    }
 
     #endregion
 

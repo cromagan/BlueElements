@@ -143,7 +143,7 @@ public class ComicCompPadItem : AbstractPadItem {
             p[z].X -= minX;
             p[z].Y -= minY;
         }
-        PointF[] destPara2 = { p[0], p[1], p[2] }; //LO,RO,RU
+        PointF[] destPara2 = [p[0], p[1], p[2]]; //LO,RO,RU
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
         }
@@ -183,25 +183,25 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(r.PointOf(Alignment.Bottom_HorizontalCenter), false);
     }
 
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben,16);
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben, 16);
 
     protected override RectangleF CalculateUsedArea() {
         //var wp12 = AngleOfMiddleLine();
         var angleOfMiddleLine = GetAngle(P1, JointMiddle);
 
-        _ber_Lo.SetTo(P1, _width / 2, angleOfMiddleLine - 90, false);
-        _ber_Ro.SetTo(P1, _width / 2, angleOfMiddleLine + 90, false);
-        _ber_Lu.SetTo(P2, _width / 2, angleOfMiddleLine - 90, false);
-        _ber_Ru.SetTo(P2, _width / 2, angleOfMiddleLine + 90, false);
-        var x = new List<PointM>
-        {
+        _ber_Lo.SetTo(P1, _width / 2f, angleOfMiddleLine - 90, false);
+        _ber_Ro.SetTo(P1, _width / 2f, angleOfMiddleLine + 90, false);
+        _ber_Lu.SetTo(P2, _width / 2f, angleOfMiddleLine - 90, false);
+        _ber_Ru.SetTo(P2, _width / 2f, angleOfMiddleLine + 90, false);
+        List<PointM> x =
+        [
             P1,
             P2,
             _ber_Lo,
             _ber_Ro,
             _ber_Lu,
             _ber_Ru
-        };
+        ];
         var x1 = int.MaxValue;
         var y1 = int.MaxValue;
         var x2 = int.MinValue;
@@ -220,7 +220,7 @@ public class ComicCompPadItem : AbstractPadItem {
         var rOt = _ber_Ro.ZoomAndMove(scale, shiftX, shiftY);
         var rUt = _ber_Ru.ZoomAndMove(scale, shiftX, shiftY);
         var lUt = _ber_Lu.ZoomAndMove(scale, shiftX, shiftY);
-        PointF[] destPara2 = { lOt, rOt, lUt };
+        PointF[] destPara2 = [lOt, rOt, lUt];
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
         }

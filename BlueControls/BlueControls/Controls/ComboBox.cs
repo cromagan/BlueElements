@@ -43,6 +43,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Fields
 
+    private readonly List<AbstractListItem> _items = [];
     private bool _autoSort = true;
     private bool _btnDropDownIsIn;
     private ComboboxStyle _drawStyle = ComboboxStyle.TextBox;
@@ -57,7 +58,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     private string _initialtext = string.Empty;
 
     private bool _itemEditAllowed;
-    private List<AbstractListItem> _items = new();
     private string? _lastClickedText;
 
     #endregion

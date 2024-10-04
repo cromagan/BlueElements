@@ -31,7 +31,7 @@ public class DropDownListItem : AbstractListItem {
 
     #region Fields
 
-    public readonly List<AbstractListItem> DDItems = new();
+    public readonly List<AbstractListItem> DropDownItems = [];
     public AbstractListItem? Selected;
 
     #endregion
@@ -58,7 +58,7 @@ public class DropDownListItem : AbstractListItem {
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer) {
         var he = 16;
 
-        foreach (var item in DDItems) {
+        foreach (var item in DropDownItems) {
             var s = item.HeightForListBox(style, columnWidth, itemdesign, renderer);
 
             he = Math.Max(he, s);
@@ -70,7 +70,7 @@ public class DropDownListItem : AbstractListItem {
         var wi = 16 * 3;
         var he = 16;
 
-        foreach (var item in DDItems) {
+        foreach (var item in DropDownItems) {
             var s = item.SizeUntouchedForListBox(itemdesign);
 
             wi = Math.Max(wi, s.Width);

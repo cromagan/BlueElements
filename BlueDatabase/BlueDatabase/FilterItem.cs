@@ -48,7 +48,8 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     #region Constructors
 
-    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
+    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType, (List<string>)
+        [searchValue]) { }
 
     /// <summary>
     /// Ein AlwaysFalse Filter
@@ -80,9 +81,11 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Database' vorkommen!
     /// </summary>
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, (List<string>)
+        [searchValue], string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, new List<string> { searchValue }, origin) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, (List<string>)
+        [searchValue], origin) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
@@ -232,7 +235,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         OnPropertyChanged();
     }
 
-    public void Changeto(FilterType type, string searchvalue) => Changeto(type, new List<string> { searchvalue });
+    public void Changeto(FilterType type, string searchvalue) => Changeto(type, (List<string>)[searchvalue]);
 
     public object? Clone() {
         if (!this.IsOk()) { return null; }

@@ -299,7 +299,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "Filter unbehandelt!"); }
 
         if (FilterInput == null) {
-            RowsInput = new List<RowItem>();
+            RowsInput = [];
             _rowsInputChangedHandling = false;
             return;
         }

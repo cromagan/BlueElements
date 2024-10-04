@@ -55,7 +55,7 @@ internal class AdderItem : IReadableTextWithKey {
     /// </summary>
     public string KeyName { get; }
 
-    public List<string> KeysAndInfo { get; } = new();
+    public List<string> KeysAndInfo { get; } = [];
 
     public string Last { get; }
 

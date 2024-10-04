@@ -111,17 +111,21 @@ public class LinePadItem : AbstractPadItem {
     //}
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var verhalt = new List<AbstractListItem>
-        {
-            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie)),
-            ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(), QuickImage.Get(ImageCode.Linie)),
-            ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein", ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie))
-        };
+        List<AbstractListItem> verhalt =
+        [
+            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(),
+                QuickImage.Get(ImageCode.Linie)),
+            ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(),
+                QuickImage.Get(ImageCode.Linie)),
+            ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein",
+                ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie))
+        ];
 
-        List<GenericControl> result = [];
-
-        result.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
-        result.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true)));
+        List<GenericControl> result =
+        [
+            new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt),
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true))
+        ];
 
         result.AddRange(base.GetProperties(widthOfControl));
         return result;

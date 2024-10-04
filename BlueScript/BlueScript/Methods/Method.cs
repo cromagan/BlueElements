@@ -95,7 +95,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public abstract string Syntax { get; }
 
-    public List<string> Verwendung { get; } = new();
+    public List<string> Verwendung { get; } = [];
 
     #endregion
 

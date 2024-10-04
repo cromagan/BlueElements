@@ -411,7 +411,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-
     public Database? Database {
         get => _database;
         private set {
@@ -743,7 +742,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             OnPropertyChanged();
         }
     }
-
 
     public ReadOnlyCollection<string> PermissionGroupsChangeCell {
         get => new(_permissionGroupsChangeCell);
@@ -1746,12 +1744,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             d.Add(keyValue, count);
         }
 
-        var l = new List<string> {
+        List<string> l =
+        [
             "Statistik der vorkommenden Werte der Spalte: " + ReadableText(),
             " - nur aktuell angezeigte Zeilen",
             ignoreMultiLine ? " - Zelleninhalte werden als ganzes behandelt" : " - Zelleninhalte werden gesplittet",
             " "
-        };
+        ];
 
         do {
             var maxCount = 0;

@@ -1527,7 +1527,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     var vars = CreateVariableCollection(row, false, dbVariables, true, false);
 
                     if (eventname == ScriptEventTypes.export) {
-                        return new ScriptEndedFeedback(vars, new List<string>(), true, false, false, true, vars.GetBoolean("Successful") ?? false);
+                        return new ScriptEndedFeedback(vars, [], true, false, false, true, vars.GetBoolean("Successful") ?? false);
                     }
 
                     return new ScriptEndedFeedback(vars, vars.GetBoolean("Successful") ?? false);
@@ -1990,7 +1990,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
         IsInCache = FileStateUtcDate;
 
-        CheckSysUndoNow(new List<Database> { this }, true);
+        CheckSysUndoNow((List<Database>)[this], true);
 
         RepairAfterParse();
 
@@ -3359,7 +3359,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string RefreshRowData(RowItem row, bool refreshAlways) {
         if (!refreshAlways && row.IsInCache != null) { return string.Empty; }
 
-        return RefreshRowData(new List<RowItem> { row });
+        return RefreshRowData((List<RowItem>)[row]);
     }
 
     private string WriteTempFileToDisk(List<byte> dataUncompressed) {

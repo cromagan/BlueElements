@@ -239,7 +239,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     public ReadOnlyCollection<ReciverSenderControlPadItem> GetFilterFromGet() {
         if (Parent == null) {
             //Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");
-            return new ReadOnlyCollection<ReciverSenderControlPadItem>(new List<ReciverSenderControlPadItem>());
+            return new ReadOnlyCollection<ReciverSenderControlPadItem>((List<ReciverSenderControlPadItem>)[]);
         }
 
         if (_getFilterFrom == null || _getFilterFrom.Count != _getFilterFromKeys.Count) {

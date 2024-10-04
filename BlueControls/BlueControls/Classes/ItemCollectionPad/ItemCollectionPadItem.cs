@@ -64,6 +64,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// </summary>
     private readonly int _idCount;
 
+    private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private string _caption = string.Empty;
 
     private bool _endless = false;
@@ -71,9 +72,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private float _gridShow = 10;
 
     private float _gridsnap = 1;
-
-    private ObservableCollection<AbstractPadItem> _internal = [];
-
     private Padding _randinMm = Padding.Empty;
 
     private RowItem? _sheetStyle;
@@ -96,7 +94,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         RandinMm = Padding.Empty;
         _idCount++;
 
-        _sheetStyle = Skin.StyleDb?.Row.First(); ;
+        _sheetStyle = Skin.StyleDb?.Row.First();
         _sheetStyleScale = 1f;
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
@@ -587,7 +585,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public void Clear() {
-        var l = new List<AbstractPadItem>(_internal);
+        List<AbstractPadItem> l = [.. _internal];
 
         foreach (var thisit in l) {
             Remove(thisit);
@@ -634,7 +632,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// Prüft, ob das Formular sichtbare Elemente hat.
     /// Zeilenselectionen werden dabei ignoriert.
     /// </summary>
-    /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
+    /// <param name="mode">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
     public bool HasVisibleItemsForMe(string mode) {
         if (_internal == null || _internal.Count == 0) { return false; }
@@ -651,7 +649,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public AbstractPadItem? HotItem(Point p, bool topLevel, float scale, float shiftX, float shiftY) {
         if (_internal == null) { return null; }
 
-        
         Point newP = ZoomPad.CoordinatesUnscaled(p, scale, shiftX, shiftY);
         var l = _internal.Where(thisItem => thisItem != null &&
                                         thisItem.Contains(newP, scale)).ToList();
@@ -673,10 +670,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (tmp is ItemCollectionPadItem icpi) {
             var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
             var newPt = new Point(newP.X + (int)(positionModified.X / scale), newP.Y + (int)(positionModified.Y / scale));
-            TODOP
+            //TODOP
 
             var (newS, newX, newY) = AlterView(positionModified, scale, shiftX, shiftY);
-            Point newP2 = ZoomPad.CoordinatesUnscaled(p, 1/ newS, newX, newY);
+            Point newP2 = ZoomPad.CoordinatesUnscaled(p, 1 / newS, newX, newY);
             return icpi.HotItem(newP2, false, 1, 0, 0);
         }
 
@@ -945,7 +942,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal ScriptEndedFeedback? ExecuteScript(string scripttext, string mode, RowItem rowIn) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? new VariableCollection();
+        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? [];
 
         //var vars = new VariableCollection();
         vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));

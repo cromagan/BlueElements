@@ -46,6 +46,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Fields
 
+    private readonly List<AbstractListItem> _item = [];
     private AddType _addAlloweds = AddType.Text;
 
     private ListBoxAppearance _appearance;
@@ -59,9 +60,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private Design _controlDesign;
 
     private string _filterText = string.Empty;
-
-    private List<AbstractListItem> _item = [];
-
     private Design _itemDesign;
 
     private bool _itemEditAllowed;
@@ -257,7 +255,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<AbstractListItem> Suggestions { get; } = new();
+    public List<AbstractListItem> Suggestions { get; } = [];
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;

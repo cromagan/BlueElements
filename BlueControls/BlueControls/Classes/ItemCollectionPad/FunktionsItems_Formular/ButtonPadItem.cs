@@ -349,11 +349,14 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
         result.Add(new FlexiControlForProperty<string>(() => Bild, c));
 
-        var za = new List<AbstractListItem>();
-        za.Add(ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()));
-        za.Add(ItemOf("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()));
-        za.Add(ItemOf("...genau eine oder mehr Zeilen gefunden wurden", ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()));
-        za.Add(ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString()));
+        List<AbstractListItem> za =
+        [
+            ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()),
+            ItemOf("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()),
+            ItemOf("...genau eine oder mehr Zeilen gefunden wurden",
+                ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()),
+            ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString())
+        ];
 
         result.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 

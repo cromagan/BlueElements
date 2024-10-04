@@ -53,8 +53,6 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public override string Description => "Text wird immer einzeilig dargestellt.";
 
-  
-
     public string Präfix {
         get => _präfix;
         set {
@@ -90,8 +88,8 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var cbxEinheit = new List<AbstractListItem>
-        {
+        List<AbstractListItem> cbxEinheit =
+        [
             ItemOf("µm", ImageCode.Lineal),
             ItemOf("mm", ImageCode.Lineal),
             ItemOf("cm", ImageCode.Lineal),
@@ -108,7 +106,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
             ItemOf("h", ImageCode.Uhr),
             ItemOf("min", ImageCode.Uhr),
             ItemOf("St.", ImageCode.Eins)
-        };
+        ];
 
         List<GenericControl> result =
         [   new FlexiControlForProperty<string>(() => Präfix),

@@ -271,7 +271,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (row?.Database is { IsDisposed: false } db) {
             vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
-            vars = new VariableCollection();
+            vars = [];
         }
 
         #region FilterVariablen erstellen und in fis speichern
