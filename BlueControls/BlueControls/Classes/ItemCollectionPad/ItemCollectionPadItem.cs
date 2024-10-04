@@ -641,9 +641,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public AbstractPadItem? HotItem(Point point, bool topLevel, float scale, float shiftX, float shiftY) {
         // Berechne die unscaled Koordinaten für dieses Item
+
         var unscaledPoint = ZoomPad.CoordinatesUnscaled(point, scale, shiftX, shiftY);
 
-        CreativePad.XXX = unscaledPoint.ToString();
+        //CreativePad.XXX = unscaledPoint.ToString();
 
         // Prüfe die Grenzen nur, wenn nicht endlos
         if (!_endless && !UsedArea.Contains(unscaledPoint)) { return null; }
@@ -664,18 +665,28 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem icpi) {
-            var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
-            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY);
+            var positionModified = icpi.UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
+            var (childScale, childShiftX, childShiftY) = icpi.AlterView(positionModified, scale, shiftX, shiftY);
 
-            // Berechne den neuen Punkt für das Kind-Item
-            var childPoint = new Point(
-                (int)((point.X - positionModified.X) / childScale),
-                (int)((point.Y - positionModified.Y) / childScale)
-            );
+            ////Berechne den neuen Punkt für das Kind - Item
+            //var childPoint = new Point(
+            //    (int)(-(point.X - positionModified.X)),
+            //    (int)(-(point.Y - positionModified.Y))
+            //);
+
+            //var childPoint = new Point(
+            //    (int)positionModified.X + (int)( point.X- positionModified.X),
+            //    (int)positionModified.Y + (int)(point.Y - positionModified.Y));
+
+            //var pn = new Point(point.X - (int) positionModified.X, unscaledPoint.Y);
+            // Berechnung des childPoint
+            //var childPoint = ZoomPad.CoordinatesUnscaled(point, childScale, childShiftX, childShiftY);
+
+            //var childPoint = ZoomPad.CoordinatesUnscaled(pn, childScale, childShiftX, childShiftY);
 
             // Rekursiver Aufruf mit den angepassten Koordinaten
-            var childHotItem = icpi.HotItem(childPoint, false, childScale, childShiftX, childShiftY);
-
+            var childHotItem = icpi.HotItem(point, false, childScale, childShiftX, childShiftY);
+            //CreativePad.XXX = CreativePad.XXX  + ";" + childShiftX.ToString();
             // Wenn ein Kind-Item gefunden wurde, geben wir dieses zurück
             if (childHotItem != null) { return childHotItem; }
         }
@@ -1120,11 +1131,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         #region Items selbst
 
         if (SheetStyleScale > 0.1) {
-            var (newS, newX, newY) = AlterView(positionModified, scale, shiftX, shiftY);
+            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY);
 
             foreach (var thisItem in _internal) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, positionModified.ToRect(), newS, newX, newY);
+                thisItem.Draw(gr, positionModified.ToRect(), childScale, childShiftX, childShiftY);
             }
         }
 

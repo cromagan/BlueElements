@@ -50,8 +50,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     #region Fields
 
-    public static string XXX = string.Empty;
+    //public static string XXX = string.Empty;
     private readonly List<IMoveable> _itemsToMove = [];
+
     private ItemCollectionPadItem? _items;
     private AbstractPadItem? _lastClickedItem;
     private bool _repairPrinterDataPrepaired;
@@ -456,7 +457,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             #endregion
         }
 
-        Skin.Draw_FormatedText(gr, XXX, null, Alignment.VerticalCenter, new Rectangle(0, 0, 100, 100), Design.Caption, States.Standard, null, false, false);
+        //Skin.Draw_FormatedText(gr, XXX, null, Alignment.VerticalCenter, new Rectangle(0, 0, 1000, 100), Design.Caption, States.Standard, null, false, false);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }

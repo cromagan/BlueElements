@@ -64,9 +64,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public TextPadItem() : this(string.Empty, string.Empty) { }
 
-    public TextPadItem(string keyName, string readableText) : base(keyName) {
-        _textReplaced = readableText;
-        _textOriginal = readableText;
+    public TextPadItem(string keyName, string visibleText) : base(keyName) {
+        _textReplaced = visibleText;
+        _textOriginal = visibleText;
         _ausrichtung = Alignment.Top_Left;
         InvalidateText();
     }

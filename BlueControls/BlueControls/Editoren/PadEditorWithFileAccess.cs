@@ -95,8 +95,19 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
+        //var t1 = new TextPadItem(string.Empty, "-100,100 (500)");
+        //t1.SetCoordinates(new RectangleF(-100, 100, 500, 500));
+
+        //var t2 = new TextPadItem(string.Empty, "600,600 (300)");
+        //t2.SetCoordinates(new RectangleF(600, 600, 300, 300));
+
+        //ItemCollectionPadItem b = new();
+        //b.SetCoordinates(new RectangleF(100, 100, 500, 500));
+        //b.Endless = false;
+
+        //b.Add(t1);
+        //b.Add(t2);
         PhysicPadItem b = new();
-        //b.SetCoordinates(new RectangleF(100, 100, 300, 300));
         Pad.AddCentered(b);
     }
 
