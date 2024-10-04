@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;

@@ -789,6 +789,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    //TODO: Unused
     public (RowItem? newrow, string message, bool stoptrying) UniqueRow(string value, string comment) {
         if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
 

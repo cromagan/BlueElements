@@ -642,12 +642,14 @@ public static partial class Extensions {
         }
     }
 
+    //TODO: Unused
     public static string Reverse(this string tXt) {
         var charArray = tXt.ToCharArray();
         Array.Reverse(charArray);
         return new string(charArray);
     }
 
+    //TODO: Unused
     public static string SetLenght(this string s, int anzahl) => s.Length == anzahl ? s : s.Length < anzahl ? s.PadRight(anzahl) : s.Substring(0, anzahl);
 
     /// <summary>
@@ -944,6 +946,7 @@ public static partial class Extensions {
         return Encoding.UTF8.GetBytes(tXt);
     }
 
+    //TODO: Unused
     public static byte[] WIN1252_toByte(this string? tXt) {
         if (tXt == null || string.IsNullOrEmpty(tXt)) { return []; }
         return Encoding.GetEncoding(1252).GetBytes(tXt);

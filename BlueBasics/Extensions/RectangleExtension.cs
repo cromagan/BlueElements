@@ -27,6 +27,7 @@ public static partial class Extensions {
 
     #region Methods
 
+    //TODO: Unused
     public static PointF NearestCornerOf(this Rectangle r, Point p) {
         List<Point> pl =
         [

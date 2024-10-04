@@ -25,9 +25,7 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueControls.ItemCollectionPad.Abstract;
-using static BlueBasics.IO;
 using BlueControls.ItemCollectionPad;
-
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -62,45 +60,37 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
         t.SetCoordinates(new System.Drawing.RectangleF(0, 0, 100, 100));
 
         return t;
-}
+    }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filen = attvar.ValueStringGet(0);
 
-
         if (filen.FileType() is not FileFormat.BlueCreativeSymbol) {
-            return new DoItFeedback(ld, "Datei ist kein Symbol: " +filen);
+            return new DoItFeedback(ld, "Datei ist kein Symbol: " + filen);
         }
 
         if (!IO.FileExists(filen)) {
             //return new DoItFeedback(ld, "Datei nicht gefunden: " +filen);
 
             return new DoItFeedback(new VariablePadItem(DummyItem()));
-
         }
 
         try {
-
             var toparse = System.IO.File.ReadAllText(filen, BlueBasics.Constants.Win1252);
 
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
-  
 
             if (i is not AbstractPadItem api) {
                 return new DoItFeedback(ld, "Datei fehlerhaft: " + filen);
-
             }
 
             api.GetNewIdsForEverything();
 
-
-            return new DoItFeedback(new VariablePadItem( api));
+            return new DoItFeedback(new VariablePadItem(api));
         } catch {
             //return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " +filen);
             return new DoItFeedback(new VariablePadItem(DummyItem()));
         }
-
-
     }
 
     #endregion

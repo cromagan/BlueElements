@@ -119,6 +119,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     public string Page { get; }
 
+    //TODO: Unused
     public RowItem? ShowingRow {
         get {
             HandleChangesNow();

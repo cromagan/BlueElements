@@ -106,6 +106,7 @@ public static class Converter {
     }
 
     public static T EnsureNotNull<T>(T? value) where T : class {
+        //TODO: Unused
         if (value == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Wert ist null!");
             throw new ArgumentNullException();

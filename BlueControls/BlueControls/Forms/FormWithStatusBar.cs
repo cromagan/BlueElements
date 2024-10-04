@@ -59,6 +59,7 @@ public partial class FormWithStatusBar : Form {
 
     #region Methods
 
+    //TODO: Unused
     public static void UpdateStatusBar(string jobname, string text) {
         if (string.IsNullOrEmpty(jobname) && string.IsNullOrEmpty(text)) {
             UpdateStatusBar(FehlerArt.Info, string.Empty, false);

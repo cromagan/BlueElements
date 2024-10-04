@@ -54,6 +54,7 @@ public static class IO {
 
     #region Methods
 
+    //TODO: Unused
     public static string CalculateMd5(string filename) {
         if (!FileExists(filename)) { return string.Empty; }
         using var md5 = MD5.Create();
@@ -149,6 +150,7 @@ public static class IO {
         return pfad;
     }
 
+    //TODO: Unused
     public static string ChecksumFileName(string name) {
         name = name.Replace("\\", "}");
         name = name.Replace("/", "}");
@@ -335,6 +337,7 @@ public static class IO {
         }
     }
 
+    //TODO: Unused
     public static List<string>? GetFilesWithFileSelector(string defaultpath, bool multi) {
         if (string.IsNullOrEmpty(LastFilePath)) {
             if (!string.IsNullOrEmpty(defaultpath)) {
@@ -365,6 +368,7 @@ public static class IO {
 
     public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, 5, toBeSure);
 
+    //TODO: Unused
     public static bool MoveFile(string oldName, string newName, int tries, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, tries, toBeSure);
 
     /// <summary>

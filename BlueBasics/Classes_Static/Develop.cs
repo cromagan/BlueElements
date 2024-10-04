@@ -83,6 +83,7 @@ public static class Develop {
         Application.Exit();
     }
 
+    //TODO: Unused
     public static string AppExe() => Application.StartupPath + "\\" + AppName() + ".exe";
 
     public static string AppName() {
@@ -270,6 +271,7 @@ public static class Develop {
 
     public static bool IsHostRunning() => Debugger.IsAttached;
 
+    //TODO: Unused
     public static bool IsRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
     public static void SetUserDidSomething() => LastUserActionUtc = DateTime.UtcNow;

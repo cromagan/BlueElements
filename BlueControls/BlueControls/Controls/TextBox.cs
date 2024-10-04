@@ -161,10 +161,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    [Browsable(false)]
-    [DefaultValue("")]
-    public string Prefix { get; set; } = string.Empty;
-
     [DefaultValue(0)]
     public int RaiseChangeDelay {
         get => _raiseChangeDelay / 2; // Umrechnung aus Sekunden
@@ -524,7 +520,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _mouseValue = 0;
             _cursorVisible = false;
             //_suffix = string.Empty;
-
+            qq
             _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
             _eTxt?.Dispose();
         }

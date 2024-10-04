@@ -44,8 +44,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
 
-    private string _caption = string.Empty;
-
     private ConnectedFormula.ConnectedFormula? _cFormula;
 
     #endregion
@@ -432,7 +430,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
 
         if (_cFormula?.Pages is { } pg) {
-
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem icp && icp.Caption.ToLower() == "head") {
                     Pad.Items = icp;
@@ -506,7 +503,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
 
         if (_cFormula?.Pages is { } pg) {
-
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem icp) {
                     if (s == icp.Caption) {

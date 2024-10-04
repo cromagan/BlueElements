@@ -23,7 +23,6 @@ using BlueControls.Controls;
 using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollectionPad;
 

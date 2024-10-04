@@ -397,6 +397,7 @@ public static partial class Extensions {
         return string.Empty;
     }
 
+    //TODO: Unused
     public static List<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
         List<string> l = [];
         if (list == null) { return l; }
@@ -418,6 +419,7 @@ public static partial class Extensions {
         return l;
     }
 
+    //TODO: Unused
     public static void TagRemove(this ICollection<string> col, string tagname) {
         var found = col.TagGetPosition(tagname);
         if (found >= 0) {

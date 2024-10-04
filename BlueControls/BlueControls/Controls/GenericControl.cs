@@ -252,7 +252,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             return;
         }
         Forms.QuickInfo.Close();
-
     }
 
     public new void Invalidate() {
@@ -407,7 +406,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         if (!DoDrawings()) { return; }
 
         base.OnMouseEnter(e);
-
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
@@ -417,7 +415,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
         if (!DoDrawings()) { return; }
         base.OnMouseLeave(e);
-
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
@@ -428,7 +425,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
             if (!DoDrawings()) { return; }
             base.OnMouseMove(e);
-
         }
     }
 

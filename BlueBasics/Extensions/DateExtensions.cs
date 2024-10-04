@@ -28,8 +28,10 @@ public static partial class Extensions {
 
     public static string ToString1(this DateTime value) => value.ToString("yyyy/MM/dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
+    //TODO: Unused
     public static string ToString2(this DateTime value) => value.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
+    //TODO: Unused
     public static string ToString3(this DateTime value) => value.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
 
     public static string ToString4(this DateTime value) => value.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);

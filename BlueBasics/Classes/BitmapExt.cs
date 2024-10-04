@@ -231,6 +231,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
+        //TODO: Unused
         try {
             if (sourceBmp == null || !sourceBmp.IsValid()) { return null; }
             Bitmap bmp = new(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
@@ -253,6 +254,7 @@ public class BitmapExt : IDisposableExtended {
     /// <param name="accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
     /// <returns></returns>
     public static bool IntersectsWith(Bitmap? image1, Point pos1, Bitmap? image2, Point pos2, int accuracy) {
+        //TODO: Unused
         if (image1 == null || image2 == null) { return false; }
         Rectangle koord1 = new(pos1, image1.Size);
         Rectangle koord2 = new(pos2, image2.Size);
@@ -350,6 +352,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
+        //TODO: Unused
         // Open a Stream and decode a TIFF image
         FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         List<Bitmap> l = [];
@@ -477,6 +480,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public void FromFile(string dateiName, bool setDummyPicIfFails) {
+        //TODO: Unused
         var x = (Bitmap?)Image_FromFile(dateiName);
         if (x == null && setDummyPicIfFails) {
             x = QuickImage.Get(ImageCode.Warnung);
@@ -518,6 +522,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public void MakeTransparent(Color color) {
+        //TODO: Unused
         UnlockBits(true);
         _bitmap?.MakeTransparent(color);
         LockBits();

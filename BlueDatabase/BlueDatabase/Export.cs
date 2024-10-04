@@ -86,6 +86,7 @@ public static class Export {
         return (l, fehler);
     }
 
+    //TODO: Unused
     public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
         List<string> l = [];
 

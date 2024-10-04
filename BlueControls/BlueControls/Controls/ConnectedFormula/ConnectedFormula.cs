@@ -44,8 +44,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Fields
 
-    public const float StandardHöhe = 1.75f;
-
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
 
     private readonly List<string> _notAllowedChilds = [];
@@ -272,7 +270,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
                 foreach (var thisit in icp) {
                     if (thisit is RowEntryPadItem repi) {
-                        found = repi; break;
+                        found = repi;
+                        break;
                     }
                 }
 

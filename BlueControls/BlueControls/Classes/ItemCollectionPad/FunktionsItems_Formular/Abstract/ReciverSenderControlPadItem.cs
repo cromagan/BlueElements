@@ -26,7 +26,6 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.ItemCollectionList;
 using BlueBasics.Enums;
-using BlueControls.Enums;
 using BlueControls.Forms;
 using static BlueDatabase.Database;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -44,8 +43,6 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasVersion {
 
     #region Fields
-
-    private readonly List<string> _childIds = [];
 
     private Database? _databaseOutput;
 

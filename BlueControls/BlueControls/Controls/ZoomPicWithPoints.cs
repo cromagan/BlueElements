@@ -91,6 +91,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static string FilenameTxt(string pathOfPicture) => pathOfPicture.FilePath() + pathOfPicture.FileNameWithoutSuffix() + ".txt";
 
+    //TODO: Unused
     public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
         var (bitmap, list) = LoadFromDisk(pathOfPicture);
         return GenerateBitmapListItem(bitmap, list);
@@ -125,13 +126,16 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return tags;
     }
 
+    //TODO: Unused
     public BitmapListItem GenerateBitmapListItem() {
         WritePointsInTags();
         return GenerateBitmapListItem(Bmp, Tags);
     }
 
+    //TODO: Unused
     public PointM? GetPoint(string name) => _points.Get(name);
 
+    //TODO: Unused
     public void LetUserAddAPoint(string pointName, Helpers helper, Orientation mittelline) {
         _mittelLinie = mittelline;
         _helper = helper;
@@ -140,6 +144,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Invalidate();
     }
 
+    //TODO: Unused
     public void LoadData(string pathOfPicture) {
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
@@ -149,6 +154,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Invalidate();
     }
 
+    //TODO: Unused
     public void PointClear() {
         _points.Clear();
         WritePointsInTags();
@@ -174,6 +180,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         WritePointsInTags();
     }
 
+    //TODO: Unused
     public void SaveData() {
         WritePointsInTags();
         var path = Tags.TagGet("ImageFile");

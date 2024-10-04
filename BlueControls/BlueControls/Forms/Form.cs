@@ -41,12 +41,12 @@ public partial class Form : System.Windows.Forms.Form {
     /// </summary>
     public const int BorderWidth = 16;
 
-    /// <summary>
-    /// Die Dicke des oberen Balken einer Form in Pixel
-    /// </summary>
-    public static readonly int BorderTop = 31;
-
     #endregion
+
+    ///// <summary>
+    ///// Die Dicke des oberen Balken einer Form in Pixel
+    ///// </summary>
+    //public static readonly int BorderTop = 31;
 
     #region Constructors
 

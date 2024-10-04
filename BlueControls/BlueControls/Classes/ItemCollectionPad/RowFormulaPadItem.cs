@@ -26,7 +26,6 @@ using BlueDatabase;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 

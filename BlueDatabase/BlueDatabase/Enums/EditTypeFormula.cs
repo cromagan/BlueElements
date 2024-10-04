@@ -35,7 +35,7 @@ public enum EditTypeFormula {
     ////   FileHandling_InDataSystem = 8
     ////Dropdown_Multi = 9,
     //Dropdown_Single = 10,
-    Font_AuswahlDialog = 11,
+    //Font_AuswahlDialog = 11,
 
     //Image_Auswahl_Dialog = 12,
     ////	ListBox_MarkedUp = 13,

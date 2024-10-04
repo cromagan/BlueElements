@@ -28,6 +28,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
+// ReSharper disable once UnusedMember.Global
 public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Constructors

@@ -255,7 +255,7 @@ namespace BlueControls.Forms {
             this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
             this.btnAddPhsyik.TabIndex = 10;
             this.btnAddPhsyik.Text = "Physik";
-            this.btnAddPhsyik.Click += new System.EventHandler(this.btnAddUnterStufe_Click);
+            this.btnAddPhsyik.Click += new System.EventHandler(this.btnAddPhsyik_Click);
             // 
             // btnAddSymbol
             // 

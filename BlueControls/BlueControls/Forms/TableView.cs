@@ -403,6 +403,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// Setzt von allen Reitern die Ansichts- und Filtereinstellungen zurück
     /// </summary>
     public void ResetDatabaseSettings() {
+        //TODO: Unused
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is TabPage { Tag: List<object> s } tp) {
                 s[1] = string.Empty;

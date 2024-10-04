@@ -24,13 +24,8 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
+// ReSharper disable once UnusedMember.Global
 public class Method_ItemCollectionPad : Method {
-
-    #region Fields
-
-    public static readonly List<string> ItemCollectionPadVal = [VariableItemCollectionPad.ShortName_Variable];
-
-    #endregion
 
     #region Properties
 

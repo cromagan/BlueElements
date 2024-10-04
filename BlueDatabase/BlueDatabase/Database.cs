@@ -857,6 +857,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return l.SortedDistinctList();
     }
 
+    //TODO: Unused
     public static bool SaveToFile(Database db, int minLen, string filn) {
         var bytes = ToListOfByte(db, minLen, db.FileStateUtcDate);
 
@@ -1135,6 +1136,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
+    //TODO: Unused
     public void CloneFrom(Database sourceDatabase, bool cellDataToo, bool tagsToo) {
         _ = sourceDatabase.Save();
 

@@ -635,6 +635,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// <param name="mode">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
     public bool HasVisibleItemsForMe(string mode) {
+        //TODO: Unused
         if (_internal == null || _internal.Count == 0) { return false; }
 
         foreach (var thisItem in _internal) {
@@ -836,6 +837,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
+    //TODO: Unused
     public bool ReplaceVariable(string name, string wert) => ReplaceVariable(new VariableString(name, wert));
 
     public bool ReplaceVariable(Variable variable) {
@@ -1243,23 +1245,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     private void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
-
-    private void ParseConnections(string toParse) {
-        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
-
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key.ToLowerInvariant()) {
-                case "connection":
-                    CreateConnection(pair.Value);
-
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
-        }
-    }
 
     private void ParseItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
