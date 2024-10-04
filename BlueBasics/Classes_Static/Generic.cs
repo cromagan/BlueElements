@@ -44,7 +44,7 @@ public static class Generic {
 
     public static string UserGroup = Constants.Everybody;
 
-    private static List<Type>? _allTypes = null;
+    private static List<Type>? _allTypes;
     private static int _getUniqueKeyCount;
 
     private static string _getUniqueKeyLastTime = "InitialDummy";
@@ -57,7 +57,8 @@ public static class Generic {
 
     public static List<Type> AllTypes {
         get {
-            if (_allTypes != null) return _allTypes;
+            if (_allTypes != null)
+                return _allTypes;
 
             _allTypes = [];
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {

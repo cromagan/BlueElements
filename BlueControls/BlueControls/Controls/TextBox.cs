@@ -520,9 +520,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _mouseValue = 0;
             _cursorVisible = false;
             //_suffix = string.Empty;
-            qq
             _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
-            _eTxt?.Dispose();
+            _eTxt.Dispose();
         }
     }
 
@@ -623,9 +622,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
             if (_eTxt.Count > 0) {
                 r.X += 2;
-                Skin.Draw_FormatedText(gr, _suffix, _eTxt.Design, States.Standard_Disabled, null, Alignment.Top_Left, r, this, false, false);
+                Skin.Draw_FormatedText(gr, _suffix, null, Alignment.Top_Left, r, _eTxt.Design, States.Standard_Disabled, this, false, false);
             } else {
-                Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, States.Standard_Disabled, null, Alignment.Top_Left, r, this, false, true);
+                Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", null, Alignment.Top_Left, r, _eTxt.Design, States.Standard_Disabled, this, false, true);
             }
         }
         Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);

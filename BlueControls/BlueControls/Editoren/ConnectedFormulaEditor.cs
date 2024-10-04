@@ -486,7 +486,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         IO.LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);
-        if (i is not ReciverControlPadItem api) { return; }
+        if (i is not { } api) { return; }
 
         api.GetNewIdsForEverything();
 

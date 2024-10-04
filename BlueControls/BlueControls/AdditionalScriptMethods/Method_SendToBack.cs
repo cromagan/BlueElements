@@ -58,14 +58,12 @@ internal class Method_SendToBack : Method {
         if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent is not ItemCollectionPadItem icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+        if (iciv.Parent is not { } icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
         icpv.SendToBack(iciv);
         return DoItFeedback.Null();
 
         //return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");
-
-
     }
 
     #endregion

@@ -93,7 +93,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         }
 
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        Skin.Draw_FormatedText(gr, txt, Design.Caption, States.Standard, qi, Alignment.Top_Left, DisplayRectangle, null, false, false);
+        Skin.Draw_FormatedText(gr, txt, qi, Alignment.Top_Left, DisplayRectangle, Design.Caption, States.Standard, null, false, false);
     }
 
     protected override void HandleChangesNow() {

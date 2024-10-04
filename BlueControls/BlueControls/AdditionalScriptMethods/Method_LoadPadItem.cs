@@ -80,7 +80,7 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
 
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
 
-            if (i is not AbstractPadItem api) {
+            if (i is not { } api) {
                 return new DoItFeedback(ld, "Datei fehlerhaft: " + filen);
             }
 

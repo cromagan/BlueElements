@@ -160,7 +160,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
             //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
             //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
             var tmpPic = QuickImage.Get(QuickImage.GenerateCode(qi.Name, 48, 28, qi.Effekt, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
-            Skin.Draw_FormatedText(gr, string.Empty, tmpPic, design, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, displayRectangle.Width, 44), control, false, translate);
+            Skin.Draw_FormatedText(gr, string.Empty, tmpPic, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, displayRectangle.Width, 44), design, control, false, translate);
 
             var tt = LanguageTool.DoTranslate(text, translate);
 
@@ -176,7 +176,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
                 etxt.Draw(gr, 1);
             }
         } else if (buttontype is not Design.OptionButton_TextStyle and not Design.CheckBox_TextStyle) {
-            Skin.Draw_FormatedText(gr, text, qi, design, align, displayRectangle, control, false, translate);
+            Skin.Draw_FormatedText(gr, text, qi, align, displayRectangle, design, control, false, translate);
         } else if (etxt is { }) {
             var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
             //etxt = new ExtText(buttontype, state);

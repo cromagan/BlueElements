@@ -53,7 +53,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private bool _isSaved = true;
     private bool _isSaving;
     private string _lastSaveCode;
-    private int _lockCount = 0;
+    private int _lockCount;
     private FileSystemWatcher? _watcher;
 
     #endregion

@@ -51,6 +51,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     #region Fields
 
+    public static string XXX = string.Empty;
     private readonly List<IMoveable> _itemsToMove = [];
     private ItemCollectionPadItem? _items;
     private AbstractPadItem? _lastClickedItem;
@@ -61,8 +62,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     #endregion
 
     #region Constructors
-
-
 
     public CreativePad(ItemCollectionPadItem page, RowItem? row) : this() {
         Items = page;
@@ -321,8 +320,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnContextMenuInit(e);
     }
 
-
-
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
@@ -460,6 +457,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             #endregion
         }
 
+        Skin.Draw_FormatedText(gr, XXX, null, Alignment.VerticalCenter, new Rectangle(0, 0, 100, 100), Design.Caption, States.Standard, null, false, false);
+
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
 
@@ -516,8 +515,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         base.OnMouseDown(e);
         if (!EditAllowed) { return; }
 
-   
-
         QuickInfo = string.Empty;
 
         if (e.Button == MouseButtons.Left) {
@@ -543,7 +540,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 }
             }
 
-            if (hotitem is IMoveable imv) {
+            if (hotitem is { } imv) {
                 SelectItem(imv, ModifierKeys.HasFlag(Keys.Control));
             } else {
                 Unselect();
@@ -559,14 +556,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
+        Invalidate();
 
-
+        var it = GetHotItem(e, false);
 
         if (!EditAllowed) { return; }
 
         QuickInfo = string.Empty;
 
-        if (e.Button == MouseButtons.None && GetHotItem(e, false) is AbstractPadItem bpi) {
+        if (e.Button == MouseButtons.None && it is AbstractPadItem bpi) {
             if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
                 QuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
             } else {
@@ -646,11 +644,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
-    private object? GetHotItem(MouseEventArgs? e, bool topLevel) {
+    private IMoveable? GetHotItem(MouseEventArgs? e, bool topLevel) {
         if (e == null || Items == null) { return null; }
 
         var tmp = Items.HotItem(e.Location, topLevel, Zoom, ShiftX, ShiftY);
-              if (LastClickedItem is AbstractPadItem bpi) {
+        if (LastClickedItem is { } bpi) {
             var p = CoordinatesUnscaled(e, Zoom, ShiftX, ShiftY);
 
             foreach (var thisPoint in bpi.JointPoints) {

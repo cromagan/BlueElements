@@ -58,19 +58,15 @@ internal class Method_ConnectPointsWithSameName : Method {
         if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent is not ItemCollectionPadItem icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+        if (iciv.Parent is not { } icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
-
-        if(iciv.JointPoints.Count == 0) {
+        if (iciv.JointPoints.Count == 0) {
             return DoItFeedback.Null();
-}
-
+        }
 
         foreach (var pt in iciv.JointPoints) {
-
             var p = icpv.GetJointPoint(pt.KeyName, iciv);
             if (p != null) {
-
                 iciv.ConnectJointPoint(pt, p);
                 return DoItFeedback.Null();
             }
@@ -78,8 +74,6 @@ internal class Method_ConnectPointsWithSameName : Method {
         return DoItFeedback.Null();
 
         //return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");
-
-
     }
 
     #endregion

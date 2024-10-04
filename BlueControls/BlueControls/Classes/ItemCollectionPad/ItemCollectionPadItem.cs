@@ -51,7 +51,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IDisposableExtended, IReadableTextWithKey, IParseable, ICanHaveVariables {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables {
 
     #region Fields
 
@@ -59,15 +59,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public bool AutoZoomFit = true;
 
-    /// <summary>
-    /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
-    /// </summary>
-    private readonly int _idCount;
-
     private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private string _caption = string.Empty;
 
-    private bool _endless = false;
+    private bool _endless;
 
     private float _gridShow = 10;
 
@@ -92,8 +87,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Höhe = 10;
         _endless = false;
         RandinMm = Padding.Empty;
-        _idCount++;
-
         _sheetStyle = Skin.StyleDb?.Row.First();
         _sheetStyleScale = 1f;
 
@@ -636,7 +629,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// <returns></returns>
     public bool HasVisibleItemsForMe(string mode) {
         //TODO: Unused
-        if (_internal == null || _internal.Count == 0) { return false; }
+        if (_internal.Count == 0) { return false; }
 
         foreach (var thisItem in _internal) {
             if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
@@ -647,38 +640,50 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return false;
     }
 
-    public AbstractPadItem? HotItem(Point p, bool topLevel, float scale, float shiftX, float shiftY) {
-        if (_internal == null) { return null; }
+    public AbstractPadItem? HotItem(Point point, bool topLevel, float scale, float shiftX, float shiftY) {
+        // Berechne die unscaled Koordinaten für dieses Item
+        var unscaledPoint = ZoomPad.CoordinatesUnscaled(point, scale, shiftX, shiftY);
 
-        Point newP = ZoomPad.CoordinatesUnscaled(p, scale, shiftX, shiftY);
-        var l = _internal.Where(thisItem => thisItem != null &&
-                                        thisItem.Contains(newP, scale)).ToList();
+        CreativePad.XXX = unscaledPoint.ToString();
 
-        var mina = long.MaxValue;
-        AbstractPadItem? tmp = null;
+        // Prüfe die Grenzen nur, wenn nicht endlos
+        if (!_endless && !UsedArea.Contains(unscaledPoint)) { return null; }
 
-        foreach (var thisItem in l) {
-            var a = (long)Math.Abs(thisItem.UsedArea.Width) * (long)Math.Abs(thisItem.UsedArea.Height);
-            if (a <= mina) {
-                // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
-                mina = a;
-                tmp = thisItem;
-            }
-        }
+        // Finde alle Items, die den Punkt enthalten
+        var hotItems = _internal.Where(item => item != null && item.Contains(unscaledPoint, scale))
+                                        .OrderBy(item => item.UsedArea.Width * item.UsedArea.Height)
+                                        .ToList();
 
-        if (topLevel) { return tmp; }
+        // Wenn kein Item gefunden wurde, return null
+        if (!hotItems.Any()) { return null; }
 
-        if (tmp is ItemCollectionPadItem icpi) {
+        // Nehme das kleinste Item (das oberste in der Z-Reihenfolge bei gleicher Größe)
+        var smallestHotItem = hotItems.First();
+
+        // Wenn topLevel true ist, geben wir das gefundene Item zurück ohne tiefer zu gehen
+        if (topLevel) { return smallestHotItem; }
+
+        // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
+        if (smallestHotItem is ItemCollectionPadItem icpi) {
             var positionModified = UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
-            var newPt = new Point(newP.X + (int)(positionModified.X / scale), newP.Y + (int)(positionModified.Y / scale));
-            //TODOP
+            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY);
 
-            var (newS, newX, newY) = AlterView(positionModified, scale, shiftX, shiftY);
-            Point newP2 = ZoomPad.CoordinatesUnscaled(p, 1 / newS, newX, newY);
-            return icpi.HotItem(newP2, false, 1, 0, 0);
+            // Berechne den neuen Punkt für das Kind-Item
+            var childPoint = new Point(
+                (int)((point.X - positionModified.X) / childScale),
+                (int)((point.Y - positionModified.Y) / childScale)
+            );
+
+            // Rekursiver Aufruf mit den angepassten Koordinaten
+            var childHotItem = icpi.HotItem(childPoint, false, childScale, childShiftX, childShiftY);
+
+            // Wenn ein Kind-Item gefunden wurde, geben wir dieses zurück
+            if (childHotItem != null) { return childHotItem; }
         }
 
-        return tmp;
+        // Wenn kein Kind-Item gefunden wurde oder es kein ItemCollection war,
+        // geben wir das ursprünglich gefundene Item zurück
+        return smallestHotItem;
     }
 
     public void MirrorAllItems(PointM? p, bool vertical, bool horizontal) {
@@ -1023,7 +1028,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls, string mode) {
-        if (_internal == null || _internal.Count == 0) { return; }
+        if (_internal.Count == 0) { return; }
 
         if (changeControls) {
             var x = ResizeControls(this, newWidthPixel, newhHeightPixel, mode);

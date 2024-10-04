@@ -133,12 +133,12 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Parent is not ItemCollectionPadItem icpi) { return; }
+        if (Parent is not { } icpi) { return; }
 
         var l = new List<PointM>();
 
         foreach (var thiss in _includedjointPoints.SplitAndCutByCr()) {
-            if (icpi.GetJointPoint(thiss, this) is PointM p) {
+            if (icpi.GetJointPoint(thiss, this) is { } p) {
                 l.Add(p);
             }
         }

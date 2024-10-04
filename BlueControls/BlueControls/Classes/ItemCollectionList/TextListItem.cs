@@ -61,7 +61,7 @@ public class TextListItem : AbstractListItem {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
         }
-        Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionModified, tmpd, vState, null, false, translate);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, tmpd, vState, positionModified);
         }

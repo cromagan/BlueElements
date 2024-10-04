@@ -2822,7 +2822,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (!string.IsNullOrEmpty(txt)) {
                 var pos = new Rectangle(columnX1 + plus, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth - plus, _pix16);
-                viewItem.GetRenderer()?.Draw(gr, txt, pos, Design.Table_Cell_New, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
+                viewItem.GetRenderer().Draw(gr, txt, pos, Design.Table_Cell_New, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                 gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
             }
         }
@@ -2872,7 +2872,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                         if (contentHolderCellColumn != null && contentHolderCellRow != null) {
                             var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
-                            viewItem.GetRenderer()?.Draw(gr, toDraw, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
+                            viewItem.GetRenderer().Draw(gr, toDraw, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                         } else {
                             if (isAdmin) {
                                 gr.DrawImage(errorImg, cellrectangle.Left + 3, cellrectangle.Top + 1);

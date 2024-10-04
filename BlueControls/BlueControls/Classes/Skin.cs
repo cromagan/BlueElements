@@ -1093,14 +1093,18 @@ public static class Skin {
     /// </summary>
     /// <param name="gr"></param>
     /// <param name="txt"></param>
-    /// <param name="design"></param>
-    /// <param name="state"></param>
     /// <param name="qi"></param>
     /// <param name="align"></param>
     /// <param name="fitInRect"></param>
+    /// <param name="design"></param>
+    /// <param name="state"></param>
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
-    public static void Draw_FormatedText(Graphics gr, string txt, Design design, States state, QuickImage? qi, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, qi, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
+    /// <param name="translate"></param>
+    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi,
+        Alignment align,
+        Rectangle fitInRect, Design design, States state,
+        Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, qi, align, fitInRect, DesignOf(design, state), child, deleteBack, translate);
 
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, qi, align, fitInRect, null, false, bFont, translate);
 
@@ -1126,13 +1130,15 @@ public static class Skin {
     /// <param name="gr"></param>
     /// <param name="txt"></param>
     /// <param name="qi"></param>
-    /// <param name="design"></param>
     /// <param name="align"></param>
     /// <param name="fitInRect"></param>
+    /// <param name="design"></param>
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
     /// <param name="translate"></param>
-    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, SkinDesign design, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
+    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align,
+        Rectangle fitInRect, SkinDesign design,
+        Control? child, bool deleteBack, bool translate) {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
         if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }

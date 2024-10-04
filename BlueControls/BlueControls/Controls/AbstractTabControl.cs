@@ -201,11 +201,11 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
             r.X++;
             if (this is RibbonBar) {
                 Skin.Draw_Back(graphics, Design.RibbonBar_Head, tmpState, r, this, true);
-                Skin.Draw_FormatedText(graphics, TabPages[id].Text, Design.RibbonBar_Head, tmpState, null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, this, false, true);
+                Skin.Draw_FormatedText(graphics, TabPages[id].Text, null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, Design.RibbonBar_Head, tmpState, this, false, true);
                 Skin.Draw_Border(graphics, Design.RibbonBar_Head, tmpState, r);
             } else {
                 Skin.Draw_Back(graphics, Design.TabStrip_Head, tmpState, r, this, true);
-                Skin.Draw_FormatedText(graphics, TabPages[id].Text, Design.TabStrip_Head, tmpState, null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, this, false, true);
+                Skin.Draw_FormatedText(graphics, TabPages[id].Text, null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, Design.TabStrip_Head, tmpState, this, false, true);
                 Skin.Draw_Border(graphics, Design.TabStrip_Head, tmpState, r);
             }
         } catch { }

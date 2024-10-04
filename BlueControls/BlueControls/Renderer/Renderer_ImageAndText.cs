@@ -36,7 +36,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Fields
 
-    private bool _bild_anzeigen = false;
+    private bool _bild_anzeigen;
     private int _constantHeight = 16;
     private int _constantWidth = 16;
     private string _defaultImage = string.Empty;

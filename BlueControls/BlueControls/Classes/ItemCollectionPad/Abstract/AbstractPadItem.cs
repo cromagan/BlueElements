@@ -114,7 +114,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ForPrinting {
         get {
-            if (_parent is ItemCollectionPadItem icpi) { return icpi.ForPrinting; }
+            if (_parent is { } icpi) { return icpi.ForPrinting; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
             return true;
         }
@@ -189,7 +189,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ShowAlways {
         get {
-            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowAlways; }
+            if (_parent is { } icpi) { return icpi.ShowAlways; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
             return false;
         }
@@ -197,7 +197,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ShowJointPoints {
         get {
-            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowJointPoints; }
+            if (_parent is { } icpi) { return icpi.ShowJointPoints; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
             return false;
         }
@@ -240,7 +240,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             if (showName) {
                 var t = p.ZoomAndMove(zoom, shiftX, shiftY);
                 Rectangle r = new((int)(t.X + 5), (int)(t.Y + 0), 200, 200);
-                Skin.Draw_FormatedText(gr, p.KeyName, design, state, null, Alignment.Top_Left, r, null, false, false);
+                Skin.Draw_FormatedText(gr, p.KeyName, null, Alignment.Top_Left, r, design, state, null, false, false);
             }
         }
     }

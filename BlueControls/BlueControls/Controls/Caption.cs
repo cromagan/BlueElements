@@ -206,7 +206,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 if (QuickModePossible(_text, _textAnzeigeverhalten)) {
                     if (gr == null) { return; }
                     Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-                    Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
+                    Skin.Draw_FormatedText(gr, _text, null, Alignment.Top_Left, new Rectangle(), _design, state, null, false, Translate);
                     return;
                 }
 
