@@ -117,7 +117,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public static bool ScaleWarnung() {
         if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
-        BlueControls.Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
+        Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
         return true;
     }
 

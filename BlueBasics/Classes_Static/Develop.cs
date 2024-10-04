@@ -31,7 +31,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.IO;
-using Timer = System.Windows.Forms.Timer;
 
 namespace BlueBasics;
 
@@ -308,7 +307,7 @@ public static class Develop {
 
         Generic.LoadAllAssemblies(Application.StartupPath);
 
-        Timer check = new();
+        System.Windows.Forms.Timer check = new();
         check.Tick += CloseAfter12Hours;
         check.Interval = 60000;
         check.Enabled = true;

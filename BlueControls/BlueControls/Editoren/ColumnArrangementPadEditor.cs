@@ -37,7 +37,6 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -56,7 +55,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     public ColumnArrangementPadEditor(Database? database) : this() {
         var m = Database.EditableErrorReason(database, EditableErrorReasonType.EditCurrently);
         if (!string.IsNullOrEmpty(m)) {
-            MessageBox.Show(m, ImageCode.Information, "OK");
+            Forms.MessageBox.Show(m, ImageCode.Information, "OK");
             Close();
             return;
         }
@@ -152,7 +151,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         if (arn < 2) { return; }
 
-        if (MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        if (Forms.MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var tcvc = ColumnViewCollection.ParseAll(db);
         tcvc.RemoveAt(arn);
         db.ColumnArrangements = tcvc.ToString(false);
@@ -164,7 +163,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
-        if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        if (Forms.MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         ca.ShowAllColumns();
 
         ChangeCurrentArrangementto(ca);
@@ -203,7 +202,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         var mitVorlage = false;
         if (!IsAllColumnView() && ca != null) {
-            mitVorlage = MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
+            mitVorlage = Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
         }
 
         var tcvc = ColumnViewCollection.ParseAll(db);
@@ -241,7 +240,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var mitDaten = false;
         if (vorlage != null && vorlage.IsSystemColumn()) { vorlage = null; }
         if (vorlage != null) {
-            switch (MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
+            switch (Forms.MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
                 case 0:
                     break;
 
@@ -447,7 +446,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                 #region Code für Ansicht 0
 
                 var col = ca[ca.Count - 1]?.Column;
-                if (col != null && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
+                if (col != null && Forms.MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                         "Ja", "Nein") == 0) {
                     db.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
                     did = true;

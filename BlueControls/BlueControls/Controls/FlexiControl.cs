@@ -32,7 +32,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -834,7 +833,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void Control_Create_Line() {
         Line control = new() {
             Enabled = Enabled,
-            Orientation = Orientation.Waagerecht
+            Orientation = BlueBasics.Enums.Orientation.Waagerecht
         };
         StandardBehandlung(control);
     }
@@ -993,8 +992,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             if (control is IInputFormat inf) { inf.GetStyleFrom(this); }
 
-            if(control is TextBox txb) { txb.Suffix = _suffix; }
-
+            if (control is TextBox txb) { txb.Suffix = _suffix; }
         }
     }
 

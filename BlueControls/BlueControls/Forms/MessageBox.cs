@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
@@ -34,7 +33,7 @@ public partial class MessageBox : Form {
 
     #region Fields
 
-    private Button? _pressed;
+    private Controls.Button? _pressed;
 
     #endregion
 
@@ -103,15 +102,15 @@ public partial class MessageBox : Form {
         return mb._pressed == null ? -1 : IntParse(mb._pressed.Name);
     }
 
-    public List<Button> Generate_Buttons(string[] names) {
+    public List<Controls.Button> Generate_Buttons(string[] names) {
         var myX = Width - Skin.Padding - BorderWidth;
         ExtText erT = new(Design.Button, States.Standard);
-        List<Button> buts = [];
+        List<Controls.Button> buts = [];
         for (var z = names.GetUpperBound(0); z > -1; z--) {
             if (!string.IsNullOrEmpty(names[z])) {
                 erT.TextDimensions = Size.Empty;
                 erT.PlainText = names[z];
-                Button b = new() {
+                Controls.Button b = new() {
                     Name = z.ToString(),
                     Text = names[z]
                 };
@@ -181,7 +180,7 @@ public partial class MessageBox : Form {
     }
 
     private void ThisButton_Click(object sender, System.EventArgs e) {
-        _pressed = (Button)sender;
+        _pressed = (Controls.Button)sender;
         Close();
     }
 

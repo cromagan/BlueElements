@@ -138,7 +138,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
-        if (!string.IsNullOrEmpty(IO.LastFilePath)) { LoadSymbol.InitialDirectory = IO.LastFilePath; }
+        if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
 
         LoadSymbol.ShowDialog();
     }
@@ -154,7 +154,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
             i.Add(ItemOf(thisl));
         }
 
-        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
+        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (x is not { Count: 1 }) { return; }
 
@@ -186,7 +186,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
         var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
-        IO.LastFilePath = LoadSymbol.FileName.FilePath();
+        LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);
         if (i is not { }) { return; }

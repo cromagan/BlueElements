@@ -37,7 +37,6 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -456,13 +455,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             var dropped = (string[])e.Data.GetData(DataFormats.FileDrop);
             files = dropped.ToList();
         } catch {
-            MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+            Forms.MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
             return;
         }
 
         foreach (var thisfile in files) {
             if (!FileExists(thisfile)) {
-                MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+                Forms.MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
                 return;
             }
         }

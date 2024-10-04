@@ -47,7 +47,6 @@ using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -788,7 +787,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "item":
-                var i = ParsebleItem.NewByParsing<AbstractPadItem>(value.FromNonCritical());
+                var i = NewByParsing<AbstractPadItem>(value.FromNonCritical());
                 if (i != null) { Add(i); }
                 return true;
 
@@ -899,7 +898,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 break;
 
             default:
-                MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
+                Forms.MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
                 return;
         }
     }
@@ -953,8 +952,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         //var vars = new VariableCollection();
         vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        vars.Add(new VariableString("User", Generic.UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("Usergroup", Generic.UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         //vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
         //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
@@ -975,7 +974,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (!t.Successful || !t.AllOk) {
             var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
 
-            this.Add(ep);
+            Add(ep);
         }
         return t;
     }
@@ -1224,7 +1223,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
 
                 case "item":
-                    var i = ParsebleItem.NewByParsing<AbstractPadItem>(pair.Value);
+                    var i = NewByParsing<AbstractPadItem>(pair.Value);
                     if (i != null) { Add(i); }
                     break;
 

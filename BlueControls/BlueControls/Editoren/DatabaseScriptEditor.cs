@@ -32,7 +32,6 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
 using BlueControls.ItemCollectionList;
 using System;
 using BlueControls.Controls;
@@ -413,14 +412,14 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
     private bool EnableScript() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
 
-        var s = MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
+        var s = Forms.MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
 
         if (s == 1) { return false; }
 
         Database.EnableScript();
 
         if (!Database.IsRowScriptPossible(false)) {
-            MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
+            Forms.MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
             return false;
         }
         return true;
@@ -463,7 +462,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
         }
 
         if (!_testmode) {
-            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
+            if (Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
         var ext = chkExtendend is { Checked: true, Visible: true };

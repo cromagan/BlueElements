@@ -33,8 +33,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.IO;
-using Clipboard = System.Windows.Clipboard;
-using Point = System.Drawing.Point;
 
 namespace BlueBasics;
 
@@ -100,7 +98,7 @@ public static class Generic {
 
         for (var i = 0; i < 10; i++) {
             try {
-                Clipboard.SetText(text);
+                System.Windows.Clipboard.SetText(text);
                 return true;
             } catch { }
 

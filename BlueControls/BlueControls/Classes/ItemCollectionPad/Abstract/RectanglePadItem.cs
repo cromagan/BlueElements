@@ -160,7 +160,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
                 return true;
 
             case "rotation":
-                _drehwinkel = Converter.IntParse(value);
+                _drehwinkel = IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -225,6 +225,11 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
         _pRu.SetTo(r.PointOf(Alignment.Bottom_Right), false);
     }
 
+    protected override RectangleF CalculateUsedArea() => new(Math.Min(_pLo.X, _pRu.X),
+                                                               Math.Min(_pLo.Y, _pRu.Y),
+                                                               Math.Abs(_pRu.X - _pLo.X),
+                                                               Math.Abs(_pRu.Y - _pLo.Y));
+
     private void CalculateSlavePoints() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
         _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
@@ -233,11 +238,6 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
         _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y, false);
         CalculateJointMiddle(_pl, _pr);
     }
-
-    protected override RectangleF CalculateUsedArea() => new(Math.Min(_pLo.X, _pRu.X),
-                                                               Math.Min(_pLo.Y, _pRu.Y),
-                                                               Math.Abs(_pRu.X - _pLo.X),
-                                                               Math.Abs(_pRu.Y - _pLo.Y));
 
     #endregion
 }

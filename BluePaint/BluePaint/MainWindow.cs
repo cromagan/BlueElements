@@ -29,7 +29,6 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
@@ -73,7 +72,7 @@ public partial class MainWindow {
 
     public void SetTool(GenericTool? newTool) {
         if (AreSame(newTool, _currentTool)) {
-            MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
+            BlueControls.Forms.MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
             return;
         }
         if (_currentTool != null) {
@@ -147,7 +146,7 @@ public partial class MainWindow {
 
             return;
         }
-        MessageBox.Show("Kein Bild vorhanden.");
+        BlueControls.Forms.MessageBox.Show("Kein Bild vorhanden.");
     }
 
     private void btnEinfügen_Click(object sender, System.EventArgs e) {
@@ -187,7 +186,7 @@ public partial class MainWindow {
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
         if (FileExists(SaveTab.FileName)) {
-            if (MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
+            if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
         }
         _filename = SaveTab.FileName;
         _isSaved = false;
@@ -242,7 +241,7 @@ public partial class MainWindow {
                 return true;
             }
 
-            switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
+            switch (BlueControls.Forms.MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
                 case 0:
                     Speichern();
                     break;

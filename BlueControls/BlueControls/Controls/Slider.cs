@@ -25,7 +25,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
-using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -52,7 +51,7 @@ public partial class Slider : IBackgroundNone {
 
     private float _minimum;
 
-    private Orientation _orientation = Orientation.Waagerecht;
+    private BlueBasics.Enums.Orientation _orientation = BlueBasics.Enums.Orientation.Waagerecht;
 
     private Rectangle _slider;
 
@@ -114,8 +113,8 @@ public partial class Slider : IBackgroundNone {
     [DefaultValue(1f)]
     public float MouseChange { get; set; } = 1;
 
-    [DefaultValue(Orientation.Waagerecht)]
-    public Orientation Orientation {
+    [DefaultValue(BlueBasics.Enums.Orientation.Waagerecht)]
+    public BlueBasics.Enums.Orientation Orientation {
         get => _orientation;
         set {
             if (value == _orientation) { return; }
@@ -176,7 +175,7 @@ public partial class Slider : IBackgroundNone {
         _clickAreaContainsMouse = _clickArea.Contains(MousePos().X, MousePos().Y);
         var proz = (_value - Minimum) / (Maximum - Minimum);
         if (Maximum - Minimum > 0) {
-            _slider = _orientation == Orientation.Waagerecht
+            _slider = _orientation == BlueBasics.Enums.Orientation.Waagerecht
                 ? new Rectangle((int)(_clickArea.Left + (proz * (_clickArea.Width - But1.Width))), 0, But1.Width, But1.Height)
                 : new Rectangle(0, (int)(_clickArea.Top + (proz * (_clickArea.Height - But1.Height))), But1.Width, But1.Height);
             _sliderContainsMouse = _slider.Contains(MousePos());
@@ -319,7 +318,7 @@ public partial class Slider : IBackgroundNone {
         if (!_clickAreaContainsMouse && !mouseisMoving) { return; }
         if (_sliderContainsMouse && !mouseisMoving) { return; }
         if (_clickArea.Width <= 0 || _clickArea.Height <= 0) { return; }
-        var testVal = _orientation == Orientation.Waagerecht
+        var testVal = _orientation == BlueBasics.Enums.Orientation.Waagerecht
             ? Minimum + ((e.X - _clickArea.Left - (_slider.Width / 2f)) / (_clickArea.Width - _slider.Width) * (Maximum - Minimum))
             : Minimum + ((e.Y - _clickArea.Top - (_slider.Height / 2f)) / (_clickArea.Height - _slider.Height) * (Maximum - Minimum));
         testVal = CheckMinMax((int)(testVal / MouseChange) * MouseChange);
@@ -334,7 +333,7 @@ public partial class Slider : IBackgroundNone {
     private void GenerateButtons() {
         _sliderContainsMouse = false;
         _clickAreaContainsMouse = false;
-        if (_orientation == Orientation.Waagerecht) {
+        if (_orientation == BlueBasics.Enums.Orientation.Waagerecht) {
             _backStyle = Design.Slider_Hintergrund_Waagerecht;
             _sliderStyle = Design.Button_Slider_Waagerecht;
             But1.SetBounds(0, 0, ButtonSize, Height);

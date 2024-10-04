@@ -282,7 +282,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.SaveAll(true);
 
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
-        if (!string.IsNullOrEmpty(IO.LastFilePath)) { LoadSymbol.InitialDirectory = IO.LastFilePath; }
+        if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
 
         LoadSymbol.ShowDialog();
     }
@@ -483,7 +483,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
         var toparse = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
-        IO.LastFilePath = LoadSymbol.FileName.FilePath();
+        LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);
         if (i is not { } api) { return; }

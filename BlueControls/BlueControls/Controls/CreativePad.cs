@@ -38,7 +38,6 @@ using System.Windows.Forms;
 using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Geometry;
-using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 using System.IO;
 using BlueControls.ItemCollectionPad;
 using static BlueBasics.Converter;
@@ -263,7 +262,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     return;
 
                 case "umbenennen":
-                    var t = Forms.InputBox.Show("Neuer Name:", pm.KeyName, BlueBasics.FormatHolder.SystemName);
+                    var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolder.SystemName);
                     if (!string.IsNullOrEmpty(t)) {
                         pm.KeyName = t;
                     }
@@ -271,7 +270,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
                 case "verschieben":
 
-                    var tn = Forms.InputBox.Show("Zu welchem Punkt:", pm.KeyName, BlueBasics.FormatHolder.SystemName);
+                    var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolder.SystemName);
                     if (!string.IsNullOrEmpty(tn)) {
                         if (pm.Parent is AbstractPadItem api2) {
                             var p = Items?.GetJointPoint(tn, api2);
@@ -355,7 +354,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public void ShowPrinterPageSetup() {
         RepairPrinterData();
-        var x = PageSetupDialog.Show(DruckerDokument, false);
+        var x = Forms.PageSetupDialog.Show(DruckerDokument, false);
         if (x == null) { return; }
         DruckerDokument = x;
     }
@@ -376,7 +375,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         oriD.DefaultPageSettings.Margins.Bottom = (int)MmToPixel(_items.RandinMm.Bottom, 100);
         oriD.DefaultPageSettings.Margins.Left = (int)MmToPixel(_items.RandinMm.Left, 100);
         oriD.DefaultPageSettings.Margins.Right = (int)MmToPixel(_items.RandinMm.Right, 100);
-        var nOriD = PageSetupDialog.Show(oriD, true);
+        var nOriD = Forms.PageSetupDialog.Show(oriD, true);
         if (nOriD == null) { return; }
 
         _items.Breite = PixelToMm(nOriD.DefaultPageSettings.PaperSize.Width, 100);
@@ -478,7 +477,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
         var multi = 1f;
         if (_items.SnapMode == SnapMode.SnapToGrid) {
-            multi = Converter.MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
+            multi = MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
         }
         if (multi < 1) { multi = 1f; }
         switch (e.KeyCode) {
@@ -758,7 +757,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         if (_items is not { SnapMode: SnapMode.SnapToGrid } || Math.Abs(_items.GridSnap) < 0.001) { return mouseMovedTo; }
         if (movedPoint is null) { return 0f; }
 
-        var multi = Converter.MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
+        var multi = MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
         float value;
         if (doX) {
             value = movedPoint.X + mouseMovedTo;

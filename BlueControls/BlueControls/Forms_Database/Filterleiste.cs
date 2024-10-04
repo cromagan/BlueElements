@@ -29,7 +29,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.CellRenderer;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -307,7 +306,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
         var r = fc.Rows;
         if (r.Count != 1 || _ähnliche is not { Count: not 0 }) {
-            MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
         }
 
@@ -371,7 +370,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
         if (AutoPin && r.Count == 1) {
             if (_lastLooked != r[0].CellFirstString()) {
                 if (_table.RowsFilteredAndPinned().Get(r[0]) == null) {
-                    if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
+                    if (Forms.MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
                         _table.PinAdd(r[0]);
                     }
                     _lastLooked = r[0].CellFirstString();

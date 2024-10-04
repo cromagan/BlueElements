@@ -79,7 +79,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     protected AbstractPadItem(string keyName) : base() {
         _keyName = keyName;
-        if (string.IsNullOrEmpty(_keyName)) { _keyName = Generic.GetUniqueKey(); }
+        if (string.IsNullOrEmpty(_keyName)) { _keyName = GetUniqueKey(); }
 
         JointMiddle = new PointM("JointMiddle", 0, 0);
         JointMiddle.Moved += JointMiddle_Moved;
@@ -613,7 +613,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     }
 
     internal void GetNewIdsForEverything() {
-        KeyName = Generic.GetUniqueKey();
+        KeyName = GetUniqueKey();
 
         //foreach (var thispoint in JointPoints) {
         //    thispoint.KeyName = Generic.GetUniqueKey();
