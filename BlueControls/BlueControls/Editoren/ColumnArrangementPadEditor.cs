@@ -496,7 +496,10 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private void ShowOrder() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        if (Pad?.Items == null) { return; }
+
+        Pad.Items = new ItemCollectionPadItem();
+        Pad.Items.Endless = true;
+        Pad.Items.ForPrinting = true;   
 
         if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
 
