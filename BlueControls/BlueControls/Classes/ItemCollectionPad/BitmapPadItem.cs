@@ -352,7 +352,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
                 BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
             }
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     #endregion

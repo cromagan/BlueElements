@@ -86,18 +86,6 @@ public static class Export {
         return (l, fehler);
     }
 
-    //TODO: Unused
-    public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
-        List<string> l = [];
-
-        //foreach (var thisRow in row) {
-        //    var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
-        //    thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));
-        //    l.Add(fn);
-        //}
-        return (l, string.Empty);
-    }
-
     private static string CreateLayout(RowItem row, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         List<RowItem> tmpList = [row];

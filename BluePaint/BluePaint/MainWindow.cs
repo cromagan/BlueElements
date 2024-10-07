@@ -106,7 +106,6 @@ public partial class MainWindow {
         }
     }
 
-    //TODO: Unused
     public new Bitmap? ShowDialog() {
         if (Visible) { Visible = false; }
         _ = base.ShowDialog();

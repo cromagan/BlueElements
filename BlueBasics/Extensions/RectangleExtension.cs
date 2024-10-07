@@ -27,8 +27,8 @@ public static partial class Extensions {
 
     #region Methods
 
-    //TODO: Unused
     public static PointF NearestCornerOf(this Rectangle r, Point p) {
+        //TODO: Unused
         List<Point> pl =
         [
             r.PointOf(Alignment.Top_Left),

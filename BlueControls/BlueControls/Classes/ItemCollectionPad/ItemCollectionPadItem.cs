@@ -620,34 +620,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return result;
     }
 
-    /// <summary>
-    /// Prüft, ob das Formular sichtbare Elemente hat.
-    /// Zeilenselectionen werden dabei ignoriert.
-    /// </summary>
-    /// <param name="mode">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
-    /// <returns></returns>
-    public bool HasVisibleItemsForMe(string mode) {
-        //TODO: Unused
-        if (_internal.Count == 0) { return false; }
-
-        foreach (var thisItem in _internal) {
-            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
-                if (cspi.IsVisibleForMe(mode, false)) { return true; }
-            }
-        }
-
-        return false;
-    }
-
     public AbstractPadItem? HotItem(Point point, bool topLevel, float scale, float shiftX, float shiftY) {
         // Berechne die unscaled Koordinaten für dieses Item
 
         var unscaledPoint = ZoomPad.CoordinatesUnscaled(point, scale, shiftX, shiftY);
 
-        //CreativePad.XXX = unscaledPoint.ToString();
+        //CreativePad.MouseCoords = unscaledPoint.ToString();
 
-        // Prüfe die Grenzen nur, wenn nicht endlos
-        if (!_endless && !UsedArea.Contains(unscaledPoint)) { return null; }
+        //// Prüfe die Grenzen nur, wenn nicht endlos
+        //if (!_endless && !UsedArea.Contains(unscaledPoint)) { return null; }
 
         // Finde alle Items, die den Punkt enthalten
         var hotItems = _internal.Where(item => item != null && item.Contains(unscaledPoint, scale))
@@ -661,7 +642,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var smallestHotItem = hotItems.First();
 
         // Wenn topLevel true ist, geben wir das gefundene Item zurück ohne tiefer zu gehen
-        if (topLevel) { return smallestHotItem; }
+        if (topLevel) {
+            //CreativePad.Highlight = smallestHotItem;
+            return smallestHotItem;
+        }
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem icpi) {
@@ -688,11 +672,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             var childHotItem = icpi.HotItem(point, false, childScale, childShiftX, childShiftY);
             //CreativePad.XXX = CreativePad.XXX  + ";" + childShiftX.ToString();
             // Wenn ein Kind-Item gefunden wurde, geben wir dieses zurück
-            if (childHotItem != null) { return childHotItem; }
+            if (childHotItem != null) {
+                //CreativePad.Highlight = childHotItem;
+                return childHotItem;
+            }
         }
 
         // Wenn kein Kind-Item gefunden wurde oder es kein ItemCollection war,
         // geben wir das ursprünglich gefundene Item zurück
+        //CreativePad.Highlight = smallestHotItem;
         return smallestHotItem;
     }
 
@@ -852,7 +840,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    //TODO: Unused
+    //Used: Only BZL
     public bool ReplaceVariable(string name, string wert) => ReplaceVariable(new VariableString(name, wert));
 
     public bool ReplaceVariable(Variable variable) {
@@ -936,6 +924,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (thisIt is ReciverControlPadItem csi) {
                 l.AddRange(csi.VisibleFor);
             }
+
+            if (thisIt is ItemCollectionPadItem icpi) {
+                l.AddRange(icpi.VisibleFor_AllUsed());
+            }
+
         }
 
         l.Add(Administrator);
@@ -1140,8 +1133,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         #endregion
-
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void ApplyDesignToItems() {

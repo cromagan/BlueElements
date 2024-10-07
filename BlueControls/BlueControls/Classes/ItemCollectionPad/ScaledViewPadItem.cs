@@ -227,7 +227,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
         //    }
         //}
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     #endregion

@@ -254,7 +254,7 @@ public class BitmapExt : IDisposableExtended {
     /// <param name="accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
     /// <returns></returns>
     public static bool IntersectsWith(Bitmap? image1, Point pos1, Bitmap? image2, Point pos2, int accuracy) {
-        //TODO: Unused
+        //Used: Only BZL
         if (image1 == null || image2 == null) { return false; }
         Rectangle koord1 = new(pos1, image1.Size);
         Rectangle koord2 = new(pos2, image2.Size);
@@ -352,7 +352,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
-        //TODO: Unused
+        //Used: Only BZL
         // Open a Stream and decode a TIFF image
         FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         List<Bitmap> l = [];

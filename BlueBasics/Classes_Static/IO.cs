@@ -54,8 +54,9 @@ public static class IO {
 
     #region Methods
 
-    //TODO: Unused
+   
     public static string CalculateMd5(string filename) {
+ //TODO: Unused
         if (!FileExists(filename)) { return string.Empty; }
         using var md5 = MD5.Create();
         using var stream = File.OpenRead(filename);
@@ -150,8 +151,9 @@ public static class IO {
         return pfad;
     }
 
-    //TODO: Unused
+
     public static string ChecksumFileName(string name) {
+        //Used: Only BZL
         name = name.Replace("\\", "}");
         name = name.Replace("/", "}");
         name = name.Replace(":", "}");
@@ -337,38 +339,11 @@ public static class IO {
         }
     }
 
-    //TODO: Unused
-    public static List<string>? GetFilesWithFileSelector(string defaultpath, bool multi) {
-        if (string.IsNullOrEmpty(LastFilePath)) {
-            if (!string.IsNullOrEmpty(defaultpath)) {
-                LastFilePath = defaultpath;
-            }
-        }
-
-        using OpenFileDialog f = new();
-        f.CheckFileExists = true;
-        f.CheckPathExists = true;
-        f.Multiselect = multi;
-        f.InitialDirectory = LastFilePath;
-        f.Title = "Datei hinzufügen:";
-        _ = f.ShowDialog();
-        if (f.FileNames == null) { return null; }
-
-        if (!multi && f.FileNames.Length != 1) { return null; }
-        var x = new List<string>();
-        x.AddRange(f.FileNames);
-        if (f.FileNames != null && f.FileNames.GetUpperBound(0) > 0) {
-            LastFilePath = f.FileNames[0].FilePath();
-        }
-
-        return x;
-    }
 
     public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, oldName, newName, 5, toBeSure);
 
     public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, 5, toBeSure);
 
-    //TODO: Unused
     public static bool MoveFile(string oldName, string newName, int tries, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, tries, toBeSure);
 
     /// <summary>
@@ -440,6 +415,7 @@ public static class IO {
     /// <param name="executeAfter"></param>
     public static bool WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
         try {
+            if(Develop.AllReadOnly) { return true; }
             filename = filename.CheckFile();
 
             var pfad = filename.FilePath();

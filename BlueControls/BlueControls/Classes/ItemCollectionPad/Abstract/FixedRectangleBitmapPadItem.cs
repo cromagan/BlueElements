@@ -98,8 +98,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         } catch { }
 
         #endregion
-
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     protected abstract void GeneratePic();

@@ -334,8 +334,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
     /// <returns></returns>
     internal bool HasVisibleItemsForMe(string page, string mode) {
-        var pg = GetPage(page);
-        if (pg == null) { return false; }
+        if (GetPage(page) is not { IsDisposed: false } pg) { return false; }
 
         foreach (var thisItem in pg) {
             if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
@@ -360,11 +359,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     private ItemCollectionPadItem? GetPage(string caption) {
-        if (Pages is not { } pg) { return null; }
+        if (Pages is not { IsDisposed: false } pg) { return null; }
 
         foreach (var thisP in pg) {
             if (thisP is ItemCollectionPadItem icp2 &&
-                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase)) {
+                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase) &&
+                !icp2.IsDisposed) {
                 return icp2;
             }
         }

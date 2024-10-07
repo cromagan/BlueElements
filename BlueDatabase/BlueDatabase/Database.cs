@@ -857,8 +857,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return l.SortedDistinctList();
     }
 
-    //TODO: Unused
     public static bool SaveToFile(Database db, int minLen, string filn) {
+        // Used: Only BZL
         var bytes = ToListOfByte(db, minLen, db.FileStateUtcDate);
 
         if (bytes == null) { return false; }
@@ -1136,8 +1136,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    //TODO: Unused
     public void CloneFrom(Database sourceDatabase, bool cellDataToo, bool tagsToo) {
+        // Used: Only BZL
         _ = sourceDatabase.Save();
 
         Column.CloneFrom(sourceDatabase);

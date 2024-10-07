@@ -574,19 +574,14 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         f.Caption = Caption;
 
         if (realColumn != null) {
+   
             QuickInfo = realColumn.QuickInfoText(string.Empty);
 
             f.GetStyleFrom(realColumn);
             if (Renderer_Abstract.RendererOf(realColumn) is Renderer_TextOneLine r) {
                 f.Suffix = r.Suffix;
             }
-        } else {
-            if (string.IsNullOrEmpty(_columnName)) {
-                f.Caption = "[?]";
-            } else {
-                f.Caption = _columnName + ":";
-            }
-        }
+        } 
 
         foreach (var thisControl in f.Controls) {
             switch (thisControl) {

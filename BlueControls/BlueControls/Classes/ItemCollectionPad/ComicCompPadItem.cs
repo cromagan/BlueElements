@@ -231,7 +231,6 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawLine(ZoomPad.PenGray, lUt, lOt);
             gr.DrawLine(ZoomPad.PenGray, P1.ZoomAndMove(scale, shiftX, shiftY), P2.ZoomAndMove(scale, shiftX, shiftY));
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void ImageChanged() {

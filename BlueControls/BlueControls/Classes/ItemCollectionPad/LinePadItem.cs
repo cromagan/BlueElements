@@ -195,7 +195,6 @@ public class LinePadItem : AbstractPadItem {
                 gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointM p1, PointM p2) {

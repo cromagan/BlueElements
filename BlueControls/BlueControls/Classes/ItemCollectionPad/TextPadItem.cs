@@ -231,8 +231,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             gr.ResetTransform();
             gr.ResetClip();
         }
-
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void InvalidateText() => _txt = null;

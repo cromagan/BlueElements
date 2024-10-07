@@ -348,7 +348,6 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
             f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void CalculateOtherPoints() {

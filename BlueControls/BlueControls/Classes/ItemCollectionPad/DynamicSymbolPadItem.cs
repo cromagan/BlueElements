@@ -181,7 +181,6 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
         //gr.TranslateTransform(-trp.X, -trp.Y);
         //gr.ResetTransform();
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     private void Skript_Bearbeiten() => IUniqueWindowExtension.ShowOrCreate<DynamicSymbolScriptEditor>(this);

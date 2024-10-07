@@ -168,7 +168,6 @@ public class SymbolPadItem : RectanglePadItem {
 
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     #endregion

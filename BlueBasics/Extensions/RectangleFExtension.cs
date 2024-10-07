@@ -64,8 +64,8 @@ public static partial class Extensions {
 
     public static bool IntersectsVericalyWith(this RectangleF r, RectangleF rect) => rect.X < r.X + r.Width && r.X < rect.X + rect.Width;
 
-    //TODO: Unused
     public static PointF NearestCornerOf(this RectangleF r, PointF p) {
+        //TODO: Unused
         List<PointF> pl =
         [
             r.PointOf(Alignment.Top_Left),

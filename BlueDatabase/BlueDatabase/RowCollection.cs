@@ -789,8 +789,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    //TODO: Unused
     public (RowItem? newrow, string message, bool stoptrying) UniqueRow(string value, string comment) {
+        // Used: Only BZL
         if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
 
         if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen", true); }

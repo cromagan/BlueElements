@@ -32,9 +32,6 @@ public static partial class Extensions {
 
     public static string ToStringFloat1(this double value) => Math.Round(value, 1, MidpointRounding.AwayFromZero).ToString("0.#", CultureInfo.InvariantCulture);
 
-    //TODO: Unused
-    public static string ToStringFloat10_3(this float value) => Math.Round(value, 3, MidpointRounding.AwayFromZero).ToString("0000000000.###", CultureInfo.InvariantCulture);
-
     public static string ToStringFloat10_3(this double value) => Math.Round(value, 3, MidpointRounding.AwayFromZero).ToString("0000000000.###", CultureInfo.InvariantCulture);
 
     public static string ToStringFloat2(this float value) => Math.Round(value, 2, MidpointRounding.AwayFromZero).ToString("0.##", CultureInfo.InvariantCulture);

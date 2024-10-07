@@ -84,7 +84,7 @@ public static partial class Extensions {
 
     public static bool IsMagentaOrTransparent(this Color col) => col.ToArgb() == -65281 || col.A == 0;
 
-    //TODO: Unused
+    //Used: Only BZL
     public static bool IsNearBlack(this Color color, double maxBrightness) => color.A != 0 && (color.ToArgb() == 0 || color.GetBrightness() <= maxBrightness);
 
     public static bool IsNearWhite(this Color col, double minBrightness) => col.ToArgb() == -1 || col.A == 0 || col.GetBrightness() >= minBrightness;

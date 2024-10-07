@@ -37,8 +37,6 @@ public static class Geometry {
 
     public static float Cosinus(float winkel) => (float)Math.Cos(winkel * Rad);
 
-    //TODO: Unused
-    public static float DegToRad(float degAngle) => (float)(degAngle * (Math.PI / 180));
 
     /// <summary>
     ///  Calculate the distance between the point and the segment
@@ -75,15 +73,6 @@ public static class Geometry {
         return ya == 0f ? xa <= 0f ? 180f : 0f : ya < 0f ? 90f + ArcTangens(xa / ya) : 270f + ArcTangens(xa / ya);
     }
 
-    //TODO: Unused
-    public static float GetLenght(float x1, float y1, float x2, float y2) {
-        //TODO: Unused
-        // Berechnet die Länge einer Strecke
-        float l1 = x1 - x2;
-        float l2 = y1 - y2;
-        // ^2 ist langsamer, laut Project Analyzer
-        return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
-    }
 
     public static float GetLenght(Point sP, Point ep) {
         // Berechnet die Länge einer Strecke
@@ -204,8 +193,6 @@ public static class Geometry {
         }
     }
 
-    //TODO: Unused
-    public static float RadToDeg(float radAngle) => (float)(radAngle * (180 / Math.PI));
 
     public static float Sinus(float winkel) => (float)Math.Sin(winkel * Rad);
 

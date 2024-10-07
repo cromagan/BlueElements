@@ -397,8 +397,8 @@ public static partial class Extensions {
         return string.Empty;
     }
 
-    //TODO: Unused
     public static List<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
+        //Used: Only BZL
         List<string> l = [];
         if (list == null) { return l; }
         var uTagName = tagName.ToUpperInvariant();
@@ -419,8 +419,9 @@ public static partial class Extensions {
         return l;
     }
 
-    //TODO: Unused
+
     public static void TagRemove(this ICollection<string> col, string tagname) {
+        //Used: Only BZL
         var found = col.TagGetPosition(tagname);
         if (found >= 0) {
             _ = col.Remove(col.ElementAtOrDefault(found));

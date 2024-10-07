@@ -105,16 +105,6 @@ public static class Converter {
                || double.TryParse(s.Replace(".", ","), out result);
     }
 
-    public static T EnsureNotNull<T>(T? value) where T : class {
-        //TODO: Unused
-        if (value == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Wert ist null!");
-            throw new ArgumentNullException();
-        }
-
-        return value;
-    }
-
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
     /// </summary>

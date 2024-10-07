@@ -90,8 +90,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static string FilenameTxt(string pathOfPicture) => pathOfPicture.FilePath() + pathOfPicture.FileNameWithoutSuffix() + ".txt";
 
-    //TODO: Unused
     public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
+        // Used: Only BZL
         var (bitmap, list) = LoadFromDisk(pathOfPicture);
         return GenerateBitmapListItem(bitmap, list);
     }
@@ -125,17 +125,17 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return tags;
     }
 
-    //TODO: Unused
     public BitmapListItem GenerateBitmapListItem() {
+        // Used: Only BZL
         WritePointsInTags();
         return GenerateBitmapListItem(Bmp, Tags);
     }
 
-    //TODO: Unused
+    // Used: Only BZL
     public PointM? GetPoint(string name) => _points.Get(name);
 
-    //TODO: Unused
     public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
+        // Used: Only BZL
         _mittelLinie = mittelline;
         _helper = helper;
         Feedback = pointName;
@@ -143,8 +143,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Invalidate();
     }
 
-    //TODO: Unused
     public void LoadData(string pathOfPicture) {
+        // Used: Only BZL
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
         Tags.Clear();
@@ -153,8 +153,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Invalidate();
     }
 
-    //TODO: Unused
     public void PointClear() {
+        // Used: Only BZL
         _points.Clear();
         WritePointsInTags();
         Invalidate();
@@ -179,8 +179,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         WritePointsInTags();
     }
 
-    //TODO: Unused
     public void SaveData() {
+        // Used: Only BZL
         WritePointsInTags();
         var path = Tags.TagGet("ImageFile");
         var pathtxt = FilenameTxt(path);

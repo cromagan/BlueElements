@@ -316,9 +316,36 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         if (ShowAlways || IsInDrawingArea(positionModified, visibleArea)) {
             DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
 
-            if (ShowJointPoints) {
-                DrawPoints(gr, JointPoints, scale, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+            if (!ForPrinting) {
+                if (ShowJointPoints) {
+                    DrawPoints(gr, JointPoints, scale, shiftX, shiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                }
+
+                gr.DrawRectangle(scale > 1 ? new Pen(Color.Gray, scale) : ZoomPad.PenGray, positionModified);
+
+                if (positionModified is { Width: < 1, Height: < 1 }) {
+                    gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
+                    gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
+                }
+
+                if (!_beiExportSichtbar) {
+                    var q = QuickImage.Get("Drucker|16||1");
+                    gr.DrawImage(q, positionModified.X, positionModified.Y);
+                }
+
+                if (this is IErrorCheckable iec) {
+                    var r = iec.ErrorReason();
+
+                    if (!string.IsNullOrEmpty(r)) {
+                        using var brush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
+                        gr.FillRectangle(brush, positionModified);
+                        var q = QuickImage.Get("Kritisch|32||1");
+                        gr.DrawImage(q, positionModified.X, positionModified.Y);
+                    }
+                }
+                //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionModified); }
             }
+     
         }
 
         #region Verknüpfte Pfeile Zeichnen
@@ -672,35 +699,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    protected virtual void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        try {
-            if (!ForPrinting) {
-                if (positionModified is { Width: > 1, Height: > 1 }) {
-                    gr.DrawRectangle(scale > 1 ? new Pen(Color.Gray, scale) : ZoomPad.PenGray, positionModified);
-                }
-                if (positionModified is { Width: < 1, Height: < 1 }) {
-                    gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);
-                    gr.DrawLine(ZoomPad.PenGray, positionModified.PointOf(Alignment.Top_Left), positionModified.PointOf(Alignment.Bottom_Right));
-                }
-
-                if (!_beiExportSichtbar) {
-                    var q = QuickImage.Get("Drucker|16||1");
-                    gr.DrawImage(q, positionModified.X, positionModified.Y);
-                }
-
-                if (this is IErrorCheckable iec) {
-                    var r = iec.ErrorReason();
-
-                    if (!string.IsNullOrEmpty(r)) {
-                        using var brush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
-                        gr.FillRectangle(brush, positionModified);
-                        var q = QuickImage.Get("Kritisch|32||1");
-                        gr.DrawImage(q, positionModified.X, positionModified.Y);
-                    }
-                }
-            }
-        } catch { }
-    }
+    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 

@@ -415,7 +415,6 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
                 lastP = thisP;
             }
         }
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
     }
 
     // Return the dot product AB · BC.
