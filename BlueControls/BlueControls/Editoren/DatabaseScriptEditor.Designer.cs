@@ -34,7 +34,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpRechte = new BlueControls.Controls.GroupBox();
             this.lstPermissionExecute = new BlueControls.Controls.ListBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
-            this.chkAendertWerte = new BlueControls.Controls.Button();
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
             this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
@@ -65,6 +64,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkExtendend = new BlueControls.Controls.Button();
             this.btnAusführen = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
+            this.chkAuslöser_Fehlerfrei = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
             this.tabSkriptEditor.SuspendLayout();
@@ -84,7 +84,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1060, 24);
             this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -98,7 +97,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.eventScriptEditor.Location = new System.Drawing.Point(3, 3);
             this.eventScriptEditor.Name = "eventScriptEditor";
             this.eventScriptEditor.Script = "";
-            this.eventScriptEditor.Size = new System.Drawing.Size(1046, 504);
+            this.eventScriptEditor.Size = new System.Drawing.Size(1046, 508);
             this.eventScriptEditor.TabIndex = 6;
             this.eventScriptEditor.TabStop = false;
             this.eventScriptEditor.ExecuteScript += new System.EventHandler<BlueScript.EventArgs.ScriptEventArgs>(this.eventScriptEditor_ExecuteScript);
@@ -123,10 +122,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabSkriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSkriptEditor.Controls.Add(this.eventScriptEditor);
-            this.tabSkriptEditor.Location = new System.Drawing.Point(4, 29);
+            this.tabSkriptEditor.Location = new System.Drawing.Point(4, 25);
             this.tabSkriptEditor.Name = "tabSkriptEditor";
             this.tabSkriptEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSkriptEditor.Size = new System.Drawing.Size(1052, 510);
+            this.tabSkriptEditor.Size = new System.Drawing.Size(1052, 514);
             this.tabSkriptEditor.TabIndex = 1;
             this.tabSkriptEditor.Text = "Skript-Editor";
             // 
@@ -144,10 +143,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabKopfdaten.Controls.Add(this.btnVerlauf);
             this.tabKopfdaten.Controls.Add(this.capName);
             this.tabKopfdaten.Controls.Add(this.txbName);
-            this.tabKopfdaten.Location = new System.Drawing.Point(4, 29);
+            this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(1052, 510);
+            this.tabKopfdaten.Size = new System.Drawing.Size(1052, 514);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -230,7 +229,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpEigenschaften
             // 
             this.grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpEigenschaften.Controls.Add(this.chkAendertWerte);
             this.grpEigenschaften.Controls.Add(this.chkZeile);
             this.grpEigenschaften.Location = new System.Drawing.Point(8, 64);
             this.grpEigenschaften.Name = "grpEigenschaften";
@@ -238,18 +236,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpEigenschaften.TabIndex = 24;
             this.grpEigenschaften.TabStop = false;
             this.grpEigenschaften.Text = "Eigenschaften";
-            // 
-            // chkAendertWerte
-            // 
-            this.chkAendertWerte.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAendertWerte.Location = new System.Drawing.Point(8, 24);
-            this.chkAendertWerte.Name = "chkAendertWerte";
-            this.chkAendertWerte.QuickInfo = "Das Skript wird nur ausgeführt um dessen\r\nBerechnungen abzugreifen.\r\nÄnderungen w" +
-    "erden nicht in die Datenbank\r\nzurückgespielt";
-            this.chkAendertWerte.Size = new System.Drawing.Size(120, 16);
-            this.chkAendertWerte.TabIndex = 16;
-            this.chkAendertWerte.Text = "Ändert Werte";
-            this.chkAendertWerte.CheckedChanged += new System.EventHandler(this.chkAendertWerte_CheckedChanged);
             // 
             // chkZeile
             // 
@@ -266,6 +252,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpAuslöser
             // 
             this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpAuslöser.Controls.Add(this.chkAuslöser_Fehlerfrei);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_deletingRow);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_databaseloaded);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
@@ -306,7 +293,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_export
             // 
             this.chkAuslöser_export.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 160);
+            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 176);
             this.chkAuslöser_export.Name = "chkAuslöser_export";
             this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
     " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
@@ -353,7 +340,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_prepaireformula
             // 
             this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 144);
+            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 160);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
             this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird zur Datenkonsitenzprüfung,\r\nfür Variablen für Formulare und virtu" +
     "elle Spalten verwendet.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen " +
@@ -473,10 +460,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabStart.Controls.Add(this.grpAktionen);
             this.tabStart.Controls.Add(this.grpInfos);
             this.tabStart.Controls.Add(this.grpAusführen);
-            this.tabStart.Location = new System.Drawing.Point(4, 29);
+            this.tabStart.Location = new System.Drawing.Point(4, 25);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStart.Size = new System.Drawing.Size(1289, 77);
+            this.tabStart.Size = new System.Drawing.Size(1289, 81);
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             // 
@@ -489,7 +476,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAktionen.Location = new System.Drawing.Point(800, 3);
             this.grpAktionen.Name = "grpAktionen";
-            this.grpAktionen.Size = new System.Drawing.Size(208, 71);
+            this.grpAktionen.Size = new System.Drawing.Size(208, 75);
             this.grpAktionen.TabIndex = 2;
             this.grpAktionen.TabStop = false;
             this.grpAktionen.Text = "Aktionen";
@@ -517,7 +504,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpInfos.Location = new System.Drawing.Point(520, 3);
             this.grpInfos.Name = "grpInfos";
-            this.grpInfos.Size = new System.Drawing.Size(280, 71);
+            this.grpInfos.Size = new System.Drawing.Size(280, 75);
             this.grpInfos.TabIndex = 1;
             this.grpInfos.TabStop = false;
             this.grpInfos.Text = "Infos";
@@ -553,7 +540,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnBefehlsUebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 4;
             this.btnBefehlsUebersicht.Text = "Befehls-Übersicht";
-            this.btnBefehlsUebersicht.Click += new System.EventHandler(DatabaseScriptEditor.btnBefehlsUebersicht_Click);
             // 
             // btnZusatzDateien
             // 
@@ -580,7 +566,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusführen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAusführen.Location = new System.Drawing.Point(3, 3);
             this.grpAusführen.Name = "grpAusführen";
-            this.grpAusführen.Size = new System.Drawing.Size(517, 71);
+            this.grpAusführen.Size = new System.Drawing.Size(517, 75);
             this.grpAusführen.TabIndex = 0;
             this.grpAusführen.TabStop = false;
             this.grpAusführen.Text = "Ausführen";
@@ -620,8 +606,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
+            // chkAuslöser_Fehlerfrei
+            // 
+            this.chkAuslöser_Fehlerfrei.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslöser_Fehlerfrei.Location = new System.Drawing.Point(8, 136);
+            this.chkAuslöser_Fehlerfrei.Name = "chkAuslöser_Fehlerfrei";
+            this.chkAuslöser_Fehlerfrei.QuickInfo = "Das Skript wird ausgeführt, wenn sich der Fehlerfrei-Status\r\nverändert hat.";
+            this.chkAuslöser_Fehlerfrei.Size = new System.Drawing.Size(208, 16);
+            this.chkAuslöser_Fehlerfrei.TabIndex = 25;
+            this.chkAuslöser_Fehlerfrei.Text = "\'Fehlerfrei\' hat sich verändert";
+            this.chkAuslöser_Fehlerfrei.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            // 
             // DatabaseScriptEditor
             // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(1297, 677);
             this.Controls.Add(this.tbcScriptEigenschaften);
             this.Controls.Add(this.grpVerfügbareSkripte);
@@ -656,7 +654,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;
         private Button chkAuslöser_newrow;
-        private Button chkAendertWerte;
         private Button chkZeile;
         private TextBox txbName;
         private Caption capName;
@@ -693,5 +690,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capFehler;
         private Button chkAuslöser_deletingRow;
         private Button chkExtendend;
+        private Button chkAuslöser_Fehlerfrei;
     }
 }

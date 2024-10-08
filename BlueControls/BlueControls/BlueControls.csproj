@@ -102,6 +102,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptMethods\Method_ScaledView.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Dimension.cs" />
     <Compile Include="AdditionalScriptMethods\Method_MirrorPadItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SendToBack.cs" />

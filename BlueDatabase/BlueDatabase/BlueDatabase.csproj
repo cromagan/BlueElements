@@ -89,6 +89,7 @@
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowInvalidate.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowDelete.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Call.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallRow.cs" />

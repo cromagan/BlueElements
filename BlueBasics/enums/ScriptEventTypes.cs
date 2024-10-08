@@ -39,5 +39,10 @@ public enum ScriptEventTypes {
     //clipboard_changed = 64,
 
     //value_changed_large = 128,
-    row_deleting = 256
+    row_deleting = 256,
+
+    correct_changed= 512
+
+
+
 }

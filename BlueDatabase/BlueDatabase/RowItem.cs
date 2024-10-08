@@ -366,8 +366,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
 
         if (db?.Column.SysCorrect is { IsDisposed: false } sc) {
-            if (IsNullOrEmpty(sc) || cols.Count == 0 != CellGetBoolean(db.Column.SysCorrect)) {
+            if (IsNullOrEmpty(sc) || (cols.Count == 0 ) != CellGetBoolean(db.Column.SysCorrect)) {
                 CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
+
+                ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
             }
         }
 

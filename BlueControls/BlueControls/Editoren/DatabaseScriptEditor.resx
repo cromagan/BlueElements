@@ -140,8 +140,6 @@ Einfach muss schnell gehen und den Benutzer nicht stören. Es wird nach jeder We
 
 Erweitert darf länger dauern und den benutzer unterbrechen. Es wurd nach Schlüsselspaltenänderungen und neuen Zeile ausgeführt.
 
-In welchen Modus sich das Skript befindet, kann mit der Variable 'Extended' abgefragt werden.
-
-</value>
+In welchen Modus sich das Skript befindet, kann mit der Variable 'Extended' abgefragt werden.</value>
   </data>
 </root>

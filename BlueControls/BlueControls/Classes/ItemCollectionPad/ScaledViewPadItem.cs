@@ -46,6 +46,8 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
     public static string ClassId => "SCALEDVIEW";
 
+    public string Caption { get; internal set; }
+
     //public ScaledViewPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
     //    Bitmap = bmp;
     //    SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
@@ -68,6 +70,8 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
             OnPropertyChanged();
         }
     }
+
+    public double Scale { get; internal set; }
 
     protected override int SaveOrder => 999;
 

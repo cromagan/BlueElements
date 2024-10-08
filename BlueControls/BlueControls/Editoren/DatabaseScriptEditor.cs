@@ -140,7 +140,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
                 chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
-                chkAendertWerte.Checked = value.ChangeValues;
+                chkAuslöser_Fehlerfrei.Checked = value.EventTypes.HasFlag(ScriptEventTypes.correct_changed);
+                //chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.Script = value.Script;
 
                 lstPermissionExecute.ItemClear();
@@ -166,7 +167,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_prepaireformula.Checked = false;
-                chkAendertWerte.Checked = false;
                 chkAuslöser_valuechangedThread.Checked = false;
                 chkAuslöser_databaseloaded.Checked = false;
                 chkAuslöser_export.Checked = false;
@@ -369,11 +369,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
         Item.Image = cbxPic.Text.TrimEnd("|16");
     }
 
-    private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
+    //private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
+    //    if (Item == null) { return; }
 
-        Item.ChangeValues = chkAendertWerte.Checked;
-    }
+    //    Item.ChangeValues = chkAendertWerte.Checked;
+    //}
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
@@ -386,6 +386,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
         if (chkAuslöser_databaseloaded.Checked) { tmp |= ScriptEventTypes.loaded; }
         if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
         if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
+        if (chkAuslöser_Fehlerfrei.Checked) { tmp |= ScriptEventTypes.correct_changed; }
         Item.EventTypes = tmp;
     }
 

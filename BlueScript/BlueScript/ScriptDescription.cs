@@ -31,8 +31,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     private string _admininfo;
 
-    private bool _changeValues;
-
     private string _image;
 
     private string _keyName;
@@ -90,15 +88,15 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         }
     }
 
-    public bool ChangeValues {
-        get => _changeValues;
-        set {
-            if (IsDisposed) { return; }
-            if (_changeValues == value) { return; }
-            _changeValues = value;
-            OnPropertyChanged();
-        }
-    }
+    //public bool ChangeValues {
+    //    get => _changeValues;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (_changeValues == value) { return; }
+    //        _changeValues = value;
+    //        OnPropertyChanged();
+    //    }
+    //}
 
     public string CompareKey => KeyName;
 
@@ -184,7 +182,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             result.ParseableAdd("Name", _keyName);
             result.ParseableAdd("Script", _script);
             //result.ParseableAdd("ManualExecutable", _manualexecutable);
-            result.ParseableAdd("ChangeValues", _changeValues);
+            //result.ParseableAdd("ChangeValues", _changeValues);
             result.ParseableAdd("QuickInfo", _quickinfo);
             result.ParseableAdd("AdminInfo", _admininfo);
             result.ParseableAdd("Image", _image);
@@ -235,8 +233,8 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
                 _usergroups = _usergroups.SortedDistinctList();
                 return true;
 
-            case "changevalues":
-                _changeValues = value.FromPlusMinus();
+            case "changevalues": // Todo: 08.10.2024
+                //_changeValues = value.FromPlusMinus();
                 return true;
         }
 

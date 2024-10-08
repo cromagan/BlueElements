@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Interfaces;
 using BlueScript;
+using BlueScript.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -87,6 +88,26 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
 
     #region Properties
 
+    public bool AddSysCorrect => _eventTypes.HasFlag(ScriptEventTypes.correct_changed);
+
+    public bool AllVariabelsReadOnly {
+        get {
+            if (!ChangeValues) { return true; }
+            if (_eventTypes.HasFlag(ScriptEventTypes.correct_changed)) { return true; }
+            return false;
+        }
+    }
+
+    public bool ChangeValues {
+        get {
+            if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { return false; }
+            if (_eventTypes.HasFlag(ScriptEventTypes.export)) { return false; }
+            if (_eventTypes.HasFlag(ScriptEventTypes.row_deleting)) { return false; }
+            if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { return false; }
+            return true;
+        }
+    }
+
     public Database? Database {
         get => _database;
         private set {
@@ -124,6 +145,11 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         }
     }
 
+    /// <summary>
+    /// Virtuelle Spalten werden bei FormularVorbereiten benötigt.
+    /// </summary>
+    public bool VirtalColumns => _eventTypes.HasFlag(ScriptEventTypes.prepare_formula);
+
     #endregion
 
     #region Methods
@@ -150,39 +176,46 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         if (Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
-            if (ChangeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
+            //if (ChangeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, die das Formular vorbereiten, können nicht von außerhalb benutzt werden."; }
             if (_eventTypes != ScriptEventTypes.prepare_formula) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) {
-            if (ChangeValues) { return "Routinen für Export können keine Werte ändern."; }
+            //if (ChangeValues) { return "Routinen für Export können keine Werte ändern."; }
             if (!_needRow) { return "Routinen für Export müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, die den Export vorbereiten, können nicht von außerhalb benutzt werden."; }
             if (_eventTypes != ScriptEventTypes.export) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
-            if (ChangeValues) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
+            //if (ChangeValues) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
             if (!_needRow) { return "Routinen für das Löschen einer Zeile müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, für das Löschen einer Zeile, können nicht von außerhalb benutzt werden."; }
             if (_eventTypes != ScriptEventTypes.row_deleting) { return "Routinen für für das Löschen einer Zeile müssen für sich alleine stehen."; }
         }
 
+        if (_eventTypes.HasFlag(ScriptEventTypes.correct_changed)) {
+            //if (ChangeValues) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
+            if (!_needRow) { return "Routinen, die den Fehlerfrei-Status überwachen, einer Zeile müssen sich auf Zeilen beziehen."; }
+            if (UserGroups.Count > 0) { return "Routinen, die den Fehlerfrei-Status überwachen, können nicht von außerhalb benutzt werden."; }
+            if (_eventTypes != ScriptEventTypes.correct_changed) { return "Routinen, die den Fehlerfrei-Status überwachen, müssen für sich alleine stehen."; }
+        }
+
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) {
-            if (ChangeValues) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
+            //if (ChangeValues) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
-            if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
+            //if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
             if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
-            if (!ChangeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
+            //if (!ChangeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
             if (UserGroups.Count > 0) { return "Routinen, die die Zeilen initialsieren, können nicht von außerhalb benutzt werden."; }
             if (_eventTypes != ScriptEventTypes.InitialValues) { return "Routinen zum Initialisieren müssen für sich alleine stehen."; }
         }
@@ -253,6 +286,23 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         return QuickImage.Get(symb, 16, c, Color.Transparent, h);
+    }
+
+    internal MethodType AllowedMethods(RowItem? row, bool extended) {
+
+        #region  Erlaubte Methoden ermitteln
+
+        var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.Math | MethodType.DrawOnBitmap;
+
+        if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
+
+        if (_eventTypes == ScriptEventTypes.Ohne_Auslöser || extended) {
+            allowedMethods |= MethodType.ManipulatesUser;
+        }
+
+        #endregion
+
+        return allowedMethods;
     }
 
     protected override void Dispose(bool disposing) {

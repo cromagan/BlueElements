@@ -269,7 +269,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         var row = RowSingleOrNull();
 
         if (row?.Database is { IsDisposed: false } db) {
-            vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            vars = db.CreateVariableCollection(row, true, false, false, true, false); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = [];
         }

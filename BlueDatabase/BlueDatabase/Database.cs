@@ -1113,6 +1113,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Skript 'Zeile löschen' mehrfach vorhanden";
         }
 
+        if (l.Get(ScriptEventTypes.correct_changed).Count > 1) {
+            return "Skript 'Fehlerfrei verändert' mehrfach vorhanden";
+        }
+
         if (l.Get(ScriptEventTypes.loaded).Count > 1) {
             return "Skript 'Datenank geladen' mehrfach vorhanden";
         }
@@ -1192,7 +1196,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, bool addSysCorrect) {
 
         #region Variablen für Skript erstellen
 
@@ -1219,6 +1223,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
         vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
+
+        if (addSysCorrect) {
+            vars.Add(new VariableBool("sys_correct", row?.CellGetBoolean(Column.SysCorrect) ?? true, true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler enthält."));
+        }
 
         if (Column.First() is { IsDisposed: false } fc) {
             vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
@@ -1348,24 +1356,40 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     ///
     /// </summary>
-    /// <param name="s"></param>
+    /// <param name="script">Wenn keine DatabaseScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist</param>
     /// <param name="produktivphase"></param>
     /// <param name="row"></param>
     /// <param name="attributes"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, s.KeyName); }
-        if (_completing) { return new ScriptEndedFeedback("Aktuell wird die Datenbank kompletiert", false, false, s.KeyName); }
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
+        var name = script?.KeyName ?? "Allgemein";
+
+        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, name); }
+
+        if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, name); }
+        if (_completing) { return new ScriptEndedFeedback("Aktuell wird die Datenbank kompletiert", false, false, name); }
 
         var sce = CheckScriptError();
-        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
+        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, name); }
 
-        //if (ExecutingScript > 0) {
-        //    return new ScriptEndedFeedback("Aktuell wird bereits ein Skript ausgeführt" + sce, false, false, "Allgemein");
-        //}
+        var e = new CancelReasonEventArgs();
+        OnCanDoScript(e);
+        if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
+
+        var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
+        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name); }
+
+        if (script == null) {
+            // Wenn keine DatabaseScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist
+            var vars = CreateVariableCollection(row, true, dbVariables, true, false, false);
+            return new ScriptEndedFeedback(vars, true);
+        }
+
+        if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
+        if (!script.NeedRow) { row = null; }
+
         ExecutingScript++;
         ExecutingScriptAnyDatabase++;
         try {
@@ -1377,37 +1401,23 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            #region  Erlaubte Methoden ermitteln
+            var vars = CreateVariableCollection(row, script.AllVariabelsReadOnly, dbVariables, script.VirtalColumns, extended, script.AddSysCorrect);
 
-            var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.Math | MethodType.DrawOnBitmap;
+            var meth = BlueScript.Methods.Method.GetMethods(script.AllowedMethods(row, extended));
 
-            if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
-
-            if (s.EventTypes == ScriptEventTypes.Ohne_Auslöser || extended) {
-                allowedMethods |= MethodType.ManipulatesUser;
-            }
-
-            #endregion
-
-            var prepf = s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
-
-            var vars = CreateVariableCollection(row, !s.ChangeValues, dbVariables, prepf, extended);
-
-            var m = BlueScript.Methods.Method.GetMethods(allowedMethods);
-
-            if (prepf) { m.Add(Method_SetError.Method); }
+            if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(s.KeyName, m, produktivphase, s.Attributes(), addinfo, 0);
+            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, 0);
 
             vars.Add(new VariableString("AdditionalFilesPfad", (AdditionalFilesPfadWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
             var sc = new Script(vars, scp) {
-                ScriptText = s.Script
+                ScriptText = script.Script
             };
 
-            var scf = sc.Parse(0, s.KeyName, attributes);
+            var scf = sc.Parse(0, script.KeyName, attributes);
 
             #endregion
 
@@ -1416,7 +1426,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (!scf.AllOk) {
                 ExecutingScript--;
                 ExecutingScriptAnyDatabase--;
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
                 return scf;
             }
 
@@ -1424,19 +1434,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (row.IsDisposed) {
                     ExecutingScript--;
                     ExecutingScriptAnyDatabase--;
-                    return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, s.KeyName);
+                    return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName);
                 }
 
                 if (Column.SysRowChangeDate is null) {
                     ExecutingScript--;
                     ExecutingScriptAnyDatabase--;
-                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
+                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName);
                 }
 
                 if (row.RowStamp() != rowstamp) {
                     ExecutingScript--;
                     ExecutingScriptAnyDatabase--;
-                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.KeyName);
+                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName);
                 }
             }
 
@@ -1450,10 +1460,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Variablen zurückschreiben
 
-            if (s.ChangeValues) {
+            if (!script.AllVariabelsReadOnly && produktivphase) {
                 if (row is { IsDisposed: false }) {
                     foreach (var thisCol in Column) {
-                        row.VariableToCell(thisCol, vars, s.KeyName);
+                        row.VariableToCell(thisCol, vars, script.KeyName);
                     }
                 }
                 if (dbVariables) {
@@ -1461,11 +1471,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-            if (prepf) {
-                if (row is { IsDisposed: false }) {
+            if (script.VirtalColumns) {
+                if (row is { IsDisposed: false } r) {
                     foreach (var thisCol in Column) {
                         if (thisCol.Function == ColumnFunction.Virtuelle_Spalte) {
-                            row.VariableToCell(thisCol, vars, s.KeyName);
+                            r.VariableToCell(thisCol, vars, script.KeyName);
                         }
                     }
                 }
@@ -1485,7 +1495,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Develop.CheckStackForOverflow();
             ExecutingScript--;
             ExecutingScriptAnyDatabase--;
-            return ExecuteScript(s, produktivphase, row, attributes, dbVariables, extended);
+            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended);
         }
     }
 
@@ -1502,51 +1512,28 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         try {
-            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
+            scriptname ??= string.Empty;
 
-            var e = new CancelReasonEventArgs();
-            OnCanDoScript(e);
-            if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, "Allgemein"); }
-
-            var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
-
-            if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, "Allgemein"); }
-
-            #region Script ermitteln
-
-            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
+            if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
                 return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein"); }
-
-            if (string.IsNullOrEmpty(scriptname) && eventname != null) {
-                var l = EventScript.Get((ScriptEventTypes)eventname);
-                if (l.Count == 1) { scriptname = l[0].KeyName; }
-                if (string.IsNullOrEmpty(scriptname)) {
-                    // Script nicht definiert. Macht nix. ist eben keines gewünscht
-                    var vars = CreateVariableCollection(row, false, dbVariables, true, false);
-
-                    if (eventname == ScriptEventTypes.export) {
-                        return new ScriptEndedFeedback(vars, [], true, false, false, true, vars.GetBoolean("Successful") ?? false);
-                    }
-
-                    return new ScriptEndedFeedback(vars, vars.GetBoolean("Successful") ?? false);
-                }
+            if (eventname == null && string.IsNullOrWhiteSpace(scriptname)) {
+                return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein");
             }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, false, "Allgemein"); }
+            if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
+                var l = EventScript.Get((ScriptEventTypes)eventname);
+                if (l.Count == 1) {
+                    ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, false);
+                }
+
+                return ExecuteScript(null, produktivphase, row, attributes, dbVariables, extended);
+            }
 
             var script = EventScript.Get(scriptname);
-
             if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
-
-            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, scriptname); }
-
-            if (!script.NeedRow) { row = null; }
-
-            #endregion
 
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended);
         } catch {
