@@ -199,7 +199,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         if (_eventTypes.HasFlag(ScriptEventTypes.correct_changed)) {
             //if (ChangeValues) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die den Fehlerfrei-Status überwachen, einer Zeile müssen sich auf Zeilen beziehen."; }
-            if (UserGroups.Count > 0) { return "Routinen, die den Fehlerfrei-Status überwachen, können nicht von außerhalb benutzt werden."; }
+            //if (UserGroups.Count > 0) { return "Routinen, die den Fehlerfrei-Status überwachen, können nicht von außerhalb benutzt werden."; }
             if (_eventTypes != ScriptEventTypes.correct_changed) { return "Routinen, die den Fehlerfrei-Status überwachen, müssen für sich alleine stehen."; }
         }
 
@@ -296,7 +296,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
 
         if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
 
-        if (_eventTypes == ScriptEventTypes.Ohne_Auslöser || extended) {
+        if (_eventTypes == ScriptEventTypes.Ohne_Auslöser || _eventTypes == ScriptEventTypes.correct_changed || extended) {
             allowedMethods |= MethodType.ManipulatesUser;
         }
 

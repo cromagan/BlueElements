@@ -364,12 +364,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
         }
 
-
         if (db?.Column.SysCorrect is { IsDisposed: false } sc) {
-            if (IsNullOrEmpty(sc) || (cols.Count == 0 ) != CellGetBoolean(db.Column.SysCorrect)) {
+            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(db.Column.SysCorrect)) {
                 CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
 
-                ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
+                var erg2 = ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
+
+                if (!erg2.AllOk) {
+                    LastCheckedMessage += "Das Skripte enthalten Fehler und müssen repariert werden.";
+                }
             }
         }
 
@@ -451,11 +454,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m) || Database is not { } db) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
-            var erg = ExecuteScript(eventname, scriptname, produktivphase, attributes, dbVariables, extended);
+            var erg = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -760,7 +763,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!ok.AllOk) {
                 LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
-                return false; }
+                return false;
+            }
 
             if (!RepairAllLinks()) { return false; }
 
@@ -988,72 +992,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             IsDisposed = true;
         }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="eventname"></param>
-    /// <param name="scriptname"></param>
-    /// <param name="produktivphase"></param>
-    /// <param name="attributes"></param>
-    /// <param name="dbVariables"></param>
-    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    ///
-    ///
-    /// <returns></returns>
-    private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, List<string>? attributes, bool dbVariables, bool extended) {
-        var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
-
-        var feh = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
-
-        // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        var script = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
-
-        if (script is { AllOk: false, ScriptNeedFix: true })
-        //db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));
-        {
-            db.ScriptNeedFix = "Datenbank: " + db.Caption + "\r\n" +
-                               "Benutzer: " + Generic.UserName + "\r\n" +
-                               "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                               "Extended: " + extended.ToString() + "\r\n" +
-                               "Zeile: " + CellFirstString() + "\r\n\r\n\r\n" +
-                               script.ProtocolText;
-        }
-        //return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\nZeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
-        //// Nicht ganz optimal, da ein Script ebenfalls den Flag changevalues hat. Aber hier wird nur auf den Flag eingenangen, ob es eine Testroutine ist oder nicht
-        //if (eventname is ScriptEventTypes.prepare_formula
-        //    or ScriptEventTypes.value_changed_extra_thread
-        //    or ScriptEventTypes.export
-        //    or ScriptEventTypes.row_deleting) { return script; }
-
-        //if (!produktivphase) { return script; }
-
-        //// Dann die abschließenden Korrekturen vornehmen
-        //foreach (var thisColum in db.Column) {
-        //    if (thisColum != null) {
-        //        if (fullCheck) {
-        //            var x = CellGetString(thisColum);
-        //            var x2 = thisColum.AutoCorrect(x, true);
-        //            //if (thisColum.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 && x != x2) {
-        //                db.Cell.Set(thisColum, this, x2, "Nach Skript-Korrekturen");
-        //            //} else {
-        //            //    if (!thisColum.IsFirst() && !thisColum.IsSystemColumn()) {
-        //            //        db.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
-        //            //    }
-        //            //}
-        //            doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
-        //        }
-
-        //        if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
-        //            thisColum.Invalidate_ContentWidth();
-        //        }
-        //    }
-        //}
-
-        return script;
     }
 
     private void GenerateQuickInfo() {

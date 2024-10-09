@@ -1366,11 +1366,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         var name = script?.KeyName ?? "Allgemein";
 
-        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, name); }
-
-        if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, name); }
-        if (_completing) { return new ScriptEndedFeedback("Aktuell wird die Datenbank kompletiert", false, false, name); }
-
         var sce = CheckScriptError();
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, name); }
 
@@ -1378,7 +1373,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         OnCanDoScript(e);
         if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
 
-        var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
+        var m = EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name); }
 
         if (script == null) {
@@ -1422,6 +1417,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #endregion
 
             #region Fehlerprüfungen
+
+            if (string.IsNullOrEmpty(ScriptNeedFix)) {
+                if (scf is { AllOk: false, ScriptNeedFix: true }) {
+                    var t = "Datenbank: " + Caption + "\r\n" +
+                                      "Benutzer: " + UserName + "\r\n" +
+                                      "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
+                                      "Extended: " + extended.ToString() + "\r\n";
+                    if (row is RowItem r) { t = t + "Zeile: " + r.CellFirstString() + "\r\n"; }
+
+                    ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+                }
+            }
 
             if (!scf.AllOk) {
                 ExecutingScript--;
@@ -1526,7 +1533,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) {
-                    ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, false);
+                    return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, false);
                 }
 
                 return ExecuteScript(null, produktivphase, row, attributes, dbVariables, extended);
@@ -1534,7 +1541,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             var script = EventScript.Get(scriptname);
             if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
-
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended);
         } catch {
             Develop.CheckStackForOverflow();
