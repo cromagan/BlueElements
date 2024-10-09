@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -33,7 +34,7 @@ internal class Method_ScaledView : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, StringVal, FloatVal, StringVal];
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, StringVal];
     public override string Command => "scaledview";
     public override List<string> Constants => [];
     public override string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoings.";
@@ -64,7 +65,17 @@ internal class Method_ScaledView : Method {
         }
 
         d.Caption = attvar.ValueStringGet(2);
-        d.Scale = attvar.ValueNumGet(3);
+        d.Scale = (float)attvar.ValueNumGet(3);
+
+
+
+        var n = new List<string>();
+
+        for (var z = 4; z < attvar.Attributes.Count; z++) {
+            n.AddIfNotExists(attvar.ValueStringGet(z));
+
+        }
+        d.IncludedJointPoints = n.AsReadOnly();
 
         //var p2 = icpv.GetJointPoint(attvar.ValueStringGet(4), null);
         //var abmm = attvar.ValueNumGet(5);

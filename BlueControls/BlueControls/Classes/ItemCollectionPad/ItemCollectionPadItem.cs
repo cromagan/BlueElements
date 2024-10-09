@@ -997,6 +997,20 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return -1;
     }
 
+    internal List<PointM> GetJointPoints(string pointName, AbstractPadItem? notOfMe) {
+        var l = new List<PointM>();
+
+        foreach (var thisIt in _internal) {
+            if (thisIt != notOfMe) {
+                foreach (var thisPt in thisIt.JointPoints) {
+                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { l.Add(thisPt); }
+                }
+            }
+        }
+
+        return l;
+    }
+
     internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
         foreach (var thisIt in _internal) {
             if (thisIt != notOfMe) {
