@@ -393,6 +393,45 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
     }
 
+    public static bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
+        using FilterCollection fc = new(fi.Database, "Remove Row") { fi };
+        return Remove(fc, pinned, comment);
+    }
+
+    public static bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
+        var allrows = new List<RowItem>();
+        if (fc?.Rows is { Count: > 0 } rows) { allrows.AddRange(rows); }
+        if (pinned is { Count: > 0 }) { allrows.AddRange(pinned); }
+
+        if (allrows.Count == 0) { return false; }
+
+        var did = false;
+
+        Database? db = null;
+
+        allrows = allrows.Distinct().ToList();
+
+        foreach (var thisr in allrows) {
+            db ??= thisr.Database;
+
+            if (db != thisr.Database) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent");
+                return false;
+            }
+        }
+
+        foreach (var thisRow in allrows) {
+            if (Remove(thisRow, comment)) { did = true; }
+        }
+
+        return did;
+    }
+
+    public static bool Remove(RowItem? row, string comment) {
+        if (row is not { IsDisposed: false } r) { return false; }
+        return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment));
+    }
+
     public static string UniqueKeyValue() {
         var x = 9999;
         do {
@@ -691,41 +730,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return foundrow;
     }
 
-    public bool Remove(string key, string comment) {
-        var r = SearchByKey(key);
-
-        if (r is not { IsDisposed: false }) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, key, Generic.UserName, DateTime.UtcNow, comment));
-    }
-
-    public bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
-        using FilterCollection fc = new(Database, "renome row") { fi };
-        return Remove(fc, pinned, comment);
-    }
-
-    public bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
-        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc.ToArray()) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
-        var did = false;
-
-        foreach (var thisKey in keys) {
-            if (Remove(thisKey, comment)) { did = true; }
-        }
-
-        if (pinned is { Count: > 0 }) {
-            foreach (var thisr in pinned) {
-                if (Remove(thisr.KeyName, comment)) { did = true; }
-            }
-        }
-
-        return did;
-    }
-
-    public bool Remove(RowItem? row, string comment) => row != null && Remove(row.KeyName, comment);
-
     public bool RemoveOlderThan(float inHours, string comment) {
         if (Database?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
 
-        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem.KeyName).Select(dummy => dummy).ToList();
+        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
         //foreach (var thisrowitem in _Internal.Values)
         //{
         //    if (thisrowitem != null)
@@ -763,7 +771,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        db.Row.Remove(toDel, "RowCleanUp");
+        RowCollection.Remove(toDel, "RowCleanUp");
 
         if (reduceToOne) {
             l.Remove(toDel);

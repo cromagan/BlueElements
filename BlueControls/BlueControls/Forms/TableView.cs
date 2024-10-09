@@ -217,7 +217,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 if (row is not { IsDisposed: false }) { return; }
 
                 if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
-                    _ = db.Row.Remove(row, "Benutzer: löschen Befehl");
+                    _ = RowCollection.Remove(row, "Benutzer: löschen Befehl");
                 }
 
                 break;
@@ -962,7 +962,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        _ = db.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
+        _ = RowCollection.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => Table.Arrangement = e.Item.KeyName;

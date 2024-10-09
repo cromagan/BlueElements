@@ -68,8 +68,6 @@ public class Method_RowDelete : Method_Database, IUseableForButton {
 
     #region Methods
 
-
-
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
@@ -81,9 +79,7 @@ public class Method_RowDelete : Method_Database, IUseableForButton {
 
         if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile löschen im Testmodus deaktiviert."); }
 
-
-
-       var r = mydb.Row.Remove(allFi, null, "Script Command: RowDelete");
+        var r = RowCollection.Remove(allFi, null, "Script Command: RowDelete");
 
         return new DoItFeedback(r);
     }
