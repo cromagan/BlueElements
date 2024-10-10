@@ -33,6 +33,7 @@ using BlueControls.ItemCollectionList;
 
 using static BlueBasics.Converter;
 using BlueControls.EventArgs;
+using System;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -90,7 +91,19 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override string Description => string.Empty;
 
-    public float Skalierung { get; set; } = 3.07f;
+    private float _textScale = 3.07f;
+
+    public float TextScale {
+        get => _textScale;
+        set {
+            value = Math.Max(value, 0.01f);
+            value = Math.Min(value, 20);
+            if (value == _textScale) { return; }
+            _textScale = value;
+            OnPropertyChanged();
+        }
+    }
+
 
     /// <summary>
     ///
@@ -127,7 +140,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         [
             new FlexiControlForProperty<string>(() => Text, 5),
             new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht),
-            new FlexiControlForProperty<float>(() => Skalierung),
+            new FlexiControlForProperty<float>(() => TextScale),
             new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true))
         ];
         result.AddRange(base.GetProperties(widthOfControl));
@@ -139,7 +152,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("ReadableText", _textOriginal);
         result.ParseableAdd("Alignment", _ausrichtung);
-        result.ParseableAdd("AdditionalScale", Skalierung);
+        result.ParseableAdd("AdditionalScale", _textScale);
         return result;
     }
 
@@ -164,7 +177,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             //    return true;
 
             case "additionalscale":
-                Skalierung = FloatParse(value.FromNonCritical());
+                _textScale = FloatParse(value.FromNonCritical());
                 return true;
         }
         return base.ParseThis(key, value);
@@ -224,7 +237,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
                 _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
-                    _txt.Draw(gr, scale * Skalierung * Parent.SheetStyleScale);
+                    _txt.Draw(gr, scale * _textScale * Parent.SheetStyleScale);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -249,7 +262,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
             //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            _txt.TextDimensions = new Size((int)(UsedArea.Width / Skalierung / Parent.SheetStyleScale), -1);
+            _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale / Parent.SheetStyleScale), -1);
             _txt.Ausrichtung = _ausrichtung;
         }
     }

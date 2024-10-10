@@ -553,18 +553,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
-    public (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    public static (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY, bool autoZoomFit, RectangleF usedArea) {
         var newX = shiftX;
         var newY = shiftY;
         var newS = scale;
 
-        if (AutoZoomFit) {
-            var f = UsedAreaOfItems();
-            newS = ZoomFitValue(f, positionModified.ToRect().Size);
-            newX = -positionModified.X - positionModified.Width / 2;
-            newY = -positionModified.Y - positionModified.Height / 2;
-            newX = newX + (f.Left + f.Width / 2) * newS;
-            newY = newY + (f.Top + f.Height / 2) * newS;
+        if (autoZoomFit) {
+            newS = ZoomFitValue(usedArea, positionModified.ToRect().Size);
+            newX = -positionModified.X - (positionModified.Width / 2f);
+            newY = -positionModified.Y - (positionModified.Height / 2f);
+            newX = newX + ((usedArea.Left + (usedArea.Width / 2f)) * newS);
+            newY = newY + ((usedArea.Top + (usedArea.Height / 2f)) * newS);
         }
 
         return (newS, newX, newY);
@@ -650,7 +649,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem icpi) {
             var positionModified = icpi.UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
-            var (childScale, childShiftX, childShiftY) = icpi.AlterView(positionModified, scale, shiftX, shiftY);
+            var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
             ////Berechne den neuen Punkt für das Kind - Item
             //var childPoint = new Point(
@@ -1137,7 +1136,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         #region Items selbst
 
         if (SheetStyleScale > 0.1) {
-            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY);
+            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, AutoZoomFit, UsedAreaOfItems());
 
             foreach (var thisItem in _internal) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;

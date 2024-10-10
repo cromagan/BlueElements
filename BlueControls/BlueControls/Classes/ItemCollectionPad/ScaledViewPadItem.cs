@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -37,6 +39,8 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     private ReadOnlyCollection<string> _includedjointPoints = new([]);
 
     private float _scale = 1f;
+
+    private string _caption = "Test";
 
     #endregion
 
@@ -50,15 +54,19 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
     public static string ClassId => "SCALEDVIEW";
 
-    public string Caption { get; internal set; }
+    public string Caption {
+        get => _caption;
+        internal set {
+            if (value == _caption) { return; }
+            _caption = value;
+            OnPropertyChanged();
+        }
+    }
 
     public override string Description => string.Empty;
 
     public ReadOnlyCollection<string> IncludedJointPoints {
-        get {
-            return _includedjointPoints;
-        }
-
+        get => _includedjointPoints;
         set {
             if (!_includedjointPoints.IsDifferentTo(value)) { return; }
             _includedjointPoints = value;
@@ -79,33 +87,38 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         }
     }
 
+
+    private float _textScale = 3.07f;
+
+    public float TextScale {
+        get => _textScale;
+        set {
+            value = Math.Max(value, 0.01f);
+            value = Math.Min(value, 20);
+            if (value == _textScale) { return; }
+            _textScale = value;
+            OnPropertyChanged();
+        }
+    }
+
+
     protected override int SaveOrder => 999;
 
     #endregion
 
     #region Methods
 
-    public (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        var newX = shiftX;
-        var newY = shiftY;
-        var newS = scale;
 
-        var f = CalculateShowingArea();
-        newS = ItemCollectionPadItem.ZoomFitValue(f, positionModified.ToRect().Size);
-        newX = -positionModified.X - positionModified.Width / 2;
-        newY = -positionModified.Y - positionModified.Height / 2;
-        newX = newX + (f.Left + f.Width / 2) * newS;
-        newY = newY + (f.Top + f.Height / 2) * newS;
-
-        return (newS, newX, newY);
-    }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
         [
+          new FlexiControlForProperty<string>(() => Caption),
+             new FlexiControlForProperty<float>(() => TextScale),
+                      new FlexiControlForProperty<float>(() => Scale),
+          new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(Parent?.SheetStyle)),
+          new FlexiControlForProperty<ReadOnlyCollection<string>>(() => IncludedJointPoints, 5),
 
-                       //new FlexiControlForProperty<List<string>>(() => IncludedJointPoints, 5),
-            new FlexiControl()
         ];
         //result.Add(new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms));
         //result.Add(new FlexiControl());
@@ -122,7 +135,11 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Caption", _caption);
+        result.ParseableAdd("Scale", _scale);
         result.ParseableAdd("IncludedJointPoints", _includedjointPoints.JoinWithCr());
+        result.ParseableAdd("AdditionalScale", _textScale);
+        result.ParseableAdd("Alignment", _ausrichtung);
         return result;
     }
 
@@ -131,6 +148,12 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
             case "includedjointpoints":
                 //_includedjointPoints = value.FromNonCritical().SplitAndCutByCrToList();
                 return true;
+            case "additionalscale":
+                _textScale = FloatParse(value.FromNonCritical());
+                return true;
+            case "alignment":
+                _ausrichtung = (Alignment)byte.Parse(value);
+                return true;
         }
         return base.ParseThis(key, value);
     }
@@ -138,6 +161,17 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     public override string ReadableText() => "Skalierte Ansicht";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.LupePlus, 16);
+
+    private Alignment _ausrichtung = Alignment.Top_Left;
+    public Alignment Ausrichtung {
+        get => _ausrichtung;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _ausrichtung) { return; }
+            _ausrichtung = value;
+            OnPropertyChanged();
+        }
+    }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -163,7 +197,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
         if (icpi.SheetStyleScale > 0.1) {
             var newarea = positionModified.ToRect();
-            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY);
+            var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, true, CalculateShowingArea());
 
             foreach (var thisItem in icpi) {
                 if (thisItem is not ScaledViewPadItem) {
@@ -179,99 +213,42 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
             }
         }
 
-        gr.DrawRectangle(new Pen(Color.Red, 2), positionModified);
 
+
+
+        var allScale = Parent?.SheetStyleScale * TextScale * scale ?? TextScale * scale;
+        var bFont = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
+        var font = bFont.Font(allScale);
+
+
+        Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale));
+        colorPen.DashPattern = [5, 1, 1, 1];
+        Pen whitePen = new(Color.White, (float)(8.7d * scale) + 2f);
+
+        var textSize = gr.MeasureString(_caption, font);
+
+        // Umrandung der Detailansicht
+        gr.DrawRectangle(whitePen, positionModified);
+        gr.DrawRectangle(colorPen, positionModified);
+        if (_ausrichtung != (Alignment)(-1)) {
+
+            gr.FillRectangle(Brushes.White, new RectangleF(positionModified.Left, positionModified.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
+            BlueFont.DrawString(gr, _caption, font, new SolidBrush(bFont.ColorMain), positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
+        }
+
+
+
+        //Markierung in der Zeichnung
         var f = CalculateShowingArea().ZoomAndMoveRect(scale, shiftX, shiftY, false);
+        gr.DrawRectangle(whitePen, f);
+        gr.DrawRectangle(colorPen, f);
+        if (_ausrichtung != (Alignment)(-1)) {
+            gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
+            BlueFont.DrawString(gr, _caption, font, new SolidBrush(bFont.ColorMain), f.Left, f.Top - textSize.Height - (9f * scale));
+        }
 
-        gr.DrawRectangle(new Pen(Color.Red, 2), f);
 
-        //icpi.Draw(gr, positionModified, scale * _scale, shiftX, shiftY);
 
-        //var r = RectangleF.Empty;
-
-        //if (l.Count > 0) { }
-
-        //if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
-        //var geszoom = Parent?.SheetStyleScale * Skalierung ?? Skalierung;
-        //var f2 = Skin.GetBlueFont(Stil, Parent?.SheetStyle).Font(geszoom);
-
-        //var maxrad = Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height));
-        //RectangleF x = new(_point1, new SizeF(0, 0));
-        //x = x.ExpandTo(_point2);
-        //x = x.ExpandTo(_bezugslinie1);
-        //x = x.ExpandTo(_bezugslinie2);
-        //x = x.ExpandTo(_textPoint, maxrad);
-
-        //x.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
-        //return x;
-
-        //positionModified.Inflate(-Padding, -Padding);
-        //RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
-        //    positionModified.Width - (Padding * 2), positionModified.Height - (Padding * 2));
-        //RectangleF r2 = new();
-        //RectangleF r3 = new();
-        //if (Bitmap != null) {
-        //    r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
-        //    switch (Bild_Modus) {
-        //        case SizeModes.Verzerren: {
-        //                r2 = r1;
-        //                break;
-        //            }
-
-        //        case SizeModes.BildAbschneiden: {
-        //                var scale = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-        //                var tmpw = (positionModified.Width - (Padding * 2)) / scale;
-        //                var tmph = (positionModified.Height - (Padding * 2)) / scale;
-        //                r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-        //                r2 = r1;
-        //                break;
-        //            }
-        //        default: // Is = enSizeModes.WeißerRand
-        //        {
-        //                var scale = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-        //                r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale)) / 2) + positionModified.Top, Bitmap.Width * scale, Bitmap.Height * scale);
-        //                break;
-        //            }
-        //    }
-        //}
-        //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
-        //gr.TranslateTransform(trp.X, trp.Y);
-        //gr.RotateTransform(-Drehwinkel);
-        //r1 = r1 with { X = r1.Left - trp.X, Y = r1.Top - trp.Y };
-        //r2 = r2 with { X = r2.Left - trp.X, Y = r2.Top - trp.Y };
-        //if (Hintergrund_Weiß_Füllen) {
-        //    gr.FillRectangle(Brushes.White, r1);
-        //}
-        //try {
-        //    if (Bitmap != null) {
-        //        if (ForPrinting) {
-        //            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-        //            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        //        } else {
-        //            gr.InterpolationMode = InterpolationMode.Low;
-        //            gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-        //        }
-        //        gr.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
-        //    }
-        //} catch {
-        //    Generic.CollectGarbage();
-        //}
-        //if (Stil != PadStyles.Undefiniert) {
-        //    if (Parent is { SheetStyle: not null, SheetStyleScale: > 0 }) {
-        //        gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
-        //    }
-        //}
-        //foreach (var thisQi in Overlays) {
-        //    gr.DrawImage(thisQi, r2.Left + 8, r2.Top + 8);
-        //}
-        //gr.TranslateTransform(-trp.X, -trp.Y);
-        //gr.ResetTransform();
-        //if (!ForPrinting) {
-        //    if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
-        //        Font f = new("Arial", 8);
-        //        BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
-        //    }
-        //}
     }
 
     protected override void ParentChanged() {
