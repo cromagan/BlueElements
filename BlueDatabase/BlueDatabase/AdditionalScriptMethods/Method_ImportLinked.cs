@@ -62,7 +62,7 @@ public class Method_ImportLinked : Method_Database {
         foreach (var thisColumn in db.Column) {
             if (thisColumn.IsDisposed) { continue; }
 
-            if (thisColumn.Function is not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { continue; }
+            if (thisColumn.Function != BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
             if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }

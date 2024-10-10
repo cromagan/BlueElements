@@ -138,7 +138,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             if (ignoreLinked) { return string.Empty; }
             //repairallowed = repairallowed && mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently;
 
@@ -245,7 +245,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
         if (linkedcolumn.Database is not { IsDisposed: false } ldb || linkedcolumn.IsDisposed) { return (null, "Datenbank verworfen."); }
 
-        if (mycolumn.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, "Falsches Format."); }
+        if (mycolumn.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { return (null, "Falsches Format."); }
 
         if (mycolumn.Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen."); }
 
@@ -265,7 +265,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             foreach (var thisColumn in db.Column) {
                 if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
-                    fi.Add(new FilterItem(thisColumn, FilterType.Istgleich_MultiRowIgnorieren, linkedrow.CellGetString(c)));
+                    fi.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, linkedrow.CellGetList(c)));
                 }
             }
         }
@@ -331,56 +331,21 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="repairLinkedValue">Repariert - wenn möglich - denn Zellenbezug und schreibt ihn im Hintergrund in die Zelle.</param>
-    /// <param name="addRowIfNotExists"></param>
-    /// <returns></returns>
-
-    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? column, RowItem? row, bool repairLinkedValue, bool addRowIfNotExists) {
-        if (column?.Database is not { IsDisposed: false } db) { return (null, null, "Interner Spaltenfehler.", false); }
-
-        if (column.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, null, "Format ist nicht LinkedCell.", false); }
-
-        var linkedDatabase = column.LinkedDatabase;
-        if (linkedDatabase is not { IsDisposed: false }) { return (null, null, "Verlinkte Datenbank nicht gefunden.", false); }
-
-        if (repairLinkedValue) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
-
-        var key = db.Cell.GetStringCore(column, row);
-        if (string.IsNullOrEmpty(key)) {
-            return (linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase], null, "Keine Verlinkung vorhanden.", false);
-        }
-
-        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { return (null, null, "Format ist nicht LinkedCell.", false); }
-
-        if (key.Contains("|")) { return (null, null, "Falsches Format", false); }
-
-        var linkedColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
-
-        if (linkedColumn != null) {
-            linkedDatabase.RefreshColumnsData(linkedColumn);
-        }
-
-        var linkedRow = linkedDatabase.Row.SearchByKey(key);
-
-        return (linkedColumn, linkedRow, string.Empty, false);
-    }
-
-    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
+    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem column, RowItem? row, bool repairallowed, bool addRowIfNotExists) {
         RowItem? targetRow = null;
         ColumnItem? targetColumn = null;
         var cr = false;
 
-        // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
-        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
+        if (column.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { return (null, null, "Format ist nicht LinkedCell.", false); }
 
         var db = column.Database;
-        if (db is not { IsDisposed: false }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
+        if (db is not { IsDisposed: false }) { return Ergebnis("Eigene Datenbank verworfen."); }
 
+        var linkedDatabase = column.LinkedDatabase;
+        if (linkedDatabase is not { IsDisposed: false }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
+
+        // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
+        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
         if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
 
         if (row is not { IsDisposed: false }) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
@@ -422,9 +387,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 var newvalue = string.Empty;
 
                 if (targetRow != null && targetColumn != null && string.IsNullOrEmpty(fehler)) {
-                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { newvalue = targetRow.KeyName; }
-
-                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) { newvalue = targetRow.CellGetString(targetColumn); }
+                    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { newvalue = targetRow.CellGetString(targetColumn); }
                 }
 
                 //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
@@ -482,10 +445,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return string.Empty;
             }
 
-            if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-                var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
-                return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
-            }
+            //if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+            //    var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
+            //    return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
+            //}
 
             return GetStringCore(column, row);
         } catch {
@@ -499,10 +462,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (IsDisposed || Database is not { IsDisposed: false }) { return true; }
         if (column is not { IsDisposed: false }) { return true; }
         if (row is not { IsDisposed: false }) { return true; }
-        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
-            return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
-        }
+        //if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        //    var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
+        //    return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
+        //}
 
         return string.IsNullOrEmpty(GetStringCore(column, row));
     }
@@ -522,8 +485,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
 
-        if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
 
             //return db.ChangeData(DatabaseDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
@@ -748,8 +710,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
             foreach (var thisColumn in db.Column) {
-                if (thisColumn.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or
-                                           ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+                if (thisColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                     _ = LinkedCellData(thisColumn, row, true, false);
                 }
             }

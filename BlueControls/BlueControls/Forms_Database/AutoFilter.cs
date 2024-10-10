@@ -95,9 +95,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         // Column ist für die Filter in dieser Datenbank zuständig
         // lColumn für das Aussehen und Verhalten des FilterDialogs
 
-        if (_column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-            _ = CellCollection.LinkedCellData(_column, null, false, false);
-        }
+        //if (_column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        //    _ = CellCollection.LinkedCellData(_column, null, false, false);
+        //}
 
         Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), minWidth);
         lsbFilterItems.ItemClear();

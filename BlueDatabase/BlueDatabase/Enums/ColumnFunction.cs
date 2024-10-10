@@ -68,11 +68,11 @@ public enum ColumnFunction {
     // KeyForSame = 78
     //Button = 79,
 
-    Verknüpfung_zu_anderer_Datenbank = 80,
+    //Verknüpfung_zu_anderer_Datenbank = 80,
 
     Schlüsselspalte = 81,
 
-    Verknüpfung_zu_anderer_Datenbank2 = 82,
+    Verknüpfung_zu_anderer_Datenbank = 82,
 
     Virtuelle_Spalte = 83,
 
@@ -87,7 +87,6 @@ public static class ColumnFunctionExtensions {
 
     public static bool Autofilter_möglich(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                     or ColumnFunction.RelationText
                                                                                     or ColumnFunction.Schlüsselspalte
@@ -112,34 +111,28 @@ public static class ColumnFunctionExtensions {
 
     public static bool DropdownItemsOfOtherCellsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                                  or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                                   or ColumnFunction.RelationText;
 
     public static bool DropdownUnselectAllAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                             or ColumnFunction.RelationText
-                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2;
+                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
 
     public static bool MultilinePossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                    or ColumnFunction.RelationText
                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                    or ColumnFunction.Schlüsselspalte
                                                                                    or ColumnFunction.Virtuelle_Spalte;
 
     public static bool NeedTargetDatabase(this ColumnFunction function) => function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems;
 
     public static bool SpellCheckingPossible(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                       or ColumnFunction.RelationText
+                                                                                     or ColumnFunction.RelationText
                                                                                        or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                       or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                        or ColumnFunction.Schlüsselspalte;
 
     public static bool TextboxEditPossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Virtuelle_Spalte;
 

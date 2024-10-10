@@ -2056,7 +2056,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             thisColumn.Optimize();
 
             if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
-                                      not ColumnFunction.Verknüpfung_zu_anderer_Datenbank2 and
                                       not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
                                       not ColumnFunction.Virtuelle_Spalte) {
                 var x = thisColumn.Contents();

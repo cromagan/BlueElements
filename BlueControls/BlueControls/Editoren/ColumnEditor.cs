@@ -595,7 +595,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             tcvc[1].Add(sp, false);
             tcvc[1].Add(b, false);
 
-            db.ColumnArrangements = tcvc.ToString();
+            db.ColumnArrangements = tcvc.ToString(false);
 
             db.SortDefinition = new RowSortDefinition(db, sp, false);
             tblFilterliste.DatabaseSet(db, string.Empty);

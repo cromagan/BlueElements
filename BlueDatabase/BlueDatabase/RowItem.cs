@@ -633,7 +633,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
 
         foreach (var thisColumn in db.Column) {
-            if (thisColumn.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+            if (thisColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                 _ = CellCollection.LinkedCellData(thisColumn, this, true, false);
 
                 //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }
@@ -1033,12 +1033,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             var txt = string.Empty;
 
             switch (column.Function) {
-                case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-                    var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
-                    if (columnItem != null && rowItem != null) {
-                        txt = rowItem.CellGetString(columnItem);
-                    }
-                    break;
+                //case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+                //    var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
+                //    if (columnItem != null && rowItem != null) {
+                //        txt = rowItem.CellGetString(columnItem);
+                //    }
+                //    break;
 
                 case ColumnFunction.Virtuelle_Spalte:
                     CheckRowDataIfNeeded();

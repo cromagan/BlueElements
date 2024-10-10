@@ -457,7 +457,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
             case FilterType.Istgleich_MultiRowIgnorieren:
                 if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
-                return "Spezial-Filter";
+                return "Der ganze Zelleninhalt von " +  nam + " muss genau '" + SearchValue[0] + "' sein.";
 
             case FilterType.Instr:
 

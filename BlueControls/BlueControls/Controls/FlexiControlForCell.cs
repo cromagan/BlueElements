@@ -391,7 +391,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
         ColumnItem? gbColumn;
 
-        if (column?.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank or ColumnFunction.Verknüpfung_zu_anderer_Datenbank2) {
+        if (column?.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
         } else {
             gbColumn = column;
@@ -557,7 +557,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
 
         switch (column.Function) {
-            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank2:
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
                 _ = GetRealColumn(column, row);
                 f.ValueSet(row.CellGetString(column), true);
