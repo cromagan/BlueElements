@@ -166,12 +166,13 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         set {
             if (_parent == null || _parent == value) {
                 _parent = value;
-                //OnParentChanged();
+                ParentChanged();
                 return;
             }
 
             if (value == null) {
                 _parent = null;
+                ParentChanged();
                 return;
             }
 
@@ -345,7 +346,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 }
                 //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionModified); }
             }
-     
         }
 
         #region Verknüpfte Pfeile Zeichnen
@@ -702,6 +702,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+
+    protected virtual void ParentChanged() { }
 
     private void JointMiddle_Moved(object sender, MoveEventArgs e) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }

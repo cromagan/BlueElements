@@ -838,6 +838,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public static List<string> RepairUserGroups(IEnumerable<string> e) {
         var l = new List<string>();
 
+        e = e.JoinWith("|").SplitAndCutBy("|").Distinct();
+        e = e.JoinWithCr().SplitAndCutByCr().Distinct();
+
         foreach (var thisUser in e) {
             if (string.Equals(thisUser, Everybody, StringComparison.OrdinalIgnoreCase)) {
                 l.Add(Everybody);

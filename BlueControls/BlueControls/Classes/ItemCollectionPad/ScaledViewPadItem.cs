@@ -162,13 +162,28 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         if (Parent is not { } icpi) { return; }
 
         if (icpi.SheetStyleScale > 0.1) {
+            var newarea = positionModified.ToRect();
             var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY);
 
             foreach (var thisItem in icpi) {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, positionModified.ToRect(), childScale, childShiftX, childShiftY);
+                if (thisItem is not ScaledViewPadItem) {
+                    gr.PixelOffsetMode = PixelOffsetMode.None;
+                    var childpos = thisItem.UsedArea.ZoomAndMoveRect(childScale, childShiftX, childShiftY, false);
+                    if (IsInDrawingArea(childpos, newarea)) {
+                        // IsInDrawingArea extra abfragen, weil ShowAlways dazwischenfunkt
+                        gr.SetClip(newarea);
+                        thisItem.Draw(gr, newarea, childScale, childShiftX, childShiftY);
+                        gr.ResetClip();
+                    }
+                }
             }
         }
+
+        gr.DrawRectangle(new Pen(Color.Red, 2), positionModified);
+
+        var f = CalculateShowingArea().ZoomAndMoveRect(scale, shiftX, shiftY, false);
+
+        gr.DrawRectangle(new Pen(Color.Red, 2), f);
 
         //icpi.Draw(gr, positionModified, scale * _scale, shiftX, shiftY);
 
@@ -259,6 +274,11 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         //}
     }
 
+    protected override void ParentChanged() {
+        base.ParentChanged();
+        CalculateSize();
+    }
+
     private RectangleF CalculateShowingArea() {
         var points = new List<PointM>();
 
@@ -279,7 +299,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         RectangleF area = new(points[0].X, points[0].Y, 0, 0);
 
         foreach (var thisPoint in points) {
-            area.ExpandTo(thisPoint);
+            area = area.ExpandTo(thisPoint);
         }
 
         area.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
