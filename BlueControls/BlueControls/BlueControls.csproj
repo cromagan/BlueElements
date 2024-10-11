@@ -126,6 +126,7 @@
     <Compile Include="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
+    <Compile Include="Classes\ItemCollectionPad\TablePadItem.cs" />
     <Compile Include="Editoren\CreativePadScriptEditor.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -318,8 +318,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnSpaltenAnordnungen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        var x = new ColumnArrangementPadEditor(db);
-        _ = x.ShowDialog();
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        tcvc[1].Edit();
+        Table.RepairColumnArrangements(db);
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();

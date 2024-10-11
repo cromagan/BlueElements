@@ -25,7 +25,6 @@ using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
-using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;

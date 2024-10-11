@@ -17,15 +17,12 @@
 
 #nullable enable
 
-using BlueScript;
 using BlueScript.Enums;
 using BlueDatabase.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Diagnostics;
-using BlueBasics;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 

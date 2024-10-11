@@ -163,16 +163,14 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     // }
     public ItemCollectionPadItem? Parent {
         get => _parent;
-        set {
+        internal set {
             if (_parent == null || _parent == value) {
                 _parent = value;
-                ParentChanged();
                 return;
             }
 
             if (value == null) {
                 _parent = null;
-                ParentChanged();
                 return;
             }
 
@@ -246,7 +244,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    public virtual void AddedToCollection() { }
+    public virtual void AddedToCollection(ItemCollectionPadItem parent) {
+        if (IsDisposed) { return; }
+        Parent = parent;
+    }
 
     public void AddJointPointAbsolute(string name, float x, float y) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
@@ -702,8 +703,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
-
-    protected virtual void ParentChanged() { }
 
     private void JointMiddle_Moved(object sender, MoveEventArgs e) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }

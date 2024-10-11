@@ -273,13 +273,27 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public AbstractPadItem? this[int nr] => _internal[nr];
 
-    public List<AbstractPadItem> this[int x, int y] => this[new Point(x, y)];
-
     public List<AbstractPadItem> this[Point p] => _internal.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
 
     #endregion
 
     #region Methods
+
+    public static (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY, bool autoZoomFit, RectangleF usedArea) {
+        var newX = shiftX;
+        var newY = shiftY;
+        var newS = scale;
+
+        if (autoZoomFit) {
+            newS = ZoomFitValue(usedArea, positionModified.ToRect().Size);
+            newX = -positionModified.X - (positionModified.Width / 2f);
+            newY = -positionModified.Y - (positionModified.Height / 2f);
+            newX = newX + ((usedArea.Left + (usedArea.Width / 2f)) * newS);
+            newY = newY + ((usedArea.Top + (usedArea.Height / 2f)) * newS);
+        }
+
+        return (newS, newX, newY);
+    }
 
     /// <summary>
     /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
@@ -542,37 +556,21 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
 
         _internal.Add(item);
-        item.Parent = this;
+        item.AddedToCollection(this);
 
         IsSaved = false;
         OnItemAdded(item);
-        item.AddedToCollection();
+
         item.PropertyChanged += Item_PropertyChanged;
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
         //item.CheckedChanged += Item_CheckedChanged;
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
-    public static (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY, bool autoZoomFit, RectangleF usedArea) {
-        var newX = shiftX;
-        var newY = shiftY;
-        var newS = scale;
-
-        if (autoZoomFit) {
-            newS = ZoomFitValue(usedArea, positionModified.ToRect().Size);
-            newX = -positionModified.X - (positionModified.Width / 2f);
-            newY = -positionModified.Y - (positionModified.Height / 2f);
-            newX = newX + ((usedArea.Left + (usedArea.Width / 2f)) * newS);
-            newY = newY + ((usedArea.Top + (usedArea.Height / 2f)) * newS);
-        }
-
-        return (newS, newX, newY);
-    }
-
     public void BringToFront(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
-        Remove(thisItem);
-        Add(thisItem);
+        _internal.Remove(thisItem);
+        _internal.Add(thisItem);
     }
 
     public void Clear() {
@@ -903,7 +901,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void SendToBack(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == 0) { return; }
-        Remove(thisItem);
+        _internal.Remove(thisItem);
         _internal.Insert(0, thisItem);
     }
 
@@ -981,19 +979,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return t;
     }
 
-    internal int GetFreeColorId() {
-        var usedids = new List<int>();
-
+    internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
         foreach (var thisIt in _internal) {
-            if (thisIt is ReciverSenderControlPadItem hci) {
-                usedids.Add(hci.OutputColorId);
+            if (thisIt != notOfMe) {
+                foreach (var thisPt in thisIt.JointPoints) {
+                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
+                }
             }
         }
 
-        for (var c = 0; c < 9999; c++) {
-            if (!usedids.Contains(c)) { return c; }
-        }
-        return -1;
+        return null;
     }
 
     internal List<PointM> GetJointPoints(string pointName, AbstractPadItem? notOfMe) {
@@ -1008,18 +1003,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         return l;
-    }
-
-    internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
-        foreach (var thisIt in _internal) {
-            if (thisIt != notOfMe) {
-                foreach (var thisPt in thisIt.JointPoints) {
-                    if (string.Equals(thisPt.KeyName, pointName, StringComparison.OrdinalIgnoreCase)) { return thisPt; }
-                }
-            }
-        }
-
-        return null;
     }
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {

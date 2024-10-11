@@ -36,6 +36,25 @@ public static class AbstractListItemExtension {
 
     #region Methods
 
+    public static List<AbstractListItem> AllAvailableColumArrangemengts(Database db) {
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        var u2 = new List<AbstractListItem>();
+        foreach (var thisC in tcvc) {
+            u2.Add(ItemOf(thisC));
+        }
+        return u2;
+    }
+
+    public static List<AbstractListItem> AllAvailableTables() {
+        var ld = Database.AllAvailableTables(string.Empty);
+        var ld2 = new List<AbstractListItem>();
+        foreach (var thisd in ld) {
+            thisd.Editor = typeof(DatabaseHeadEditor);
+            ld2.Add(ItemOf(thisd));
+        }
+        return ld2;
+    }
+
     public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);

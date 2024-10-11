@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
@@ -31,7 +32,7 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey, IEditable {
 
     #region Fields
 
@@ -63,6 +64,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Properties
 
+    public string CaptionForEditor => "Spaltenanordnung";
     public int Count => _internal.Count;
 
     public Database? Database {
@@ -82,6 +84,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
+    public Type? Editor { get; set; }
     public bool IsDisposed { get; private set; }
 
     public string KeyName { get; set; }
@@ -126,6 +129,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
 
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
+
+        foreach (var thisC in tcvc) {
+            thisC.Editor = typeof(ColumnArrangementPadEditor);
+        }
 
         return tcvc;
     }

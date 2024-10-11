@@ -106,6 +106,13 @@ public partial class PadEditor : FormWithStatusBar {
         Pad.Invalidate();
     }
 
+    private void btnNoArea_Click(object sender, System.EventArgs e) {
+        if (Pad?.Items == null) { return; }
+
+        Pad.Items.Endless = true;
+        Pad.Invalidate();
+    }
+
     private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
 
     private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();

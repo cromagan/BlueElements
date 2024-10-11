@@ -36,11 +36,12 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
     #region Fields
 
+    private Alignment _ausrichtung = Alignment.Top_Left;
+    private string _caption = string.Empty;
     private ReadOnlyCollection<string> _includedjointPoints = new([]);
 
     private float _scale = 1f;
-
-    private string _caption = "Test";
+    private float _textScale = 3.07f;
 
     #endregion
 
@@ -53,6 +54,16 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     #region Properties
 
     public static string ClassId => "SCALEDVIEW";
+
+    public Alignment Ausrichtung {
+        get => _ausrichtung;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _ausrichtung) { return; }
+            _ausrichtung = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string Caption {
         get => _caption;
@@ -87,9 +98,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         }
     }
 
-
-    private float _textScale = 3.07f;
-
     public float TextScale {
         get => _textScale;
         set {
@@ -101,14 +109,16 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         }
     }
 
-
     protected override int SaveOrder => 999;
 
     #endregion
 
     #region Methods
 
-
+    public override void AddedToCollection(ItemCollectionPadItem parent) {
+        base.AddedToCollection(parent);
+        CalculateSize();
+    }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
@@ -148,9 +158,11 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
             case "includedjointpoints":
                 //_includedjointPoints = value.FromNonCritical().SplitAndCutByCrToList();
                 return true;
+
             case "additionalscale":
                 _textScale = FloatParse(value.FromNonCritical());
                 return true;
+
             case "alignment":
                 _ausrichtung = (Alignment)byte.Parse(value);
                 return true;
@@ -161,17 +173,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     public override string ReadableText() => "Skalierte Ansicht";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.LupePlus, 16);
-
-    private Alignment _ausrichtung = Alignment.Top_Left;
-    public Alignment Ausrichtung {
-        get => _ausrichtung;
-        set {
-            if (IsDisposed) { return; }
-            if (value == _ausrichtung) { return; }
-            _ausrichtung = value;
-            OnPropertyChanged();
-        }
-    }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -213,13 +214,9 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
             }
         }
 
-
-
-
-        var allScale = Parent?.SheetStyleScale * TextScale * scale ?? TextScale * scale;
+        var allScale = Parent?.SheetStyleScale * _textScale * scale ?? _textScale * scale;
         var bFont = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
         var font = bFont.Font(allScale);
-
 
         Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale));
         colorPen.DashPattern = [5, 1, 1, 1];
@@ -231,12 +228,9 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         gr.DrawRectangle(whitePen, positionModified);
         gr.DrawRectangle(colorPen, positionModified);
         if (_ausrichtung != (Alignment)(-1)) {
-
             gr.FillRectangle(Brushes.White, new RectangleF(positionModified.Left, positionModified.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
             BlueFont.DrawString(gr, _caption, font, new SolidBrush(bFont.ColorMain), positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
         }
-
-
 
         //Markierung in der Zeichnung
         var f = CalculateShowingArea().ZoomAndMoveRect(scale, shiftX, shiftY, false);
@@ -247,13 +241,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
             BlueFont.DrawString(gr, _caption, font, new SolidBrush(bFont.ColorMain), f.Left, f.Top - textSize.Height - (9f * scale));
         }
 
-
-
-    }
-
-    protected override void ParentChanged() {
-        base.ParentChanged();
-        CalculateSize();
+        //base.DrawExplicit(gr,visibleArea,positionModified,scale, shiftX, shiftY);
     }
 
     private RectangleF CalculateShowingArea() {

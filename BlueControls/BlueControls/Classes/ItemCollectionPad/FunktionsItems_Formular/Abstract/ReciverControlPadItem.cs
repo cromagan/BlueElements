@@ -186,11 +186,12 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     #region Methods
 
-    public override void AddedToCollection() {
-        base.AddedToCollection();
-        CalculateColorIds();
-        OnPropertyChanged();
-    }
+    //public override void AddedToCollection(ItemCollectionPadItem parent) {
+    //    if (IsDisposed) { return; }
+    //    base.AddedToCollection(parent);
+    //    CalculateColorIds();
+    //    OnPropertyChanged();
+    //}
 
     public List<int> CalculateColorIds() {
         var l = new List<int>();

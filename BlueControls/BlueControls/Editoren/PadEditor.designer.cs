@@ -58,6 +58,7 @@ namespace BlueControls.Forms {
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabRightSide = new BlueControls.Controls.TabControl();
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
+            this.btnNoArea = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -379,6 +380,7 @@ namespace BlueControls.Forms {
             // 
             this.grpDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpDesign.CausesValidation = false;
+            this.grpDesign.Controls.Add(this.btnNoArea);
             this.grpDesign.Controls.Add(this.btnKeinHintergrund);
             this.grpDesign.Controls.Add(this.btnHintergrundFarbe);
             this.grpDesign.Controls.Add(this.btnArbeitsbreichSetup);
@@ -401,7 +403,7 @@ namespace BlueControls.Forms {
             this.btnKeinHintergrund.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnKeinHintergrund.Location = new System.Drawing.Point(464, 2);
             this.btnKeinHintergrund.Name = "btnKeinHintergrund";
-            this.btnKeinHintergrund.Size = new System.Drawing.Size(112, 22);
+            this.btnKeinHintergrund.Size = new System.Drawing.Size(136, 22);
             this.btnKeinHintergrund.TabIndex = 16;
             this.btnKeinHintergrund.Text = "kein Hintergrund";
             this.btnKeinHintergrund.Click += new System.EventHandler(this.btnKeinHintergrund_Click);
@@ -494,6 +496,17 @@ namespace BlueControls.Forms {
             this.tabElementEigenschaften.TabIndex = 0;
             this.tabElementEigenschaften.Text = "Element-Eigenschaften";
             // 
+            // btnNoArea
+            // 
+            this.btnNoArea.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnNoArea.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnNoArea.Location = new System.Drawing.Point(464, 24);
+            this.btnNoArea.Name = "btnNoArea";
+            this.btnNoArea.Size = new System.Drawing.Size(136, 22);
+            this.btnNoArea.TabIndex = 17;
+            this.btnNoArea.Text = "kein Arbeitsbereich";
+            this.btnNoArea.Click += new System.EventHandler(this.btnNoArea_Click);
+            // 
             // PadEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -554,5 +567,6 @@ namespace BlueControls.Forms {
         private Controls.ComboBox PadDesign;
         private Caption capDesign;
         protected TabControl tabRightSide;
+        private Button btnNoArea;
     }
 }

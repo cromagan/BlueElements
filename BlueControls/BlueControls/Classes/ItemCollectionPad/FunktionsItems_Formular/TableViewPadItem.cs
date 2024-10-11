@@ -64,7 +64,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public override bool DatabaseInputMustMatchOutputDatabase => true;
 
-    public override string Description => "Darstellung einer Datenbank in Tabellen-Form.";
+    public override string Description => "Darstellung einer Datenbank als bearbeitbare und filterbare Tabelle.";
 
     public Filterausgabe FilterOutputType {
         get => _filterOutputType;
@@ -113,12 +113,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         ];
 
         if (DatabaseOutput is { IsDisposed: false } db) {
-            var tcvc = ColumnViewCollection.ParseAll(db);
-            var u2 = new List<AbstractListItem>();
-            foreach (var thisC in tcvc) {
-                u2.Add(ItemOf(thisC));
-            }
-            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
+            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(db)));
         }
 
         if (DatabaseOutput is { IsDisposed: false }) {
@@ -149,7 +144,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     }
 
     public override string ReadableText() {
-        const string txt = "Tabellenansicht: ";
+        const string txt = "Bearbeitbare Tabelle: ";
 
         return txt + DatabaseOutput?.Caption;
     }

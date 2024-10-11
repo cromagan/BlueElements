@@ -34,17 +34,17 @@ internal class Method_ScaledView : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, StringVal];
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, FloatVal, StringVal];
     public override string Command => "scaledview";
     public override List<string> Constants => [];
     public override string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoings.";
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 2;
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "ScaledView(Collection, LinkeObereEckePunkt, Überschrift, Skalierung, Einzuschließende Punkte, ...);";
+    public override string Syntax => "ScaledView(Collection, LinkeObereEckePunkt, Überschrift, SchriftSkalierung, Skalierung, Einzuschließende Punkte, ...);";
 
     #endregion
 
@@ -65,29 +65,19 @@ internal class Method_ScaledView : Method {
         }
 
         d.Caption = attvar.ValueStringGet(2);
-        d.Scale = (float)attvar.ValueNumGet(3);
+        d.TextScale = (float)attvar.ValueNumGet(3);
+        d.Scale = (float)attvar.ValueNumGet(4);
 
 
 
         var n = new List<string>();
 
-        for (var z = 4; z < attvar.Attributes.Count; z++) {
+        for (var z = 5; z < attvar.Attributes.Count; z++) {
             n.AddIfNotExists(attvar.ValueStringGet(z));
 
         }
         d.IncludedJointPoints = n.AsReadOnly();
 
-        //var p2 = icpv.GetJointPoint(attvar.ValueStringGet(4), null);
-        //var abmm = attvar.ValueNumGet(5);
-
-        //if (p1 != null && p2 != null) {
-        //    if (attvar.ValueBoolGet(6)) { p2 = new PointM(p1.X, p2.Y); }
-        //    if (attvar.ValueBoolGet(7)) { p2 = new PointM(p2.X, p1.Y); }
-        //}
-
-
-        //d.Text_Oben = attvar.ValueStringGet(1);
-        //d.Text_Unten = attvar.ValueStringGet(2);
 
         return new DoItFeedback(new VariablePadItem(d));
     }

@@ -37,10 +37,12 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
+using BlueControls.Interfaces;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
+public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEditor {
 
     #region Fields
 
@@ -52,31 +54,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     #region Constructors
 
-    public ColumnArrangementPadEditor(Database? database) : this() {
-        var m = Database.EditableErrorReason(database, EditableErrorReasonType.EditCurrently);
-        if (!string.IsNullOrEmpty(m)) {
-            Forms.MessageBox.Show(m, ImageCode.Information, "OK");
-            Close();
-            return;
-        }
-
-        Database = database;
-
-        if (database is { IsDisposed: false } db) {
-            var tcvc = ColumnViewCollection.ParseAll(db);
-
-            if (tcvc.Count > 1) {
-                _arrangement = tcvc[1].KeyName;
-            } else if (tcvc.Count > 0) {
-                _arrangement = tcvc[0].KeyName;
-            }
-        }
-
-        UpdateCombobox();
-        ShowOrder();
-    }
-
-    private ColumnArrangementPadEditor() => InitializeComponent();
+    public ColumnArrangementPadEditor() => InitializeComponent();
 
     #endregion
 
@@ -105,6 +83,17 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     public bool Generating { get; private set; }
 
     public bool Sorting { get; private set; }
+
+    public IEditable? ToEdit {
+        set {
+            if (value is ColumnViewCollection cvc) {
+                Database = cvc.Database;
+                _arrangement = cvc.KeyName;
+                UpdateCombobox();
+                ShowOrder();
+            }
+        }
+    }
 
     #endregion
 
@@ -499,7 +488,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         Pad.Items = new ItemCollectionPadItem();
         Pad.Items.Endless = true;
-        Pad.Items.ForPrinting = true;   
+        Pad.Items.ForPrinting = true;
 
         if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
 

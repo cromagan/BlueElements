@@ -53,6 +53,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     /// </summary>
     private string _textReplaced;
 
+    private float _textScale = 3.07f;
+
     /// <summary>
     /// Dieses Element ist nur temporär und ist der tatsächlich angezeigte Text - mit Bildern, verschieden Größen, etc.
     /// Wird immer von _text_replaced abgeleitet.
@@ -91,20 +93,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     public override string Description => string.Empty;
 
-    private float _textScale = 3.07f;
-
-    public float TextScale {
-        get => _textScale;
-        set {
-            value = Math.Max(value, 0.01f);
-            value = Math.Min(value, 20);
-            if (value == _textScale) { return; }
-            _textScale = value;
-            OnPropertyChanged();
-        }
-    }
-
-
     /// <summary>
     ///
     /// </summary>
@@ -118,6 +106,17 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
             _textReplaced = value;
             InvalidateText();
             //CalculateSlavePoints();
+            OnPropertyChanged();
+        }
+    }
+
+    public float TextScale {
+        get => _textScale;
+        set {
+            value = Math.Max(value, 0.01f);
+            value = Math.Min(value, 20);
+            if (value == _textScale) { return; }
+            _textScale = value;
             OnPropertyChanged();
         }
     }

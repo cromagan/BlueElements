@@ -24,7 +24,6 @@ using BlueDatabase;
 using System.Collections.Generic;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
-using BlueControls.ItemCollectionList;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using static BlueDatabase.Database;
@@ -105,18 +104,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
 
     #endregion
 
-    #region Methods
-
-    public static List<AbstractListItem> AllAvailableTables() {
-        var ld = Database.AllAvailableTables(string.Empty);
-        var ld2 = new List<AbstractListItem>();
-        foreach (var thisd in ld) {
-            thisd.Editor = typeof(DatabaseHeadEditor);
-            ld2.Add(ItemOf(thisd));
-        }
-        return ld2;
-    }
-
     //public void AddChild(IHasKeyName add) {
     //    var l = new List<string>();
     //    l.AddRange(ChildIds);
@@ -126,13 +113,15 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
     //    ChildIds = l.AsReadOnly();
     //}
 
-    public override void AddedToCollection() {
+    #region Methods
+
+    public override void AddedToCollection(ItemCollectionPadItem parent) {
         if (IsDisposed) { return; }
-        base.AddedToCollection();
+        base.AddedToCollection(parent);
 
         if (Parent != null) {
             OutputColorId = -1;
-            OutputColorId = Parent.GetFreeColorId();
+            OutputColorId = GetFreeColorId();
         }
         OnPropertyChanged();
     }
@@ -216,6 +205,23 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
                 return true;
         }
         return base.ParseThis(key, value);
+    }
+
+    internal int GetFreeColorId() {
+        if (Parent == null) { return -1; }
+
+        var usedids = new List<int>();
+
+        foreach (var thisIt in Parent) {
+            if (thisIt is ReciverSenderControlPadItem hci) {
+                usedids.Add(hci.OutputColorId);
+            }
+        }
+
+        for (var c = 0; c < 9999; c++) {
+            if (!usedids.Contains(c)) { return c; }
+        }
+        return -1;
     }
 
     #endregion

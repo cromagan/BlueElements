@@ -512,6 +512,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     protected virtual void DatabaseSet(Database? db, string toParse) {
         if (db is { IsDisposed: false }) {
             DropMessages = db.IsAdministrator();
+            cbxColumnArr.ItemEditAllowed = db.IsAdministrator();
         }
 
         if (Table.Database != db) {
@@ -717,7 +718,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     protected virtual void Table_DatabaseChanged(object sender, System.EventArgs e) {
         Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
-        //ChangeDatabase(Table.Database);
         Check_OrderButtons();
         CheckButtons();
     }
@@ -921,9 +921,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table.Database is not { IsDisposed: false } db) { return; }
 
-        var x = new ColumnArrangementPadEditor(db);
-        _ = x.ShowDialog();
-
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        tcvc.Get(cbxColumnArr.Text)?.Edit();
         Table.RepairColumnArrangements(db);
     }
 
