@@ -157,7 +157,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
     public override List<string> Attributes() {
         var s = new List<string>();
         if (!NeedRow) { s.Add("Rowless"); }
-        if (!ChangeValues) { s.Add("NeverChangesValues"); }
+        //if (!ChangeValues) { s.Add("NeverChangesValues"); }
         return s;
     }
 

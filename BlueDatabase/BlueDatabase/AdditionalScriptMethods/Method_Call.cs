@@ -77,7 +77,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
             if (!newat.Contains(thisAt)) {
-                return new DoItFeedback(ld, "Aufzurufendes Skript hat andere Bedingungen.");
+                return new DoItFeedback(ld, "Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.");
             }
         }
 
