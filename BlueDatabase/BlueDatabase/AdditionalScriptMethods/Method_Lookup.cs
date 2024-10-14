@@ -87,6 +87,8 @@ public class Method_Lookup : Method_Database {
         //    return new DoItFeedback(ld, "Spaltentyp nicht unterstützt.");
         //}
 
+        c.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+
         return new DoItFeedback(r[0].CellGetList(c));
     }
 

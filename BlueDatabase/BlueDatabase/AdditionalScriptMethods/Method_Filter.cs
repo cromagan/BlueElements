@@ -131,6 +131,8 @@ public class Method_Filter : Method_Database {
             return new DoItFeedback(ld, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
         }
 
+        filterColumn.AddSystemInfo("Filter in Script", db, scp.ScriptName);
+
         return new DoItFeedback(new VariableFilterItem(fii));
     }
 

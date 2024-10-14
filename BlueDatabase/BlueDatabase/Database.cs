@@ -2909,6 +2909,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
+        SaveToByteList(l, DatabaseDataType.ColumnSystemInfo, c.SystemInfo, name);
         //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, name);

@@ -139,6 +139,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
             this.btnSpaltenkopf = new BlueControls.Controls.Button();
+            this.btnSystemInfo = new BlueControls.Controls.Button();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -1062,6 +1063,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
+            this.BlueFrame1.Controls.Add(this.btnSystemInfo);
             this.BlueFrame1.Controls.Add(this.btnVerwendung);
             this.BlueFrame1.Controls.Add(this.capInfo);
             this.BlueFrame1.Controls.Add(this.Caption3);
@@ -1079,7 +1081,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnVerwendung.Location = new System.Drawing.Point(8, 80);
             this.btnVerwendung.Name = "btnVerwendung";
-            this.btnVerwendung.Size = new System.Drawing.Size(144, 24);
+            this.btnVerwendung.Size = new System.Drawing.Size(128, 24);
             this.btnVerwendung.TabIndex = 3;
             this.btnVerwendung.Text = "Verwendungs-Info";
             this.btnVerwendung.Click += new System.EventHandler(this.btnVerwendung_Click);
@@ -1446,6 +1448,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSpaltenkopf.TabIndex = 49;
             this.btnSpaltenkopf.Click += new System.EventHandler(this.btnSpaltenkopf_Click);
             // 
+            // btnSystemInfo
+            // 
+            this.btnSystemInfo.Location = new System.Drawing.Point(152, 80);
+            this.btnSystemInfo.Name = "btnSystemInfo";
+            this.btnSystemInfo.Size = new System.Drawing.Size(152, 24);
+            this.btnSystemInfo.TabIndex = 4;
+            this.btnSystemInfo.Text = "Systeminfos zurücksetzen";
+            this.btnSystemInfo.Click += new System.EventHandler(this.btnSystemInfo_Click);
+            // 
             // ColumnEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1596,5 +1607,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private ComboBox cbxRenderer;
         private Caption capRenderer;
         private GroupBox RendererEditor;
+        private Button btnSystemInfo;
     }
 }

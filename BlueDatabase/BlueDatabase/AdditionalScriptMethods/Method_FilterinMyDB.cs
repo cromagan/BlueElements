@@ -56,7 +56,7 @@ public class Method_FilterInMyDB : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 0);
-        if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column?.Database is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
         #region Typ ermitteln
 
@@ -73,6 +73,8 @@ public class Method_FilterInMyDB : Method_Database {
         if (!fii.IsOk()) {
             return new DoItFeedback(ld, "Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'");
         }
+
+        column.AddSystemInfo("Filter in Script", column.Database, scp.ScriptName);
 
         return new DoItFeedback(new VariableFilterItem(fii));
     }

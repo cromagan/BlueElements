@@ -240,6 +240,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
         Column_DatenAuslesen();
     }
 
+    private void btnSystemInfo_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
+
+        _column.SystemInfoReset(true);
+    }
+
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _ = ColorDia.ShowDialog();

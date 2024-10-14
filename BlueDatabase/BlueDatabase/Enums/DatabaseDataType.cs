@@ -185,6 +185,7 @@ public enum DatabaseDataType : byte {
 
     AllowedChars = 135,
     ColumnAdminInfo = 137,
+    ColumnSystemInfo = 138,
 
     //co_AutoFilterErlaubt = 138,
     //co_AutoFilterTextFilterErlaubt_alt = 139,

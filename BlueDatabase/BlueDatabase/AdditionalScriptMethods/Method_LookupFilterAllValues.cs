@@ -58,6 +58,8 @@ public class Method_LookupFilterAllValues : Method {
         var returncolumn = db.Column[attvar.ValueStringGet(0)];
         if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
+        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+
         var l = new List<string>();
 
         var r = allFi.Rows;

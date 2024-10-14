@@ -432,6 +432,24 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return (rowData, vrc);
     }
 
+    public static string QuickInfoText(ColumnItem col, string additionalText) {
+        if (col.IsDisposed || col.Database is not { IsDisposed: false }) { return string.Empty; }
+
+
+        var T = string.Empty;
+        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
+        if (col.Database.IsAdministrator() && !string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
+        if (col.Database.IsAdministrator() && col.Tags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.Tags.JoinWith("<br>"); }
+        if (col.Database.IsAdministrator()) { T = T + "<br><br>" + Table.ColumnUseage(col); }
+        T = T.Trim();
+        T = T.Trim("<br>");
+        T = T.Trim();
+        if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(additionalText)) {
+            T = "<b><u>" + additionalText + "</b></u><br><br>" + T;
+        }
+        return T;
+    }
+
     public static string ColumnUseage(ColumnItem? column) {
         if (column?.Database is not { IsDisposed: false } db) { return string.Empty; }
 
@@ -454,12 +472,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (!first && thisView[column] != null) { cola = true; }
             first = false;
         }
-        if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
-        if (column.UsedInScript()) { t += " - Regeln-Skript<br>"; }
+        if (cola) { t += " - Spalten-Anordnungen<br>"; }
+        if (column.UsedInScript()) { t += " - Skripte<br>"; }
         if (db.ZeilenQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
         if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
+        if (!string.IsNullOrEmpty(column.SystemInfo)) {
+            t += "<br><br><b>Gesammelte Infos:</b><br>";
+            t += column.SystemInfo;
+        }
+
+
 
         var l = column.Contents();
         if (l.Count > 0) {
@@ -1932,7 +1956,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 //_database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             } else {
                 if (e.Y < ca.HeadSize(_columnFont)) {
-                    QuickInfo = c.QuickInfoText(string.Empty);
+                    QuickInfo = QuickInfoText(c, string.Empty);
                 } else if (_mouseOverRow != null) {
                     if (c.Function.NeedTargetDatabase()) {
                         if (c.LinkedDatabase != null) {
@@ -1940,7 +1964,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
 
                                     var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, false);
-                                    if (lcolumn != null) { QuickInfo = lcolumn.QuickInfoText(c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
+                                    if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                                     if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
                                         if (string.IsNullOrEmpty(QuickInfo)) { QuickInfo += "\r\n"; }
@@ -2378,9 +2402,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     break;
                 }
             default:
-                Develop.DebugPrint("Unbekannter Command:   " + e.Command);
+                Develop.DebugPrint("Unbekannter Command: " + e.Command);
                 break;
         }
+
+
+        if (e.Filter?.Column is { IsDisposed: false } col) {
+            col.AddSystemInfo("Filter Clicked", Generic.UserName);
+        }
+
         OnAutoFilterClicked(new FilterEventArgs(e.Filter));
     }
 
@@ -2496,18 +2526,22 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         switch (dia) {
             case EditTypeTable.Textfeld:
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
                 _ = Cell_Edit_TextBox(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
                 break;
 
             case EditTypeTable.Textfeld_mit_Auswahlknopf:
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
                 _ = Cell_Edit_TextBox(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
                 break;
 
             case EditTypeTable.Dropdown_Single:
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
                 Cell_Edit_Dropdown(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow);
                 break;
 
             case EditTypeTable.Farb_Auswahl_Dialog:
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
                 if (viewItem.Column != contentHolderCellColumn || cellInThisDatabaseRow?.Row != contentHolderCellRow) {
                     NotEditableInfo("Verlinkte Zellen hier verboten.");
                     return;
@@ -2516,6 +2550,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 break;
 
             case EditTypeTable.Font_AuswahlDialog:
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
                 Develop.DebugPrint_NichtImplementiert(false);
                 //if (cellInThisDatabaseColumn != ContentHolderCellColumn || cellInThisDatabaseRow != ContentHolderCellRow)
                 //{

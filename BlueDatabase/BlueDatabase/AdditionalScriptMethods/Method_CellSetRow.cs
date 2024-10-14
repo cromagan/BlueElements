@@ -73,6 +73,8 @@ public class Method_CellSetRow : Method_Database {
         value = columnToSet.AutoCorrect(value, true);
 
         row.CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
+        columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);
+
         return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 

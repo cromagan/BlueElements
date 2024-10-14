@@ -110,6 +110,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _showUndo;
     private SortierTyp _sortType;
     private bool _spellCheckingEnabled;
+    private string _systemInfo;
     private bool _textBearbeitungErlaubt;
 
     #endregion
@@ -155,6 +156,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //_keyColumnKey = -1;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
+        _systemInfo = string.Empty;
         _defaultRenderer = string.Empty;
         _rendererSettings = string.Empty;
         _maxTextLenght = 4000;
@@ -842,6 +844,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
+    public string SystemInfo {
+        get => _systemInfo;
+        private set {
+            if (IsDisposed) { return; }
+            if (_systemInfo == value) { return; }
+
+            _ = Database?.ChangeData(DatabaseDataType.ColumnSystemInfo, this, null, _adminInfo, value, Generic.UserName, DateTime.UtcNow, string.Empty);
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// Was in Textfeldern oder Datenbankzeilen für ein Suffix angezeigt werden soll. Beispiel: mm
     /// </summary>
@@ -904,6 +917,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool preverDropDown) {
         if (column is not { IsDisposed: false }) { return EditTypeTable.None; }
         return UserEditDialogTypeInTable(column.Function, preverDropDown && column.DropdownBearbeitungErlaubt, column.TextBearbeitungErlaubt, column.MultiLine);
+    }
+
+    public void AddSystemInfo(string type, string user) {
+        var t = SystemInfo.SplitAndCutByCrToList();
+        t.TagSet(type, user);
+        SystemInfo = t.SortedDistinctList().JoinWithCr();
+    }
+
+    public void AddSystemInfo(string type, Database sourcedatabase, string user) {
+        AddSystemInfo(type, sourcedatabase.Caption + " -> " + user);
     }
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
@@ -1374,21 +1397,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, new ColumnEventArgs(this));
 
-    public string QuickInfoText(string additionalText) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return string.Empty; }
-        var T = string.Empty;
-        if (!string.IsNullOrEmpty(_quickInfo)) { T += _quickInfo; }
-        if (Database.IsAdministrator() && !string.IsNullOrEmpty(_adminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + _adminInfo; }
-        if (Database.IsAdministrator() && _tags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + Tags.JoinWith("<br>"); }
-        T = T.Trim();
-        T = T.Trim("<br>");
-        T = T.Trim();
-        if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(additionalText)) {
-            T = "<b><u>" + additionalText + "</b></u><br><br>" + T;
-        }
-        return T;
-    }
-
     public string ReadableText() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return string.Empty; }
 
@@ -1435,7 +1443,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (IsDisposed) { return; }
-
 
         if (_function == ColumnFunction.Zeile) { ScriptType = ScriptType.Row; }
 
@@ -1510,6 +1517,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         ResetSystemToDefault(false);
         CheckIfIAmAKeyColumn();
+
+        SystemInfoReset(false);
     }
 
     public void ResetSystemToDefault(bool setOpticalToo) {
@@ -1857,6 +1866,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return QuickImage.Get(ImageCode.Warnung);
     }
 
+    public void SystemInfoReset(bool always) {
+        if (always || string.IsNullOrEmpty(SystemInfo)) {
+            SystemInfo = "Seit UTC: " + DateTime.Now.ToString5();
+        }
+    }
+
     //        case FormatHolder.Url:
     //            SetFormatForUrl();
     //            break;
@@ -2172,6 +2187,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.ColumnAdminInfo:
                 _adminInfo = newvalue;
+                break;
+
+            case DatabaseDataType.ColumnSystemInfo:
+                _systemInfo = newvalue;
                 break;
 
             case DatabaseDataType.RendererSettings:

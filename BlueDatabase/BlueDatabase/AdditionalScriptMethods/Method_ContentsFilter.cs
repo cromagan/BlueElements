@@ -58,6 +58,9 @@ public class Method_ContentsFilter : Method {
 
         var returncolumn = db.Column[attvar.ReadableText(0)];
         if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
+
+        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+
         var x = returncolumn.Contents(allFi.Rows);
         return new DoItFeedback(x);
     }

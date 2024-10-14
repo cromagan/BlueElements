@@ -45,20 +45,10 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEditor {
 
-
-    public void OpenScriptEditor() {
-        if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
-
-        var se = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
-        se.Row = _lastrow;
-
-    }
-
-
-
     #region Fields
 
     private ColumnItem? _column;
+
     private string _columnName = string.Empty;
 
     private RowItem? _lastrow;
@@ -120,9 +110,19 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     }
 
     public EditTypeFormula EditType { get => f.EditType; set => f.EditType = value; }
+
     public string Value => f.Value;
 
     #endregion
+
+    #region Methods
+
+    public void OpenScriptEditor() {
+        if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
+
+        var se = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        se.Row = _lastrow;
+    }
 
     //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
     //    var (column, row) = GetTmpVariables();
@@ -165,8 +165,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     //    //}
     //    hotItem = column;
     //}
-
-    #region Methods
 
     protected override void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) {
         try {
@@ -573,14 +571,13 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         f.Caption = Caption;
 
         if (realColumn != null) {
-   
-            QuickInfo = realColumn.QuickInfoText(string.Empty);
+            QuickInfo = Table.QuickInfoText(realColumn, string.Empty);
 
             f.GetStyleFrom(realColumn);
             if (Renderer_Abstract.RendererOf(realColumn) is Renderer_TextOneLine r) {
                 f.Suffix = r.Suffix;
             }
-        } 
+        }
 
         foreach (var thisControl in f.Controls) {
             switch (thisControl) {

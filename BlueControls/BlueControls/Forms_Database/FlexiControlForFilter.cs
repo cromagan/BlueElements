@@ -334,7 +334,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         #region QuickInfo erstellen
 
-        var qi = FilterSingleColumn.QuickInfoText(string.Empty);
+        var qi = Table.QuickInfoText(FilterSingleColumn, string.Empty);
 
         if (filterSingle != null) {
             if (string.IsNullOrEmpty(qi)) {
