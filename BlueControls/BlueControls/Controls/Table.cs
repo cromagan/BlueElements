@@ -432,25 +432,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return (rowData, vrc);
     }
 
-    public static string QuickInfoText(ColumnItem col, string additionalText) {
-        if (col.IsDisposed || col.Database is not { IsDisposed: false }) { return string.Empty; }
-
-
-        var T = string.Empty;
-        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
-        if (col.Database.IsAdministrator() && !string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
-        if (col.Database.IsAdministrator() && col.Tags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.Tags.JoinWith("<br>"); }
-        if (col.Database.IsAdministrator()) { T = T + "<br><br>" + Table.ColumnUseage(col); }
-        T = T.Trim();
-        T = T.Trim("<br>");
-        T = T.Trim();
-        if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(additionalText)) {
-            T = "<b><u>" + additionalText + "</b></u><br><br>" + T;
-        }
-        return T;
-    }
-
-    public static string ColumnUseage(ColumnItem? column) {
+    public static string ColumnUsage(ColumnItem? column) {
         if (column?.Database is not { IsDisposed: false } db) { return string.Empty; }
 
         var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
@@ -478,33 +460,19 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
+
         if (!string.IsNullOrEmpty(column.SystemInfo)) {
             t += "<br><br><b>Gesammelte Infos:</b><br>";
             t += column.SystemInfo;
         }
-
-
-
         var l = column.Contents();
         if (l.Count > 0) {
             t += "<br><br><b>Zusatz-Info:</b><br>";
             t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
         }
+
         return t;
     }
-
-    //public static Size ContentSize(ColumnItem column, RowItem row, AbstractRenderer renderer) {
-    //    if (column.Database is not { IsDisposed: false } db) { return new Size(16, 16); }
-
-    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-    //        var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
-    //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
-    //            : new Size(16, 16);
-    //    }
-
-    //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
-    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
-    //}
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
@@ -522,14 +490,24 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
+    //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
+    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+    //}
     public static void Database_AdditionalRepair(object sender, System.EventArgs e) {
         if (sender is not Database db) { return; }
 
         RepairColumnArrangements(db);
     }
 
+    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+    //        var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
+    //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
+    //            : new Size(16, 16);
+    //    }
     public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, FormatHolder.Text);
 
+    //public static Size ContentSize(ColumnItem column, RowItem row, AbstractRenderer renderer) {
+    //    if (column.Database is not { IsDisposed: false } db) { return new Size(16, 16); }
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column is not { IsDisposed: false }) { return; }
         if (row is not { IsDisposed: false }) { return; }
@@ -634,6 +612,23 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         e.RemoveString(Administrator, false);
 
         return Database.RepairUserGroups(e);
+    }
+
+    public static string QuickInfoText(ColumnItem col, string additionalText) {
+        if (col.IsDisposed || col.Database is not { IsDisposed: false }) { return string.Empty; }
+
+        var T = string.Empty;
+        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
+        if (col.Database.IsAdministrator() && !string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
+        if (col.Database.IsAdministrator() && col.Tags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.Tags.JoinWith("<br>"); }
+        if (col.Database.IsAdministrator()) { T = T + "<br><br>" + Table.ColumnUsage(col); }
+        T = T.Trim();
+        T = T.Trim("<br>");
+        T = T.Trim();
+        if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(additionalText)) {
+            T = "<b><u>" + additionalText + "</b></u><br><br>" + T;
+        }
+        return T;
     }
 
     public static void SearchNextText(string searchTxt, Table tableView, ColumnViewItem? column, RowData? row, out ColumnViewItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
@@ -2406,7 +2401,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 break;
         }
 
-
         if (e.Filter?.Column is { IsDisposed: false } col) {
             col.AddSystemInfo("Filter Clicked", Generic.UserName);
         }
@@ -2506,7 +2500,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var contentHolderCellColumn = viewItem.Column;
         var contentHolderCellRow = cellInThisDatabaseRow?.Row;
-
 
         if (contentHolderCellColumn == null) {
             NotEditableInfo("Keine Spalte angeklickt.");

@@ -394,9 +394,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 //row.CellSet(column, targetRow.KeyName);
                 //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                if (oldvalue != newvalue) {
+                if (repairallowed && oldvalue != newvalue) {
                     fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
                 }
+
+
+                if (targetColumn?.Database != null) {
+                    targetColumn.AddSystemInfo("Links to me", db, column.KeyName);
+                }
+
             } else {
                 if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
             }

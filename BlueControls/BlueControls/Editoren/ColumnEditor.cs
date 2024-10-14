@@ -252,7 +252,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(Table.ColumnUseage(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(Table.ColumnUsage(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
