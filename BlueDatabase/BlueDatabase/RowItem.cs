@@ -131,6 +131,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    /// <summary>
+    /// Wie wichtig ein Update ist. Kleine Zahlen sind wichtiger.
+    /// </summary>
+    public long UrgencyUpdate {
+        get {
+            if (NeedsRowInitialization()) { return 0; }
+            if (NeedsRowUpdateAfterChange()) { return 1; }
+            if (NeedsRowUpdate(false, true)) { return 2; }
+
+            if (Database?.Column.SysRowState is not { IsDisposed: false } srs) { return long.MaxValue; }
+
+            return CellGetDateTime(srs).Ticks;
+        }
+    }
+
     #endregion
 
     #region Methods

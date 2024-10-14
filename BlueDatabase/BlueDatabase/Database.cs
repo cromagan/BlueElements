@@ -1535,7 +1535,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) {
-                    return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, false);
+                    return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended);
                 }
 
                 return ExecuteScript(null, produktivphase, row, attributes, dbVariables, extended);

@@ -432,6 +432,24 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment));
     }
 
+    /// <summary>
+    /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
+    /// </summary>
+    /// <returns></returns>
+    public static List<RowItem> RowListToCheck() {
+        var r = new List<RowItem>();
+        List<Database> l = [.. Database.AllFiles];
+
+        foreach (var thisDb in l) {
+            if (thisDb is { IsDisposed: false and false } db) {
+                if (!db.CanDoValueChangedScript()) { continue; }
+                r.AddRange(db.Row);
+            }
+        }
+
+        return r.OrderBy(eintrag => eintrag.UrgencyUpdate).ToList();
+    }
+
     public static string UniqueKeyValue() {
         var x = 9999;
         do {
