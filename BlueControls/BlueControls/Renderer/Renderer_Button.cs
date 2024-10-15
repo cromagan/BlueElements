@@ -105,8 +105,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        var font = Skin.DesignOf(design, state).BFont?.Scale(scale);
-        if (font == null) { return; }
+        //var font = Skin.DesignOf(design, state).BFont.Scale(scale);
 
         var s = state;
 
@@ -169,9 +168,9 @@ public class Renderer_Button : Renderer_Abstract {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
     protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
-        var font = Skin.DesignOf(design, state).BFont?.Font();
+        var font = Skin.DesignOf(design, state).BFont.Font();
 
-        if (font == null) { return new Size(16, 32); }
+        //if (font == null) { return new Size(16, 32); }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
         return font.FormatedText_NeededSize(replacedText, QImage(content), 32);

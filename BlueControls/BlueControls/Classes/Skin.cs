@@ -37,37 +37,37 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
-//	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	Button	Standard_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Button	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	Button	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Button_OptionButton	Standard_MouseOver_HasFocus															{Name=Calibri, Size=10[K]15}
+//	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Win11/X10006
+//	Button	Standard_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
+//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Win11/X10006
+//	Button	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	Button	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Win11/X10006
+//	Button	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
+//	Button	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Win11/X10006
+//	Button_CheckBox	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Win11/X10006
+//	Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
+//	Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			Win11/X10006
+//	Button_CheckBox	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
+//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Button_CheckBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Win11/X10006
+//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
+//	Button_CheckBox	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
+//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Win11/X10006
+//	Button_OptionButton	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Win11/X10006
+//	Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
+//	Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			Win11/X10006
+//	Button_OptionButton	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
+//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Button_OptionButton	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Win11/X10006
+//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
+//	Button_OptionButton	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
+//	Button_OptionButton	Standard_MouseOver_HasFocus															Win11/X10006
 //	Button_AutoFilter	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6
 //	Button_AutoFilter	Checked	Rechteck					Solide		BFDFFF			Solide_1px	FF0000
 //	Button_AutoFilter	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8
@@ -96,64 +96,64 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Button_EckpunktSchieber	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0
 //	Button_EckpunktSchieber	Checked_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0
 //	Button_EckpunktSchieber_Phantom	Standard	Rechteck					Ohne					Solide_1px	D8D8D8
-//	TabStrip_Head	Standard	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	TabStrip_Head	Checked	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	TabStrip_Head	Checked_Disabled	Rechteck				5	Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	TabStrip_Head	Checked_MouseOver	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	TabStrip_Head	Standard_Disabled	Rechteck			-2	5	Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	TabStrip_Head	Standard_MouseOver	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	RibbonBar_Head	Standard	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15}
-//	RibbonBar_Head	Checked	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15}
-//	RibbonBar_Head	Checked_Disabled	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	RibbonBar_Head	Checked_MouseOver	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15, Color=0000ff}
-//	RibbonBar_Head	Standard_Disabled	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	RibbonBar_Head	Standard_MouseOver	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15, Color=0000ff}
-//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	CheckBox
-//	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	CheckBox_Checked
-//	CheckBox_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	CheckBox_Disabled_Checked
-//	CheckBox_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	CheckBox_Checked_MouseOver
-//	CheckBox_TextStyle	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	CheckBox_Disabled
-//	CheckBox_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	CheckBox_Checked
-//	CheckBox_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	CheckBox_Checked_MouseOver
-//	CheckBox_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	CheckBox_Checked
-//	CheckBox_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	CheckBox_MouseOver
-//	CheckBox_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	CheckBox_Checked_MouseOver
-//	CheckBox_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	CheckBox
-//	CheckBox_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	CheckBox_MouseOver
-//	OptionButton_TextStyle	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	OptionBox
-//	OptionButton_TextStyle	Checked	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	OptionBox_Checked
-//	OptionButton_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	OptionBox_Disabled_Checked
-//	OptionButton_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	OptionBox_Checked_MouseOver
-//	OptionButton_TextStyle	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	OptionBox_Disabled
-//	OptionButton_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox_Checked
-//	OptionButton_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox_Checked_MouseOver
-//	OptionButton_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox
-//	OptionButton_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	OptionBox_MouseOver
-//	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox_Checked_MouseOver
-//	OptionButton_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox
-//	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox_MouseOver
-//	TextBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	TextBox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	TextBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	TextBox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	TextBox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	TabStrip_Head	Standard	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			Win11/X10006
+//	TabStrip_Head	Checked	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	TabStrip_Head	Checked_Disabled	Rechteck				5	Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
+//	TabStrip_Head	Checked_MouseOver	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	TabStrip_Head	Standard_Disabled	Rechteck			-2	5	Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	TabStrip_Head	Standard_MouseOver	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			Win11/X10006
+//	RibbonBar_Head	Standard	Rechteck				5	Solide		FFFFFF			Ohne				Win11/X10006
+//	RibbonBar_Head	Checked	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Win11/X10006
+//	RibbonBar_Head	Checked_Disabled	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Win11 Disabled/X10006
+//	RibbonBar_Head	Checked_MouseOver	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Win11 Blue/X10006
+//	RibbonBar_Head	Standard_Disabled	Rechteck				5	Solide		FFFFFF			Ohne				Win11 Disabled/X10006
+//	RibbonBar_Head	Standard_MouseOver	Rechteck				5	Solide		FFFFFF			Ohne				Win11 Blue/X10006
+//	Caption	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				Win11/X10006	CheckBox
+//	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				Win11/X10006	CheckBox_Checked
+//	CheckBox_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	CheckBox_Disabled_Checked
+//	CheckBox_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	CheckBox_Checked_MouseOver
+//	CheckBox_TextStyle	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	CheckBox_Disabled
+//	CheckBox_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked
+//	CheckBox_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked_MouseOver
+//	CheckBox_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked
+//	CheckBox_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	CheckBox_MouseOver
+//	CheckBox_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked_MouseOver
+//	CheckBox_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox
+//	CheckBox_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_MouseOver
+//	OptionButton_TextStyle	Standard	Ohne					Ohne					Ohne				Win11/X10006	OptionBox
+//	OptionButton_TextStyle	Checked	Ohne					Ohne					Ohne				Win11/X10006	OptionBox_Checked
+//	OptionButton_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	OptionBox_Disabled_Checked
+//	OptionButton_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	OptionBox_Checked_MouseOver
+//	OptionButton_TextStyle	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	OptionBox_Disabled
+//	OptionButton_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_Checked
+//	OptionButton_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_Checked_MouseOver
+//	OptionButton_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox
+//	OptionButton_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	OptionBox_MouseOver
+//	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_Checked_MouseOver
+//	OptionButton_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox
+//	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_MouseOver
+//	TextBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	TextBox	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	TextBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	TextBox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	TextBox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
 //	ListBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
 //	ListBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
-//	ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
 //	Table_And_Pad	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
 //	Table_And_Pad	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
 //	Table_And_Pad	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
@@ -163,16 +163,16 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	EasyPic	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
 //	EasyPic	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
 //	EasyPic	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
-//	TextBox_Stufe3	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=12, Bold=True, Underline=True}
-//	TextBox_Stufe3	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}
-//	TextBox_Stufe3	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=12, Bold=True, Underline=True, Color=c0c0c0}
-//	TextBox_Stufe3	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}
-//	TextBox_Stufe3	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=12, Bold=True, Underline=True}
-//	TextBox_Bold	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15, Bold=True}
-//	TextBox_Bold	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}
+//	TextBox_Stufe3	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10001
+//	TextBox_Stufe3	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10001
+//	TextBox_Stufe3	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10001
+//	TextBox_Stufe3	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10001
+//	TextBox_Stufe3	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10001
+//	TextBox_Bold	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10007
+//	TextBox_Bold	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10007
 //	TextBox_Bold	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}
-//	TextBox_Bold	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}
-//	TextBox_Bold	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15, Bold=True}
+//	TextBox_Bold	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10007
+//	TextBox_Bold	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10007
 //	Slider_Hintergrund_Waagerecht	Standard	Rechteck					Solide		F0F0F0			Ohne
 //	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
 //	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8
@@ -184,52 +184,52 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8
 //	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
 //	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
-//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Ribbonbar_Button	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbon_ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbon_ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne				Win11/X10006
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Ribbonbar_Button	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Win11/X10006
+//	Ribbonbar_Button	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
+//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
 //	Ribbonbar_Button_Combobox	Standard	Ohne					Ohne					Ohne
 //	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne
 //	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Ohne					Ohne					Ohne
@@ -238,51 +238,51 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Ribbonbar_Button_Combobox	Standard_HasFocus	Ohne					Ohne					Ohne
 //	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Ohne					Ohne					Ohne
 //	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True}
-//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True, Color=9d9d9d}
+//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			Win11 Disabled/X10006
 //	Form_Standard	Standard	Rechteck					Solide		F0F0F0			Ohne
-//	Form_MsgBox	Standard	Rechteck					Solide		F0F0F0			Ohne				{Name=Calibri, Size=10[K]15}
-//	Form_QuickInfo	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15}
+//	Form_MsgBox	Standard	Rechteck					Solide		F0F0F0			Ohne				Win11/X10006
+//	Form_QuickInfo	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10006
 //	Form_DesktopBenachrichtigung	Standard	Rechteck					Solide		1F1F1F			Solide_3px	484848			{Name=Calibri, Size=12[K]5, Color=ffffff}
-//	Form_BitteWarten	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15}
-//	Form_AutoFilter	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			{Name=Calibri, Size=10[K]15}
-//	Form_AutoFilter	Standard_Disabled															{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Form_BitteWarten	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10006
+//	Form_AutoFilter	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			Win11/X10006
+//	Form_AutoFilter	Standard_Disabled															Win11 Disabled/X10006
 //	Form_KontextMenu	Standard	Rechteck					Solide		F0F0F0			Solide_1px	0
-//	Form_SelectBox_Dropdown	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			{Name=Calibri, Size=10[K]15}
-//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Item_DropdownMenu	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_DropdownMenu	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_DropdownMenu	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Item_DropdownMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Item_KontextMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_KontextMenu_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
-//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
-//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15, Bold=True}
-//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Autofilter	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Autofilter	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Autofilter	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Item_Autofilter	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
-//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15, Underline=True}
-//	Item_Listbox	Checked	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}
-//	Item_Listbox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
-//	Item_Listbox	Checked_MouseOver	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15, Underline=True}
-//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
-//	Item_Listbox	Checked_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}
-//	Item_Listbox	Standard_MouseOver	Rechteck					Solide		E5F3FF			Ohne				{Name=Calibri, Size=10[K]15, Underline=True}
-//	Item_Listbox	Standard_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}
-//	Item_Listbox_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
-//	Item_Listbox_Caption	Standard_Disabled	Rechteck					Solide		DFDFDF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}
-//	Item_Listbox_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15, Bold=True}
-//	Frame	Standard	Rechteck			-7		Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15}
-//	Frame	Standard_Disabled	Rechteck			-7		Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Form_SelectBox_Dropdown	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			Win11/X10006
+//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_DropdownMenu	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_DropdownMenu	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				Win11 Checked/X10006
+//	Item_DropdownMenu	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
+//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Item_DropdownMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Item_KontextMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_KontextMenu_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				Win11/X10007
+//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck					Solide		BFDFFF			Ohne				Win11/X10007
+//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10007
+//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_Autofilter	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_Autofilter	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				Win11 Checked/X10006
+//	Item_Autofilter	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
+//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Item_Autofilter	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
+//	Item_Listbox	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11 MouseOver/X10006
+//	Item_Listbox	Checked	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11/X10006
+//	Item_Listbox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
+//	Item_Listbox	Checked_MouseOver	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11 MouseOver/X10006
+//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
+//	Item_Listbox	Checked_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11/X10006
+//	Item_Listbox	Standard_MouseOver	Rechteck					Solide		E5F3FF			Ohne				Win11 MouseOver/X10006
+//	Item_Listbox	Standard_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11/X10006
+//	Item_Listbox_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				Win11/X10007
+//	Item_Listbox_Caption	Standard_Disabled	Rechteck					Solide		DFDFDF			Ohne				Win11 Checked/X10007
+//	Item_Listbox_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10007
+//	Frame	Standard	Rechteck			-7		Ohne					Solide_1px	ACACAC			Win11/X10006
+//	Frame	Standard_Disabled	Rechteck			-7		Ohne					Solide_1px	ACACAC			Win11 Disabled/X10006
 //	TabStrip_Body	Standard	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC
 //	TabStrip_Body	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC
 //	RibbonBar_Body	Standard	Rechteck					Solide		F4F5F6			Solide_1px	E5E4E5
@@ -295,10 +295,10 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	D8D8D8
 //	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	ACACAC
 //	Table_Cursor	Standard_HasFocus	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	3399FF
-//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Table_Cell	Standard	Ohne					Ohne					Ohne				Win11/X10006
 //	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Italic=True}
-//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
-//	Table_Cell_Chapter	Standard															{Name=Calibri, Size=15, Bold=True, Underline=True}
+//	Table_Column	Standard	Ohne					Ohne					Ohne				Win11/X10007
+//	Table_Cell_Chapter	Standard															Win11/X10003
 
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
 //	Button	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
@@ -1207,7 +1207,7 @@ public static class Skin {
         return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format), rowOfStyle);
     }
 
-    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).BFont ?? BlueFont.DefaultFont;
+    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).BFont;
 
     /// <summary>
     /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.
@@ -1294,44 +1294,46 @@ public static class Skin {
         }
     }
 
-    public static void InitStyles() => StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+    public static void InitStyles() {
+        StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+    }
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
         //_SkinString = "Windows10";
         //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Develop.AppName() == "SkinDesigner");
         //="Design.GenerateAndAdd(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
-        Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
         Design.Add(Enums.Design.Button_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_AutoFilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "FF0000", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_AutoFilter, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
@@ -1365,64 +1367,64 @@ public static class Skin {
         Design.Add(Enums.Design.Button_EckpunktSchieber_Phantom, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_EckpunktSchieber_Joint, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFD800", string.Empty, RahmenArt.Solide_1px, "FF6A00", string.Empty, "{Name=Calibri, Size=9[K]15, Color=FF6A00}", string.Empty);
 
-        Design.Add(Enums.Design.TabStrip_Head, States.Standard, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "{Name=Calibri, Size=10[K]15, Color=0000ff}", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=0000ff}", string.Empty);
-        Design.Add(Enums.Design.Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "CheckBox");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "CheckBox_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "CheckBox_Disabled_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "CheckBox_Checked_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "CheckBox_Disabled");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "CheckBox_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "CheckBox_Checked_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "CheckBox_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "CheckBox_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "CheckBox_Checked_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "CheckBox");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "CheckBox_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "OptionBox");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "OptionBox_Checked");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "OptionBox_Disabled_Checked");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "OptionBox_Checked_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "OptionBox_Disabled");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "OptionBox_Checked");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "OptionBox_Checked_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "OptionBox");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", "OptionBox_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "OptionBox_Checked_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "OptionBox");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "{Name=Calibri, Size=10[K]15}", "OptionBox_MouseOver");
-        Design.Add(Enums.Design.TextBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Standard, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11 Blue/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Blue/X10006", string.Empty);
+        Design.Add(Enums.Design.Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "CheckBox_Disabled_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox_Checked_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "CheckBox_Disabled");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox_Checked");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "OptionBox_Disabled_Checked");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox_Checked_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "OptionBox_Disabled");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_Checked");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_Checked_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_Checked_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_MouseOver");
+        Design.Add(Enums.Design.TextBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
         Design.Add(Enums.Design.ListBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.ListBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
         Design.Add(Enums.Design.Table_And_Pad, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_And_Pad, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_And_Pad, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
@@ -1435,16 +1437,16 @@ public static class Skin {
         Design.Add(Enums.Design.EasyPic, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.EasyPic, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.EasyPic, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=12, Bold=True, Underline=True}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=12, Bold=True, Underline=True, Color=c0c0c0}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=12, Bold=True, Underline=True}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}", string.Empty);
+        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10001", string.Empty);
+        Design.Add(Enums.Design.TextBox_Stufe3, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
+        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10001", string.Empty);
+        Design.Add(Enums.Design.TextBox_Stufe3, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
+        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10001", string.Empty);
+        Design.Add(Enums.Design.TextBox_Bold, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.TextBox_Bold, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10007", string.Empty);
         Design.Add(Enums.Design.TextBox_Bold, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
+        Design.Add(Enums.Design.TextBox_Bold, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10007", string.Empty);
+        Design.Add(Enums.Design.TextBox_Bold, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10007", string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
@@ -1456,52 +1458,52 @@ public static class Skin {
         Design.Add(Enums.Design.Slider_Hintergrund_Senkrecht, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Senkrecht, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Senkrecht, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
         Design.Add(Enums.Design.Ribbonbar_Button_Combobox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Ribbonbar_Button_Combobox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Ribbonbar_Button_Combobox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
@@ -1512,52 +1514,51 @@ public static class Skin {
         Design.Add(Enums.Design.RibbonBar_Frame, States.Standard, Enums.Kontur.Rechteck, 1, 1, 0, 1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15,Italic=True}", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Frame, States.Standard_Disabled, Enums.Kontur.Rechteck, 1, 1, 0, 1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15,Italic=True, Color=9d9d9d}", string.Empty);
         Design.Add(Enums.Design.Form_Standard, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Form_MsgBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Form_QuickInfo, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        // Design.GenerateAndAdd(enDesign.Form_DesktopBenachrichtigung, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "1F1F1F", string.Empty,string.Empty, enRahmenArt.Solide_3px, "484848", string.Empty,string.Empty, "{Name=Calibri, Size=12[K]5, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Form_DesktopBenachrichtigung, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "5D5D5D", string.Empty, "{Name=Calibri, Size=11[K]9}", string.Empty);
-        Design.Add(Enums.Design.Form_BitteWarten, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Form_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Form_AutoFilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
+        Design.Add(Enums.Design.Form_MsgBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_QuickInfo, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_DesktopBenachrichtigung, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "5D5D5D", string.Empty, "Win11/X10004", string.Empty);
+        Design.Add(Enums.Design.Form_BitteWarten, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_AutoFilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
         Design.Add(Enums.Design.Form_KontextMenu, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Form_SelectBox_Dropdown, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "{Name=Calibri, Size=10[K]15, Underline=True}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "{Name=Calibri, Size=10[K]15, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "{Name=Calibri, Size=10[K]15, Underline=True}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "E5F3FF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Underline=True}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.GroupBox, States.Standard, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.GroupBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.GroupBoxBold, States.Standard, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "40568D", string.Empty, "{Name=Calibri, Size=10[K]15, Color=FFFFFF}", string.Empty);
-        Design.Add(Enums.Design.GroupBoxBold, States.Standard_Disabled, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
+        Design.Add(Enums.Design.Form_SelectBox_Dropdown, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11 MouseOver/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11 MouseOver/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "E5F3FF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 MouseOver/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.GroupBox, States.Standard, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.GroupBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.GroupBoxBold, States.Standard, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "40568D", string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.GroupBoxBold, States.Standard_Disabled, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "ACACAC", string.Empty, "Win11 Disabled/X10006", string.Empty);
         Design.Add(Enums.Design.TabStrip_Body, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.TabStrip_Body, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.RibbonBar_Body, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, string.Empty, string.Empty);
@@ -1570,12 +1571,12 @@ public static class Skin {
         Design.Add(Enums.Design.Table_Lines_thin, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard_HasFocus, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Table_Cell, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
-        Design.Add(Enums.Design.Table_Cell, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Table_Cell_New, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15,Italic=True, color=aaaaaa}", string.Empty);
-        Design.Add(Enums.Design.Table_Cell_New, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15,Italic=True, color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.Table_Column, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True}", string.Empty);
-        Design.Add(Enums.Design.Table_Cell_Chapter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "{Name=Calibri, Size=15, Bold=True, Underline=True}", string.Empty);
+        Design.Add(Enums.Design.Table_Cell, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Table_Cell, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Table_Cell_New, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Table_Cell_New, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Table_Column, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Table_Cell_Chapter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10003", string.Empty);
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;
@@ -1585,108 +1586,15 @@ public static class Skin {
         PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
     }
 
-    internal static Color Color_Border(Design vDesign, States vState) => DesignOf(vDesign, vState).BorderColor1;
+    internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
 
     internal static BlueFont? GetBlueFont(int design, States state, RowItem? rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((Design)design, state, stufe);
 
-    //private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r) {
-    //    var cb = new ColorBlend();
-    //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-    //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-    //    var PR = Value(Row, col_Verlauf_Mitte, 0.05f);
-    //    if (PR < 0.06F) { PR = 0.06F; }
-    //    if (PR > 0.94F) { PR = 0.94F; }
-    //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
-    //    cb.Colors = new[] { c1, c2, c1, c1, c1.Darken(0.3), c1 };
-    //    cb.Positions = new[]
-    //    {
-    //        0.0F, (float) (PR - 0.05), (float) (PR + 0.05), (float) (1 - PR - 0.05), (float) (1 - PR + 0.05), 1.0F
-    //    };
-    //    lgb.InterpolationColors = cb;
-    //    lgb.GammaCorrection = true;
-    //    GR.FillRectangle(lgb, r);
-    //}
-    //private static void Draw_Back_Verlauf_Horizontal_2(Graphics GR, RowItem Row, Rectangle r) {
-    //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-    //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-    //    var lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Horizontal);
-    //    GR.FillRectangle(lgb, r);
-    //}
-    //private static void Draw_Back_Verlauf_Horizontal_3(Graphics GR, RowItem Row, Rectangle r) {
-    //    var cb = new ColorBlend();
-    //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-    //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-    //    var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
-    //    var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
-    //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
-    //    cb.Colors = new[] { c1, c2, c3 };
-    //    cb.Positions = new[] { 0.0F, PR, 1.0F };
-    //    lgb.InterpolationColors = cb;
-    //    lgb.GammaCorrection = true;
-    //    GR.FillRectangle(lgb, r);
-    //    GR.DrawLine(new Pen(c3), r.Left, r.Bottom - 1, r.Right, r.Bottom - 1);
-    //}
-    //private static void Draw_Back_Glossy(Graphics GR, RowItem Row, Rectangle r) {
-    //    var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-    //    var cb = new ColorBlend();
-    //    var c1 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
-    //    var c2 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
-    //    var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
-    //    var c4 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
-    //    var c5 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
-    //    cb.Colors = new[] { c1, c2, c3, c4, c5 };
-    //    cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-    //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
-    //        InterpolationColors = cb
-    //    };
-    //    Draw_Back_Glossy_TMP(lgb, r, GR, 20);
-    //    c2 = Color.White;
-    //    cb.Colors = new[] { c2, c3, c4, c5 };
-    //    cb.Positions = new[] { 0.0F, 0.5F, 0.75F, 1.0F };
-    //    lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5) {
-    //        InterpolationColors = cb
-    //    };
-    //    r.Inflate(-4, -4);
-    //    GR.SmoothingMode = SmoothingMode.HighQuality;
-    //    Draw_Back_Glossy_TMP(lgb, r, GR, 16);
-    //}
-    //private static void Draw_Back_GlossyPressed(Graphics GR, RowItem Row, Rectangle r) {
-    //    var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-    //    var cb = new ColorBlend();
-    //    var c5 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
-    //    var c4 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
-    //    var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
-    //    var c2 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
-    //    var c1 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
-    //    cb.Colors = new[] { c1, c2, c3, c4, c5 };
-    //    cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
-    //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
-    //        InterpolationColors = cb
-    //    };
-    //    Draw_Back_Glossy_TMP(lgb, r, GR, 20);
-    //    c2 = Color.White;
-    //    cb.Colors = new[] { c2, c3, c4, c5 };
-    //    cb.Positions = new[] { 0.0F, 0.5F, 0.75F, 1.0F };
-    //    lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5) {
-    //        InterpolationColors = cb
-    //    };
-    //    r.Inflate(-4, -4);
-    //    GR.SmoothingMode = SmoothingMode.HighQuality;
-    //    Draw_Back_Glossy_TMP(lgb, r, GR, 16);
-    //    //    GR.SmoothingModex = Drawing2D.SmoothingMode.None
-    //}
-    //private static void Draw_Back_Glossy_TMP(Brush b, Rectangle rect, Graphics GR, int RMinus) {
-    //    var r = Math.Min(RMinus, Math.Min(rect.Width, rect.Height) - 1);
-    //    var r2 = (int)Math.Truncate(r / 2.0);
-    //    r = r2 * 2;
-    //    GR.FillEllipse(b, new Rectangle(rect.Left, rect.Top - 1, r, r));
-    //    GR.FillEllipse(b, new Rectangle(rect.Right - r - 1, rect.Top - 1, r, r));
-    //    GR.FillEllipse(b, new Rectangle(rect.Left, rect.Bottom - r, r, r));
-    //    GR.FillEllipse(b, new Rectangle(rect.Right - r - 1, rect.Bottom - r, r, r));
-    //    GR.SmoothingMode = SmoothingMode.None;
-    //    GR.FillRectangle(b, new Rectangle(rect.Left + r2, rect.Top, rect.Width - r, rect.Height));
-    //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
-    //}
+
+
+
+
+
 
     internal static BlueFont? GetBlueFont(PadStyles padStyle, RowItem? rowOfStyle, int stufe) {
         switch (stufe) {
@@ -1695,45 +1603,29 @@ public static class Skin {
 
             case 3:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard:
-                        return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
-
-                    case PadStyles.Style_StandardFett:
-                        return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
-                        //    Case Else : Return BlueFont(vDesign, vState)
+                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
+                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
                 }
                 break;
 
             case 2:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard:
-                        return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
-
-                    case PadStyles.Style_StandardFett:
-                        return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
-                        //    Case Else : Return BlueFont(vDesign, vState)
+                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
+                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
                 }
                 break;
 
             case 1:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard:
-                        return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
-
-                    case PadStyles.Style_StandardFett:
-                        return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
-                        //  Case Else : Return BlueFont(vDesign, vState)
+                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
+                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
                 }
                 break;
 
             case 7:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard:
-                        return GetBlueFont(PadStyles.Style_StandardFett, rowOfStyle);
-
-                    case PadStyles.Style_StandardFett:
-                        return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
-                        //default: : Return BlueFont(vDesign, vState)
+                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_StandardFett, rowOfStyle);
+                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
                 }
                 break;
         }
@@ -1748,21 +1640,13 @@ public static class Skin {
             return GetBlueFont(design, state);
         }
         switch (stufe) {
-            case 4:
-                return GetBlueFont(design, state);
-
-            case 3:
-                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
-
-            case 2:
-                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
-
-            case 1:
-                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
-
-            case 7:
-                return GetBlueFont(Enums.Design.TextBox_Bold, state);
+            case 4: return GetBlueFont(design, state);
+            case 3: return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+            case 2: return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+            case 1: return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+            case 7: return GetBlueFont(Enums.Design.TextBox_Bold, state);
         }
+
         Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
         return GetBlueFont(design, state);
     }
@@ -1770,25 +1654,21 @@ public static class Skin {
     private static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
 
     private static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
-        var @string = styleDb.Cell.GetString(column, row);
-        if (string.IsNullOrEmpty(@string)) {
+        var fontString = styleDb.Cell.GetString(column, row);
+
+        if (string.IsNullOrEmpty(fontString)) {
             Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column?.KeyName + " - " + row?.CellFirstString());
-            return BlueFont.DefaultFont; // BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
+            return BlueFont.DefaultFont; 
         }
-        return BlueFont.Get(@string);
+        return BlueFont.Get(fontString);
     }
 
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
         switch (kon) {
-            case Enums.Kontur.Rechteck:
-                return Poly_Rechteck(r); // GR.SmoothingModex = Drawing2D.SmoothingMode.None
-            case Enums.Kontur.Rechteck_R4:
-                return Poly_RoundRec(r, 4); // GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-            case Enums.Kontur.Ohne:
-                return null;
-
-            default:
-                return Poly_Rechteck(r); //  GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            case Enums.Kontur.Rechteck: return Poly_Rechteck(r);
+            case Enums.Kontur.Rechteck_R4: return Poly_RoundRec(r, 4);
+            case Enums.Kontur.Ohne: return null;
+            default: return Poly_Rechteck(r);
         }
     }
 

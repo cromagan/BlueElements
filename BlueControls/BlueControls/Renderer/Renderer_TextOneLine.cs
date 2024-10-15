@@ -79,8 +79,8 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        var font = Skin.DesignOf(design, state).BFont?.Scale(scale);
-        if (font == null) { return; }
+        var font = Skin.DesignOf(design, state).BFont.Scale(scale);
+        //if (font == null) { return; }
 
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
@@ -148,9 +148,9 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     /// </summary>
     ///
     protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
-        var font = Skin.DesignOf(design, state).BFont?.Font();
+        var font = Skin.DesignOf(design, state).BFont.Font();
 
-        if (font == null) { return new Size(16, 16); }
+        //if (font == null) { return new Size(16, 16); }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
         return font.FormatedText_NeededSize(replacedText, null, 16);

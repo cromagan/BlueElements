@@ -56,14 +56,31 @@ public static class SkinDesignExtensions {
             Y2 = y2,
             HintergrundArt = hint
         };
+
         if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = bc2.FromHtmlCode(); }
         des.HintergrundArt = hint;
         des.RahmenArt = rahm;
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(f)) { des.BFont = BlueFont.Get(f); }
-        //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
+        if (!string.IsNullOrEmpty(f)) { 
+            
+
+            if(f.StartsWith("{")) {
+                des.BFont = BlueFont.Get(f);
+            }
+            else
+            {
+                var fl = (f + "/X10006").SplitAndCutByCr("/");
+                Skin.GetBlueFont(fl[0], fl[1],
+
+                des.BFont = BlueFont.Get(f);
+            }
+
+
+
+        }
+
         des.Image = pic;
         des.Status = status;
         dictStats.Add(status, des);
@@ -78,7 +95,7 @@ public class SkinDesign {
 
     public Color BackColor1 { get; set; }
     public Color BackColor2 { get; set; }
-    public BlueFont? BFont { get; set; }
+    public BlueFont BFont { get; set; } = BlueFont.DefaultFont;
     public Color BorderColor1 { get; set; }
     public Color BorderColor2 { get; set; }
     public HintergrundArt HintergrundArt { get; set; }
