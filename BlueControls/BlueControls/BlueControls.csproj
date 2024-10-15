@@ -625,11 +625,11 @@
     <Compile Include="Forms_Database\ExportDialog.Designer.cs">
       <DependentUpon>ExportDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\FontSelectDialog.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Editoren\FontEditor.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Editoren\FontSelectDialog.Designer.cs">
-      <DependentUpon>FontSelectDialog.cs</DependentUpon>
+    <Compile Include="Editoren\FontEditor.Designer.cs">
+      <DependentUpon>FontEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Form.cs">
       <SubType>Form</SubType>
@@ -927,8 +927,8 @@
       <DependentUpon>FloatingForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\FontSelectDialog.resx">
-      <DependentUpon>FontSelectDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Editoren\FontEditor.resx">
+      <DependentUpon>FontEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form.resx">

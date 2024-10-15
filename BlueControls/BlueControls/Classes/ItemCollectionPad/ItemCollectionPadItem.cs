@@ -599,13 +599,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    public IEnumerator<AbstractPadItem> GetEnumerator() {
-        return ((IEnumerable<AbstractPadItem>)_internal).GetEnumerator();
-    }
+    public IEnumerator<AbstractPadItem> GetEnumerator() => ((IEnumerable<AbstractPadItem>)_internal).GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() {
-        return ((IEnumerable)_internal).GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =

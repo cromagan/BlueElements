@@ -404,9 +404,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused();
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        OnContextMenuInit(e);
-    }
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;

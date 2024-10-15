@@ -120,9 +120,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return txt + DatabaseInput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         //var id = GetRowFrom?.OutputColorId ?? - 1;

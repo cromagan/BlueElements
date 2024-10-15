@@ -182,9 +182,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         return txt + DatabaseInput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Groupbox);
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Groupbox);
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

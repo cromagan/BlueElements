@@ -122,9 +122,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
     /// <param name="style"></param>
     /// <param name="translate"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
-        return string.Empty;
-    }
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) => string.Empty;
 
     #endregion
 }

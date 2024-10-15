@@ -154,9 +154,7 @@ public partial class PadEditor : FormWithStatusBar {
         }
     }
 
-    private void Pad_DrawModChanged(object sender, System.EventArgs e) {
-        btnVorschauModus.Checked = Pad.ShowInPrintMode;
-    }
+    private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }

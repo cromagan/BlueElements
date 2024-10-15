@@ -239,9 +239,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         return txt + Column?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Stift, 16);
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stift, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (!ForPrinting) {

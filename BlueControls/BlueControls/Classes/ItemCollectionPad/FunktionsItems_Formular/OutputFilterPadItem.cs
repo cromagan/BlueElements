@@ -228,9 +228,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return txt + DatabaseOutput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Trichter, 16);
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (!ForPrinting) {

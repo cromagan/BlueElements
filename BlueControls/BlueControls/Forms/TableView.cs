@@ -201,11 +201,13 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
             case "Skript":
                 if (row is { IsDisposed: false }) {
-                    var t = row.ExecuteScript(null, ev[1], true, 10, null, true, false).Protocol.JoinWithCr();
-                    if (string.IsNullOrEmpty(t)) {
+                    var t = row.ExecuteScript(null, ev[1], true, 10, null, true, false);
+
+
+                    if (t.Successful && t.AllOk) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
                     } else {
-                        MessageBox.Show("Wähernd der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>" + t, ImageCode.Kreuz, "Ok");
+                        MessageBox.Show("Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>" + t.Protocol.JoinWithCr(), ImageCode.Kreuz, "Ok");
                     }
                 }
 

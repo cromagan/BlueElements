@@ -182,9 +182,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         }
     }
 
-    private void btnAktualisieren_Click(object sender, System.EventArgs e) {
-        RefreshPad();
-    }
+    private void btnAktualisieren_Click(object sender, System.EventArgs e) => RefreshPad();
 
     private void btnCopy_Click(object sender, System.EventArgs e) {
         RefreshPad();
@@ -206,9 +204,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         _panelMover.Enabled = true;
     }
 
-    private void pad_MouseLeave(object sender, System.EventArgs e) {
-        _panelMover.Enabled = true;
-    }
+    private void pad_MouseLeave(object sender, System.EventArgs e) => _panelMover.Enabled = true;
 
     private void pad_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e) {
         _panelMoveDirection = 1;

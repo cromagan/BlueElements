@@ -457,7 +457,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (cola) { t += " - Spalten-Anordnungen<br>"; }
         if (column.UsedInScript()) { t += " - Skripte<br>"; }
         if (db.ZeilenQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
+        //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
 
@@ -1202,9 +1202,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        OnContextMenuInit(e);
-    }
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
     public void ImportBdb() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }

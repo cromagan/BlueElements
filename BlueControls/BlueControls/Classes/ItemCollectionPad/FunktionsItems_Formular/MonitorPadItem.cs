@@ -80,9 +80,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return txt + DatabaseInput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Monitor, 16);
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Monitor, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         //var id = GetRowFrom?.OutputColorId ?? -1;

@@ -476,9 +476,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         return txt + DatabaseInput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         _eTxt ??= new ExtText(Design.Button, States.Standard);

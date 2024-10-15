@@ -284,9 +284,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         se.Database = DatabaseInput;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         DrawArrowOutput(gr, positionModified, scale, ForPrinting, OutputColorId);

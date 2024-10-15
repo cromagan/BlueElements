@@ -82,9 +82,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
         return txt + DatabaseOutput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() {
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
-    }
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         // Die Eigangszeile ist immer vom übergeordenetem Formular und wird einfach weitergegeben.

@@ -26,6 +26,12 @@ using BlueControls.Controls;
 
 namespace BlueControls.Editoren;
 
+
+/// <summary>
+/// Standard element, dass das Grundgerüst eines Editors Darstellt.
+/// Es müssen die Routinen SetValuesToFormula, Clear und InitializeComponentDefaultValues überschrieben werden.
+/// </summary>
+
 public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
     #region Fields
@@ -70,8 +76,8 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
             _toEdit = null; // Keine Steuerelement Änderungen auffangen
 
-            if (!ObjectSeted) {
-                ObjectSeted = true;
+            if (!DefaultValuesInitialized) {
+                DefaultValuesInitialized = true;
                 InitializeComponentDefaultValues();
             }
 
@@ -90,7 +96,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     /// <summary>
     /// Ob die Standardwerte der Elemente erstellt wurden. Z.B. Komboboxen befüllt
     /// </summary>
-    protected bool ObjectSeted { get; private set; }
+    protected bool DefaultValuesInitialized { get; private set; }
 
     #endregion
 
@@ -123,18 +129,13 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         GroupBox.DrawGroupBox(this, e.Graphics, s, _groupBoxStyle, t);
     }
 
-    //public virtual IEditable? GetCloneOfCurrent() {
-    //    if (!string.IsNullOrEmpty(Error)) { return null; }
 
-    //    Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-    //    return null;
-    //}
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
 
         if (!Visible || Disposing || IsDisposed) { return; }
 
-        if (ObjectSeted) { return; }
+        if (DefaultValuesInitialized) { return; }
 
         var merk = _toEdit;
         _toEdit = null; // Keine Steuerelement Änderungen auffangen
