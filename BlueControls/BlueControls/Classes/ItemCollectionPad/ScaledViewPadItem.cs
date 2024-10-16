@@ -27,12 +27,13 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ScaledViewPadItem : FixedRectanglePadItem {
+public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne {
 
     #region Fields
 
@@ -41,6 +42,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
     private ReadOnlyCollection<string> _includedjointPoints = new([]);
 
     private float _scale = 1f;
+    private PadStyles _style = PadStyles.Style_Standard;
     private float _textScale = 3.07f;
 
     #endregion
@@ -98,6 +100,16 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         }
     }
 
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            ProcessStyleChange();
+            OnPropertyChanged();
+        }
+    }
+
     public float TextScale {
         get => _textScale;
         set {
@@ -146,6 +158,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Caption", _caption);
+        result.ParseableAdd("Style", _style);
         result.ParseableAdd("Scale", _scale);
         result.ParseableAdd("IncludedJointPoints", _includedjointPoints.JoinWithCr());
         result.ParseableAdd("AdditionalScale", _textScale);
@@ -165,6 +178,10 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
 
             case "alignment":
                 _ausrichtung = (Alignment)byte.Parse(value);
+                return true;
+
+            case "style":
+                _style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -215,7 +232,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         }
 
         var allScale = Parent?.SheetStyleScale * _textScale * scale ?? _textScale * scale;
-        var bFont = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
+        var bFont = Skin.GetBlueFont(_style, Parent?.SheetStyle);
         var font = bFont.Font(allScale);
 
         Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale));

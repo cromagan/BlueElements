@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using static BlueBasics.Converter;
@@ -34,7 +35,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class LinePadItem : AbstractPadItem {
+public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     #region Fields
 
@@ -42,6 +43,7 @@ public class LinePadItem : AbstractPadItem {
     private readonly PointM _point2;
     private string _calcTempPointsCode = string.Empty;
     private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
+    private PadStyles _style = PadStyles.Style_Standard;
     private List<PointF>? _tempPoints;
 
     #endregion
@@ -61,7 +63,7 @@ public class LinePadItem : AbstractPadItem {
         MovablePoint.Add(_point2);
         PointsForSuccesfullyMove.AddRange(MovablePoint);
         CalculateJointMiddle(_point1, _point2);
-        Stil = format;
+        _style = format;
         _tempPoints = [];
         Linien_Verhalten = ConectorStyle.Direct;
     }
@@ -71,8 +73,19 @@ public class LinePadItem : AbstractPadItem {
     #region Properties
 
     public static string ClassId => "LINE";
+
     public override string Description => string.Empty;
+
     public ConectorStyle Linien_Verhalten { get; set; }
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            OnPropertyChanged();
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -140,6 +153,7 @@ public class LinePadItem : AbstractPadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Connection", Linien_Verhalten);
+        result.ParseableAdd("Style", _style);
         return result;
     }
 
@@ -147,6 +161,10 @@ public class LinePadItem : AbstractPadItem {
         switch (key) {
             case "connection":
                 Linien_Verhalten = (ConectorStyle)IntParse(value);
+                return true;
+
+            case "style":
+                _style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -188,11 +206,11 @@ public class LinePadItem : AbstractPadItem {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Stil != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefiniert) {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
+                gr.DrawLine(Skin.GetBlueFont(_style, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
     }

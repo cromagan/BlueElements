@@ -33,14 +33,16 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class DynamicSymbolPadItem : RectanglePadItem {
+public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Fields
 
     private string _script = string.Empty;
+    private PadStyles _style = PadStyles.Style_Standard;
 
     #endregion
 
@@ -68,6 +70,15 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         set {
             if (value == _script) { return; }
             _script = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
             OnPropertyChanged();
         }
     }
@@ -125,6 +136,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Style", _style);
         result.ParseableAdd("Script", _script);
         return result;
     }
@@ -133,6 +145,10 @@ public class DynamicSymbolPadItem : RectanglePadItem {
         switch (key) {
             case "script":
                 _script = value.FromNonCritical();
+                return true;
+
+            case "style":
+                _style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);

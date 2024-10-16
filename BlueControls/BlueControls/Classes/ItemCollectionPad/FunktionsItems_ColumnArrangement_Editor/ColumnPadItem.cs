@@ -37,6 +37,12 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor
 /// </summary>
 public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
+    #region Fields
+
+    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
+
+    #endregion
+
     #region Constructors
 
     public ColumnPadItem(ColumnItem c, bool permanent, Renderer_Abstract? renderer) : base(c.Database?.TableName + "|" + c.KeyName) {

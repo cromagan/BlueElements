@@ -26,6 +26,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueDatabase;
 using static BlueBasics.Converter;
 
@@ -54,7 +55,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended {
+public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended, IStyleableOne {
 
     #region Fields
 

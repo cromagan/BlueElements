@@ -33,7 +33,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
+public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableOne {
 
     #region Fields
 
@@ -62,6 +62,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     private float _länge;
 
+    private PadStyles _style = PadStyles.Style_Standard;
     private string _textOben = string.Empty;
 
     private float _winkel;
@@ -88,7 +89,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
         Text_Unten = string.Empty;
         Nachkommastellen = 1;
 
-        Stil = PadStyles.Style_StandardAlternativ;
+        _style = PadStyles.Style_StandardAlternativ;
         _point1.Parent = this;
         _point2.Parent = this;
         _textPoint.Parent = this;
@@ -123,6 +124,15 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
     public string Präfix { get; set; } = string.Empty;
 
     public float Skalierung { get; set; } = 3.07f;
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string Suffix { get; set; } = string.Empty;
 
@@ -219,6 +229,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
         result.ParseableAdd("refix", Präfix);
         result.ParseableAdd("Suffix", Suffix);
         result.ParseableAdd("AdditionalScale", Skalierung);
+        result.ParseableAdd("Style", _style);
         return result;
     }
 
@@ -266,6 +277,10 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
             case "additionalscale":
                 Skalierung = FloatParse(value.FromNonCritical());
                 return true;
+
+            case "style":
+                _style = (PadStyles)IntParse(value);
+                return true;
         }
         return base.ParseThis(key, value);
     }
@@ -287,9 +302,9 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
     protected override RectangleF CalculateUsedArea() {
-        if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
+        if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
         var geszoom = Parent?.SheetStyleScale * Skalierung ?? Skalierung;
-        var f2 = Skin.GetBlueFont(Stil, Parent?.SheetStyle).Font(geszoom);
+        var f2 = Skin.GetBlueFont(_style, Parent?.SheetStyle).Font(geszoom);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -305,9 +320,9 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Stil != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefiniert) {
             var geszoom = Parent?.SheetStyleScale * Skalierung * scale ?? scale;
-            var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
+            var f = Skin.GetBlueFont(_style, Parent?.SheetStyle);
             var pfeilG = f.Font(geszoom).Size * 0.8f;
             var pen2 = f.Pen(scale);
 

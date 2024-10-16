@@ -22,6 +22,7 @@ using System.Drawing;
 using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 
 public static class SkinDesignExtensions {
 
@@ -80,7 +81,7 @@ public static class SkinDesignExtensions {
     #endregion
 }
 
-public class SkinDesign {
+public class SkinDesign : IStyleableOne {
 
     #region Properties
 

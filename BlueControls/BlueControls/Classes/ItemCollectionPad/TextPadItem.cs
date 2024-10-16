@@ -36,11 +36,13 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class TextPadItem : RectanglePadItem, ICanHaveVariables {
+public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
 
     #region Fields
 
     private Alignment _ausrichtung;
+
+    private PadStyles _style = PadStyles.Style_Standard;
 
     /// <summary>
     /// Der Original-Text. Bei änderungen deses Textes wird die Variable _text_replaced ebenfalls zurückgesetzt.
@@ -91,6 +93,16 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     }
 
     public override string Description => string.Empty;
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            ProcessStyleChange();
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     ///
@@ -151,6 +163,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         result.ParseableAdd("ReadableText", _textOriginal);
         result.ParseableAdd("Alignment", _ausrichtung);
         result.ParseableAdd("AdditionalScale", _textScale);
+        result.ParseableAdd("Style", _style);
         return result;
     }
 
@@ -170,9 +183,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
                 _ausrichtung = (Alignment)byte.Parse(value);
                 return true;
 
-            //case "format":
-            //    Format = (DataFormat)IntParse(value);
-            //    return true;
+            case "style":
+                _style = (PadStyles)IntParse(value);
+                return true;
 
             case "additionalscale":
                 _textScale = FloatParse(value.FromNonCritical());
@@ -223,7 +236,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Stil != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefiniert) {
             gr.SetClip(positionModified);
             var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
@@ -248,13 +261,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     private void MakeNewETxt() {
         _txt = null;
-        if (Stil != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefiniert) {
             if (Parent == null) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 return;
             }
 
-            _txt = new ExtText(Stil, Parent.SheetStyle);
+            _txt = new ExtText(_style, Parent.SheetStyle);
             _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist

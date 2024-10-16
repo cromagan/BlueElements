@@ -23,6 +23,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
@@ -31,7 +32,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
+public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, IStyleable {
 
     #region Fields
 

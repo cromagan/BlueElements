@@ -23,7 +23,8 @@ using BlueBasics.Interfaces;
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Wird verwendet, wenn das Steuerelement sich selbst zeichnet und nicht als Container vorgesehen ist.
+/// Wird verwendet, wenn ein einzigartiges Fenster eines Objektes angezeigt werden soll.
+/// Typischerweiße bei einem Editor
 /// </summary>
 public interface IUniqueWindow : IDisposableExtended {
 

@@ -23,6 +23,7 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
 using static BlueBasics.Converter;
@@ -31,7 +32,7 @@ using static BlueDatabase.Database;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class TablePadItem : RectanglePadItem {
+public class TablePadItem : RectanglePadItem, IStyleable {
 
     #region Fields
 

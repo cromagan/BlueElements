@@ -172,10 +172,6 @@ public class ComicCompPadItem : AbstractPadItem {
         base.PointMoved(sender, e);
     }
 
-    public override void ProcessStyleChange() {
-        // Keine Variablen zum Reseten, ein Invalidate reicht
-    }
-
     public override string ReadableText() => "Bewegliches Element";
 
     public void SetCoordinates(Rectangle r) {

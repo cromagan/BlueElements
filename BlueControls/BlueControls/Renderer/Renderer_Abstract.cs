@@ -26,12 +26,13 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor {
+public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor, IStyleableOne {
 
     #region Fields
 

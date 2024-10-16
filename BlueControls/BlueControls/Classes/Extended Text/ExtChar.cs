@@ -19,10 +19,11 @@
 
 using System.Drawing;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar {
+public abstract class ExtChar: IStyleableOne {
 
     #region Fields
 

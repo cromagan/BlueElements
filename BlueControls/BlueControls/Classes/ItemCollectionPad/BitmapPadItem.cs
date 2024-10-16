@@ -39,7 +39,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
+public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
 
     #region Fields
 
@@ -50,6 +50,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
     private string _platzhalter_Für_Layout = string.Empty;
 
+    private PadStyles _style = PadStyles.Style_Standard;
+
     #endregion
 
     #region Constructors
@@ -57,11 +59,11 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
     public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
-        Bitmap = bmp;
+        _bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
         Hintergrund_Weiß_Füllen = true;
-        Bild_Modus = SizeModes.EmptySpace;
-        Stil = PadStyles.Undefiniert; // Kein Rahmen
+        _bild_Modus = SizeModes.EmptySpace;
+        _style = PadStyles.Undefiniert; // Kein Rahmen
     }
 
     #endregion
@@ -95,6 +97,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         get => _platzhalter_Für_Layout; set {
             if (_platzhalter_Für_Layout == value) { return; }
             _platzhalter_Für_Layout = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
             OnPropertyChanged();
         }
     }
@@ -187,6 +198,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
         result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
         result.ParseableAdd("Image", Bitmap);
+        result.ParseableAdd("Style", _style);
 
         return result;
     }
@@ -211,6 +223,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
             case "placeholder":
                 _platzhalter_Für_Layout = value.FromNonCritical();
+                return true;
+
+            case "style":
+                _style = (PadStyles)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -328,9 +344,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         } catch {
             Generic.CollectGarbage();
         }
-        if (Stil != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefiniert) {
             if (Parent is { SheetStyle: not null, SheetStyleScale: > 0 }) {
-                gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), r1);
+                gr.DrawRectangle(Skin.GetBlueFont(_style, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), r1);
             }
         }
 

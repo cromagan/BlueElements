@@ -24,6 +24,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using static BlueBasics.Converter;
@@ -32,7 +33,13 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class SymbolPadItem : RectanglePadItem {
+public class SymbolPadItem : RectanglePadItem, IStyleableOne {
+
+    #region Fields
+
+    private PadStyles _style = PadStyles.Style_Standard;
+
+    #endregion
 
     #region Constructors
 
@@ -56,6 +63,16 @@ public class SymbolPadItem : RectanglePadItem {
     public float Randdicke { get; set; }
 
     public Color Randfarbe { get; set; }
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            ProcessStyleChange();
+            OnPropertyChanged();
+        }
+    }
 
     public Symbol Symbol { get; set; }
 
@@ -92,6 +109,7 @@ public class SymbolPadItem : RectanglePadItem {
         result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
         result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
         result.ParseableAdd("BorderWidth", Randdicke);
+        result.ParseableAdd("Style", _style);
         return result;
     }
 
@@ -112,6 +130,10 @@ public class SymbolPadItem : RectanglePadItem {
             case "borderwidth":
                 _ = FloatTryParse(value.FromNonCritical(), out var tRanddicke);
                 Randdicke = tRanddicke;
+                return true;
+
+            case "style":
+                _style = (PadStyles)IntParse(value);
                 return true;
 
             case "fill": // alt: 28.11.2019

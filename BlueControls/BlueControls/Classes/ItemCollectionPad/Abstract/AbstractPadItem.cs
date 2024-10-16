@@ -43,8 +43,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     #region Fields
 
-    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-
     public string Page = string.Empty;
 
     /// <summary>
@@ -68,8 +66,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     private string _keyName;
 
     private ItemCollectionPadItem? _parent;
-
-    private PadStyles _style = PadStyles.Style_Standard;
 
     private RectangleF _usedArea;
 
@@ -109,7 +105,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    //public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
     public abstract string Description { get; }
 
     public bool ForPrinting {
@@ -199,16 +194,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             if (_parent is { } icpi) { return icpi.ShowJointPoints; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
             return false;
-        }
-    }
-
-    public PadStyles Stil {
-        get => _style;
-        set {
-            if (_style == value) { return; }
-            _style = value;
-            ProcessStyleChange();
-            OnPropertyChanged();
         }
     }
 
@@ -450,7 +435,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Key", KeyName);
-        result.ParseableAdd("Style", _style);
         result.ParseableAdd("Print", _beiExportSichtbar);
         result.ParseableAdd("QuickInfo", QuickInfo);
         //result.ParseableAdd("ZoomPadding", _zoomPadding);
@@ -507,12 +491,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
                 return true;
 
-            case "format": // = Textformat!!!
-            case "design":
-            case "style":
-                _style = (PadStyles)IntParse(value);
-                return true;
-
             case "removetoo": // TODO: Alt, löschen, 02.03.2020
                 //RemoveToo.AddRange(value.FromNonCritical().SplitAndCutByCr());
                 return true;
@@ -559,11 +537,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         OnPropertyChanged();
     }
 
-    /// <summary>
-    /// Teilt dem Item mit, dass das Design geändert wurde.
-    /// Es löst kein Ereigniss aus.
-    /// </summary>
-    public virtual void ProcessStyleChange() { }
 
     public abstract string ReadableText();
 

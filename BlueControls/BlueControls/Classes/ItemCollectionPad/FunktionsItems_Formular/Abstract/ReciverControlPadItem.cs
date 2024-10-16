@@ -54,6 +54,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     #region Fields
 
+    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
+
     private static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
     private readonly List<string> _getFilterFromKeys = [];
     private ReadOnlyCollection<ReciverSenderControlPadItem>? _getFilterFrom;

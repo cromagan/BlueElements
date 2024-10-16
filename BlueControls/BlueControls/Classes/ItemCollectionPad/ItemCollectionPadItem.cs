@@ -52,7 +52,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable {
 
     #region Fields
 
@@ -211,19 +211,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             OnPropertyChanged();
         }
     }
-
-    //public SizeF SheetSizeInMm {
-    //    set {
-    //        if (IsDisposed) { return; }
-    //        //if (Math.Abs(value.Width - _sheetSizeInMm.Width) < DefaultTolerance &&
-    //        //    Math.Abs(value.Height - _sheetSizeInMm.Height) < DefaultTolerance) { return; }
-    //        //_sheetSizeInMm = new SizeF(value.Width, value.Height);
-
-    //        SetCoordinates(UsedArea with { Width = MmToPixel(value.Width, Dpi), Height = MmToPixel(value.Height, Dpi) });
-
-    //        //OnPropertyChanged();
-    //    }
-    //}
 
     public RowItem? SheetStyle {
         get => _sheetStyle;
