@@ -31,7 +31,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor, IPropertyChangedFeedback {
+public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor {
 
     #region Fields
 
@@ -121,7 +121,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         if (string.IsNullOrEmpty(content)) { return string.Empty; }
 
         var key = (int)style + "|" + (int)translate + "|" + TextSizeKey(_lastCode, content);
-        if (key == null) { return string.Empty; }
 
         if (Replaced.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 

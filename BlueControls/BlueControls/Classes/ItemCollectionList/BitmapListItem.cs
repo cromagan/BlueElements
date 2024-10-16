@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -113,7 +112,7 @@ public class BitmapListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpperInvariant().Contains(filterText.ToUpperInvariant()) || _imageFilename.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == ListBoxAppearance.FileSystem) {
             return 110 + (_captionlines * ConstMy);
         }

@@ -102,7 +102,7 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
     private void txbFilterText_TextChanged(object sender, System.EventArgs e) {
         if (ToEdit is not FilterItem { IsDisposed: false } fi) { return; }
 
-        fi.SearchValue = (new List<string>() { txbFilterText.Text }).AsReadOnly();
+        fi.SearchValue = (new List<string> { txbFilterText.Text }).AsReadOnly();
     }
 
     #endregion

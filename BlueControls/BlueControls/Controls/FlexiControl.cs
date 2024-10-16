@@ -32,6 +32,7 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -489,7 +490,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         OnValueChanged();
     }
 
-    protected virtual void CommandButton_Click(object sender, System.EventArgs e) {
+    protected void CommandButton_Click(object sender, System.EventArgs e) {
         if (_editType != EditTypeFormula.Button) { return; }
         //ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
         OnButtonClicked();
@@ -695,7 +696,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Entfernt alle Controls und löst dessen die Events auf. Setzt _allinitialized auf false.
     /// </summary>
-    protected virtual void RemoveAll() {
+    protected void RemoveAll() {
         List<Control> l = [];
         for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
 
@@ -833,7 +834,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void Control_Create_Line() {
         Line control = new() {
             Enabled = Enabled,
-            Orientation = BlueBasics.Enums.Orientation.Waagerecht
+            Orientation = Orientation.Waagerecht
         };
         StandardBehandlung(control);
     }

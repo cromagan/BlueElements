@@ -27,6 +27,7 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms;
 
@@ -83,8 +84,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         control.GetContextMenuItems(ce);
 
-        if (ce.Cancel) { return; }
-
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf(ContextMenuCommands.Abbruch));
@@ -99,7 +98,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate, controlDesign, itemDesign, autosort);
 
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) {
-        var (biggestItemX, _, heightAdded, _) = BlueControls.Controls.ListBox.ItemData(items, itemDesign);
+        var (biggestItemX, _, heightAdded, _) = ListBox.ItemData(items, itemDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = controlDesign;
         lstbx.Translate = translate;

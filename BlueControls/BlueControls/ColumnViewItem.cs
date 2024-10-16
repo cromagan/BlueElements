@@ -27,6 +27,7 @@ using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -142,7 +143,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         if (_drawWidth is { } v) { return v; }
 
-        if (_column == null || _column.IsDisposed) {
+        if (_column is not { IsDisposed: false }) {
             _drawWidth = Table.GetPix(16, scale);
             return (int)_drawWidth;
         }
@@ -249,8 +250,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         var renderer = GetRenderer();
 
-        if (renderer == null) { return 16; }
-
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
@@ -266,7 +265,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return newContentWidth;
     }
 
-    private void Cell_CellValueChanged(object sender, EventArgs.CellEventArgs e) {
+    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Column == _column) { _drawWidth = null; }
     }
 

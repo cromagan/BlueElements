@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -37,12 +38,14 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ItemClicked")]
-public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
+public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
     #region Fields
 
@@ -497,9 +500,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         ValidateCheckStates(null, string.Empty);
     }
 
-    public virtual void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public virtual void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void Remove(string keyName) {
         if (string.IsNullOrEmpty(keyName)) { return; }
@@ -635,9 +638,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                     itenc++;
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
-                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign, renderer);
+                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
                     } else {
-                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign, renderer);
+                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
                     }
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
@@ -812,8 +815,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         //}
     }
 
-    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
     //protected override void OnDoubleClick(System.EventArgs e) {
     //    if (!Enabled) { return; }
     //    var nd = MouseOverNode(MousePos().X, MousePos().Y);
@@ -826,20 +827,20 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         DoMouseMovement();
     }
 
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         if (e.X != _mousepos.X || e.Y != _mousepos.Y) { _mousemoved = true; }
         _mousepos = new Point(e.X, e.Y);
         DoMouseMovement();
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
         var nd = MouseOverNode(e.X, e.Y);
         if (nd is { Enabled: false }) { return; }
         switch (e.Button) {
-            case System.Windows.Forms.MouseButtons.Left:
+            case MouseButtons.Left:
                 if (nd != null) {
                     if (_appearance is ListBoxAppearance.Listbox or
                                       ListBoxAppearance.Listbox_Boxes or
@@ -856,13 +857,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
                 break;
 
-            case System.Windows.Forms.MouseButtons.Right:
+            case MouseButtons.Right:
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, MouseOverNode(e.X, e.Y), e);
                 break;
         }
     }
 
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!SliderY.Visible) { return; }
         _mousemoved = false;
@@ -872,7 +873,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     protected override void OnParentEnabledChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         DoMouseMovement();
-        base.OnEnabledChanged(e);
+        base.OnParentEnabledChanged(e);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -1162,6 +1163,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 

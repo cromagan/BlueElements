@@ -41,12 +41,6 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     #endregion
 
-    #region Constructors
-
-    public Renderer_TextOneLine() : base() { }
-
-    #endregion
-
     #region Properties
 
     public static string ClassId => "TextOneLine";

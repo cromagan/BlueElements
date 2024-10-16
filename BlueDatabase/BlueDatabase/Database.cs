@@ -26,6 +26,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -35,6 +36,7 @@ using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Constants;
@@ -42,6 +44,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
 
@@ -76,7 +79,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
     /// </summary>
-    private static System.Threading.Timer? _pendingChangesTimer;
+    private static Timer? _pendingChangesTimer;
 
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _pendingChangesTimer
@@ -93,10 +96,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _caption = string.Empty;
-    private System.Threading.Timer? _checker;
+    private Timer? _checker;
     private int _checkerTickCount = -5;
     private string _columnArrangements = string.Empty;
-    private bool _completing;
     private string _createDate;
     private string _creator;
     private string _editNormalyError = string.Empty;
@@ -510,7 +512,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         alf.AddRange(AllFiles);
 
         foreach (var thisDb in alf) {
-            var possibletables = thisDb.AllAvailableTables(allreadychecked, mustBeFreezed);
+            var possibletables = thisDb.AllAvailableTables(allreadychecked);
 
             allreadychecked.Add(thisDb);
 
@@ -1261,7 +1263,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         GC.SuppressFinalize(this);
     }
 
-    public virtual string EditableErrorReason(EditableErrorReasonType mode) {
+    public string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
 
         if (DoingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
@@ -1343,9 +1345,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
 
-        foreach (var thisCom in BlueScript.Methods.Method.AllMethods) {
+        foreach (var thisCom in Method.AllMethods) {
             if (thisCom.Verwendung.Count < 3) {
-                if (ev.Script.ContainsWord(thisCom.Command + thisCom.StartSequence, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
+                if (ev.Script.ContainsWord(thisCom.Command + thisCom.StartSequence, RegexOptions.IgnoreCase)) {
                     thisCom.Verwendung.AddIfNotExists($"Datenbank: {Caption} / {ev.KeyName}");
                     if (thisCom.LastArgMinCount == 3) {
                         thisCom.Verwendung.Add("[WEITERE VERWENDUNGEN VORHANDEN]");
@@ -1400,7 +1402,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             var vars = CreateVariableCollection(row, script.AllVariabelsReadOnly, dbVariables, script.VirtalColumns, extended, script.AddSysCorrect);
 
-            var meth = BlueScript.Methods.Method.GetMethods(script.AllowedMethods(row, extended));
+            var meth = Method.GetMethods(script.AllowedMethods(row, extended));
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
 
@@ -1425,7 +1427,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     var t = "Datenbank: " + Caption + "\r\n" +
                                       "Benutzer: " + UserName + "\r\n" +
                                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                                      "Extended: " + extended.ToString() + "\r\n";
+                                      "Extended: " + extended + "\r\n";
                     if (row is { } r) { t = t + "Zeile: " + r.CellFirstString() + "\r\n"; }
 
                     ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
@@ -2024,7 +2026,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //_ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
-    public virtual string NextRowKey() {
+    public string NextRowKey() {
         if (IsDisposed) { return string.Empty; }
         var tmp = 0;
         string key;
@@ -2116,7 +2118,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return false;
     }
 
-    public virtual void RefreshColumnsData(params ColumnItem[] columns) {
+    public void RefreshColumnsData(params ColumnItem[] columns) {
         if (columns.Length == 0) { return; }
 
         foreach (var thiscol in columns) {
@@ -2151,7 +2153,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    public virtual void RepairAfterParse() {
+    public void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten DatabaseMU nicht mehr funktioniert
 
         if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
@@ -2275,7 +2277,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
     }
 
-    protected virtual List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked, string mustBeFreezed) {
+    protected virtual List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
@@ -2303,7 +2305,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
-            _checker = new System.Threading.Timer(Checker_Tick);
+            _checker = new Timer(Checker_Tick);
             _ = _checker.Change(2000, 2000);
         }
     }
@@ -2345,20 +2347,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime startTimeUtc, DateTime endTimeUtc) => ([], null);
 
-    protected bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is { IsDisposed: false and false } db) {
-                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    _ = thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
 
     protected void OnAdditionalRepair() {
@@ -2385,30 +2373,29 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (!string.IsNullOrEmpty(m)) { return false; }
 
-        _completing = true;
-        if (string.IsNullOrEmpty(Filename)) { _completing = false; return false; }
+        if (string.IsNullOrEmpty(Filename)) { return false; }
 
         Develop.SetUserDidSomething();
         var dataUncompressed = ToListOfByte(this, 1200, setfileStateUtcDateTo);
 
-        if (dataUncompressed == null) { _completing = false; return false; }
+        if (dataUncompressed == null) { return false; }
         Develop.SetUserDidSomething();
 
         var tmpFileName = WriteTempFileToDisk(dataUncompressed);
         Develop.SetUserDidSomething();
-        if (string.IsNullOrEmpty(tmpFileName)) { _completing = false; return false; }
+        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
 
         if (FileExists(Backupdateiname())) {
-            if (!DeleteFile(Backupdateiname(), false)) { _completing = false; return false; }
+            if (!DeleteFile(Backupdateiname(), false)) { return false; }
         }
         Develop.SetUserDidSomething();
         // Haupt-Datei wird zum Backup umbenannt
-        if (!MoveFile(Filename, Backupdateiname(), false)) { _completing = false; return false; }
+        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
 
         if (FileExists(Filename)) {
             // Paralleler Prozess hat gespeichert?!?
             _ = DeleteFile(tmpFileName, false);
-            _completing = false;
+
             return false;
         }
 
@@ -2418,7 +2405,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         HasPendingChanges = false;
         FileStateUtcDate = setfileStateUtcDateTo;
 
-        _completing = false;
         return true;
     }
 
@@ -3137,8 +3123,22 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private void GenerateTimer() {
         if (_pendingChangesTimer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _pendingChangesTimer = new System.Threading.Timer(CheckSysUndo);
+        _pendingChangesTimer = new Timer(CheckSysUndo);
         _ = _pendingChangesTimer.Change(10000, 10000);
+    }
+
+    private bool IsFileAllowedToLoad(string fileName) {
+        foreach (var thisFile in AllFiles) {
+            if (thisFile is { IsDisposed: false and false } db) {
+                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
+                    _ = thisFile.Save();
+                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /// <summary>

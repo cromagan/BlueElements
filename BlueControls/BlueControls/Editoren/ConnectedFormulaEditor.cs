@@ -21,12 +21,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
@@ -37,6 +39,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
@@ -316,7 +319,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             i.Add(ItemOf(thisl));
         }
 
-        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, Enums.CheckBehavior.SingleSelection, null, Enums.AddType.None);
+        var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (x is not { Count: 1 }) { return; }
 
@@ -443,7 +446,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         CheckButtons();
     }
 
-    private void GenQuickInfo(Controls.Button b, ReciverControlPadItem from) {
+    private void GenQuickInfo(Button b, ReciverControlPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt += "<br><br><b><u>Beschreibung:</b></u>";
@@ -482,7 +485,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var toparse = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var toparse = File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);

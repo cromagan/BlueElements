@@ -40,6 +40,7 @@ using BlueDatabase;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 
 namespace BlueControls.Controls;
 
@@ -184,7 +185,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             _items.Breite = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Width, 100);
             _items.Höhe = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Height, 100);
             _items.RandinMm = new Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
-        };
+        }
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
@@ -304,7 +305,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
             LastClickedItem = null;
 
-            if (e.HotItem is PointM pm) {
+            if (e.HotItem is PointM) {
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Verschieben));
                 e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
@@ -346,7 +347,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public void ShowPrinterPageSetup() {
         RepairPrinterData();
-        var x = Forms.PageSetupDialog.Show(DruckerDokument, false);
+        var x = PageSetupDialog.Show(DruckerDokument, false);
         if (x == null) { return; }
         DruckerDokument = x;
     }
@@ -367,7 +368,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         oriD.DefaultPageSettings.Margins.Bottom = (int)MmToPixel(_items.RandinMm.Bottom, 100);
         oriD.DefaultPageSettings.Margins.Left = (int)MmToPixel(_items.RandinMm.Left, 100);
         oriD.DefaultPageSettings.Margins.Right = (int)MmToPixel(_items.RandinMm.Right, 100);
-        var nOriD = Forms.PageSetupDialog.Show(oriD, true);
+        var nOriD = PageSetupDialog.Show(oriD, true);
         if (nOriD == null) { return; }
 
         _items.Breite = PixelToMm(nOriD.DefaultPageSettings.PaperSize.Width, 100);

@@ -22,13 +22,14 @@ using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_MsgBox : BlueScript.Methods.Method {
+public class Method_MsgBox : Method {
 
     #region Properties
 

@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using BlueDatabase;
 using BlueDatabase.AdditionalScriptMethods;
+using BlueDatabase.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -62,7 +63,7 @@ public class Method_ImportLinked : Method_Database {
         foreach (var thisColumn in db.Column) {
             if (thisColumn.IsDisposed) { continue; }
 
-            if (thisColumn.Function != BlueDatabase.Enums.ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { continue; }
+            if (thisColumn.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
             if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }

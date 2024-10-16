@@ -35,10 +35,6 @@ public class VariablePadItem : Variable {
 
     public VariablePadItem(string name, AbstractPadItem? value, bool ronly, string comment) : base(name, ronly, comment) => _item = value;
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-    /// </summary>
-    /// <param name="name"></param>
     public VariablePadItem(string name) : this(name, null, true, string.Empty) { }
 
     public VariablePadItem(AbstractPadItem? value) : this(DummyName(), value, true, string.Empty) { }

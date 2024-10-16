@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using Orientation = BlueBasics.Enums.Orientation;
+using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {
@@ -17,26 +16,26 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.capInfo = new BlueControls.Controls.Caption();
-            this.lstDone = new BlueControls.Controls.ListBox();
+            this.capInfo = new Caption();
+            this.lstDone = new ListBox();
             this.SuspendLayout();
             // 
             // capInfo
             // 
             this.capInfo.CausesValidation = false;
-            this.capInfo.Dock = System.Windows.Forms.DockStyle.Top;
-            this.capInfo.Location = new System.Drawing.Point(0, 0);
+            this.capInfo.Dock = DockStyle.Top;
+            this.capInfo.Location = new Point(0, 0);
             this.capInfo.Name = "capInfo";
-            this.capInfo.Size = new System.Drawing.Size(401, 24);
+            this.capInfo.Size = new Size(401, 24);
             // 
             // lstDone
             // 
-            this.lstDone.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstDone.AddAllowed = AddType.None;
             this.lstDone.AutoSort = true;
-            this.lstDone.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstDone.Location = new System.Drawing.Point(0, 24);
+            this.lstDone.Dock = DockStyle.Fill;
+            this.lstDone.Location = new Point(0, 24);
             this.lstDone.Name = "lstDone";
-            this.lstDone.Size = new System.Drawing.Size(401, 384);
+            this.lstDone.Size = new Size(401, 384);
             this.lstDone.TabIndex = 1;
             // 
             // Monitor
@@ -44,7 +43,7 @@ namespace BlueControls.Controls
             this.Controls.Add(this.lstDone);
             this.Controls.Add(this.capInfo);
             this.Name = "Monitor";
-            this.Size = new System.Drawing.Size(401, 408);
+            this.Size = new Size(401, 408);
             this.ResumeLayout(false);
 
         }

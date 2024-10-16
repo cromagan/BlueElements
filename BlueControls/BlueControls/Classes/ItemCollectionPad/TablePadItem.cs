@@ -54,9 +54,7 @@ public class TablePadItem : RectanglePadItem {
     public static string ClassId => "Table";
 
     public Database? Database {
-        get {
-            return _database;
-        }
+        get => _database;
 
         set {
             if (IsDisposed) { return; }

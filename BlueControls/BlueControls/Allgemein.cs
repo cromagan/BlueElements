@@ -20,6 +20,7 @@
 using System.Collections.Specialized;
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
 
@@ -49,7 +50,7 @@ public static class Allgemein {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
                 if (thisit is Database db) {
-                    db.AdditionalRepair += Controls.Table.Database_AdditionalRepair;
+                    db.AdditionalRepair += Table.Database_AdditionalRepair;
                 }
             }
         }
@@ -60,7 +61,7 @@ public static class Allgemein {
                     dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
                 if (thisit is Database db) {
-                    db.AdditionalRepair += Controls.Table.Database_AdditionalRepair;
+                    db.AdditionalRepair += Table.Database_AdditionalRepair;
                 }
             }
         }

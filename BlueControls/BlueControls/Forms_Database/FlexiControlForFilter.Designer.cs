@@ -1,6 +1,8 @@
-﻿
+﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
+using BlueDatabase.Enums;
 
 namespace BlueControls.Controls{
     partial class FlexiControlForFilter {
@@ -14,21 +16,21 @@ namespace BlueControls.Controls{
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.f = new BlueControls.Controls.FlexiControl();
+            this.f = new FlexiControl();
             this.SuspendLayout();
             // 
             // f
             // 
-            this.f.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.f.EditType = BlueDatabase.Enums.EditTypeFormula.Line;
-            this.f.Location = new System.Drawing.Point(0, 0);
+            this.f.Dock = DockStyle.Fill;
+            this.f.EditType = EditTypeFormula.Line;
+            this.f.Location = new Point(0, 0);
             this.f.Name = "f";
-            this.f.Size = new System.Drawing.Size(150, 150);
+            this.f.Size = new Size(150, 150);
             this.f.TabIndex = 0;
-            this.f.ButtonClicked += new System.EventHandler(this.F_ButtonClick);
+            this.f.ButtonClicked += new EventHandler(this.F_ButtonClick);
             this.f.ControlAdded += new ControlEventHandler(F_ControlAdded);
             this.f.ControlRemoved += new ControlEventHandler(F_ControlRemoved);
-            this.f.ValueChanged += new System.EventHandler(this.F_ValueChanged);
+            this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
             // 
             // FlexiControlForFilter
             // 
@@ -39,6 +41,6 @@ namespace BlueControls.Controls{
         }
         #endregion
 
-        private BlueControls.Controls.FlexiControl f;
+        private FlexiControl f;
     }
 }

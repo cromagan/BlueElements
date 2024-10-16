@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
+using BlueControls.EventArgs;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -76,7 +77,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasDatabase {
         return true;
     }
 
-    private void lstFilter_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+    private void lstFilter_RemoveClicked(object sender, AbstractListItemEventArgs e) {
         if (ToEdit is not FilterCollection { IsDisposed: false } fc) { return; }
         if (e.Item is ReadableListItem { Item: FilterItem fi }) {
             fc.Remove(fi);

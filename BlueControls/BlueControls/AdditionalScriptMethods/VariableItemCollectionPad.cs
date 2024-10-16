@@ -35,10 +35,6 @@ public class VariableItemCollectionPad : Variable {
 
     public VariableItemCollectionPad(string name, ItemCollectionPadItem? value, bool ronly, string comment) : base(name, ronly, comment) => _itemCol = value;
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-    /// </summary>
-    /// <param name="name"></param>
     public VariableItemCollectionPad(string name) : this(name, null, true, string.Empty) { }
 
     public VariableItemCollectionPad(ItemCollectionPadItem? value) : this(DummyName(), value, true, string.Empty) { }

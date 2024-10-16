@@ -37,12 +37,6 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #endregion
 
-    #region Constructors
-
-    public Renderer_DynamicSymbol() : base() { }
-
-    #endregion
-
     #region Properties
 
     public static string ClassId => "DynamicSymbol";

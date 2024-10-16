@@ -26,6 +26,7 @@ using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class Method_If : Method {
 
     #region Fields

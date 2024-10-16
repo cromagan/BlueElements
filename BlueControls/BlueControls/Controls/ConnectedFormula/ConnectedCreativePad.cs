@@ -19,6 +19,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -28,6 +29,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -192,7 +194,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             //GenerateBottleFromRow(tblAlleBehaelter.CursorPosRow.Row);
             //var sk = FloatParse(GetSetting("Solid Edge Skalierung").Replace(".", ","));
             var i = pad?.Items?.ToBitmap(DefaultCopyScale);
-            System.Windows.Forms.Clipboard.SetImage(i);
+            Clipboard.SetImage(i);
             Notification.Show("Kopiert!", ImageCode.Smiley);
         } catch {
             MessageBox.Show("Fehler beim Kopieren!");
@@ -206,7 +208,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
     private void pad_MouseLeave(object sender, System.EventArgs e) => _panelMover.Enabled = true;
 
-    private void pad_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e) {
+    private void pad_MouseMove(object sender, MouseEventArgs e) {
         _panelMoveDirection = 1;
         _panelMover.Enabled = true;
     }

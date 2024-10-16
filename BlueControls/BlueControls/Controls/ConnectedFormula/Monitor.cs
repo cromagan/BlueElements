@@ -22,14 +22,13 @@ using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class Monitor : GenericControlReciver, IBackgroundNone //UserControl
+public sealed partial class Monitor : GenericControlReciver //UserControl
     {
     #region Fields
 

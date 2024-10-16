@@ -28,6 +28,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using static BlueBasics.Constants;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -117,7 +118,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public static bool ScaleWarnung() {
         if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
-        Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
+        MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
         return true;
     }
 

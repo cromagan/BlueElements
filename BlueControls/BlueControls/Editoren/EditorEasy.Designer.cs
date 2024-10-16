@@ -1,10 +1,13 @@
-﻿namespace BlueControls.Editoren;
+﻿using System.ComponentModel;
+using System.Drawing;
+
+namespace BlueControls.Editoren;
 
 partial class EditorEasy {
     /// <summary> 
     /// Erforderliche Designervariable.
     /// </summary>
-    private System.ComponentModel.IContainer components = null;
+    private IContainer components = null;
 
     /// <summary> 
     /// Verwendete Ressourcen bereinigen.
@@ -29,7 +32,7 @@ partial class EditorEasy {
             // EditorAbstract
             // 
             this.Name = "EditorAbstract";
-            this.Size = new System.Drawing.Size(421, 380);
+            this.Size = new Size(421, 380);
             this.ResumeLayout(false);
 
     }

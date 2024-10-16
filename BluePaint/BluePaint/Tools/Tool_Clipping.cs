@@ -24,6 +24,7 @@ using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Generic;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
@@ -37,7 +38,7 @@ public partial class Tool_Clipping {
         CheckMinMax();
         btnAutoZ_Click(null, null);
         ZuschnittOK_Click(null, null);
-        BlueControls.Forms.MessageBox.Show("Automatisch zugeschnitten.");
+        MessageBox.Show("Automatisch zugeschnitten.");
     }
 
     #endregion
@@ -48,11 +49,10 @@ public partial class Tool_Clipping {
         if (originalPic == null) { return; }
         Pen penBlau = new(Color.FromArgb(150, 0, 0, 255));
         DrawZusatz(e, originalPic);
-        if (e.Current == null) { return; }
         e.DrawLine(penBlau, e.Current.TrimmedX, -1, e.Current.TrimmedX, originalPic.Height);
         e.DrawLine(penBlau, -1, e.Current.TrimmedY, originalPic.Width, e.Current.TrimmedY);
 
-        if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {
+        if (e.Current.Button == MouseButtons.Left) {
             e.DrawLine(penBlau, e.MouseDown.X, -1, e.MouseDown.X, originalPic.Height);
             e.DrawLine(penBlau, -1, e.MouseDown.Y, originalPic.Width, e.MouseDown.Y);
         }
@@ -121,7 +121,7 @@ public partial class Tool_Clipping {
 
     private void WollenSieDenZuschnittÜbernehmen() {
         if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
-        if (BlueControls.Forms.MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
+        if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
         ZuschnittOK_Click(null, System.EventArgs.Empty);
     }
 

@@ -33,42 +33,42 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.btnDropDown = new BlueControls.Controls.Button();
-            this.btnEdit = new BlueControls.Controls.Button();
+            this.btnDropDown = new Button();
+            this.btnEdit = new Button();
             this.SuspendLayout();
             // 
             // btnDropDown
             // 
-            this.btnDropDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDropDown.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom) 
+                                                       | AnchorStyles.Right)));
             this.btnDropDown.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
-            this.btnDropDown.Location = new System.Drawing.Point(476, 0);
+            this.btnDropDown.Location = new Point(476, 0);
             this.btnDropDown.Name = "btnDropDown";
-            this.btnDropDown.Size = new System.Drawing.Size(24, 150);
+            this.btnDropDown.Size = new Size(24, 150);
             this.btnDropDown.TabIndex = 1;
-            this.btnDropDown.LostFocus += new System.EventHandler(this.btnDropDown_LostFocus);
-            this.btnDropDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ShowMenu);
+            this.btnDropDown.LostFocus += new EventHandler(this.btnDropDown_LostFocus);
+            this.btnDropDown.MouseUp += new MouseEventHandler(this.ShowMenu);
             // 
             // btnEdit
             // 
-            this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEdit.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom) 
+                                                   | AnchorStyles.Right)));
             this.btnEdit.ImageCode = "Stift|14";
-            this.btnEdit.Location = new System.Drawing.Point(452, 0);
+            this.btnEdit.Location = new Point(452, 0);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.QuickInfo = "Dahinter stehendes<br>Element bearbeiten";
-            this.btnEdit.Size = new System.Drawing.Size(24, 150);
+            this.btnEdit.Size = new Size(24, 150);
             this.btnEdit.TabIndex = 2;
             this.btnEdit.Visible = false;
-            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
-            this.btnEdit.MouseLeave += new System.EventHandler(this.btnEdit_MouseLeave);
+            this.btnEdit.Click += new EventHandler(this.btnEdit_Click);
+            this.btnEdit.MouseLeave += new EventHandler(this.btnEdit_MouseLeave);
             // 
             // ComboBox
             // 
             this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.btnDropDown);
             this.Name = "ComboBox";
-            this.Size = new System.Drawing.Size(500, 150);
+            this.Size = new Size(500, 150);
             this.ResumeLayout(false);
 
         }

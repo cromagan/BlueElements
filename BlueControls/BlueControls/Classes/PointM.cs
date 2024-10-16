@@ -99,8 +99,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public event EventHandler<MoveEventArgs>? Moved;
 
-    public event EventHandler<MoveEventArgs>? Moving;
-
     public event EventHandler? PropertyChanged;
 
     #endregion
@@ -206,8 +204,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
-    public void OnMoving(MoveEventArgs e) => Moving?.Invoke(this, e);
-
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public List<string> ParseableItems() {
@@ -290,7 +286,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         var my = (float)Math.Round(y - _y, 6);
 
         if (mx == 0 && my == 0) { return; }
-        OnMoving(new MoveEventArgs(byMouse));
         _x = x;
         _y = y;
         OnMoved(new MoveEventArgs(byMouse));

@@ -1,12 +1,7 @@
-using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using Button = BlueControls.Controls.Button;
-using GroupBox = BlueControls.Controls.GroupBox;
-using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -26,33 +21,33 @@ namespace BlueControls.BlueDatabaseDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.tblUndo = new BlueControls.Controls.Table();
+            this.tblUndo = new Table();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(853, 24);
+            this.capStatusBar.Size = new Size(853, 24);
             this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 416);
-            this.pnlStatusBar.Size = new System.Drawing.Size(853, 24);
+            this.pnlStatusBar.Location = new Point(0, 416);
+            this.pnlStatusBar.Size = new Size(853, 24);
             // 
             // tblUndo
             // 
-            this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblUndo.Location = new System.Drawing.Point(0, 0);
+            this.tblUndo.Dock = DockStyle.Fill;
+            this.tblUndo.Location = new Point(0, 0);
             this.tblUndo.Name = "tblUndo";
-            this.tblUndo.Size = new System.Drawing.Size(853, 416);
+            this.tblUndo.Size = new Size(853, 416);
             this.tblUndo.TabIndex = 97;
             // 
             // UserInfo
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(853, 440);
+            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(853, 440);
             this.Controls.Add(this.tblUndo);
             this.Name = "UserInfo";
             this.Tag = "";

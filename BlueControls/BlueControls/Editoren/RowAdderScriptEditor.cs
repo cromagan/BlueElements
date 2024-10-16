@@ -135,7 +135,7 @@ public sealed partial class RowAdderScriptEditor : FormWithStatusBar, IHasDataba
 
         if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
             DatabaseScriptEditor._befehlsReferenz.Close();
-            DatabaseScriptEditor._befehlsReferenz?.Dispose();
+            DatabaseScriptEditor._befehlsReferenz.Dispose();
             DatabaseScriptEditor._befehlsReferenz = null;
         }
 

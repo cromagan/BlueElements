@@ -63,7 +63,7 @@ public class CellLikeListItem : AbstractListItem {
         return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         //if (_cellRenderer == null) { return new Size(16, 0); }

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -83,7 +84,7 @@ public class Method_AddRowsUnique : Method_Database {
 
         foreach (var thisKey in keys) {
             var allFi = new FilterCollection(db, "Method_AddRows") {
-                new(c, Enums.FilterType.Istgleich_GroßKleinEgal, thisKey)
+                new(c, FilterType.Istgleich_GroßKleinEgal, thisKey)
             };
 
             var fb = Method_RowUnique.UniqueRow(ld, allFi, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);

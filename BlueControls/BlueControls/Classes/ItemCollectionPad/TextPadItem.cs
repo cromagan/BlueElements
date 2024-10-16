@@ -114,7 +114,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables {
         set {
             value = Math.Max(value, 0.01f);
             value = Math.Min(value, 20);
-            if (value == _textScale) { return; }
+            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
             OnPropertyChanged();
         }

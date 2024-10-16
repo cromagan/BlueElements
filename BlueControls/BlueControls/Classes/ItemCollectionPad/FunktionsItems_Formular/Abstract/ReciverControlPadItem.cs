@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -49,17 +50,17 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPropertyChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
+public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IErrorCheckable {
 
     #region Fields
 
-    public static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
+    private static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
     private readonly List<string> _getFilterFromKeys = [];
     private ReadOnlyCollection<ReciverSenderControlPadItem>? _getFilterFrom;
     private List<int> _inputColorId = [];
     private ReadOnlyCollection<string> _visibleFor = new([]);
 
-    private XPosition _X_Position = XPosition.frei;
+    private XPosition _xPosition = XPosition.frei;
 
     #endregion
 
@@ -109,7 +110,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     public override bool MoveXByMouse {
         get {
-            if (_X_Position != XPosition.frei) { return false; }
+            if (_xPosition != XPosition.frei) { return false; }
             return base.MoveXByMouse;
         }
     }
@@ -165,16 +166,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public XPosition X_Position {
-        get {
-            return _X_Position;
-        }
+        get => _xPosition;
 
         set {
-            if (_X_Position == value) { return; }
-            _X_Position = value;
+            if (_xPosition == value) { return; }
+            _xPosition = value;
             OnPropertyChanged();
 
-            if (_X_Position != XPosition.frei) {
+            if (_xPosition != XPosition.frei) {
                 PointMoved(_pLo, new MoveEventArgs(false));
             }
         }
@@ -263,10 +262,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
         if (Parent is null) { return result; }
 
-        if (this is ReciverSenderControlPadItem iiss) {
-            var outp = iiss.DatabaseOutput;
-        }
-
         if (AllowedInputFilter != AllowedInputFilter.None) {
             result.Add(new FlexiControl("Eingang:", widthOfControl, true));
 
@@ -283,24 +278,19 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
             switch (AllowedInputFilter) {
                 case AllowedInputFilter.One:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, ComboBoxStyle.DropDownList));
                     break;
 
                 case AllowedInputFilter.More:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList));
                     break;
 
                 case AllowedInputFilter.More | AllowedInputFilter.None:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList));
                     break;
 
                 case AllowedInputFilter.One | AllowedInputFilter.None:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, System.Windows.Forms.ComboBoxStyle.DropDownList));
-                    break;
-
-                default:
-
-                    //case AllowedInputFilter.None:
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, ComboBoxStyle.DropDownList));
                     break;
             }
         }
@@ -317,7 +307,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
                 vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
-                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, System.Windows.Forms.ComboBoxStyle.DropDownList));
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, ComboBoxStyle.DropDownList));
             }
         }
 
@@ -371,7 +361,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
             result.ParseableAdd("VisibleFor", VisibleFor, false);
         }
 
-        result.ParseableAdd("XLock", _X_Position);
+        result.ParseableAdd("XLock", _xPosition);
 
         result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
@@ -393,7 +383,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
                 return true;
 
             case "xlock":
-                _X_Position = (XPosition)IntParse(value);
+                _xPosition = (XPosition)IntParse(value);
                 return true;
 
             case "getvaluefrom":
@@ -411,14 +401,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
     }
 
     public override void PointMoved(object sender, MoveEventArgs e) {
-        if (_X_Position == XPosition.frei ||
+        if (_xPosition == XPosition.frei ||
             Parent == null) {
             base.PointMoved(sender, e);
             return;
         }
 
-        var anzahlSpaltenImFormular = (int)_X_Position / 100;
-        var aufXPosition = (int)(_X_Position - anzahlSpaltenImFormular * 100);
+        var anzahlSpaltenImFormular = (int)_xPosition / 100;
+        var aufXPosition = (int)(_xPosition - anzahlSpaltenImFormular * 100);
 
         var wi = (Parent.UsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));

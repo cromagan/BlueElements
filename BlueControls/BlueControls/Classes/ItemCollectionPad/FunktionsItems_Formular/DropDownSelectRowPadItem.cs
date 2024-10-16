@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ConnectedFormula;
@@ -106,7 +107,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FlexiControlRowSelector(DatabaseOutput, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition

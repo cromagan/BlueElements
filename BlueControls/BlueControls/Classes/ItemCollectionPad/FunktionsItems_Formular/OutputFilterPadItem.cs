@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.CellRenderer;
@@ -124,7 +125,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var r = Renderer_Abstract.RendererOf(Column);
 
         var con = new FlexiControlForFilter(Column, _überschriftanordung, r) {

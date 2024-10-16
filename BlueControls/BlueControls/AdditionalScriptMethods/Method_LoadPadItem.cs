@@ -19,11 +19,14 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -31,7 +34,7 @@ namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_LoadPadItem : BlueScript.Methods.Method {
+internal class Method_LoadPadItem : Method {
 
     #region Properties
 
@@ -57,7 +60,7 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
     public static TextPadItem DummyItem() {
         var t = new TextPadItem();
         t.Text = "FEHLER!";
-        t.SetCoordinates(new System.Drawing.RectangleF(0, 0, 100, 100));
+        t.SetCoordinates(new RectangleF(0, 0, 100, 100));
 
         return t;
     }
@@ -76,7 +79,7 @@ internal class Method_LoadPadItem : BlueScript.Methods.Method {
         }
 
         try {
-            var toparse = System.IO.File.ReadAllText(filen, BlueBasics.Constants.Win1252);
+            var toparse = File.ReadAllText(filen, BlueBasics.Constants.Win1252);
 
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
 

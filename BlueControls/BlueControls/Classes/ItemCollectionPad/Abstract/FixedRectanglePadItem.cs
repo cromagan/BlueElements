@@ -92,21 +92,21 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     [Description("Die Breite des Objekts in mm.")]
     public float Breite {
-        get => (float)Math.Round((double)PixelToMm(_size.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(_size.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
-            if (Breite == value) { return; }
-            Size = new SizeF(MmToPixel(value, ItemCollectionPadItem.Dpi), _size.Height);
+            if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
+            Size = _size with { Width = MmToPixel(value, ItemCollectionPadItem.Dpi) };
         }
     }
 
     [Description("Die Höhe des Objekts in mm.")]
     public float Höhe {
-        get => (float)Math.Round((double)PixelToMm(_size.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(_size.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
-            if (Höhe == value) { return; }
-            Size = new SizeF(_size.Width, MmToPixel(value, ItemCollectionPadItem.Dpi));
+            if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
+            Size = _size with { Height = MmToPixel(value, ItemCollectionPadItem.Dpi) };
         }
     }
 
@@ -114,11 +114,9 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     /// Die fixe Größe in Pixel
     /// </summary>
     public SizeF Size {
-        get {
-            return _size;
-        }
+        get => _size;
         set {
-            if (_size.Width == value.Width && _size.Height == value.Height) { return; }
+            if (Math.Abs(_size.Width - value.Width) < Constants.DefaultTolerance && Math.Abs(_size.Height - value.Height) < Constants.DefaultTolerance) { return; }
             _size = value;
             PointMoved(_pLo, new MoveEventArgs(false));
             OnPropertyChanged();
@@ -240,10 +238,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         CalculateJointMiddle(_pl, _pr);
     }
 
-    protected override RectangleF CalculateUsedArea() {
-        if (_pLo == null) { return RectangleF.Empty; }
-        return new RectangleF(_pLo.X, _pLo.Y, Size.Width, Size.Height);
-    }
+    protected override RectangleF CalculateUsedArea() => new(_pLo.X, _pLo.Y, Size.Width, Size.Height);
 
     #endregion
 }

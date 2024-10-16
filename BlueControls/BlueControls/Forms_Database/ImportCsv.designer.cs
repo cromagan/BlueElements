@@ -26,24 +26,24 @@ namespace BlueControls.BlueDatabaseDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.btnImportieren = new BlueControls.Controls.Button();
-            this.chkDoppelteTrennzeichen = new BlueControls.Controls.Button();
-            this.grpTrennzeichen = new BlueControls.Controls.GroupBox();
-            this.txtAndere = new BlueControls.Controls.TextBox();
-            this.optTabStopp = new BlueControls.Controls.Button();
-            this.optAndere = new BlueControls.Controls.Button();
-            this.optSemikolon = new BlueControls.Controls.Button();
-            this.optLeerzeichen = new BlueControls.Controls.Button();
-            this.optKomma = new BlueControls.Controls.Button();
-            this.capEinträge = new BlueControls.Controls.Caption();
-            this.chkTrennzeichenAmAnfang = new BlueControls.Controls.Button();
-            this.grpSpaltenOptionen = new BlueControls.Controls.GroupBox();
-            this.optSpalteNachderReihe = new BlueControls.Controls.Button();
-            this.optSpalteZuordnen = new BlueControls.Controls.Button();
-            this.btnCancel = new BlueControls.Controls.Button();
-            this.grpZeilenOptionen = new BlueControls.Controls.GroupBox();
-            this.optZeilenAlle = new BlueControls.Controls.Button();
-            this.optZeilenZuorden = new BlueControls.Controls.Button();
+            this.btnImportieren = new Button();
+            this.chkDoppelteTrennzeichen = new Button();
+            this.grpTrennzeichen = new GroupBox();
+            this.txtAndere = new TextBox();
+            this.optTabStopp = new Button();
+            this.optAndere = new Button();
+            this.optSemikolon = new Button();
+            this.optLeerzeichen = new Button();
+            this.optKomma = new Button();
+            this.capEinträge = new Caption();
+            this.chkTrennzeichenAmAnfang = new Button();
+            this.grpSpaltenOptionen = new GroupBox();
+            this.optSpalteNachderReihe = new Button();
+            this.optSpalteZuordnen = new Button();
+            this.btnCancel = new Button();
+            this.grpZeilenOptionen = new GroupBox();
+            this.optZeilenAlle = new Button();
+            this.optZeilenZuorden = new Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpTrennzeichen.SuspendLayout();
             this.grpSpaltenOptionen.SuspendLayout();
@@ -52,36 +52,36 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(731, 24);
+            this.capStatusBar.Size = new Size(731, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 302);
-            this.pnlStatusBar.Size = new System.Drawing.Size(731, 24);
+            this.pnlStatusBar.Location = new Point(0, 302);
+            this.pnlStatusBar.Size = new Size(731, 24);
             // 
             // btnImportieren
             // 
-            this.btnImportieren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnImportieren.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
             this.btnImportieren.ImageCode = "Textfeld|16";
-            this.btnImportieren.Location = new System.Drawing.Point(621, 264);
+            this.btnImportieren.Location = new Point(621, 264);
             this.btnImportieren.Name = "btnImportieren";
-            this.btnImportieren.Size = new System.Drawing.Size(104, 32);
+            this.btnImportieren.Size = new Size(104, 32);
             this.btnImportieren.TabIndex = 9;
             this.btnImportieren.Text = "Importieren";
-            this.btnImportieren.Click += new System.EventHandler(this.Fertig_Click);
+            this.btnImportieren.Click += new EventHandler(this.Fertig_Click);
             // 
             // chkDoppelteTrennzeichen
             // 
-            this.chkDoppelteTrennzeichen.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkDoppelteTrennzeichen.Location = new System.Drawing.Point(8, 40);
+            this.chkDoppelteTrennzeichen.ButtonStyle = ButtonStyle.Checkbox_Text;
+            this.chkDoppelteTrennzeichen.Location = new Point(8, 40);
             this.chkDoppelteTrennzeichen.Name = "chkDoppelteTrennzeichen";
-            this.chkDoppelteTrennzeichen.Size = new System.Drawing.Size(376, 16);
+            this.chkDoppelteTrennzeichen.Size = new Size(376, 16);
             this.chkDoppelteTrennzeichen.TabIndex = 7;
             this.chkDoppelteTrennzeichen.Text = "Aufeinanderfolgende Trennzeichen als ein Zeichen behandeln";
             // 
             // grpTrennzeichen
             // 
-            this.grpTrennzeichen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpTrennzeichen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpTrennzeichen.CausesValidation = false;
             this.grpTrennzeichen.Controls.Add(this.txtAndere);
             this.grpTrennzeichen.Controls.Add(this.optTabStopp);
@@ -89,159 +89,159 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpTrennzeichen.Controls.Add(this.optSemikolon);
             this.grpTrennzeichen.Controls.Add(this.optLeerzeichen);
             this.grpTrennzeichen.Controls.Add(this.optKomma);
-            this.grpTrennzeichen.Location = new System.Drawing.Point(16, 88);
+            this.grpTrennzeichen.Location = new Point(16, 88);
             this.grpTrennzeichen.Name = "grpTrennzeichen";
-            this.grpTrennzeichen.Size = new System.Drawing.Size(168, 169);
+            this.grpTrennzeichen.Size = new Size(168, 169);
             this.grpTrennzeichen.TabIndex = 13;
             this.grpTrennzeichen.TabStop = false;
             this.grpTrennzeichen.Text = "Trennzeichen";
             // 
             // txtAndere
             // 
-            this.txtAndere.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtAndere.Location = new System.Drawing.Point(88, 116);
+            this.txtAndere.Cursor = Cursors.IBeam;
+            this.txtAndere.Location = new Point(88, 116);
             this.txtAndere.Name = "txtAndere";
-            this.txtAndere.Size = new System.Drawing.Size(64, 24);
+            this.txtAndere.Size = new Size(64, 24);
             this.txtAndere.TabIndex = 6;
             // 
             // optTabStopp
             // 
-            this.optTabStopp.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.optTabStopp.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optTabStopp.Checked = true;
-            this.optTabStopp.Location = new System.Drawing.Point(16, 24);
+            this.optTabStopp.Location = new Point(16, 24);
             this.optTabStopp.Name = "optTabStopp";
-            this.optTabStopp.Size = new System.Drawing.Size(80, 16);
+            this.optTabStopp.Size = new Size(80, 16);
             this.optTabStopp.TabIndex = 1;
             this.optTabStopp.Text = "TabStop";
             // 
             // optAndere
             // 
-            this.optAndere.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optAndere.Location = new System.Drawing.Point(16, 120);
+            this.optAndere.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optAndere.Location = new Point(16, 120);
             this.optAndere.Name = "optAndere";
-            this.optAndere.Size = new System.Drawing.Size(64, 16);
+            this.optAndere.Size = new Size(64, 16);
             this.optAndere.TabIndex = 5;
             this.optAndere.Text = "Andere:";
             // 
             // optSemikolon
             // 
-            this.optSemikolon.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optSemikolon.Location = new System.Drawing.Point(16, 72);
+            this.optSemikolon.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optSemikolon.Location = new Point(16, 72);
             this.optSemikolon.Name = "optSemikolon";
-            this.optSemikolon.Size = new System.Drawing.Size(80, 16);
+            this.optSemikolon.Size = new Size(80, 16);
             this.optSemikolon.TabIndex = 2;
             this.optSemikolon.Text = "Semikolon";
             // 
             // optLeerzeichen
             // 
-            this.optLeerzeichen.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optLeerzeichen.Location = new System.Drawing.Point(16, 48);
+            this.optLeerzeichen.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optLeerzeichen.Location = new Point(16, 48);
             this.optLeerzeichen.Name = "optLeerzeichen";
-            this.optLeerzeichen.Size = new System.Drawing.Size(88, 16);
+            this.optLeerzeichen.Size = new Size(88, 16);
             this.optLeerzeichen.TabIndex = 4;
             this.optLeerzeichen.Text = "Leerzeichen";
             // 
             // optKomma
             // 
-            this.optKomma.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optKomma.Location = new System.Drawing.Point(16, 96);
+            this.optKomma.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optKomma.Location = new Point(16, 96);
             this.optKomma.Name = "optKomma";
-            this.optKomma.Size = new System.Drawing.Size(64, 16);
+            this.optKomma.Size = new Size(64, 16);
             this.optKomma.TabIndex = 3;
             this.optKomma.Text = "Komma";
             // 
             // capEinträge
             // 
-            this.capEinträge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capEinträge.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+                                                       | AnchorStyles.Right)));
             this.capEinträge.CausesValidation = false;
-            this.capEinträge.Location = new System.Drawing.Point(8, 8);
+            this.capEinträge.Location = new Point(8, 8);
             this.capEinträge.Name = "capEinträge";
-            this.capEinträge.Size = new System.Drawing.Size(721, 24);
+            this.capEinträge.Size = new Size(721, 24);
             // 
             // chkTrennzeichenAmAnfang
             // 
-            this.chkTrennzeichenAmAnfang.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkTrennzeichenAmAnfang.Location = new System.Drawing.Point(8, 56);
+            this.chkTrennzeichenAmAnfang.ButtonStyle = ButtonStyle.Checkbox_Text;
+            this.chkTrennzeichenAmAnfang.Location = new Point(8, 56);
             this.chkTrennzeichenAmAnfang.Name = "chkTrennzeichenAmAnfang";
-            this.chkTrennzeichenAmAnfang.Size = new System.Drawing.Size(224, 16);
+            this.chkTrennzeichenAmAnfang.Size = new Size(224, 16);
             this.chkTrennzeichenAmAnfang.TabIndex = 10;
             this.chkTrennzeichenAmAnfang.Text = "Trennzeichen am Anfang entfernen";
             // 
             // grpSpaltenOptionen
             // 
-            this.grpSpaltenOptionen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpSpaltenOptionen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpSpaltenOptionen.CausesValidation = false;
             this.grpSpaltenOptionen.Controls.Add(this.optSpalteNachderReihe);
             this.grpSpaltenOptionen.Controls.Add(this.optSpalteZuordnen);
-            this.grpSpaltenOptionen.Location = new System.Drawing.Point(192, 88);
+            this.grpSpaltenOptionen.Location = new Point(192, 88);
             this.grpSpaltenOptionen.Name = "grpSpaltenOptionen";
-            this.grpSpaltenOptionen.Size = new System.Drawing.Size(532, 72);
+            this.grpSpaltenOptionen.Size = new Size(532, 72);
             this.grpSpaltenOptionen.TabIndex = 12;
             this.grpSpaltenOptionen.TabStop = false;
             this.grpSpaltenOptionen.Text = "Spalten-Optionen";
             // 
             // optSpalteNachderReihe
             // 
-            this.optSpalteNachderReihe.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optSpalteNachderReihe.Location = new System.Drawing.Point(8, 40);
+            this.optSpalteNachderReihe.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optSpalteNachderReihe.Location = new Point(8, 40);
             this.optSpalteNachderReihe.Name = "optSpalteNachderReihe";
-            this.optSpalteNachderReihe.Size = new System.Drawing.Size(512, 24);
+            this.optSpalteNachderReihe.Size = new Size(512, 24);
             this.optSpalteNachderReihe.TabIndex = 1;
             this.optSpalteNachderReihe.Text = "Alle Einträge importieren, <b>interne Spaltenreihenfolge</b> benutzen und nichts " +
     "zuordnen.";
             // 
             // optSpalteZuordnen
             // 
-            this.optSpalteZuordnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.optSpalteZuordnen.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optSpalteZuordnen.Checked = true;
-            this.optSpalteZuordnen.Location = new System.Drawing.Point(8, 16);
+            this.optSpalteZuordnen.Location = new Point(8, 16);
             this.optSpalteZuordnen.Name = "optSpalteZuordnen";
-            this.optSpalteZuordnen.Size = new System.Drawing.Size(512, 24);
+            this.optSpalteZuordnen.Size = new Size(512, 24);
             this.optSpalteZuordnen.TabIndex = 0;
             this.optSpalteZuordnen.Text = "Die <b>erste Zeile</b> enthält den Spaltennamen und zu diesen zuordnen.";
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
             this.btnCancel.ImageCode = "Kreuz|16";
-            this.btnCancel.Location = new System.Drawing.Point(509, 264);
+            this.btnCancel.Location = new Point(509, 264);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(104, 32);
+            this.btnCancel.Size = new Size(104, 32);
             this.btnCancel.TabIndex = 11;
             this.btnCancel.Text = "Abbrechen";
-            this.btnCancel.Click += new System.EventHandler(this.Cancel_Click);
+            this.btnCancel.Click += new EventHandler(this.Cancel_Click);
             // 
             // grpZeilenOptionen
             // 
-            this.grpZeilenOptionen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpZeilenOptionen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpZeilenOptionen.CausesValidation = false;
             this.grpZeilenOptionen.Controls.Add(this.optZeilenAlle);
             this.grpZeilenOptionen.Controls.Add(this.optZeilenZuorden);
-            this.grpZeilenOptionen.Location = new System.Drawing.Point(192, 168);
+            this.grpZeilenOptionen.Location = new Point(192, 168);
             this.grpZeilenOptionen.Name = "grpZeilenOptionen";
-            this.grpZeilenOptionen.Size = new System.Drawing.Size(532, 88);
+            this.grpZeilenOptionen.Size = new Size(532, 88);
             this.grpZeilenOptionen.TabIndex = 0;
             this.grpZeilenOptionen.TabStop = false;
             this.grpZeilenOptionen.Text = "Zeilen-Optionen";
             // 
             // optZeilenAlle
             // 
-            this.optZeilenAlle.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optZeilenAlle.Location = new System.Drawing.Point(8, 56);
+            this.optZeilenAlle.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optZeilenAlle.Location = new Point(8, 56);
             this.optZeilenAlle.Name = "optZeilenAlle";
-            this.optZeilenAlle.Size = new System.Drawing.Size(512, 24);
+            this.optZeilenAlle.Size = new Size(512, 24);
             this.optZeilenAlle.TabIndex = 1;
             this.optZeilenAlle.Text = "<b>Jede Zeile</b> importieren, auch wenn dadurch <b>doppelte</b> Einträge entsteh" +
     "en.";
             // 
             // optZeilenZuorden
             // 
-            this.optZeilenZuorden.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
+            this.optZeilenZuorden.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optZeilenZuorden.Checked = true;
-            this.optZeilenZuorden.Location = new System.Drawing.Point(8, 24);
+            this.optZeilenZuorden.Location = new Point(8, 24);
             this.optZeilenZuorden.Name = "optZeilenZuorden";
-            this.optZeilenZuorden.Size = new System.Drawing.Size(512, 32);
+            this.optZeilenZuorden.Size = new Size(512, 32);
             this.optZeilenZuorden.TabIndex = 0;
             this.optZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Datenbank z" +
     "ugeordnet werden. <br>Wenn der Eintrag nicht in der Datenbank vorhanden ist, wir" +
@@ -249,9 +249,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ImportCsv
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(731, 326);
+            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(731, 326);
             this.Controls.Add(this.grpZeilenOptionen);
             this.Controls.Add(this.grpTrennzeichen);
             this.Controls.Add(this.grpSpaltenOptionen);
@@ -260,7 +260,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.btnImportieren);
             this.Controls.Add(this.chkDoppelteTrennzeichen);
             this.Controls.Add(this.capEinträge);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
             this.Name = "ImportCsv";
             this.ShowInTaskbar = false;
             this.Text = "Einträge importieren:";

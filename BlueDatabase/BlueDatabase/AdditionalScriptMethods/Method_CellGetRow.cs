@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueDatabase.AdditionalScriptMethods.Method_Database;
@@ -26,7 +27,7 @@ using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_CellGetRow : BlueScript.Methods.Method {
+public class Method_CellGetRow : Method {
 
     #region Properties
 

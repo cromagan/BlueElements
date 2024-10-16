@@ -240,7 +240,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
 
-    protected virtual void DatabaseInput_Disposed(object sender, System.EventArgs e) { }
+    protected void DatabaseInput_Disposed(object sender, System.EventArgs e) { }
 
     protected virtual void DatabaseInput_Loaded(object sender, System.EventArgs e) { }
 

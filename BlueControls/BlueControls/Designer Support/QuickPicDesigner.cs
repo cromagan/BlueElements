@@ -20,6 +20,7 @@
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.EventArgs;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -73,7 +74,7 @@ public partial class QuickPicDesigner : Panel {
         txbZweitsymbol.Text = l.Zweitsymbol;
     }
 
-    private void LstNames_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) => txbName.Text = e.Item.KeyName;
+    private void LstNames_ItemClicked(object sender, AbstractListItemEventArgs e) => txbName.Text = e.Item.KeyName;
 
     private void SomethingChanged(object sender, System.EventArgs e) {
         Helll.Text = satLum.Value + "%";

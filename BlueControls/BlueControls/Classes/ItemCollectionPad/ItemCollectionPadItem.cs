@@ -40,12 +40,15 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -114,8 +117,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public event EventHandler<System.EventArgs>? ItemAdded;
 
     public event EventHandler? ItemRemoved;
-
-    public event EventHandler<System.EventArgs>? ItemRemoving;
 
     #endregion
 
@@ -643,7 +644,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem icpi) {
             var positionModified = icpi.UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
-            var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
+            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
             ////Berechne den neuen Punkt für das Kind - Item
             //var childPoint = new Point(
@@ -820,7 +821,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (IsDisposed) { return; }
         if (item == null || !_internal.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
-        OnItemRemoving();
         _ = _internal.Remove(item);
         item.Parent = null;
         OnItemRemoved();
@@ -890,7 +890,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 break;
 
             default:
-                Forms.MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
+                MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
                 return;
         }
     }
@@ -958,12 +958,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
+        var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
 
         var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, 0);
 
-        var sc = new BlueScript.Script(vars, scp);
-        sc.ScriptText = scripttext;
+        var sc = new Script(vars, scp) {
+            ScriptText = scripttext
+        };
 
         var t = sc.Parse(0, "Main", null);
 
@@ -1044,7 +1045,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (!Endless) { return base.CalculateUsedArea(); }
 
         var f = UsedAreaOfItems();
-        return new RectangleF(f.X + _pLo.X, f.Y + _pLo.Y, f.Width, f.Height);
+        return f with { X = f.X + _pLo.X, Y = f.Y + _pLo.Y };
     }
 
     protected override void Dispose(bool disposing) {
@@ -1240,8 +1241,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (IsDisposed) { return; }
         OnPropertyChanged();
     }
-
-    private void OnItemRemoving() => ItemRemoving?.Invoke(this, System.EventArgs.Empty);
 
     private void ParseItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {

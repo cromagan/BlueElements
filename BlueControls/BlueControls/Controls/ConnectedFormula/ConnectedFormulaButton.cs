@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -28,6 +29,7 @@ using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -237,15 +239,10 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         Enabled = enabled;
     }
 
-    private void ButtonError(string message) => Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
+    private void ButtonError(string message) => MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
     private void F_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button != MouseButtons.Left) { return; }
-
-        if (Method.AllMethods == null) {
-            ButtonError("Befehle konnten nicht initialisiert werden.");
-            return;
-        }
 
         var m = Method.AllMethods.Get(_action);
 
@@ -299,7 +296,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (row != null) {
             vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
             ai = row;
-            row.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Knopfdruck mit dieser Zeile");
+            row.OnDropMessage(FehlerArt.Info, "Knopfdruck mit dieser Zeile");
         }
 
         #endregion
@@ -315,10 +312,10 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         }
 
         if (!string.IsNullOrEmpty(f)) {
-            Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+            MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
 
-        row?.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Knopfdruck ausgeführt");
+        row?.OnDropMessage(FehlerArt.Info, "Knopfdruck ausgeführt");
         main.Enabled = true;
         main.Refresh();
     }

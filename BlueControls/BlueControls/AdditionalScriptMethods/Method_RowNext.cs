@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueControls.Controls;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -80,7 +81,7 @@ public class Method_RowNext : Method_Database {
 
         var rsd = new RowSortDefinition(db, column, attvar.ValueBoolGet(1));
 
-        var sr = BlueControls.Controls.Table.CalculateSortedRows(db, r, null, rsd);
+        var sr = Table.CalculateSortedRows(db, r, null, rsd);
 
         var givebackrow = -1;
 

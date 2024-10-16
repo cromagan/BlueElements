@@ -112,7 +112,7 @@ public partial class Voting : System.Windows.Forms.Form {
     }
 
     private void Change(double v, int value, List<RowItem> notallowed) {
-        using var f = new FilterCollection(_column.Database, "ChangeFilter") {
+        var f = new FilterCollection(_column.Database, "ChangeFilter") {
             new(_column, v - 3, v + 3)
         };
 
@@ -124,6 +124,8 @@ public partial class Voting : System.Windows.Forms.Form {
                 thisRow.CellSet(_column, v1 + value, "VoteChange");
             }
         }
+
+        f.Dispose();
     }
 
     private void Generate() {
@@ -163,11 +165,11 @@ public partial class Voting : System.Windows.Forms.Form {
             key = _fr2.KeyName + "|" + _fr1.KeyName;
         }
 
-        if (_done.ContainsKey(key)) {
+        if (_done.TryGetValue(key, out var value)) {
             //Pad1.Refresh();
             //Pad2.Refresh();
             //Database.ForceSaveAll();
-            if (_done[key]) {
+            if (value) {
                 btn2_Click(null, System.EventArgs.Empty);
             } else {
                 btn1_Click(null, System.EventArgs.Empty);

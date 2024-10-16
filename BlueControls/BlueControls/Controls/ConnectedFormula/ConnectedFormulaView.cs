@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -33,6 +34,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -387,7 +389,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             //var se = new_DatabaseScriptEditor(db);
             //_ = se.ShowDialog();
         } else {
-            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+            MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }
         Invalidate_FilterInput();
     }

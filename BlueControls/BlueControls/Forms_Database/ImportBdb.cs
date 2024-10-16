@@ -125,7 +125,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
             return;
         }
 
-        txtInfo.Text = _files.Count.ToString() + " Dateien.";
+        txtInfo.Text = _files.Count + " Dateien.";
     }
 
     private void Fertig_Click(object sender, System.EventArgs e) {

@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
+using BlueControls.Controls;
 using BlueControls.Enums;
 
 namespace BlueControls.ItemCollectionList;
@@ -32,9 +32,10 @@ public class DropDownListItem : AbstractListItem {
     #region Fields
 
     public readonly List<AbstractListItem> DropDownItems = [];
-    public AbstractListItem? Selected;
 
     #endregion
+
+    //public AbstractListItem? Selected;
 
     #region Constructors
 
@@ -55,11 +56,11 @@ public class DropDownListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => false;
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         var he = 16;
 
         foreach (var item in DropDownItems) {
-            var s = item.HeightForListBox(style, columnWidth, itemdesign, renderer);
+            var s = item.HeightForListBox(style, columnWidth, itemdesign);
 
             he = Math.Max(he, s);
         }
@@ -85,7 +86,7 @@ public class DropDownListItem : AbstractListItem {
             Skin.Draw_Back(gr, Design.ComboBox_Textbox, vState, positionModified, null, false);
         }
 
-        Selected?.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
+        //Selected?.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
 
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
         if (drawBorderAndBack) {
@@ -94,7 +95,7 @@ public class DropDownListItem : AbstractListItem {
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
 
-            Controls.Button.DrawButton(null, gr, Design.Button_ComboBox, vState, qi, Alignment.Horizontal_Vertical_Center, false, null, string.Empty, but, false);
+            Button.DrawButton(null, gr, Design.Button_ComboBox, vState, qi, Alignment.Horizontal_Vertical_Center, false, null, string.Empty, but, false);
 
             //Skin.Draw_Back(gr, Design.Button_ComboBox, vState, but, null, false);
             //Skin.Draw_Border(gr, Design.Button_ComboBox, vState, but);

@@ -61,7 +61,7 @@ internal class Method_AutoCorrect : Method_Database {
             if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden."); }
             var columnVar = attvar.Attributes[n];
 
-            if (columnVar is not { ReadOnly: not true }) { return new DoItFeedback(ld, "Variable Schreibgeschützt."); }
+            if (columnVar is not { ReadOnly: false }) { return new DoItFeedback(ld, "Variable Schreibgeschützt."); }
             if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback(ld, "Spalte nicht veränderbar."); }
 
             var s = string.Empty;

@@ -31,6 +31,7 @@ using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using static BlueBasics.IO;
+using Timer = System.Windows.Forms.Timer;
 
 namespace BlueBasics;
 
@@ -68,8 +69,7 @@ public static class Develop {
 
     public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
 
-    [DefaultValue(false)]
-    public static bool ServiceStarted { get; private set; }
+    [DefaultValue(false)] private static bool ServiceStarted { get; set; }
 
     #endregion
 
@@ -283,7 +283,7 @@ public static class Develop {
 
         Generic.LoadAllAssemblies(Application.StartupPath);
 
-        System.Windows.Forms.Timer check = new();
+        Timer check = new();
         check.Tick += CloseAfter12Hours;
         check.Interval = 60000;
         check.Enabled = true;

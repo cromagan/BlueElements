@@ -49,6 +49,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -154,8 +155,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public event EventHandler<CellEventArgs>? CellClicked;
 
-    public event EventHandler<CellEventArgs>? CellValueChanged;
-
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
@@ -246,7 +245,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Filterausgabe FilterOutputType { get; set; } = Filterausgabe.Gewähle_Zeile;
+    public Filterausgabe FilterOutputType { get; } = Filterausgabe.Gewähle_Zeile;
 
     [DefaultValue(1.0f)]
     public float FontScale => Database?.GlobalScale ?? 1f;
@@ -521,7 +520,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var cellKey = CellCollection.KeyOfCell(column, row);
         var i = UndoItems(column.Database, cellKey);
         if (i.Count < 1) {
-            Forms.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
+            MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
             return;
         }
         var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None);
@@ -621,7 +620,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
         if (col.Database.IsAdministrator() && !string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
         if (col.Database.IsAdministrator() && col.Tags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.Tags.JoinWith("<br>"); }
-        if (col.Database.IsAdministrator()) { T = T + "<br><br>" + Table.ColumnUsage(col); }
+        if (col.Database.IsAdministrator()) { T = T + "<br><br>" + ColumnUsage(col); }
         T = T.Trim();
         T = T.Trim("<br>");
         T = T.Trim();
@@ -633,7 +632,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public static void SearchNextText(string searchTxt, Table tableView, ColumnViewItem? column, RowData? row, out ColumnViewItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         if (tableView.Database is not { IsDisposed: false } db) {
-            Forms.MessageBox.Show("Datenbank-Fehler.", ImageCode.Information, "OK");
+            MessageBox.Show("Datenbank-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -641,7 +640,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         searchTxt = searchTxt.Trim();
         if (tableView.CurrentArrangement is not { IsDisposed: false } ca) {
-            Forms.MessageBox.Show("Datenbank-Ansichts-Fehler.", ImageCode.Information, "OK");
+            MessageBox.Show("Datenbank-Ansichts-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -651,7 +650,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         column ??= ca.Last();
         var rowsChecked = 0;
         if (string.IsNullOrEmpty(searchTxt)) {
-            Forms.MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -1171,7 +1170,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             //    (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn.Column, thisRow.Row, false, false);
                             //}
 
-                            if (lCrow != null && lcColumn != null) {
+                            if (lcColumn != null) {
                                 da.CellAdd(lCrow.CellGetList(lcColumn).JoinWith("<br>"), thisColumn.Column.BackColor);
                             } else {
                                 da.CellAdd(" ", thisColumn.Column.BackColor);
@@ -1574,11 +1573,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        List<RowData>? sortedRowData = [.. RowsFilteredAndPinned()];
-        if (sortedRowData == null) {
-            DrawWaitScreen(gr, string.Empty);
-            return;
-        }
+        List<RowData> sortedRowData = [.. RowsFilteredAndPinned()];
 
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
@@ -2157,7 +2152,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (formatWarnung && !string.IsNullOrEmpty(newValue)) {
             if (!newValue.IsFormat(contentHolderCellColumn)) {
-                if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
+                if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
                     NotEditableInfo("Abbruch, da das erwartete Format nicht eingehalten wurde.");
                     return;
                 }
@@ -2170,7 +2165,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return; }
-            if (cellInThisDatabaseColumn?.Column?.Database is not { IsDisposed: false } db) { return; }
+            if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return; }
 
             var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(fe)) {
@@ -2182,7 +2177,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             var l = table.RowsFiltered;
             if (newr != null && !l.Contains(newr)) {
-                if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
+                if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                     table.PinAdd(newr);
                 }
             }
@@ -2231,7 +2226,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         Invalidate_DrawWidth(e.Column);
         Invalidate();
-        OnCellValueChanged(e);
     }
 
     private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) {
@@ -2412,7 +2406,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         if (Filter.HasAlwaysFalse()) {
-            Forms.MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
+            MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
             return;
         }
 
@@ -2424,7 +2418,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         if (!string.IsNullOrEmpty(t)) {
-            Forms.MessageBox.Show("<b>Diese(r) Filter wurde(n) automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
+            MessageBox.Show("<b>Diese(r) Filter wurde(n) automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
             return;
         }
         //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
@@ -2833,7 +2827,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var isCurrentThreadBackground = Thread.CurrentThread.IsBackground;
         var columnX1 = viewItem.X_WithSlider ?? 0;
         var drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, db.GlobalScale) - 2;
-        var errorImg = QuickImage.Get("Warnung|10||||||120||60");
         var rowScript = db.CanDoValueChangedScript();
 
         if (SliderY.Value < _pix16 && UserEdit_NewRowAllowed()) {
@@ -2912,12 +2905,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     case ColumnFunction.Virtuelle_Spalte:
                         cellInThisDatabaseRow.CheckRowDataIfNeeded();
                         var toDrawd2 = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        viewItem.GetRenderer()?.Draw(gr, toDrawd2, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
+                        viewItem.GetRenderer().Draw(gr, toDrawd2, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                         break;
 
                     default:
                         var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        viewItem.GetRenderer()?.Draw(gr, toDrawd, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
+                        viewItem.GetRenderer().Draw(gr, toDrawd, cellrectangle, Design.Table_Cell, state, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, db.GlobalScale);
                         break;
                 }
 
@@ -3304,11 +3297,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void OnBlockEdit(CellEditBlockReasonEventArgs ed) => BlockEdit?.Invoke(this, ed);
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
-
-    private void OnCellValueChanged(CellEventArgs e) {
-        if (IsDisposed) { return; }
-        CellValueChanged?.Invoke(this, e);
-    }
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 

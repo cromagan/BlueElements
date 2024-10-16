@@ -32,11 +32,12 @@ using BlueControls.Interfaces;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBackgroundNone //  UserControl //
+public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  UserControl //
                                                   {
     #region Fields
 
@@ -118,7 +119,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBack
         if (string.IsNullOrEmpty(_filename)) { return true; }
         if (!FileExists(_filename)) { return true; }
 
-        if (Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
+        if (MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
         if (DeleteFile(_filename, false)) {
             _bitmap = null;

@@ -32,7 +32,10 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
@@ -117,12 +120,13 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden.")
         ];
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
+        var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
 
-        var sc = new BlueScript.Script(vars, scp);
-        sc.ScriptText = scripttext;
+        var sc = new Script(vars, scp) {
+            ScriptText = scripttext
+        };
         return sc.Parse(0, "Main", null);
     }
 
@@ -211,7 +215,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             return;
         }
 
-        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, BlueDatabase.Enums.FilterType.BeginntMit, nowGeneratedId.newid + "\\"));
+        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, FilterType.BeginntMit, nowGeneratedId.newid + "\\"));
 
         var selected = OriginIDColumn.Contents(FilterOutput, null);
         selected = selected.Select(s => s.TrimStart(nowGeneratedId.newid + "\\").Trim("\\")).ToList().SortedDistinctList();
@@ -478,8 +482,8 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     private List<string> RepairMenu(List<string> menu) {
         var m = new List<string>();
 
-        for (var z2 = 0; z2 < menu.Count; z2++) {
-            var t = menu[z2].Trim("\\").SplitBy("\\");
+        foreach (var thisMenu in menu) {
+            var t = thisMenu.Trim("\\").SplitBy("\\");
 
             var n = string.Empty;
             foreach (var item in t) {

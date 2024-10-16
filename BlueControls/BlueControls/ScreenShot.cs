@@ -19,9 +19,11 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Forms;
 using static BlueBasics.BitmapExt;
+using Form = System.Windows.Forms.Form;
 
 namespace BlueControls;
 
@@ -100,12 +102,12 @@ public sealed partial class ScreenShot {
     /// <param name="frm">Diese Form wird automatisch minimiert und wieder maximiert.</param>
     /// <returns></returns>
     /// <remarks></remarks>
-    public static ScreenData GrabArea(System.Windows.Forms.Form? frm) {
+    public static ScreenData GrabArea(Form? frm) {
         using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.");
         return x.GrabAreaInternal(frm);
     }
 
-    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         if (!_mousesWasUp) { return; }
         _feedBack.Point1 = new Point(e.X, e.Y);
@@ -118,11 +120,11 @@ public sealed partial class ScreenShot {
     //    Generic.CollectGarbage();
     //    return im;
     //}
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs? e) {
+    protected override void OnMouseMove(MouseEventArgs? e) {
         if (e == null || _screenShotBmp == null) { return; }
 
         base.OnMouseMove(e);
-        if (e.Button == System.Windows.Forms.MouseButtons.None && !_mousesWasUp) {
+        if (e.Button == MouseButtons.None && !_mousesWasUp) {
             _mousesWasUp = true;
             return;
         }
@@ -138,7 +140,7 @@ public sealed partial class ScreenShot {
 
         PrintText(gr, e);
         Magnify(_screenShotBmp, new Point(e.X, e.Y), gr, false);
-        if (e.Button != System.Windows.Forms.MouseButtons.None) {
+        if (e.Button != MouseButtons.None) {
             gr.DrawLine(new Pen(Color.Red), 0, _feedBack.Point1.Y, Width, _feedBack.Point1.Y);
             gr.DrawLine(new Pen(Color.Red), _feedBack.Point1.X, 0, _feedBack.Point1.X, Height);
             gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
@@ -151,7 +153,7 @@ public sealed partial class ScreenShot {
         Refresh();
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!_mousesWasUp) {
             _mousesWasUp = true;
@@ -173,7 +175,7 @@ public sealed partial class ScreenShot {
         Close();
     }
 
-    private ScreenData GrabAreaInternal(System.Windows.Forms.Form? frm) {
+    private ScreenData GrabAreaInternal(Form? frm) {
         try {
             //System.Windows.Forms.FormWindowState ws = 0;
             var op = 0d;
@@ -314,7 +316,7 @@ public sealed partial class ScreenShot {
     //    if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookEndPoint = new Point(LastMouse.X, LastMouse.Y); }
     //}
 
-    private void PrintText(Graphics gr, System.Windows.Forms.MouseEventArgs? e) {
+    private void PrintText(Graphics gr, MouseEventArgs? e) {
         Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
         Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
         Font fn = new("Arial", DrawSize, FontStyle.Bold);

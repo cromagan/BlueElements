@@ -353,9 +353,9 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return e.Editing;
     }
 
-    protected override void OnLoaded(object sender, System.EventArgs e) {
+    protected override void OnLoaded() {
         Repair();
-        base.OnLoaded(sender, e);
+        base.OnLoaded();
     }
 
     private ItemCollectionPadItem? GetPage(string caption) {

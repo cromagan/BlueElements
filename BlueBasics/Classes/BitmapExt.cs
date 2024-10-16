@@ -568,7 +568,7 @@ public class BitmapExt : IDisposableExtended {
         _isLocked = false;
     }
 
-    protected virtual void Dispose(bool disposing) {
+    protected void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)

@@ -34,6 +34,7 @@ using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -48,7 +49,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private readonly List<PointM> _points = [];
     private Helpers _helper = Helpers.Ohne;
-    private BlueBasics.Enums.Orientation _mittelLinie = BlueBasics.Enums.Orientation.Ohne;
+    private Orientation _mittelLinie = Orientation.Ohne;
     private bool _pointAdding;
 
     #endregion
@@ -71,8 +72,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
     }
 
-    [DefaultValue((BlueBasics.Enums.Orientation)(-1))]
-    public BlueBasics.Enums.Orientation Mittellinie {
+    [DefaultValue((Orientation)(-1))]
+    public Orientation Mittellinie {
         get => _mittelLinie;
         set {
             if (_mittelLinie == value) { return; }
@@ -133,7 +134,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     // Used: Only BZL
     public PointM? GetPoint(string name) => _points.Get(name);
 
-    public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
+    public void LetUserAddAPoint(string pointName, Helpers helper, Orientation mittelline) {
         // Used: Only BZL
         _mittelLinie = mittelline;
         _helper = helper;
@@ -266,13 +267,13 @@ public partial class ZoomPicWithPoints : ZoomPic {
         //TMPGR.Clear(Color.Transparent);
         // Mittellinie
         var picturePos = base.MaxBounds();
-        if (_mittelLinie.HasFlag(BlueBasics.Enums.Orientation.Waagerecht)) {
+        if (_mittelLinie.HasFlag(Orientation.Waagerecht)) {
             var p1 = picturePos.PointOf(Alignment.VerticalCenter_Left).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             var p2 = picturePos.PointOf(Alignment.VerticalCenter_Right).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
             eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
         }
-        if (_mittelLinie.HasFlag(BlueBasics.Enums.Orientation.Senkrecht)) {
+        if (_mittelLinie.HasFlag(Orientation.Senkrecht)) {
             var p1 = picturePos.PointOf(Alignment.Top_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             var p2 = picturePos.PointOf(Alignment.Bottom_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);

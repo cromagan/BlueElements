@@ -18,11 +18,12 @@
 #nullable enable
 
 using System.ComponentModel;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.Editoren;
 
@@ -31,7 +32,7 @@ namespace BlueControls.Editoren;
 /// Es müssen die Routinen SetValuesToFormula, Clear und InitializeComponentDefaultValues überschrieben werden.
 /// </summary>
 
-public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
+public partial class EditorEasy : UserControl, IIsEditor {
 
     #region Fields
 
@@ -111,7 +112,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     /// </summary>
     protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
-    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+    protected override void OnPaint(PaintEventArgs e) {
         if (IsDisposed) { return; }
 
         base.OnPaint(e);

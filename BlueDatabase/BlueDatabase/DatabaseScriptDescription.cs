@@ -296,7 +296,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
 
         if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
 
-        if (_eventTypes == ScriptEventTypes.Ohne_Auslöser || _eventTypes == ScriptEventTypes.correct_changed || extended) {
+        if (_eventTypes is ScriptEventTypes.Ohne_Auslöser or ScriptEventTypes.correct_changed || extended) {
             allowedMethods |= MethodType.ManipulatesUser;
         }
 

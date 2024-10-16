@@ -24,9 +24,13 @@ using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase.Enums;
+using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -98,14 +102,15 @@ public class DynamicSymbolPadItem : RectanglePadItem {
             new VariableBitmap("BMP", bmp, true, "Das Objekt,auf dem gezeichnet werden kann")
         ];
 
-        var m = BlueScript.Methods.Method.GetMethods(MethodType.Math | MethodType.DrawOnBitmap);
+        var m = Method.GetMethods(MethodType.Math | MethodType.DrawOnBitmap);
 
         //using var gr = Graphics.FromImage(bmp);
 
         var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, 0);
 
-        var sc = new BlueScript.Script(vars, scp);
-        sc.ScriptText = scripttext;
+        var sc = new Script(vars, scp) {
+            ScriptText = scripttext
+        };
         return sc.Parse(0, "Main", null);
     }
 
@@ -138,7 +143,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Enums.Design.TextBox, Enums.States.Standard, BlueDatabase.Enums.TranslationType.Original_Anzeigen, Alignment.Left, scale);
+        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Design.TextBox, States.Standard, TranslationType.Original_Anzeigen, Alignment.Left, scale);
 
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         //gr.TranslateTransform(trp.X, trp.Y);

@@ -22,6 +22,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -53,7 +54,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
         e.DrawLine(PenRedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
         e.DrawLine(PenRedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);
-        if (e.Current.Button != MouseButtons.Left || e.MouseDown == null) {
+        if (e.Current.Button != MouseButtons.Left) {
             return;
         }
 
@@ -133,7 +134,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             clonedBitmap.RotateFlip(b);
             OnOverridePic(clonedBitmap, true);
         } catch (Exception ex) {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Warnung, "Spiegeln/Drehen fehlgeschlagen", ex);
+            Develop.DebugPrint(FehlerArt.Warnung, "Spiegeln/Drehen fehlgeschlagen", ex);
             Notification.Show("Befehl konnte nicht\r\nausgeführt werden.");
         }
 

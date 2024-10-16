@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -95,7 +96,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         ConnectedFormula.ConnectedFormula? cf = null;
 
         var txt = "?";

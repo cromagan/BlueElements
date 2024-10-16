@@ -49,7 +49,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
     private ColumnItem? _column;
 
-    private string _columnName = string.Empty;
+    private string _columnName;
 
     private RowItem? _lastrow;
 
@@ -83,7 +83,9 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
             if (_column != null) {
                 return _column.ReadableText() + ":";
-            } else if (!string.IsNullOrEmpty(_columnName)) {
+            }
+
+            if (!string.IsNullOrEmpty(_columnName)) {
                 return _columnName + ":";
             }
 

@@ -802,7 +802,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);
-        if (columnVar is not { ReadOnly: not true }) { return; }
+        if (columnVar is not { ReadOnly: false }) { return; }
         if (!column.Function.CanBeChangedByRules()) { return; }
 
         var comment = "Skript '" + scriptname + "'";
@@ -864,7 +864,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         return false; // Mindestens einer der Werte ist keine gültige Zahl
                     }
                     return numericValue >= minNumeric && numericValue <= maxNumeric;
-                } else if (DateTimeTryParse(istValue, out var dateValue)) {
+                }
+
+                if (DateTimeTryParse(istValue, out var dateValue)) {
                     if (!DateTimeTryParse(rangeParts[0], out var minDate) || !DateTimeTryParse(rangeParts[1], out var maxDate)) {
                         return false; // Mindestens einer der Bereichswerte ist kein gültiges Datum
                     }
@@ -950,8 +952,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             var cellKey = CellCollection.KeyOfCell(column, this);
 
-            if (db.Cell.ContainsKey(cellKey)) {
-                var c = db.Cell[cellKey];
+            if (db.Cell.TryGetValue(cellKey, out var c)) {
                 c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
                 if (string.IsNullOrEmpty(value)) {
                     if (!db.Cell.TryRemove(cellKey, out _)) {
@@ -1045,7 +1046,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
             //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
-            var txt = string.Empty;
+            string txt;
 
             switch (column.Function) {
                 //case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:

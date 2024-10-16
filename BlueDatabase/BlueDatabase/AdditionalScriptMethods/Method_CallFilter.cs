@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueDatabase.AdditionalScriptMethods.Method_Database;
@@ -28,7 +29,7 @@ using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallFilter : BlueScript.Methods.Method, IUseableForButton {
+public class Method_CallFilter : Method, IUseableForButton {
 
     #region Properties
 

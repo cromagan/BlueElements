@@ -176,7 +176,7 @@ public class Script {
             // Ansonsten werden bei Try / If / For diese gelöscht
             varCol.RemoveWithComment("Attribut");
             for (var z = 0; z < attributes.Count; z++) {
-                varCol.Add(new VariableString("Attribut" + z.ToString(), attributes[z], true, "Attribut"));
+                varCol.Add(new VariableString("Attribut" + z, attributes[z], true, "Attribut"));
             }
         }
 

@@ -716,7 +716,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    private void Row_Added(object sender, RowChangedEventArgs e) {
+    private void Row_Added(object sender, RowEventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (_rows == null) { return; }
         if (e.Row.MatchesTo(_internal.ToArray())) { Invalidate_FilteredRows(); }

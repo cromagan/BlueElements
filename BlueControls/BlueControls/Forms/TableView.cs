@@ -607,8 +607,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
-        if (tabPage == null) { return; }
-
         var s = (List<object>)tabPage.Tag;
 
         var ci = (ConnectionInfo)s[0];

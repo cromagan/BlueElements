@@ -19,13 +19,14 @@
 
 using System.Collections.Generic;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_UniqueRowId : BlueScript.Methods.Method {
+public class Method_UniqueRowId : Method {
 
     #region Properties
 

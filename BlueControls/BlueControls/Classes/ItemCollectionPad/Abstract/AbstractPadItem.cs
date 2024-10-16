@@ -126,7 +126,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
     /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
     /// </summary>
-    public PointM JointMiddle { get; private set; }
+    public PointM JointMiddle { get; }
 
     /// <summary>
     /// Diese Punket sind Verbindungspunkte.
@@ -665,8 +665,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     }
 
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
-        if (_jointReferenceFirst == null) { _jointReferenceFirst = firstPoint; }
-        if (_jointReferenceSecond == null) { _jointReferenceSecond = secondPoint; }
+        _jointReferenceFirst ??= firstPoint;
+        _jointReferenceSecond ??= secondPoint;
 
         if (firstPoint != _jointReferenceFirst) {
             Develop.DebugPrint(FehlerArt.Fehler, "Refernz-Punkt falsch!");
@@ -710,10 +710,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         if (JointPoints.Count > 0) {
             var angle = GetAngle(_jointReferenceFirst, _jointReferenceSecond);
 
-            foreach (var thisPoint in JointPoints) {
-                foreach (var thispoint in JointPoints) {
-                    thispoint.SetTo(JointMiddle, thispoint.Distance, thispoint.Angle + angle, false);
-                }
+            foreach (var thispoint in JointPoints) {
+                thispoint.SetTo(JointMiddle, thispoint.Distance, thispoint.Angle + angle, false);
             }
         }
     }

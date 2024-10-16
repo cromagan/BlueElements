@@ -79,7 +79,6 @@ public static class Converter {
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
     /// </summary>
     /// <param name="s"></param>
-    /// <param name="result"></param>
     /// <returns></returns>
     public static double DoubleParse(string? s) {
         if (string.IsNullOrEmpty(s)) { return 0; }
@@ -194,9 +193,9 @@ public static class Converter {
         return long.TryParse(s, out result);
     }
 
-    public static float MmToPixel(float mM, int dPi) => mM * (float)dPi / 25.4f;
+    public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;
 
-    public static float PixelToMm(float pixel, int dPi) => pixel * 25.4f / (float)dPi;
+    public static float PixelToMm(float pixel, int dPi) => pixel * 25.4f / dPi;
 
     public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 

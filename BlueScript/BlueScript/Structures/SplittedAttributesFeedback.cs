@@ -36,11 +36,10 @@ public readonly struct SplittedAttributesFeedback {
         FehlerTyp = ScriptIssueType.ohne;
     }
 
-    public SplittedAttributesFeedback(ScriptIssueType type, string error, int attWithError) {
+    public SplittedAttributesFeedback(ScriptIssueType type, string error) {
         Attributes = [];
         ErrorMessage = error;
         FehlerTyp = type;
-        AttWithError = attWithError;
     }
 
     #endregion
@@ -48,7 +47,6 @@ public readonly struct SplittedAttributesFeedback {
     #region Properties
 
     public VariableCollection Attributes { get; }
-    public int AttWithError { get; }
     public string ErrorMessage { get; }
 
     public ScriptIssueType FehlerTyp { get; }
@@ -78,7 +76,7 @@ public readonly struct SplittedAttributesFeedback {
     public bool ReadOnly(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return true; }
 
-        return Attributes[varno] is not { ReadOnly: not true };
+        return Attributes[varno] is not { ReadOnly: false };
     }
 
     public Bitmap? ValueBitmapGet(int varno) {

@@ -381,7 +381,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         #region Subroutine Ergebnis
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
-            if (db != null && column != null && row != null) {
+            if (db != null && row != null) {
                 var oldvalue = db.Cell.GetStringCore(column, row);
 
                 var newvalue = string.Empty;

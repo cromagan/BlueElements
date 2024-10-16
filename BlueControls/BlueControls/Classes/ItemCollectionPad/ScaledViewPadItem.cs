@@ -91,7 +91,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         internal set {
             value = Math.Max(value, 0.01f);
             value = Math.Min(value, 100f);
-            if (value == _scale) { return; }
+            if (Math.Abs(value - _scale) < Constants.DefaultTolerance) { return; }
             _scale = value;
             CalculateSize();
             OnPropertyChanged();
@@ -103,7 +103,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem {
         set {
             value = Math.Max(value, 0.01f);
             value = Math.Min(value, 20);
-            if (value == _textScale) { return; }
+            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
             OnPropertyChanged();
         }

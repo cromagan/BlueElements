@@ -2,9 +2,7 @@
 using System.Windows.Forms;
 using BlueControls.Controls;
 using Button = BlueControls.Controls.Button;
-using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
-using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms {
     partial class ConnectedFormulaForm {
@@ -323,7 +321,7 @@ namespace BlueControls.Forms {
         private GroupBox grpAdminBearbeiten;
         private Button btnFormular;
         private OpenFileDialog LoadTab;
-        protected Controls.ConnectedFormulaView CFormula;
+        protected ConnectedFormulaView CFormula;
         private Button btnAusgehendeDatenbank;
         private Button btnEingehendeDatenbank;
         private Caption capClicked;

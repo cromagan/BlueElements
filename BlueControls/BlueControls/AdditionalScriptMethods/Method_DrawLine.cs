@@ -20,13 +20,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_DrawLine : BlueScript.Methods.Method {
+public class Method_DrawLine : Method {
 
     #region Properties
 

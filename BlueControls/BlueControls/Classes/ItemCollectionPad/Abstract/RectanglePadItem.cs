@@ -83,10 +83,10 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     [Description("Die Breite des Objekts in mm.")]
     public virtual float Breite {
-        get => (float)Math.Round((double)PixelToMm(UsedArea.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(UsedArea.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
-            if (Breite == value) { return; }
+            if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
             _pRu.X = _pLo.X + MmToPixel(value, ItemCollectionPadItem.Dpi);
         }
     }
@@ -103,10 +103,10 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     [Description("Die Höhe des Objekts in mm.")]
     public virtual float Höhe {
-        get => (float)Math.Round((double)PixelToMm(UsedArea.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(UsedArea.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
-            if (Höhe == value) { return; }
+            if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
             _pRu.Y = _pLo.Y + MmToPixel(value, ItemCollectionPadItem.Dpi);
         }
     }
@@ -130,7 +130,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
     public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height));
 
     public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
-        if (p == null) { p = new PointM(JointMiddle); }
+        p ??= new PointM(JointMiddle);
 
         foreach (var thisP in JointPoints) {
             thisP.Mirror(p, vertical, horizontal);

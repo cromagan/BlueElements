@@ -406,9 +406,9 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         if (_column == null) {
             if (SearchValue.Count == 0) {
                 return "Zeilen-Filter";
-            } else {
-                return "Zeilen-Filter: " + SearchValue[0];
             }
+
+            return "Zeilen-Filter: " + SearchValue[0];
         }
         var nam = _column.ReadableText();
 

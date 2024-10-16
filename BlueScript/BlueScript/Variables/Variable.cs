@@ -30,7 +30,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 
-public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName, IPropertyChangedFeedback {
+public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName {
 
     #region Fields
 
@@ -187,13 +187,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return GetVariableByParsing(txt.Substring(oo + 2), ld, varCol, scp);
         }
 
-        if (varCol != null) {
-            // Variabelen nur ersetzen, wenn Variablen auch vorhanden sind.
-            var t = Method.ReplaceVariable(txt, varCol, ld);
-            if (!t.AllOk) { return new DoItFeedback(ld, "Variablen-Berechnungsfehler"); }
-            if (t.Variable != null) { return new DoItFeedback(t.Variable); }
-            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
-        }
+        // Variabelen nur ersetzen, wenn Variablen auch vorhanden sind.
+        var t = Method.ReplaceVariable(txt, varCol, ld);
+        if (!t.AllOk) { return new DoItFeedback(ld, "Variablen-Berechnungsfehler"); }
+        if (t.Variable != null) { return new DoItFeedback(t.Variable); }
+        if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
 
         var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
         if (!t2.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler"); }

@@ -20,6 +20,8 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueDatabase.Enums;
+using BlueScript;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -61,7 +63,7 @@ public static class UseableForButton {
 
         var sx = ufb.TranslateButtonArgs(args, filterarg, rowarg);
 
-        var t = BlueScript.Script.ReduceText(sx);
+        var t = Script.ReduceText(sx);
 
         if (!string.IsNullOrEmpty(t.error)) {
             return "Fehler beim Berechnen der Attribute: " + t.error;
@@ -70,7 +72,7 @@ public static class UseableForButton {
         var ld = new LogData("Knopfdruck", 0);
         var cdw = new CanDoFeedback(0, t.reducedText, string.Empty, ld);
 
-        var scp = new ScriptProperties("Knopfdruck im Formular", BlueScript.Methods.Method.AllMethods, true, [], additionalInfo, 0);
+        var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, 0);
         ufb.DoIt(varCol, cdw, scp);
 
         return cdw.LogData.Protocol.JoinWithCr();

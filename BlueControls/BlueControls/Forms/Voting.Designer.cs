@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using BlueControls.Controls;
 
 namespace BlueControls.Forms {
     partial class Voting {
@@ -96,10 +97,10 @@ namespace BlueControls.Forms {
         }
         #endregion
 
-        private Controls.CreativePad Pad1;
-        private Controls.CreativePad Pad2;
-        private Controls.Button btn1;
-        private Controls.Button btn2;
-        private Controls.ComboBox cbxStil;
+        private CreativePad Pad1;
+        private CreativePad Pad2;
+        private Button btn1;
+        private Button btn2;
+        private ComboBox cbxStil;
     }
 }

@@ -1,4 +1,9 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
 
 namespace BlueControls.Controls;
 
@@ -6,7 +11,7 @@ partial class RowAdder {
     /// <summary> 
     /// Erforderliche Designervariable.
     /// </summary>
-    private System.ComponentModel.IContainer components = null;
+    private IContainer components = null;
 
     /// <summary> 
     /// Verwendete Ressourcen bereinigen.
@@ -26,26 +31,26 @@ partial class RowAdder {
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
     private void InitializeComponent() {
-            this.f = new BlueControls.Controls.ListBox();
+            this.f = new ListBox();
             this.SuspendLayout();
             // 
             // f
             // 
-            this.f.AddAllowed = BlueControls.Enums.AddType.None;
-            this.f.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.f.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.f.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.f.Location = new System.Drawing.Point(0, 0);
+            this.f.AddAllowed = AddType.None;
+            this.f.Appearance = ListBoxAppearance.Listbox_Boxes;
+            this.f.CheckBehavior = CheckBehavior.MultiSelection;
+            this.f.Dock = DockStyle.Fill;
+            this.f.Location = new Point(0, 0);
             this.f.Name = "f";
-            this.f.Size = new System.Drawing.Size(381, 419);
+            this.f.Size = new Size(381, 419);
             this.f.TabIndex = 0;
-            this.f.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.F_ItemClicked);
+            this.f.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.F_ItemClicked);
             // 
             // RowAdder
             // 
             this.Controls.Add(this.f);
             this.Name = "RowAdder";
-            this.Size = new System.Drawing.Size(381, 419);
+            this.Size = new Size(381, 419);
             this.ResumeLayout(false);
 
     }

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel; // Für TypeConverter
-using System.Globalization; // Für CultureInfo
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using BlueBasics;
-using BlueBasics.Interfaces; // Für IList<T>
+using BlueBasics.Interfaces;
+
+// Für TypeConverter
+// Für CultureInfo
+
+// Für IList<T>
 
 public class InputFormatConverter : TypeConverter {
 

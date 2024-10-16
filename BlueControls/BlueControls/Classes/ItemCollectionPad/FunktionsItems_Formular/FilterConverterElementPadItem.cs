@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -141,7 +142,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var o = DatabaseOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
         con.ErrorText = _fehlerText;

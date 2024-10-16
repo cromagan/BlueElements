@@ -33,7 +33,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class DimensionPadItem : AbstractPadItem, IMirrorable {
+public sealed class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     #region Fields
 
@@ -197,7 +197,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
         _textPoint.SetTo(x + (width / 2), y, false);
     }
 
-    public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
+    public void Mirror(PointM? p, bool vertical, bool horizontal) {
         p ??= new PointM(_textPoint);
 
         _point1.Mirror(p, vertical, horizontal);

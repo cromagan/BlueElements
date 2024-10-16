@@ -38,13 +38,12 @@ using static BlueDatabase.Database;
 
 namespace BlueDatabase;
 
-public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtendedWithEvent, IEditable {
+public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColumnInputFormat, IErrorCheckable, IHasDatabase, IDisposableExtendedWithEvent, IEditable {
 
     #region Fields
 
     public DateTime? IsInCache = null;
     public QuickImage? TmpCaptionBitmapCode;
-    public SizeF TmpCaptionTextSize = new(-1, -1);
     public int? TmpIfFilterRemoved = null;
     internal List<string>? UcaseNamesSortedByLenght;
     private const string TmpNewDummy = "TMPNEWDUMMY";
@@ -112,6 +111,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _spellCheckingEnabled;
     private string _systemInfo;
     private bool _textBearbeitungErlaubt;
+    private SizeF _tmpCaptionTextSize = new(-1, -1);
 
     #endregion
 
@@ -1109,10 +1109,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public SizeF ColumnCaptionText_Size(Font columnFont) {
         if (IsDisposed) { return new SizeF(16, 16); }
 
-        if (TmpCaptionTextSize.Width > 0) { return TmpCaptionTextSize; }
+        if (_tmpCaptionTextSize.Width > 0) { return _tmpCaptionTextSize; }
         //if (_columnFont == null) { return new SizeF(_pix16, _pix16); }
-        TmpCaptionTextSize = columnFont.MeasureString(Caption.Replace("\r", "\r\n"));
-        return TmpCaptionTextSize;
+        _tmpCaptionTextSize = columnFont.MeasureString(Caption.Replace("\r", "\r\n"));
+        return _tmpCaptionTextSize;
     }
 
     public SizeF ColumnHead_Size(Font columnFont) {
@@ -2336,7 +2336,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private void _TMP_Linked_database_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedDatabase();
 
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        //if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
 
@@ -2438,7 +2438,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     private void Invalidate_Head() {
-        TmpCaptionTextSize = new SizeF(-1, -1);
+        _tmpCaptionTextSize = new SizeF(-1, -1);
         TmpCaptionBitmapCode = null;
     }
 

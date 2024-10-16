@@ -33,6 +33,8 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using static BlueBasics.IO;
+using Clipboard = System.Windows.Clipboard;
+using Point = System.Drawing.Point;
 
 namespace BlueBasics;
 
@@ -53,7 +55,17 @@ public static class Generic {
 
     #region Properties
 
-    public static List<Type> AllTypes {
+    public static string UserName {
+        get {
+            if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
+            _gotUserName = WindowsIdentity.GetCurrent().Name;
+            if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
+            return _gotUserName;
+        }
+        set => _gotUserName = value;
+    }
+
+    private static List<Type> AllTypes {
         get {
             if (_allTypes != null)
                 return _allTypes;
@@ -72,16 +84,6 @@ public static class Generic {
         }
     }
 
-    public static string UserName {
-        get {
-            if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
-            _gotUserName = WindowsIdentity.GetCurrent().Name;
-            if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
-            return _gotUserName;
-        }
-        set => _gotUserName = value;
-    }
-
     #endregion
 
     #region Methods
@@ -98,7 +100,7 @@ public static class Generic {
 
         for (var i = 0; i < 10; i++) {
             try {
-                System.Windows.Clipboard.SetText(text);
+                Clipboard.SetText(text);
                 return true;
             } catch { }
 

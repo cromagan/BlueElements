@@ -68,7 +68,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Events
 
-    public event EventHandler<RowChangedEventArgs>? RowAdded;
+    public event EventHandler<RowEventArgs>? RowAdded;
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
@@ -76,7 +76,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<RowEventArgs>? RowRemoved;
 
-    public event EventHandler<RowChangedEventArgs>? RowRemoving;
+    public event EventHandler<RowEventArgs>? RowRemoving;
 
     #endregion
 
@@ -381,21 +381,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return null;
     }
 
-    public static RowItem? OlderState(RowItem? row1, RowItem? row2) {
-        if (row1 == null) { return row2; }
-        if (row2 == null) { return row1; }
-
-        if (row1.Database?.Column.SysRowState is not { IsDisposed: false } srs1 ||
-            row2.Database?.Column.SysRowState is not { IsDisposed: false } srs2) {
-            return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
-        }
-
-        return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
-    }
-
     public static bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
-        using FilterCollection fc = new(fi.Database, "Remove Row") { fi };
-        return Remove(fc, pinned, comment);
+        FilterCollection fc = new(fi.Database, "Remove Row") { fi };
+        var r = Remove(fc, pinned, comment);
+        fc.Dispose();
+        return r;
     }
 
     public static bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
@@ -789,7 +779,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        RowCollection.Remove(toDel, "RowCleanUp");
+        Remove(toDel, "RowCleanUp");
 
         if (reduceToOne) {
             l.Remove(toDel);
@@ -802,7 +792,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? SearchByKey(string? key) {
         if (Database is not { IsDisposed: false } || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
         try {
-            var r = _internal.ContainsKey(key) ? _internal[key] : null;
+            var r = _internal.TryGetValue(key, out var value) ? value : null;
             if (r is { IsDisposed: true }) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Interner Zeilenfehler: " + key);
                 return null;
@@ -894,7 +884,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var row = SearchByKey(rowkey);
             if (row == null) { return "Zeile nicht gefunden!"; }
 
-            OnRowRemoving(new RowChangedEventArgs(row, reason));
+            OnRowRemoving(new RowEventArgs(row));
 
             if (reason == Reason.SetCommand) {
                 row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
@@ -907,7 +897,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
-            OnRowRemoved(new RowChangedEventArgs(row, reason));
+            OnRowRemoved(new RowEventArgs(row));
             return string.Empty;
         }
 
@@ -920,6 +910,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisR in _internal) {
             thisR.Value.Repair();
         }
+    }
+
+    private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
+        if (row1 == null) { return row2; }
+        if (row2 == null) { return row1; }
+
+        if (row1.Database?.Column.SysRowState is not { IsDisposed: false } srs1 ||
+            row2.Database?.Column.SysRowState is not { IsDisposed: false } srs2) {
+            return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
+        }
+
+        return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
     }
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -939,7 +941,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
-        OnRowAdded(new RowChangedEventArgs(row, reason));
+        OnRowAdded(new RowEventArgs(row));
 
         if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
             if (Database?.Column.SysRowState != null) {
@@ -963,7 +965,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    private void OnRowAdded(RowChangedEventArgs e) {
+    private void OnRowAdded(RowEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.RowGotData += OnRowGotData;
 
@@ -974,9 +976,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnRowGotData(object sender, RowEventArgs e) => RowGotData?.Invoke(this, e);
 
-    private void OnRowRemoved(RowChangedEventArgs e) => RowRemoved?.Invoke(this, e);
+    private void OnRowRemoved(RowEventArgs e) => RowRemoved?.Invoke(this, e);
 
-    private void OnRowRemoving(RowChangedEventArgs e) {
+    private void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);

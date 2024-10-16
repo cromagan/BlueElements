@@ -69,7 +69,7 @@ internal class Method_ForEachRow : Method_Database {
 
         if (allFi is null) { return new DoItFeedback(infos.LogData, "Fehler im Filter"); }
 
-        if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(infos.LogData, "Datenbankfehler!"); }
+        //if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(infos.LogData, "Datenbankfehler!"); }
 
         var scx = new DoItFeedback(false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1);

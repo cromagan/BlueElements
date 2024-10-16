@@ -219,9 +219,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         }
 
         if (db.Column["Symbol"] is { IsDisposed: false } c) {
-            var o = new Renderer_ImageAndText();
-            o.Text_anzeigen = false;
-            o.Bild_anzeigen = true;
+            var o = new Renderer_ImageAndText {
+                Text_anzeigen = false,
+                Bild_anzeigen = true
+            };
 
             c.RendererSettings = o.ParseableItems().FinishParseable();
         }

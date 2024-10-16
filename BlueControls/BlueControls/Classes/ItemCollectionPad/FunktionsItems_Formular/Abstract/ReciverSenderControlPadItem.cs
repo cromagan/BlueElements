@@ -23,8 +23,8 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueDatabase.Database;
@@ -39,7 +39,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasVersion {
+public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Fields
 
@@ -77,7 +77,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         set {
             if (IsDisposed) { return; }
 
-            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None)) { return; }
+            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(AllowedInputFilter.None)) { return; }
 
             if (value == DatabaseOutput) { return; }
 
@@ -147,7 +147,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem, IHasV
         Database? outp = null;
 
         if (DatabaseInputMustMatchOutputDatabase) {
-            enableOutput = AllowedInputFilter.HasFlag(Enums.AllowedInputFilter.None);
+            enableOutput = AllowedInputFilter.HasFlag(AllowedInputFilter.None);
 
             outp = DatabaseInput;
             if (outp is not null) { enableOutput = false; }

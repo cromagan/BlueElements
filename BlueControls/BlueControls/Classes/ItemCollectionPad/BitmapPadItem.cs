@@ -35,16 +35,13 @@ using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirrorable {
+public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     #region Fields
-
-    public readonly List<QuickImage> Overlays;
-
-    public int Padding;
 
     private SizeModes _bild_Modus;
 
@@ -62,9 +59,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
     public BitmapPadItem(string keyName, Bitmap? bmp, Size size) : base(keyName) {
         Bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
-        Overlays = [];
         Hintergrund_Weiß_Füllen = true;
-        Padding = 0;
         Bild_Modus = SizeModes.EmptySpace;
         Stil = PadStyles.Undefiniert; // Kein Rahmen
     }
@@ -112,7 +107,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
     public void Bildschirmbereich_wählen() {
         if (Bitmap != null) {
-            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).CloneOfBitmap();
         OnPropertyChanged();
@@ -120,7 +115,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
     public void Datei_laden() {
         if (Bitmap != null) {
-            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         OpenFileDialog e = new() {
             CheckFileExists = true,
@@ -191,9 +186,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         result.ParseableAdd("Modus", Bild_Modus);
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
         result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
-        //result.ParseableAdd("Overlays", "Overlay", Overlays);
-
-        result.ParseableAdd("Padding", Padding);
         result.ParseableAdd("Image", Bitmap);
 
         return result;
@@ -210,7 +202,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
                 return true;
 
             case "padding":
-                Padding = IntParse(value);
+                //_padding = IntParse(value);
                 return true;
 
             case "image":
@@ -286,30 +278,29 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        positionModified.Inflate(-Padding, -Padding);
-        RectangleF r1 = new(positionModified.Left + Padding, positionModified.Top + Padding,
-            positionModified.Width - (Padding * 2), positionModified.Height - (Padding * 2));
+        //positionModified.Inflate(-_padding, -_padding);
+        //RectangleF r1 = new(positionModified.Left , positionModified.Top , positionModified.Width , positionModified.Height );
         RectangleF r2 = new();
         RectangleF r3 = new();
         if (Bitmap != null) {
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
             switch (Bild_Modus) {
                 case SizeModes.Verzerren: {
-                        r2 = r1;
+                        r2 = positionModified;
                         break;
                     }
 
                 case SizeModes.BildAbschneiden: {
-                        var scale2 = Math.Max((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
-                        var tmpw = (positionModified.Width - (Padding * 2)) / scale2;
-                        var tmph = (positionModified.Height - (Padding * 2)) / scale2;
+                        var scale2 = Math.Max((positionModified.Width) / Bitmap.Width, (positionModified.Height) / Bitmap.Height);
+                        var tmpw = (positionModified.Width) / scale2;
+                        var tmph = (positionModified.Height) / scale2;
                         r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-                        r2 = r1;
+                        r2 = positionModified;
                         break;
                     }
                 default: // Is = enSizeModes.WeißerRand
                 {
-                        var scale2 = Math.Min((positionModified.Width - (Padding * 2)) / Bitmap.Width, (positionModified.Height - (Padding * 2)) / Bitmap.Height);
+                        var scale2 = Math.Min((positionModified.Width) / Bitmap.Width, (positionModified.Height) / Bitmap.Height);
                         r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale2)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale2)) / 2) + positionModified.Top, Bitmap.Width * scale2, Bitmap.Height * scale2);
                         break;
                     }
@@ -318,7 +309,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
-        r1 = r1 with { X = r1.Left - trp.X, Y = r1.Top - trp.Y };
+        var r1 = positionModified with { X = positionModified.Left - trp.X, Y = positionModified.Top - trp.Y };
         r2 = r2 with { X = r2.Left - trp.X, Y = r2.Top - trp.Y };
         if (Hintergrund_Weiß_Füllen) {
             gr.FillRectangle(Brushes.White, r1);
@@ -342,9 +333,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
                 gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), r1);
             }
         }
-        foreach (var thisQi in Overlays) {
-            gr.DrawImage(thisQi, r2.Left + 8, r2.Top + 8);
-        }
+
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
         if (!ForPrinting) {

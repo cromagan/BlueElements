@@ -113,7 +113,6 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(true);
 
-        if (e.Item == null) { return; }
         FormulaSet(e.Item.KeyName);
     }
 

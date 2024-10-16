@@ -35,6 +35,7 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase.EventArgs;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -1002,7 +1003,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             Minimum = 0f,
             MouseChange = 1f,
             Name = "SliderY",
-            Orientation = BlueBasics.Enums.Orientation.Senkrecht,
+            Orientation = Orientation.Senkrecht,
             Size = new Size(18, Height),
             SmallChange = 48f,
             TabIndex = 0,

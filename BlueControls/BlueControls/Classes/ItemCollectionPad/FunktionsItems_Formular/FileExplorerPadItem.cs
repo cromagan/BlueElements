@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -128,7 +129,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FileBrowser {
             Var_Directory = Pfad,
             Var_DirectoryMin = Mindest_Pfad,

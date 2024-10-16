@@ -130,7 +130,7 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
         if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
             DatabaseScriptEditor._befehlsReferenz.Close();
-            DatabaseScriptEditor._befehlsReferenz?.Dispose();
+            DatabaseScriptEditor._befehlsReferenz.Dispose();
             DatabaseScriptEditor._befehlsReferenz = null;
         }
 

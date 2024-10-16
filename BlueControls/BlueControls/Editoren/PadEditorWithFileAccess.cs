@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -182,7 +183,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void CheckSave() {
         if (string.IsNullOrWhiteSpace(_lastFileName)) { return; }
-        if (Pad?.Items is not { IsSaved: not true }) { return; }
+        if (Pad?.Items is not { IsSaved: false }) { return; }
 
         Pad.Items.IsSaved = true;
 
@@ -196,7 +197,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var x = File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);

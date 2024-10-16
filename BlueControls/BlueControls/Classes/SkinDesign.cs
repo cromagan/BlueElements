@@ -66,12 +66,10 @@ public static class SkinDesignExtensions {
         if (!string.IsNullOrEmpty(f)) {
             if (f.StartsWith("{")) {
                 des.BFont = BlueFont.Get(f);
-            } else {
-                //var fl = (f + "/X10006").SplitAndCutByCr("/");
-                //Skin.GetBlueFont(fl[0], fl[1],
-
-                //des.BFont = BlueFont.Get(f);
             }
+            //var fl = (f + "/X10006").SplitAndCutByCr("/");
+            //Skin.GetBlueFont(fl[0], fl[1],
+            //des.BFont = BlueFont.Get(f);
         }
 
         des.Image = pic;

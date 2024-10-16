@@ -34,6 +34,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -128,7 +129,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
 
         if (!string.IsNullOrEmpty(feh)) {
-            Forms.MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
+            MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
             return false;
         }
 
@@ -252,7 +253,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(Table.ColumnUsage(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(Table.ColumnUsage(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
@@ -591,8 +592,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
             b.DefaultRenderer = Renderer_ImageAndText.ClassId;
 
-            var s = new Renderer_ImageAndText();
-            s.Text_ersetzen = or.JoinWithCr();
+            var s = new Renderer_ImageAndText {
+                Text_ersetzen = or.JoinWithCr()
+            };
             b.RendererSettings = s.ReadableText();
 
             db.RepairAfterParse();

@@ -21,13 +21,12 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueDatabase.Enums;
 
 namespace BlueControls.Controls;
 
-public class FlexiControlForDelegate : FlexiControl, IDisposableExtended {
+public class FlexiControlForDelegate : FlexiControl {
 
     #region Fields
 

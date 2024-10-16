@@ -1,10 +1,16 @@
-﻿namespace BlueControls.Editoren;
+﻿using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Controls;
+using BlueControls.Enums;
+
+namespace BlueControls.Editoren;
 
 partial class RowEditor {
     /// <summary> 
     /// Erforderliche Designervariable.
     /// </summary>
-    private System.ComponentModel.IContainer components = null;
+    private IContainer components = null;
 
     /// <summary> 
     /// Verwendete Ressourcen bereinigen.
@@ -24,18 +30,18 @@ partial class RowEditor {
     /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
     /// </summary>
     private void InitializeComponent() {
-            this.formular = new BlueControls.Controls.ConnectedFormulaView();
+            this.formular = new ConnectedFormulaView();
             this.SuspendLayout();
             // 
             // formular
             // 
-            this.formular.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.formular.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
-            this.formular.Location = new System.Drawing.Point(0, 0);
+            this.formular.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
+                                                     | AnchorStyles.Left) 
+                                                    | AnchorStyles.Right)));
+            this.formular.GroupBoxStyle = GroupBoxStyle.Nothing;
+            this.formular.Location = new Point(0, 0);
             this.formular.Name = "formular";
-            this.formular.Size = new System.Drawing.Size(523, 612);
+            this.formular.Size = new Size(523, 612);
             this.formular.TabIndex = 0;
             this.formular.TabStop = false;
             // 
@@ -43,12 +49,12 @@ partial class RowEditor {
             // 
             this.Controls.Add(this.formular);
             this.Name = "RowEditor";
-            this.Size = new System.Drawing.Size(523, 612);
+            this.Size = new Size(523, 612);
             this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private Controls.ConnectedFormulaView formular;
+    private ConnectedFormulaView formular;
 }

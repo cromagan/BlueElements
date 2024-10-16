@@ -26,16 +26,19 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -322,7 +325,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
         var l = new List<string>();
         // Durchlaufen aller Undo-Operationen in der Datenbank
         foreach (var thisUndo in db.Undo) {
-            if (thisUndo.Command == BlueDatabase.Enums.DatabaseDataType.EventScript) {
+            if (thisUndo.Command == DatabaseDataType.EventScript) {
                 l.Add("############################################################################");
                 l.Add("############################################################################");
                 l.Add("############################################################################");
@@ -413,14 +416,14 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
     private bool EnableScript() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
 
-        var s = Forms.MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
+        var s = MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
 
         if (s == 1) { return false; }
 
         Database.EnableScript();
 
         if (!Database.IsRowScriptPossible(false)) {
-            Forms.MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
+            MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
             return false;
         }
         return true;
@@ -463,7 +466,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
         }
 
         if (!_testmode) {
-            if (Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
+            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
         var ext = chkExtendend is { Checked: true, Visible: true };
@@ -497,7 +500,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
         Item = newItem;
     }
 
-    private void lstPermissionExecute_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+    private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var tmp = lstPermissionExecute.Checked.ToList();
         //_ = tmp.Remove(Constants.Administrator);
         if (Item != null) { Item.UserGroups = [.. tmp]; }

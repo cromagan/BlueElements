@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.Abstract;
 
 namespace BlueControls.ItemCollectionPad.Temporär;
@@ -49,7 +50,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     public override string ReadableText() => "Physik-Objekt";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(BlueBasics.Enums.ImageCode.Apfel, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Apfel, 16);
 
     #endregion
 }

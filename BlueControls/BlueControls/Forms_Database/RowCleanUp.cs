@@ -25,6 +25,7 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -156,7 +157,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
         //    return;
         //}
 
-        txtInfo.Text = r.ToString() + " angepinnte und gefilterte Zeilen werden berücksichtigt.";
+        txtInfo.Text = r + " angepinnte und gefilterte Zeilen werden berücksichtigt.";
     }
 
     private void Fertig_Click(object sender, System.EventArgs e) {
@@ -183,7 +184,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
                 var f = new FilterCollection(db, "Dupe Suche");
 
                 foreach (var thisc in columns) {
-                    f.Add(new FilterItem(thisc, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
+                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
                 }
 
                 #endregion

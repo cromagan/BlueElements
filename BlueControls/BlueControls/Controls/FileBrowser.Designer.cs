@@ -4,10 +4,9 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 
 namespace BlueControls.Controls {
-    partial class FileBrowser {
+    sealed partial class FileBrowser {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>

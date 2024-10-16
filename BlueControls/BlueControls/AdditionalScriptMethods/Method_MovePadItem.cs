@@ -49,11 +49,6 @@ internal class Method_MovePadItem : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        List<string> names = [];
-        for (var z = 1; z < attvar.Attributes.Count; z++) {
-            names.Add(attvar.ValueStringGet(z));
-        }
-
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
             icpv.MoveAllItems(attvar.ValueIntGet(1), attvar.ValueIntGet(2));

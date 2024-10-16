@@ -64,6 +64,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
+    /// <param name="texteditAllowed"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, texteditAllowed ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList) { }
 
     /// <summary>

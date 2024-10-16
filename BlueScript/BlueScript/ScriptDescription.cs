@@ -255,9 +255,9 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         if (!string.IsNullOrEmpty(_image)) {
             if (_usergroups.Count > 0) {
                 return QuickImage.Get(_image + "|16");
-            } else {
-                return QuickImage.Get(_image + "|16|||||170");
             }
+
+            return QuickImage.Get(_image + "|16|||||170");
         }
         //if (_manualexecutable) {            return QuickImage.Get(ImageCode.Person, 16, Color.Yellow, Color.Transparent);        }
         return null;

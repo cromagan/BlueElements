@@ -229,7 +229,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
     public bool FormatierungErlaubt { get; set; }
-    public QuickImage? Image { get; set; }
+    public QuickImage? Image { get; private set; }
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
     public string Name { get; }

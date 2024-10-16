@@ -21,11 +21,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -89,7 +91,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             value = Math.Min(value, 20f);
             value = (float)Math.Round(value, 2, MidpointRounding.AwayFromZero);
 
-            if (_defaultCopyScale == value) { return; }
+            if (Math.Abs(_defaultCopyScale - value) < Constants.DefaultTolerance) { return; }
             _defaultCopyScale = value;
             OnPropertyChanged();
         }
@@ -129,7 +131,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             value = Math.Min(value, 20f);
             value = (float)Math.Round(value, 2, MidpointRounding.AwayFromZero);
 
-            if (_scale == value) { return; }
+            if (Math.Abs(_scale - value) < Constants.DefaultTolerance) { return; }
             _scale = value;
             OnPropertyChanged();
         }
@@ -162,7 +164,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedCreativePad();
 
         switch (_typ.ToLower()) {
@@ -203,7 +205,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var layouts = new List<AbstractListItem>();
-        var scripte = new List<AbstractListItem>();
 
         if (DatabaseInput is { IsDisposed: false } db) {
 
@@ -217,21 +218,21 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             #endregion
 
-            #region Verfügbare Skripte ermitteln
+            //#region Verfügbare Skripte ermitteln
 
-            foreach (var thise in db.EventScript) {
-                if (!thise.ChangeValues && thise.NeedRow) {
-                    scripte.Add(ItemOf(thise));
-                }
-            }
-
-            //if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
-            //    var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
-
-            //    layouts.AddRange(ItemsOf(f));
+            //foreach (var thise in db.EventScript) {
+            //    if (!thise.ChangeValues && thise.NeedRow) {
+            //        scripte.Add(ItemOf(thise));
+            //    }
             //}
 
-            #endregion
+            ////if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
+            ////    var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
+
+            ////    layouts.AddRange(ItemsOf(f));
+            ////}
+
+            //#endregion
         }
 
         #region Verfügbare Typen ermitteln
@@ -337,7 +338,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     /// </summary>
     public void Skripte_Bearbeiten() {
         if (DatabaseInput is { IsDisposed: false } db) {
-            Forms.TableView.OpenScriptEditor(db);
+            TableView.OpenScriptEditor(db);
         }
         OnDoUpdateSideOptionMenu();
     }

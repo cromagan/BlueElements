@@ -37,10 +37,11 @@ using Microsoft.Win32;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControlReciver   //UserControl //
+public sealed partial class FileBrowser : GenericControlReciver   //UserControl //
 {
     #region Fields
 
@@ -237,8 +238,6 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             DirectoryMin = tmpDirectoryMin;
         }
     }
-
-    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
@@ -455,13 +454,13 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
             var dropped = (string[])e.Data.GetData(DataFormats.FileDrop);
             files = dropped.ToList();
         } catch {
-            Forms.MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+            MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
             return;
         }
 
         foreach (var thisfile in files) {
             if (!FileExists(thisfile)) {
-                Forms.MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+                MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
                 return;
             }
         }
@@ -548,6 +547,8 @@ public partial class FileBrowser : GenericControlReciver   //UserControl //
 
         Directory = e.Item.KeyName;
     }
+
+    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void ReloadDirectory() {
         if (InvokeRequired) {

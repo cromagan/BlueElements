@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
 using BlueScript.Methods;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -24,7 +25,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls;
 
-public partial class Befehlsreferenz : Forms.Form {
+public partial class Befehlsreferenz : Form {
 
     #region Constructors
 

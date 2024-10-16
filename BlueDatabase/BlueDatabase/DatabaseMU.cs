@@ -138,7 +138,7 @@ public class DatabaseMu : Database {
 
     //public new static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
     //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
-    protected override List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked, string mustBeFreezed) {
+    protected override List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {

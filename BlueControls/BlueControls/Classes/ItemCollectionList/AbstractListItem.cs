@@ -22,7 +22,6 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.CellRenderer;
 using BlueControls.Enums;
 
 namespace BlueControls.ItemCollectionList;
@@ -185,7 +184,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public virtual bool FilterMatch(string filterText) => KeyName.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign, Renderer_Abstract renderer);
+    public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign);
 
     public virtual bool IsClickable() => !IsCaption;
 

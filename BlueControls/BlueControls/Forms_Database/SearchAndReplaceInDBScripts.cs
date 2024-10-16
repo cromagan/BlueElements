@@ -48,7 +48,7 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
     private void AltNeu_TextChanged(object sender, System.EventArgs e) => Checkbuttons();
 
     private void Checkbuttons() {
-        var canDo = !!Generic.IsAdministrator();
+        var canDo = Generic.IsAdministrator();
         if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
         btnAusfuehren.Enabled = canDo;
     }

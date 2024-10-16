@@ -37,6 +37,7 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.Forms;
 
@@ -106,7 +107,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(Controls.ComboBox addHere, Database? db) {
+    public static void AddLayoutsOff(ComboBox addHere, Database? db) {
         if (db is null || db.IsDisposed) { return; }
         var r = db.GetAllLayoutsFileNames();
 

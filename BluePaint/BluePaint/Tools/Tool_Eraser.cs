@@ -45,10 +45,10 @@ public partial class Tool_Eraser : GenericTool {
         }
 
         var pic = OnNeedCurrentPic();
-        if (pic == null || e.Current == null) { return; }
+        if (pic == null) { return; }
 
         Point p1, p2;
-        if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {
+        if (e.Current.Button == MouseButtons.Left) {
             p1 = new Point(Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY));
             p2 = new Point(Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
             e.FillRectangle(BrushRedTransp, e.TrimmedRectangle());

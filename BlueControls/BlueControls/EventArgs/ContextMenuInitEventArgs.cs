@@ -31,7 +31,6 @@ public class ContextMenuInitEventArgs : System.EventArgs {
         ContextMenu = contextMenu;
         HotItem = hotItem;
         Translate = true;
-        Cancel = false;
         Mouse = mouse;
     }
 
@@ -39,7 +38,6 @@ public class ContextMenuInitEventArgs : System.EventArgs {
 
     #region Properties
 
-    public bool Cancel { get; set; }
     public List<AbstractListItem> ContextMenu { get; }
     public object? HotItem { get; }
     public MouseEventArgs? Mouse { get; }

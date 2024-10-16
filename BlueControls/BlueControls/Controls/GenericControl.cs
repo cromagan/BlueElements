@@ -27,7 +27,9 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
+using Form = System.Windows.Forms.Form;
 
 //Inherits UserControl ' -> Gibt Focus an Child!
 //Inherits ContainerControl -> ?
@@ -172,10 +174,10 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
                 return ParentType.Slider;
             //Is = "FRMMSGBOX"
 
-            case Forms.FloatingForm:
+            case FloatingForm:
                 return ParentType.MsgBox;
 
-            case Forms.DialogWithOkAndCancel:
+            case DialogWithOkAndCancel:
                 return ParentType.MsgBox;
 
             case TextBox:
@@ -241,8 +243,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     public bool DoDrawings() {
         if (IsDisposed || Disposing) { return false; }
         if (DesignMode) { return true; }
-        if (_pform is not { IsDisposed: false, Visible: true }) { return false; }
-        if (_pform is Forms.Form { IsClosing: true }) { return false; }
+        if (_pform is not { IsDisposed: false, Visible: true } or Forms.Form { IsClosing: true }) { return false; }
+
         return Visible;
     }
 

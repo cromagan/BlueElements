@@ -24,6 +24,7 @@ using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Enums;
 
 namespace BlueDatabase;
@@ -109,7 +110,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
     #region Methods
 
     public void CalculateScaledDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, float scale) {
-        if (IsDisposed || Row.IsDisposed) { DrawHeight = BlueControls.Controls.Table.GetPix(18, scale); return; }
+        if (IsDisposed || Row.IsDisposed) { DrawHeight = Table.GetPix(18, scale); return; }
 
         DrawHeight = 18;
 
@@ -117,12 +118,12 @@ public sealed class RowData : IComparable, IDisposableExtended {
             if (CellCollection.IsInCache(thisViewItem.Column, Row) && thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer();
 
-                if (renderer != null) { DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.DoOpticalTranslation).Height); }
+                DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), Design.Table_Cell, States.Standard, tmpc.DoOpticalTranslation).Height);
             }
         }
 
         DrawHeight = Math.Min(DrawHeight, (int)(displayRectangleWoSlider.Height * 0.4) - columnHeadSize);
-        DrawHeight = BlueControls.Controls.Table.GetPix(Math.Max(DrawHeight, 18), scale);
+        DrawHeight = Table.GetPix(Math.Max(DrawHeight, 18), scale);
     }
 
     public string CompareKey() => PinStateSortAddition + ";" + Chapter + ";" + AdditionalSort;

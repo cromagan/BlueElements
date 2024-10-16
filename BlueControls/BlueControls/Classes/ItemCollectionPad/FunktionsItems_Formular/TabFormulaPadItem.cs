@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -30,6 +31,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using ListBox = BlueControls.Controls.ListBox;
+using TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -73,7 +76,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     #region Methods
 
-    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TabControl();
         con.Name = this.DefaultItemToControlName(ParentFormula?.Filename);
         // Die Input-Settings werden direkt auf das erzeugte
@@ -109,10 +112,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
             #region Prüfen, ob der Tab schon vorhanden ist (existsTab)
 
-            System.Windows.Forms.TabPage? existTab = null;
+            TabPage? existTab = null;
 
             foreach (var thisTab in tabctrl.TabPages) {
-                if (thisTab is System.Windows.Forms.TabPage tb) {
+                if (thisTab is TabPage tb) {
                     if (tb.Name == thisc.FileNameWithoutSuffix()) {
                         existTab = tb;
                         break;
@@ -130,7 +133,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
                         #region Neuen Tab und ConnectedFormulaView (cc) erstellen
 
-                        var t = new System.Windows.Forms.TabPage {
+                        var t = new TabPage {
                             Name = thisc.FileNameWithoutSuffix(),
                             Text = thisc.FileNameWithoutSuffix()
                         };
@@ -140,7 +143,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, cc.DatabaseInput);
-                        cc.Dock = System.Windows.Forms.DockStyle.Fill;
+                        cc.Dock = DockStyle.Fill;
                         cc.DoDefaultSettings(parentView, this, mode);
 
                         //cc.HandleChangesNow();

@@ -254,8 +254,6 @@ public static partial class Extensions {
     /// Entfernt Leerzeichen und angebebene Textpaare am Anfang/Ende - mit genau einem Zeichen. Z.B. perfekt im Klammern zu entfernen
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="klammern">z.B. Constants.KlammernRund</param>
-
     public static string FromNonCritical(this string txt) {
         // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -604,7 +602,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Entfernt alle < > aus dem gegebenen Text.
+    /// Entfernt alle Größer/Kleiner-Zeichen aus dem gegebenen Text.
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
@@ -818,6 +816,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="tXt"></param>
     /// <param name="additinalAllowed"></param>
+    /// <param name="removedupes"></param>
     /// <returns></returns>
     public static string StarkeVereinfachung(this string tXt, string additinalAllowed, bool removedupes) {
         tXt = tXt.ToLowerInvariant().ReduceToChars(Char_Numerals + Char_Buchstaben + additinalAllowed);

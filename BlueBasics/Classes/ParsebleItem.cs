@@ -41,9 +41,9 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
             var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
             if (ci != null) {
                 return ci;
-            } else {
-                Develop.DebugPrint(FehlerArt.Fehler, "ClassID nicht gefunden!");
             }
+
+            Develop.DebugPrint(FehlerArt.Fehler, "ClassID nicht gefunden!");
             return string.Empty;
         }
     }
@@ -82,7 +82,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
     /// <param name="args">Ein Array von Argumenten, das bezüglich Anzahl, Reihenfolge und Typ mit den Parametern
     /// des aufzurufenden Konstruktors übereinstimmt. Wenn args ein leeres Array oder
     /// null ist, wird der Konstruktor aufgerufen, der keine Parameter akzeptiert, d.   h. der Standardkonstruktor.
-    //</param>
+    ///</param>
     /// <returns></returns>
     public static T? NewByTypeName<T>(string typname, params object[] args) where T : ParsebleItem {
         var types = Generic.GetEnumerableOfType<T>();

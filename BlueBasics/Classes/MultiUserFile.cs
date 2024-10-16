@@ -28,6 +28,7 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using Timer = System.Threading.Timer;
 
 namespace BlueBasics.MultiUserFile;
 
@@ -36,7 +37,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     #region Fields
 
     private static readonly List<MultiUserFile> AllFiles = [];
-    private readonly System.Threading.Timer _checker;
+    private readonly Timer _checker;
     private string _canWriteError = string.Empty;
     private bool _checkedAndReloadNeed;
     private int _checkerTickCount = -5;
@@ -62,7 +63,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     protected MultiUserFile() {
         AllFiles.Add(this);
-        _checker = new System.Threading.Timer(Checker_Tick);
+        _checker = new Timer(Checker_Tick);
         Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
@@ -325,7 +326,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             _initialLoadDone = true;
             _checkedAndReloadNeed = false;
 
-            OnLoaded(this, System.EventArgs.Empty);
+            OnLoaded();
 
             return ReloadNeeded;
         } catch {
@@ -477,7 +478,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
-    protected virtual void OnLoaded(object sender, System.EventArgs e) => Loaded?.Invoke(this, e);
+    protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
 
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 

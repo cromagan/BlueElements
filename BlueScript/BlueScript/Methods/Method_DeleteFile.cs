@@ -60,9 +60,9 @@ internal class Method_DeleteFile : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var files = new List<string>();
 
-        for (var z = 0; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is VariableString vs1) { files.Add(vs1.ValueString); }
-            if (attvar.Attributes[z] is VariableListString vl1) { files.AddRange(vl1.ValueList); }
+        foreach (var thisAtt in attvar.Attributes) {
+            if (thisAtt is VariableString vs1) { files.Add(vs1.ValueString); }
+            if (thisAtt is VariableListString vl1) { files.AddRange(vl1.ValueList); }
         }
         files = files.SortedDistinctList();
 

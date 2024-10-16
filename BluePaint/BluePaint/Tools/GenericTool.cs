@@ -80,6 +80,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+    /// <param name="originalPic"></param>
     public virtual new void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
 
     /// <summary>
