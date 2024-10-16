@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.Forms;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BluePaint;
@@ -36,26 +36,7 @@ public partial class Tool_DummyGenerator {
 
     #region Methods
 
-    private void CreateDummy() {
-        var w = IntParse( MathFormulaParser.Ergebnis(X.Text));
-        var h = IntParse(MathFormulaParser.Ergebnis(Y.Text));
-        if (w < 2) {
-            Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
-            return;
-        }
-        if (h < 2) {
-            Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
-            return;
-        }
-
-        var newPic = CreateDummy(TXT.Text, w, h);
-
-        OnOverridePic(newPic, true);
-    }
-
-
     public static Bitmap CreateDummy(string text, int width, int height) {
-
         Bitmap newPic = new(width, height);
         var gr = Graphics.FromImage(newPic);
         gr.Clear(Color.White);
@@ -70,6 +51,22 @@ public partial class Tool_DummyGenerator {
         return newPic;
     }
 
+    private void CreateDummy() {
+        var w = IntParse(MathFormulaParser.Ergebnis(X.Text));
+        var h = IntParse(MathFormulaParser.Ergebnis(Y.Text));
+        if (w < 2) {
+            Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
+            return;
+        }
+        if (h < 2) {
+            Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
+            return;
+        }
+
+        var newPic = CreateDummy(TXT.Text, w, h);
+
+        OnOverridePic(newPic, true);
+    }
 
     private void Erstellen_Click(object sender, System.EventArgs e) {
         CreateDummy();

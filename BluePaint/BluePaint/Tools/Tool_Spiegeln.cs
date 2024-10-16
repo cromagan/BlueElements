@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueControls;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 

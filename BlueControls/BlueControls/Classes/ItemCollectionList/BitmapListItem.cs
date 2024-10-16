@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.CellRenderer;
+using BlueControls.Enums;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 

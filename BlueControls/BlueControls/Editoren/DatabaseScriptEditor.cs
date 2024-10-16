@@ -17,25 +17,25 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
-using BlueControls.ItemCollectionList;
-using System;
-using BlueControls.Controls;
-using BlueControls.Interfaces;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueControls;
 

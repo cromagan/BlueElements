@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -27,6 +25,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -648,7 +648,6 @@ public static partial class Extensions {
         return new string(charArray);
     }
 
-
     /// <summary>
     /// Trennt den Text mittels dem Trennzeichen. Sind ein oder mehrere Trennzeichen am Ende, werden die leeren Felder nicht zurückgegeben.
     /// </summary>
@@ -942,8 +941,6 @@ public static partial class Extensions {
         if (tXt == null || string.IsNullOrEmpty(tXt)) { return []; }
         return Encoding.UTF8.GetBytes(tXt);
     }
-
-
 
     #endregion
 }

@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics.Enums;
 
 namespace BlueBasics;
 

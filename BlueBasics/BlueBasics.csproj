@@ -143,7 +143,6 @@
     <Compile Include="Classes\ParsebleItem.cs" />
     <Compile Include="Classes_Static\Polygons.cs" />
     <Compile Include="Classes\QuickImage.cs" />
-    <Compile Include="EventArgs\ListEventArgs.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\ByteArrayExtension.cs" />
     <Compile Include="Extensions\ConcurrentDictionaryExtension.cs" />

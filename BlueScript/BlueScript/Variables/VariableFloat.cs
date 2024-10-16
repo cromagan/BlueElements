@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
-using System;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -58,7 +58,6 @@ public class VariableFloat : Variable {
     public override int CheckOrder => 1;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
-  
 
     /// <summary>
     /// Der Zahlenwert mit maximal 5 Kommastellen (0.#####)

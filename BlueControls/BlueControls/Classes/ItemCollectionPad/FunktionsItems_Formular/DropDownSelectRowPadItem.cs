@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ConnectedFormula;
@@ -27,9 +30,6 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -56,7 +56,9 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-SelectRowWithDropDownMenu";
+
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
 
     [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]

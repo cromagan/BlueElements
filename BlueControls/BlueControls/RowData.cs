@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Enums;
 
 namespace BlueDatabase;
 
@@ -139,6 +139,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
+        //pp
         GC.SuppressFinalize(this);
     }
 

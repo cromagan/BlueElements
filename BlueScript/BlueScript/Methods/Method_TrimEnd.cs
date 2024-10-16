@@ -17,24 +17,24 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_TrimEnd : Method {
-    public override List<string> Constants => [];
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "trimend";
+    public override List<string> Constants => [];
     public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -48,7 +48,7 @@ internal class Method_TrimEnd : Method {
 
     #region Methods
 
-   public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
         string txt;

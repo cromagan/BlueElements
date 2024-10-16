@@ -1,7 +1,7 @@
-﻿using BlueControls.Controls;
-using BlueControls.Enums;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.Design;
+using BlueControls.Controls;
+using BlueControls.Enums;
 
 namespace BlueControls.Designer_Support;
 
@@ -49,7 +49,7 @@ public sealed class ButtonActionList : DesignerActionList {
             new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
         ];
         if ((int)_reverenceControl.ButtonStyle % 1000 is (int)ButtonStyle.Checkbox or (int)ButtonStyle.Yes_or_No or (int)ButtonStyle.Optionbox) {
-           items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
+            items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
         }
         return items;
     }

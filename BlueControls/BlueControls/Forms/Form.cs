@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueDatabase;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 

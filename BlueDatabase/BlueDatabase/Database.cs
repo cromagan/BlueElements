@@ -17,16 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueDatabase.AdditionalScriptMethods;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueScript;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,6 +27,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueDatabase.AdditionalScriptMethods;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueScript;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -1426,7 +1426,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                       "Benutzer: " + UserName + "\r\n" +
                                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
                                       "Extended: " + extended.ToString() + "\r\n";
-                    if (row is RowItem r) { t = t + "Zeile: " + r.CellFirstString() + "\r\n"; }
+                    if (row is { } r) { t = t + "Zeile: " + r.CellFirstString() + "\r\n"; }
 
                     ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
                 }

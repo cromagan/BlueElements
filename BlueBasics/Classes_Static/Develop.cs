@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,6 +28,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 
 namespace BlueBasics;
@@ -233,39 +233,17 @@ public static class Develop {
     public static void DebugPrint_MissingCommand(string command) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
     public static void DebugPrint_NichtImplementiert(bool doend) {
-        if (doend) {
-            DebugPrint(FehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
-        } else {
-            DebugPrint(FehlerArt.Warnung, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
-        }
+        DebugPrint(doend ? FehlerArt.Fehler : FehlerArt.Warnung,
+            "Diese Funktion ist vom Entwickler noch nicht implementiert.");
     }
 
     public static void DebugPrint_ReadOnly() => DebugPrint(FehlerArt.Warnung, "Der Wert ist schreibgeschützt.");
 
     public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) {
-        if (doend) {
-            DebugPrint(FehlerArt.Fehler, "Diese Routine muss überschrieben werden.");
-        } else {
-            DebugPrint(FehlerArt.Warnung, "Diese Routine muss überschrieben werden.");
-        }
+        DebugPrint(doend ? FehlerArt.Fehler : FehlerArt.Warnung, "Diese Routine muss überschrieben werden.");
     }
 
     public static void DoEvents() => Application.DoEvents();
-
-    public static void HTML_AddFoot(List<string> l) {
-        l.Add("  </body>");
-        l.Add("</html>");
-    }
-
-    public static void HTML_AddHead(List<string> l, string title) {
-        l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
-        l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
-        l.Add("<html>");
-        l.Add("  <head>");
-        l.Add("    <title>" + title + "</title>");
-        l.Add("  </head>");
-        l.Add("<body>");
-    }
 
     public static bool IsAllreadyRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
@@ -362,6 +340,21 @@ public static class Develop {
             TraceLogging_End();
             AbortExe();
         }
+    }
+
+    private static void HTML_AddFoot(List<string> l) {
+        l.Add("  </body>");
+        l.Add("</html>");
+    }
+
+    private static void HTML_AddHead(List<string> l, string title) {
+        l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+        l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
+        l.Add("<html>");
+        l.Add("  <head>");
+        l.Add("    <title>" + title + "</title>");
+        l.Add("  </head>");
+        l.Add("<body>");
     }
 
     #endregion

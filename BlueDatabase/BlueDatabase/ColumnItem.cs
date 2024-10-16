@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,6 +25,12 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -2335,7 +2335,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private void _TMP_Linked_database_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedDatabase();
 
-    private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellChangedEventArgs e) {
+    private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
@@ -2344,7 +2344,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //    foreach (var thisRow in Database.Row) {
         //        if (Database.Cell.GetStringCore(this, thisRow) == e.Row.KeyName) {
         //            thisRow.InvalidateCheckData();
-        //            Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
+        //            Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow, e.Reason));
         //            thisRow.DoSystemColumns(db, this, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
         //        }
         //    }

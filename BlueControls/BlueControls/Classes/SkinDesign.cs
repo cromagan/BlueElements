@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
-using System.Collections.Generic;
-using System.Drawing;
 
 public static class SkinDesignExtensions {
 
@@ -63,22 +63,15 @@ public static class SkinDesignExtensions {
         des.RahmenArt = rahm;
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(f)) { 
-            
-
-            if(f.StartsWith("{")) {
+        if (!string.IsNullOrEmpty(f)) {
+            if (f.StartsWith("{")) {
                 des.BFont = BlueFont.Get(f);
+            } else {
+                //var fl = (f + "/X10006").SplitAndCutByCr("/");
+                //Skin.GetBlueFont(fl[0], fl[1],
+
+                //des.BFont = BlueFont.Get(f);
             }
-            else
-            {
-                var fl = (f + "/X10006").SplitAndCutByCr("/");
-                Skin.GetBlueFont(fl[0], fl[1],
-
-                des.BFont = BlueFont.Get(f);
-            }
-
-
-
         }
 
         des.Image = pic;

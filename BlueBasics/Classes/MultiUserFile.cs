@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 

@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
 using System.Drawing.Imaging;
+using BlueBasics.Interfaces;
 
 namespace BlueBasics;
 

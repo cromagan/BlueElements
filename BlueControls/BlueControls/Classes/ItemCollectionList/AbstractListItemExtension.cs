@@ -17,18 +17,18 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
+using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionList;
 

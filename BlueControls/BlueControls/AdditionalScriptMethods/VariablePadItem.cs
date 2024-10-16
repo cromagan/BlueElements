@@ -47,12 +47,14 @@ public class VariablePadItem : Variable {
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "ici";
+
     public static string ShortName_Variable => "*ici";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _item == null;
-  
+
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 

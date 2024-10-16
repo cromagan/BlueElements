@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -31,6 +24,13 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
+using BlueDatabase;
 using static BlueBasics.Polygons;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -1590,12 +1590,6 @@ public static class Skin {
 
     internal static BlueFont? GetBlueFont(int design, States state, RowItem? rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((Design)design, state, stufe);
 
-
-
-
-
-
-
     internal static BlueFont? GetBlueFont(PadStyles padStyle, RowItem? rowOfStyle, int stufe) {
         switch (stufe) {
             case 4:
@@ -1603,29 +1597,41 @@ public static class Skin {
 
             case 3:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
-                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
+                    case PadStyles.Style_Standard:
+                        return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
+
+                    case PadStyles.Style_StandardFett:
+                        return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
                 }
                 break;
 
             case 2:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
-                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
+                    case PadStyles.Style_Standard:
+                        return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
+
+                    case PadStyles.Style_StandardFett:
+                        return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
                 }
                 break;
 
             case 1:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
-                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
+                    case PadStyles.Style_Standard:
+                        return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
+
+                    case PadStyles.Style_StandardFett:
+                        return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
                 }
                 break;
 
             case 7:
                 switch (padStyle) {
-                    case PadStyles.Style_Standard: return GetBlueFont(PadStyles.Style_StandardFett, rowOfStyle);
-                    case PadStyles.Style_StandardFett: return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
+                    case PadStyles.Style_Standard:
+                        return GetBlueFont(PadStyles.Style_StandardFett, rowOfStyle);
+
+                    case PadStyles.Style_StandardFett:
+                        return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
                 }
                 break;
         }
@@ -1640,11 +1646,20 @@ public static class Skin {
             return GetBlueFont(design, state);
         }
         switch (stufe) {
-            case 4: return GetBlueFont(design, state);
-            case 3: return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
-            case 2: return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
-            case 1: return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
-            case 7: return GetBlueFont(Enums.Design.TextBox_Bold, state);
+            case 4:
+                return GetBlueFont(design, state);
+
+            case 3:
+                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+
+            case 2:
+                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+
+            case 1:
+                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+
+            case 7:
+                return GetBlueFont(Enums.Design.TextBox_Bold, state);
         }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
@@ -1658,17 +1673,24 @@ public static class Skin {
 
         if (string.IsNullOrEmpty(fontString)) {
             Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column?.KeyName + " - " + row?.CellFirstString());
-            return BlueFont.DefaultFont; 
+            return BlueFont.DefaultFont;
         }
         return BlueFont.Get(fontString);
     }
 
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
         switch (kon) {
-            case Enums.Kontur.Rechteck: return Poly_Rechteck(r);
-            case Enums.Kontur.Rechteck_R4: return Poly_RoundRec(r, 4);
-            case Enums.Kontur.Ohne: return null;
-            default: return Poly_Rechteck(r);
+            case Enums.Kontur.Rechteck:
+                return Poly_Rechteck(r);
+
+            case Enums.Kontur.Rechteck_R4:
+                return Poly_RoundRec(r, 4);
+
+            case Enums.Kontur.Ohne:
+                return null;
+
+            default:
+                return Poly_Rechteck(r);
         }
     }
 

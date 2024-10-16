@@ -17,9 +17,9 @@
 
 #nullable enable
 
+using System.Windows.Forms;
 using BlueControls.Forms;
 using BlueDatabase;
-using System.Windows.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -35,6 +35,11 @@ public sealed partial class UserInfo : FormWithStatusBar {
 
     #region Methods
 
+    protected override void OnFormClosing(FormClosingEventArgs e) {
+        base.OnFormClosing(e);
+        tblUndo.Database?.Dispose();
+    }
+
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
         DatabaseHeadEditor.GenerateUndoTabelle(tblUndo);
@@ -49,9 +54,4 @@ public sealed partial class UserInfo : FormWithStatusBar {
     }
 
     #endregion
-
-    protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        tblUndo.Database?.Dispose();
-    }
 }

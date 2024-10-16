@@ -17,16 +17,16 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;

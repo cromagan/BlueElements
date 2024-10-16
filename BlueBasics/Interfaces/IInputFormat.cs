@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using System.Collections.Generic;
+using BlueBasics.Enums;
 
 namespace BlueBasics.Interfaces;
 
@@ -41,7 +41,6 @@ public interface IInputFormat {
 
     //public enSortierTyp SortType { get; set; }
     public bool SpellCheckingEnabled { get; set; }
-
 
     #endregion
 

@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -38,7 +38,7 @@ public class Method_MsgBox : BlueScript.Methods.Method {
     public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer einen Knopf drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType =>  MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableFloat.ShortName_Variable;
     public override string StartSequence => "(";

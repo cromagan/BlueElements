@@ -17,6 +17,10 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -24,10 +28,6 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using static BlueBasics.Generic;
 
 namespace BlueDatabase;
@@ -58,7 +58,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Events
 
-    public event EventHandler<CellChangedEventArgs>? CellValueChanged;
+    public event EventHandler<CellEventArgs>? CellValueChanged;
 
     #endregion
 
@@ -398,11 +398,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
                 }
 
-
                 if (targetColumn?.Database != null) {
                     targetColumn.AddSystemInfo("Links to me", db, column.KeyName);
                 }
-
             } else {
                 if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
             }
@@ -550,7 +548,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    internal void OnCellValueChanged(CellChangedEventArgs e) {
+    internal void OnCellValueChanged(CellEventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         e.Column.UcaseNamesSortedByLenght = null;
         CellValueChanged?.Invoke(this, e);

@@ -17,14 +17,14 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
 
 namespace BlueScript.Methods;
 
@@ -35,6 +35,7 @@ internal class Method_SaveImage : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, [VariableBitmap.ShortName_Variable]];
     public override string Command => "saveimage";
+    public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Speichert das Bild auf die Festplatte";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -45,9 +46,6 @@ internal class Method_SaveImage : Method {
     public override string Syntax => "SaveImage(Filename, PNG/JPG/BMP, Bild);";
 
     #endregion
-
-
-    public override List<string> Constants => ["PNG", "JPG", "BMP"];
 
     #region Methods
 

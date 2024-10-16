@@ -17,21 +17,21 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -60,7 +60,9 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-EditField";
+
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
     public bool AutoSizeableHeight {

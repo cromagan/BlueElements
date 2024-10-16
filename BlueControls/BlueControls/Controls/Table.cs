@@ -17,23 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
-using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,9 +29,26 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueBasics.MultiUserFile;
+using BlueControls.BlueDatabaseDialogs;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Extended_Text;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
+using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -154,7 +154,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public event EventHandler<CellEventArgs>? CellClicked;
 
-    public event EventHandler<CellChangedEventArgs>? CellValueChanged;
+    public event EventHandler<CellEventArgs>? CellValueChanged;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
@@ -1328,8 +1328,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 VisibleRowCount = 0;
                 _rowsFilteredAndPinned = [];
             } else {
-                List<RowData> sortedRowDataNew;
-                (sortedRowDataNew, VisibleRowCount) = CalculateSortedRows(db, RowsFiltered, PinnedRows, SortUsed());
+                (List<RowData> sortedRowDataNew, VisibleRowCount) = CalculateSortedRows(db, RowsFiltered, PinnedRows, SortUsed());
 
                 var sortedRowDataTmp = new List<RowData>();
 
@@ -2213,7 +2212,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
+    private void _Database_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
         if (SortUsed() is { } rsd) {
@@ -3306,14 +3305,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
-    private void OnCellValueChanged(CellChangedEventArgs e) {
+    private void OnCellValueChanged(CellEventArgs e) {
         if (IsDisposed) { return; }
         CellValueChanged?.Invoke(this, e);
     }
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 
-    //private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
+    //private void OnCellValueChanged(CellEventArgs e) => CellValueChanged?.Invoke(this, e);
     private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);

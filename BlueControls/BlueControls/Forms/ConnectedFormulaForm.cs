@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using System.ComponentModel;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
@@ -25,8 +27,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using System.ComponentModel;
-using System.Windows.Forms;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
 
@@ -100,7 +100,6 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         DebugPrint_InvokeRequired(InvokeRequired, true);
         if (CFormula.ConnectedFormula == null) { return; }
         if (!Generic.IsAdministrator()) { return; }
-
 
         if (!CFormula.ConnectedFormula.LockEditing()) { return; }
 

@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics.Enums;
+using BlueControls.Enums;
 
 namespace BlueControls.Controls;
 

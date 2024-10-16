@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using BlueControls.Controls;
 using System;
 using System.Drawing;
+using BlueControls.Controls;
 
 namespace BluePaint;
 

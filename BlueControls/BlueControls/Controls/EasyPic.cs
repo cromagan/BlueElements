@@ -17,28 +17,27 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.Enums;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic :  GenericControlReciver, IContextMenu, IBackgroundNone //  UserControl //
+public sealed partial class EasyPic : GenericControlReciver, IContextMenu, IBackgroundNone //  UserControl //
                                                   {
-
     #region Fields
 
     private Bitmap? _bitmap;
@@ -227,17 +226,6 @@ public sealed partial class EasyPic :  GenericControlReciver, IContextMenu, IBac
         ZoomFitInvalidateAndCheckButtons();
     }
 
-    private void btnScreenshot_Click(object sender, System.EventArgs e) {
-        if (!DeleteImageInFileSystem()) { return; }
-        if (!HasFileName()) { return; }
-        _bitmap = ScreenShot.GrabArea(ParentForm()).CloneOfBitmap();
-
-        SaveNewPicToDisc();
-        ZoomFitInvalidateAndCheckButtons();
-    }
-
-    private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
-
     private void _paneMover_Tick(object sender, System.EventArgs e) {
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {
@@ -271,6 +259,17 @@ public sealed partial class EasyPic :  GenericControlReciver, IContextMenu, IBac
             EditPanelFrame.Top -= 4;
         }
     }
+
+    private void btnScreenshot_Click(object sender, System.EventArgs e) {
+        if (!DeleteImageInFileSystem()) { return; }
+        if (!HasFileName()) { return; }
+        _bitmap = ScreenShot.GrabArea(ParentForm()).CloneOfBitmap();
+
+        SaveNewPicToDisc();
+        ZoomFitInvalidateAndCheckButtons();
+    }
+
+    private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
 
     private bool HasFileName() {
         if (string.IsNullOrEmpty(_filename)) { return false; }

@@ -19,8 +19,8 @@
 
 using System.Collections.Generic;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 

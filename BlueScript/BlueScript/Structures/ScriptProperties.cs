@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueScript.Methods;
 using System.Collections.Generic;
+using BlueScript.Methods;
 
 namespace BlueScript.Structures;
 
@@ -42,6 +42,7 @@ public class ScriptProperties {
     #region Properties
 
     public object? AdditionalInfo { get; }
+    public List<Method> AllowedMethods { get; }
     public bool ProduktivPhase { get; }
 
     /// <summary>
@@ -51,7 +52,6 @@ public class ScriptProperties {
 
     public string ScriptName { get; }
     public int Stufe { get; }
-    public List<Method> AllowedMethods { get; }
 
     #endregion
 }

@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Reflection;
+using BlueBasics.Enums;
 using static BlueBasics.IO;
 
 namespace BlueBasics;
@@ -72,7 +72,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
         try {
-            using var fs =  new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             var im = Image.FromStream(fs);
             fs.Close();
             return im;

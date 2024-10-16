@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 

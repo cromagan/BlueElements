@@ -17,18 +17,18 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
+using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 

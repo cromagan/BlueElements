@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueBasics.EventArgs;
 using System;
+using BlueBasics.EventArgs;
 
 namespace BlueBasics.Interfaces;
 

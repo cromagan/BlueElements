@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -26,7 +24,9 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 
 //Inherits UserControl ' -> Gibt Focus an Child!

@@ -17,6 +17,10 @@
 
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -27,10 +31,6 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -248,7 +248,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this,this, e); }
+        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, this, e); }
     }
 
     private static bool QuickModePossible(string text, SteuerelementVerhalten textAnzeigeverhalten) {

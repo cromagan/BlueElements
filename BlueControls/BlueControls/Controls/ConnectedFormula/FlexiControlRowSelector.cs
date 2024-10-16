@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ConnectedFormula;

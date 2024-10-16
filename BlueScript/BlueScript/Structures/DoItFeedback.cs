@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using BlueScript.Methods;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueScript.Methods;
+using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
@@ -104,10 +104,10 @@ public struct DoItFeedback {
 
     public static DoItFeedback FalscherDatentyp(LogData ld) => new(ld, "Falscher Datentyp.");
 
+    public static DoItFeedback InternerFehler(LogData? ld) => new(ld, "Interner Programmierfehler. Admin verständigen.");
+
     public static DoItFeedback KlammerFehler(LogData ld) => new(ld, "Fehler bei der Klammersetzung.");
 
-
-    public static DoItFeedback InternerFehler(LogData? ld) => new(ld, "Interner Programmierfehler. Admin verständigen.");
     public static DoItFeedback Null() => new();
 
     public static DoItFeedback Schreibgschützt(LogData ld) => new(ld, "Variable ist schreibgeschützt.");

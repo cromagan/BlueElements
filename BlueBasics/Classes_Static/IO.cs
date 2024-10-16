@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,6 +25,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BlueBasics.Enums;
 using static BlueBasics.Generic;
 
 namespace BlueBasics;
@@ -53,9 +53,8 @@ public static class IO {
 
     #region Methods
 
-   
     public static string CalculateMd5(string filename) {
- //TODO: Unused
+        //TODO: Unused
         if (!FileExists(filename)) { return string.Empty; }
         using var md5 = MD5.Create();
         using var stream = File.OpenRead(filename);
@@ -149,7 +148,6 @@ public static class IO {
         } catch { }
         return pfad;
     }
-
 
     public static string ChecksumFileName(string name) {
         //Used: Only BZL
@@ -338,7 +336,6 @@ public static class IO {
         }
     }
 
-
     public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, oldName, newName, 5, toBeSure);
 
     public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, 5, toBeSure);
@@ -414,7 +411,7 @@ public static class IO {
     /// <param name="executeAfter"></param>
     public static bool WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
         try {
-            if(Develop.AllReadOnly) { return true; }
+            if (Develop.AllReadOnly) { return true; }
             filename = filename.CheckFile();
 
             var pfad = filename.FilePath();

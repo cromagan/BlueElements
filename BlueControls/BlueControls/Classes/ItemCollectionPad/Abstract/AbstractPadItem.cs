@@ -17,14 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,9 +25,17 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
 using static BlueBasics.Converter;
-using static BlueBasics.Geometry;
 using static BlueBasics.Generic;
+using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 

@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Editoren;
 using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.Editoren;
-using BlueBasics.Interfaces;
 
 namespace BlueControls.Forms;
 
@@ -139,17 +139,17 @@ public partial class FontEditor : EditorEasy {
     }
 
     private void ChangeFont() {
-        ToEdit = BlueFont.Get(lstName.Checked[0], 
+        ToEdit = BlueFont.Get(lstName.Checked[0],
                               FloatParse(listSize.Checked[0]),
-                              chkFett.Checked, 
-                              chkKursiv.Checked, 
-                              chkUnterstrichen.Checked, 
-                              chkDurchgestrichen.Checked, 
-                              chkOutline.Checked, 
-                              QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo, 
-                              QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo, 
-                              chkKap.Checked, 
-                              chkOnlyUpper.Checked, 
+                              chkFett.Checked,
+                              chkKursiv.Checked,
+                              chkUnterstrichen.Checked,
+                              chkDurchgestrichen.Checked,
+                              chkOutline.Checked,
+                              QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo,
+                              QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo,
+                              chkKap.Checked,
+                              chkOnlyUpper.Checked,
                               chkOnlyLow.Checked);
 
         UpdateSampleText();

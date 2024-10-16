@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,9 +27,6 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -48,7 +48,9 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-EasyPic";
+
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 

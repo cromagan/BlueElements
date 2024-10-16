@@ -17,9 +17,9 @@
 
 #nullable enable
 
+using System.Drawing;
 using BlueBasics;
 using BlueScript.Structures;
-using System.Drawing;
 using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
@@ -53,7 +53,7 @@ public class VariableBitmap : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp == null;
-  
+
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 

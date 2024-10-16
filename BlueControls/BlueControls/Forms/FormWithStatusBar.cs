@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 
 namespace BlueControls.Forms;
 
@@ -58,8 +58,6 @@ public partial class FormWithStatusBar : Form {
     #endregion
 
     #region Methods
-
-
 
     public static void UpdateStatusBar(FehlerArt type, string text, bool addtime) {
         if (addtime && !string.IsNullOrEmpty(text)) {

@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,9 +27,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
@@ -111,6 +111,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "DIMENSION";
 
     public override string Description => string.Empty;
@@ -197,7 +198,7 @@ public class DimensionPadItem : AbstractPadItem, IMirrorable {
     }
 
     public virtual void Mirror(PointM? p, bool vertical, bool horizontal) {
-        if (p == null) { p = new PointM(_textPoint); }
+        p ??= new PointM(_textPoint);
 
         _point1.Mirror(p, vertical, horizontal);
         _point2.Mirror(p, vertical, horizontal);

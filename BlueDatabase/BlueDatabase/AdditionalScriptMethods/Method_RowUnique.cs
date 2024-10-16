@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueScript;
-using BlueScript.Enums;
-using BlueDatabase.Interfaces;
-using BlueDatabase.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics;
 using BlueBasics;
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
+using BlueScript;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -74,14 +74,13 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
     public static DoItFeedback UniqueRow(LogData ld, FilterCollection fic, string coment, ScriptProperties scp) {
         RowItem? newrow;
         string message;
-        bool stoptrying;
         var t = Stopwatch.StartNew();
 
         do {
-            (newrow, message, stoptrying) = RowCollection.UniqueRow(fic, coment);
+            (newrow, message, var stoptrying) = RowCollection.UniqueRow(fic, coment);
 
             if (newrow != null && string.IsNullOrEmpty(message)) { break; }
-            if(stoptrying ) { break; }
+            if (stoptrying) { break; }
             if (t.Elapsed.TotalMinutes > 5) { break; }
             if (t.Elapsed.TotalSeconds > 10 && !scp.ProduktivPhase) { break; }
 

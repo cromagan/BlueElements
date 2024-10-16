@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
 using System;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.Interfaces;
 
@@ -93,7 +93,7 @@ public static class IUniqueWindowExtension {
         Type windowType = typeof(T);
 
         foreach (var form in FormManager.Forms) {
-            if (form.GetType() == windowType && form is T uniqueWindow && !uniqueWindow.IsDisposed) {
+            if (form.GetType() == windowType && form is T { IsDisposed: false } uniqueWindow) {
                 if (uniqueWindow.Object.Equals(o)) {
                     uniqueWindow.BringToFront();
                     return uniqueWindow;

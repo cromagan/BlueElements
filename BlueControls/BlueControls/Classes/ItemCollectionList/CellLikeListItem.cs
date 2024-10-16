@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System.Drawing;
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using BlueDatabase.Enums;
-using System.Drawing;
-using BlueControls.CellRenderer;
-using BlueBasics.Enums;
 
 namespace BlueControls.ItemCollectionList;
 

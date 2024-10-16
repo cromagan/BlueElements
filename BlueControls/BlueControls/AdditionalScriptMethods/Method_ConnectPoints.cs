@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -57,20 +57,15 @@ internal class Method_ConnectPoints : Method {
         if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent is not {IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+        if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
-
-        if(iciv.JointPoints.Count == 0) {            return DoItFeedback.Null();}
+        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(); }
 
         iciv.ConnectJointPoint(iciv, attvar.ValueStringGet(1), attvar.ValueStringGet(2), attvar.ValueBoolGet(3), attvar.ValueBoolGet(4));
-
-
 
         return DoItFeedback.Null();
 
         //return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");
-
-
     }
 
     #endregion

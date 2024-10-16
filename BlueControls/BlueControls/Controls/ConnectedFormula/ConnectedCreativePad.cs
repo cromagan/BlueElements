@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using System;
+using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -26,8 +28,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
-using System;
-using System.ComponentModel;
 
 namespace BlueControls.Controls;
 

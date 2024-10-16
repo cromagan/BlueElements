@@ -17,16 +17,16 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
@@ -169,7 +169,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         var font = Skin.DesignOf(design, state).BFont.Scale(scale);
-
 
         var pix16 = Table.GetPix(16, scale);
 

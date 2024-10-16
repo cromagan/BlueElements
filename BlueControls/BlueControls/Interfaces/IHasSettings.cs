@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using BlueBasics;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using BlueBasics;
 using static BlueBasics.IO;
 
 namespace BlueControls.Interfaces;
@@ -102,7 +102,6 @@ public static class HasSettings {
         s = s.Replace("\r", string.Empty).Replace("\n", string.Empty);
 
         if (settings.Settings.IndexOf(s) == 0) { return; }
-
 
         if (settings.Settings.Count > 0) { settings.Settings.RemoveString(s, false); }
         settings.Settings.Add(s);

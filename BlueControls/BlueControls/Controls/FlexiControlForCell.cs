@@ -17,28 +17,28 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.CellRenderer;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
+using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
 
 namespace BlueControls.Controls;
 
@@ -166,7 +166,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     //    hotItem = column;
     //}
 
-    protected override void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) {
+    protected override void DatabaseInput_CellValueChanged(object sender, CellEventArgs e) {
         try {
             if (InvokeRequired) {
                 _ = Invoke(new Action(() => DatabaseInput_CellValueChanged(sender, e)));

@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -30,11 +35,6 @@ using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 

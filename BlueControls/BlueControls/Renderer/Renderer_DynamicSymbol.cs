@@ -33,7 +33,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Fields
 
-    public static Renderer_DynamicSymbol Method = new();
+    public static readonly Renderer_DynamicSymbol Method = new();
 
     #endregion
 
@@ -56,7 +56,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        if (drawarea.Width > 4 && drawarea.Height > 4) {
+        if (drawarea is { Width: > 4, Height: > 4 }) {
             using var bmp = new Bitmap(drawarea.Width, drawarea.Height);
 
             var ok = DynamicSymbolPadItem.ExecuteScript(content, string.Empty, bmp);

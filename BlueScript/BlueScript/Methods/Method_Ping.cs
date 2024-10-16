@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 

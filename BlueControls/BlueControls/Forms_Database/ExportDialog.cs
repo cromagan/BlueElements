@@ -17,15 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -34,9 +25,18 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad;
+using BlueDatabase;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
-using BlueControls.ItemCollectionPad;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
@@ -159,7 +159,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                 var it = new ItemCollectionPadItem(layoutFileName);
 
                 //if (it._internal is { }) {
-                    it.ReplaceVariables(rowsForExport[startNr]);
+                it.ReplaceVariables(rowsForExport[startNr]);
                 //    it.GridShow = -1;
                 //}
                 pad.Items.Add(it);

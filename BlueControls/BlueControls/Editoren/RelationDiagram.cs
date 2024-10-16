@@ -17,19 +17,19 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
+using BlueDatabase.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -356,7 +356,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (i is not { Count: 1 }) { return; }
 
         _ = AddOne(i[0], 0, 0, string.Empty);
-        if (Pad.Items.Count()  < 10) {
+        if (Pad.Items.Count() < 10) {
             Pad.ZoomFit();
         }
         //RepairLinesAndFullProcessing();

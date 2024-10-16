@@ -17,15 +17,14 @@
 
 #nullable enable
 
+using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using System.ComponentModel;
-using BlueControls.Controls;
 
 namespace BlueControls.Editoren;
-
 
 /// <summary>
 /// Standard element, dass das Grundgerüst eines Editors Darstellt.
@@ -128,7 +127,6 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         if (!Enabled) { s = States.Standard_Disabled; }
         GroupBox.DrawGroupBox(this, e.Graphics, s, _groupBoxStyle, t);
     }
-
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);

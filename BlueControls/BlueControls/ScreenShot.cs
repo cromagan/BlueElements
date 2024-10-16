@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
+using BlueBasics;
+using BlueControls.Forms;
 using static BlueBasics.BitmapExt;
 
 namespace BlueControls;

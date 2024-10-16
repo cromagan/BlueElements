@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -28,12 +34,6 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.Polygons;
@@ -184,14 +184,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
     #endregion
 
-    #region Methods
-
     //public override void AddedToCollection(ItemCollectionPadItem parent) {
     //    if (IsDisposed) { return; }
     //    base.AddedToCollection(parent);
     //    CalculateColorIds();
     //    OnPropertyChanged();
     //}
+
+    #region Methods
 
     public List<int> CalculateColorIds() {
         var l = new List<int>();
@@ -263,10 +263,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasKeyName, IPr
 
         if (Parent is null) { return result; }
 
-        Database? outp = null;
-
         if (this is ReciverSenderControlPadItem iiss) {
-            outp = iiss.DatabaseOutput;
+            var outp = iiss.DatabaseOutput;
         }
 
         if (AllowedInputFilter != AllowedInputFilter.None) {

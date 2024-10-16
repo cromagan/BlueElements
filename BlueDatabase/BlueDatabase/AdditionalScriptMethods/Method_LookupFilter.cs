@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
@@ -83,7 +83,6 @@ public class Method_LookupFilter : Method {
         } else {
             return new DoItFeedback(ld, "Spaltentyp nicht unterstützt.");
         }
-
 
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 

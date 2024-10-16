@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
@@ -34,6 +34,7 @@ internal class Method_IsDateTime : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "isdatetime";
+    public override List<string> Constants => [.. BlueBasics.Constants.DateTimeFormats];
     public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -44,7 +45,7 @@ internal class Method_IsDateTime : Method {
     public override string Syntax => "IsDateTime(Value)";
 
     #endregion
-    public override List<string> Constants => [..BlueBasics.Constants.DateTimeFormats];
+
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,12 +31,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -73,6 +73,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "IMAGE";
 
     public SizeModes Bild_Modus {
@@ -166,7 +167,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IMirror
     }
 
     public override void Mirror(PointM? p, bool vertical, bool horizontal) {
-        if (p == null) { p = new PointM(JointMiddle); }
+        p ??= new PointM(JointMiddle);
 
         base.Mirror(p, vertical, horizontal);
 

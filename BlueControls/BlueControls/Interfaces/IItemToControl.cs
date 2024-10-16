@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using System;
 using System.Windows.Forms;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
 
 namespace BlueControls.Interfaces;
 

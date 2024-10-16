@@ -17,18 +17,18 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
+using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using BlueControls.CellRenderer;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 
@@ -53,6 +53,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-Column";
 
     public ColumnItem? Column { get; }

@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using BlueControls.Enums;
 using System.Drawing;
 using BlueControls.CellRenderer;
+using BlueControls.Enums;
 
 namespace BlueControls.ItemCollectionList;
 

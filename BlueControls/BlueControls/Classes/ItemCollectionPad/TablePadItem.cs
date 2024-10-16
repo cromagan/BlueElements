@@ -17,19 +17,17 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueDatabase.Database;
-
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -37,10 +35,11 @@ public class TablePadItem : RectanglePadItem {
 
     #region Fields
 
+    private Database? _database;
     private string _defaultArrangement = string.Empty;
 
-    private int _zeile_von = -1;
     private int _zeile_bis = -1;
+    private int _zeile_von = -1;
 
     #endregion
 
@@ -53,6 +52,24 @@ public class TablePadItem : RectanglePadItem {
     #region Properties
 
     public static string ClassId => "Table";
+
+    public Database? Database {
+        get {
+            return _database;
+        }
+
+        set {
+            if (IsDisposed) { return; }
+
+            if (value == _database) { return; }
+
+            _database = value;
+
+            OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
+        }
+    }
+
     public override string Description => "Darstellung einer Datenbank Tabelle.";
 
     [DefaultValue("")]
@@ -66,6 +83,16 @@ public class TablePadItem : RectanglePadItem {
         }
     }
 
+    [DefaultValue(-1)]
+    public int Zeile_Bis {
+        get => _zeile_bis;
+        set {
+            if (IsDisposed) { return; }
+            if (_zeile_bis == value) { return; }
+            _zeile_bis = value;
+            OnPropertyChanged();
+        }
+    }
 
     [DefaultValue(-1)]
     public int Zeile_Von {
@@ -78,51 +105,11 @@ public class TablePadItem : RectanglePadItem {
         }
     }
 
-
-    [DefaultValue(-1)]
-    public int Zeile_Bis {
-        get => _zeile_bis;
-        set {
-            if (IsDisposed) { return; }
-            if (_zeile_bis == value) { return; }
-            _zeile_bis = value;
-            OnPropertyChanged();
-        }
-    }
-
-
-
     protected override int SaveOrder => 999;
 
     #endregion
 
     #region Methods
-
-    private Database? _database;
-
-    public Database? Database {
-        get {
-            return _database;
-        }
-
-        set {
-            if (IsDisposed) { return; }
-
-
-
-            if (value == _database) { return; }
-
-            _database = value;
-
-            OnPropertyChanged();
-            OnDoUpdateSideOptionMenu();
-        }
-    }
-
-
-
-
-
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
@@ -132,15 +119,10 @@ public class TablePadItem : RectanglePadItem {
             new FlexiControlForProperty<Database?>(() => Database, AllAvailableTables())
         ];
 
-
-
-
         if (_database is { IsDisposed: false } db) {
-
-            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht,  AllAvailableColumArrangemengts(db)));
+            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(db)));
             result.Add(new FlexiControlForProperty<int>(() => Zeile_Von));
             result.Add(new FlexiControlForProperty<int>(() => Zeile_Bis));
-
         }
 
         //if (DatabaseOutput is { IsDisposed: false }) {
@@ -155,11 +137,9 @@ public class TablePadItem : RectanglePadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-
-
         if (_database is { IsDisposed: false } db) {
             result.ParseableAdd("Database", db.KeyName);
-        } 
+        }
 
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         result.ParseableAdd("RowStart", _zeile_von);
@@ -172,19 +152,11 @@ public class TablePadItem : RectanglePadItem {
             case "id":
                 return true;
 
-
             case "database":
 
                 _database = GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
 
-
-
                 return true;
-
-
-
-
-
 
             case "defaultarrangement":
                 _defaultArrangement = value.FromNonCritical();
@@ -197,8 +169,6 @@ public class TablePadItem : RectanglePadItem {
             case "rowend":
                 _zeile_bis = IntParse(value);
                 return true;
-
-
         }
         return base.ParseThis(key, value);
     }

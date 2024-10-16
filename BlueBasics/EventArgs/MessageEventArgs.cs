@@ -17,55 +17,53 @@
 
 #nullable enable
 
+using System;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using System;
 
 namespace BlueBasics.EventArgs;
 
 public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
+
+    #region Fields
+
+    private readonly DateTime _time = DateTime.Now;
+
+    #endregion
 
     #region Constructors
 
     public MessageEventArgs(FehlerArt type, string message) {
         Message = message;
         Type = type;
-        WrittenToLogifile = false;
-        Shown = false;
-        Time = DateTime.Now;
     }
 
     #endregion
 
     #region Properties
-    public DateTime Time { get; }
-    public string Message { get; }
-
-    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-    public bool Shown { get; set; }
-
-    public FehlerArt Type { get; }
-
-    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-    public bool WrittenToLogifile { get; set; }
-
-    public string QuickInfo => Message;
 
     public string KeyName => Generic.GetUniqueKey();
+    public string Message { get; }
+    public string QuickInfo => Message;
+    public FehlerArt Type { get; }
 
-    public string ReadableText() => $"[{Time.ToString4()}]  {Message}";
+    #endregion
+
+    #region Methods
+
+    public string ReadableText() => $"[{_time.ToString4()}]  {Message}";
 
     public QuickImage? SymbolForReadableText() {
-        
         switch (Type) {
+            case FehlerArt.Warnung:
+                return QuickImage.Get(ImageCode.Warnung, 16);
 
-            case FehlerArt.Warnung: return QuickImage.Get(ImageCode.Warnung, 16);
-            case FehlerArt.Fehler: return QuickImage.Get(ImageCode.Kreis, 16);
-            default: return null;
+            case FehlerArt.Fehler:
+                return QuickImage.Get(ImageCode.Kreis, 16);
+
+            default:
+                return null;
         }
-
-
-
     }
 
     #endregion

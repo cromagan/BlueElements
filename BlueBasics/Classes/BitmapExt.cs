@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +29,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.Extensions;
 
 namespace BlueBasics;

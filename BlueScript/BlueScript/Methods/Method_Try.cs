@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace BlueScript.Methods;
 
@@ -35,8 +35,10 @@ internal class Method_Try : Method {
     public override List<List<string>> Args => [];
     public override string Command => "try";
 
+    public override List<string> Constants => [];
+
     public override string Description => "Führt den Codeblock innerhalb der geschweiften Klammern aus.\r\n" +
-                                          "Tritt währenddessen ein Fehler auf, wird der Codeblock verlassen und die weiteren Befehle innerhalb des Codeblocks ignoriert.\r\n" +
+                                              "Tritt währenddessen ein Fehler auf, wird der Codeblock verlassen und die weiteren Befehle innerhalb des Codeblocks ignoriert.\r\n" +
                                           "Das Skript wird in jedem Fall nach dem Codeblock-Ende weiter ausgeführt.\r\n" +
                                           "Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
 
@@ -47,8 +49,6 @@ internal class Method_Try : Method {
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
     public override string Syntax => "Try { }";
-
-    public override List<string> Constants => [];
 
     #endregion
 
@@ -68,7 +68,6 @@ internal class Method_Try : Method {
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();
     }
-
 
     #endregion
 }

@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,11 +35,6 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
@@ -203,8 +203,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 if (row is { IsDisposed: false }) {
                     var t = row.ExecuteScript(null, ev[1], true, 10, null, true, false);
 
-
-                    if (t.Successful && t.AllOk) {
+                    if (t is { Successful: true, AllOk: true }) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
                     } else {
                         MessageBox.Show("Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>" + t.Protocol.JoinWithCr(), ImageCode.Kreuz, "Ok");

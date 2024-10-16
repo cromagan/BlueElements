@@ -17,15 +17,15 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -457,7 +457,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
             case FilterType.Istgleich_MultiRowIgnorieren:
                 if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
-                return "Der ganze Zelleninhalt von " +  nam + " muss genau '" + SearchValue[0] + "' sein.";
+                return "Der ganze Zelleninhalt von " + nam + " muss genau '" + SearchValue[0] + "' sein.";
 
             case FilterType.Instr:
 

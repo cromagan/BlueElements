@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueDatabase.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -266,7 +266,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return newContentWidth;
     }
 
-    private void Cell_CellValueChanged(object sender, EventArgs.CellChangedEventArgs e) {
+    private void Cell_CellValueChanged(object sender, EventArgs.CellEventArgs e) {
         if (e.Column == _column) { _drawWidth = null; }
     }
 

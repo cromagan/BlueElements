@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -61,8 +61,7 @@ internal class Method_AddPadItem : Method {
 
         icpv.Add(iciv);
 
-        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null();  }
-
+        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(); }
 
         foreach (var pt in iciv.JointPoints) {
             var p = icpv.GetJointPoint(pt.KeyName, iciv);
@@ -71,7 +70,6 @@ internal class Method_AddPadItem : Method {
                 return DoItFeedback.Null();
             }
         }
-
 
         return DoItFeedback.Null();
     }

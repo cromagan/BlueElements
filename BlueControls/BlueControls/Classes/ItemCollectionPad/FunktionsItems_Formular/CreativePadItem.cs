@@ -17,6 +17,10 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -25,10 +29,6 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -51,7 +51,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Constructors
 
-    public CreativePadItem() : base(string.Empty, null) { }
+    public CreativePadItem() : this(string.Empty, null) { }
 
     public CreativePadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
@@ -59,7 +59,9 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-CreativePad";
+
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
     public int AutoRefresh {

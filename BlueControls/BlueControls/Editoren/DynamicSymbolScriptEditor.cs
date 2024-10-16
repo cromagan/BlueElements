@@ -17,16 +17,16 @@
 
 #nullable enable
 
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.MultiUserFile;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
-using System.Windows.Forms;
-using BlueBasics.MultiUserFile;
-using BlueControls.ItemCollectionPad;
-using BlueBasics;
-using System.Drawing;
-using System;
-using BlueControls.Interfaces;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
 
 // ReSharper disable All
 

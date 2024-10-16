@@ -17,20 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,6 +30,19 @@ using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
+using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueDatabase;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
@@ -112,16 +111,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     #region Events
 
-    public event EventHandler<ListEventArgs>? ItemAdded;
+    public event EventHandler<System.EventArgs>? ItemAdded;
 
     public event EventHandler? ItemRemoved;
 
-    public event EventHandler<ListEventArgs>? ItemRemoving;
+    public event EventHandler<System.EventArgs>? ItemRemoving;
 
     #endregion
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "ITEMCOLLECTION";
 
     public Color BackColor { get; set; } = Color.White;
@@ -559,7 +559,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         item.AddedToCollection(this);
 
         IsSaved = false;
-        OnItemAdded(item);
+        OnItemAdded();
 
         item.PropertyChanged += Item_PropertyChanged;
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
@@ -820,7 +820,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (IsDisposed) { return; }
         if (item == null || !_internal.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
-        OnItemRemoving(item);
+        OnItemRemoving();
         _ = _internal.Remove(item);
         item.Parent = null;
         OnItemRemoved();
@@ -1229,9 +1229,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
-    private void OnItemAdded(AbstractPadItem item) {
+    private void OnItemAdded() {
         if (IsDisposed) { return; }
-        ItemAdded?.Invoke(this, new ListEventArgs(item));
+        ItemAdded?.Invoke(this, System.EventArgs.Empty);
         OnPropertyChanged();
     }
 
@@ -1241,7 +1241,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         OnPropertyChanged();
     }
 
-    private void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
+    private void OnItemRemoving() => ItemRemoving?.Invoke(this, System.EventArgs.Empty);
 
     private void ParseItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {

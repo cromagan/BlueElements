@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueScript.Enums;
-using BlueDatabase.Interfaces;
-using BlueDatabase.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using BlueBasics;
+using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
@@ -50,7 +50,7 @@ internal class Method_Execte : Method, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType =>  MethodType.ManipulatesUser;
+    public override MethodType MethodType => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Einen Befehl an Windows übergeben";

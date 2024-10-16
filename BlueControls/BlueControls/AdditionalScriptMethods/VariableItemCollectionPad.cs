@@ -47,7 +47,9 @@ public class VariableItemCollectionPad : Variable {
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "icp";
+
     public static string ShortName_Variable => "*icp";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;

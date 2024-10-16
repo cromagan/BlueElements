@@ -17,40 +17,38 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using BlueDatabase;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueBasics.Geometry;
-using System.IO;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using static BlueBasics.Converter;
+using static BlueBasics.Geometry;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
 public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChangedFeedback {
+    //public static object? Highlight = null;
 
     #region Fields
-
-    //public static object? Highlight = null;
 
     //public static string MouseCoords = string.Empty;
     private readonly List<IMoveable> _itemsToMove = [];
@@ -98,15 +96,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public event EventHandler? DrawModeChanged;
 
-    public event PrintEventHandler? EndPrint;
-
     public event EventHandler? GotNewItemCollection;
 
-    public event EventHandler<ListEventArgs>? ItemAdded;
-
     public event EventHandler<System.EventArgs>? ItemRemoved;
-
-    public event EventHandler<ListEventArgs>? ItemRemoving;
 
     public event PrintPageEventHandler? PrintPage;
 
@@ -324,12 +316,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
-
     public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
 
     //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
-    public void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
@@ -616,11 +605,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         base.OnSizeChanged(e);
     }
 
-    private void _Items_ItemAdded(object sender, ListEventArgs e) {
+    private void _Items_ItemAdded(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (_items.Count() > 0 || Fitting) { ZoomFit(); }
         Invalidate();
-        OnItemAdded(e);
     }
 
     private void _Items_ItemRemoved(object sender, System.EventArgs e) {
@@ -632,14 +620,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         OnItemRemoved();
     }
 
-    private void _Items_ItemRemoving(object sender, ListEventArgs e) {
-        if (IsDisposed) { return; }
-        OnItemRemoving(e);
-    }
-
     private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
-
-    private void DruckerDokument_EndPrint(object sender, PrintEventArgs e) => OnEndPrint(e);
 
     private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
         e.HasMorePages = false;
@@ -719,8 +700,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     private void OnDrawModeChanged() => DrawModeChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnEndPrint(PrintEventArgs e) => EndPrint?.Invoke(this, e);
-
     private void OnGotNewItemCollection() => GotNewItemCollection?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
@@ -733,7 +712,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void RegisterEvents() {
         if (_items != null) {
             _items.ItemRemoved += _Items_ItemRemoved;
-            _items.ItemRemoving += _Items_ItemRemoving;
             _items.ItemAdded += _Items_ItemAdded;
             _items.PropertyChanged += Items_PropertyChanged;
         }
@@ -779,7 +757,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void UnRegisterEvents() {
         if (_items != null) {
             _items.ItemRemoved -= _Items_ItemRemoved;
-            _items.ItemRemoving -= _Items_ItemRemoving;
             _items.ItemAdded -= _Items_ItemAdded;
             _items.PropertyChanged -= Items_PropertyChanged;
         }

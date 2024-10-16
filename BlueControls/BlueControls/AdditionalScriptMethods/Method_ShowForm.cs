@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueControls.Forms;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 

@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Controls;
-using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics;
+using BlueControls.Controls;
+using BlueControls.EventArgs;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;

@@ -162,13 +162,13 @@
     <Compile Include="Variables\Variable.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

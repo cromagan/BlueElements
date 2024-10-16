@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Geometry;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.ItemCollectionPad.Abstract;
+using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -79,6 +79,7 @@ public class ComicCompPadItem : AbstractPadItem {
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "COMIC";
 
     public Bitmap? Bitmap {

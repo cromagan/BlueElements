@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad;
 
 namespace BlueControls.AdditionalScriptMethods;
 

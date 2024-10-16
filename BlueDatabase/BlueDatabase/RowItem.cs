@@ -17,6 +17,15 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -27,15 +36,6 @@ using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -979,7 +979,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                 //column.Invalidate_ContentWidth();
                 InvalidateCheckData();
-                db.Cell.OnCellValueChanged(new CellChangedEventArgs(column, this, reason));
+                db.Cell.OnCellValueChanged(new CellEventArgs(column, this));
             }
 
             return string.Empty;

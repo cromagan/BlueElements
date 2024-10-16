@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.EventArgs;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using BlueControls.ItemCollectionList;
 using BlueScript.Methods;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 #nullable enable
 

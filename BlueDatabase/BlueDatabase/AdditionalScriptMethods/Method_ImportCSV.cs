@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -32,6 +32,7 @@ internal class Method_ImportCsv : Method_Database {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
+    public override List<string> Constants => [];
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -40,8 +41,6 @@ internal class Method_ImportCsv : Method_Database {
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "ImportCSV(CSVText, Separator);";
-
-    public override List<string> Constants => [];
 
     #endregion
 

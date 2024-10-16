@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -29,6 +27,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -418,7 +418,6 @@ public static partial class Extensions {
         }
         return l;
     }
-
 
     public static void TagRemove(this ICollection<string> col, string tagname) {
         //Used: Only BZL

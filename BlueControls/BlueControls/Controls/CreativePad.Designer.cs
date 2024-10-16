@@ -34,7 +34,6 @@ namespace BlueControls.Controls
             // DruckerDokument
             // 
             this.DruckerDokument.BeginPrint += new PrintEventHandler(this.DruckerDokument_BeginPrint);
-            this.DruckerDokument.EndPrint += new PrintEventHandler(this.DruckerDokument_EndPrint);
             this.DruckerDokument.PrintPage += new PrintPageEventHandler(this.DruckerDokument_PrintPage);
             // 
             // PrintDialog1

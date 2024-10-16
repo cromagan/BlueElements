@@ -21,8 +21,8 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueDatabase;
 using BlueControls.Forms;
+using BlueDatabase;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

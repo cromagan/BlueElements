@@ -17,18 +17,18 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
+using BlueControls.CellRenderer;
+using BlueControls.Controls;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueControls.CellRenderer;
-using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -53,6 +53,7 @@ public class DynamicSymbolPadItem : RectanglePadItem {
 
     #region Properties
 
+    // ReSharper disable once UnusedMember.Global
     public static string ClassId => "DynamicSymbol";
 
     public override string Description => string.Empty;

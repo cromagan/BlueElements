@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System.Collections.Generic;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -32,7 +32,7 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
 
     #region Constructors
 
-    public FilterEditor() : base () => InitializeComponent();
+    public FilterEditor() : base() => InitializeComponent();
 
     #endregion
 

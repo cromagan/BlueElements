@@ -17,15 +17,15 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
@@ -37,11 +37,11 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
     protected readonly PointM _pl;
     protected readonly PointM _pLo;
     protected readonly PointM _pLu;
-    protected readonly PointM _po;
     protected readonly PointM _pr;
-    protected readonly PointM _pRo;
     protected readonly PointM _pRu;
-    protected readonly PointM _pu;
+    private readonly PointM _po;
+    private readonly PointM _pRo;
+    private readonly PointM _pu;
     private int _drehwinkel;
 
     #endregion

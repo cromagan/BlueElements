@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
-using BlueScript.Methods;
 using BlueScript;
+using BlueScript.Enums;
+using BlueScript.Methods;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -54,7 +54,6 @@ internal class Method_ForEachRow : Method_Database {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
-  
         var varnam = "value";
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
@@ -66,30 +65,16 @@ internal class Method_ForEachRow : Method_Database {
             return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
         }
 
-
-
-
-
         using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
         if (allFi is null) { return new DoItFeedback(infos.LogData, "Fehler im Filter"); }
 
         if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(infos.LogData, "Datenbankfehler!"); }
 
-
-
-
-
-
-
-
-
-
         var scx = new DoItFeedback(false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1);
 
-
-        var l= allFi.Rows;
+        var l = allFi.Rows;
 
         foreach (var thisl in l) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");

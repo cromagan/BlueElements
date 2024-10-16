@@ -17,17 +17,17 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueControls.Interfaces;
-using BlueDatabase;
 using System.Collections.Generic;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
-using BlueBasics.Enums;
 using BlueControls.Forms;
-using static BlueDatabase.Database;
+using BlueControls.Interfaces;
+using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueDatabase.Database;
 
 #nullable enable
 

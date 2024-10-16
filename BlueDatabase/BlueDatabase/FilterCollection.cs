@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,6 +24,12 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
@@ -578,7 +578,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
+    private void _Database_CellValueChanged(object sender, CellEventArgs e) {
         if (_rows == null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 

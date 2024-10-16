@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -24,12 +27,9 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 namespace BlueControls.Controls;
 
@@ -236,7 +236,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_RowsInput();
     }
 
-    protected virtual void DatabaseInput_CellValueChanged(object sender, CellChangedEventArgs e) { }
+    protected virtual void DatabaseInput_CellValueChanged(object sender, CellEventArgs e) { }
 
     protected virtual void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
 
