@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,18 +56,27 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended, IStyleableOne {
+public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended, IChild, IStyleableChild, IStyleableParent {
 
     #region Fields
 
     private readonly RowItem? _row;
     private Design _design;
     private int? _height;
+    private IParent? _parent;
+    private RowItem? _sheetStyle;
+
+    private float _sheetStyleScale;
     private States _state;
+
     private Size _textDimensions;
+
     private string? _tmpHtmlText;
+
     private string? _tmpPlainText;
+
     private int? _width;
+
     private float _zeilenabstand;
 
     #endregion
@@ -108,11 +118,13 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public event EventHandler? PropertyChanged;
 
+    public event EventHandler? StyleChanged;
+
     #endregion
 
     #region Properties
 
-    public string AllowedChars { get; set; } // Todo: Implementieren
+    public string AllowedChars { get; set; }   // Todo: Implementieren
 
     public Alignment Ausrichtung { get; set; }
 
@@ -155,7 +167,18 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public int MaxTextLenght { get; } // TODO: Implementieren
 
+
     public bool Multiline { get; set; }
+
+    public IParent? Parent {
+        get => _parent;
+        set {
+            if (_parent != value) {
+                _parent = value;
+                this.InvalidateFont();
+            }
+        }
+    }
 
     public string PlainText {
         get {
@@ -167,6 +190,30 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (IsDisposed) { return; }
             if (PlainText == value) { return; }
             ConvertTextToChar(value, false);
+            OnPropertyChanged();
+        }
+    }
+
+    public RowItem? SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (IsDisposed) { return; }
+            if (_sheetStyle == value) { return; }
+            _sheetStyle = value;
+            OnStyleChanged();
+            OnPropertyChanged();
+        }
+    }
+
+    [DefaultValue(1.0)]
+    public float SheetStyleScale {
+        get => _sheetStyleScale;
+        set {
+            if (IsDisposed) { return; }
+            if (value < 0.1f) { value = 0.1f; }
+            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
+            _sheetStyleScale = value;
+            OnStyleChanged();
             OnPropertyChanged();
         }
     }
@@ -357,6 +404,8 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     }
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void StufeÄndern(int first, int last, int stufe) {
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {

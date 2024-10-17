@@ -26,7 +26,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.ItemCollectionList;
 
-public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChangedFeedback {
+public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChangedFeedback, IChild {
 
     #region Fields
 
@@ -46,6 +46,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     private bool _isCaption;
     private string _keyName;
+    private IParent? _parent;
+
     private Size _sizeUntouchedForListBox = Size.Empty;
 
     private string _userDefCompareKey;
@@ -103,11 +105,17 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
+    public virtual IParent? Parent {
+        get => _parent;
+        set {
+            if (_parent != value) {
+                _parent = value;
+            }
+        }
+    }
+
     public abstract string QuickInfo { get; }
 
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
-    //    }
-    //}
     public string UserDefCompareKey {
         get => _userDefCompareKey;
         set {
@@ -119,14 +127,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
     }
 
     #endregion
-
-    //public void CloneBasicStatesFrom(AbstractListItem sourceItem) {
-    //    Enabled = sourceItem.Enabled;
-    //    Tag = sourceItem.Tag;
-    //    UserDefCompareKey = sourceItem.UserDefCompareKey;
-    //    KeyName = sourceItem.KeyName;
-    //    IsCaption = sourceItem.IsCaption;
-    //}
 
     #region Methods
 

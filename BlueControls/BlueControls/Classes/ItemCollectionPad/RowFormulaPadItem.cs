@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -37,13 +38,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
     #region Fields
 
     private Database? _database;
-
     private string _lastQuickInfo = string.Empty;
-
     private string _layoutFileName;
-
     private string _rowKey;
-
     private string _tmpQuickInfo = string.Empty;
 
     #endregion
@@ -59,6 +56,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
         _rowKey = rowkey;
         _layoutFileName = layoutFileName;
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? StyleChanged;
 
     #endregion
 
@@ -116,6 +119,30 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
 
     public RowItem? Row => Database?.Row.SearchByKey(_rowKey);
 
+    public RowItem? SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (IsDisposed) { return; }
+            if (_sheetStyle == value) { return; }
+            _sheetStyle = value;
+            OnStyleChanged();
+            OnPropertyChanged();
+        }
+    }
+
+    [DefaultValue(1.0)]
+    public float SheetStyleScale {
+        get => _sheetStyleScale;
+        set {
+            if (IsDisposed) { return; }
+            if (value < 0.1f) { value = 0.1f; }
+            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
+            _sheetStyleScale = value;
+            OnStyleChanged();
+            OnPropertyChanged();
+        }
+    }
+
     protected override int SaveOrder => 999;
 
     #endregion
@@ -135,6 +162,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
         }
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
+    }
+
+    public void OnStyleChanged() {
+        RemovePic();
+        StyleChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public override List<string> ParseableItems() {
@@ -182,8 +214,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
         }
         return base.ParseThis(key, value);
     }
-
-    public override void ProcessStyleChange() => RemovePic();
 
     public override string ReadableText() => "Zeile";
 

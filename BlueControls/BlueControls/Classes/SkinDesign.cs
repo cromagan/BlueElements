@@ -17,12 +17,14 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueDatabase;
 
 public static class SkinDesignExtensions {
 
@@ -95,10 +97,16 @@ public class SkinDesign : IStyleableOne {
     public Kontur Kontur { get; set; }
     public bool Need { get; set; }
     public RahmenArt RahmenArt { get; set; }
+    public RowItem? SheetStyle { get; set; }
+    public float SheetStyleScale { get; set; }
     public States Status { get; set; }
+    public PadStyles Stil { get; set; }
     public int X1 { get; set; }
+
     public int X2 { get; set; }
+
     public int Y1 { get; set; }
+
     public int Y2 { get; set; }
 
     #endregion

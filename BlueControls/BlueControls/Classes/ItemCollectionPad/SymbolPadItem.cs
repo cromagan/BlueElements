@@ -27,13 +27,14 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class SymbolPadItem : RectanglePadItem, IStyleableOne {
+public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
 
     #region Fields
 
@@ -63,6 +64,20 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     public float Randdicke { get; set; }
 
     public Color Randfarbe { get; set; }
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
+        }
+    }
 
     public PadStyles Stil {
         get => _style;

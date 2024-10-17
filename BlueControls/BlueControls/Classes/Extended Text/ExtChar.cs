@@ -18,35 +18,34 @@
 #nullable enable
 
 using System.Drawing;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueDatabase;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar: IStyleableOne {
+public abstract class ExtChar : IStyleableOne, IChild, IStyleableChild {
 
     #region Fields
 
     public PointF Pos = PointF.Empty;
-
-    private Design _design;
-
     private BlueFont? _font;
+    private IParent? _parent;
 
     private SizeF _size;
-    private States _state;
 
     private int _stufe;
+    private PadStyles _style = PadStyles.Style_Standard;
 
     #endregion
 
     #region Constructors
 
-    protected ExtChar(Design design, States state, BlueFont? font, int stufe) : base() {
-        _design = design;
-        _state = state;
-        _stufe = stufe;
+    protected ExtChar(ExtText parent, BlueFont? font, int stufe) : base() {
+        _parent = parent;
         _font = font;
+        _stufe = stufe;
         _size = SizeF.Empty;
     }
 
@@ -54,29 +53,40 @@ public abstract class ExtChar: IStyleableOne {
 
     #region Properties
 
-    public Design Design {
-        get => _design;
-        set {
-            if (value == _design) { return; }
-            ChangeState(value, _state, _stufe);
-        }
-    }
-
     public BlueFont? Font {
         get {
-            if (_font != null) {
-                return _font;
-            }
-
-            _font = Design == Design.Undefiniert || State == States.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
-            _size = SizeF.Empty;
+            _font ??= this.GetFont(_stufe);
             return _font;
         }
-
-        protected set => _font = value;
+        set => _font = value;
     }
 
     public MarkState Marking { get; set; }
+
+    public IParent? Parent {
+        get => _parent;
+        set {
+            if (_parent != value) {
+                _parent = value;
+                this.InvalidateFont();
+                _size = new Size(0, 0);
+            }
+        }
+    }
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
+        }
+    }
 
     public SizeF Size {
         get {
@@ -85,11 +95,13 @@ public abstract class ExtChar: IStyleableOne {
         }
     }
 
-    public States State {
-        get => _state;
+    public PadStyles Stil {
+        get => _style;
         set {
-            if (value == _state) { return; }
-            ChangeState(_design, value, _stufe);
+            if (_style == value) { return; }
+            _style = value;
+            this.InvalidateFont();
+            _size = new Size(0, 0);
         }
     }
 
@@ -97,7 +109,9 @@ public abstract class ExtChar: IStyleableOne {
         get => _stufe;
         set {
             if (_stufe == value) { return; }
-            ChangeState(_design, _state, value);
+            _stufe = value;
+            this.InvalidateFont();
+            _size = new Size(0, 0);
         }
     }
 
@@ -131,21 +145,7 @@ public abstract class ExtChar: IStyleableOne {
 
     public abstract string PlainText();
 
-    internal void GetStyleFrom(ExtChar c) {
-        ChangeState(c.Design, c.State, c.Stufe);
-        Font = c.Font;
-    }
-
     protected abstract SizeF CalculateSize();
-
-    private void ChangeState(Design design, States state, int stufe) {
-        if (state == _state && stufe == _stufe && design == _design) { return; }
-        _size = SizeF.Empty;
-        _design = design;
-        _state = state;
-        _stufe = stufe;
-        _font = null;
-    }
 
     #endregion
 }

@@ -27,6 +27,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
@@ -37,11 +38,12 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
+public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
 
     #region Fields
 
     private string _script = string.Empty;
+
     private PadStyles _style = PadStyles.Style_Standard;
 
     #endregion
@@ -71,6 +73,20 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
             if (value == _script) { return; }
             _script = value;
             OnPropertyChanged();
+        }
+    }
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
         }
     }
 

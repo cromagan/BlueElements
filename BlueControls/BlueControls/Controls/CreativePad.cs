@@ -47,11 +47,9 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
 public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChangedFeedback {
-    //public static object? Highlight = null;
 
     #region Fields
 
-    //public static string MouseCoords = string.Empty;
     private readonly List<IMoveable> _itemsToMove = [];
 
     private ItemCollectionPadItem? _items;
@@ -189,22 +187,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is AbstractPadItem item) {
+        if (e.HotItem is AbstractPadItem item && item?.Parent is ItemCollectionPadItem icpi) {
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "#vordergrund":
-                    item.Parent?.BringToFront(item);
+                    icpi.BringToFront(item);
                     return;
 
                 case "#hintergrund":
-                    item.Parent?.SendToBack(item);
+                    icpi.SendToBack(item);
                     return;
 
                 case "#vorne":
-                    item.Parent?.EineEbeneNachVorne(item);
+                    icpi.EineEbeneNachVorne(item);
                     return;
 
                 case "#hinten":
-                    item.Parent?.EineEbeneNachHinten(item);
+                    icpi.EineEbeneNachHinten(item);
                     return;
 
                 case "#duplicate":

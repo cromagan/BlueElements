@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -32,7 +31,7 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChangedFeedback, IMirrorable {
+public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChangedFeedback, IMirrorable, IChild {
 
     #region Fields
 
@@ -46,7 +45,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     /// </summary>
     private float _distance;
 
-    private object? _parent;
+    private IParent? _parent;
     private float _x;
     private float _y;
 
@@ -54,7 +53,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     #region Constructors
 
-    public PointM(object? parent, string name, float startX, float startY, float laenge, float alpha) : this(parent) {
+    public PointM(IParent? parent, string name, float startX, float startY, float laenge, float alpha) : this(parent) {
         KeyName = name;
         var tempVar = PolarToCartesian(laenge, alpha);
         _x = startX + tempVar.X;
@@ -66,9 +65,9 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public PointM(PointF startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-    public PointM(object? parent, string toParse) : this(parent) => this.Parse(toParse);
+    public PointM(IParent? parent, string toParse) : this(parent) => this.Parse(toParse);
 
-    public PointM(object? parent, string name, float x, float y) {
+    public PointM(IParent? parent, string name, float x, float y) {
         _parent = parent;
         _x = x;
         _y = y;
@@ -77,11 +76,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public PointM() : this(null, string.Empty, 0f, 0f) { }
 
-    public PointM(object? parent) : this(parent, string.Empty, 0f, 0f) { }
+    public PointM(IParent? parent) : this(parent, string.Empty, 0f, 0f) { }
 
     public PointM(string name, float x, float y) : this(null, name, x, y) { }
 
-    public PointM(object? parent, string name, int x, int y) : this(parent, name, x, (float)y) { }
+    public PointM(IParent? parent, string name, int x, int y) : this(parent, name, x, (float)y) { }
 
     public PointM(PointF point) : this(null, string.Empty, point.X, point.Y) { }
 
@@ -91,7 +90,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public PointM(PointM point) : this(null, string.Empty, point.X, point.Y) { }
 
-    public PointM(object parent, PointM template) : this(parent, template.KeyName, template.X, template.Y) { }
+    public PointM(IParent parent, PointM template) : this(parent, template.KeyName, template.X, template.Y) { }
 
     #endregion
 
@@ -132,7 +131,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     public bool MoveXByMouse { get; set; } = true;
     public bool MoveYByMouse { get; set; } = true;
 
-    public object? Parent {
+    public IParent? Parent {
         get => _parent;
         set {
             if (_parent == value) { return; }
@@ -216,9 +215,9 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
                     break;
 
                 //case ItemCollectionPadItem:
-                case CreativePad:
-                    result.ParseableAdd("ParentType", "Main");
-                    break;
+                //case CreativePad:
+                //    result.ParseableAdd("ParentType", "Main");
+                //    break;
 
                 default:
                     result.ParseableAdd("ParentType", _parent.GetType().FullName);

@@ -17,36 +17,19 @@
 
 #nullable enable
 
-using BlueControls.Enums;
+namespace BlueBasics.Interfaces;
 
-namespace BlueControls.Interfaces;
-
-/// <summary>
-/// Wird vermendet, wenn das Element sein Aussehen verändern kann - mittels StyleDB
-/// Zusätzlich wenn es davon EINEN bestimmten Stil benutzt. Z.B. die Überschrift davon
-/// </summary>
-public interface IStyleableOne : IStyleable {
+public interface IChild {
 
     #region Properties
 
-    public BlueFont? Font { get; set; }
+    public void OnParentChanged();
 
-    public PadStyles Stil { get; set; }
+    event System.EventHandler ParentChanged;
+    IParent? Parent { get; }
 
     #endregion
 }
 
-public static class StyleableOneExtension {
-
-    #region Methods
-
-    public static BlueFont GetFont(this IStyleableOne o, int stufe) { 
-        return Skin.GetBlueFont(o.SheetStyle, o.SheetStyle); 
-    }
-
-    public static void InvalidateFont(this IStyleableOne o) {
-        o.Font = null;
-    }
-
-    #endregion
+public static class ChildExtension {
 }

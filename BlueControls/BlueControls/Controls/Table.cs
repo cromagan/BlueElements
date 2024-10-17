@@ -62,41 +62,23 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     #region Fields
 
     public readonly FilterCollection Filter = new("DefaultTableFilter");
-
     private readonly List<string> _collapsed = [];
-
     private readonly object _lockUserAction = new();
-
     private string _arrangement = string.Empty;
-
     private AutoFilter? _autoFilter;
-
     private BlueFont _chapterFont = BlueFont.DefaultFont;
-
     private BlueFont _columnFilterFont = BlueFont.DefaultFont;
-
     private BlueFont _columnFont = BlueFont.DefaultFont;
-
     private ColumnViewCollection? _currentArrangement;
-
     private DateTime? _databaseDrawError;
-
     private bool _editButton;
-
     private bool _isinClick;
-
     private bool _isinDoubleClick;
-
     private bool _isinKeyDown;
-
     private bool _isinMouseDown;
-
     private bool _isinMouseMove;
-
     private bool _isinMouseWheel;
-
     private bool _isinSizeChanged;
-
     private bool _isinVisibleChanged;
 
     /// <summary>
@@ -105,21 +87,16 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private ColumnViewItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
-
     private Progressbar? _pg;
-
     private int _pix16 = 16;
-
     private int _pix18 = 18;
-
     private int _rowCaptionFontY = 26;
-
     private List<RowData>? _rowsFilteredAndPinned;
-
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
-
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
+    private RowItem? _sheetStyle;
 
+    private float _sheetStyleScale;
     private bool _showNumber;
 
     private RowSortDefinition? _sortDefinitionTemporary;
@@ -271,6 +248,28 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return new List<RowItem>().AsReadOnly(); }
             return Filter.Rows;
+        }
+    }
+
+    public RowItem? SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (IsDisposed) { return; }
+            if (_sheetStyle == value) { return; }
+            _sheetStyle = value;
+            Invalidate();
+        }
+    }
+
+    [DefaultValue(1.0)]
+    public float SheetStyleScale {
+        get => _sheetStyleScale;
+        set {
+            if (IsDisposed) { return; }
+            if (value < 0.1f) { value = 0.1f; }
+            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
+            _sheetStyleScale = value;
+            Invalidate();
         }
     }
 

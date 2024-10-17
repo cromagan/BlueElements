@@ -29,21 +29,27 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class LinePadItem : AbstractPadItem, IStyleableOne {
+public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
 
     #region Fields
 
     private readonly PointM _point1;
+
     private readonly PointM _point2;
+
     private string _calcTempPointsCode = string.Empty;
+
     private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
+
     private PadStyles _style = PadStyles.Style_Standard;
+
     private List<PointF>? _tempPoints;
 
     #endregion
@@ -77,6 +83,20 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     public override string Description => string.Empty;
 
     public ConectorStyle Linien_Verhalten { get; set; }
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
+        }
+    }
 
     public PadStyles Stil {
         get => _style;

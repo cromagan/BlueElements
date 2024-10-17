@@ -33,17 +33,18 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
+public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor, IChild, IParent {
 
     #region Fields
 
     public string Page = string.Empty;
+
+    protected IParent? _parent;
 
     /// <summary>
     /// Soll es gedruckt werden?
@@ -64,9 +65,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     private PointM? _jointReferenceSecond;
 
     private string _keyName;
-
-    private ItemCollectionPadItem? _parent;
-
     private RectangleF _usedArea;
 
     #endregion
@@ -109,7 +107,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ForPrinting {
         get {
-            if (_parent is { } icpi) { return icpi.ForPrinting; }
+            if (_parent is ItemCollectionPadItem icpi) { return icpi.ForPrinting; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
             return true;
         }
@@ -156,20 +154,13 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
-    public ItemCollectionPadItem? Parent {
+
+    public virtual IParent? Parent {
         get => _parent;
-        internal set {
-            if (_parent == null || _parent == value) {
+        set {
+            if (_parent != value) {
                 _parent = value;
-                return;
             }
-
-            if (value == null) {
-                _parent = null;
-                return;
-            }
-
-            Develop.DebugPrint(FehlerArt.Fehler, "Parent Fehler!");
         }
     }
 
@@ -183,7 +174,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ShowAlways {
         get {
-            if (_parent is { } icpi) { return icpi.ShowAlways; }
+            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowAlways; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
             return false;
         }
@@ -191,7 +182,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ShowJointPoints {
         get {
-            if (_parent is { } icpi) { return icpi.ShowJointPoints; }
+            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowJointPoints; }
             if (this is ItemCollectionPadItem icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
             return false;
         }
@@ -340,10 +331,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             var line = 1f;
             if (scale > 1) { line = scale; }
 
-            if (Parent is { }) {
-                foreach (var thisV in Parent.Connections) {
+            if (_parent is ItemCollectionPadItem icpi) {
+                foreach (var thisV in icpi.Connections) {
                     if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
-                        if (Parent.Contains(thisV.Item2) && thisV.Item2 != this) {
+                        if (icpi.Contains(thisV.Item2) && thisV.Item2 != this) {
                             if (thisV.Item2.Bei_Export_sichtbar) {
                                 var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(scale, shiftX, shiftY);
                                 var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(scale, shiftX, shiftY);
@@ -537,7 +528,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         OnPropertyChanged();
     }
 
-
     public abstract string ReadableText();
 
     public abstract QuickImage? SymbolForReadableText();
@@ -586,7 +576,9 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         var myPoint = itemToConnect.JointPoints.Get(pointnameInItem);
         if (myPoint == null) { return; }
 
-        var otherPoint = itemToConnect.Parent?.GetJointPoint(otherPointName, itemToConnect);
+        if (itemToConnect.Parent is not ItemCollectionPadItem icpi) { return; }
+
+        var otherPoint = icpi.GetJointPoint(otherPointName, itemToConnect);
         if (otherPoint == null) { return; }
 
         if (connectX && connectY) {

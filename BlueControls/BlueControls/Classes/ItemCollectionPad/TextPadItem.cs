@@ -30,13 +30,14 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
+public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, IStyleableChild {
 
     #region Fields
 
@@ -93,6 +94,20 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
     }
 
     public override string Description => string.Empty;
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
+        }
+    }
 
     public PadStyles Stil {
         get => _style;

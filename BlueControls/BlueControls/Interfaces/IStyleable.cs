@@ -17,48 +17,32 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.ItemCollectionPad;
 using BlueDatabase;
-using System;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace BlueControls.Interfaces;
-
 
 /// <summary>
 /// Wird vermendet, wenn das Element sein Aussehen verändern kann - mittels StyleDB
 /// </summary>
 public interface IStyleable {
 
-    public IStyleable? Parent { get; set; }
 
-    public void OnParentChanged();
 
-    public void OnParentStyleChanged();
+    #region Properties
 
-    (RowItem? sheetStyle, float? sheetStyleScale) MyStyle();
+    public RowItem? SheetStyle { get; }
+
+    public float SheetStyleScale { get; }
+
+    #endregion
+
+    #region Methods
+
+
+    #endregion
 }
 
 public static class StyleableExtension {
-
-    public static (RowItem sheetStyle, float sheetStyleScale) GetParentStyle(this IStyleable ob) {
-
-        if (ob.Parent is IStyleable obn) { return obn.GetParentStyle(); }
-
-        var t = ob.MyStyle();
-
-        if (t.sheetStyle is { } r1 && t.sheetStyleScale is { } s) { return (r1, s); }
-
-        if (Skin.StyleDb?.Row.First() is { } r2) { return (r2, 1f); }
-
-        Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "StyleDB-Fehler");
-        throw new Exception();
-    }
-
     //#region Fields
 
     //public const float GridSize = 8; // PixelToMm(4f, ItemCollectionPadItem.Dpi);

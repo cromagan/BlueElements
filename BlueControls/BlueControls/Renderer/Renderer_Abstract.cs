@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -37,16 +38,15 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     #region Fields
 
     public readonly bool ReadOnly;
-
     internal static readonly Renderer_Abstract Bool = new Renderer_ImageAndText("+|Häkchen\r\no|Kreis2\r\n-|Kreuz");
-
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
-
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
-
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
-
     private string _lastCode = "?";
+    private RowItem? _sheetStyle;
+    private float _sheetStyleScale;
+
+    private PadStyles _style = PadStyles.Style_Standard;
 
     #endregion
 
@@ -69,6 +69,36 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     public abstract string Description { get; }
 
     public string QuickInfo => Description;
+
+    public RowItem? SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (_sheetStyle == value) { return; }
+            _sheetStyle = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [DefaultValue(1.0)]
+    public float SheetStyleScale {
+        get => _sheetStyleScale;
+        set {
+            if (value < 0.1f) { value = 0.1f; }
+            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
+            _sheetStyleScale = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            this.InvalidateFont();
+            OnStyleChanged();
+        }
+    }
 
     #endregion
 

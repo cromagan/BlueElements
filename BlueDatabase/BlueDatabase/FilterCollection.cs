@@ -35,7 +35,7 @@ namespace BlueDatabase;
 
 #nullable enable
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable, IParent {
 
     #region Fields
 
@@ -613,6 +613,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         if (fi.Parent != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelte Filterverwendung!"); }
+
         fi.Parent = this;
 
         fi.PropertyChanging += Filter_PropertyChanging;

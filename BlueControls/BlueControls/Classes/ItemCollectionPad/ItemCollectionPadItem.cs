@@ -52,7 +52,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable, IStyleableParent, IStyleableChild {
 
     #region Fields
 
@@ -71,9 +71,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private Padding _randinMm = Padding.Empty;
 
     private RowItem? _sheetStyle;
-
     private float _sheetStyleScale;
-
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -117,6 +115,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public event EventHandler<System.EventArgs>? ItemAdded;
 
     public event EventHandler? ItemRemoved;
+
+    public event EventHandler? StyleChanged;
 
     #endregion
 
@@ -218,7 +218,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
-            ApplyDesignToItems();
+            OnStyleChanged();
             OnPropertyChanged();
         }
     }
@@ -231,7 +231,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (value < 0.1f) { value = 0.1f; }
             if (Math.Abs(_sheetStyleScale - value) < DefaultTolerance) { return; }
             _sheetStyleScale = value;
-            ApplyDesignToItems();
+            OnStyleChanged();
             OnPropertyChanged();
         }
     }
@@ -684,6 +684,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         base.OnPropertyChanged();
     }
 
+    public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
+
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
 
@@ -1112,14 +1114,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         #endregion
-    }
-
-    private void ApplyDesignToItems() {
-        if (IsDisposed) { return; }
-        foreach (var thisItem in _internal) {
-            thisItem?.ProcessStyleChange();
-        }
-        OnPropertyChanged();
     }
 
     private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {

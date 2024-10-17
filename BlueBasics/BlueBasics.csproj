@@ -125,6 +125,7 @@
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Classes_Static\HTML.cs" />
+    <Compile Include="Interfaces\IParent.cs" />
     <Compile Include="Interfaces\IEditable.cs" />
     <Compile Include="Interfaces\ICanDropMessages.cs" />
     <Compile Include="Interfaces\IDisposableExtendedWithEvent.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Interfaces\IErrorCheckable.cs" />
     <Compile Include="Interfaces\IDisposableExtended.cs" />
     <Compile Include="Interfaces\IInputFormat.cs" />
+    <Compile Include="Interfaces\IChild.cs" />
     <Compile Include="Interfaces\IReadableTextWithKey.cs" />
     <Compile Include="Interfaces\IReadableTextWithPropertyChangingAndKey.cs" />
     <Compile Include="Interfaces\IStringable.cs" />

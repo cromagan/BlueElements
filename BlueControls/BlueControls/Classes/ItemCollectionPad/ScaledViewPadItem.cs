@@ -29,20 +29,25 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne {
+public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IStyleableChild {
 
     #region Fields
 
     private Alignment _ausrichtung = Alignment.Top_Left;
+
     private string _caption = string.Empty;
+
     private ReadOnlyCollection<string> _includedjointPoints = new([]);
 
     private float _scale = 1f;
+
     private PadStyles _style = PadStyles.Style_Standard;
+
     private float _textScale = 3.07f;
 
     #endregion
@@ -97,6 +102,20 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne {
             _scale = value;
             CalculateSize();
             OnPropertyChanged();
+        }
+    }
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
         }
     }
 

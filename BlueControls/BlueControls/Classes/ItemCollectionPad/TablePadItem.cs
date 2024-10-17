@@ -32,14 +32,16 @@ using static BlueDatabase.Database;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class TablePadItem : RectanglePadItem, IStyleable {
+public class TablePadItem : RectanglePadItem, IStyleable, IStyleableChild {
 
     #region Fields
 
     private Database? _database;
+
     private string _defaultArrangement = string.Empty;
 
     private int _zeile_bis = -1;
+
     private int _zeile_von = -1;
 
     #endregion
@@ -70,6 +72,20 @@ public class TablePadItem : RectanglePadItem, IStyleable {
     }
 
     public override string Description => "Darstellung einer Datenbank Tabelle.";
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
+        }
+    }
 
     [DefaultValue("")]
     public string Standard_Ansicht {

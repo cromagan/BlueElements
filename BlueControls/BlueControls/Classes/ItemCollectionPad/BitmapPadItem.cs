@@ -30,6 +30,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueDatabase;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -39,12 +40,11 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
+public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, IStyleableChild {
 
     #region Fields
 
     private SizeModes _bild_Modus;
-
     private Bitmap? _bitmap;
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
@@ -65,6 +65,12 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         _bild_Modus = SizeModes.EmptySpace;
         _style = PadStyles.Undefiniert; // Kein Rahmen
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? StyleChanged;
 
     #endregion
 
@@ -98,6 +104,20 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             if (_platzhalter_Für_Layout == value) { return; }
             _platzhalter_Für_Layout = value;
             OnPropertyChanged();
+        }
+    }
+
+    public RowItem? SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
+        }
+    }
+
+    public float SheetStyleScale {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
         }
     }
 
@@ -345,8 +365,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             Generic.CollectGarbage();
         }
         if (_style != PadStyles.Undefiniert) {
-            if (Parent is { SheetStyle: not null, SheetStyleScale: > 0 }) {
-                gr.DrawRectangle(Skin.GetBlueFont(_style, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), r1);
+            if (Parent is ItemCollectionPadItem { SheetStyle: not null, SheetStyleScale: > 0 } icpi) {
+                gr.DrawRectangle(Skin.GetBlueFont(_style, icpi.SheetStyle).Pen(scale * icpi.SheetStyleScale), r1);
             }
         }
 
