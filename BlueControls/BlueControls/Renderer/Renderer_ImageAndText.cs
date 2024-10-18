@@ -168,7 +168,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        var font = Skin.DesignOf(design, state).BFont.Scale(scale);
+        var font = Skin.DesignOf(design, state).Font.Scale(scale);
 
         var pix16 = Table.GetPix(16, scale);
 
@@ -305,7 +305,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     /// </summary>
     ///
     protected override Size CalculateContentSize(string content, Design design, States state, TranslationType doOpticalTranslation) {
-        var font = Skin.DesignOf(design, state).BFont.Font();
+        var font = Skin.DesignOf(design, state).Font.Font();
 
         //if (font == null) { return new Size(16, 16); }
 

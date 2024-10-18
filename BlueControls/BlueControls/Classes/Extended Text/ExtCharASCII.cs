@@ -25,8 +25,6 @@ using BlueControls.Enums;
 namespace BlueControls.Extended_Text;
 
 public class ExtCharAscii : ExtChar {
-    //public const char StoreX = (char)5;
-    //public const char Top = (char)4;
 
     #region Fields
 
@@ -36,7 +34,7 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    internal ExtCharAscii(char charcode, Design design, States state, BlueFont? font, int stufe, MarkState markState) : base(design, state, font, stufe) {
+    internal ExtCharAscii(char charcode, BlueFont font, MarkState markState) : base(font) {
         _char = charcode;
         Marking = markState;
     }

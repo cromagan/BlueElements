@@ -42,7 +42,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     #region Fields
 
     private Alignment _ausrichtung;
-
     private PadStyles _style = PadStyles.Style_Standard;
 
     /// <summary>
@@ -94,6 +93,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     }
 
     public override string Description => string.Empty;
+    public BlueFont? Font { get; set; }
 
     public RowItem? SheetStyle {
         get {
@@ -114,7 +114,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         set {
             if (_style == value) { return; }
             _style = value;
-            ProcessStyleChange();
+            InvalidateText();
             OnPropertyChanged();
         }
     }
@@ -166,7 +166,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             new FlexiControlForProperty<string>(() => Text, 5),
             new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht),
             new FlexiControlForProperty<float>(() => TextScale),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true))
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(SheetStyle, true))
         ];
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
@@ -213,8 +213,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         base.PointMoved(sender, e);
         InvalidateText();
     }
-
-    public override void ProcessStyleChange() => InvalidateText();
 
     public override string ReadableText() => "Text";
 
@@ -263,7 +261,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
-                    _txt.Draw(gr, scale * _textScale * Parent.SheetStyleScale);
+                    _txt.Draw(gr, scale * _textScale * SheetStyleScale);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -272,7 +270,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         }
     }
 
-    private void InvalidateText() => _txt = null;
+    private void InvalidateText() {
+        this.InvalidateFont();
+        _txt = null;
+    }
 
     private void MakeNewETxt() {
         _txt = null;
@@ -282,13 +283,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 return;
             }
 
-            _txt = new ExtText(_style, Parent.SheetStyle);
+            _txt = new ExtText(SheetStyle, SheetStyleScale);
             _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
-            //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);
+            //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale / Parent.SheetStyleScale), -1);
+            _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale / SheetStyleScale), -1);
             _txt.Ausrichtung = _ausrichtung;
         }
     }

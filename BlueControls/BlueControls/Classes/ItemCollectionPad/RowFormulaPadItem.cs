@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -120,26 +119,16 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
     public RowItem? Row => Database?.Row.SearchByKey(_rowKey);
 
     public RowItem? SheetStyle {
-        get => _sheetStyle;
-        set {
-            if (IsDisposed) { return; }
-            if (_sheetStyle == value) { return; }
-            _sheetStyle = value;
-            OnStyleChanged();
-            OnPropertyChanged();
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
         }
     }
 
-    [DefaultValue(1.0)]
     public float SheetStyleScale {
-        get => _sheetStyleScale;
-        set {
-            if (IsDisposed) { return; }
-            if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
-            _sheetStyleScale = value;
-            OnStyleChanged();
-            OnPropertyChanged();
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
         }
     }
 

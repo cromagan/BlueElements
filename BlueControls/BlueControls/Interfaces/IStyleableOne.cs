@@ -40,8 +40,13 @@ public static class StyleableOneExtension {
 
     #region Methods
 
-    public static BlueFont GetFont(this IStyleableOne o, int stufe) { 
-        return Skin.GetBlueFont(o.SheetStyle, o.SheetStyle); 
+    public static BlueFont GetFont(this IStyleableOne o, int stufe) {
+        if (stufe != 4) {
+            return Skin.GetBlueFont(o.Stil, o.SheetStyle, stufe) ?? BlueFont.DefaultFont;
+        }
+
+        o.Font ??= Skin.GetBlueFont(o.Stil, o.SheetStyle, stufe) ?? BlueFont.DefaultFont;
+        return o.Font;
     }
 
     public static void InvalidateFont(this IStyleableOne o) {

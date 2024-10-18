@@ -96,7 +96,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     }
 
     public override string Description => string.Empty;
-
+    public BlueFont? Font { get; set; }
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
     public string Platzhalter_Für_Layout {
@@ -126,6 +126,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         set {
             if (_style == value) { return; }
             _style = value;
+            this.InvalidateFont();
             OnPropertyChanged();
         }
     }
@@ -183,7 +184,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             new FlexiControl(),
             new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms),
             new FlexiControl(),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true)),
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(SheetStyle, true)),
             new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen),
             new FlexiControl(),
             ..base.GetProperties(widthOfControl)
@@ -366,7 +367,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
         if (_style != PadStyles.Undefiniert) {
             if (Parent is ItemCollectionPadItem { SheetStyle: not null, SheetStyleScale: > 0 } icpi) {
-                gr.DrawRectangle(Skin.GetBlueFont(_style, icpi.SheetStyle).Pen(scale * icpi.SheetStyleScale), r1);
+                gr.DrawRectangle(Skin.GetBlueFont(_style, SheetStyle).Pen(scale * SheetStyleScale), r1);
             }
         }
 

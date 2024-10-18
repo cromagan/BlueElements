@@ -168,7 +168,7 @@ public class Renderer_Button : Renderer_Abstract {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
     protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
-        var font = Skin.DesignOf(design, state).BFont.Font();
+        var font = Skin.DesignOf(design, state).Font.Font();
 
         //if (font == null) { return new Size(16, 32); }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);

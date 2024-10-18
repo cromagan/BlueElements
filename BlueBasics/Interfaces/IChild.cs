@@ -23,9 +23,6 @@ public interface IChild {
 
     #region Properties
 
-    public void OnParentChanged();
-
-    event System.EventHandler ParentChanged;
     IParent? Parent { get; }
 
     #endregion

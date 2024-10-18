@@ -18,34 +18,26 @@
 #nullable enable
 
 using System.Drawing;
-using BlueBasics.Interfaces;
+using BlueBasics;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar : IStyleableOne, IChild, IStyleableChild {
+public abstract class ExtChar {
 
     #region Fields
 
     public PointF Pos = PointF.Empty;
     private BlueFont? _font;
-    private IParent? _parent;
-
     private SizeF _size;
-
-    private int _stufe;
-    private PadStyles _style = PadStyles.Style_Standard;
 
     #endregion
 
     #region Constructors
 
-    protected ExtChar(ExtText parent, BlueFont? font, int stufe) : base() {
-        _parent = parent;
+    public ExtChar(BlueFont font) : base() {
         _font = font;
-        _stufe = stufe;
         _size = SizeF.Empty;
     }
 
@@ -54,64 +46,21 @@ public abstract class ExtChar : IStyleableOne, IChild, IStyleableChild {
     #region Properties
 
     public BlueFont? Font {
-        get {
-            _font ??= this.GetFont(_stufe);
-            return _font;
-        }
-        set => _font = value;
-    }
-
-    public MarkState Marking { get; set; }
-
-    public IParent? Parent {
-        get => _parent;
+        get => _font;
         set {
-            if (_parent != value) {
-                _parent = value;
-                this.InvalidateFont();
-                _size = new Size(0, 0);
+            if (_font != value) {
+                _font = value;
+                _size = SizeF.Empty;
             }
         }
     }
 
-    public RowItem? SheetStyle {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
-        }
-    }
-
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
+    public MarkState Marking { get; set; }
 
     public SizeF Size {
         get {
             if (_size.IsEmpty) { _size = CalculateSize(); }
             return _size;
-        }
-    }
-
-    public PadStyles Stil {
-        get => _style;
-        set {
-            if (_style == value) { return; }
-            _style = value;
-            this.InvalidateFont();
-            _size = new Size(0, 0);
-        }
-    }
-
-    public int Stufe {
-        get => _stufe;
-        set {
-            if (_stufe == value) { return; }
-            _stufe = value;
-            this.InvalidateFont();
-            _size = new Size(0, 0);
         }
     }
 
@@ -144,6 +93,25 @@ public abstract class ExtChar : IStyleableOne, IChild, IStyleableChild {
     public abstract bool IsWordSeperator();
 
     public abstract string PlainText();
+
+    public int Stufe(RowItem sheetStyle) {
+        if (Font == null || sheetStyle.Database is not Database db) { return 4; }
+
+        foreach (var thisC in db.Column) {
+            if (thisC.KeyName.ToUpperInvariant().StartsWith("X")) {
+                if (Font == Skin.GetBlueFont(thisC.KeyName, sheetStyle)) {
+                    switch (thisC.KeyName.ToUpperInvariant()) {
+                        case "X10006": return 4;
+                        default:
+                            Develop.DebugPrint_NichtImplementiert(true);
+                            return 4;
+                    }
+                }
+            }
+        }
+
+        return 4;
+    }
 
     protected abstract SizeF CalculateSize();
 

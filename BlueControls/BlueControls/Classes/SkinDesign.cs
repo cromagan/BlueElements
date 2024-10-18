@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
@@ -68,11 +67,14 @@ public static class SkinDesignExtensions {
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(f)) {
             if (f.StartsWith("{")) {
-                des.BFont = BlueFont.Get(f);
+                des.Font = BlueFont.Get(f);
+            } else {
+                if (Skin.StyleDb == null) { Skin.InitStyles(); }
+
+                var fl = (f + "/X10006").SplitAndCutBy("/");
+                des.SheetStyle = Skin.StyleDb?.Row[fl[0]];
+                des.Font = Skin.GetBlueFont(fl[1], des.SheetStyle);
             }
-            //var fl = (f + "/X10006").SplitAndCutByCr("/");
-            //Skin.GetBlueFont(fl[0], fl[1],
-            //des.BFont = BlueFont.Get(f);
         }
 
         des.Image = pic;
@@ -89,9 +91,9 @@ public class SkinDesign : IStyleableOne {
 
     public Color BackColor1 { get; set; }
     public Color BackColor2 { get; set; }
-    public BlueFont BFont { get; set; } = BlueFont.DefaultFont;
     public Color BorderColor1 { get; set; }
     public Color BorderColor2 { get; set; }
+    public BlueFont Font { get; set; }
     public HintergrundArt HintergrundArt { get; set; }
     public string Image { get; set; } = string.Empty;
     public Kontur Kontur { get; set; }

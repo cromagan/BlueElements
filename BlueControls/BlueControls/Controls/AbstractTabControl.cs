@@ -162,8 +162,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         } catch { }
     }
 
-    //protected override void OnParentChanged(System.EventArgs e) {
-    //    base.OnParentChanged(e);
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
     protected override void ScaleCore(float dx, float dy) { }

@@ -204,7 +204,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                     found.RandinMm = Pages.RandinMm;
                     found.GridShow = Pages.GridShow;
                     found.GridSnap = Pages.GridSnap;
-                    found.Stil = Pages.Stil;
+                    found.SheetStyleScale = Pages.SheetStyleScale;
                     Pages.Add(found);
                 }
 
@@ -259,7 +259,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             h.RandinMm = Pages.RandinMm;
             h.GridShow = Pages.GridShow;
             h.GridSnap = Pages.GridSnap;
-            h.Stil = Pages.Stil;
+            h.SheetStyleScale = Pages.SheetStyleScale;
             Pages.Add(h);
         }
         RepairReciver(Pages);

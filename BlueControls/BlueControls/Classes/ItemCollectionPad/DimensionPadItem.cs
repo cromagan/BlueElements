@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -61,8 +60,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private readonly PointM _textPoint = new(null, "Mitte Text", 0, 0);
 
     private float _länge;
-    private RowItem? _sheetStyle;
 
+    private PadStyles _style = PadStyles.Style_Standard;
     private string _textOben = string.Empty;
 
     private float _winkel;
@@ -123,6 +122,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     public override string Description => string.Empty;
 
+    public BlueFont? Font { get; set; }
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPadItem.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
     public int Nachkommastellen { get; set; }
@@ -130,26 +130,16 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     public string Präfix { get; set; } = string.Empty;
 
     public RowItem? SheetStyle {
-        get => _sheetStyle;
-        set {
-            if (IsDisposed) { return; }
-            if (_sheetStyle == value) { return; }
-            _sheetStyle = value;
-            OnStyleChanged();
-            OnPropertyChanged();
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return null;
         }
     }
 
-    [DefaultValue(1.0)]
     public float SheetStyleScale {
-        get => _sheetStyleScale;
-        set {
-            if (IsDisposed) { return; }
-            if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
-            _sheetStyleScale = value;
-            OnStyleChanged();
-            OnPropertyChanged();
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
+            return 1f;
         }
     }
 
@@ -160,6 +150,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         set {
             if (_style == value) { return; }
             _style = value;
+            this.InvalidateFont();
             OnPropertyChanged();
         }
     }
@@ -224,7 +215,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             new FlexiControlForProperty<string>(() => Text_Unten),
 
             new FlexiControlForProperty<string>(() => Präfix),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(_sheetStyle)),
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(SheetStyle)),
             new FlexiControlForProperty<float>(() => Skalierung)
         ];
         result.AddRange(base.GetProperties(widthOfControl));
@@ -273,7 +264,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "text": // TODO: Alt 06.09.2019
-
             case "text1":
                 Text_Oben = value.FromNonCritical();
                 return true;
@@ -282,23 +272,16 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
                 Text_Unten = value.FromNonCritical();
                 return true;
 
+            case "checked": // TODO: Alt 06.09.2019
             case "color": // TODO: Alt 06.09.2019
-                return true;
-
             case "fontsize": // TODO: Alt 06.09.2019
-                return true;
-
             case "accuracy": // TODO: Alt 06.09.2019
-                return true;
 
             case "decimal":
                 Nachkommastellen = IntParse(value);
                 return true;
 
-            case "checked": // TODO: Alt 06.09.2019
-                return true;
-
-            case "prefix": // TODO: Alt 06.09.2019
+            case "prefix":
                 Präfix = value.FromNonCritical();
                 return true;
 
@@ -335,8 +318,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override RectangleF CalculateUsedArea() {
         if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
-        var geszoom = _sheetStyleScale * Skalierung;
-        var f2 = Skin.GetBlueFont(_style, _sheetStyle).Font(geszoom);
+        var geszoom = SheetStyleScale * Skalierung;
+        var f2 = this.GetFont(4).Font(geszoom);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -353,8 +336,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_style != PadStyles.Undefiniert) {
-            var geszoom = _sheetStyleScale * Skalierung * scale;
-            var f = Skin.GetBlueFont(_style, _sheetStyle);
+            var geszoom = SheetStyleScale * Skalierung * scale;
+            var f = this.GetFont(4);
             var pfeilG = f.Font(geszoom).Size * 0.8f;
             var pen2 = f.Pen(scale);
 

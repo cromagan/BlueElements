@@ -65,6 +65,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
     public static string ClassId => "DynamicSymbol";
 
     public override string Description => string.Empty;
+    public BlueFont? Font { get; set; }
 
     public string Script {
         get => _script;
@@ -95,6 +96,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
         set {
             if (_style == value) { return; }
             _style = value;
+            this.InvalidateFont();
             OnPropertyChanged();
         }
     }
@@ -214,7 +216,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
 
         //if (p != null && Parent != null) {
         //    gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-        //    gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * Parent.SheetStyleScale), p);
+        //    gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * SheetStyleScale), p);
         //}
 
         //gr.TranslateTransform(-trp.X, -trp.Y);

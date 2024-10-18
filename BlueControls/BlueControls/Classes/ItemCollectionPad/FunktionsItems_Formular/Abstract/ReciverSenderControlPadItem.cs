@@ -208,11 +208,11 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
     }
 
     internal int GetFreeColorId() {
-        if (Parent == null) { return -1; }
+        if (Parent is not ItemCollectionPadItem icpi) { return -1; }
 
         var usedids = new List<int>();
 
-        foreach (var thisIt in Parent) {
+        foreach (var thisIt in icpi) {
             if (thisIt is ReciverSenderControlPadItem hci) {
                 usedids.Add(hci.OutputColorId);
             }

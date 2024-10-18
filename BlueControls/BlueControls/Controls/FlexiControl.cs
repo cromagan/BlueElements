@@ -676,16 +676,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (e.Control == _captionObject) { _captionObject = null; }
     }
 
-    //protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
-
-    //protected override void OnParentChanged(System.EventArgs e) {
-    //    base.OnParentChanged(e);
-
-    //    if (ParentForm() is Form parentForm) {
-    //        parentForm.FormClosing += ParentForm_FormClosing;
-    //    }
-    //}
-
     protected override void OnQuickInfoChanged() {
         base.OnQuickInfoChanged();
         UpdateControls();

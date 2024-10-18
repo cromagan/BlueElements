@@ -45,7 +45,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     private string _lastCode = "?";
     private RowItem? _sheetStyle;
     private float _sheetStyleScale;
-
     private PadStyles _style = PadStyles.Style_Standard;
 
     #endregion
@@ -67,7 +66,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     #region Properties
 
     public abstract string Description { get; }
-
+    public BlueFont? Font { get; set; }
     public string QuickInfo => Description;
 
     public RowItem? SheetStyle {
@@ -96,7 +95,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnStyleChanged();
         }
     }
 

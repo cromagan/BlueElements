@@ -83,6 +83,8 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     public override string Description => string.Empty;
 
+    public BlueFont? Font { get; set; }
+
     public ReadOnlyCollection<string> IncludedJointPoints {
         get => _includedjointPoints;
         set {
@@ -124,7 +126,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         set {
             if (_style == value) { return; }
             _style = value;
-            ProcessStyleChange();
+            this.InvalidateFont();
             OnPropertyChanged();
         }
     }
@@ -157,7 +159,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
           new FlexiControlForProperty<string>(() => Caption),
              new FlexiControlForProperty<float>(() => TextScale),
                       new FlexiControlForProperty<float>(() => Scale),
-          new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(Parent?.SheetStyle)),
+          //new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(SheetStyle)),
           new FlexiControlForProperty<ReadOnlyCollection<string>>(() => IncludedJointPoints, 5),
 
         ];
@@ -230,9 +232,9 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     //}
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Parent is not { } icpi) { return; }
+        if (Parent is not ItemCollectionPadItem icpi) { return; }
 
-        if (icpi.SheetStyleScale > 0.1) {
+        if (SheetStyleScale > 0.1) {
             var newarea = positionModified.ToRect();
             var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, true, CalculateShowingArea());
 
@@ -250,8 +252,8 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             }
         }
 
-        var allScale = Parent?.SheetStyleScale * _textScale * scale ?? _textScale * scale;
-        var bFont = Skin.GetBlueFont(_style, Parent?.SheetStyle);
+        var allScale = SheetStyleScale * _textScale * scale;
+        var bFont = Skin.GetBlueFont(_style, SheetStyle);
         var font = bFont.Font(allScale);
 
         Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale));
@@ -283,7 +285,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     private RectangleF CalculateShowingArea() {
         var points = new List<PointM>();
 
-        if (Parent is { } icpi) {
+        if (Parent is ItemCollectionPadItem icpi) {
             foreach (var thiss in _includedjointPoints) {
                 if (icpi.GetJointPoints(thiss, this) is { } p) {
                     points.AddRange(p);

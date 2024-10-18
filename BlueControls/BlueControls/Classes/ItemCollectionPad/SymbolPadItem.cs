@@ -56,9 +56,8 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
     #region Properties
 
     public static string ClassId => "Symbol";
-
     public override string Description => string.Empty;
-
+    public BlueFont? Font { get; set; }
     public Color Hintergrundfarbe { get; set; }
 
     public float Randdicke { get; set; }
@@ -84,7 +83,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
         set {
             if (_style == value) { return; }
             _style = value;
-            ProcessStyleChange();
+            this.InvalidateFont();
             OnPropertyChanged();
         }
     }
@@ -200,7 +199,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
 
         if (p != null && Parent != null) {
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-            gr.DrawPath(new Pen(Randfarbe, Randdicke * scale * Parent.SheetStyleScale), p);
+            gr.DrawPath(new Pen(Randfarbe, Randdicke * scale * SheetStyleScale), p);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

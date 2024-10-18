@@ -41,15 +41,10 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
     #region Fields
 
     private readonly PointM _point1;
-
     private readonly PointM _point2;
-
     private string _calcTempPointsCode = string.Empty;
-
     private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
-
     private PadStyles _style = PadStyles.Style_Standard;
-
     private List<PointF>? _tempPoints;
 
     #endregion
@@ -79,9 +74,8 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
     #region Properties
 
     public static string ClassId => "LINE";
-
     public override string Description => string.Empty;
-
+    public BlueFont? Font { get; set; }
     public ConectorStyle Linien_Verhalten { get; set; }
 
     public RowItem? SheetStyle {
@@ -103,6 +97,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
         set {
             if (_style == value) { return; }
             _style = value;
+            this.InvalidateFont();
             OnPropertyChanged();
         }
     }
@@ -157,7 +152,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
         List<GenericControl> result =
         [
             new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(Parent?.SheetStyle, true))
+            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(SheetStyle, true))
         ];
 
         result.AddRange(base.GetProperties(widthOfControl));
@@ -230,7 +225,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(Skin.GetBlueFont(_style, Parent.SheetStyle).Pen(scale * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
+                gr.DrawLine(Skin.GetBlueFont(_style, SheetStyle).Pen(scale * SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
     }
@@ -332,9 +327,9 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
     }
 
     private bool IsVerdeckt(float x, float y) {
-        if (Parent == null) { return false; }
+        if (Parent is not ItemCollectionPadItem icpi) { return false; }
 
-        foreach (var thisBasicItem in Parent) {
+        foreach (var thisBasicItem in icpi) {
             if (thisBasicItem is { } and not LinePadItem) {
                 var a = thisBasicItem.UsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
@@ -360,10 +355,10 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
     }
 
     private bool SchneidetWas(float x1, float y1, float x2, float y2) {
-        if (Parent == null) { return false; }
+        if (Parent is not ItemCollectionPadItem icpi) { return false; }
         PointM p1 = new(x1, y1);
         PointM p2 = new(x2, y2);
-        return Parent.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
+        return icpi.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
     }
 
     private bool Vereinfache(int p1) {
@@ -418,12 +413,12 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
 
     private bool WeicheAus(int p1) {
         if (_tempPoints == null) { return false; }
-        if (Parent == null) { return false; }
+        if (Parent is not ItemCollectionPadItem icpi) { return false; }
 
         if (_tempPoints.Count > 100) { return false; }
         if (p1 >= _tempPoints.Count - 1) { return false; }
         //   If _TempPoints.Count > 4 Then Return False
-        foreach (var thisItemBasic in Parent) {
+        foreach (var thisItemBasic in icpi) {
             if (thisItemBasic is { } and not LinePadItem)
             //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
             {

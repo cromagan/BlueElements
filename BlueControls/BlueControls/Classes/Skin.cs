@@ -834,7 +834,6 @@ public static class Skin {
 
     #region Fields
 
-    public const string DummyStandardFont = "<Name=Arial, Size=10>";
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
@@ -842,7 +841,6 @@ public static class Skin {
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
-    private const string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
 
@@ -883,7 +881,7 @@ public static class Skin {
             SkinDesign d = new() {
                 BackColor1 = Color.White,
                 BorderColor1 = Color.Red,
-                BFont = BlueFont.DefaultFont,
+                Font = BlueFont.DefaultFont,
                 HintergrundArt = HintergrundArt.Solide,
                 RahmenArt = RahmenArt.Solide_1px,
                 Kontur = Enums.Kontur.Rechteck
@@ -1142,7 +1140,7 @@ public static class Skin {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
         if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
-        Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.BFont, translate);
+        Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.Font, translate);
     }
 
     /// <summary>
@@ -1204,16 +1202,28 @@ public static class Skin {
 
     public static BlueFont GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
         if (StyleDb == null) { InitStyles(); }
-        return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format), rowOfStyle);
+        return GetBlueFont("X" + ((int)format), rowOfStyle);
     }
 
-    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).BFont;
+    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).Font;
 
     /// <summary>
     /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.
     /// </summary>
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
+
+    public static BlueFont GetBlueFont(string column, RowItem? row) => GetBlueFont(row?.Database?.Column[column], row);
+
+    public static BlueFont GetBlueFont(ColumnItem? column, RowItem? row) {
+        var fontString = row?.Database?.Cell.GetString(column, row) ?? string.Empty;
+
+        if (string.IsNullOrEmpty(fontString)) {
+            Develop.DebugPrint("Schrift nicht definiert: " + column?.KeyName + " - " + row?.CellFirstString());
+            return BlueFont.DefaultFont;
+        }
+        return BlueFont.Get(fontString);
+    }
 
     public static List<AbstractListItem> GetFonts(RowItem? sheetStyle) {
         List<AbstractListItem> rahms =
@@ -1664,18 +1674,6 @@ public static class Skin {
 
         Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
         return GetBlueFont(design, state);
-    }
-
-    private static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
-
-    private static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
-        var fontString = styleDb.Cell.GetString(column, row);
-
-        if (string.IsNullOrEmpty(fontString)) {
-            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column?.KeyName + " - " + row?.CellFirstString());
-            return BlueFont.DefaultFont;
-        }
-        return BlueFont.Get(fontString);
     }
 
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {

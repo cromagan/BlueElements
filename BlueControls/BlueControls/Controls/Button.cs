@@ -166,8 +166,9 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
             if (!string.IsNullOrWhiteSpace(tt) && etxt is { }) {
                 // Mehrzeiligen Text generieren und Zeichnen
-                etxt.Design = buttontype;
-                etxt.State = state; // Fall es nicht nothing ist
+                var sh = Skin.DesignOf(buttontype, state);
+                etxt.SheetStyle = sh.SheetStyle; ;
+                etxt.SheetStyleScale = sh.SheetStyleScale;
                 etxt.Zeilenabstand = 0.65f;
                 etxt.DrawingPos = new Point(0, 43);
                 etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
@@ -179,9 +180,9 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
             Skin.Draw_FormatedText(gr, text, qi, align, displayRectangle, design, control, false, translate);
         } else if (etxt is { }) {
             var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
-            //etxt = new ExtText(buttontype, state);
-            etxt.Design = buttontype;
-            etxt.State = state;
+            var sh = Skin.DesignOf(buttontype, state);
+            etxt.SheetStyle = sh.SheetStyle; ;
+            etxt.SheetStyleScale = sh.SheetStyleScale;
             etxt.TextDimensions = displayRectangle.Size;
             etxt.HtmlText = tt;
             etxt.Draw(gr, 1);

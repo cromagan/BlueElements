@@ -26,8 +26,6 @@ namespace BlueControls.Interfaces;
 /// </summary>
 public interface IStyleable {
 
-
-
     #region Properties
 
     public RowItem? SheetStyle { get; }
@@ -35,14 +33,18 @@ public interface IStyleable {
     public float SheetStyleScale { get; }
 
     #endregion
-
-    #region Methods
-
-
-    #endregion
 }
 
 public static class StyleableExtension {
+
+    #region Methods
+
+    public static BlueFont GetFont(this IStyleable o, int stufe) {
+        return Skin.GetBlueFont(Enums.PadStyles.Style_Standard, o.SheetStyle, stufe) ?? BlueFont.DefaultFont;
+    }
+
+    #endregion
+
     //#region Fields
 
     //public const float GridSize = 8; // PixelToMm(4f, ItemCollectionPadItem.Dpi);
