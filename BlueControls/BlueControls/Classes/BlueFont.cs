@@ -34,7 +34,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     #region Fields
 
-    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false);
+    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
     internal Brush BrushColorMain = Brushes.Red;
     internal Brush BrushColorOutline = Brushes.Red;
     private static readonly List<BlueFont> FontsAll = [];
@@ -73,8 +73,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     #region Properties
 
     public string CaptionForEditor => "Schriftart";
+
+    public float CharHeight => _zeilenabstand;
+    public Color ColorBack { get; private set; } = Color.Transparent;
     public Color ColorMain { get; private set; } = Color.Black;
-    public Color ColorOutline { get; private set; } = Color.Magenta;
+    public Color ColorOutline { get; private set; } = Color.Transparent;
     public Type? Editor { get; set; }
     public string FontName { get; private set; } = "Arial";
 
@@ -117,42 +120,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
     }
 
-    public Size FormatedText_NeededSize(string text, QuickImage? qi, int minSize) {
-        try {
-            var pSize = SizeF.Empty;
-            var tSize = SizeF.Empty;
+    public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false, Color.Transparent);
 
-            if (qi != null) {
-                lock (qi) {
-                    pSize = ((Bitmap)qi).Size;
-                }
-            }
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, string colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower, colorBack).FinishParseable());
 
-            if (!string.IsNullOrEmpty(text)) { tSize = _font.MeasureString(text); }
-
-            if (!string.IsNullOrEmpty(text)) {
-                if (qi == null) {
-                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
-                }
-
-                return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
-            }
-
-            if (qi != null) { return new Size((int)pSize.Width, (int)pSize.Height); }
-
-            return new Size(minSize, minSize);
-        } catch {
-            // tmpImageCode wird an anderer Stelle verwendet
-            Develop.CheckStackForOverflow();
-            return FormatedText_NeededSize(text, qi, minSize);
-        }
-    }
-
-    public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
-
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower).FinishParseable());
-
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower);
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, Color colorBack) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower, colorBack.ToHtmlCode());
 
     public static BlueFont Get(string toParse) {
         if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) { return DefaultFont; }
@@ -231,8 +203,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return txt;
     }
 
-
-    public float CharHeight => _zeilenabstand;
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
     public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1f, StringFormat.GenericDefault);
@@ -288,7 +258,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         //}
     }
 
-
     public Font Font(float scale) {
         if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
 
@@ -308,6 +277,37 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public Font FontWithoutLinesForCapitals(float scale) =>
         new(_fontOl.Name, _fontOl.Size * scale * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
 
+    public Size FormatedText_NeededSize(string text, QuickImage? qi, int minSize) {
+        try {
+            var pSize = SizeF.Empty;
+            var tSize = SizeF.Empty;
+
+            if (qi != null) {
+                lock (qi) {
+                    pSize = ((Bitmap)qi).Size;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(text)) { tSize = _font.MeasureString(text); }
+
+            if (!string.IsNullOrEmpty(text)) {
+                if (qi == null) {
+                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
+                }
+
+                return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
+            }
+
+            if (qi != null) { return new Size((int)pSize.Width, (int)pSize.Height); }
+
+            return new Size(minSize, minSize);
+        } catch {
+            // tmpImageCode wird an anderer Stelle verwendet
+            Develop.CheckStackForOverflow();
+            return FormatedText_NeededSize(text, qi, minSize);
+        }
+    }
+
     public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
 
     public SizeF MeasureString(string text, StringFormat stringFormat) => _fontOl.MeasureString(text, stringFormat);
@@ -324,7 +324,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
+    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower, ColorBack.ToHtmlCode());
 
     public void ParseFinished(string parsed) {
         KeyName = parsed.Replace(" ", string.Empty).ToUpperInvariant();
@@ -481,7 +481,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _sampleTextSym;
     }
 
-    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < Constants.DefaultTolerance ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
+    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < Constants.DefaultTolerance ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
 
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
@@ -546,7 +546,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     internal float Oberlänge(float scale) => _oberlänge * scale;
 
-    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
+    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower, string colorBack) {
         List<string> result = [];
 
         result.ParseableAdd("Name", fontName);
@@ -563,6 +563,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             result.ParseableAdd("OutlineColor", colorOutline);
         }
         if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
+        if (colorBack != "00ffffff") { result.ParseableAdd("BackColor", colorBack); }
         return result;
     }
 

@@ -42,7 +42,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     #endregion
 
-    //public Renderer_Button() : base() { }
+  
 
     #region Properties
 
@@ -68,7 +68,7 @@ public class Renderer_Button : Renderer_Abstract {
         }
     }
 
-    public override string Description => "Text wird immer einzeilig dargestellt.";
+    public override string Description => "Stellt den Inhalt als Knopf dar.\r\nFormat: checked(+/-);BildCode;Text";
 
     public bool Text_anzeigen {
         get => _text_anzeigen;
@@ -82,25 +82,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     #endregion
 
-    //public string Präfix {
-    //    get => _präfix;
-    //    set {
-    //        if (_präfix == value) { return; }
-    //        if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-    //        _präfix = value;
-    //        OnPropertyChanged();
-    //    }
-    //}
 
-    //public string Suffix {
-    //    get => _suffix;
-    //    set {
-    //        if (_suffix == value) { return; }
-    //        if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-    //        _suffix = value;
-    //        OnPropertyChanged();
-    //    }
-    //}
 
     #region Methods
 

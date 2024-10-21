@@ -3231,7 +3231,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void InitializeSkin() {
         _columnFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Hervorgehoben, States.Standard, Scale);
         _chapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, Scale);
-        _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false);
+        _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
 
         _pix16 = GetPix(16, Scale);
         _pix18 = GetPix(18, Scale);

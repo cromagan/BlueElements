@@ -148,6 +148,7 @@
     <Compile Include="Interfaces\IUniqueWindow.cs" />
     <Compile Include="Interfaces\IOpenScriptEditor.cs" />
     <Compile Include="Renderer\Renderer_Abstract.cs" />
+    <Compile Include="Renderer\Renderer_Font.cs" />
     <Compile Include="Renderer\Renderer_DynamicSymbol.cs" />
     <Compile Include="Renderer\Renderer_Button.cs" />
     <Compile Include="Renderer\Renderer_TextOneLine.cs" />
