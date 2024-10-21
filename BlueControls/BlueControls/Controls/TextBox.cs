@@ -33,7 +33,6 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.EventArgs;
-using static System.Windows.Forms.AxHost;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -331,21 +330,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             case "#Caption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1, 3);
+                _eTxt.StufeÄndern(_markStart, _markEnd - 1,  PadStyles.Überschrift);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#NoCaption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1, 4);
+                _eTxt.StufeÄndern(_markStart, _markEnd - 1,  PadStyles.Standard);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#Bold":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1, 7);
+                _eTxt.StufeÄndern(_markStart, _markEnd - 1,  PadStyles.Hervorgehoben);
                 RaiseEventIfTextChanged(false);
                 return;
 
@@ -403,9 +402,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
                     if (_markEnd > -1) {
                         e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont("Windows 11", PadStyles.Überschrift, States.Standard).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont("Windows 11", PadStyles.Hervorgehoben, States.Standard).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont("Windows 11",  PadStyles.Standard, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont("Windows 11", PadStyles.Überschrift, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont("Windows 11", PadStyles.Hervorgehoben, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont("Windows 11",  PadStyles.Standard, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
                     }
                 }
             }

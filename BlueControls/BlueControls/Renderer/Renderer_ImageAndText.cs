@@ -24,10 +24,10 @@ using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using BlueControls.Interfaces;
 
 namespace BlueControls.CellRenderer;
 
@@ -166,9 +166,9 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType doOpticalTranslation, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        var font = Skin.DesignOf(design, state).Font.Scale(scale);
+        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard,  States.Standard).Scale(SheetStyleScale);
 
         var pix16 = Table.GetPix(16, scale);
 
@@ -192,7 +192,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
                 image = null;
             }
 
-            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, font, false);
+            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, this.GetFont(scale), false);
 
             if (image != null) {
                 y += Math.Max(image.Height, pix16);
@@ -304,10 +304,8 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     ///
-    protected override Size CalculateContentSize(string content, Design design, States state, TranslationType doOpticalTranslation) {
-        var font = Skin.DesignOf(design, state).Font.Font();
-
-        //if (font == null) { return new Size(16, 16); }
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
+        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
 
         var contentSize = Size.Empty;
 
@@ -318,7 +316,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, doOpticalTranslation);
 
-            var tmpSize = font.FormatedText_NeededSize(replacedText, image, 16);
+            var tmpSize = this.GetFont().FormatedText_NeededSize(replacedText, image, 16);
             contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
             contentSize.Height += Math.Max(tmpSize.Height, 16);
         }

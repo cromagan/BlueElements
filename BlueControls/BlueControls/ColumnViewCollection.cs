@@ -192,12 +192,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Database, ParseableItems().FinishParseable());
 
-    public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider) {
+    public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, float currentScale) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, db.GlobalScale)) {
+                if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, currentScale)) {
                     return thisViewItem;
                 }
             }

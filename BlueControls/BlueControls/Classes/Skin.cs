@@ -1200,7 +1200,7 @@ public static class Skin {
         }
     }
 
-    public static BlueFont GetBlueFont(string style, PadStyles format) => GetBlueFont(style, format, States.Standard);
+    public static BlueFont GetBlueFont(string style, PadStyles format) => GetBlueFont(style, format, States.Standard, 1f);
 
     public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).Font;
 
@@ -1210,7 +1210,7 @@ public static class Skin {
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
 
-    public static BlueFont GetBlueFont(string style, PadStyles format, States state) {
+    public static BlueFont GetBlueFont(string style, PadStyles format, States state, float scale) {
         if (StyleDb is not { IsDisposed: false }) { InitStyles(); }
         if (StyleDb is not { IsDisposed: false } db) { return BlueFont.DefaultFont; }
 
@@ -1220,11 +1220,11 @@ public static class Skin {
 
         var r = db.Row[f1, f2, f3];
 
-        if (r == null) { return BlueFont.DefaultFont; }
+        if (r == null) { return BlueFont.DefaultFont.Scale(scale); }
 
         var s = r.CellGetString("font");
 
-        return BlueFont.Get(s);
+        return BlueFont.Get(s).Scale(scale);
     }
 
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
@@ -1600,54 +1600,54 @@ public static class Skin {
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
 
-    internal static BlueFont? GetBlueFont(PadStyles padStyle, string sheetStyle, int stufe) {
-        switch (stufe) {
-            case 4:
-                return GetBlueFont(sheetStyle, padStyle);
+    //internal static BlueFont? GetBlueFont(PadStyles padStyle, string sheetStyle, int stufe) {
+    //    switch (stufe) {
+    //        case 4:
+    //            return GetBlueFont(sheetStyle, padStyle);
 
-            case 3:
-                switch (padStyle) {
-                    case PadStyles.Standard:
-                        return GetBlueFont(sheetStyle, PadStyles.Kapitel);
+    //        case 3:
+    //            switch (padStyle) {
+    //                case PadStyles.Standard:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Kapitel);
 
-                    case PadStyles.Hervorgehoben:
-                        return GetBlueFont(sheetStyle, PadStyles.Kapitel);
-                }
-                break;
+    //                case PadStyles.Hervorgehoben:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Kapitel);
+    //            }
+    //            break;
 
-            case 2:
-                switch (padStyle) {
-                    case PadStyles.Standard:
-                        return GetBlueFont(sheetStyle, PadStyles.Untertitel);
+    //        case 2:
+    //            switch (padStyle) {
+    //                case PadStyles.Standard:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Untertitel);
 
-                    case PadStyles.Hervorgehoben:
-                        return GetBlueFont(sheetStyle, PadStyles.Untertitel);
-                }
-                break;
+    //                case PadStyles.Hervorgehoben:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Untertitel);
+    //            }
+    //            break;
 
-            case 1:
-                switch (padStyle) {
-                    case PadStyles.Standard:
-                        return GetBlueFont(sheetStyle, PadStyles.Überschrift);
+    //        case 1:
+    //            switch (padStyle) {
+    //                case PadStyles.Standard:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Überschrift);
 
-                    case PadStyles.Hervorgehoben:
-                        return GetBlueFont(sheetStyle, PadStyles.Überschrift);
-                }
-                break;
+    //                case PadStyles.Hervorgehoben:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Überschrift);
+    //            }
+    //            break;
 
-            case 7:
-                switch (padStyle) {
-                    case PadStyles.Standard:
-                        return GetBlueFont(sheetStyle, PadStyles.Hervorgehoben);
+    //        case 7:
+    //            switch (padStyle) {
+    //                case PadStyles.Standard:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Hervorgehoben);
 
-                    case PadStyles.Hervorgehoben:
-                        return GetBlueFont(sheetStyle, PadStyles.Standard);
-                }
-                break;
-        }
-        Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
-        return null;
-    }
+    //                case PadStyles.Hervorgehoben:
+    //                    return GetBlueFont(sheetStyle, PadStyles.Standard);
+    //            }
+    //            break;
+    //    }
+    //    Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+    //    return null;
+    //}
 
     //internal static BlueFont GetBlueFont(Design design, States state, int stufe) {
     //    if (stufe != 4 && design != Enums.Design.TextBox) {

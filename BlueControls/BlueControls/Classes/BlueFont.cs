@@ -77,15 +77,25 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public Color ColorOutline { get; private set; } = Color.Magenta;
     public Type? Editor { get; set; }
     public string FontName { get; private set; } = "Arial";
+
     public bool Italic { get; private set; }
+
     public bool Kapitälchen { get; private set; }
+
     public string KeyName { get; private set; } = string.Empty;
+
     public bool OnlyLower { get; private set; }
+
     public bool OnlyUpper { get; private set; }
+
     public bool Outline { get; private set; }
+
     public float Size { get; private set; } = 9;
+
     public bool StrikeOut { get; private set; }
+
     public bool Underline { get; private set; }
+
     internal bool Bold { get; private set; }
 
     #endregion
@@ -104,6 +114,37 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             // Wird bereits an anderer Stelle verwendet... Multitasking, wenn mehrere items auf einmal generiert werden.
             Develop.CheckStackForOverflow();
             DrawString(gr, text, font, brush, x, y, stringFormat);
+        }
+    }
+
+    public Size FormatedText_NeededSize(string text, QuickImage? qi, int minSize) {
+        try {
+            var pSize = SizeF.Empty;
+            var tSize = SizeF.Empty;
+
+            if (qi != null) {
+                lock (qi) {
+                    pSize = ((Bitmap)qi).Size;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(text)) { tSize = _font.MeasureString(text); }
+
+            if (!string.IsNullOrEmpty(text)) {
+                if (qi == null) {
+                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
+                }
+
+                return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
+            }
+
+            if (qi != null) { return new Size((int)pSize.Width, (int)pSize.Height); }
+
+            return new Size(minSize, minSize);
+        } catch {
+            // tmpImageCode wird an anderer Stelle verwendet
+            Develop.CheckStackForOverflow();
+            return FormatedText_NeededSize(text, qi, minSize);
         }
     }
 
@@ -245,7 +286,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         //}
     }
 
-    public Font Font() => _font;
 
     public Font Font(float scale) {
         if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
@@ -418,7 +458,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return false;
     }
 
-    public Pen Pen(float scale) => Math.Abs(scale - 1) < DefaultTolerance ? _pen : GeneratePen(scale);
+    public Pen Pen(float addtionalScale) => Math.Abs(addtionalScale - 1) < DefaultTolerance ? _pen : GeneratePen(addtionalScale);
 
     public string ReadableText() {
         var t = FontName + ", " + Size + " pt, ";
@@ -439,7 +479,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _sampleTextSym;
     }
 
-    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < 0.01 ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
+    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < Constants.DefaultTolerance ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
 
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
@@ -524,8 +564,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return result;
     }
 
-    private Pen GeneratePen(float scale) {
-        var linDi = (float)_zeilenabstand / 10 * scale;
+    private Pen GeneratePen(float addtionalScale) {
+        var linDi = (float)_zeilenabstand / 10 * addtionalScale;
         if (Bold) { linDi *= 1.5F; }
         return new Pen(ColorMain, linDi);
     }

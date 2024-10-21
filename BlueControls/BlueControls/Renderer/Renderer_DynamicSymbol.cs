@@ -22,7 +22,6 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase.Enums;
 
@@ -47,7 +46,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         if (drawarea is { Width: > 4, Height: > 4 }) {
@@ -99,7 +98,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
-    protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
+    protected override Size CalculateContentSize(string content, TranslationType translate) {
         //var font = Skin.DesignOf(design, state).BFont?.Font();
 
         //if (font == null) { return new Size(16, 32); }

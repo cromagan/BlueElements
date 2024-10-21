@@ -26,7 +26,7 @@ public enum PadStyles {
     Überschrift = 1,
     Untertitel = 2,
     Kapitel = 3,
-    Alternativ = 4,
+    Alternativ = 6,
     Kleiner_Zusatz = 5,
     Hervorgehoben = 7
 }

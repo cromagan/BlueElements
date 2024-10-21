@@ -68,14 +68,14 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         //if (_cellRenderer == null) { return new Size(16, 0); }
 
-        return _cellRenderer.ContentSize(KeyName, itemdesign, States.Standard, _translate);
+        return _cellRenderer.ContentSize(KeyName, States.Standard, _translate);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        _cellRenderer.Draw(gr, KeyName, positionModified, itemdesign, state, _translate, _align, 1f);
+        _cellRenderer.Draw(gr, KeyName, positionModified, _translate, _align);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }

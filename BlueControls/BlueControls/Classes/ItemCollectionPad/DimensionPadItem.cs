@@ -27,7 +27,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
@@ -319,7 +318,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     protected override RectangleF CalculateUsedArea() {
         if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
         var geszoom = SheetStyleScale * Skalierung;
-        var f2 = this.GetFont(4).Font(geszoom);
+        var f2 = this.GetFont().Font(geszoom);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -337,7 +336,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_style != PadStyles.Undefiniert) {
             var geszoom = SheetStyleScale * Skalierung * scale;
-            var f = this.GetFont(4);
+            var f = this.GetFont();
             var pfeilG = f.Font(geszoom).Size * 0.8f;
             var pen2 = f.Pen(scale);
 

@@ -29,7 +29,6 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -225,7 +224,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(Skin.GetBlueFont(SheetStyle, _style).Pen(scale * SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
+                gr.DrawLine(this.GetFont().Pen(scale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
     }

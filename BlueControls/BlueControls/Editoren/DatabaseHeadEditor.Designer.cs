@@ -58,8 +58,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAdditionalFiles = new TextBox();
             this.capAdditional = new Caption();
             this.capZeilenQuickInfo = new Caption();
-            this.txbGlobalScale = new TextBox();
-            this.capGlobalScale = new Caption();
             this.btnSpaltenuebersicht = new Button();
             this.tabRechte = new TabPage();
             this.tabSortierung = new TabPage();
@@ -329,8 +327,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAllgemein.Controls.Add(this.txbAdditionalFiles);
             this.tabAllgemein.Controls.Add(this.capAdditional);
             this.tabAllgemein.Controls.Add(this.capZeilenQuickInfo);
-            this.tabAllgemein.Controls.Add(this.txbGlobalScale);
-            this.tabAllgemein.Controls.Add(this.capGlobalScale);
             this.tabAllgemein.Controls.Add(this.txbTags);
             this.tabAllgemein.Controls.Add(this.btnSpaltenuebersicht);
             this.tabAllgemein.Controls.Add(this.capInfo);
@@ -457,24 +453,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capZeilenQuickInfo.Name = "capZeilenQuickInfo";
             this.capZeilenQuickInfo.Size = new Size(152, 18);
             this.capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
-            // 
-            // txbGlobalScale
-            // 
-            this.txbGlobalScale.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.txbGlobalScale.Cursor = Cursors.IBeam;
-            this.txbGlobalScale.Location = new Point(160, 514);
-            this.txbGlobalScale.Name = "txbGlobalScale";
-            this.txbGlobalScale.Size = new Size(160, 24);
-            this.txbGlobalScale.TabIndex = 39;
-            // 
-            // capGlobalScale
-            // 
-            this.capGlobalScale.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.capGlobalScale.CausesValidation = false;
-            this.capGlobalScale.Location = new Point(8, 514);
-            this.capGlobalScale.Name = "capGlobalScale";
-            this.capGlobalScale.Size = new Size(144, 18);
-            this.capGlobalScale.Text = "Bevorzugtes Skalierung:";
             // 
             // btnSpaltenuebersicht
             // 
@@ -626,8 +604,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnSpaltenuebersicht;
         private Table tblUndo;
         private Caption capNeueZeilenInfo;
-        private TextBox txbGlobalScale;
-        private Caption capGlobalScale;
         private TabControl GlobalTab;
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;

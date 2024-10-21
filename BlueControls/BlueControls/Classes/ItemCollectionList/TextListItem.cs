@@ -53,7 +53,7 @@ public class TextListItem : AbstractListItem {
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => ((Font)Skin.GetBlueFont(TempDesign(itemdesign), States.Standard)).FormatedText_NeededSize(Text, Symbol, 16);
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
         var tmpd = TempDesign(design);

@@ -23,7 +23,6 @@ using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using static BlueBasics.Converter;
 
 public static class SkinDesignExtensions {
@@ -78,7 +77,7 @@ public static class SkinDesignExtensions {
 
                 var fl = (f + "|0|0").SplitAndCutBy("|");
                 des.SheetStyle = fl[0];
-                des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]));
+                des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]), 1f);
             }
         }
 

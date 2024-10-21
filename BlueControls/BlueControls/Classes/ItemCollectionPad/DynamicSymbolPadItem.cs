@@ -27,7 +27,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
@@ -177,7 +176,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), Design.TextBox, States.Standard, TranslationType.Original_Anzeigen, Alignment.Left, scale);
+        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left);
 
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         //gr.TranslateTransform(trp.X, trp.Y);

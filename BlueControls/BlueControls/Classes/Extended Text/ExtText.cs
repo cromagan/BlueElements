@@ -27,7 +27,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using static BlueBasics.Converter;
 
 // VTextTyp-Hirachie
@@ -360,8 +359,8 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public void StufeÄndern(int first, int last, int stufe) {
-        var font = this.GetFont(stufe);
+    public void StufeÄndern(int first, int last, PadStyles style) {
+        var font = this.GetFont(style);
 
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
             this[cc].Font = font;
@@ -397,7 +396,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this.GetFont(4)));
+    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this.GetFont( PadStyles.Standard)));
 
     internal void Mark(MarkState markstate, int first, int last) {
         try {
@@ -498,11 +497,11 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     private void ConvertTextToChar(string cactext, bool isRich) {
         var pos = 0;
         var zeichen = -1;
-        var stufe = 4;
+        var style = PadStyles.Standard;
         var markstate = MarkState.None;
         Clear();
         ResetPosition(true);
-        var bf = this.GetFont(4);
+        var bf = this.GetFont(style);
 
         if (!string.IsNullOrEmpty(cactext)) {
             cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
@@ -513,7 +512,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                 if (isRich) {
                     switch (ch) {
                         case '<': {
-                                DoHtmlCode(cactext, pos, ref zeichen, ref bf, ref stufe, ref markstate);
+                                DoHtmlCode(cactext, pos, ref zeichen, ref bf, ref style, ref markstate);
                                 var op = 1;
                                 do {
                                     pos++;
@@ -547,7 +546,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         ResetPosition(true);
     }
 
-    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont? font, ref int stufe, ref MarkState markState) {
+    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont? font, ref PadStyles style, ref MarkState markState) {
         if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
 
         var endpos = htmlText.IndexOf('>', start + 1);
@@ -659,33 +658,34 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                 break;
 
             case "H7":
-                stufe = 7;
-                font = this.GetFont(stufe);
+                style = PadStyles.Hervorgehoben;
+                font = this.GetFont(style);
                 break;
 
             case "H6":
-                stufe = 6;
-                font = this.GetFont(stufe); break;
+                style = PadStyles.Alternativ;
+                font = this.GetFont(style); break;
 
             case "H5":
-                stufe = 5;
-                font = this.GetFont(stufe); break;
+                style = PadStyles.Kleiner_Zusatz;   
+                font = this.GetFont(style); break;
 
+            case "H0":
             case "H4":
-                stufe = 4;
-                font = this.GetFont(stufe); break;
+                style =  PadStyles.Standard;
+                font = this.GetFont(style); break;
 
             case "H3":
-                stufe = 3;
-                font = this.GetFont(stufe); break;
+                style = PadStyles.Kapitel;
+                font = this.GetFont(style); break;
 
             case "H2":
-                stufe = 2;
-                font = this.GetFont(stufe); break;
+                style = PadStyles.Untertitel;
+                font = this.GetFont(style); break;
 
             case "H1":
-                stufe = 1;
-                font = this.GetFont(stufe); break;
+                style = PadStyles.Überschrift;
+                font = this.GetFont(style); break;
 
             case "MARKSTATE":
                 markState = (MarkState)IntParse(attribut);

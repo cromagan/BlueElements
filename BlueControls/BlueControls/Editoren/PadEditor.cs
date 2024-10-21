@@ -76,10 +76,7 @@ public partial class PadEditor : FormWithStatusBar {
             ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
             txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
             txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
-            if (Pad.Items.SheetStyle != null) {
                 PadDesign.Text = Pad.Items.SheetStyle;
-            }
-
             cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
         }
     }

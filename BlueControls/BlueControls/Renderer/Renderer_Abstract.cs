@@ -113,21 +113,21 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return renderer;
     }
 
-    public Size ContentSize(string content, Design design, States state, TranslationType translate) {
+    public Size ContentSize(string content, States state, TranslationType translate) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
         var key = TextSizeKey(_lastCode, content);
 
         if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
 
-        var contentsize = CalculateContentSize(content, design, state, translate);
+        var contentsize = CalculateContentSize(content, translate);
 
         _ = Sizes.TryAdd(key, contentsize);
 
         return contentsize;
     }
 
-    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale);
+    public abstract void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
@@ -173,7 +173,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         return RendererOf(columnViewItem.Column);
     }
 
-    protected abstract Size CalculateContentSize(string content, Design design, States state, TranslationType doOpticalTranslation);
+    protected abstract Size CalculateContentSize(string content, TranslationType doOpticalTranslation);
 
     protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
 

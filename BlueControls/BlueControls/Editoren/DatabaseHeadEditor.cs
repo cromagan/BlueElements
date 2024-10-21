@@ -35,7 +35,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
-using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -281,7 +280,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbTags.Text = db.Tags.JoinWithCr();
 
         txbCaption.Text = db.Caption;
-        txbGlobalScale.Text = db.GlobalScale.ToStringFloat2();
         txbAdditionalFiles.Text = db.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = db.StandardFormulaFile;
         txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
@@ -409,10 +407,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         Database.GlobalShowPass = txbKennwort.Text;
         Database.Caption = txbCaption.Text;
         //Database.UndoCount = txbUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(txbUndoAnzahl.Text), 5) : 5;
-        if (txbGlobalScale.Text.IsDouble()) {
-            Database.GlobalScale = Math.Min(FloatParse(txbGlobalScale.Text), 5);
-            Database.GlobalScale = Math.Max(0.5f, Database.GlobalScale);
-        }
+        //if (txbGlobalScale.Text.IsDouble()) {
+        //    Database.GlobalScale = Math.Min(FloatParse(txbGlobalScale.Text), 5);
+        //    Database.GlobalScale = Math.Max(0.5f, Database.GlobalScale);
+        //}
         Database.AdditionalFilesPfad = txbAdditionalFiles.Text;
         Database.StandardFormulaFile = txbStandardFormulaFile.Text;
         Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");

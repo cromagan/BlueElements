@@ -29,7 +29,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
@@ -252,22 +251,23 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             }
         }
 
-        var allScale = SheetStyleScale * _textScale * scale;
-        var bFont = Skin.GetBlueFont(SheetStyle, _style);
-        var font = bFont.Font(allScale);
 
-        Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale));
-        colorPen.DashPattern = [5, 1, 1, 1];
+        var bFont = this.GetFont(_textScale * scale);
+        //var font = bFont.Font(allScale);
+
+        Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale)) {
+            DashPattern = [5, 1, 1, 1]
+        };
         Pen whitePen = new(Color.White, (float)(8.7d * scale) + 2f);
 
-        var textSize = gr.MeasureString(_caption, font);
+        var textSize = bFont.MeasureString(_caption);
 
         // Umrandung der Detailansicht
         gr.DrawRectangle(whitePen, positionModified);
         gr.DrawRectangle(colorPen, positionModified);
         if (_ausrichtung != (Alignment)(-1)) {
             gr.FillRectangle(Brushes.White, new RectangleF(positionModified.Left, positionModified.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            BlueFont.DrawString(gr, _caption, font, new SolidBrush(bFont.ColorMain), positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
+            bFont.DrawString(gr, _caption, positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
         }
 
         //Markierung in der Zeichnung
@@ -276,7 +276,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         gr.DrawRectangle(colorPen, f);
         if (_ausrichtung != (Alignment)(-1)) {
             gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            BlueFont.DrawString(gr, _caption, font, new SolidBrush(bFont.ColorMain), f.Left, f.Top - textSize.Height - (9f * scale));
+            bFont.DrawString(gr, _caption, f.Left, f.Top - textSize.Height - (9f * scale));
         }
 
         //base.DrawExplicit(gr,visibleArea,positionModified,scale, shiftX, shiftY);

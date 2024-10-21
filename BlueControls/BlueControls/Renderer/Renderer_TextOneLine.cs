@@ -22,7 +22,6 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
@@ -72,11 +71,11 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        var font = this.GetFont(4).Scale(scale);
+        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
-        Skin.Draw_FormatedText(gr, replacedText, null, align, drawarea, font, false);
+        Skin.Draw_FormatedText(gr, replacedText, null, align, drawarea, this.GetFont(scale), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -139,11 +138,9 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     ///
-    protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
-        var font = this.GetFont(4);
+    protected override Size CalculateContentSize(string content, TranslationType translate) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
-
-        return font.Font().FormatedText_NeededSize(replacedText, null, 16);
+        return this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
     }
 
     /// <summary>

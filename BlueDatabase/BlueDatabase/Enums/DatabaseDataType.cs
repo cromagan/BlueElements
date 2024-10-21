@@ -116,7 +116,7 @@ public enum DatabaseDataType : byte {
     //VerwaisteDaten = 62,
     EventScript = 63,
 
-    GlobalScale = 64,
+    //GlobalScale = 64,
 
     //FilterImagePfad = 65,
     RowQuickInfo = 66,

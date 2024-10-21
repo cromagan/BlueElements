@@ -105,7 +105,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _eventScriptTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
-    private float _globalScale = 1f;
+    //private float _globalScale = 1f;
     private string _globalShowPass = string.Empty;
     private bool _isInSave;
     private bool _readOnly;
@@ -345,14 +345,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
 
-    public float GlobalScale {
-        get => _globalScale;
-        set {
-            if (Math.Abs(_globalScale - value) < DefaultTolerance) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToStringFloat2(), value.ToStringFloat2(), UserName, DateTime.UtcNow, string.Empty);
-            Cell.InvalidateAllSizes();
-        }
-    }
+    //public float GlobalScale {
+    //    get => _globalScale;
+    //    set {
+    //        if (Math.Abs(_globalScale - value) < DefaultTolerance) { return; }
+    //        _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToStringFloat2(), value.ToStringFloat2(), UserName, DateTime.UtcNow, string.Empty);
+    //        Cell.InvalidateAllSizes();
+    //    }
+    //}
 
     public string GlobalShowPass {
         get => _globalShowPass;
@@ -907,7 +907,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToStringFloat2());
+            //SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToStringFloat2());
             //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
             //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
             //SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
@@ -1163,7 +1163,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //Filename - nope
         //Tablename - nope
         //TimeCode - nope
-        GlobalScale = sourceDatabase.GlobalScale;
+        //GlobalScale = sourceDatabase.GlobalScale;
         GlobalShowPass = sourceDatabase.GlobalShowPass;
         //RulesScript = sourceDatabase.RulesScript;
         if (SortDefinition == null || SortDefinition.ParseableItems().FinishParseable() != sourceDatabase.SortDefinition?.ParseableItems().FinishParseable()) {
@@ -2547,9 +2547,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _caption = value;
                 break;
 
-            case DatabaseDataType.GlobalScale:
-                _globalScale = FloatParse(value);
-                break;
+            //case DatabaseDataType.GlobalScale:
+            //    _globalScale = FloatParse(value);
+            //    break;
 
             case DatabaseDataType.AdditionalFilesPath:
                 _additionalFilesPfad = value;

@@ -30,7 +30,6 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -366,9 +365,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             Generic.CollectGarbage();
         }
         if (_style != PadStyles.Undefiniert) {
-            if (Parent is ItemCollectionPadItem{IsDisposed: false,  SheetStyle: not null, SheetStyleScale: > 0 } icpi) {
-                gr.DrawRectangle(Skin.GetBlueFont(SheetStyle, _style).Pen(scale * SheetStyleScale), r1);
-            }
+ 
+                gr.DrawRectangle(this.GetFont().Pen(scale), r1);
+            
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

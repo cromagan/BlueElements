@@ -17,7 +17,9 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueControls.Enums;
+using System;
 
 namespace BlueControls.Interfaces;
 
@@ -40,12 +42,18 @@ public static class StyleableOneExtension {
 
     #region Methods
 
-    public static BlueFont GetFont(this IStyleableOne o, int stufe) {
-        if (stufe != 4) {
-            return Skin.GetBlueFont(o.Stil, o.SheetStyle, stufe) ?? BlueFont.DefaultFont;
-        }
 
-        o.Font ??= Skin.GetBlueFont(o.Stil, o.SheetStyle, stufe) ?? BlueFont.DefaultFont;
+    public static BlueFont GetFont(this IStyleableOne o, float additionalScale) {
+
+        if (Math.Abs(1 - additionalScale) < Constants.DefaultTolerance) { return GetFont(o); }
+
+        return Skin.GetBlueFont(o.SheetStyle, o.Stil, States.Standard, additionalScale * o.SheetStyleScale);
+
+    }
+
+
+    public static BlueFont GetFont(this IStyleableOne o) {
+        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Stil, States.Standard, o.SheetStyleScale) ?? BlueFont.DefaultFont;
         return o.Font;
     }
 

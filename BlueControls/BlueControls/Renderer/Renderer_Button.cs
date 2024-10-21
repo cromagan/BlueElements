@@ -25,6 +25,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueControls.Interfaces;
 
 namespace BlueControls.CellRenderer;
 
@@ -103,11 +104,10 @@ public class Renderer_Button : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, Design design, States state, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        //var font = Skin.DesignOf(design, state).BFont.Scale(scale);
 
-        var s = state;
+        var s = States.Standard;
 
         if (_checkstatus_anzeigen) {
             var t = (content + ";").SplitBy(";");
@@ -124,8 +124,6 @@ public class Renderer_Button : Renderer_Abstract {
         drawarea.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
 
         Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawarea, true);
-
-        //Skin.Draw_FormatedText(gr, replacedText, null, align, drawarea, font, false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -167,13 +165,13 @@ public class Renderer_Button : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
-    protected override Size CalculateContentSize(string content, Design design, States state, TranslationType translate) {
-        var font = Skin.DesignOf(design, state).Font.Font();
+    protected override Size CalculateContentSize(string content, TranslationType translate) {
+        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
 
         //if (font == null) { return new Size(16, 32); }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
-        return font.FormatedText_NeededSize(replacedText, QImage(content), 32);
+        return this.GetFont().FormatedText_NeededSize(replacedText, QImage(content), 32);
     }
 
     /// <summary>

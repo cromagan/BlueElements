@@ -27,39 +27,39 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Size FormatedText_NeededSize(this Font font, string text, QuickImage? qi, int minSize) {
-        try {
-            var pSize = SizeF.Empty;
-            var tSize = SizeF.Empty;
-            //if (font == null) { return new Size(3, 3); }
+    //public static Size FormatedText_NeededSize(this Font font, string text, QuickImage? qi, int minSize) {
+    //    try {
+    //        var pSize = SizeF.Empty;
+    //        var tSize = SizeF.Empty;
+    //        //if (font == null) { return new Size(3, 3); }
 
-            if (qi != null) {
-                lock (qi) {
-                    pSize = ((Bitmap)qi).Size;
-                }
-            }
-            if (!string.IsNullOrEmpty(text)) { tSize = font.MeasureString(text); }
+    //        if (qi != null) {
+    //            lock (qi) {
+    //                pSize = ((Bitmap)qi).Size;
+    //            }
+    //        }
+    //        if (!string.IsNullOrEmpty(text)) { tSize = font.MeasureString(text); }
 
-            if (!string.IsNullOrEmpty(text)) {
-                if (qi == null) {
-                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
-                }
+    //        if (!string.IsNullOrEmpty(text)) {
+    //            if (qi == null) {
+    //                return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
+    //            }
 
-                return new Size((int)(tSize.Width + 2 + pSize.Width + 1),
-                    Math.Max((int)tSize.Height, (int)pSize.Height));
-            }
+    //            return new Size((int)(tSize.Width + 2 + pSize.Width + 1),
+    //                Math.Max((int)tSize.Height, (int)pSize.Height));
+    //        }
 
-            if (qi != null) {
-                return new Size((int)pSize.Width, (int)pSize.Height);
-            }
+    //        if (qi != null) {
+    //            return new Size((int)pSize.Width, (int)pSize.Height);
+    //        }
 
-            return new Size(minSize, minSize);
-        } catch {
-            // tmpImageCode wird an anderer Stelle verwendet
-            Develop.CheckStackForOverflow();
-            return FormatedText_NeededSize(font, text, qi, minSize);
-        }
-    }
+    //        return new Size(minSize, minSize);
+    //    } catch {
+    //        // tmpImageCode wird an anderer Stelle verwendet
+    //        Develop.CheckStackForOverflow();
+    //        return FormatedText_NeededSize(font, text, qi, minSize);
+    //    }
+    //}
 
     public static SizeF MeasureString(this Font font, string text) {
         try {
