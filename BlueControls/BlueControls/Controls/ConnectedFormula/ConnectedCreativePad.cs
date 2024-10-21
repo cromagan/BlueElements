@@ -77,7 +77,6 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     public float DefaultCopyScale { get; set; } = 1f;
 
     public string DefaultDesign { get; set; } = string.Empty;
-    public float DefaultScale { get; set; } = 1f;
     public string ExecuteScriptAtRowChange { get; internal set; } = string.Empty;
 
     [Browsable(false)]
@@ -229,7 +228,6 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
             pad.Items = new ItemCollectionPadItem();
             pad.Items.Endless = true;
-            pad.Items.SheetStyleScale = DefaultScale;
 
             if (Skin.StyleDb?.Row != null) {
                 pad.Items.SheetStyle = DefaultDesign;

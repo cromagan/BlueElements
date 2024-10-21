@@ -125,13 +125,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
-
     protected override int SaveOrder => 999;
 
     #endregion

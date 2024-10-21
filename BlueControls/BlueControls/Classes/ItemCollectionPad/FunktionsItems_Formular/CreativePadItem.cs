@@ -174,7 +174,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             case "script":
                 con.ExecuteScriptAtRowChange = _script;
-                con.DefaultScale = _scale;
                 con.DefaultDesign = _design;
                 break;
         }

@@ -101,13 +101,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
-
     public PadStyles Stil {
         get => _style;
         set {
@@ -260,7 +253,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
-                    _txt.Draw(gr, scale * _textScale * SheetStyleScale);
+                    _txt.Draw(gr, scale * _textScale);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -282,13 +275,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 return;
             }
 
-            _txt = new ExtText(SheetStyle, SheetStyleScale);
+            _txt = new ExtText(SheetStyle);
             _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
             //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale / SheetStyleScale), -1);
+            _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale), -1);
             _txt.Ausrichtung = _ausrichtung;
         }
     }

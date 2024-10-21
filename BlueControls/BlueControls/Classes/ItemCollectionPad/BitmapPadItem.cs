@@ -113,12 +113,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
 
     public PadStyles Stil {
         get => _style;

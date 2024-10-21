@@ -70,13 +70,6 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
-
     public PadStyles Stil {
         get => _style;
         set {
@@ -198,7 +191,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
 
         if (p != null && Parent != null) {
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-            gr.DrawPath(new Pen(Randfarbe, Randdicke * scale * SheetStyleScale), p);
+            gr.DrawPath(new Pen(Randfarbe, Randdicke * scale), p);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

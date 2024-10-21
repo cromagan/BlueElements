@@ -39,7 +39,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields
 
-    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont("Windows 11", PadStyles.Hervorgehoben, States.Standard, 1f);
+    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben, States.Standard, 1f);
 
     #endregion
 
@@ -179,7 +179,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         var r = Column.Database?.Row.First();
         if (r is { IsDisposed: false }) {
-            Renderer?.Draw(gr, r.CellGetString(Column), new Rectangle(0, 210, bmp.Width, 90), Column.DoOpticalTranslation, (Alignment)Column.Align);
+            Renderer?.Draw(gr, r.CellGetString(Column), new Rectangle(0, 210, bmp.Width, 90), Column.DoOpticalTranslation, (Alignment)Column.Align, 1f);
         }
 
         GeneratedBitmap = bmp;

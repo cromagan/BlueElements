@@ -24,7 +24,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
@@ -222,7 +221,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            var r = Renderer_Abstract.RendererOf(thisColumn);
+                            var r = Table.RendererOf(thisColumn, Constants.Win11);
                             flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, r);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;

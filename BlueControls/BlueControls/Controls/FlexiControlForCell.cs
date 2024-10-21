@@ -576,7 +576,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
             QuickInfo = Table.QuickInfoText(realColumn, string.Empty);
 
             f.GetStyleFrom(realColumn);
-            if (Renderer_Abstract.RendererOf(realColumn) is Renderer_TextOneLine r) {
+            if (Table.RendererOf(realColumn, Constants.Win11) is Renderer_TextOneLine r) {
                 f.Suffix = r.Suffix;
             }
         }
@@ -586,7 +586,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                 case ComboBox comboBox:
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
-                        var r = Renderer_Abstract.RendererOf(column);
+                        var r = Table.RendererOf(column, Constants.Win11);
                         item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
@@ -631,7 +631,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
         var item = new List<AbstractListItem>();
         if (column.DropdownBearbeitungErlaubt) {
-            var r = Renderer_Abstract.RendererOf(column);
+            var r = Table.RendererOf(column, Constants.Win11);
             item.AddRange(ItemsOf(column, null, 10000, r));
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
@@ -683,7 +683,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         control.SuggestionsClear();
         if (column is not { IsDisposed: false }) { return; }
 
-        var r = Renderer_Abstract.RendererOf(column);
+        var r = Table.RendererOf(column, Constants.Win11);
 
         var item = new List<AbstractListItem>();
         item.AddRange(ItemsOf(column, null, 10000, r));

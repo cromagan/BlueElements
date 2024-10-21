@@ -44,21 +44,6 @@ public partial class PadEditor : FormWithStatusBar {
         if (Pad?.Items != null && Skin.StyleDb != null) {
             Pad.Items.SheetStyle = PadDesign.Text;
         }
-
-        cbxSchriftGröße.ItemAdd(ItemOf("30%", "030"));
-        cbxSchriftGröße.ItemAdd(ItemOf("40%", "040"));
-        cbxSchriftGröße.ItemAdd(ItemOf("50%", "050"));
-        cbxSchriftGröße.ItemAdd(ItemOf("60%", "060"));
-        cbxSchriftGröße.ItemAdd(ItemOf("70%", "070"));
-        cbxSchriftGröße.ItemAdd(ItemOf("80%", "080"));
-        cbxSchriftGröße.ItemAdd(ItemOf("90%", "090"));
-        cbxSchriftGröße.ItemAdd(ItemOf("100%", "100"));
-        cbxSchriftGröße.ItemAdd(ItemOf("110%", "110"));
-        cbxSchriftGröße.ItemAdd(ItemOf("120%", "120"));
-        cbxSchriftGröße.ItemAdd(ItemOf("130%", "130"));
-        cbxSchriftGröße.ItemAdd(ItemOf("140%", "140"));
-        cbxSchriftGröße.ItemAdd(ItemOf("150%", "150"));
-        cbxSchriftGröße.Text = "100";
     }
 
     #endregion
@@ -76,8 +61,7 @@ public partial class PadEditor : FormWithStatusBar {
             ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
             txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
             txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
-                PadDesign.Text = Pad.Items.SheetStyle;
-            cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
+            PadDesign.Text = Pad.Items.SheetStyle;
         }
     }
 
@@ -119,11 +103,6 @@ public partial class PadEditor : FormWithStatusBar {
     private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom = 1f;
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
-
-    private void cbxSchriftGröße_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Items == null) { return; }
-        Pad.Items.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
-    }
 
     private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
         if (Pad?.Items == null) { return; }

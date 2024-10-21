@@ -22,7 +22,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -126,7 +125,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var r = Renderer_Abstract.RendererOf(Column);
+        var r = Table.RendererOf(Column, Constants.Win11);
 
         var con = new FlexiControlForFilter(Column, _überschriftanordung, r) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,

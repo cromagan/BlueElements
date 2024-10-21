@@ -80,13 +80,6 @@ public class TablePadItem : RectanglePadItem, IStyleable, IStyleableChild {
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
-
     [DefaultValue("")]
     public string Standard_Ansicht {
         get => _defaultArrangement;

@@ -71,7 +71,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private Padding _randinMm = Padding.Empty;
 
     private string _sheetStyle;
-    private float _sheetStyleScale;
+
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -87,7 +87,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         _endless = false;
         RandinMm = Padding.Empty;
         _sheetStyle = string.Empty;
-        _sheetStyleScale = 1f;
+
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
         IsSaved = true;
@@ -223,18 +223,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    [DefaultValue(1.0)]
-    public float SheetStyleScale {
-        get => _sheetStyleScale;
-        set {
-            if (IsDisposed) { return; }
-            if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < DefaultTolerance) { return; }
-            _sheetStyleScale = value;
-            OnStyleChanged();
-            OnPropertyChanged();
-        }
-    }
+
 
     public new bool ShowAlways { get; set; }
 
@@ -696,14 +685,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         result.ParseableAdd("Style", _sheetStyle);
 
         result.ParseableAdd("BackColor", BackColor.ToArgb());
-        if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
-            result.ParseableAdd("FontScale", _sheetStyleScale);
-        }
 
-        //if (SheetSizeInMm is { Width: > 0, Height: > 0 }) {
-        //result.ParseableAdd("SheetSize", _sheetSizeInMm);
+
         result.ParseableAdd("PrintArea", _randinMm.ToString());
-        //}
+
 
         result.ParseableAdd("Endless", Endless);
 
@@ -747,7 +732,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "fontscale":
-                _sheetStyleScale = FloatParse(value);
                 return true;
 
             case "snapmode":
@@ -787,7 +771,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "sheetstylescale":
-                _sheetStyleScale = FloatParse(value);
                 return true;
 
             case "endless":
@@ -1102,14 +1085,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #region Items selbst
 
-        if (SheetStyleScale > 0.1) {
+ 
             var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, AutoZoomFit, UsedAreaOfItems());
 
             foreach (var thisItem in _internal) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
                 thisItem.Draw(gr, positionModified.ToRect(), childScale, childShiftX, childShiftY);
             }
-        }
+        
 
         #endregion
     }

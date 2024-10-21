@@ -135,13 +135,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
-
     public float Skalierung { get; set; } = 3.07f;
 
     public PadStyles Stil {
@@ -317,8 +310,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override RectangleF CalculateUsedArea() {
         if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
-        var geszoom = SheetStyleScale * Skalierung;
-        var f2 = this.GetFont().Font(geszoom);
+        var f2 = this.GetFont(Skalierung);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -335,9 +327,10 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_style != PadStyles.Undefiniert) {
-            var geszoom = SheetStyleScale * Skalierung * scale;
-            var f = this.GetFont();
-            var pfeilG = f.Font(geszoom).Size * 0.8f;
+            var geszoom = Skalierung * scale;
+
+            var f = this.GetFont(geszoom);
+            var pfeilG = f.Size * 0.8f;
             var pen2 = f.Pen(scale);
 
             //DrawOutline(gr, zoom, shiftX, shiftY, Color.Red);
@@ -348,8 +341,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             gr.DrawLine(pen2, _point2.ZoomAndMove(scale, shiftX, shiftY), _bezugslinie2.ZoomAndMove(scale, shiftX, shiftY)); // Bezugslinie 2
             gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY), _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY)); // Maßhilfslinie
             gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY), _textPoint.ZoomAndMove(scale, shiftX, shiftY)); // Maßhilfslinie
-            var sz1 = gr.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
-            var sz2 = gr.MeasureString(Text_Unten, f.Font(geszoom));
+            var sz1 = f.MeasureString(Angezeigter_Text_Oben());
+            var sz2 = f.MeasureString(Text_Unten);
             var p1 = _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY);
             var p2 = _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY);
             if (sz1.Width + (pfeilG * 2f) < GetLenght(p1, p2)) {
@@ -362,20 +355,23 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             var mitte = _textPoint.ZoomAndMove(scale, shiftX, shiftY);
             var textWinkel = _winkel % 360;
             if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
+
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
+
+
             PointM mitte1 = new(mitte, (float)(sz1.Height / 2.1), textWinkel + 90);
             var x = gr.Save();
             gr.TranslateTransform(mitte1.X, mitte1.Y);
             gr.RotateTransform(-textWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
-            f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), geszoom, StringFormat.GenericDefault);
+            f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), 1f, StringFormat.GenericDefault);
             gr.Restore(x);
             PointM mitte2 = new(mitte, (float)(sz2.Height / 2.1), textWinkel - 90);
             x = gr.Save();
             gr.TranslateTransform(mitte2.X, mitte2.Y);
             gr.RotateTransform(-textWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz2.Width * 0.9 / 2), (int)(-sz2.Height * 0.8 / 2), (int)(sz2.Width * 0.9), (int)(sz2.Height * 0.8)));
-            f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), geszoom, StringFormat.GenericDefault);
+            f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), 1f, StringFormat.GenericDefault);
             gr.Restore(x);
         }
     }

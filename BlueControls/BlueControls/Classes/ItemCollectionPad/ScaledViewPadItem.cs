@@ -113,12 +113,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
 
     public PadStyles Stil {
         get => _style;
@@ -233,7 +227,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return; }
 
-        if (SheetStyleScale > 0.1) {
+    
             var newarea = positionModified.ToRect();
             var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, true, CalculateShowingArea());
 
@@ -249,7 +243,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
                     }
                 }
             }
-        }
+        
 
 
         var bFont = this.GetFont(_textScale * scale);

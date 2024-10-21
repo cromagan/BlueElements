@@ -65,7 +65,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var page in _pages) {
-                if (page is ItemCollectionPadItem {IsDisposed: false} icp) {
+                if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
                     icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
                     icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
                 }
@@ -155,7 +155,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages == null) { return p; }
 
         foreach (var thisp in Pages) {
-            if (thisp is ItemCollectionPadItem {IsDisposed: false} icp) {
+            if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
                 _ = p.AddIfNotExists(icp.Caption);
             }
         }
@@ -196,15 +196,15 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 var found = GetPage(thisIt.Page);
 
                 if (found == null) {
-                    found = new ItemCollectionPadItem();
-                    found.Caption = thisIt.Page;
-                    found.Breite = Pages.Breite;
-                    found.Höhe = Pages.Höhe;
-                    found.SheetStyle = Pages.SheetStyle;
-                    found.RandinMm = Pages.RandinMm;
-                    found.GridShow = Pages.GridShow;
-                    found.GridSnap = Pages.GridSnap;
-                    found.SheetStyleScale = Pages.SheetStyleScale;
+                    found = new ItemCollectionPadItem {
+                        Caption = thisIt.Page,
+                        Breite = Pages.Breite,
+                        Höhe = Pages.Höhe,
+                        SheetStyle = Pages.SheetStyle,
+                        RandinMm = Pages.RandinMm,
+                        GridShow = Pages.GridShow,
+                        GridSnap = Pages.GridSnap
+                    };
                     Pages.Add(found);
                 }
 
@@ -259,13 +259,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             h.RandinMm = Pages.RandinMm;
             h.GridShow = Pages.GridShow;
             h.GridSnap = Pages.GridSnap;
-            h.SheetStyleScale = Pages.SheetStyleScale;
             Pages.Add(h);
         }
         RepairReciver(Pages);
 
         foreach (var thisP in Pages) {
-            if (thisP is ItemCollectionPadItem {IsDisposed: false} icp) {
+            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp) {
                 RowEntryPadItem? found = null;
 
                 foreach (var thisit in icp) {
@@ -318,7 +317,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var thisf in _pages) {
-                if (thisf is ItemCollectionPadItem {IsDisposed: false} icp) {
+                if (thisf is ItemCollectionPadItem { IsDisposed: false } icp) {
                     if (!notAllowedChilds.Contains(icp.KeyName) && !string.Equals("Head", icp.Caption, StringComparison.OrdinalIgnoreCase)) {
                         list.Add(ItemOf(icp));
                     }
@@ -362,8 +361,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages is not { IsDisposed: false } pg) { return null; }
 
         foreach (var thisP in pg) {
-            if (thisP is ItemCollectionPadItem {IsDisposed: false} icp2 &&
-                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase) ) {
+            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp2 &&
+                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase)) {
                 return icp2;
             }
         }
@@ -381,7 +380,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {
-            if (thisIt is ItemCollectionPadItem {IsDisposed: false} icp2) {
+            if (thisIt is ItemCollectionPadItem { IsDisposed: false } icp2) {
                 RepairReciver(icp2);
             }
 

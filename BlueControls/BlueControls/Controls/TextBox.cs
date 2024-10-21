@@ -248,6 +248,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
+    protected virtual Design Design => Design.TextBox;
+
     #endregion
 
     #region Methods
@@ -330,21 +332,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             case "#Caption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1,  PadStyles.Überschrift);
+                _eTxt.StufeÄndern(_markStart, _markEnd - 1, PadStyles.Überschrift);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#NoCaption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1,  PadStyles.Standard);
+                _eTxt.StufeÄndern(_markStart, _markEnd - 1, PadStyles.Standard);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#Bold":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1,  PadStyles.Hervorgehoben);
+                _eTxt.StufeÄndern(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
                 RaiseEventIfTextChanged(false);
                 return;
 
@@ -402,9 +404,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
                     if (_markEnd > -1) {
                         e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont("Windows 11", PadStyles.Überschrift, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont("Windows 11", PadStyles.Hervorgehoben, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont("Windows 11",  PadStyles.Standard, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard, States.Standard, 1f).SymbolForReadableText(), _markEnd > -1));
                     }
                 }
             }
@@ -541,7 +543,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         //}
         // Erst den Typ richtig stellen, dann den State ändern!
 
-
         var effectWidth = Width;
         var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
@@ -633,8 +634,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Skin.Draw_Border(gr, Design, state, DisplayRectangle);
         if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }
-
-    protected virtual Design Design => Design.TextBox;
 
     protected override bool IsInputKey(Keys keyData) {
         // Ganz wichtig diese Routine!
@@ -979,7 +978,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         //if (!Enabled) { state = States.Standard_Disabled; }
         //_eTxt.State = state;
 
-
         _eTxt.Multiline = _multiline;
         _eTxt.AllowedChars = _allowedChars;
 
@@ -1040,8 +1038,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (_markStart == _markEnd) { return; }
         _eTxt.Check(maS, maE - 1, true);
         //var tmpcharS = maS;
-
-
 
         //for (var cc = maS; cc <= maE; cc++) {
         //    if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen

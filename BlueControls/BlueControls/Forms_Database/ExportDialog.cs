@@ -140,7 +140,6 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         var oneItem = tmp.UsedArea;
         pad.Items.SheetStyle = tmp.SheetStyle;
-        pad.Items.SheetStyleScale = tmp.SheetStyleScale;
         pad.ShowInPrintMode = true;
         pad.Items.GridShow = -1;
         pad.Items.BackColor = Color.LightGray;

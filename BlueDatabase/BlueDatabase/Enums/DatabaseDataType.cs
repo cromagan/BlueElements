@@ -31,7 +31,7 @@ public static class DatabaseDataTypeExtension {
 
     //public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
-    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 65 or 67 or 70 or 109 or 123 or 134 or 151 or 153 or 178 or 185 or 191 or 249;
+    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 109 or 123 or 134 or 151 or 153 or 178 or 185 or 191 or 249;
 
     #endregion
 
@@ -166,7 +166,9 @@ public enum DatabaseDataType : byte {
     // co_SteuerelementName = 119
     // co_BezugsSpalte = 120
     DefaultRenderer = 121, // FREI = 121
+
     RendererSettings = 122,     // co_ReplaceAnsicht = 122
+
     // co_CellUBound = 123
     // co_GetFilesAufruf = 124
     PermissionGroupsChangeCell = 125,

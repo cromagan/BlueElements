@@ -109,14 +109,14 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Methods
 
-    public void CalculateScaledDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, float scale) {
+    public void CalculateScaledDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, float scale, string style) {
         if (IsDisposed || Row.IsDisposed) { DrawHeight = Table.GetPix(18, scale); return; }
 
         DrawHeight = 18;
 
         foreach (var thisViewItem in ca) {
             if (CellCollection.IsInCache(thisViewItem.Column, Row) && thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
-                var renderer = thisViewItem.GetRenderer();
+                var renderer = thisViewItem.GetRenderer(style);
 
                 DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), States.Standard, tmpc.DoOpticalTranslation).Height);
             }

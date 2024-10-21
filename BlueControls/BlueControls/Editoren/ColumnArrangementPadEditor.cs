@@ -508,7 +508,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
             if (thisColumnViewItem?.Column is { IsDisposed: false } c) {
-                var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.GetRenderer());
+                var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.GetRenderer(Constants.Win11));
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.UsedArea.Right;
@@ -576,7 +576,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
                             var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
-                                var it2 = new ColumnPadItem(c2, false, thisc.GetRenderer());
+                                var it2 = new ColumnPadItem(c2, false, thisc.GetRenderer(Constants.Win11));
                                 Pad.Items.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
                                 if (it != null) {

@@ -66,8 +66,7 @@ public static class SkinDesignExtensions {
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
 
-                des.SheetStyle = string.Empty;
-                des.SheetStyleScale = 1;
+        des.SheetStyle = string.Empty;
 
         if (!string.IsNullOrEmpty(f)) {
             if (f.StartsWith("{")) {
@@ -104,7 +103,6 @@ public class SkinDesign : IStyleableOne {
     public bool Need { get; set; }
     public RahmenArt RahmenArt { get; set; }
     public string SheetStyle { get; set; } = string.Empty;
-    public float SheetStyleScale { get; set; }
     public States Status { get; set; }
     public PadStyles Stil { get; set; }
     public int X1 { get; set; }

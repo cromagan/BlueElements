@@ -168,7 +168,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard,  States.Standard).Scale(SheetStyleScale);
 
         var pix16 = Table.GetPix(16, scale);
 

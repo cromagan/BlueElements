@@ -34,6 +34,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.BlueDatabaseDialogs;
+using BlueControls.CellRenderer;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -94,9 +95,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
-    private string _sheetStyle;
+    private string _sheetStyle = Constants.Win11;
 
-    private float _sheetStyleScale;
     private bool _showNumber;
 
     private RowSortDefinition? _sortDefinitionTemporary;
@@ -116,7 +116,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        InitializeSkin();
         MouseHighlight = false;
         Filter.PropertyChanged += Filter_PropertyChanged;
         Filter.RowsChanged += Filter_PropertyChanged;
@@ -155,6 +154,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     #endregion
 
     #region Properties
+
+    [DefaultValue(1.0f)]
+    public float AdditionalScale => 1f;
 
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
@@ -224,9 +226,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Filterausgabe FilterOutputType { get; } = Filterausgabe.Gewähle_Zeile;
 
-    [DefaultValue(1.0f)]
-    public float ScaleComplete => SheetStyleScale;
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -251,25 +250,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
+    public float Scale => 1f;
+
     public string SheetStyle {
         get => _sheetStyle;
         set {
             if (IsDisposed) { return; }
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
-            InitializeSkin();
-            Invalidate();
-        }
-    }
-
-    [DefaultValue(1.0)]
-    public float SheetStyleScale {
-        get => _sheetStyleScale;
-        set {
-            if (IsDisposed) { return; }
-            if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
-            _sheetStyleScale = value;
             InitializeSkin();
             Invalidate();
         }
@@ -631,6 +619,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return T;
     }
 
+    public static Renderer_Abstract RendererOf(ColumnItem? column, string style) {
+        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Renderer_Abstract.Default; }
+
+        var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
+        if (renderer == null) { return Renderer_Abstract.Default; }
+
+        renderer.Parse(column.RendererSettings);
+        renderer.SheetStyle = style;
+
+        return renderer;
+    }
+
     public static void SearchNextText(string searchTxt, Table tableView, ColumnViewItem? column, RowData? row, out ColumnViewItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         if (tableView.Database is not { IsDisposed: false } db) {
             MessageBox.Show("Datenbank-Fehler.", ImageCode.Information, "OK");
@@ -660,7 +660,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         do {
             column = ca.NextVisible(column);
 
-            var renderer = column?.GetRenderer();
+            var renderer = column?.GetRenderer(tableView.SheetStyle);
 
             if (column is not { }) {
                 column = ca.First();
@@ -925,161 +925,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
-
-    public void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo, ColumnViewCollection ca) {
-        if (Database is not { } db) { return; }
-
-        if (!IsOnScreen(viewItem, displayRectangleWoSlider)) { return; }
-        if (!ca.ShowHead) { return; }
-
-        if (viewItem is { Column: not null, X_WithSlider: not null }) {
-            gr.FillRectangle(new SolidBrush(viewItem.Column.BackColor), (int)viewItem.X_WithSlider, 0, viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete), ca.HeadSize(_columnFont));
-            Draw_Border(gr, viewItem, displayRectangleWoSlider, true, ca);
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(100, 200, 200, 200)), (int)viewItem.X_WithSlider, 0, viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete), ca.HeadSize(_columnFont));
-
-            var down = 0;
-            if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup3)) {
-                down = ColumnCaptionSizeY * 3;
-            } else if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup2)) {
-                down = ColumnCaptionSizeY * 2;
-            } else if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup1)) {
-                down = ColumnCaptionSizeY;
-            }
-
-            #region Recude-Button zeichnen
-
-            if (viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) > 70 || viewItem.Reduced) {
-                viewItem.ReduceLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - 18, down, 18, 18);
-                gr.DrawImage(viewItem.Reduced ? QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20") : QuickImage.Get("Pfeil_Links|16||||||||75"), viewItem.ReduceLocation.Left + 2, viewItem.ReduceLocation.Top + 2);
-            }
-
-            #endregion
-
-            #region Filter-Knopf mit Trichter
-
-            var trichterText = string.Empty;
-            QuickImage? trichterIcon = null;
-            var trichterState = States.Undefiniert;
-            viewItem.AutoFilterLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - AutoFilterSize, ca.HeadSize(_columnFont) - AutoFilterSize, AutoFilterSize, AutoFilterSize);
-            var fi = Filter[viewItem.Column];
-
-            if (viewItem.Column.AutoFilterSymbolPossible()) {
-                if (fi != null) {
-                    trichterState = States.Checked;
-                    var anz = Autofilter_Text(viewItem.Column);
-                    trichterText = anz > -100 ? (anz * -1).ToString() : "∞";
-                } else {
-                    trichterState = States.Standard;
-                }
-            }
-
-            var trichterSize = (AutoFilterSize - 4).ToString();
-            if (Filter.HasAlwaysFalse() && viewItem.Column.AutoFilterSymbolPossible()) {
-                trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000||170");
-            } else if (fi != null) {
-                trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
-            } else if (Filter.MayHaveRowFilter(viewItem.Column)) {
-                trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
-            } else if (viewItem.Column.AutoFilterSymbolPossible()) {
-                trichterIcon = QuickImage.Get("Trichter|" + trichterSize);
-            }
-
-            if (trichterState != States.Undefiniert) {
-                Skin.Draw_Back(gr, Design.Button_AutoFilter, trichterState, viewItem.AutoFilterLocation, null, false);
-                Skin.Draw_Border(gr, Design.Button_AutoFilter, trichterState, viewItem.AutoFilterLocation);
-            }
-
-            if (trichterIcon != null) {
-                gr.DrawImage(trichterIcon, viewItem.AutoFilterLocation.Left + 2, viewItem.AutoFilterLocation.Top + 2);
-            }
-
-            if (!string.IsNullOrEmpty(trichterText)) {
-                var s = _columnFilterFont.MeasureString(trichterText, StringFormat.GenericDefault);
-
-                _columnFilterFont.DrawString(gr, trichterText,
-                    viewItem.AutoFilterLocation.Left + ((AutoFilterSize - s.Width) / 2),
-                    viewItem.AutoFilterLocation.Top + ((AutoFilterSize - s.Height) / 2));
-            }
-
-            if (trichterState == States.Undefiniert) {
-                viewItem.AutoFilterLocation = new Rectangle(0, 0, 0, 0);
-            }
-
-            #endregion Filter-Knopf mit Trichter
-
-            #region LaufendeNummer
-
-            if (_showNumber) {
-                for (var x = -1; x < 2; x++) {
-                    for (var y = -1; y < 2; y++) {
-                        BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.Black, (int)viewItem.X_WithSlider + x, viewItem.AutoFilterLocation.Top + y);
-                    }
-                }
-
-                BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.White, (int)viewItem.X_WithSlider, viewItem.AutoFilterLocation.Top);
-            }
-
-            #endregion LaufendeNummer
-
-            var tx = viewItem.Column.Caption;
-            tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
-            var fs = gr.MeasureString(tx, (Font)_columnFont);
-
-            #region Spalten-Kopf-Bild erzeugen
-
-            if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmapCode) && viewItem.Column.TmpCaptionBitmapCode == null) {
-                viewItem.Column.TmpCaptionBitmapCode = QuickImage.Get(viewItem.Column.CaptionBitmapCode + "|100");
-            }
-
-            #endregion
-
-            if (viewItem.Column.TmpCaptionBitmapCode is { IsError: false }) {
-
-                #region Spalte mit Bild zeichnen
-
-                Point pos = new(
-                    (int)viewItem.X_WithSlider +
-                    (int)((viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - fs.Width) / 2.0), 3 + down);
-                gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmapCode, (int)viewItem.X_WithSlider + 2, (int)(pos.Y + fs.Height), viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - 4, ca.HeadSize(_columnFont) - (int)(pos.Y + fs.Height) - 6 - 18);
-                // Dann der Text
-                gr.TranslateTransform(pos.X, pos.Y);
-                //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                BlueFont.DrawString(gr, tx, _columnFont, new SolidBrush(viewItem.Column.ForeColor), 0, 0);
-                gr.TranslateTransform(-pos.X, -pos.Y);
-
-                #endregion
-            } else {
-
-                #region Spalte ohne Bild zeichnen
-
-                Point pos = new(
-                    (int)viewItem.X_WithSlider +
-                    (int)((viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - fs.Height) / 2.0),
-                    ca.HeadSize(_columnFont) - 4 - AutoFilterSize);
-                gr.TranslateTransform(pos.X, pos.Y);
-                gr.RotateTransform(-90);
-                //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                BlueFont.DrawString(gr, tx, _columnFont, new SolidBrush(viewItem.Column.ForeColor), 0, 0);
-                gr.TranslateTransform(-pos.X, -pos.Y);
-                gr.ResetTransform();
-
-                #endregion
-            }
-
-            #region Sortierrichtung Zeichnen
-
-            var tmpSortDefinition = SortUsed();
-            if (tmpSortDefinition != null && (tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database?.Column.SysChapter)) {
-                if (viewItem.X_WithSlider != null) {
-                    gr.DrawImage(tmpSortDefinition.Reverse ? QuickImage.Get("ZA|11|5||||50") : QuickImage.Get("AZ|11|5||||50"),
-                        (float)((viewItem.X_WithSlider ?? 0) + (viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) / 2.0) - 6),
-                        ca.HeadSize(_columnFont) - 6 - AutoFilterSize);
-                }
-            }
-        }
-
-        #endregion
-    }
 
     public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
         var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
@@ -1365,7 +1210,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                     thisRowData.Expanded = expanded;
                     if (thisRowData.Expanded) {
-                        thisRowData.CalculateScaledDrawHeight(ca, ca.HeadSize(_columnFont), displayR, ScaleComplete);
+                        thisRowData.CalculateScaledDrawHeight(ca, ca.HeadSize(_columnFont), displayR, Scale, SheetStyle);
                         maxY += thisRowData.DrawHeight;
                     }
 
@@ -1467,6 +1312,19 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return result.FinishParseable();
     }
 
+    internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem, string style) {
+        if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
+            var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
+            if (renderer == null) { return RendererOf(columnViewItem.Column, style); }
+
+            renderer.Parse(columnViewItem.RendererSettings);
+
+            return renderer;
+        }
+
+        return RendererOf(columnViewItem.Column, style);
+    }
+
     internal static bool RepairColumnArrangements(Database db) {
         if (db.IsDisposed) { return false; }
         if (!string.IsNullOrEmpty(db.FreezedReason)) { return false; }
@@ -1526,6 +1384,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         base.DrawControl(gr, state);
 
         if (IsDisposed) { return; }
+
+        InitializeSkin();
 
         _tmpCursorRect = Rectangle.Empty;
 
@@ -1629,7 +1489,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var maxX = 0;
         if (ca.Count > 1) {
             // Ka, größer 1! Weil wenns nur eine ist, diese als ganze breite angezeigt wird
-            maxX = ca[ca.Count - 1].DrawWidth(displayRectangleWoSlider, ScaleComplete) + (ca[ca.Count - 1].X ?? 0);
+            maxX = ca[ca.Count - 1].DrawWidth(displayRectangleWoSlider, AdditionalScale, SheetStyle) + (ca[ca.Count - 1].X ?? 0);
         }
 
         SliderX.Minimum = 0;
@@ -1664,21 +1524,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (FilterOutputType == Filterausgabe.Alle_Filter) {
             FilterOutput.ChangeTo(Filter);
         }
-    }
-
-    protected void InitializeSkin() {
-
-        var scale = ScaleComplete * _sheetStyleScale;
-
-        _columnFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Hervorgehoben, States.Standard, scale);
-        _chapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, scale);
-        _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false);
-
-
-        _pix16 = GetPix(16, scale);
-        _pix18 = GetPix(18, scale);
-        _rowCaptionFontY = GetPix(26, scale);
-
     }
 
     protected override bool IsInputKey(Keys keyData) {
@@ -2423,7 +2268,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
         //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
         //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
-        _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows, columnviewitem.DrawWidth(DisplayRectangleWithoutSlider(), ScaleComplete), columnviewitem.GetRenderer());
+        _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows, columnviewitem.DrawWidth(DisplayRectangleWithoutSlider(), Scale, SheetStyle), columnviewitem.GetRenderer(SheetStyle));
         _autoFilter.Position_LocateToPosition(new Point(screenx + columnviewitem.X_WithSlider ?? 0, screeny + ca.HeadSize(_columnFont)));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
@@ -2597,7 +2442,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var t = new List<AbstractListItem>();
 
-        var r = viewItem.GetRenderer();
+        var r = viewItem.GetRenderer(SheetStyle);
 
         t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
         if (t.Count == 0) {
@@ -2647,12 +2492,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var h = cellInThisDatabaseRow?.DrawHeight ?? _pix18;// Row_DrawHeight(cellInThisDatabaseRow, DisplayRectangle);
             if (isHeight > 0) { h = isHeight; }
             box.Location = new Point(viewItem.X_WithSlider ?? 0, DrawY(ca, cellInThisDatabaseRow));
-            box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, ScaleComplete) + addWith, h);
+            box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, Scale, SheetStyle) + addWith, h);
             box.Text = contentHolderCellRow.CellGetString(contentHolderCellColumn);
         } else {
             // Neue Zeile...
             box.Location = new Point(viewItem.X_WithSlider ?? 0, ca.HeadSize(_columnFont));
-            box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, ScaleComplete) + addWith, _pix18);
+            box.Size = new Size(viewItem.DrawWidth(DisplayRectangle, Scale, SheetStyle) + addWith, _pix18);
             box.Text = string.Empty;
         }
 
@@ -2662,7 +2507,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (box is ComboBox cbox) {
             cbox.ItemClear();
-            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, viewItem.GetRenderer()));
+            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle)));
             if (cbox.ItemCount == 0) {
                 return Cell_Edit_TextBox(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
             }
@@ -2681,7 +2526,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos, out ColumnViewItem? column, out RowData? row) {
-        column = ca.ColumnOnCoordinate(xpos, DisplayRectangleWithoutSlider());
+        column = ca.ColumnOnCoordinate(xpos, DisplayRectangleWithoutSlider(), Scale, SheetStyle);
         row = RowOnCoordinate(ca, ypos);
     }
 
@@ -2734,11 +2579,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                     if (wdh) {
                         thisViewItem.X_WithSlider = thisViewItem.X;
-                        maxX += thisViewItem.DrawWidth(displayRectangleWithoutSlider, ScaleComplete);
+                        maxX += thisViewItem.DrawWidth(displayRectangleWithoutSlider, Scale, SheetStyle);
                         ca._wiederHolungsSpaltenWidth = Math.Max(maxX, (int)ca._wiederHolungsSpaltenWidth);
                     } else {
                         thisViewItem.X_WithSlider = se ? (int)(maxX - sliderXVal) : maxX;
-                        maxX += thisViewItem.DrawWidth(displayRectangleWithoutSlider, ScaleComplete);
+                        maxX += thisViewItem.DrawWidth(displayRectangleWithoutSlider, Scale, SheetStyle);
                     }
                 }
             }
@@ -2775,7 +2620,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 xPos = column.X_WithSlider ?? 0;
                 lin = column.Column?.LineLeft ?? ColumnLineStyle.Dünn;
             } else {
-                xPos = (column.X_WithSlider ?? 0) + column.DrawWidth(displayRectangleWoSlider, ScaleComplete);
+                xPos = (column.X_WithSlider ?? 0) + column.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle);
                 lin = column.Column?.LineRight ?? ColumnLineStyle.Ohne;
             }
             switch (lin) {
@@ -2815,7 +2660,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         gr.SmoothingMode = SmoothingMode.None;
-        gr.FillRectangle(new SolidBrush(tmpc.BackColor), cellInThisDatabaseColumn.X_WithSlider ?? 0, ca.HeadSize(_columnFont), cellInThisDatabaseColumn.DrawWidth(displayRectangleWoSlider, ScaleComplete), displayRectangleWoSlider.Height);
+        gr.FillRectangle(new SolidBrush(tmpc.BackColor), cellInThisDatabaseColumn.X_WithSlider ?? 0, ca.HeadSize(_columnFont), cellInThisDatabaseColumn.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle), displayRectangleWoSlider.Height);
         Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWoSlider, false, ca);
     }
 
@@ -2826,7 +2671,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var isAdmin = db.IsAdministrator();
         var isCurrentThreadBackground = Thread.CurrentThread.IsBackground;
         var columnX1 = viewItem.X_WithSlider ?? 0;
-        var drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - 2;
+        var drawWidth = viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - 2;
         var rowScript = db.CanDoValueChangedScript();
 
         if (SliderY.Value < _pix16 && UserEdit_NewRowAllowed()) {
@@ -2844,7 +2689,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (!string.IsNullOrEmpty(txt)) {
                 var pos = new Rectangle(columnX1 + plus, (int)(-SliderY.Value + ca.HeadSize(_columnFont) + 1), drawWidth - plus, _pix16);
-                viewItem.GetRenderer().Draw(gr, txt, pos, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align);
+                viewItem.GetRenderer(SheetStyle).Draw(gr, txt, pos, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, Scale);
                 gr.DrawImage(qi, new Point(columnX1, (int)(-SliderY.Value + ca.HeadSize(_columnFont))));
             }
         }
@@ -2855,7 +2700,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             gr.SmoothingMode = SmoothingMode.None;
 
             Rectangle cellrectangle = new(columnX1, DrawY(ca, cellInThisDatabaseRowData),
-                viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete), cellInThisDatabaseRowData.DrawHeight);
+                viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle), cellInThisDatabaseRowData.DrawHeight);
 
             if (cellInThisDatabaseRowData.Expanded) {
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
@@ -2905,12 +2750,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     case ColumnFunction.Virtuelle_Spalte:
                         cellInThisDatabaseRow.CheckRowDataIfNeeded();
                         var toDrawd2 = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        viewItem.GetRenderer().Draw(gr, toDrawd2, cellrectangle, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align);
+                        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd2, cellrectangle, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, Scale);
                         break;
 
                     default:
                         var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);
-                        viewItem.GetRenderer().Draw(gr, toDrawd, cellrectangle, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align);
+                        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellrectangle, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, Scale);
                         break;
                 }
 
@@ -2948,6 +2793,161 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
+    private void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo, ColumnViewCollection ca) {
+        if (Database is not { } db) { return; }
+
+        if (!IsOnScreen(viewItem, displayRectangleWoSlider)) { return; }
+        if (!ca.ShowHead) { return; }
+
+        if (viewItem is { Column: not null, X_WithSlider: not null }) {
+            gr.FillRectangle(new SolidBrush(viewItem.Column.BackColor), (int)viewItem.X_WithSlider, 0, viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle), ca.HeadSize(_columnFont));
+            Draw_Border(gr, viewItem, displayRectangleWoSlider, true, ca);
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(100, 200, 200, 200)), (int)viewItem.X_WithSlider, 0, viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle), ca.HeadSize(_columnFont));
+
+            var down = 0;
+            if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup3)) {
+                down = ColumnCaptionSizeY * 3;
+            } else if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup2)) {
+                down = ColumnCaptionSizeY * 2;
+            } else if (!string.IsNullOrEmpty(viewItem.Column.CaptionGroup1)) {
+                down = ColumnCaptionSizeY;
+            }
+
+            #region Recude-Button zeichnen
+
+            if (viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) > 70 || viewItem.Reduced) {
+                viewItem.ReduceLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - 18, down, 18, 18);
+                gr.DrawImage(viewItem.Reduced ? QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20") : QuickImage.Get("Pfeil_Links|16||||||||75"), viewItem.ReduceLocation.Left + 2, viewItem.ReduceLocation.Top + 2);
+            }
+
+            #endregion
+
+            #region Filter-Knopf mit Trichter
+
+            var trichterText = string.Empty;
+            QuickImage? trichterIcon = null;
+            var trichterState = States.Undefiniert;
+            viewItem.AutoFilterLocation = new Rectangle((int)viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - AutoFilterSize, ca.HeadSize(_columnFont) - AutoFilterSize, AutoFilterSize, AutoFilterSize);
+            var fi = Filter[viewItem.Column];
+
+            if (viewItem.Column.AutoFilterSymbolPossible()) {
+                if (fi != null) {
+                    trichterState = States.Checked;
+                    var anz = Autofilter_Text(viewItem.Column);
+                    trichterText = anz > -100 ? (anz * -1).ToString() : "∞";
+                } else {
+                    trichterState = States.Standard;
+                }
+            }
+
+            var trichterSize = (AutoFilterSize - 4).ToString();
+            if (Filter.HasAlwaysFalse() && viewItem.Column.AutoFilterSymbolPossible()) {
+                trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000||170");
+            } else if (fi != null) {
+                trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
+            } else if (Filter.MayHaveRowFilter(viewItem.Column)) {
+                trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
+            } else if (viewItem.Column.AutoFilterSymbolPossible()) {
+                trichterIcon = QuickImage.Get("Trichter|" + trichterSize);
+            }
+
+            if (trichterState != States.Undefiniert) {
+                Skin.Draw_Back(gr, Design.Button_AutoFilter, trichterState, viewItem.AutoFilterLocation, null, false);
+                Skin.Draw_Border(gr, Design.Button_AutoFilter, trichterState, viewItem.AutoFilterLocation);
+            }
+
+            if (trichterIcon != null) {
+                gr.DrawImage(trichterIcon, viewItem.AutoFilterLocation.Left + 2, viewItem.AutoFilterLocation.Top + 2);
+            }
+
+            if (!string.IsNullOrEmpty(trichterText)) {
+                var s = _columnFilterFont.MeasureString(trichterText, StringFormat.GenericDefault);
+
+                _columnFilterFont.DrawString(gr, trichterText,
+                    viewItem.AutoFilterLocation.Left + ((AutoFilterSize - s.Width) / 2),
+                    viewItem.AutoFilterLocation.Top + ((AutoFilterSize - s.Height) / 2));
+            }
+
+            if (trichterState == States.Undefiniert) {
+                viewItem.AutoFilterLocation = new Rectangle(0, 0, 0, 0);
+            }
+
+            #endregion Filter-Knopf mit Trichter
+
+            #region LaufendeNummer
+
+            if (_showNumber) {
+                for (var x = -1; x < 2; x++) {
+                    for (var y = -1; y < 2; y++) {
+                        BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.Black, (int)viewItem.X_WithSlider + x, viewItem.AutoFilterLocation.Top + y);
+                    }
+                }
+
+                BlueFont.DrawString(gr, "#" + lfdNo, _columnFont, Brushes.White, (int)viewItem.X_WithSlider, viewItem.AutoFilterLocation.Top);
+            }
+
+            #endregion LaufendeNummer
+
+            var tx = viewItem.Column.Caption;
+            tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
+            var fs = gr.MeasureString(tx, (Font)_columnFont);
+
+            #region Spalten-Kopf-Bild erzeugen
+
+            if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmapCode) && viewItem.Column.TmpCaptionBitmapCode == null) {
+                viewItem.Column.TmpCaptionBitmapCode = QuickImage.Get(viewItem.Column.CaptionBitmapCode + "|100");
+            }
+
+            #endregion
+
+            if (viewItem.Column.TmpCaptionBitmapCode is { IsError: false }) {
+
+                #region Spalte mit Bild zeichnen
+
+                Point pos = new(
+                    (int)viewItem.X_WithSlider +
+                    (int)((viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - fs.Width) / 2.0), 3 + down);
+                gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmapCode, (int)viewItem.X_WithSlider + 2, (int)(pos.Y + fs.Height), viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - 4, ca.HeadSize(_columnFont) - (int)(pos.Y + fs.Height) - 6 - 18);
+                // Dann der Text
+                gr.TranslateTransform(pos.X, pos.Y);
+                //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                BlueFont.DrawString(gr, tx, _columnFont, new SolidBrush(viewItem.Column.ForeColor), 0, 0);
+                gr.TranslateTransform(-pos.X, -pos.Y);
+
+                #endregion
+            } else {
+
+                #region Spalte ohne Bild zeichnen
+
+                Point pos = new(
+                    (int)viewItem.X_WithSlider +
+                    (int)((viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - fs.Height) / 2.0),
+                    ca.HeadSize(_columnFont) - 4 - AutoFilterSize);
+                gr.TranslateTransform(pos.X, pos.Y);
+                gr.RotateTransform(-90);
+                //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                BlueFont.DrawString(gr, tx, _columnFont, new SolidBrush(viewItem.Column.ForeColor), 0, 0);
+                gr.TranslateTransform(-pos.X, -pos.Y);
+                gr.ResetTransform();
+
+                #endregion
+            }
+
+            #region Sortierrichtung Zeichnen
+
+            var tmpSortDefinition = SortUsed();
+            if (tmpSortDefinition != null && (tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database?.Column.SysChapter)) {
+                if (viewItem.X_WithSlider != null) {
+                    gr.DrawImage(tmpSortDefinition.Reverse ? QuickImage.Get("ZA|11|5||||50") : QuickImage.Get("AZ|11|5||||50"),
+                        (float)((viewItem.X_WithSlider ?? 0) + (viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) / 2.0) - 6),
+                        ca.HeadSize(_columnFont) - 6 - AutoFilterSize);
+                }
+            }
+        }
+
+        #endregion
+    }
+
     /// <summary>
     /// Zeichnet die Überschriften
     /// </summary>
@@ -2963,7 +2963,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var permaX = 0;
 
         foreach (var thisViewItem in ca) {
-            var thisViewItemWidth = thisViewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete);
+            var thisViewItemWidth = thisViewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle);
             var thisViewItemLeft = thisViewItem.X_WithSlider ?? 0;
             var thisViewItemRight = thisViewItemLeft + thisViewItemWidth;
 
@@ -2977,13 +2977,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     if (newCaptionGroup != prevCaptionGroup) {
                         if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem != null && prevViewItemWithOtherCaption[u] is { } tmp) {
                             var le = Math.Max(0, prevViewItemWithOtherCaption[u]?.X_WithSlider ?? 0);
-                            var re = (prevViewItem.X_WithSlider ?? 0) + prevViewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) - 1;
+                            var re = (prevViewItem.X_WithSlider ?? 0) + prevViewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) - 1;
                             if (thisViewItem?.ViewType != ViewType.PermanentColumn && tmp.ViewType != ViewType.PermanentColumn) {
                                 le = Math.Max(le, permaX);
                             }
 
                             if (thisViewItem?.ViewType != ViewType.PermanentColumn && tmp.ViewType == ViewType.PermanentColumn) {
-                                var tmp2 = prevPermanentViewItemWithOtherCaption[u].DrawWidth(displayRectangleWoSlider, ScaleComplete);
+                                var tmp2 = prevPermanentViewItemWithOtherCaption[u].DrawWidth(displayRectangleWoSlider, Scale, SheetStyle);
                                 re = Math.Max(re, prevPermanentViewItemWithOtherCaption[u].X_WithSlider ?? 0 + tmp2);
                             }
 
@@ -3037,7 +3037,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     //    return;
                     //}
 
-                    permaX = Math.Max(permaX, viewItem.X_WithSlider ?? 0 + viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete));
+                    permaX = Math.Max(permaX, viewItem.X_WithSlider ?? 0 + viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle));
                 }
             }
 
@@ -3094,7 +3094,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (viewItem?.Column != null) {
                 lfdno++;
                 if (IsOnScreen(viewItem, displayRectangleWoSlider)) {
-                    if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.X_WithSlider ?? 0) + viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) > permaX) ||
+                    if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.X_WithSlider ?? 0) + viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) > permaX) ||
                         (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                         switch (type) {
                             case TableDrawType.ColumnBackBody:
@@ -3203,14 +3203,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         _ = ComputeAllColumnPositions(ca, r);
         if (viewItem.ViewType == ViewType.PermanentColumn) {
-            if (viewItem.X_WithSlider + viewItem.DrawWidth(r, ScaleComplete) <= r.Width) { return true; }
+            if (viewItem.X_WithSlider + viewItem.DrawWidth(r, Scale, SheetStyle) <= r.Width) { return true; }
             //Develop.DebugPrint(enFehlerArt.Info,"Unsichtbare Wiederholungsspalte: " + ViewItem.Column.KeyName);
             return false;
         }
         if (viewItem.X_WithSlider < ca._wiederHolungsSpaltenWidth) {
             SliderX.Value = SliderX.Value + (int)viewItem.X_WithSlider - (int)ca._wiederHolungsSpaltenWidth;
-        } else if (viewItem.X_WithSlider + viewItem.DrawWidth(r, ScaleComplete) > r.Width) {
-            SliderX.Value = SliderX.Value + viewItem.X_WithSlider ?? 0 + viewItem.DrawWidth(r, ScaleComplete) - r.Width;
+        } else if (viewItem.X_WithSlider + viewItem.DrawWidth(r, Scale, SheetStyle) > r.Width) {
+            SliderX.Value = SliderX.Value + viewItem.X_WithSlider ?? 0 + viewItem.DrawWidth(r, Scale, SheetStyle) - r.Width;
         }
         return true;
     }
@@ -3226,6 +3226,16 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         Invalidate_SortedRowData();
         OnFilterChanged();
+    }
+
+    private void InitializeSkin() {
+        _columnFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Hervorgehoben, States.Standard, Scale);
+        _chapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, Scale);
+        _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false);
+
+        _pix16 = GetPix(16, Scale);
+        _pix18 = GetPix(18, Scale);
+        _rowCaptionFontY = GetPix(26, Scale);
     }
 
     private void Invalidate_DrawWidth(ColumnItem? column) {
@@ -3245,7 +3255,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
         if (viewItem == null) { return false; }
 
-        if (viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, ScaleComplete) >= 0 && viewItem.X_WithSlider <= displayRectangleWoSlider.Width) { return true; }
+        if (viewItem.X_WithSlider + viewItem.DrawWidth(displayRectangleWoSlider, Scale, SheetStyle) >= 0 && viewItem.X_WithSlider <= displayRectangleWoSlider.Width) { return true; }
 
         return false;
     }

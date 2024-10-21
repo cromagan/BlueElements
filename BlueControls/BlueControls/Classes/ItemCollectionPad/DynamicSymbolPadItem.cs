@@ -83,12 +83,6 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
         }
     }
 
-    public float SheetStyleScale {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyleScale; }
-            return 1f;
-        }
-    }
 
     public PadStyles Stil {
         get => _style;
@@ -176,7 +170,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left);
+        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left, scale);
 
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         //gr.TranslateTransform(trp.X, trp.Y);

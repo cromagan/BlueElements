@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -28,7 +27,6 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using BlueDatabase.Enums;
 
 namespace BlueControls.CellRenderer;
@@ -44,7 +42,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
     private string _sheetStyle;
-    private float _sheetStyleScale;
     private PadStyles _style = PadStyles.Standard;
 
     #endregion
@@ -78,17 +75,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         }
     }
 
-    [DefaultValue(1.0)]
-    public float SheetStyleScale {
-        get => _sheetStyleScale;
-        set {
-            if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
-            _sheetStyleScale = value;
-            OnPropertyChanged();
-        }
-    }
-
     public PadStyles Stil {
         get => _style;
         set {
@@ -101,17 +87,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     #endregion
 
     #region Methods
-
-    public static Renderer_Abstract RendererOf(ColumnItem? column) {
-        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Default; }
-
-        var renderer = NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
-        if (renderer == null) { return Default; }
-
-        renderer.Parse(column.RendererSettings);
-
-        return renderer;
-    }
 
     public Size ContentSize(string content, States state, TranslationType translate) {
         if (string.IsNullOrEmpty(content)) { return Size.Empty; }
@@ -158,19 +133,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         _ = Replaced.TryAdd(key, replaced);
 
         return replaced;
-    }
-
-    internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem) {
-        if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
-            var renderer = NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
-            if (renderer == null) { return RendererOf(columnViewItem.Column); }
-
-            renderer.Parse(columnViewItem.RendererSettings);
-
-            return renderer;
-        }
-
-        return RendererOf(columnViewItem.Column);
     }
 
     protected abstract Size CalculateContentSize(string content, TranslationType doOpticalTranslation);

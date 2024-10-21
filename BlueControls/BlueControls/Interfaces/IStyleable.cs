@@ -30,8 +30,6 @@ public interface IStyleable {
 
     public string SheetStyle { get; }
 
-    public float SheetStyleScale { get; }
-
     #endregion
 }
 
@@ -40,7 +38,7 @@ public static class StyleableExtension {
     #region Methods
 
     public static BlueFont GetFont(this IStyleable o, PadStyles stufe) {
-        return Skin.GetBlueFont(o.SheetStyle, stufe, States.Standard,o.SheetStyleScale) ?? BlueFont.DefaultFont;
+        return Skin.GetBlueFont(o.SheetStyle, stufe, States.Standard, 1f) ?? BlueFont.DefaultFont;
     }
 
     #endregion

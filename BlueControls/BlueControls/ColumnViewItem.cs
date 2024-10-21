@@ -136,7 +136,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         //GC.SuppressFinalize(this);
     }
 
-    public int DrawWidth(Rectangle displayRectangleWoSlider, float scale) {
+    public int DrawWidth(Rectangle displayRectangleWoSlider, float scale, string style) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
         if (Parent == null) { return Table.GetPix(16, scale); }
@@ -157,18 +157,18 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             _drawWidth = Table.GetPix(16, scale);
         } else {
             _drawWidth = _viewType == ViewType.PermanentColumn
-                ? Math.Min(Table.GetPix(CalculateColumnContentWidth(), scale), (int)(displayRectangleWoSlider.Width * 0.3))
-                : Math.Min(Table.GetPix(CalculateColumnContentWidth(), scale), (int)(displayRectangleWoSlider.Width * 0.6));
+                ? Math.Min(Table.GetPix(CalculateColumnContentWidth(style), scale), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(Table.GetPix(CalculateColumnContentWidth(style), scale), (int)(displayRectangleWoSlider.Width * 0.6));
         }
 
         _drawWidth = Math.Max((int)_drawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
         return (int)_drawWidth;
     }
 
-    public Renderer_Abstract GetRenderer() {
+    public Renderer_Abstract GetRenderer(string style) {
         if (_renderer != null) { return _renderer; }
 
-        _renderer = Renderer_Abstract.RendererOf(this);
+        _renderer = Table.RendererOf(this, style);
         return _renderer;
     }
 
@@ -238,7 +238,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private void _column_PropertyChanged(object sender, System.EventArgs e) { _drawWidth = null; }
 
-    private int CalculateColumnContentWidth() {
+    private int CalculateColumnContentWidth(string style) {
         if (_column is not { IsDisposed: false }) { return 16; }
         if (_column.Database is not { IsDisposed: false } db) { return 16; }
         if (_column.FixedColumnWidth > 0) { return _column.FixedColumnWidth; }
@@ -248,7 +248,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
 
-        var renderer = GetRenderer();
+        var renderer = GetRenderer(style);
 
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
@@ -258,7 +258,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             }
         } catch {
             Develop.CheckStackForOverflow();
-            return CalculateColumnContentWidth();
+            return CalculateColumnContentWidth(style);
         }
 
         Contentwidth = newContentWidth;

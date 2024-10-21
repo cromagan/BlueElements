@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using BlueBasics;
@@ -60,7 +59,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     private int? _height;
     private string _sheetStyle;
-    private float _sheetStyleScale = 1f;
     private Size _textDimensions;
 
     private string? _tmpHtmlText;
@@ -76,8 +74,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     #region Constructors
 
     public ExtText() : base() {
-        _sheetStyle = null;
-        _sheetStyleScale = 1f;
+        _sheetStyle = string.Empty;
         DrawingPos = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
         MaxTextLenght = 4000;
@@ -94,13 +91,10 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public ExtText(Design design, States state) : this() {
         var sh = Skin.DesignOf(design, state);
-
         _sheetStyle = sh.SheetStyle;
-        _sheetStyleScale = sh.SheetStyleScale;
     }
 
-    public ExtText(string sheetStyle, float sheetStyleScale) : this() {
-        _sheetStyleScale = sheetStyleScale;
+    public ExtText(string sheetStyle) : this() {
         _sheetStyle = sheetStyle;
     }
 
@@ -169,19 +163,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (IsDisposed) { return; }
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
-            OnStyleChanged();
-            OnPropertyChanged();
-        }
-    }
-
-    [DefaultValue(1.0)]
-    public float SheetStyleScale {
-        get => _sheetStyleScale;
-        set {
-            if (IsDisposed) { return; }
-            if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
-            _sheetStyleScale = value;
             OnStyleChanged();
             OnPropertyChanged();
         }
@@ -396,7 +377,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this.GetFont( PadStyles.Standard)));
+    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this.GetFont(PadStyles.Standard)));
 
     internal void Mark(MarkState markstate, int first, int last) {
         try {
@@ -667,12 +648,12 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                 font = this.GetFont(style); break;
 
             case "H5":
-                style = PadStyles.Kleiner_Zusatz;   
+                style = PadStyles.Kleiner_Zusatz;
                 font = this.GetFont(style); break;
 
             case "H0":
             case "H4":
-                style =  PadStyles.Standard;
+                style = PadStyles.Standard;
                 font = this.GetFont(style); break;
 
             case "H3":

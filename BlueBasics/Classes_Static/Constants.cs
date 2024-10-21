@@ -42,6 +42,7 @@ public static class Constants {
     public const string Everybody = "#Everybody";
     public const char FirstSortChar = '+';
     public const char SecondSortChar = '-';
+    public const string Win11 = "Windows 11";
     public static readonly int AutoFilterSize = 22;
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));

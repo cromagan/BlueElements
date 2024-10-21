@@ -55,8 +55,6 @@ namespace BlueControls.Forms {
             this.btnKeinHintergrund = new Button();
             this.btnHintergrundFarbe = new Button();
             this.btnArbeitsbreichSetup = new Button();
-            this.cbxSchriftGröße = new ComboBox();
-            this.capSchriftgröße = new Caption();
             this.PadDesign = new ComboBox();
             this.capDesign = new Caption();
             this.ColorDia = new ColorDialog();
@@ -388,8 +386,6 @@ namespace BlueControls.Forms {
             this.grpDesign.Controls.Add(this.btnKeinHintergrund);
             this.grpDesign.Controls.Add(this.btnHintergrundFarbe);
             this.grpDesign.Controls.Add(this.btnArbeitsbreichSetup);
-            this.grpDesign.Controls.Add(this.cbxSchriftGröße);
-            this.grpDesign.Controls.Add(this.capSchriftgröße);
             this.grpDesign.Controls.Add(this.PadDesign);
             this.grpDesign.Controls.Add(this.capDesign);
             this.grpDesign.Dock = DockStyle.Left;
@@ -434,27 +430,6 @@ namespace BlueControls.Forms {
             this.btnArbeitsbreichSetup.TabIndex = 13;
             this.btnArbeitsbreichSetup.Text = "Arbeitsbereich einreichten";
             this.btnArbeitsbreichSetup.Click += new EventHandler(this.btnArbeitsbreichSetup_Click);
-            // 
-            // cbxSchriftGröße
-            // 
-            this.cbxSchriftGröße.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
-                                                           | AnchorStyles.Right)));
-            this.cbxSchriftGröße.Cursor = Cursors.IBeam;
-            this.cbxSchriftGröße.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cbxSchriftGröße.Location = new Point(208, 46);
-            this.cbxSchriftGröße.Name = "cbxSchriftGröße";
-            this.cbxSchriftGröße.Regex = null;
-            this.cbxSchriftGröße.Size = new Size(168, 22);
-            this.cbxSchriftGröße.TabIndex = 3;
-            this.cbxSchriftGröße.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.cbxSchriftGröße_ItemClicked);
-            // 
-            // capSchriftgröße
-            // 
-            this.capSchriftgröße.CausesValidation = false;
-            this.capSchriftgröße.Location = new Point(112, 46);
-            this.capSchriftgröße.Name = "capSchriftgröße";
-            this.capSchriftgröße.Size = new Size(88, 22);
-            this.capSchriftgröße.Text = "Schrift-Größe:";
             // 
             // PadDesign
             // 
@@ -566,8 +541,6 @@ namespace BlueControls.Forms {
         private Button btnKeinHintergrund;
         private Button btnHintergrundFarbe;
         protected internal Button btnArbeitsbreichSetup;
-        internal ComboBox cbxSchriftGröße;
-        internal Caption capSchriftgröße;
         private ComboBox PadDesign;
         private Caption capDesign;
         protected TabControl tabRightSide;
