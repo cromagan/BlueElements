@@ -42,7 +42,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     #region Fields
 
     private Alignment _ausrichtung;
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
 
     /// <summary>
     /// Der Original-Text. Bei änderungen deses Textes wird die Variable _text_replaced ebenfalls zurückgesetzt.
@@ -95,10 +95,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override string Description => string.Empty;
     public BlueFont? Font { get; set; }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

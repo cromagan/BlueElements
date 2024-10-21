@@ -38,7 +38,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
 
     #region Fields
 
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
 
     #endregion
 
@@ -64,10 +64,10 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
 
     public Color Randfarbe { get; set; }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

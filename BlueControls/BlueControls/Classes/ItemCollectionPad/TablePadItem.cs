@@ -73,10 +73,10 @@ public class TablePadItem : RectanglePadItem, IStyleable, IStyleableChild {
 
     public override string Description => "Darstellung einer Datenbank Tabelle.";
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

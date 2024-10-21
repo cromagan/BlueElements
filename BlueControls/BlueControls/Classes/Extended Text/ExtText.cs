@@ -60,7 +60,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     #region Fields
 
     private int? _height;
-    private RowItem? _sheetStyle;
+    private string _sheetStyle;
     private float _sheetStyleScale = 1f;
     private Size _textDimensions;
 
@@ -100,7 +100,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         _sheetStyleScale = sh.SheetStyleScale;
     }
 
-    public ExtText(RowItem sheetStyle, float sheetStyleScale) : this() {
+    public ExtText(string sheetStyle, float sheetStyleScale) : this() {
         _sheetStyleScale = sheetStyleScale;
         _sheetStyle = sheetStyle;
     }
@@ -164,7 +164,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get => _sheetStyle;
         set {
             if (IsDisposed) { return; }
@@ -316,7 +316,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public void Dispose() {
         IsDisposed = true;
-        _sheetStyle?.Dispose();
     }
 
     public void Draw(Graphics gr, float zoom) {

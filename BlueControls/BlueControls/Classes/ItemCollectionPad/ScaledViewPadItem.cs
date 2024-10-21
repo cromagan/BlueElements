@@ -46,7 +46,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     private float _scale = 1f;
 
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
 
     private float _textScale = 3.07f;
 
@@ -107,10 +107,10 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         }
     }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

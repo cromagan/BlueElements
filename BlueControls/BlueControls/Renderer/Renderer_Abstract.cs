@@ -43,9 +43,9 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
-    private RowItem? _sheetStyle;
+    private string _sheetStyle;
     private float _sheetStyleScale;
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
 
     #endregion
 
@@ -69,7 +69,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     public BlueFont? Font { get; set; }
     public string QuickInfo => Description;
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get => _sheetStyle;
         set {
             if (_sheetStyle == value) { return; }

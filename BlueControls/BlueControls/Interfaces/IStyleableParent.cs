@@ -38,7 +38,7 @@ public interface IStyleableParent : IParent, IStyleable {
 }
 
 public static class StyleableParentExtension {
-    //public static (RowItem sheetStyle, float sheetStyleScale) GetParentStyle(this IStylableParent ob) {
+    //public static (string sheetStyle, float sheetStyleScale) GetParentStyle(this IStylableParent ob) {
     //    if (ob.Parent is IStylableParent obn) { return obn.GetParentStyle(); }
 
     //    var t = ob.MyStyle();

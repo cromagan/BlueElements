@@ -94,7 +94,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
-    private RowItem? _sheetStyle;
+    private string _sheetStyle;
 
     private float _sheetStyleScale;
     private bool _showNumber;
@@ -251,7 +251,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get => _sheetStyle;
         set {
             if (IsDisposed) { return; }

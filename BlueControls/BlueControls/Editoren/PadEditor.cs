@@ -42,7 +42,7 @@ public partial class PadEditor : FormWithStatusBar {
         PadDesign.Text = PadDesign[0]?.KeyName ?? string.Empty;
 
         if (Pad?.Items != null && Skin.StyleDb != null) {
-            Pad.Items.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
+            Pad.Items.SheetStyle = PadDesign.Text;
         }
 
         cbxSchriftGröße.ItemAdd(ItemOf("30%", "030"));
@@ -77,7 +77,7 @@ public partial class PadEditor : FormWithStatusBar {
             txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
             txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
             if (Pad.Items.SheetStyle != null) {
-                PadDesign.Text = Pad.Items.SheetStyle.CellFirstString();
+                PadDesign.Text = Pad.Items.SheetStyle;
             }
 
             cbxSchriftGröße.Text = ((int)(Pad.Items.SheetStyleScale * 100)).ToStringInt3();
@@ -163,7 +163,7 @@ public partial class PadEditor : FormWithStatusBar {
 
     private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (Pad?.Items != null && Skin.StyleDb?.Row != null) {
-            Pad.Items.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
+            Pad.Items.SheetStyle = e.Item.KeyName;
         }
     }
 

@@ -44,7 +44,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
 
     private string _script = string.Empty;
 
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
 
     #endregion
 
@@ -77,10 +77,10 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableC
         }
     }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

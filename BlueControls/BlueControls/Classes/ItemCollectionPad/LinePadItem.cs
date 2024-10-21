@@ -44,14 +44,14 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
     private readonly PointM _point2;
     private string _calcTempPointsCode = string.Empty;
     private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
     private List<PointF>? _tempPoints;
 
     #endregion
 
     #region Constructors
 
-    public LinePadItem() : this(string.Empty, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+    public LinePadItem() : this(string.Empty, PadStyles.Standard, Point.Empty, Point.Empty) { }
 
     public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
@@ -78,10 +78,10 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
     public BlueFont? Font { get; set; }
     public ConectorStyle Linien_Verhalten { get; set; }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

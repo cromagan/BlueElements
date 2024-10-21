@@ -61,7 +61,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     private float _länge;
 
-    private PadStyles _style = PadStyles.Style_Standard;
+    private PadStyles _style = PadStyles.Standard;
     private string _textOben = string.Empty;
 
     private float _winkel;
@@ -88,7 +88,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         Text_Unten = string.Empty;
         Nachkommastellen = 1;
 
-        _style = PadStyles.Style_StandardAlternativ;
+        _style = PadStyles.Alternativ;
         _point1.Parent = this;
         _point2.Parent = this;
         _textPoint.Parent = this;
@@ -129,10 +129,10 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     public string Präfix { get; set; } = string.Empty;
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return null;
+            return string.Empty;
         }
     }
 

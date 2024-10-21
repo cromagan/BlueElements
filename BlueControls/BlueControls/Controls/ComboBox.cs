@@ -307,9 +307,9 @@ public partial class ComboBox : TextBox, ITranslateable {
         btnDropDown.Invalidate();
     }
 
-    protected override Design GetDesign() => GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage
-        ? Design.Ribbon_ComboBox_Textbox
-        : Design.ComboBox_Textbox;
+    protected override Design Design => GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage
+                                                            ? Design.Ribbon_ComboBox_Textbox
+                                                            : Design.ComboBox_Textbox;
 
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);

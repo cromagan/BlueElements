@@ -72,7 +72,7 @@ public static class SkinDesignExtensions {
                 if (Skin.StyleDb == null) { Skin.InitStyles(); }
 
                 var fl = (f + "/X10006").SplitAndCutBy("/");
-                des.SheetStyle = Skin.StyleDb?.Row[fl[0]];
+                des.SheetStyle = fl[0];
                 des.Font = Skin.GetBlueFont(fl[1], des.SheetStyle);
             }
         }
@@ -99,7 +99,7 @@ public class SkinDesign : IStyleableOne {
     public Kontur Kontur { get; set; }
     public bool Need { get; set; }
     public RahmenArt RahmenArt { get; set; }
-    public RowItem? SheetStyle { get; set; }
+    public string SheetStyle { get; set; } = string.Empty;
     public float SheetStyleScale { get; set; }
     public States Status { get; set; }
     public PadStyles Stil { get; set; }

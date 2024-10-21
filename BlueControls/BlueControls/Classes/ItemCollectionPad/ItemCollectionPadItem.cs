@@ -70,7 +70,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private float _gridsnap = 1;
     private Padding _randinMm = Padding.Empty;
 
-    private RowItem? _sheetStyle;
+    private string _sheetStyle;
     private float _sheetStyleScale;
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
@@ -86,7 +86,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Höhe = 10;
         _endless = false;
         RandinMm = Padding.Empty;
-        _sheetStyle = Skin.StyleDb?.Row.First();
+        _sheetStyle = string.Empty;
         _sheetStyleScale = 1f;
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
@@ -212,7 +212,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    public RowItem? SheetStyle {
+    public string SheetStyle {
         get => _sheetStyle;
         set {
             if (IsDisposed) { return; }
@@ -693,7 +693,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         result.ParseableAdd("Caption", _caption);
 
-        result.ParseableAdd("Style", _sheetStyle?.CellFirstString());
+        result.ParseableAdd("Style", _sheetStyle);
 
         result.ParseableAdd("BackColor", BackColor.ToArgb());
         if (Math.Abs(SheetStyleScale - 1) > 0.001d) {
@@ -743,8 +743,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "style":
-                _sheetStyle = Skin.StyleDb?.Row[value];
-                _sheetStyle ??= Skin.StyleDb?.Row.First();// Einfach die Erste nehmen
+                _sheetStyle = value;
                 return true;
 
             case "fontscale":
@@ -784,8 +783,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "sheetstyle":
-                if (Skin.StyleDb == null) { Skin.InitStyles(); }
-                _sheetStyle = Skin.StyleDb?.Row[value];
+                _sheetStyle = value;
                 return true;
 
             case "sheetstylescale":

@@ -94,8 +94,8 @@ public abstract class ExtChar {
 
     public abstract string PlainText();
 
-    public int Stufe(RowItem sheetStyle) {
-        if (Font == null || sheetStyle.Database is not Database db) { return 4; }
+    public int Stufe(string sheetStyle) {
+        if (Font == null || Skin.StyleDb is not Database db) { return 4; }
 
         foreach (var thisC in db.Column) {
             if (thisC.KeyName.ToUpperInvariant().StartsWith("X")) {

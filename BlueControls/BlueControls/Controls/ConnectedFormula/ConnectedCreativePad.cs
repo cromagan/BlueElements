@@ -232,7 +232,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             pad.Items.SheetStyleScale = DefaultScale;
 
             if (Skin.StyleDb?.Row != null) {
-                pad.Items.SheetStyle = Skin.StyleDb.Row[DefaultDesign];
+                pad.Items.SheetStyle = DefaultDesign;
             }
 
             if (_lastRow != null) {

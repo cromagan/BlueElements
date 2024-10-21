@@ -159,7 +159,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
         eText ??= new ExtText(design, States.Standard);
 
-        eText.Design = design;
+        //eText.Design = design;
         eText.HtmlText = LanguageTool.DoTranslate(text, translate);
         eText.Multiline = true;
         eText.TextDimensions = eText.TextDimensions with { Width = maxwidth };
@@ -217,7 +217,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                     HtmlText = LanguageTool.DoTranslate(_text, Translate),
                     Multiline = true
                 };
-                _eText.State = state;
 
                 switch (_textAnzeigeverhalten) {
                     case SteuerelementVerhalten.Steuerelement_Anpassen:

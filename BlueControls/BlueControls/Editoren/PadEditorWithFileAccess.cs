@@ -91,7 +91,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnAddLine_Click(object sender, System.EventArgs e) {
         var p = Pad.MiddleOfVisiblesScreen();
         var w = (int)(300 / Pad.Zoom);
-        LinePadItem b = new(PadStyles.Style_Standard, p with { X = p.X - w }, p with { X = p.X + w });
+        LinePadItem b = new(PadStyles.Standard, p with { X = p.X - w }, p with { X = p.X + w });
         Pad.AddCentered(b);
     }
 
@@ -121,7 +121,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnAddText_Click(object sender, System.EventArgs e) {
         TextPadItem b = new() {
             Text = string.Empty,
-            Stil = PadStyles.Style_Standard
+            Stil = PadStyles.Standard
         };
         Pad.AddCentered(b);
         b.SetCoordinates(new RectangleF(10, 10, 200, 200));
