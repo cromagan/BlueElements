@@ -1169,7 +1169,7 @@ public static class Skin {
         if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
         if (bFont != null) {
             if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth(bFont, txt, fitInRect.Width - pSize.Width); }
-            tSize = gr.MeasureString(txt, (Font)bFont);
+            tSize = bFont.MeasureString(txt);
         }
         if (align.HasFlag(Alignment.Right)) { xp = fitInRect.Width - pSize.Width - tSize.Width; }
         if (align.HasFlag(Alignment.HorizontalCenter)) { xp = (float)((fitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
@@ -1313,8 +1313,6 @@ public static class Skin {
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
         //_SkinString = "Windows10";
-        //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Develop.AppName() == "SkinDesigner");
-        //="Design.GenerateAndAdd(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
         Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
@@ -1367,12 +1365,9 @@ public static class Skin {
         Design.Add(Enums.Design.Button_Slider_Senkrecht, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CECECE", string.Empty, RahmenArt.Solide_3px, "B7B7B7", string.Empty, string.Empty, string.Empty);
 
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
-        //Design.Add(Enums.Design.Button_SliderDesign, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, "B6B6B6", string.Empty, string.Empty, string.Empty);
-        //Design.Add(Enums.Design.Button_SliderDesign, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
-        //Design.Add(Enums.Design.Button_SliderDesign, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, string.Empty);
 
         Design.Add(Enums.Design.Button_EckpunktSchieber, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_EckpunktSchieber, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, string.Empty, string.Empty);
@@ -1388,9 +1383,9 @@ public static class Skin {
         Design.Add(Enums.Design.RibbonBar_Head, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Windows 11|0|1", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11 Blue/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Windows 11 Blue|6|0", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Blue/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11 Blue|6|0", string.Empty);
         Design.Add(Enums.Design.Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "CheckBox");
@@ -1449,16 +1444,6 @@ public static class Skin {
         Design.Add(Enums.Design.EasyPic, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.EasyPic, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.EasyPic, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
-        //Design.Add(Enums.Design.TextBox_Stufe3, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10001", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Stufe3, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10001", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Stufe3, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10001", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Bold, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10007", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Bold, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|16", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Bold, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Bold, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|16", string.Empty);
-        //Design.Add(Enums.Design.TextBox_Bold, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10007", string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
@@ -1528,7 +1513,7 @@ public static class Skin {
         Design.Add(Enums.Design.Form_Standard, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Form_MsgBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Form_QuickInfo, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Windows 11|0|0", string.Empty);
-        Design.Add(Enums.Design.Form_DesktopBenachrichtigung, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "5D5D5D", string.Empty, "Win11/X10004", string.Empty);
+        Design.Add(Enums.Design.Form_DesktopBenachrichtigung, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "5D5D5D", string.Empty, "Windows 11|6|0", string.Empty);
         Design.Add(Enums.Design.Form_BitteWarten, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Form_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Form_AutoFilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
@@ -1543,9 +1528,9 @@ public static class Skin {
         Design.Add(Enums.Design.Item_KontextMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Item_KontextMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.Item_KontextMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Windows 11|7|0", string.Empty);
         Design.Add(Enums.Design.Item_Autofilter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
         Design.Add(Enums.Design.Item_Autofilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
@@ -1564,9 +1549,9 @@ public static class Skin {
         Design.Add(Enums.Design.Item_Listbox, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "E5F3FF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|2", string.Empty);
         Design.Add(Enums.Design.Item_Listbox, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|0", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
         Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|16", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Windows 11|7|0", string.Empty);
         Design.Add(Enums.Design.GroupBox, States.Standard, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.GroupBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.GroupBoxBold, States.Standard, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "40568D", string.Empty, "Windows 11|7|0", string.Empty);
@@ -1583,12 +1568,6 @@ public static class Skin {
         Design.Add(Enums.Design.Table_Lines_thin, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard_HasFocus, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, string.Empty);
-        //Design.Add(Enums.Design.Table_Cell, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
-        //Design.Add(Enums.Design.Table_Cell, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
-        //Design.Add(Enums.Design.Table_Cell_New, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
-        //Design.Add(Enums.Design.Table_Cell_New, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
-        //Design.Add(Enums.Design.Table_Column, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
-        //Design.Add(Enums.Design.Table_Cell_Chapter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10003", string.Empty);
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;

@@ -130,7 +130,6 @@ public static class Constants {
                     //{"ł", "l"},
                     };
 
-    public static readonly int RowCaptionSizeY = 50;
     public static readonly Encoding Win1252 = Encoding.GetEncoding(1252);
 
     #endregion

@@ -91,7 +91,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private Progressbar? _pg;
     private int _pix16 = 16;
     private int _pix18 = 18;
-    private int _rowCaptionFontY = 26;
+    private int _rowCaptionFontY = 50;
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
@@ -1195,9 +1195,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     #region Caption bestimmen
 
                     if (thisRow.Chapter != lastCap) {
-                        thisRowData.Y += RowCaptionSizeY;
+                        thisRowData.Y += _rowCaptionFontY;
                         expanded = !_collapsed.Contains(thisRowData.Chapter);
-                        maxY += RowCaptionSizeY;
+                        maxY += _rowCaptionFontY;
                         thisRowData.ShowCap = true;
                         lastCap = thisRow.Chapter;
                     } else {
@@ -2773,8 +2773,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 // Überschrift in der ersten Spalte zeichnen
                 cellInThisDatabaseRowData.CaptionPos = Rectangle.Empty;
                 if (cellInThisDatabaseRowData.ShowCap) {
-                    var si = gr.MeasureString(cellInThisDatabaseRowData.Chapter, (Font)_chapterFont);
-                    gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), 1, DrawY(ca, cellInThisDatabaseRowData) - RowCaptionSizeY, displayRectangleWoSlider.Width - 2, RowCaptionSizeY);
+                    var si = _chapterFont.MeasureString(cellInThisDatabaseRowData.Chapter);
+                    gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), 1, DrawY(ca, cellInThisDatabaseRowData) - _rowCaptionFontY, displayRectangleWoSlider.Width - 2, _rowCaptionFontY);
                     cellInThisDatabaseRowData.CaptionPos = new Rectangle(1, DrawY(ca, cellInThisDatabaseRowData) - _rowCaptionFontY, (int)si.Width + 28, (int)si.Height);
 
                     if (_collapsed.Contains(cellInThisDatabaseRowData.Chapter)) {
@@ -2890,7 +2890,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             var tx = viewItem.Column.Caption;
             tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
-            var fs = gr.MeasureString(tx, (Font)_columnFont);
+            var fs = _columnFont.MeasureString(tx);
 
             #region Spalten-Kopf-Bild erzeugen
 
@@ -3235,7 +3235,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         _pix16 = GetPix(16, Scale);
         _pix18 = GetPix(18, Scale);
-        _rowCaptionFontY = GetPix(26, Scale);
+        _rowCaptionFontY = (int)_chapterFont.CharHeight+1;
     }
 
     private void Invalidate_DrawWidth(ColumnItem? column) {

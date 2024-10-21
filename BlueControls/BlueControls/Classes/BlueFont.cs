@@ -231,6 +231,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return txt;
     }
 
+
+    public float CharHeight => _zeilenabstand;
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
     public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1f, StringFormat.GenericDefault);
