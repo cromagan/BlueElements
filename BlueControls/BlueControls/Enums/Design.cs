@@ -55,8 +55,8 @@ public enum Design {
     Table_And_Pad = 1205,
 
     EasyPic = 1207,
-    TextBox_Stufe3 = 1208,
-    TextBox_Bold = 1209,
+    //TextBox_Stufe3 = 1208,
+    //TextBox_Bold = 1209,
     Slider_Hintergrund_Waagerecht = 1220,
     Slider_Hintergrund_Senkrecht = 1221,
 
@@ -130,10 +130,10 @@ public enum Design {
 
     Table_Lines_thin = 2251,
     Table_Cursor = 2260,
-    Table_Cell = 2261,
-    Table_Cell_New = 2262,
-    Table_Column = 2263,
-    Table_Cell_Chapter = 2264
+    //Table_Cell = 2261,
+    //Table_Cell_New = 2262,
+    //Table_Column = 2263,
+    //Table_Cell_Chapter = 2264
     //TextBox_Cursor = 2270
     // Unipaint-Verhalten 9800
     // UniPaint_Verhalten_PowerPoint = 9800

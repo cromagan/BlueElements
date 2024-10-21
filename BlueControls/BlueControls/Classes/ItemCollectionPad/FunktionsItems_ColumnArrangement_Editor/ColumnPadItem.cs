@@ -39,7 +39,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields
 
-    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
+    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont("Windows 11", PadStyles.Hervorgehoben, States.Standard);
 
     #endregion
 

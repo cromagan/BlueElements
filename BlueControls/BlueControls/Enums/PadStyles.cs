@@ -20,6 +20,8 @@
 namespace BlueControls.Enums;
 
 public enum PadStyles {
+    Undefiniert = -1,
+
     Standard = 0,
     Überschrift = 1,
     Untertitel = 2,

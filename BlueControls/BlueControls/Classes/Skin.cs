@@ -37,37 +37,37 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
-//	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Win11/X10006
-//	Button	Standard_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
-//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Win11/X10006
+//	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Windows 11|0|0
+//	Button	Standard_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Windows 11|0|0
+//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Windows 11|0|0
 //	Button	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			Win11 Disabled/X10006
-//	Button	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Win11/X10006
-//	Button	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
-//	Button	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Win11/X10006
-//	Button_CheckBox	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Win11/X10006
-//	Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Button	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Windows 11|0|0
+//	Button	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Windows 11|0|0
+//	Button	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Windows 11|0|0
+//	Button_CheckBox	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Windows 11|0|0
+//	Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Windows 11|0|0
 //	Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
-//	Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			Win11/X10006
+//	Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			Windows 11|0|0
 //	Button_CheckBox	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			Win11 Disabled/X10006
-//	Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
-//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Button_CheckBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Win11/X10006
-//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
-//	Button_CheckBox	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
-//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Win11/X10006
-//	Button_OptionButton	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Win11/X10006
-//	Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Windows 11|0|0
+//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Button_CheckBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Windows 11|0|0
+//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Windows 11|0|0
+//	Button_CheckBox	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Windows 11|0|0
+//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			Windows 11|0|0
+//	Button_OptionButton	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			Windows 11|0|0
+//	Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Windows 11|0|0
 //	Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
-//	Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			Win11/X10006
+//	Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			Windows 11|0|0
 //	Button_OptionButton	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			Win11 Disabled/X10006
-//	Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
-//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Button_OptionButton	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Win11/X10006
-//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Win11/X10006
-//	Button_OptionButton	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Win11/X10006
-//	Button_OptionButton	Standard_MouseOver_HasFocus															Win11/X10006
+//	Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Windows 11|0|0
+//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Button_OptionButton	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			Windows 11|0|0
+//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			Windows 11|0|0
+//	Button_OptionButton	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			Windows 11|0|0
+//	Button_OptionButton	Standard_MouseOver_HasFocus															Windows 11|0|0
 //	Button_AutoFilter	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6
 //	Button_AutoFilter	Checked	Rechteck					Solide		BFDFFF			Solide_1px	FF0000
 //	Button_AutoFilter	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8
@@ -96,64 +96,64 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Button_EckpunktSchieber	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0
 //	Button_EckpunktSchieber	Checked_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0
 //	Button_EckpunktSchieber_Phantom	Standard	Rechteck					Ohne					Solide_1px	D8D8D8
-//	TabStrip_Head	Standard	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			Win11/X10006
-//	TabStrip_Head	Checked	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	TabStrip_Head	Standard	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			Windows 11|0|0
+//	TabStrip_Head	Checked	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			Windows 11|0|0
 //	TabStrip_Head	Checked_Disabled	Rechteck				5	Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
-//	TabStrip_Head	Checked_MouseOver	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	TabStrip_Head	Checked_MouseOver	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			Windows 11|0|0
 //	TabStrip_Head	Standard_Disabled	Rechteck			-2	5	Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
-//	TabStrip_Head	Standard_MouseOver	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			Win11/X10006
-//	RibbonBar_Head	Standard	Rechteck				5	Solide		FFFFFF			Ohne				Win11/X10006
-//	RibbonBar_Head	Checked	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Win11/X10006
+//	TabStrip_Head	Standard_MouseOver	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			Windows 11|0|0
+//	RibbonBar_Head	Standard	Rechteck				5	Solide		FFFFFF			Ohne				Windows 11|0|0
+//	RibbonBar_Head	Checked	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Windows 11|0|0
 //	RibbonBar_Head	Checked_Disabled	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Win11 Disabled/X10006
 //	RibbonBar_Head	Checked_MouseOver	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			Win11 Blue/X10006
 //	RibbonBar_Head	Standard_Disabled	Rechteck				5	Solide		FFFFFF			Ohne				Win11 Disabled/X10006
 //	RibbonBar_Head	Standard_MouseOver	Rechteck				5	Solide		FFFFFF			Ohne				Win11 Blue/X10006
-//	Caption	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Caption	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Caption	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
-//	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				Win11/X10006	CheckBox
-//	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				Win11/X10006	CheckBox_Checked
+//	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				Windows 11|0|0	CheckBox
+//	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				Windows 11|0|0	CheckBox_Checked
 //	CheckBox_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	CheckBox_Disabled_Checked
-//	CheckBox_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	CheckBox_Checked_MouseOver
+//	CheckBox_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				Windows 11|0|0	CheckBox_Checked_MouseOver
 //	CheckBox_TextStyle	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	CheckBox_Disabled
-//	CheckBox_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked
-//	CheckBox_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked_MouseOver
-//	CheckBox_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked
-//	CheckBox_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	CheckBox_MouseOver
-//	CheckBox_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_Checked_MouseOver
-//	CheckBox_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox
-//	CheckBox_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	CheckBox_MouseOver
-//	OptionButton_TextStyle	Standard	Ohne					Ohne					Ohne				Win11/X10006	OptionBox
-//	OptionButton_TextStyle	Checked	Ohne					Ohne					Ohne				Win11/X10006	OptionBox_Checked
+//	CheckBox_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	CheckBox_Checked
+//	CheckBox_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	CheckBox_Checked_MouseOver
+//	CheckBox_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	CheckBox_Checked
+//	CheckBox_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				Windows 11|0|0	CheckBox_MouseOver
+//	CheckBox_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	CheckBox_Checked_MouseOver
+//	CheckBox_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	CheckBox
+//	CheckBox_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	CheckBox_MouseOver
+//	OptionButton_TextStyle	Standard	Ohne					Ohne					Ohne				Windows 11|0|0	OptionBox
+//	OptionButton_TextStyle	Checked	Ohne					Ohne					Ohne				Windows 11|0|0	OptionBox_Checked
 //	OptionButton_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	OptionBox_Disabled_Checked
-//	OptionButton_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	OptionBox_Checked_MouseOver
+//	OptionButton_TextStyle	Checked_MouseOver	Ohne					Ohne					Ohne				Windows 11|0|0	OptionBox_Checked_MouseOver
 //	OptionButton_TextStyle	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006	OptionBox_Disabled
-//	OptionButton_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_Checked
-//	OptionButton_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_Checked_MouseOver
-//	OptionButton_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox
-//	OptionButton_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				Win11/X10006	OptionBox_MouseOver
-//	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_Checked_MouseOver
-//	OptionButton_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox
-//	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Win11/X10006	OptionBox_MouseOver
-//	TextBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	OptionButton_TextStyle	Checked_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	OptionBox_Checked
+//	OptionButton_TextStyle	Checked_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	OptionBox_Checked_MouseOver
+//	OptionButton_TextStyle	Checked_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	OptionBox
+//	OptionButton_TextStyle	Standard_MouseOver	Ohne					Ohne					Ohne				Windows 11|0|0	OptionBox_MouseOver
+//	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	OptionBox_Checked_MouseOver
+//	OptionButton_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	OptionBox
+//	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	Windows 11|0|0	OptionBox_MouseOver
+//	TextBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Windows 11|0|0
 //	TextBox	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	TextBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
 //	TextBox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	TextBox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	TextBox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
 //	ListBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
 //	ListBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
-//	ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
-//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Windows 11|0|0
+//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
 //	ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
 //	ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Win11/X10006
+//	ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			Windows 11|0|0
 //	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
 //	Table_And_Pad	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
 //	Table_And_Pad	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
 //	Table_And_Pad	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
@@ -184,51 +184,51 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8
 //	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
 //	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
-//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				Win11/X10006
-//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne				Win11/X10006
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
+//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne				Windows 11|0|0
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
 //	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
-//	Ribbonbar_Button	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Win11/X10006
-//	Ribbonbar_Button	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				Win11/X10006
-//	Ribbonbar_Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Windows 11|0|0
+//	Ribbonbar_Button	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Windows 11|0|0
 //	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Windows 11|0|0
 //	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				Win11/X10006
-//	Ribbonbar_Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Windows 11|0|0
 //	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			Windows 11|0|0
 //	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Win11/X10006
-//	Ribbon_ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11/X10006
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			Windows 11|0|0
+//	Ribbon_ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Windows 11|0|0
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
 //	Ribbon_ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
 //	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11 Disabled/X10006
 //	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
 //	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Win11/X10006
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			Windows 11|0|0
 //	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Win11/X10006
-//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			Windows 11|0|0
+//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
 //	Ribbonbar_Button_Combobox	Standard	Ohne					Ohne					Ohne
 //	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne
@@ -240,48 +240,48 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True}
 //	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			Win11 Disabled/X10006
 //	Form_Standard	Standard	Rechteck					Solide		F0F0F0			Ohne
-//	Form_MsgBox	Standard	Rechteck					Solide		F0F0F0			Ohne				Win11/X10006
-//	Form_QuickInfo	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10006
+//	Form_MsgBox	Standard	Rechteck					Solide		F0F0F0			Ohne				Windows 11|0|0
+//	Form_QuickInfo	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Windows 11|0|0
 //	Form_DesktopBenachrichtigung	Standard	Rechteck					Solide		1F1F1F			Solide_3px	484848			{Name=Calibri, Size=12[K]5, Color=ffffff}
-//	Form_BitteWarten	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10006
-//	Form_AutoFilter	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			Win11/X10006
+//	Form_BitteWarten	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Windows 11|0|0
+//	Form_AutoFilter	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			Windows 11|0|0
 //	Form_AutoFilter	Standard_Disabled															Win11 Disabled/X10006
 //	Form_KontextMenu	Standard	Rechteck					Solide		F0F0F0			Solide_1px	0
-//	Form_SelectBox_Dropdown	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			Win11/X10006
-//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Form_SelectBox_Dropdown	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			Windows 11|0|0
+//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Item_DropdownMenu	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	Item_DropdownMenu	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				Win11 Checked/X10006
 //	Item_DropdownMenu	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
 //	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
 //	Item_DropdownMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
 //	Item_KontextMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	Item_KontextMenu_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				Win11/X10007
 //	Item_KontextMenu_Caption	Standard_Disabled	Rechteck					Solide		BFDFFF			Ohne				Win11/X10007
 //	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10007
-//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	Item_Autofilter	Checked	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
 //	Item_Autofilter	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				Win11 Checked/X10006
 //	Item_Autofilter	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			Win11 Checked/X10006
 //	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
 //	Item_Autofilter	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				Win11/X10006
+//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				Win11 Checked/X10006
-//	Item_Listbox	Standard	Ohne					Ohne					Ohne				Win11/X10006
-//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11 MouseOver/X10006
-//	Item_Listbox	Checked	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11/X10006
+//	Item_Listbox	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
+//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			"Windows 11|0|2"
+//	Item_Listbox	Checked	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Windows 11|0|0
 //	Item_Listbox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			Win11 Checked/X10006
-//	Item_Listbox	Checked_MouseOver	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11 MouseOver/X10006
+//	Item_Listbox	Checked_MouseOver	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			"Windows 11|0|2"
 //	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				Win11 Disabled/X10006
-//	Item_Listbox	Checked_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11/X10006
-//	Item_Listbox	Standard_MouseOver	Rechteck					Solide		E5F3FF			Ohne				Win11 MouseOver/X10006
-//	Item_Listbox	Standard_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Win11/X10006
+//	Item_Listbox	Checked_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Windows 11|0|0
+//	Item_Listbox	Standard_MouseOver	Rechteck					Solide		E5F3FF			Ohne				"Windows 11|0|2"
+//	Item_Listbox	Standard_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			Windows 11|0|0
 //	Item_Listbox_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				Win11/X10007
 //	Item_Listbox_Caption	Standard_Disabled	Rechteck					Solide		DFDFDF			Ohne				Win11 Checked/X10007
 //	Item_Listbox_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			Win11/X10007
-//	Frame	Standard	Rechteck			-7		Ohne					Solide_1px	ACACAC			Win11/X10006
+//	Frame	Standard	Rechteck			-7		Ohne					Solide_1px	ACACAC			Windows 11|0|0
 //	Frame	Standard_Disabled	Rechteck			-7		Ohne					Solide_1px	ACACAC			Win11 Disabled/X10006
 //	TabStrip_Body	Standard	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC
 //	TabStrip_Body	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC
@@ -295,7 +295,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	D8D8D8
 //	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	ACACAC
 //	Table_Cursor	Standard_HasFocus	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	3399FF
-//	Table_Cell	Standard	Ohne					Ohne					Ohne				Win11/X10006
+//	Table_Cell	Standard	Ohne					Ohne					Ohne				Windows 11|0|0
 //	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Italic=True}
 //	Table_Column	Standard	Ohne					Ohne					Ohne				Win11/X10007
 //	Table_Cell_Chapter	Standard															Win11/X10003
@@ -1200,10 +1200,7 @@ public static class Skin {
         }
     }
 
-    public static BlueFont GetBlueFont(PadStyles format, string sheetStyle) {
-        if (StyleDb == null) { InitStyles(); }
-        return GetBlueFont("X" + ((int)format), sheetStyle);
-    }
+    public static BlueFont GetBlueFont(string style, PadStyles format) => GetBlueFont(style, format, States.Standard);
 
     public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).Font;
 
@@ -1213,30 +1210,40 @@ public static class Skin {
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
 
-    public static BlueFont GetBlueFont(string column, string sheetStyle) {
+    public static BlueFont GetBlueFont(string style, PadStyles format, States state) {
+        if (StyleDb is not { IsDisposed: false }) { InitStyles(); }
+        if (StyleDb is not { IsDisposed: false } db) { return BlueFont.DefaultFont; }
 
-        return BlueFont.DefaultFont;
+        var f1 = new FilterItem(db.Column["Name"], BlueDatabase.Enums.FilterType.Istgleich_GroﬂKleinEgal, style);
+        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich, ((int)format).ToString());
+        var f3 = new FilterItem(db.Column["State"], BlueDatabase.Enums.FilterType.Istgleich, ((int)state).ToString());
+
+        var r = db.Row[f1, f2, f3];
+
+        if (r == null) { return BlueFont.DefaultFont; }
+
+        var s = r.CellGetString("font");
+
+        return BlueFont.Get(s);
     }
-
-
 
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
         List<AbstractListItem> rahms =
         [
             ItemOf("Haupt-‹berschrift", ((int)PadStyles.‹berschrift).ToString(),
-                GetBlueFont(PadStyles.‹berschrift, sheetStyle).SymbolForReadableText()),
+                GetBlueFont(sheetStyle, PadStyles.‹berschrift).SymbolForReadableText()),
             ItemOf("Untertitel f¸r Haupt-‹berschrift", ((int)PadStyles.Untertitel).ToString(),
-                GetBlueFont(PadStyles.Untertitel, sheetStyle).SymbolForReadableText()),
+                GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolForReadableText()),
             ItemOf("‹berschrift f¸r Kapitel", ((int)PadStyles.Kapitel).ToString(),
-                GetBlueFont(PadStyles.Kapitel, sheetStyle).SymbolForReadableText()),
+                GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolForReadableText()),
             ItemOf("Standard", ((int)PadStyles.Standard).ToString(),
-                GetBlueFont(PadStyles.Standard, sheetStyle).SymbolForReadableText()),
+                GetBlueFont(sheetStyle, PadStyles.Standard).SymbolForReadableText()),
             ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString(),
-                GetBlueFont(PadStyles.Hervorgehoben, sheetStyle).SymbolForReadableText()),
+                GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolForReadableText()),
             ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString(),
-                GetBlueFont(PadStyles.Alternativ, sheetStyle).SymbolForReadableText()),
+                GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolForReadableText()),
             ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString(),
-                GetBlueFont(PadStyles.Kleiner_Zusatz, sheetStyle).SymbolForReadableText())
+                GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolForReadableText())
         ];
         //rahms.Sort();
         return rahms;
@@ -1247,13 +1254,13 @@ public static class Skin {
         if (mitOhne) {
             rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz));
         }
-        rahms.Add(ItemOf("Haupt-‹berschrift", ((int)PadStyles.‹berschrift).ToString(), GetBlueFont(PadStyles.‹berschrift, sheetStyle).SymbolOfLine()));
-        rahms.Add(ItemOf("Untertitel f¸r Haupt-‹berschrift", ((int)PadStyles.Untertitel).ToString(), GetBlueFont(PadStyles.Untertitel, sheetStyle).SymbolOfLine()));
-        rahms.Add(ItemOf("‹berschrift f¸r Kapitel", ((int)PadStyles.Kapitel).ToString(), GetBlueFont(PadStyles.Kapitel, sheetStyle).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard", ((int)PadStyles.Standard).ToString(), GetBlueFont(PadStyles.Standard, sheetStyle).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString(), GetBlueFont(PadStyles.Hervorgehoben, sheetStyle).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString(), GetBlueFont(PadStyles.Alternativ, sheetStyle).SymbolOfLine()));
-        rahms.Add(ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString(), GetBlueFont(PadStyles.Kleiner_Zusatz, sheetStyle).SymbolOfLine()));
+        rahms.Add(ItemOf("Haupt-‹berschrift", ((int)PadStyles.‹berschrift).ToString(), GetBlueFont(sheetStyle, PadStyles.‹berschrift).SymbolOfLine()));
+        rahms.Add(ItemOf("Untertitel f¸r Haupt-‹berschrift", ((int)PadStyles.Untertitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolOfLine()));
+        rahms.Add(ItemOf("‹berschrift f¸r Kapitel", ((int)PadStyles.Kapitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard", ((int)PadStyles.Standard).ToString(), GetBlueFont(sheetStyle, PadStyles.Standard).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString(), GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString(), GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolOfLine()));
+        rahms.Add(ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString(), GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolOfLine()));
         //rahms.Sort();
         return rahms;
     }
@@ -1308,37 +1315,37 @@ public static class Skin {
         //_SkinString = "Windows10";
         //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Develop.AppName() == "SkinDesigner");
         //="Design.GenerateAndAdd(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
-        Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_3px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Button_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EAEAEA", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_AutoFilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "FF0000", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_AutoFilter, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
@@ -1372,64 +1379,64 @@ public static class Skin {
         Design.Add(Enums.Design.Button_EckpunktSchieber_Phantom, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Button_EckpunktSchieber_Joint, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFD800", string.Empty, RahmenArt.Solide_1px, "FF6A00", string.Empty, "{Name=Calibri, Size=9[K]15, Color=FF6A00}", string.Empty);
 
-        Design.Add(Enums.Design.TabStrip_Head, States.Standard, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.TabStrip_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Standard, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.TabStrip_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, -2, 0, 5, HintergrundArt.Verlauf_Vertical_2, "F0F0F0", "E4E4E4", RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Head, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, "Win11 Blue/X10006", string.Empty);
-        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.RibbonBar_Head, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Head, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Blue/X10006", string.Empty);
-        Design.Add(Enums.Design.Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "CheckBox_Disabled_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox_Checked_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "CheckBox_Disabled");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "CheckBox_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_Checked_MouseOver");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox");
-        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "CheckBox_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox_Checked");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "OptionBox_Disabled_Checked");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox_Checked_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", "OptionBox_Disabled");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_Checked");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_Checked_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", "OptionBox_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_Checked_MouseOver");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox");
-        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Win11/X10006", "OptionBox_MouseOver");
-        Design.Add(Enums.Design.TextBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.TextBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "CheckBox");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "CheckBox_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", "CheckBox_Disabled_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "CheckBox_Checked_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", "CheckBox_Disabled");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "CheckBox_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "CheckBox_Checked_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "CheckBox_Checked");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "CheckBox_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "CheckBox_Checked_MouseOver");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "CheckBox");
+        Design.Add(Enums.Design.CheckBox_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "CheckBox_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "OptionBox");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "OptionBox_Checked");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", "OptionBox_Disabled_Checked");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "OptionBox_Checked_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", "OptionBox_Disabled");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "OptionBox_Checked");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "OptionBox_Checked_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "OptionBox");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", "OptionBox_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "OptionBox_Checked_MouseOver");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "OptionBox");
+        Design.Add(Enums.Design.OptionButton_TextStyle, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.FocusDotLine, string.Empty, "000000", "Windows 11|0|0", "OptionBox_MouseOver");
+        Design.Add(Enums.Design.TextBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.TextBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.ListBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.ListBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Table_And_Pad, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_And_Pad, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_And_Pad, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
@@ -1442,16 +1449,16 @@ public static class Skin {
         Design.Add(Enums.Design.EasyPic, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.EasyPic, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.EasyPic, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10001", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10001", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
-        Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10001", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10007", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10007", string.Empty);
-        Design.Add(Enums.Design.TextBox_Bold, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10007", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Stufe3, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10001", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Stufe3, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10001", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Stufe3, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10001", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Stufe3, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10001", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Bold, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, "Win11/X10007", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Bold, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|16", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Bold, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Bold, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|16", string.Empty);
+        //Design.Add(Enums.Design.TextBox_Bold, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10007", string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Waagerecht, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
@@ -1463,52 +1470,52 @@ public static class Skin {
         Design.Add(Enums.Design.Slider_Hintergrund_Senkrecht, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F9F9F9", string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Senkrecht, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Slider_Hintergrund_Senkrecht, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "EFEFEF", string.Empty, RahmenArt.Ohne, "B7B7B7", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_CheckBox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "81B8EF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Button_OptionButton, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Checked_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbon_ComboBox_Textbox, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Ribbonbar_Caption, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.Ribbonbar_Button_Combobox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Ribbonbar_Button_Combobox, States.Standard_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Ribbonbar_Button_Combobox, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
@@ -1519,51 +1526,51 @@ public static class Skin {
         Design.Add(Enums.Design.RibbonBar_Frame, States.Standard, Enums.Kontur.Rechteck, 1, 1, 0, 1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15,Italic=True}", string.Empty);
         Design.Add(Enums.Design.RibbonBar_Frame, States.Standard_Disabled, Enums.Kontur.Rechteck, 1, 1, 0, 1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "{Name=Calibri, Size=10[K]15,Italic=True, Color=9d9d9d}", string.Empty);
         Design.Add(Enums.Design.Form_Standard, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Form_MsgBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Form_QuickInfo, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_MsgBox, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Form_QuickInfo, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Form_DesktopBenachrichtigung, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_3px, "5D5D5D", string.Empty, "Win11/X10004", string.Empty);
-        Design.Add(Enums.Design.Form_BitteWarten, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Form_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Form_AutoFilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_BitteWarten, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Form_AutoFilter, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Form_AutoFilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.Form_KontextMenu, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F0F0F0", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Form_SelectBox_Dropdown, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
+        Design.Add(Enums.Design.Form_SelectBox_Dropdown, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Item_DropdownMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Item_KontextMenu, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
         Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
         Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
         Design.Add(Enums.Design.Item_KontextMenu_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11 MouseOver/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11 MouseOver/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "E5F3FF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 MouseOver/X10006", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Win11/X10006", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "5D5D5D", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Solide_1px, "000000", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_HasFocus, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_Autofilter, States.Standard_MouseOver_HasFocus, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|2", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Solide_1px, "B7B7B7", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|2", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Checked_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "E5F3FF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|2", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox, States.Standard_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "CCE8FF", string.Empty, RahmenArt.Solide_1px, "99D1FF", string.Empty, "Windows 11|0|0", string.Empty);
         Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Checked/X10007", string.Empty);
+        Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "DFDFDF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|7|16", string.Empty);
         Design.Add(Enums.Design.Item_Listbox_Caption, States.Standard_MouseOver, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "BFDFFF", string.Empty, RahmenArt.Solide_1px, "4DA1B5", string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.GroupBox, States.Standard, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.GroupBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.GroupBoxBold, States.Standard, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "40568D", string.Empty, "Win11 Checked/X10006", string.Empty);
-        Design.Add(Enums.Design.GroupBoxBold, States.Standard_Disabled, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "ACACAC", string.Empty, "Win11 Disabled/X10006", string.Empty);
+        Design.Add(Enums.Design.GroupBox, States.Standard, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Windows 11|0|0", string.Empty);
+        Design.Add(Enums.Design.GroupBox, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, "Windows 11|0|1", string.Empty);
+        Design.Add(Enums.Design.GroupBoxBold, States.Standard, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "40568D", string.Empty, "Windows 11|7|0", string.Empty);
+        Design.Add(Enums.Design.GroupBoxBold, States.Standard_Disabled, Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "ACACAC", string.Empty, "Windows 11|0|1", string.Empty);
         Design.Add(Enums.Design.TabStrip_Body, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.TabStrip_Body, States.Standard_Disabled, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.RibbonBar_Body, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, string.Empty, string.Empty);
@@ -1576,12 +1583,12 @@ public static class Skin {
         Design.Add(Enums.Design.Table_Lines_thin, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "ACACAC", string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard_HasFocus, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "3399FF", string.Empty, string.Empty, string.Empty);
-        Design.Add(Enums.Design.Table_Cell, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10006", string.Empty);
-        Design.Add(Enums.Design.Table_Cell, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Table_Cell_New, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Table_Cell_New, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11 Disabled/X10006", string.Empty);
-        Design.Add(Enums.Design.Table_Column, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
-        Design.Add(Enums.Design.Table_Cell_Chapter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10003", string.Empty);
+        //Design.Add(Enums.Design.Table_Cell, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|0", string.Empty);
+        //Design.Add(Enums.Design.Table_Cell, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        //Design.Add(Enums.Design.Table_Cell_New, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        //Design.Add(Enums.Design.Table_Cell_New, States.Standard_Disabled, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Windows 11|0|1", string.Empty);
+        //Design.Add(Enums.Design.Table_Column, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10007", string.Empty);
+        //Design.Add(Enums.Design.Table_Cell_Chapter, States.Standard, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, "Win11/X10003", string.Empty);
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;
@@ -1593,49 +1600,48 @@ public static class Skin {
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
 
- 
     internal static BlueFont? GetBlueFont(PadStyles padStyle, string sheetStyle, int stufe) {
         switch (stufe) {
             case 4:
-                return GetBlueFont(padStyle, sheetStyle);
+                return GetBlueFont(sheetStyle, padStyle);
 
             case 3:
                 switch (padStyle) {
                     case PadStyles.Standard:
-                        return GetBlueFont(PadStyles.Kapitel, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.Kapitel);
 
                     case PadStyles.Hervorgehoben:
-                        return GetBlueFont(PadStyles.Kapitel, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.Kapitel);
                 }
                 break;
 
             case 2:
                 switch (padStyle) {
                     case PadStyles.Standard:
-                        return GetBlueFont(PadStyles.Untertitel, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.Untertitel);
 
                     case PadStyles.Hervorgehoben:
-                        return GetBlueFont(PadStyles.Untertitel, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.Untertitel);
                 }
                 break;
 
             case 1:
                 switch (padStyle) {
                     case PadStyles.Standard:
-                        return GetBlueFont(PadStyles.‹berschrift, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.‹berschrift);
 
                     case PadStyles.Hervorgehoben:
-                        return GetBlueFont(PadStyles.‹berschrift, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.‹berschrift);
                 }
                 break;
 
             case 7:
                 switch (padStyle) {
                     case PadStyles.Standard:
-                        return GetBlueFont(PadStyles.Hervorgehoben, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.Hervorgehoben);
 
                     case PadStyles.Hervorgehoben:
-                        return GetBlueFont(PadStyles.Standard, sheetStyle);
+                        return GetBlueFont(sheetStyle, PadStyles.Standard);
                 }
                 break;
         }
@@ -1643,32 +1649,32 @@ public static class Skin {
         return null;
     }
 
-    internal static BlueFont GetBlueFont(Design design, States state, int stufe) {
-        if (stufe != 4 && design != Enums.Design.TextBox) {
-            if (design == Enums.Design.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
-            Develop.DebugPrint(FehlerArt.Warnung, "Design unbekannt: " + (int)design);
-            return GetBlueFont(design, state);
-        }
-        switch (stufe) {
-            case 4:
-                return GetBlueFont(design, state);
+    //internal static BlueFont GetBlueFont(Design design, States state, int stufe) {
+    //    if (stufe != 4 && design != Enums.Design.TextBox) {
+    //        if (design == Enums.Design.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
+    //        Develop.DebugPrint(FehlerArt.Warnung, "Design unbekannt: " + (int)design);
+    //        return GetBlueFont(design, state);
+    //    }
+    //    switch (stufe) {
+    //        case 4:
+    //            return GetBlueFont(design, state);
 
-            case 3:
-                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+    //        case 3:
+    //            return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
 
-            case 2:
-                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+    //        case 2:
+    //            return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
 
-            case 1:
-                return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
+    //        case 1:
+    //            return GetBlueFont(Enums.Design.TextBox_Stufe3, state);
 
-            case 7:
-                return GetBlueFont(Enums.Design.TextBox_Bold, state);
-        }
+    //        case 7:
+    //            return GetBlueFont(Enums.Design.TextBox_Bold, state);
+    //    }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
-        return GetBlueFont(design, state);
-    }
+    //    Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+    //    return GetBlueFont(design, state);
+    //}
 
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
         switch (kon) {

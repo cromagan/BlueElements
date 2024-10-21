@@ -94,23 +94,19 @@ public abstract class ExtChar {
 
     public abstract string PlainText();
 
-    public int Stufe(string sheetStyle) {
-        if (Font == null || Skin.StyleDb is not Database db) { return 4; }
+    public PadStyles Stufe(string sheetStyle) {
+        if (Font == null || Skin.StyleDb is not Database db) { return  PadStyles.Standard; }
 
-        foreach (var thisC in db.Column) {
-            if (thisC.KeyName.ToUpperInvariant().StartsWith("X")) {
-                if (Font == Skin.GetBlueFont(thisC.KeyName, sheetStyle)) {
-                    switch (thisC.KeyName.ToUpperInvariant()) {
-                        case "X10006": return 4;
-                        default:
-                            Develop.DebugPrint_NichtImplementiert(true);
-                            return 4;
-                    }
-                }
-            }
-        }
+        var f1 = new FilterItem(db.Column["Font"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
+        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, sheetStyle);
 
-        return 4;
+        var r = db.Row[f1, f2];
+
+
+        if( r== null) {  return  PadStyles.Standard; }
+
+
+        return (PadStyles)r.CellGetInteger("Style");
     }
 
     protected abstract SizeF CalculateSize();

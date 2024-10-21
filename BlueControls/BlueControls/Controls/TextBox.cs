@@ -403,9 +403,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
                     if (_markEnd > -1) {
                         e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont("Windows 11", PadStyles.Überschrift, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont("Windows 11", PadStyles.Hervorgehoben, States.Standard).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont("Windows 11",  PadStyles.Standard, States.Standard).SymbolForReadableText(), _markEnd > -1));
                     }
                 }
             }

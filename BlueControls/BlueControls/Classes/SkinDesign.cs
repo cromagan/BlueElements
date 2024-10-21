@@ -24,6 +24,7 @@ using BlueControls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using static BlueBasics.Converter;
 
 public static class SkinDesignExtensions {
 
@@ -65,15 +66,19 @@ public static class SkinDesignExtensions {
         des.RahmenArt = rahm;
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
+
+                des.SheetStyle = string.Empty;
+                des.SheetStyleScale = 1;
+
         if (!string.IsNullOrEmpty(f)) {
             if (f.StartsWith("{")) {
                 des.Font = BlueFont.Get(f);
             } else {
                 if (Skin.StyleDb == null) { Skin.InitStyles(); }
 
-                var fl = (f + "/X10006").SplitAndCutBy("/");
+                var fl = (f + "|0|0").SplitAndCutBy("|");
                 des.SheetStyle = fl[0];
-                des.Font = Skin.GetBlueFont(fl[1], des.SheetStyle);
+                des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]));
             }
         }
 

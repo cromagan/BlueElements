@@ -257,6 +257,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (IsDisposed) { return; }
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
+            InitializeSkin();
             Invalidate();
         }
     }
@@ -269,6 +270,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (value < 0.1f) { value = 0.1f; }
             if (Math.Abs(_sheetStyleScale - value) < Constants.DefaultTolerance) { return; }
             _sheetStyleScale = value;
+            InitializeSkin();
             Invalidate();
         }
     }
@@ -1665,19 +1667,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     protected void InitializeSkin() {
-        _columnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard).Scale(FontScale);
-        _chapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard).Scale(FontScale);
+
+        var scale = FontScale * _sheetStyleScale;
+
+        _columnFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Hervorgehoben, States.Standard).Scale(scale);
+        _chapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard).Scale(scale);
         _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false);
 
-        if (Database is { IsDisposed: false }) {
-            _pix16 = GetPix(16, Database.GlobalScale);
-            _pix18 = GetPix(18, Database.GlobalScale);
-            _rowCaptionFontY = GetPix(26, Database.GlobalScale);
-        } else {
-            _pix16 = 16;
-            _pix18 = 18;
-            _rowCaptionFontY = 26;
-        }
+
+        _pix16 = GetPix(16, scale);
+        _pix18 = GetPix(18, scale);
+        _rowCaptionFontY = GetPix(26, scale);
+
     }
 
     protected override bool IsInputKey(Keys keyData) {

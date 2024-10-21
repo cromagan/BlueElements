@@ -253,7 +253,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         }
 
         var allScale = SheetStyleScale * _textScale * scale;
-        var bFont = Skin.GetBlueFont(_style, SheetStyle);
+        var bFont = Skin.GetBlueFont(SheetStyle, _style);
         var font = bFont.Font(allScale);
 
         Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale));

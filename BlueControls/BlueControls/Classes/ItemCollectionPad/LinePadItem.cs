@@ -225,7 +225,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne, IStyleableChild {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(Skin.GetBlueFont(_style, SheetStyle).Pen(scale * SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
+                gr.DrawLine(Skin.GetBlueFont(SheetStyle, _style).Pen(scale * SheetStyleScale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
     }
