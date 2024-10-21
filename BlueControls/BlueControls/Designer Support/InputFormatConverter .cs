@@ -54,7 +54,7 @@ public class InputFormatConverter : TypeConverter {
     // Eine Liste von Standardwerten abrufen.
     public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
         // Hier greifen wir auf die statische Liste AllFormats zu und extrahieren die Namen als Strings.
-        IList<string> formatNames = (List<string>)[];
+        IList<string> formatNames = [];
         foreach (var formatHolder in FormatHolder.AllFormats) {
             // Fügen Sie den Namen des Formats zur Liste hinzu.
             formatNames.Add(formatHolder.Name);

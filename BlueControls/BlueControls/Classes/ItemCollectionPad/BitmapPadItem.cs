@@ -366,7 +366,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             Generic.CollectGarbage();
         }
         if (_style != PadStyles.Undefiniert) {
-            if (Parent is ItemCollectionPadItem { SheetStyle: not null, SheetStyleScale: > 0 } icpi) {
+            if (Parent is ItemCollectionPadItem{IsDisposed: false,  SheetStyle: not null, SheetStyleScale: > 0 } icpi) {
                 gr.DrawRectangle(Skin.GetBlueFont(_style, SheetStyle).Pen(scale * SheetStyleScale), r1);
             }
         }

@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
@@ -56,7 +57,7 @@ internal class Method_MovePadItem : Method {
 
         if (attvar.Attributes[0] is VariablePadItem ici) {
             if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
-            if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+            if (iciv.Parent is not ItemCollectionPadItem  { IsDisposed: false } ) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
             iciv.Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2), false);
         }
 

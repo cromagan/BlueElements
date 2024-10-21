@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
@@ -58,8 +59,8 @@ internal class Method_MirrorPadItem : Method {
 
         if (attvar.Attributes[0] is VariablePadItem ici) {
             if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
-            if (iciv.Parent is not { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
-            var p1 = iciv.Parent.GetJointPoint(attvar.ValueStringGet(1), null);
+            if (iciv.Parent is not ItemCollectionPadItem{ IsDisposed: false } icpi) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+            var p1 = icpi.GetJointPoint(attvar.ValueStringGet(1), null);
 
             if (iciv is IMirrorable m) {
                 m.Mirror(p1, attvar.ValueBoolGet(2), attvar.ValueBoolGet(3));

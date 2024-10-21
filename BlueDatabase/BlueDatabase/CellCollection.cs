@@ -744,7 +744,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                     }
                     if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
-                        MakeNewRelations(columnToRepair, thisRowItem, (List<string>)[], t.SplitAndCutByCrToList());
+                        MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCrToList());
                     }
                 }
             }

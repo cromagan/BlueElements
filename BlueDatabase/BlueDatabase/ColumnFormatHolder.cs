@@ -56,7 +56,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownAllesAbwählenErlaubt = false,
         DropdownBearbeitungErlaubt = true,
         TextBearbeitungErlaubt = false,
-        DropDownItems = new((List<string>)["+", "-"]),
+        DropDownItems = new(["+", "-"]),
         DropdownWerteAndererZellenAnzeigen = true
     };
 

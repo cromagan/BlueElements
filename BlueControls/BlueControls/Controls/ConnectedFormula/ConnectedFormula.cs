@@ -65,7 +65,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var page in _pages) {
-                if (page is ItemCollectionPadItem icp) {
+                if (page is ItemCollectionPadItem {IsDisposed: false} icp) {
                     icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
                     icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
                 }
@@ -155,7 +155,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages == null) { return p; }
 
         foreach (var thisp in Pages) {
-            if (thisp is ItemCollectionPadItem icp) {
+            if (thisp is ItemCollectionPadItem {IsDisposed: false} icp) {
                 _ = p.AddIfNotExists(icp.Caption);
             }
         }
@@ -190,7 +190,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         l.AddRange(Pages);
 
         foreach (var thisIt in l) {
-            if (thisIt is not ItemCollectionPadItem) {
+            if (thisIt is not ItemCollectionPadItem { IsDisposed: false }) {
                 if (string.IsNullOrEmpty(thisIt.Page)) { thisIt.Page = "Head"; }
 
                 var found = GetPage(thisIt.Page);
@@ -265,7 +265,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         RepairReciver(Pages);
 
         foreach (var thisP in Pages) {
-            if (thisP is ItemCollectionPadItem icp) {
+            if (thisP is ItemCollectionPadItem {IsDisposed: false} icp) {
                 RowEntryPadItem? found = null;
 
                 foreach (var thisit in icp) {
@@ -318,7 +318,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var thisf in _pages) {
-                if (thisf is ItemCollectionPadItem icp) {
+                if (thisf is ItemCollectionPadItem {IsDisposed: false} icp) {
                     if (!notAllowedChilds.Contains(icp.KeyName) && !string.Equals("Head", icp.Caption, StringComparison.OrdinalIgnoreCase)) {
                         list.Add(ItemOf(icp));
                     }
@@ -362,9 +362,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages is not { IsDisposed: false } pg) { return null; }
 
         foreach (var thisP in pg) {
-            if (thisP is ItemCollectionPadItem icp2 &&
-                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase) &&
-                !icp2.IsDisposed) {
+            if (thisP is ItemCollectionPadItem {IsDisposed: false} icp2 &&
+                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase) ) {
                 return icp2;
             }
         }
@@ -382,7 +381,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {
-            if (thisIt is ItemCollectionPadItem icp2) {
+            if (thisIt is ItemCollectionPadItem {IsDisposed: false} icp2) {
                 RepairReciver(icp2);
             }
 

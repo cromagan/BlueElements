@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using BlueControls.ItemCollectionPad;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
@@ -57,7 +58,7 @@ internal class Method_ConnectPointsWithSameName : Method {
         if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent is not { } icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+        if (iciv.Parent is not ItemCollectionPadItem {IsDisposed: false}  icpv) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
 
         if (iciv.JointPoints.Count == 0) {
             return DoItFeedback.Null();

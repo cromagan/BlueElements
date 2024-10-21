@@ -629,7 +629,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
-        if (smallestHotItem is ItemCollectionPadItem icpi) {
+        if (smallestHotItem is ItemCollectionPadItem {IsDisposed: false} icpi) {
             var positionModified = icpi.UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
             var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
@@ -907,7 +907,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 l.AddRange(csi.VisibleFor);
             }
 
-            if (thisIt is ItemCollectionPadItem icpi) {
+            if (thisIt is ItemCollectionPadItem {IsDisposed: false} icpi) {
                 l.AddRange(icpi.VisibleFor_AllUsed());
             }
         }

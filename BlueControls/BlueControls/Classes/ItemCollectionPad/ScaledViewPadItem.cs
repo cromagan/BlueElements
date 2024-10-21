@@ -232,7 +232,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     //}
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Parent is not ItemCollectionPadItem icpi) { return; }
+        if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return; }
 
         if (SheetStyleScale > 0.1) {
             var newarea = positionModified.ToRect();
@@ -285,7 +285,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     private RectangleF CalculateShowingArea() {
         var points = new List<PointM>();
 
-        if (Parent is ItemCollectionPadItem icpi) {
+        if (Parent is ItemCollectionPadItem {IsDisposed: false} icpi) {
             foreach (var thiss in _includedjointPoints) {
                 if (icpi.GetJointPoints(thiss, this) is { } p) {
                     points.AddRange(p);

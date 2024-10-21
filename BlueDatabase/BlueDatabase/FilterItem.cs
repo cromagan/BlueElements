@@ -49,7 +49,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     #region Constructors
 
-    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType, (List<string>)
+    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType,
         [searchValue]) { }
 
     /// <summary>
@@ -82,10 +82,10 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Database' vorkommen!
     /// </summary>
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, (List<string>)
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType,
         [searchValue], string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, (List<string>)
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType,
         [searchValue], origin) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }

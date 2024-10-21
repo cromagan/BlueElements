@@ -208,7 +208,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
     }
 
     internal int GetFreeColorId() {
-        if (Parent is not ItemCollectionPadItem icpi) { return -1; }
+        if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return -1; }
 
         var usedids = new List<int>();
 

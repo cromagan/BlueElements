@@ -96,7 +96,7 @@ public partial class VariableEditor : EditorEasy {
                 if (thisColumn2 != null) {
                     thisColumn2.TextBearbeitungErlaubt = true;
                     thisColumn2.MultiLine = false;
-                    thisColumn2.PermissionGroupsChangeCell = new((List<string>)[Constants.Everybody]);
+                    thisColumn2.PermissionGroupsChangeCell = new([Constants.Everybody]);
                 }
             }
 
@@ -104,7 +104,7 @@ public partial class VariableEditor : EditorEasy {
             if (inh != null) { inh.Caption = "Inhalt"; }
             if (kom != null) { kom.Caption = "Kommentar"; }
 
-            db.PermissionGroupsNewRow = new((List<string>)[Constants.Everybody]);
+            db.PermissionGroupsNewRow = new([Constants.Everybody]);
         }
 
         var tcvc = ColumnViewCollection.ParseAll(db);

@@ -107,8 +107,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ForPrinting {
         get {
-            if (_parent is ItemCollectionPadItem icpi) { return icpi.ForPrinting; }
-            if (this is ItemCollectionPadItem icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
+            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) { return icpi.ForPrinting; }
+            if (this is ItemCollectionPadItem {IsDisposed: false} icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
             return true;
         }
     }
@@ -174,16 +174,16 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ShowAlways {
         get {
-            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowAlways; }
-            if (this is ItemCollectionPadItem icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
+            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) { return icpi.ShowAlways; }
+            if (this is ItemCollectionPadItem {IsDisposed: false} icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
             return false;
         }
     }
 
     public bool ShowJointPoints {
         get {
-            if (_parent is ItemCollectionPadItem icpi) { return icpi.ShowJointPoints; }
-            if (this is ItemCollectionPadItem icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
+            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) { return icpi.ShowJointPoints; }
+            if (this is ItemCollectionPadItem {IsDisposed: false} icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
             return false;
         }
     }
@@ -331,7 +331,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             var line = 1f;
             if (scale > 1) { line = scale; }
 
-            if (_parent is ItemCollectionPadItem icpi) {
+            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) {
                 foreach (var thisV in icpi.Connections) {
                     if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
                         if (icpi.Contains(thisV.Item2) && thisV.Item2 != this) {
@@ -576,7 +576,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         var myPoint = itemToConnect.JointPoints.Get(pointnameInItem);
         if (myPoint == null) { return; }
 
-        if (itemToConnect.Parent is not ItemCollectionPadItem icpi) { return; }
+        if (itemToConnect.Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return; }
 
         var otherPoint = icpi.GetJointPoint(otherPointName, itemToConnect);
         if (otherPoint == null) { return; }

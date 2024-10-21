@@ -197,9 +197,11 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public List<int> CalculateColorIds() {
         var l = new List<int>();
 
-        foreach (var thisId in Parents) {
-            if (Parent?[thisId] is ReciverSenderControlPadItem i) {
-                l.Add(i.OutputColorId);
+        if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+            foreach (var thisId in Parents) {
+                if (icpi[thisId] is ReciverSenderControlPadItem i) {
+                    l.Add(i.OutputColorId);
+                }
             }
         }
 
@@ -219,9 +221,9 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     public virtual string ErrorReason() {
-        if (Parent == null) { return "Keiner Ansicht zugeordnet."; }
+        if (Parent is  not ItemCollectionPadItem { IsDisposed: false } icpi) { return "Keiner Ansicht zugeordnet."; }
 
-        if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, Parent.UsedArea.ToRect())) {
+        if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, icpi.UsedArea.ToRect())) {
             return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
         }
 
@@ -239,16 +241,15 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     public ReadOnlyCollection<ReciverSenderControlPadItem> GetFilterFromGet() {
-        if (Parent == null) {
-            //Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");
-            return new ReadOnlyCollection<ReciverSenderControlPadItem>((List<ReciverSenderControlPadItem>)[]);
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) {
+            return new ReadOnlyCollection<ReciverSenderControlPadItem>([]);
         }
 
         if (_getFilterFrom == null || _getFilterFrom.Count != _getFilterFromKeys.Count) {
             var l = new List<ReciverSenderControlPadItem>();
 
             foreach (var thisk in _getFilterFromKeys) {
-                if (Parent[thisk] is ReciverSenderControlPadItem isf) {
+                if (icpi[thisk] is ReciverSenderControlPadItem isf) {
                     l.Add(isf);
                 }
             }
@@ -262,7 +263,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
 
-        if (Parent is null) { return result; }
+
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) {return result; }
 
         if (AllowedInputFilter != AllowedInputFilter.None) {
             result.Add(new FlexiControl("Eingang:", widthOfControl, true));
@@ -270,7 +272,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             var x = new List<AbstractListItem>();
 
             // Die _internal, die man noch wählen könnte
-            foreach (var thisR in Parent) {
+            foreach (var thisR in icpi) {
                 if (thisR is ReciverSenderControlPadItem rfp) {
                     if (rfp != this) {
                         x.Add(ItemOf(rfp.ReadableText(), rfp.KeyName, rfp.SymbolForReadableText(), true, "1"));
@@ -404,7 +406,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     public override void PointMoved(object sender, MoveEventArgs e) {
         if (_xPosition == XPosition.frei ||
-            Parent == null) {
+            Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) {
             base.PointMoved(sender, e);
             return;
         }
@@ -412,7 +414,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var anzahlSpaltenImFormular = (int)_xPosition / 100;
         var aufXPosition = (int)(_xPosition - anzahlSpaltenImFormular * 100);
 
-        var wi = (Parent.UsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        var wi = (icpi.UsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
 
         _pLo.X = xpos;

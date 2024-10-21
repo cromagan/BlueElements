@@ -1989,7 +1989,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
         IsInCache = FileStateUtcDate;
 
-        CheckSysUndoNow((List<Database>)[this], true);
+        CheckSysUndoNow([this], true);
 
         RepairAfterParse();
 

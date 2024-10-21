@@ -1598,8 +1598,7 @@ public static class Skin {
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
 
-    internal static BlueFont? GetBlueFont(int design, States state, RowItem? rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((Design)design, state, stufe);
-
+ 
     internal static BlueFont? GetBlueFont(PadStyles padStyle, RowItem? rowOfStyle, int stufe) {
         switch (stufe) {
             case 4:

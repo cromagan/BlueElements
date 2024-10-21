@@ -25,6 +25,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -157,16 +158,21 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (parentFormula == null) { return; }
 
-        foreach (var thisKey in source.Parents) {
-            var it = source.Parent?[thisKey];
 
-            if (it is IItemToControl itc) {
-                var parentCon = parentFormula.SearchOrGenerate(itc, false, mode);
-                if (parentCon is GenericControlReciverSender parentConSender) {
-                    parentConSender.ChildIsBorn(this);
+        if (source.Parent is  ItemCollectionPadItem { IsDisposed: false } icpi) {
+
+
+            foreach (var thisKey in source.Parents) {
+                var it = icpi[thisKey];
+
+                if (it is IItemToControl itc) {
+                    var parentCon = parentFormula.SearchOrGenerate(itc, false, mode);
+                    if (parentCon is GenericControlReciverSender parentConSender) {
+                        parentConSender.ChildIsBorn(this);
+                    }
+                } else if (it is RowEntryPadItem) {
+                    parentFormula.ChildIsBorn(this);
                 }
-            } else if (it is RowEntryPadItem) {
-                parentFormula.ChildIsBorn(this);
             }
         }
     }
