@@ -29,7 +29,7 @@ public static class SkinDesignExtensions {
 
     #region Methods
 
-    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string f, string pic) {
+    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, string font, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string pic) {
         Dictionary<States, SkinDesign> dictState;
 
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
@@ -39,7 +39,7 @@ public static class SkinDesignExtensions {
             dictControl.Add(ds, dictState);
         }
 
-        dictState.Add(status, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, f, pic);
+        dictState.Add(status, font, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
     }
 
     public static void Remove(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status) {
@@ -48,7 +48,7 @@ public static class SkinDesignExtensions {
         }
     }
 
-    private static void Add(this IDictionary<States, SkinDesign> dictStats, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc3, string f, string pic) {
+    private static void Add(this IDictionary<States, SkinDesign> dictStats, States status, string font, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc3, string pic) {
         SkinDesign des = new() {
             Need = true,
             Kontur = enKontur,
@@ -68,13 +68,13 @@ public static class SkinDesignExtensions {
 
         des.SheetStyle = string.Empty;
 
-        if (!string.IsNullOrEmpty(f)) {
-            if (f.StartsWith("{")) {
-                des.Font = BlueFont.Get(f);
+        if (!string.IsNullOrEmpty(font)) {
+            if (font.StartsWith("{")) {
+                des.Font = BlueFont.Get(font);
             } else {
                 if (Skin.StyleDb == null) { Skin.InitStyles(); }
 
-                var fl = (f + "|0|0").SplitAndCutBy("|");
+                var fl = (font + "|0|0").SplitAndCutBy("|");
                 des.SheetStyle = fl[0];
                 des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]), 1f);
             }

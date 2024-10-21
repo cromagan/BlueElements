@@ -68,7 +68,7 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         //if (_cellRenderer == null) { return new Size(16, 0); }
 
-        return _cellRenderer.ContentSize(KeyName, States.Standard, _translate);
+        return _cellRenderer.ContentSize(KeyName, _translate);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {

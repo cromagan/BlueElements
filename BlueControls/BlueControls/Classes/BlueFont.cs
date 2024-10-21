@@ -223,8 +223,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
 
         var si = SizeF.Empty;
-        if (Underline || StrikeOut) {
+        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
             si = MeasureString(text, stringFormat);
+        }
+
+        if (!ColorBack.IsMagentaOrTransparent()) {
+            gr.FillRectangle(new SolidBrush(ColorBack), x, y, si.Width, si.Height);
         }
 
         if (Underline) {
@@ -418,6 +422,10 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
             case "color":
                 ColorMain = value.FromHtmlCode();
+                return true;
+
+            case "backcolor":
+                ColorBack = value.FromHtmlCode();
                 return true;
 
             case "italic":

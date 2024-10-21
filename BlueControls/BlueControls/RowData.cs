@@ -118,7 +118,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
             if (CellCollection.IsInCache(thisViewItem.Column, Row) && thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer(style);
 
-                DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), States.Standard, tmpc.DoOpticalTranslation).Height);
+                DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation).Height);
             }
         }
 
