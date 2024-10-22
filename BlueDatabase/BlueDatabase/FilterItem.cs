@@ -30,7 +30,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase, IDisposableExtended, ICloneable, IEditable, IChild {
+public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase, IDisposableExtended, ICloneable, IEditable {
 
     #region Fields
 
@@ -42,7 +42,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     private string _origin = string.Empty;
 
-    private IParent? _parent;
+    private object? _parent;
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
@@ -207,7 +207,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         }
     }
 
-    public IParent? Parent {
+    public object? Parent {
         get => _parent;
         set {
             if (_parent == value) { return; }

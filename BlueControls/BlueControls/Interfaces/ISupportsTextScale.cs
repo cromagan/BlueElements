@@ -17,11 +17,13 @@
 
 #nullable enable
 
-namespace BlueBasics.Interfaces;
+namespace BlueControls.Interfaces;
 
-public interface IParent {
-    //event EventHandler<ParentChangedEventArgs> ParentChanged;
-}
+public interface ISupportsTextScale {
 
-public static class ParentExtension {
+    #region Properties
+
+    public float TextScale { get; set; }
+
+    #endregion
 }

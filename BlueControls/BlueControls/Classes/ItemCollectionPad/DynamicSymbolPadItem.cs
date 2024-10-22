@@ -37,7 +37,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
+public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Fields
 

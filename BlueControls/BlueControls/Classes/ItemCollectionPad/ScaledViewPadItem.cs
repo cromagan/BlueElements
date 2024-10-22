@@ -33,7 +33,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IStyleableChild {
+public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, ISupportsTextScale {
 
     #region Fields
 

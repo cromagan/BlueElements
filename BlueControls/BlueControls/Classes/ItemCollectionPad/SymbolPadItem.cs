@@ -33,7 +33,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class SymbolPadItem : RectanglePadItem, IStyleableOne, IStyleableChild {
+public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Fields
 

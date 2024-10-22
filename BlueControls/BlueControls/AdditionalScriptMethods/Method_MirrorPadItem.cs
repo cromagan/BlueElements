@@ -54,7 +54,7 @@ internal class Method_MirrorPadItem : Method {
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
             var p1 = icpv.GetJointPoint(attvar.ValueStringGet(1), null);
-            icpv.MirrorAllItems(p1, attvar.ValueBoolGet(2), attvar.ValueBoolGet(3));
+            icpv.Items_Mirror(p1, attvar.ValueBoolGet(2), attvar.ValueBoolGet(3));
         }
 
         if (attvar.Attributes[0] is VariablePadItem ici) {

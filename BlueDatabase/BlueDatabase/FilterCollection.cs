@@ -35,7 +35,7 @@ namespace BlueDatabase;
 
 #nullable enable
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable, IParent {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable {
 
     #region Fields
 

@@ -925,9 +925,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         SystemInfo = t.SortedDistinctList().JoinWithCr();
     }
 
-    public void AddSystemInfo(string type, Database sourcedatabase, string user) {
-        AddSystemInfo(type, sourcedatabase.Caption + " -> " + user);
-    }
+    public void AddSystemInfo(string type, Database sourcedatabase, string user) => AddSystemInfo(type, sourcedatabase.Caption + " -> " + user);
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return value; }

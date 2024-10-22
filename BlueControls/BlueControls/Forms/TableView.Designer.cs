@@ -47,6 +47,9 @@ namespace BlueControls.Forms {
             this.grpAufgaben = new BlueControls.Controls.GroupBox();
             this.lstAufgaben = new BlueControls.Controls.ListBox();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
+            this.btnZoomFit = new BlueControls.Controls.Button();
+            this.btnZoomOut = new BlueControls.Controls.Button();
+            this.btnZoomIn = new BlueControls.Controls.Button();
             this.btnUnterschiede = new BlueControls.Controls.Button();
             this.btnAlleSchließen = new BlueControls.Controls.Button();
             this.btnAlleErweitern = new BlueControls.Controls.Button();
@@ -286,7 +289,7 @@ namespace BlueControls.Forms {
             this.grpAufgaben.Controls.Add(this.lstAufgaben);
             this.grpAufgaben.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAufgaben.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAufgaben.Location = new System.Drawing.Point(584, 0);
+            this.grpAufgaben.Location = new System.Drawing.Point(640, 0);
             this.grpAufgaben.Name = "grpAufgaben";
             this.grpAufgaben.Size = new System.Drawing.Size(222, 81);
             this.grpAufgaben.TabIndex = 7;
@@ -311,6 +314,9 @@ namespace BlueControls.Forms {
             // 
             this.grpAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAnsicht.CausesValidation = false;
+            this.grpAnsicht.Controls.Add(this.btnZoomFit);
+            this.grpAnsicht.Controls.Add(this.btnZoomOut);
+            this.grpAnsicht.Controls.Add(this.btnZoomIn);
             this.grpAnsicht.Controls.Add(this.btnUnterschiede);
             this.grpAnsicht.Controls.Add(this.btnAlleSchließen);
             this.grpAnsicht.Controls.Add(this.btnAlleErweitern);
@@ -323,10 +329,41 @@ namespace BlueControls.Forms {
             this.grpAnsicht.Margin = new System.Windows.Forms.Padding(0);
             this.grpAnsicht.Name = "grpAnsicht";
             this.grpAnsicht.Padding = new System.Windows.Forms.Padding(0);
-            this.grpAnsicht.Size = new System.Drawing.Size(328, 81);
+            this.grpAnsicht.Size = new System.Drawing.Size(384, 81);
             this.grpAnsicht.TabIndex = 3;
             this.grpAnsicht.TabStop = false;
             this.grpAnsicht.Text = "Ansicht";
+            // 
+            // btnZoomFit
+            // 
+            this.btnZoomFit.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnZoomFit.ImageCode = "ZoomFit|20";
+            this.btnZoomFit.Location = new System.Drawing.Point(328, 24);
+            this.btnZoomFit.Name = "btnZoomFit";
+            this.btnZoomFit.Size = new System.Drawing.Size(48, 22);
+            this.btnZoomFit.TabIndex = 17;
+            this.btnZoomFit.Text = "1:1";
+            this.btnZoomFit.Click += new System.EventHandler(this.btnZoomFit_Click);
+            // 
+            // btnZoomOut
+            // 
+            this.btnZoomOut.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnZoomOut.ImageCode = "LupeMinus|20";
+            this.btnZoomOut.Location = new System.Drawing.Point(352, 2);
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.Size = new System.Drawing.Size(24, 22);
+            this.btnZoomOut.TabIndex = 16;
+            this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
+            // 
+            // btnZoomIn
+            // 
+            this.btnZoomIn.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnZoomIn.ImageCode = "LupePlus|20";
+            this.btnZoomIn.Location = new System.Drawing.Point(328, 2);
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.Size = new System.Drawing.Size(24, 22);
+            this.btnZoomIn.TabIndex = 15;
+            this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
             // 
             // btnUnterschiede
             // 
@@ -750,7 +787,7 @@ namespace BlueControls.Forms {
             this.btnClipboardImport.ImageCode = "Tabelle||||||||||Clipboard";
             this.btnClipboardImport.Location = new System.Drawing.Point(8, 2);
             this.btnClipboardImport.Name = "btnClipboardImport";
-            this.btnClipboardImport.QuickInfo = "Importiert in die aktuell angezeigte Datenbank\r\nDaten aus dem Clipboard.\r\n";
+            this.btnClipboardImport.QuickInfo = "Importiert in die aktuell angezeigte Datenbank\r\nDaten aus dem Clipboard.";
             this.btnClipboardImport.Size = new System.Drawing.Size(64, 66);
             this.btnClipboardImport.TabIndex = 39;
             this.btnClipboardImport.Text = "Clipboard-Import";
@@ -807,8 +844,10 @@ namespace BlueControls.Forms {
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
+            this.Table.SheetStyle = "Windows 11";
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
+            this.Table.Zoom = 1F;
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Table_ContextMenuItemClicked);
             this.Table.DatabaseChanged += new System.EventHandler(this.Table_DatabaseChanged);
@@ -869,7 +908,6 @@ namespace BlueControls.Forms {
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFO.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFO.Location = new System.Drawing.Point(0, 0);
-            this.CFO.Mode = null;
             this.CFO.Name = "CFO";
             this.CFO.Size = new System.Drawing.Size(338, 566);
             this.CFO.TabIndex = 0;
@@ -1012,5 +1050,8 @@ namespace BlueControls.Forms {
         private Button grpAufräumen;
         private Button btnUserInfo;
         private Button btnSuchInScript;
+        private Button btnZoomOut;
+        private Button btnZoomIn;
+        private Button btnZoomFit;
     }
 }

@@ -39,7 +39,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, IStyleableChild {
+public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
 
     #region Fields
 

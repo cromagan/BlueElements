@@ -57,7 +57,7 @@ internal class Method_DeletePoints : Method {
 
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
-            icpv.DeleteJointPointsOfAllItems(names);
+            icpv.Items_DeleteJointPoints(names);
             icpv.DeleteJointPoints(names);
         }
 

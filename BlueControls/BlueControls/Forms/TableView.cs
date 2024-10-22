@@ -1222,4 +1222,10 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     #endregion
+
+    private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
+
+    private void btnZoomIn_Click(object sender, System.EventArgs e) => Table.DoZoom(true);
+
+    private void btnZoomOut_Click(object sender, System.EventArgs e) => Table.DoZoom(false);
 }

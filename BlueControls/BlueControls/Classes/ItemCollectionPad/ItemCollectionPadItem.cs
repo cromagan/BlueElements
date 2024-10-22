@@ -52,7 +52,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable, IStyleableParent, IStyleableChild {
+public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable {
 
     #region Fields
 
@@ -81,13 +81,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public ItemCollectionPadItem() : base(string.Empty) {
         BindingOperations.EnableCollectionSynchronization(_internal, new object());
 
-        if (Skin.StyleDb == null) { Skin.InitStyles(); }
         Breite = 10;
         Höhe = 10;
         _endless = false;
         RandinMm = Padding.Empty;
         _sheetStyle = string.Empty;
-
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
         IsSaved = true;
@@ -222,8 +220,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             OnPropertyChanged();
         }
     }
-
-
 
     public new bool ShowAlways { get; set; }
 
@@ -618,7 +614,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
-        if (smallestHotItem is ItemCollectionPadItem {IsDisposed: false} icpi) {
+        if (smallestHotItem is ItemCollectionPadItem { IsDisposed: false } icpi) {
             var positionModified = icpi.UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
             var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
@@ -654,17 +650,25 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return smallestHotItem;
     }
 
-    public void MirrorAllItems(PointM? p, bool vertical, bool horizontal) {
+    public void Items_Mirror(PointM? p, bool vertical, bool horizontal) {
         foreach (var thisItem in _internal) {
             if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
         }
     }
 
-    public void MoveAllItems(float x, float y) {
+    public void Items_Move(float x, float y) {
         if (x == 0 && y == 0) { return; }
 
         foreach (var thisItem in _internal) {
             thisItem.Move(x, y, false);
+        }
+    }
+
+    public void Items_SetTestScale(float scale) {
+        foreach (var thisItem in _internal) {
+            if (thisItem is ISupportsTextScale m) {
+                m.TextScale = scale;
+            }
         }
     }
 
@@ -686,9 +690,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         result.ParseableAdd("BackColor", BackColor.ToArgb());
 
-
         result.ParseableAdd("PrintArea", _randinMm.ToString());
-
 
         result.ParseableAdd("Endless", Endless);
 
@@ -888,7 +890,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 l.AddRange(csi.VisibleFor);
             }
 
-            if (thisIt is ItemCollectionPadItem {IsDisposed: false} icpi) {
+            if (thisIt is ItemCollectionPadItem { IsDisposed: false } icpi) {
                 l.AddRange(icpi.VisibleFor_AllUsed());
             }
         }
@@ -900,16 +902,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         l.AddRange(Table.Permission_AllUsed(false));
 
         return Database.RepairUserGroups(l);
-    }
-
-    /// <summary>
-    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
-    /// </summary>
-    /// <param name="names"></param>
-    internal void DeleteJointPointsOfAllItems(List<string> names) {
-        foreach (var thisItem in _internal) {
-            thisItem.DeleteJointPoints(names);
-        }
     }
 
     internal ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn) {
@@ -970,6 +962,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         return l;
+    }
+
+    /// <summary>
+    /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
+    /// </summary>
+    /// <param name="names"></param>
+    internal void Items_DeleteJointPoints(List<string> names) {
+        foreach (var thisItem in _internal) {
+            thisItem.DeleteJointPoints(names);
+        }
     }
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
@@ -1085,14 +1087,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #region Items selbst
 
- 
-            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, AutoZoomFit, UsedAreaOfItems());
+        var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, AutoZoomFit, UsedAreaOfItems());
 
-            foreach (var thisItem in _internal) {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                thisItem.Draw(gr, positionModified.ToRect(), childScale, childShiftX, childShiftY);
-            }
-        
+        foreach (var thisItem in _internal) {
+            gr.PixelOffsetMode = PixelOffsetMode.None;
+            thisItem.Draw(gr, positionModified.ToRect(), childScale, childShiftX, childShiftY);
+        }
 
         #endregion
     }

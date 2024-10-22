@@ -33,7 +33,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableOne, IStyleableChild {
+public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableOne, ISupportsTextScale {
 
     #region Fields
 
@@ -135,7 +135,28 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         }
     }
 
-    public float Skalierung { get; set; } = 3.07f;
+
+
+
+
+
+    public float TextScale {
+        get => _textScale;
+        set {
+            value = Math.Max(value, 0.01f);
+            value = Math.Min(value, 20);
+            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
+            _textScale = value;
+            OnPropertyChanged();
+        }
+    }
+
+
+
+
+
+
+    private float _textScale = 3.07f;
 
     public PadStyles Stil {
         get => _style;
@@ -208,7 +229,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
             new FlexiControlForProperty<string>(() => Präfix),
             new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(SheetStyle)),
-            new FlexiControlForProperty<float>(() => Skalierung)
+            new FlexiControlForProperty<float>(() => TextScale)
         ];
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
@@ -243,7 +264,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         result.ParseableAdd("Decimal", Nachkommastellen);
         result.ParseableAdd("refix", Präfix);
         result.ParseableAdd("Suffix", Suffix);
-        result.ParseableAdd("AdditionalScale", Skalierung);
+        result.ParseableAdd("AdditionalScale", _textScale);
         result.ParseableAdd("Style", _style);
         return result;
     }
@@ -282,7 +303,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
                 return true;
 
             case "additionalscale":
-                Skalierung = FloatParse(value.FromNonCritical());
+                _textScale = FloatParse(value.FromNonCritical());
                 return true;
 
             case "style":
@@ -310,7 +331,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override RectangleF CalculateUsedArea() {
         if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
-        var f2 = this.GetFont(Skalierung);
+        var f2 = this.GetFont(_textScale);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
         var sz2 = f2.MeasureString(Text_Unten);
@@ -327,7 +348,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_style != PadStyles.Undefiniert) {
-            var geszoom = Skalierung * scale;
+            var geszoom = _textScale * scale;
 
             var f = this.GetFont(geszoom);
             var pfeilG = f.Size * 0.8f;
@@ -378,7 +399,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     private void CalculateOtherPoints() {
         var tmppW = -90;
-        var mhlAb = MmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
+        var mhlAb = MmToPixel(1.5f * _textScale / 3.07f, ItemCollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
         ComputeData();
 
         //Gegeben sind:

@@ -32,7 +32,7 @@ using static BlueDatabase.Database;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class TablePadItem : RectanglePadItem, IStyleable, IStyleableChild {
+public class TablePadItem : RectanglePadItem, IStyleable {
 
     #region Fields
 

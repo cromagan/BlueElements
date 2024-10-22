@@ -36,7 +36,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, IStyleableChild {
+public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, ISupportsTextScale {
 
     #region Fields
 

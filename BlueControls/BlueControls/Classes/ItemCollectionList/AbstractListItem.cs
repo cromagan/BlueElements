@@ -26,7 +26,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.ItemCollectionList;
 
-public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChangedFeedback, IChild {
+public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChangedFeedback {
 
     #region Fields
 
@@ -46,7 +46,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     private bool _isCaption;
     private string _keyName;
-    private IParent? _parent;
+    private object? _parent;
 
     private Size _sizeUntouchedForListBox = Size.Empty;
 
@@ -105,7 +105,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         }
     }
 
-    public virtual IParent? Parent {
+    public virtual object? Parent {
         get => _parent;
         set {
             if (_parent != value) {

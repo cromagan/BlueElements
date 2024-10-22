@@ -332,21 +332,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             case "#Caption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1, PadStyles.Überschrift);
+                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Überschrift);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#NoCaption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1, PadStyles.Standard);
+                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#Bold":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.StufeÄndern(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
+                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
                 RaiseEventIfTextChanged(false);
                 return;
 

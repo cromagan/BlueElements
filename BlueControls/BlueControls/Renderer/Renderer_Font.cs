@@ -22,46 +22,33 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueControls.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BlueControls.CellRenderer;
 
 // ReSharper disable once UnusedMember.Global
 public class Renderer_Font : Renderer_Abstract {
 
-  
+    #region Fields
 
+    private const string txt = "ABCabc123ÄÖÜäöü@ß?";
+
+    #endregion
 
     #region Properties
 
     public static string ClassId => "Font";
 
-
-
-
     public override string Description => "Stellt eine Schriftart dar.";
 
-
-
     #endregion
-
-
-
-    private const string txt = "ABCabc123ÄÖÜäöü";
 
     #region Methods
 
     public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-
-
-        Skin.Draw_FormatedText(gr, txt, null, align, drawarea, BlueFont.Get(content), false);
-
+        Skin.Draw_FormatedText(gr, txt, null, align, drawarea, BlueFont.Get(content).Scale(scale), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];
@@ -69,7 +56,6 @@ public class Renderer_Font : Renderer_Abstract {
     public override List<string> ParseableItems() => [];
 
     public override bool ParseThis(string key, string value) {
-
         return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
     }
 
@@ -88,11 +74,7 @@ public class Renderer_Font : Renderer_Abstract {
     /// <param name="style"></param>
     /// <param name="translate"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
-return string.Empty;
-    }
-
-
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) => string.Empty;
 
     #endregion
 }

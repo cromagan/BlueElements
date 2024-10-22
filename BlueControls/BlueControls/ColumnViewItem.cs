@@ -25,7 +25,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using static BlueBasics.Constants;
@@ -236,7 +235,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _column_PropertyChanged(object sender, System.EventArgs e) { _drawWidth = null; }
+    private void _column_PropertyChanged(object sender, System.EventArgs e) => _drawWidth = null;
 
     private int CalculateColumnContentWidth(string style) {
         if (_column is not { IsDisposed: false }) { return 16; }

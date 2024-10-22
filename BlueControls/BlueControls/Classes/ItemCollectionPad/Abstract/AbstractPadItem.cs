@@ -38,13 +38,13 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor, IChild, IParent {
+public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
 
     #region Fields
 
     public string Page = string.Empty;
 
-    protected IParent? _parent;
+    protected object? _parent;
 
     /// <summary>
     /// Soll es gedruckt werden?
@@ -155,7 +155,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     //     Dispose(disposing: false);
     // }
 
-    public virtual IParent? Parent {
+    public virtual object? Parent {
         get => _parent;
         set {
             if (_parent != value) {
@@ -563,9 +563,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         return I;
     }
 
-    public void Verbindungspunkt_hinzu() {
-        AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
-    }
+    public void Verbindungspunkt_hinzu() => AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);
 
     internal void ConnectJointPoint(PointM myPoint, PointM otherPoint) {
         if (!JointPoints.Contains(myPoint)) { return; }
@@ -605,29 +603,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    internal void GetNewIdsForEverything() {
-        KeyName = GetUniqueKey();
-
-        //foreach (var thispoint in JointPoints) {
-        //    thispoint.KeyName = Generic.GetUniqueKey();
-
-        //}
-
-        //foreach (var thispoint in MovablePoint) {
-        //    thispoint.KeyName = Generic.GetUniqueKey();
-
-        //}
-
-        ////Doppelt gemoppelt
-        //foreach (var thispoint in PointsForSuccesfullyMove) {
-        //    thispoint.KeyName = Generic.GetUniqueKey();
-        //}
-
-        ////Doppelt gemoppelt
-        //_jointMiddle.KeyName = Generic.GetUniqueKey();
-        //_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();
-        //_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
-    }
+    internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();//foreach (var thispoint in JointPoints) {//    thispoint.KeyName = Generic.GetUniqueKey();//}//foreach (var thispoint in MovablePoint) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//foreach (var thispoint in PointsForSuccesfullyMove) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//_jointMiddle.KeyName = Generic.GetUniqueKey();//_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();//_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
 
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
         _jointReferenceFirst ??= firstPoint;

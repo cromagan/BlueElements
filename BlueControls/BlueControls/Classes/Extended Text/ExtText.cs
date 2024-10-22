@@ -340,7 +340,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public void StufeÄndern(int first, int last, PadStyles style) {
+    public void ChangeStyle(int first, int last, PadStyles style) {
         var font = this.GetFont(style);
 
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
@@ -482,7 +482,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         var markstate = MarkState.None;
         Clear();
         ResetPosition(true);
-        var bf = this.GetFont(style);
+        var font = this.GetFont(style);
 
         if (!string.IsNullOrEmpty(cactext)) {
             cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
@@ -493,7 +493,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                 if (isRich) {
                     switch (ch) {
                         case '<': {
-                                DoHtmlCode(cactext, pos, ref zeichen, ref bf, ref style, ref markstate);
+                                DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style, ref markstate);
                                 var op = 1;
                                 do {
                                     pos++;
@@ -507,19 +507,19 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
                         case '&':
                             zeichen++;
-                            pos = AddSpecialEntities(cactext, pos, bf, markstate);
+                            pos = AddSpecialEntities(cactext, pos, font, markstate);
                             break;
 
                         default:
                             // Normales Zeichen
                             zeichen++;
-                            Add(new ExtCharAscii(ch, bf, markstate));
+                            Add(new ExtCharAscii(ch, font, markstate));
                             break;
                     }
                 } else {
                     // Normales Zeichen
                     zeichen++;
-                    Add(new ExtCharAscii(ch, bf, markstate));
+                    Add(new ExtCharAscii(ch, font, markstate));
                 }
                 pos++;
             } while (true);
@@ -640,8 +640,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
             case "H7":
                 style = PadStyles.Hervorgehoben;
-                font = this.GetFont(style);
-                break;
+                font = this.GetFont(style); break;
 
             case "H6":
                 style = PadStyles.Alternativ;
