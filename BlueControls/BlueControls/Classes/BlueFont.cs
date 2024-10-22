@@ -418,6 +418,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             case "fontsize":
                 Size = FloatParse(value.FromNonCritical());
                 if (Size < 0.1f) { Size = 0.1f; }
+                Size = (float)Math.Round((double)Size, 3, MidpointRounding.AwayFromZero);
                 return true;
 
             case "color":
@@ -558,7 +559,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         List<string> result = [];
 
         result.ParseableAdd("Name", fontName);
-        result.ParseableAdd("Size", fontSize);
+        result.ParseableAdd("Size", Math.Round(fontSize,3, MidpointRounding.AwayFromZero  ));
         if (bold) { result.ParseableAdd("Bold", bold); }
         if (italic) { result.ParseableAdd("Italic", italic); }
         if (underline) { result.ParseableAdd("Underline", underline); }
@@ -571,7 +572,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             result.ParseableAdd("OutlineColor", colorOutline);
         }
         if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
-        if (colorBack != "00ffffff") { result.ParseableAdd("BackColor", colorBack); }
+        if (colorBack.ToLowerInvariant() != "00ffffff") { result.ParseableAdd("BackColor", colorBack); }
         return result;
     }
 

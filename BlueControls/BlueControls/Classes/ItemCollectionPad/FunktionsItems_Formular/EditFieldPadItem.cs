@@ -232,6 +232,10 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             case "autodistance":
                 _autoX = value.FromPlusMinus();
                 return true;
+
+            case "style":
+                return true;
+
         }
         return base.ParseThis(key, value);
     }

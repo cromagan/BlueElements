@@ -37,10 +37,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     #region Fields
 
     public int? Contentwidth;
+    public QuickImage? TmpCaptionBitmapCode;
+    public int? TmpIfFilterRemoved = null;
     private ColumnItem? _column;
     private int? _drawWidth;
     private bool _reduced;
     private Renderer_Abstract? _renderer;
+    private SizeF _tmpCaptionTextSize = SizeF.Empty;
     private ViewType _viewType = ViewType.None;
 
     #endregion
@@ -129,6 +132,36 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Methods
 
+    public SizeF ColumnCaptionText_Size(Font columnFont) {
+        if (Column is not { IsDisposed: false } c) { return new SizeF(16, 16); }
+
+        if (_tmpCaptionTextSize.Width > 0) { return _tmpCaptionTextSize; }
+        //if (_columnFont == null) { return new SizeF(_pix16, _pix16); }
+        _tmpCaptionTextSize = columnFont.MeasureString(c.Caption.Replace("\r", "\r\n"));
+        return _tmpCaptionTextSize;
+    }
+
+    public SizeF ColumnHead_Size(Font columnFont) {
+        if (Column is not { IsDisposed: false } c) { return new SizeF(16, 16); }
+
+        var ccts = ColumnCaptionText_Size(columnFont);
+
+        var wi = ccts.Height + 4;
+        var he = ccts.Width + 3;
+
+        if (!IsDisposed) {
+            if (!string.IsNullOrEmpty(c.CaptionGroup3)) {
+                he += ColumnCaptionSizeY * 3;
+            } else if (!string.IsNullOrEmpty(c.CaptionGroup2)) {
+                he += ColumnCaptionSizeY * 2;
+            } else if (!string.IsNullOrEmpty(c.CaptionGroup1)) {
+                he += ColumnCaptionSizeY;
+            }
+        }
+
+        return new SizeF(wi, he);
+    }
+
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
@@ -172,6 +205,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public void Invalidate_DrawWidth() => _drawWidth = null;
+
+    public void Invalidate_Head() {
+        _tmpCaptionTextSize = new SizeF(-1, -1);
+        TmpCaptionBitmapCode = null;
+    }
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
@@ -235,7 +273,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _column_PropertyChanged(object sender, System.EventArgs e) => _drawWidth = null;
+    private void _column_PropertyChanged(object sender, System.EventArgs e) {
+        Invalidate_Head();
+        Invalidate_DrawWidth();
+    }
 
     private int CalculateColumnContentWidth(string style) {
         if (_column is not { IsDisposed: false }) { return 16; }

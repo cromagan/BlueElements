@@ -43,8 +43,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     #region Fields
 
     public DateTime? IsInCache = null;
-    public QuickImage? TmpCaptionBitmapCode;
-    public int? TmpIfFilterRemoved = null;
+
     internal List<string>? UcaseNamesSortedByLenght;
     private const string TmpNewDummy = "TMPNEWDUMMY";
     private readonly List<string> _afterEditAutoReplace = [];
@@ -111,7 +110,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _spellCheckingEnabled;
     private string _systemInfo;
     private bool _textBearbeitungErlaubt;
-    private SizeF _tmpCaptionTextSize = new(-1, -1);
+
 
     #endregion
 
@@ -195,7 +194,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         #endregion Standard-Werte
 
-        Invalidate_Head();
         Invalidate_LinkedDatabase();
     }
 
@@ -360,7 +358,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_caption == value) { return; }
 
             _ = Database?.ChangeData(DatabaseDataType.ColumnCaption, this, null, _caption, value, Generic.UserName, DateTime.UtcNow, string.Empty);
-            Invalidate_Head();
             OnPropertyChanged();
         }
     }
@@ -373,7 +370,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             _ = Database?.ChangeData(DatabaseDataType.CaptionBitmapCode, this, null, _captionBitmapCode, value, Generic.UserName, DateTime.UtcNow, string.Empty);
             _captionBitmapCode = value;
-            Invalidate_Head();
             OnPropertyChanged();
         }
     }
@@ -516,7 +512,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_filterOptions == value) { return; }
 
             _ = Database?.ChangeData(DatabaseDataType.FilterOptions, this, null, ((int)_filterOptions).ToString(), ((int)value).ToString(), Generic.UserName, DateTime.UtcNow, string.Empty);
-            Invalidate_Head();
             OnPropertyChanged();
         }
     }
@@ -1104,38 +1099,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
-    public SizeF ColumnCaptionText_Size(Font columnFont) {
-        if (IsDisposed) { return new SizeF(16, 16); }
-
-        if (_tmpCaptionTextSize.Width > 0) { return _tmpCaptionTextSize; }
-        //if (_columnFont == null) { return new SizeF(_pix16, _pix16); }
-        _tmpCaptionTextSize = columnFont.MeasureString(Caption.Replace("\r", "\r\n"));
-        return _tmpCaptionTextSize;
-    }
-
-    public SizeF ColumnHead_Size(Font columnFont) {
-        //Bitmap? CaptionBitmapCode = null; // TODO: Caption Bitmap neu erstellen
-        //if (CaptionBitmapCode != null && CaptionBitmapCode.Width > 10) {
-        //    wi = Math.Max(50, ColumnCaptionText_Size(column).Width + 4);
-        //    he = 50 + ColumnCaptionText_Size(column).Height + 3;
-        //} else {
-        var ccts = ColumnCaptionText_Size(columnFont);
-
-        var wi = ccts.Height + 4;
-        var he = ccts.Width + 3;
-
-        if (!IsDisposed) {
-            if (!string.IsNullOrEmpty(CaptionGroup3)) {
-                he += ColumnCaptionSizeY * 3;
-            } else if (!string.IsNullOrEmpty(CaptionGroup2)) {
-                he += ColumnCaptionSizeY * 2;
-            } else if (!string.IsNullOrEmpty(CaptionGroup1)) {
-                he += ColumnCaptionSizeY;
-            }
-        }
-
-        return new SizeF(wi, he);
-    }
 
     public List<string> Contents() => Contents(Database?.Row.ToList());
 
@@ -1342,7 +1305,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void Invalidate_ColumAndContent() {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        Invalidate_Head();
         Invalidate_LinkedDatabase();
         Database.OnViewChanged();
     }
@@ -2435,10 +2397,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    private void Invalidate_Head() {
-        _tmpCaptionTextSize = new SizeF(-1, -1);
-        TmpCaptionBitmapCode = null;
-    }
+
 
     private void Invalidate_LinkedDatabase() {
         if (_linkedDatabase != null) {

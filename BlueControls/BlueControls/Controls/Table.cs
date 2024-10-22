@@ -317,13 +317,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public float Zoom {
         get => _zoom;
         set {
-        
-
             if (Math.Abs(_zoom - value) < Constants.DefaultTolerance) { return; }
 
             _zoom = value;
             InitializeSkin();
             CurrentArrangement?.Invalidate_DrawWithOfAllItems();
+            CurrentArrangement?.Invalidate_HeadSize();
             Invalidate_SortedRowData();
         }
     }
@@ -940,6 +939,21 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
+
+    public void DoZoom(bool zoomIn) {
+        var nz = Zoom;
+
+        //var m = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
+        if (zoomIn) {
+            nz *= 1.05f;
+        } else {
+            nz *= 1f / 1.05f;
+        }
+
+        nz = Math.Max(nz, 0.5f);
+        nz = Math.Min(nz, 4);
+        Zoom = nz;
+    }
 
     public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
         var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
@@ -1901,8 +1915,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (_isinMouseWheel) { return; }
             _isinMouseWheel = true;
 
-            if (_controlPressing) {  
-                 DoZoom(e.Delta > 0);
+            if (_controlPressing) {
+                DoZoom(e.Delta > 0);
+                _isinMouseWheel = false;
                 return;
             }
 
@@ -1914,25 +1929,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             _isinMouseWheel = false;
         }
     }
-
-    public void DoZoom(bool zoomIn) {
-        var nz = Zoom;
-
-        //var m = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
-        if (zoomIn) {
-            nz *= 1.05f;
-        } else {
-            nz *= 1f / 1.05f;
-        }
-
-        nz = Math.Max(nz, 0.5f);
-
-        nz = Math.Min(nz, 4);
-
-        Zoom = nz;
-
-    }
-
 
     protected override void OnSizeChanged(System.EventArgs e) {
         base.OnSizeChanged(e);
@@ -2126,6 +2122,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) {
         if (IsDisposed) { return; }
         CurrentArrangement?.Invalidate_DrawWithOfAllItems();
+        CurrentArrangement?.Invalidate_HeadSize();
     }
 
     private void _Database_DatabaseLoaded(object sender, System.EventArgs e) {
@@ -2325,15 +2322,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Develop.Debugprint_BackgroundThread();
     }
 
-    private int Autofilter_Text(ColumnItem column) {
+    private int Autofilter_Text(ColumnViewItem viewItem) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return 0; }
-        if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
+        if (viewItem.TmpIfFilterRemoved != null) { return (int)viewItem.TmpIfFilterRemoved; }
         using var fc = (FilterCollection)Filter.Clone("Autofilter_Text");
-        fc.Remove(column);
+        fc.Remove(viewItem.Column);
 
         var ro = fc.Rows;
         var c = RowsFiltered.Count - ro.Count;
-        column.TmpIfFilterRemoved = c;
+        viewItem.TmpIfFilterRemoved = c;
         return c;
     }
 
@@ -2883,7 +2880,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (viewItem.Column.AutoFilterSymbolPossible()) {
                 if (fi != null) {
                     trichterState = States.Checked;
-                    var anz = Autofilter_Text(viewItem.Column);
+                    var anz = Autofilter_Text(viewItem);
                     trichterText = anz > -100 ? (anz * -1).ToString() : "∞";
                 } else {
                     trichterState = States.Standard;
@@ -2944,20 +2941,20 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             #region Spalten-Kopf-Bild erzeugen
 
-            if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmapCode) && viewItem.Column.TmpCaptionBitmapCode == null) {
-                viewItem.Column.TmpCaptionBitmapCode = QuickImage.Get(viewItem.Column.CaptionBitmapCode + "|100");
+            if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmapCode) && viewItem.TmpCaptionBitmapCode == null) {
+                viewItem.TmpCaptionBitmapCode = QuickImage.Get(viewItem.Column.CaptionBitmapCode + "|100");
             }
 
             #endregion
 
-            if (viewItem.Column.TmpCaptionBitmapCode is { IsError: false }) {
+            if (viewItem.TmpCaptionBitmapCode is { IsError: false }) {
 
                 #region Spalte mit Bild zeichnen
 
                 Point pos = new(
                     (int)viewItem.X_WithSlider +
                     (int)((viewItem.DrawWidth(displayRectangleWoSlider, Zoom, SheetStyle) - fs.Width) / 2.0), 3 + down);
-                gr.DrawImageInRectAspectRatio(viewItem.Column.TmpCaptionBitmapCode, (int)viewItem.X_WithSlider + 2, (int)(pos.Y + fs.Height), viewItem.DrawWidth(displayRectangleWoSlider, Zoom, SheetStyle) - 4, ca.HeadSize(_columnFont) - (int)(pos.Y + fs.Height) - 6 - 18);
+                gr.DrawImageInRectAspectRatio(viewItem.TmpCaptionBitmapCode, (int)viewItem.X_WithSlider + 2, (int)(pos.Y + fs.Height), viewItem.DrawWidth(displayRectangleWoSlider, Zoom, SheetStyle) - 4, ca.HeadSize(_columnFont) - (int)(pos.Y + fs.Height) - 6 - 18);
                 // Dann der Text
                 gr.TranslateTransform(pos.X, pos.Y);
                 //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -3266,12 +3263,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void Filter_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        //if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (CurrentArrangement is not { } ca) { return; }
 
-        foreach (var thisColumn in db.Column) {
-            if (thisColumn != null) {
-                thisColumn.TmpIfFilterRemoved = null;
-            }
+        foreach (var thisColumn in ca) {
+            thisColumn.TmpIfFilterRemoved = null;
         }
 
         Invalidate_SortedRowData();

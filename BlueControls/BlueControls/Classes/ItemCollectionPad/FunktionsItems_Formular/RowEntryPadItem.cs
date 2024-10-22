@@ -69,6 +69,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
+            case "style":
             case "id": // TODO: 29.03.2023
                 //Id = IntParse(value);
                 return true;

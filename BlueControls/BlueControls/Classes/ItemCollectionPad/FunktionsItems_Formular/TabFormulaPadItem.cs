@@ -233,6 +233,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                 }
                 return true;
 
+            case "style":
             case "notallowedchilds":
                 return true;
         }

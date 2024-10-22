@@ -237,7 +237,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         _headSize = 16;
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                _headSize = Math.Max((int)_headSize, (int)thisViewItem.Column.ColumnHead_Size(columnFont).Height);
+                _headSize = Math.Max((int)_headSize, (int)thisViewItem.ColumnHead_Size(columnFont).Height);
             }
         }
 
@@ -261,6 +261,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Invalidate_DrawWithOfAllItems() {
         foreach (var thisViewItem in _internal) {
             thisViewItem?.Invalidate_DrawWidth();
+        }
+    }
+
+    public void Invalidate_HeadSize() {
+        _headSize = null;
+
+        foreach (var thisViewItem in this) {
+            thisViewItem.Invalidate_Head();
         }
     }
 
