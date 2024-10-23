@@ -44,8 +44,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public string Page = string.Empty;
 
-    protected object? _parent;
-
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -107,8 +105,8 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ForPrinting {
         get {
-            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) { return icpi.ForPrinting; }
-            if (this is ItemCollectionPadItem {IsDisposed: false} icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
+            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ForPrinting; }
+            if (this is ItemCollectionPadItem { IsDisposed: false } icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
             return true;
         }
     }
@@ -155,14 +153,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     //     Dispose(disposing: false);
     // }
 
-    public virtual object? Parent {
-        get => _parent;
-        set {
-            if (_parent != value) {
-                _parent = value;
-            }
-        }
-    }
+    public virtual object? Parent { get; set; }
 
     /// <summary>
     /// Diese Punkte müssen gleichzeitig bewegt werden,
@@ -174,16 +165,16 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
     public bool ShowAlways {
         get {
-            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) { return icpi.ShowAlways; }
-            if (this is ItemCollectionPadItem {IsDisposed: false} icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
+            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowAlways; }
+            if (this is ItemCollectionPadItem { IsDisposed: false } icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
             return false;
         }
     }
 
     public bool ShowJointPoints {
         get {
-            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) { return icpi.ShowJointPoints; }
-            if (this is ItemCollectionPadItem {IsDisposed: false} icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
+            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowJointPoints; }
+            if (this is ItemCollectionPadItem { IsDisposed: false } icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
             return false;
         }
     }
@@ -331,7 +322,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             var line = 1f;
             if (scale > 1) { line = scale; }
 
-            if (_parent is ItemCollectionPadItem {IsDisposed: false} icpi) {
+            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
                 foreach (var thisV in icpi.Connections) {
                     if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
                         if (icpi.Contains(thisV.Item2) && thisV.Item2 != this) {
@@ -574,7 +565,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         var myPoint = itemToConnect.JointPoints.Get(pointnameInItem);
         if (myPoint == null) { return; }
 
-        if (itemToConnect.Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return; }
+        if (itemToConnect.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
         var otherPoint = icpi.GetJointPoint(otherPointName, itemToConnect);
         if (otherPoint == null) { return; }

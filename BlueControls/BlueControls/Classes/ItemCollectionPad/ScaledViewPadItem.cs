@@ -108,11 +108,10 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }
-
 
     public PadStyles Stil {
         get => _style;
@@ -225,26 +224,23 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     //}
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return; }
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
-    
-            var newarea = positionModified.ToRect();
-            var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, true, CalculateShowingArea());
+        var newarea = positionModified.ToRect();
+        var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, true, CalculateShowingArea());
 
-            foreach (var thisItem in icpi) {
-                if (thisItem is not ScaledViewPadItem) {
-                    gr.PixelOffsetMode = PixelOffsetMode.None;
-                    var childpos = thisItem.UsedArea.ZoomAndMoveRect(childScale, childShiftX, childShiftY, false);
-                    if (IsInDrawingArea(childpos, newarea)) {
-                        // IsInDrawingArea extra abfragen, weil ShowAlways dazwischenfunkt
-                        gr.SetClip(newarea);
-                        thisItem.Draw(gr, newarea, childScale, childShiftX, childShiftY);
-                        gr.ResetClip();
-                    }
+        foreach (var thisItem in icpi) {
+            if (thisItem is not ScaledViewPadItem) {
+                gr.PixelOffsetMode = PixelOffsetMode.None;
+                var childpos = thisItem.UsedArea.ZoomAndMoveRect(childScale, childShiftX, childShiftY, false);
+                if (IsInDrawingArea(childpos, newarea)) {
+                    // IsInDrawingArea extra abfragen, weil ShowAlways dazwischenfunkt
+                    gr.SetClip(newarea);
+                    thisItem.Draw(gr, newarea, childScale, childShiftX, childShiftY);
+                    gr.ResetClip();
                 }
             }
-        
-
+        }
 
         var bFont = this.GetFont(_textScale * scale);
         //var font = bFont.Font(allScale);
@@ -279,7 +275,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     private RectangleF CalculateShowingArea() {
         var points = new List<PointM>();
 
-        if (Parent is ItemCollectionPadItem {IsDisposed: false} icpi) {
+        if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
             foreach (var thiss in _includedjointPoints) {
                 if (icpi.GetJointPoints(thiss, this) is { } p) {
                     points.AddRange(p);

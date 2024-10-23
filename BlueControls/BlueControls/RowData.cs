@@ -108,8 +108,8 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Methods
 
-    public void CalculateScaledDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, float scale, string style) {
-        if (IsDisposed || Row.IsDisposed) { DrawHeight = Table.GetPix(18, scale); return; }
+    public void CalculateDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, string style) {
+        if (IsDisposed || Row.IsDisposed) { DrawHeight = 16; return; }
 
         DrawHeight = 18;
 
@@ -122,7 +122,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         }
 
         DrawHeight = Math.Min(DrawHeight, (int)(displayRectangleWoSlider.Height * 0.4) - columnHeadSize);
-        DrawHeight = Table.GetPix(Math.Max(DrawHeight, 18), scale);
+        DrawHeight = Math.Max(DrawHeight, 18);
     }
 
     public string CompareKey() => PinStateSortAddition + ";" + Chapter + ";" + AdditionalSort;

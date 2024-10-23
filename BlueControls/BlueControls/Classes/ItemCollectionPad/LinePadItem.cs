@@ -79,11 +79,10 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }
-
 
     public PadStyles Stil {
         get => _style;
@@ -320,7 +319,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private bool IsVerdeckt(float x, float y) {
-        if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return false; }
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
 
         foreach (var thisBasicItem in icpi) {
             if (thisBasicItem is { } and not LinePadItem) {
@@ -348,7 +347,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private bool SchneidetWas(float x1, float y1, float x2, float y2) {
-        if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return false; }
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
         PointM p1 = new(x1, y1);
         PointM p2 = new(x2, y2);
         return icpi.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
@@ -406,7 +405,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     private bool WeicheAus(int p1) {
         if (_tempPoints == null) { return false; }
-        if (Parent is not ItemCollectionPadItem {IsDisposed: false} icpi) { return false; }
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
 
         if (_tempPoints.Count > 100) { return false; }
         if (p1 >= _tempPoints.Count - 1) { return false; }

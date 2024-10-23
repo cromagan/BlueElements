@@ -25,28 +25,28 @@ using System.Drawing;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey, IEditable {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey, IEditable, IStyleableOne {
 
     #region Fields
 
-    public int? _wiederHolungsSpaltenWidth;
-
     public bool ShowHead = true;
-
     private readonly List<ColumnViewItem> _internal = [];
-
     private readonly List<string> _permissionGroups_Show = [];
-
+    private int _clientWidth = 16;
     private Database? _database;
-
     private int? _headSize;
+    private string _sheetStyle = string.Empty;
+    private PadStyles _style = PadStyles.Standard;
 
     #endregion
 
@@ -62,9 +62,28 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? StyleChanged;
+
+    #endregion
+
     #region Properties
 
+    public int CaptionFontHeight { get; internal set; } = 20;
     public string CaptionForEditor => "Spaltenanordnung";
+    public BlueFont ChapterFont { get; internal set; } = BlueFont.DefaultFont;
+
+    public int ClientWidth {
+        get => _clientWidth;
+        set {
+            if (_clientWidth == value) { return; }
+
+            _clientWidth = value;
+            OnStyleChanged();
+        }
+    }
+
     public int Count => _internal.Count;
 
     public Database? Database {
@@ -85,8 +104,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public Type? Editor { get; set; }
+    public BlueFont? Font { get; set; }
     public bool IsDisposed { get; private set; }
-
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
@@ -102,6 +121,27 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string QuickInfo => string.Empty;
+
+    public string SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (IsDisposed) { return; }
+            if (_sheetStyle == value) { return; }
+            _sheetStyle = value;
+            OnStyleChanged();
+        }
+    }
+
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            OnStyleChanged();
+        }
+    }
+
+    public int WiederHolungsSpaltenWidth { get; private set; } = 0;
 
     #endregion
 
@@ -192,17 +232,30 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Database, ParseableItems().FinishParseable());
 
-    public ColumnViewItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, float scale, string style) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
+    public void ComputeAllColumnPositions() {
+        foreach (var thisViewItem in this) {
+            thisViewItem.X = null;
+        }
+
+        if (IsDisposed) { return; }
+
+        WiederHolungsSpaltenWidth = 0;
+
+        var wdh = true;
+        var maxX = 0;
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                if (xpos >= thisViewItem.X_WithSlider && xpos <= thisViewItem.X_WithSlider + thisViewItem.DrawWidth(displayRectangleWithoutSlider, scale, style)) {
-                    return thisViewItem;
+                if (thisViewItem.ViewType != ViewType.PermanentColumn) { wdh = false; }
+
+                thisViewItem.X = maxX;
+
+                maxX += thisViewItem.DrawWidth();
+                if (wdh) {
+                    WiederHolungsSpaltenWidth = Math.Max(maxX, (int)WiederHolungsSpaltenWidth);
                 }
             }
         }
-        return null;
     }
 
     public void Dispose() => Dispose(true);
@@ -227,7 +280,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
-    public int HeadSize(Font columnFont) {
+    public int HeadSize() {
         if (_headSize != null) { return (int)_headSize; }
 
         if (!ShowHead || Count - 1 < 0) {
@@ -235,14 +288,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             return 0;
         }
         _headSize = 16;
+
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                _headSize = Math.Max((int)_headSize, (int)thisViewItem.ColumnHead_Size(columnFont).Height);
+                _headSize = Math.Max((int)_headSize, (int)thisViewItem.ColumnHead_Size().Height);
             }
         }
 
         _headSize += 8;
-        _headSize += AutoFilterSize;
+        _headSize += ColumnViewItem.AutoFilterSize;
         return (int)_headSize;
     }
 
@@ -425,6 +479,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
+
+    private void OnStyleChanged() {
+        this.InvalidateFont();
+        Invalidate_DrawWithOfAllItems();
+        Invalidate_HeadSize();
+        ChapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, 1f);
+        CaptionFontHeight = (int)ChapterFont.CharHeight + 1;
+        StyleChanged?.Invoke(this, System.EventArgs.Empty);
+    }
 
     private void Remove(ColumnViewItem columnViewItem) {
         if (_internal.Remove(columnViewItem)) {

@@ -33,7 +33,7 @@ public interface IStyleableOne : IStyleable {
 
     public BlueFont? Font { get; set; }
 
-    public PadStyles Stil { get; set; }
+    public PadStyles Stil { get; }
 
     #endregion
 }

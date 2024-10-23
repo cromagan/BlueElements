@@ -75,7 +75,7 @@ public class TablePadItem : RectanglePadItem, IStyleable {
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }

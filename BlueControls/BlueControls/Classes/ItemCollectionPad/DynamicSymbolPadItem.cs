@@ -78,11 +78,10 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }
-
 
     public PadStyles Stil {
         get => _style;

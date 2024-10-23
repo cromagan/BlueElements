@@ -313,7 +313,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
         btnAlleFilterAus_Click(null, System.EventArgs.Empty);
         foreach (var thiscolumnitem in _ähnliche) {
             if (thiscolumnitem?.Column != null && _table?.Filter != null) {
-                if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
+                if (thiscolumnitem.AutoFilterSymbolPossible) {
                     if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
                         var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
                         _table.Filter.Add(fi);

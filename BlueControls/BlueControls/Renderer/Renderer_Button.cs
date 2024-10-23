@@ -86,7 +86,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var s = States.Standard;

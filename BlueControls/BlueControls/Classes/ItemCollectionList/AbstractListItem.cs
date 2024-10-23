@@ -46,7 +46,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     private bool _isCaption;
     private string _keyName;
-    private object? _parent;
 
     private Size _sizeUntouchedForListBox = Size.Empty;
 
@@ -102,15 +101,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
             if (_keyName == value) { return; }
             _keyName = value;
             OnPropertyChanged();
-        }
-    }
-
-    public virtual object? Parent {
-        get => _parent;
-        set {
-            if (_parent != value) {
-                _parent = value;
-            }
         }
     }
 

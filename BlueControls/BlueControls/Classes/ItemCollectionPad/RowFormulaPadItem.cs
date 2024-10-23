@@ -120,7 +120,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }
@@ -144,11 +144,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
         }
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
-    }
-
-    public void OnStyleChanged() {
-        RemovePic();
-        StyleChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public override List<string> ParseableItems() {

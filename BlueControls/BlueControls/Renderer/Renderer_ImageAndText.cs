@@ -166,7 +166,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var pix16 = Table.GetPix(16, scale);

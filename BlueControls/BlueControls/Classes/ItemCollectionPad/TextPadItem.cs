@@ -96,7 +96,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }

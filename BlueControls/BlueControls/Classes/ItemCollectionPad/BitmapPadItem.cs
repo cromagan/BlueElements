@@ -108,11 +108,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }
-
 
     public PadStyles Stil {
         get => _style;
@@ -359,9 +358,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             Generic.CollectGarbage();
         }
         if (_style != PadStyles.Undefiniert) {
- 
-                gr.DrawRectangle(this.GetFont().Pen(scale), r1);
-            
+            gr.DrawRectangle(this.GetFont().Pen(scale), r1);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

@@ -63,6 +63,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private PadStyles _style = PadStyles.Standard;
     private string _textOben = string.Empty;
 
+    private float _textScale = 3.07f;
     private float _winkel;
 
     #endregion
@@ -108,12 +109,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? StyleChanged;
-
-    #endregion
-
     #region Properties
 
     // ReSharper disable once UnusedMember.Global
@@ -130,33 +125,10 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
             return string.Empty;
         }
     }
-
-
-
-
-
-
-    public float TextScale {
-        get => _textScale;
-        set {
-            value = Math.Max(value, 0.01f);
-            value = Math.Min(value, 20);
-            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
-            _textScale = value;
-            OnPropertyChanged();
-        }
-    }
-
-
-
-
-
-
-    private float _textScale = 3.07f;
 
     public PadStyles Stil {
         get => _style;
@@ -181,6 +153,17 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     }
 
     public string Text_Unten { get; set; }
+
+    public float TextScale {
+        get => _textScale;
+        set {
+            value = Math.Max(value, 0.01f);
+            value = Math.Min(value, 20);
+            if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
+            _textScale = value;
+            OnPropertyChanged();
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -253,8 +236,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             DoJointPoint(thisP);
         }
     }
-
-    public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -378,7 +359,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
 
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
-
 
             PointM mitte1 = new(mitte, (float)(sz1.Height / 2.1), textWinkel + 90);
             var x = gr.Save();

@@ -45,7 +45,7 @@ public class Renderer_Font : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle drawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         Skin.Draw_FormatedText(gr, txt, null, align, drawarea, BlueFont.Get(content).Scale(scale), false);
