@@ -175,6 +175,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         var constH = Table.GetPix(_constantHeight, scale);
 
         var splitedContent = content.SplitAndCutByCrAndBr();
+        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
 
         var y = 0;
         for (var z = 0; z <= splitedContent.GetUpperBound(0); z++) {

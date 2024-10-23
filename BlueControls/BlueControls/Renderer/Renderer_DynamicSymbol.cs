@@ -48,6 +48,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
+        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
 
         if (drawarea is { Width: > 4, Height: > 4 }) {
             using var bmp = new Bitmap(drawarea.Width, drawarea.Height);

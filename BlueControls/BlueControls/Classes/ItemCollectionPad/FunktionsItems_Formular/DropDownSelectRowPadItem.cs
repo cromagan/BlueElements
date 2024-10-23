@@ -150,7 +150,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
-                //ColorId = IntParse(value);
+            case "style":
                 return true;
 
             case "edittype":

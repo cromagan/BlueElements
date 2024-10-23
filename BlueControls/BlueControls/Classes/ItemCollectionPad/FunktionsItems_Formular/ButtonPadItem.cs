@@ -468,6 +468,9 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             case "action":
                 _action = value.FromNonCritical();
                 return true;
+
+            case "style":
+                return true;
         }
 
         return base.ParseThis(key, value);

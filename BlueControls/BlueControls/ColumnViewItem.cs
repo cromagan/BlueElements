@@ -36,12 +36,12 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleableOne {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable {
 
     #region Fields
 
     public static readonly int AutoFilterSize = 22;
-    private QuickImage _captionBitmap;
+    private QuickImage? _captionBitmap;
     private ColumnItem? _column;
 
     private int? _drawWidth;
@@ -138,39 +138,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             UnRegisterEvents();
             _column = value;
+            Invalidate_All();
             RegisterEvents();
         }
     }
 
-    public BlueFont ColumnFilterFont {
-        get {
-            var f = this.GetFont();
-            return BlueFont.Get(f.FontName, f.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
-        }
-    }
+    public BlueFont ColumnDefaultFont { get; internal set; } = BlueFont.DefaultFont;
+    public BlueFont ColumnFilterFont { get; private set; } = BlueFont.DefaultFont;
 
-    public BlueFont ColumnFont {
-        get {
-            var f = this.GetFont();
-            if (Column is not { IsDisposed: false } c) { return f; }
+    public BlueFont ColumnFont { get; private set; } = BlueFont.DefaultFont;
 
-            return BlueFont.Get(f.FontName, f.Size, false, false, false, false, false, c.ForeColor, Color.Transparent, false, false, false, Color.Transparent);
-        }
-    }
-
-    public BlueFont ColumnOutlineFont {
-        get {
-            var f = this.GetFont();
-            return BlueFont.Get(f.FontName, f.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
-        }
-    }
+    public BlueFont ColumnOutlineFont { get; private set; } = BlueFont.DefaultFont;
 
     public int? Contentwidth { get; private set; }
-
-    /// <summary>
-    /// Ist die ColumnCaption-Font
-    /// </summary>
-    public BlueFont? Font { get; set; }
 
     public bool IsDisposed { get; private set; }
 
@@ -225,15 +205,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string SheetStyle {
         get {
-            if (_parent is IStyleableOne ist) { return ist.SheetStyle; }
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
             return Constants.Win11;
-        }
-    }
-
-    public PadStyles Stil {
-        get {
-            if (_parent is IStyleableOne ist) { return ist.Stil; }
-            return PadStyles.Hervorgehoben;
         }
     }
 
@@ -272,7 +245,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         if (!_tmpCaptionTextSize.IsEmpty) { return _tmpCaptionTextSize; }
 
-        _tmpCaptionTextSize = this.GetFont().MeasureString(c.Caption.Replace("\r", "\r\n"));
+        _tmpCaptionTextSize = ColumnDefaultFont.MeasureString(c.Caption.Replace("\r", "\r\n"));
         return _tmpCaptionTextSize;
     }
 
@@ -412,6 +385,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (X == null) { _parent.ComputeAllColumnPositions(); }
 
         if (X == null) { return Rectangle.Empty; }
+
+        if (_viewType != ViewType.PermanentColumn) { sliderx = 0; }
+
+        return new Rectangle((int)((int)X * scale + sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
     }
 
     public Rectangle ReduceButtonLocation(float scale, float sliderx) {
@@ -426,13 +403,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public override string ToString() => ParseableItems().FinishParseable();
 
     private void _column_PropertyChanged(object sender, System.EventArgs e) {
-        Invalidate_Head();
-        Invalidate_DrawWidth();
+        Invalidate_All();
     }
 
     private void _parent_StyleChanged(object? sender, System.EventArgs e) {
-        Invalidate_Head();
-        Invalidate_DrawWidth();
+        Invalidate_All();
     }
 
     private int CalculateColumnContentWidth() {
@@ -478,6 +453,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             IsDisposed = true;
+        }
+    }
+
+    private void Invalidate_All() {
+        Invalidate_Head();
+        Invalidate_DrawWidth();
+        ColumnDefaultFont = Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift, States.Standard, 1f);
+        ColumnOutlineFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
+
+        ColumnFilterFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
+
+        if (Column != null) {
+            ColumnFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, false, Column.ForeColor, Color.Transparent, false, false, false, Color.Transparent);
         }
     }
 

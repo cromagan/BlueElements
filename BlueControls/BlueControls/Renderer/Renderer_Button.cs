@@ -42,8 +42,6 @@ public class Renderer_Button : Renderer_Abstract {
 
     #endregion
 
-  
-
     #region Properties
 
     public static string ClassId => "Button";
@@ -82,8 +80,6 @@ public class Renderer_Button : Renderer_Abstract {
 
     #endregion
 
-
-
     #region Methods
 
     public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType translate, Alignment align, float scale) {
@@ -102,6 +98,8 @@ public class Renderer_Button : Renderer_Abstract {
 
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
+
+        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
 
         drawarea.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
 

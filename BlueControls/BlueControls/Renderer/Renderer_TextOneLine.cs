@@ -75,6 +75,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         if (string.IsNullOrEmpty(content)) { return; }
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
         Skin.Draw_FormatedText(gr, replacedText, null, align, drawarea, this.GetFont(scale), false);
     }
 

@@ -35,7 +35,7 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey, IEditable, IStyleableOne {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey, IEditable, IStyleable {
 
     #region Fields
 
@@ -46,7 +46,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private Database? _database;
     private int? _headSize;
     private string _sheetStyle = string.Empty;
-    private PadStyles _style = PadStyles.Standard;
 
     #endregion
 
@@ -104,7 +103,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public Type? Editor { get; set; }
-    public BlueFont? Font { get; set; }
     public bool IsDisposed { get; private set; }
     public string KeyName { get; set; }
 
@@ -128,15 +126,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (IsDisposed) { return; }
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
-            OnStyleChanged();
-        }
-    }
-
-    public PadStyles Stil {
-        get => _style;
-        set {
-            if (_style == value) { return; }
-            _style = value;
             OnStyleChanged();
         }
     }
@@ -481,7 +470,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
     private void OnStyleChanged() {
-        this.InvalidateFont();
         Invalidate_DrawWithOfAllItems();
         Invalidate_HeadSize();
         ChapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, 1f);
