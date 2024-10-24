@@ -307,6 +307,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
+
+    public void Invalidate_XOfAllItems() {
+        foreach (var thisViewItem in _internal) {
+            thisViewItem?.Invalidate_X();
+        }
+    }
+
     public void Invalidate_HeadSize() {
         _headSize = null;
 

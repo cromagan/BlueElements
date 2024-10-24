@@ -46,12 +46,12 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
-        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
 
-        if (drawarea is { Width: > 4, Height: > 4 }) {
-            using var bmp = new Bitmap(drawarea.Width, drawarea.Height);
+
+        if (scaleddrawarea is { Width: > 4, Height: > 4 }) {
+            using var bmp = new Bitmap(scaleddrawarea.Width, scaleddrawarea.Height);
 
             var ok = DynamicSymbolPadItem.ExecuteScript(content, string.Empty, bmp);
 
@@ -60,7 +60,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
                 gr2.DrawImage(QuickImage.Get(ImageCode.Warnung, 16), 0, 0);
             }
 
-            gr.DrawImage(bmp, drawarea.X, drawarea.Y);
+            gr.DrawImage(bmp, scaleddrawarea.X, scaleddrawarea.Y);
         }
     }
 

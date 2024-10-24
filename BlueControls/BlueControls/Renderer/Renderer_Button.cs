@@ -82,7 +82,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var s = States.Standard;
@@ -99,11 +99,11 @@ public class Renderer_Button : Renderer_Abstract {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
 
-        drawarea.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
 
-        Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawarea, true);
+        scaleddrawarea.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
+
+        Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, scaleddrawarea, true);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

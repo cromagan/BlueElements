@@ -166,7 +166,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle unscaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var pix16 = Table.GetPix(16, scale);
@@ -175,19 +175,18 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         var constH = Table.GetPix(_constantHeight, scale);
 
         var splitedContent = content.SplitAndCutByCrAndBr();
-        var drawarea = unscaleddrawarea.ZoomAndMoveRect(scale, 0, 0, true).ToRect();
 
         var y = 0;
         for (var z = 0; z <= splitedContent.GetUpperBound(0); z++) {
-            var rect = new Rectangle(drawarea.Left, drawarea.Top + y, drawarea.Width, pix16);
+            var rect = new Rectangle(scaleddrawarea.Left, scaleddrawarea.Top + y, scaleddrawarea.Width, pix16);
 
-            if (rect.Bottom > drawarea.Bottom) { break; }
+            if (rect.Bottom > scaleddrawarea.Bottom) { break; }
 
             var image = GetImage(splitedContent[z], maxW, constH);
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, doOpticalTranslation);
 
-            if (rect.Bottom + pix16 > drawarea.Bottom && z < splitedContent.GetUpperBound(0)) {
+            if (rect.Bottom + pix16 > scaleddrawarea.Bottom && z < splitedContent.GetUpperBound(0)) {
                 replacedText = "...";
                 image = null;
             }

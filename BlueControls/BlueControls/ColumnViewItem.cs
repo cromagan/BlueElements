@@ -312,7 +312,22 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return _renderer;
     }
 
-    public void Invalidate_DrawWidth() => _drawWidth = null;
+    public void Invalidate_DrawWidth() {
+        _drawWidth = null;
+
+        if (_parent != null) {
+            _parent.Invalidate_XOfAllItems();
+        }
+
+    }
+
+
+    public void Invalidate_X() {
+        X = null;
+
+    }
+
+
 
     public void Invalidate_Head() {
         _tmpCaptionTextSize = SizeF.Empty;
@@ -386,9 +401,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         if (X == null) { return Rectangle.Empty; }
 
-        if (_viewType != ViewType.PermanentColumn) { sliderx = 0; }
+        if (_viewType == ViewType.PermanentColumn) { sliderx = 0; }
 
-        return new Rectangle((int)((int)X * scale + sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
+        return new Rectangle((int)((int)X * scale +- sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
     }
 
     public Rectangle ReduceButtonLocation(float scale, float sliderx) {
@@ -462,7 +477,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         ColumnDefaultFont = Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift, States.Standard, 1f);
         ColumnOutlineFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
 
-        ColumnFilterFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
+        ColumnFilterFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size-2, true, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
 
         if (Column != null) {
             ColumnFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, false, Column.ForeColor, Color.Transparent, false, false, false, Color.Transparent);
