@@ -69,9 +69,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Properties
 
-    public int CaptionFontHeight { get; internal set; } = 20;
     public string CaptionForEditor => "Spaltenanordnung";
-    public BlueFont ChapterFont { get; internal set; } = BlueFont.DefaultFont;
 
     public int ClientWidth {
         get => _clientWidth;
@@ -103,6 +101,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public Type? Editor { get; set; }
+    public BlueFont Font_RowChapter { get; internal set; } = BlueFont.DefaultFont;
     public bool IsDisposed { get; private set; }
     public string KeyName { get; set; }
 
@@ -119,6 +118,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string QuickInfo => string.Empty;
+    public int RowChapterHeight { get; internal set; } = 20;
 
     public string SheetStyle {
         get => _sheetStyle;
@@ -307,18 +307,17 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-
-    public void Invalidate_XOfAllItems() {
-        foreach (var thisViewItem in _internal) {
-            thisViewItem?.Invalidate_X();
-        }
-    }
-
     public void Invalidate_HeadSize() {
         _headSize = null;
 
         foreach (var thisViewItem in this) {
             thisViewItem.Invalidate_Head();
+        }
+    }
+
+    public void Invalidate_XOfAllItems() {
+        foreach (var thisViewItem in _internal) {
+            thisViewItem?.Invalidate_X();
         }
     }
 
@@ -479,8 +478,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void OnStyleChanged() {
         Invalidate_DrawWithOfAllItems();
         Invalidate_HeadSize();
-        ChapterFont = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, 1f);
-        CaptionFontHeight = (int)ChapterFont.CharHeight + 1;
+        Font_RowChapter = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, 1f);
+        RowChapterHeight = (int)Font_RowChapter.CharHeight + 1;
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
     }
 

@@ -192,7 +192,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "id":
-                //Id = IntParse(value);
+            case "style":
                 return true;
 
             case "caption":

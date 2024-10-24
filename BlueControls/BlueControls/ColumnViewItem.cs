@@ -143,15 +143,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public BlueFont ColumnDefaultFont { get; internal set; } = BlueFont.DefaultFont;
-    public BlueFont ColumnFilterFont { get; private set; } = BlueFont.DefaultFont;
-
-    public BlueFont ColumnFont { get; private set; } = BlueFont.DefaultFont;
-
-    public BlueFont ColumnOutlineFont { get; private set; } = BlueFont.DefaultFont;
-
     public int? Contentwidth { get; private set; }
-
+    public BlueFont Font_Head_Colored { get; private set; } = BlueFont.DefaultFont;
+    public BlueFont Font_Head_Default { get; internal set; } = BlueFont.DefaultFont;
+    public BlueFont Font_Numbers { get; private set; } = BlueFont.DefaultFont;
+    public BlueFont Font_TextInFilter { get; private set; } = BlueFont.DefaultFont;
     public bool IsDisposed { get; private set; }
 
     public ColumnLineStyle LineLeft {
@@ -245,7 +241,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         if (!_tmpCaptionTextSize.IsEmpty) { return _tmpCaptionTextSize; }
 
-        _tmpCaptionTextSize = ColumnDefaultFont.MeasureString(c.Caption.Replace("\r", "\r\n"));
+        _tmpCaptionTextSize = Font_Head_Default.MeasureString(c.Caption.Replace("\r", "\r\n"));
         return _tmpCaptionTextSize;
     }
 
@@ -318,20 +314,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (_parent != null) {
             _parent.Invalidate_XOfAllItems();
         }
-
     }
-
-
-    public void Invalidate_X() {
-        X = null;
-
-    }
-
-
 
     public void Invalidate_Head() {
         _tmpCaptionTextSize = SizeF.Empty;
         _captionBitmap = null;
+    }
+
+    public void Invalidate_X() {
+        X = null;
     }
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
@@ -403,7 +394,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         if (_viewType == ViewType.PermanentColumn) { sliderx = 0; }
 
-        return new Rectangle((int)((int)X * scale +- sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
+        return new Rectangle((int)((int)X * scale + -sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
     }
 
     public Rectangle ReduceButtonLocation(float scale, float sliderx) {
@@ -474,13 +465,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void Invalidate_All() {
         Invalidate_Head();
         Invalidate_DrawWidth();
-        ColumnDefaultFont = Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift, States.Standard, 1f);
-        ColumnOutlineFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
+        Font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben, States.Standard, 1f);
+        Font_Numbers = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
 
-        ColumnFilterFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size-2, true, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
+        Font_TextInFilter = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size - 2, true, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
 
         if (Column != null) {
-            ColumnFont = BlueFont.Get(ColumnDefaultFont.FontName, ColumnDefaultFont.Size, false, false, false, false, false, Column.ForeColor, Color.Transparent, false, false, false, Color.Transparent);
+            Font_Head_Colored = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size, Font_Head_Default.Bold, Font_Head_Default.Italic, Font_Head_Default.Underline, Font_Head_Default.StrikeOut, false, Column.ForeColor, Color.Transparent, Font_Head_Default.Kapitälchen, Font_Head_Default.OnlyLower, Font_Head_Default.OnlyLower, Color.Transparent);
+        } else {
+            Font_Head_Colored = Font_Head_Default;
         }
     }
 

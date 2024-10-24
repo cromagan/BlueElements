@@ -400,6 +400,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
                 }
                 _getFilterFrom = null;
                 return true;
+
+            case "style":
+                return true;
+
         }
         return base.ParseThis(key, value);
     }

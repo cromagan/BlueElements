@@ -173,6 +173,9 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             case "borderstyle":
                 _rahmenStil = (GroupBoxStyle)IntParse(value);
                 return true;
+
+            case "style":
+                return true;
         }
         return base.ParseThis(key, value);
     }
