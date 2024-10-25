@@ -45,7 +45,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private int _clientWidth = 16;
     private Database? _database;
     private int? _headSize;
-    private string _sheetStyle = string.Empty;
+    private string _sheetStyle = Constants.Win11;
 
     #endregion
 
@@ -478,7 +478,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void OnStyleChanged() {
         Invalidate_DrawWithOfAllItems();
         Invalidate_HeadSize();
-        Font_RowChapter = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift, States.Standard, 1f);
+        Font_RowChapter = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift);
         RowChapterHeight = (int)Font_RowChapter.CharHeight + 1;
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
     }

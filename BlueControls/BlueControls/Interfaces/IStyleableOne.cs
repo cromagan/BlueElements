@@ -45,11 +45,11 @@ public static class StyleableOneExtension {
     public static BlueFont GetFont(this IStyleableOne o, float additionalScale) {
         if (Math.Abs(1 - additionalScale) < Constants.DefaultTolerance) { return GetFont(o); }
 
-        return Skin.GetBlueFont(o.SheetStyle, o.Stil, States.Standard, additionalScale);
+        return GetFont(o).Scale(additionalScale);
     }
 
     public static BlueFont GetFont(this IStyleableOne o) {
-        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Stil, States.Standard, 1f) ?? BlueFont.DefaultFont;
+        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Stil) ?? BlueFont.DefaultFont;
         return o.Font;
     }
 

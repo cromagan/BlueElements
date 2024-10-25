@@ -19,6 +19,7 @@
 
 using System.Drawing;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Extended_Text;
@@ -63,6 +64,8 @@ public abstract class ExtChar {
         }
     }
 
+    public string SheetStyle { get; set; }
+
     #endregion
 
     #region Methods
@@ -93,11 +96,11 @@ public abstract class ExtChar {
 
     public abstract string PlainText();
 
-    public PadStyles Stufe(string sheetStyle) {
+    public PadStyles GetStyle() {
         if (Font == null || Skin.StyleDb is not Database db) { return PadStyles.Standard; }
 
         var f1 = new FilterItem(db.Column["Font"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
-        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, sheetStyle);
+        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
 
         var r = db.Row[f1, f2];
 

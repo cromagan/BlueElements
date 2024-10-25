@@ -53,13 +53,13 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended, IStyleable {
+public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended {
 
     #region Fields
 
     private int? _height;
-    private string _sheetStyle;
     private Size _textDimensions;
+
 
     private string? _tmpHtmlText;
 
@@ -69,12 +69,13 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     private float _zeilenabstand;
 
+    public BlueFont Font { get; private set; } = BlueFont.DefaultFont;
+
     #endregion
 
     #region Constructors
 
     public ExtText() : base() {
-        _sheetStyle = string.Empty;
         DrawingPos = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
         MaxTextLenght = 4000;
@@ -91,11 +92,11 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public ExtText(Design design, States state) : this() {
         var sh = Skin.DesignOf(design, state);
-        _sheetStyle = sh.SheetStyle;
+        Font = sh.Font;
     }
 
     public ExtText(string sheetStyle) : this() {
-        _sheetStyle = sheetStyle;
+        Font = Skin.GetBlueFont(sheetStyle, PadStyles.Standard);
     }
 
     #endregion
@@ -126,7 +127,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public string HtmlText {
         get {
-            _tmpHtmlText ??= ConvertCharToHtmlText(0, Count - 1);
+            _tmpHtmlText ??= ConvertCharToHtmlText();
             return _tmpHtmlText;
         }
         set {
@@ -136,6 +137,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             OnPropertyChanged();
         }
     }
+
 
     public bool IsDisposed { get; private set; }
 
@@ -157,16 +159,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    public string SheetStyle {
-        get => _sheetStyle;
-        set {
-            if (IsDisposed) { return; }
-            if (_sheetStyle == value) { return; }
-            _sheetStyle = value;
-            OnStyleChanged();
-            OnPropertyChanged();
-        }
-    }
 
     /// <summary>
     /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
@@ -197,15 +189,15 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     #region Methods
 
-    public void ChangeStyle(PadStyles style) {
-        ChangeStyle(0, Count - 1, style);
+    public void ChangeStyle(BlueFont f) {
+        ChangeStyle(0, Count - 1, f);
     }
 
-    public void ChangeStyle(int first, int last, PadStyles style) {
-        var font = this.GetFont(style);
+    public void ChangeStyle(int first, int last, BlueFont f) {
+
 
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
-            this[cc].Font = font;
+            this[cc].Font = f;
         }
         ResetPosition(true);
     }
@@ -254,18 +246,20 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public void Check(int first, int last, bool checkstate) {
         for (var cc = first; cc <= last; cc++) {
-            //if (this[cc].State != States.Undefiniert) {
-            //    if (checkstate) {
-            //        if (!this[cc].State.HasFlag(States.Checked)) {
-            //            this[cc].State |= States.Checked;
-            //        }
-            //    } else {
-            //        if (this[cc].State.HasFlag(States.Checked)) {
-            //            this[cc].State ^= States.Checked;
-            //        }
-            //    }
-            //}
+
+            var tmp = this[cc].SheetStyle.TrimEnd(" Checked");
+            var st = this[cc].GetStyle();
+
+            if (checkstate) {
+
+                this[cc].SheetStyle = tmp;
+
+            } else {
+
+                this[cc].SheetStyle = tmp + " Checked";
+            }
         }
+
     }
 
     public Rectangle CursorPixelPosX(int charPos) {
@@ -351,7 +345,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     public string Substring(int startIndex, int lenght) => ConvertCharToPlainText(startIndex, startIndex + lenght - 1);
 
@@ -381,7 +374,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this.GetFont(PadStyles.Standard)));
+    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(Font));
 
     internal void Mark(MarkState markstate, int first, int last) {
         try {
@@ -459,17 +452,17 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return position + 1;
     }
 
-    private string ConvertCharToHtmlText(int first, int last) {
+    private string ConvertCharToHtmlText() {
         if (Count == 0) { return string.Empty; }
 
         var t = new StringBuilder();
 
-        last = Math.Min(last, Count - 1);
-        var lastStufe = this[first].Font;
 
-        for (var z = first; z <= last; z++) {
+        var lastStufe = Font;
+
+        for (var z = 0; z < Count; z++) {
             if (lastStufe != this[z].Font) {
-                _ = t.Append("<H" + this[z].Stufe + ">");
+                _ = t.Append("<H" + this[z].GetStyle() + ">");
                 lastStufe = this[z].Font;
             }
 
@@ -479,6 +472,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return t.ToString();
     }
 
+
     private void ConvertTextToChar(string cactext, bool isRich) {
         var pos = 0;
         var zeichen = -1;
@@ -486,7 +480,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         var markstate = MarkState.None;
         Clear();
         ResetPosition(true);
-        var font = this.GetFont(style);
+        var font = Font;
 
         if (!string.IsNullOrEmpty(cactext)) {
             cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
@@ -644,32 +638,32 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
             case "H7":
                 style = PadStyles.Hervorgehoben;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "H6":
                 style = PadStyles.Alternativ;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "H5":
                 style = PadStyles.Kleiner_Zusatz;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "H0":
             case "H4":
                 style = PadStyles.Standard;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "H3":
                 style = PadStyles.Kapitel;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "H2":
                 style = PadStyles.Untertitel;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "H1":
                 style = PadStyles.Überschrift;
-                font = this.GetFont(style); break;
+                font = Skin.GetFont(font, style); break;
 
             case "MARKSTATE":
                 markState = (MarkState)IntParse(attribut);

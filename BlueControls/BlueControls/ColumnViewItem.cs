@@ -465,7 +465,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void Invalidate_All() {
         Invalidate_Head();
         Invalidate_DrawWidth();
-        Font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben, States.Standard, 1f);
+        Font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
         Font_Numbers = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
 
         Font_TextInFilter = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size - 2, true, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);

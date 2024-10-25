@@ -73,7 +73,7 @@ public static class SkinDesignExtensions {
             var fl = font.SplitAndCutBy("|");
             des.SheetStyle = fl[0];
             des.Stil = (PadStyles)IntParse(fl[1]);
-            des.Font = Skin.GetBlueFont(des.SheetStyle, des.Stil , (States)IntParse(fl[2]), 1f);
+            des.Font = Skin.GetBlueFont(des.SheetStyle, des.Stil);
         }
 
         des.Image = pic;
