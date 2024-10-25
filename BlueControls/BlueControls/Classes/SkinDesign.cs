@@ -72,7 +72,8 @@ public static class SkinDesignExtensions {
             Skin.InitStyles();
             var fl = font.SplitAndCutBy("|");
             des.SheetStyle = fl[0];
-            des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]), 1f);
+            des.Stil = (PadStyles)IntParse(fl[1]);
+            des.Font = Skin.GetBlueFont(des.SheetStyle, des.Stil , (States)IntParse(fl[2]), 1f);
         }
 
         des.Image = pic;
@@ -91,7 +92,7 @@ public class SkinDesign : IStyleableOne {
     public Color BackColor2 { get; set; }
     public Color BorderColor1 { get; set; }
     public Color BorderColor2 { get; set; }
-    public BlueFont Font { get; set; }
+    public BlueFont Font { get; set; } = BlueFont.DefaultFont;
     public HintergrundArt HintergrundArt { get; set; }
     public string Image { get; set; } = string.Empty;
     public Kontur Kontur { get; set; }

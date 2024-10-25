@@ -197,6 +197,19 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     #region Methods
 
+    public void ChangeStyle(PadStyles style) {
+        ChangeStyle(0, Count - 1, style);
+    }
+
+    public void ChangeStyle(int first, int last, PadStyles style) {
+        var font = this.GetFont(style);
+
+        for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
+            this[cc].Font = font;
+        }
+        ResetPosition(true);
+    }
+
     /// <summary>
     ///     Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
     ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
@@ -339,15 +352,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
-
-    public void ChangeStyle(int first, int last, PadStyles style) {
-        var font = this.GetFont(style);
-
-        for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
-            this[cc].Font = font;
-        }
-        ResetPosition(true);
-    }
 
     public string Substring(int startIndex, int lenght) => ConvertCharToPlainText(startIndex, startIndex + lenght - 1);
 
