@@ -241,7 +241,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
                 maxX += thisViewItem.DrawWidth();
                 if (wdh) {
-                    WiederHolungsSpaltenWidth = Math.Max(maxX, (int)WiederHolungsSpaltenWidth);
+                    WiederHolungsSpaltenWidth = Math.Max(maxX, WiederHolungsSpaltenWidth);
                 }
             }
         }

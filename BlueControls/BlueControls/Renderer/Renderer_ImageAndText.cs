@@ -169,10 +169,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        var pix16 = Table.GetPix(16, scale);
-
-        var maxW = Table.GetPix(_constantWidth, scale);
-        var constH = Table.GetPix(_constantHeight, scale);
+        var pix16 = (int)(16 * scale);
 
         var splitedContent = content.SplitAndCutByCrAndBr();
 
@@ -182,7 +179,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             if (rect.Bottom > scaleddrawarea.Bottom) { break; }
 
-            var image = GetImage(splitedContent[z], maxW, constH);
+            var image = GetImage(splitedContent[z], _constantWidth, _constantHeight)?.Scale(scale);
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, doOpticalTranslation);
 

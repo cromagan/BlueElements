@@ -179,12 +179,12 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         var maxBounds = MaxBounds();
 
         if (maxBounds.Width == 0) { return; }
-        var p = ItemCollectionPadItem.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
-        var sliderv = ItemCollectionPadItem.SliderValues(maxBounds, Zoom, p);
+        var p = ItemCollectionPadItem.CenterPos(maxBounds, AvailablePaintArea().Size, _zoom);
+        var sliderv = ItemCollectionPadItem.SliderValues(maxBounds, _zoom, p);
         if (p.X < 0) {
             SliderX.Enabled = true;
-            SliderX.Minimum = (float)((maxBounds.Left * Zoom) - (Width * 0.6d));
-            SliderX.Maximum = (float)((maxBounds.Right * Zoom) - Width + (Width * 0.6d));
+            SliderX.Minimum = (float)((maxBounds.Left * _zoom) - (Width * 0.6d));
+            SliderX.Maximum = (float)((maxBounds.Right * _zoom) - Width + (Width * 0.6d));
             SliderX.Value = ShiftX;
         } else {
             SliderX.Enabled = false;
@@ -197,8 +197,8 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
         if (p.Y < 0) {
             SliderY.Enabled = true;
-            SliderY.Minimum = (float)((maxBounds.Top * Zoom) - (Height * 0.6d));
-            SliderY.Maximum = (float)((maxBounds.Bottom * Zoom) - Height + (Height * 0.6d));
+            SliderY.Minimum = (float)((maxBounds.Top * _zoom) - (Height * 0.6d));
+            SliderY.Maximum = (float)((maxBounds.Bottom * _zoom) - Height + (Height * 0.6d));
             SliderY.Value = ShiftY;
         } else {
             SliderY.Enabled = false;
@@ -216,8 +216,8 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
-        MousePos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
-        MouseDownPos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
+        MousePos11 = CoordinatesUnscaled(e, _zoom, _shiftX, _shiftY);
+        MouseDownPos11 = CoordinatesUnscaled(e, _zoom, _shiftX, _shiftY);
         base.OnMouseDown(e);
     }
 
@@ -227,12 +227,12 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
-        MousePos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
+        MousePos11 = CoordinatesUnscaled(e, _zoom, _shiftX, _shiftY);
         base.OnMouseMove(e);
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
-        MousePos11 = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
+        MousePos11 = CoordinatesUnscaled(e, _zoom, _shiftX, _shiftY);
         base.OnMouseUp(e);
         MouseDownPos11 = Point.Empty;
     }
@@ -240,7 +240,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         Fitting = false;
-        var m = CoordinatesUnscaled(e, Zoom, _shiftX, _shiftY);
+        var m = CoordinatesUnscaled(e, _zoom, _shiftX, _shiftY);
         if (e.Delta > 0) {
             Zoom *= 1.5f;
         } else {
@@ -253,12 +253,12 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         // Der Slider ist abhängig vom Maßsstab - sowie die echten Mauskoordinaten ebenfalls.
         // Deswegen die M mit dem neuen Zoom-Faktor berechnen umrechen, um auch Masstababhängig zu sein
         // Die Verschiebung der echten Mauskoordinaten berechnen und den Slider auf den Wert setzen.
-        ShiftX = (m.X * Zoom) - e.X;
-        ShiftY = (m.Y * Zoom) - e.Y;
+        ShiftX = (m.X * _zoom) - e.X;
+        ShiftY = (m.Y * _zoom) - e.Y;
 
         // Alte Berechnung für Mittig Setzen
-        //SliderX.Value = (m.X * _Zoom) - (Width / 2) - SliderY.Width
-        //SliderY.Value = (m.Y * _Zoom) - (Height / 2) - SliderX.Height
+        //SliderX.Value = (m.X * _zoom) - (Width / 2) - SliderY.Width
+        //SliderY.Value = (m.Y * _zoom) - (Height / 2) - SliderX.Height
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {

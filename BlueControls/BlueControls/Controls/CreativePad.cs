@@ -187,7 +187,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is AbstractPadItem item && item?.Parent is ItemCollectionPadItem {IsDisposed: false} icpi) {
+        if (e.HotItem is AbstractPadItem item && item?.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "#vordergrund":
                     icpi.BringToFront(item);

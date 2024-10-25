@@ -559,7 +559,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         List<string> result = [];
 
         result.ParseableAdd("Name", fontName);
-        result.ParseableAdd("Size", Math.Round(fontSize,3, MidpointRounding.AwayFromZero  ));
+        result.ParseableAdd("Size", Math.Round(fontSize, 3, MidpointRounding.AwayFromZero));
         if (bold) { result.ParseableAdd("Bold", bold); }
         if (italic) { result.ParseableAdd("Italic", italic); }
         if (underline) { result.ParseableAdd("Underline", underline); }

@@ -64,8 +64,6 @@ public class VariableBool : Variable {
 
     public override bool IsNullOrEmpty => false;
 
-  
-
     public override string ReadableText => _valuebool.ToString();
 
     /// <summary>

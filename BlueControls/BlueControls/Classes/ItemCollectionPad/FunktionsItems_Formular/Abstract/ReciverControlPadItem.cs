@@ -221,7 +221,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     public virtual string ErrorReason() {
-        if (Parent is  not ItemCollectionPadItem { IsDisposed: false } icpi) { return "Keiner Ansicht zugeordnet."; }
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return "Keiner Ansicht zugeordnet."; }
 
         if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, icpi.UsedArea.ToRect())) {
             return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
@@ -263,8 +263,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
 
-
-        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) {return result; }
+        if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return result; }
 
         if (AllowedInputFilter != AllowedInputFilter.None) {
             result.Add(new FlexiControl("Eingang:", widthOfControl, true));
@@ -403,7 +402,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             case "style":
                 return true;
-
         }
         return base.ParseThis(key, value);
     }

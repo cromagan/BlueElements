@@ -69,10 +69,10 @@ public static class SkinDesignExtensions {
         des.SheetStyle = string.Empty;
 
         if (!string.IsNullOrEmpty(font)) {
-                Skin.InitStyles();
-                var fl = font.SplitAndCutBy("|");
-                des.SheetStyle = fl[0];
-                des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]), 1f);       
+            Skin.InitStyles();
+            var fl = font.SplitAndCutBy("|");
+            des.SheetStyle = fl[0];
+            des.Font = Skin.GetBlueFont(fl[0], (PadStyles)IntParse(fl[1]), (States)IntParse(fl[2]), 1f);
         }
 
         des.Image = pic;

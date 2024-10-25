@@ -23,7 +23,7 @@ namespace BlueControls.Enums;
 
 [Flags]
 public enum XPosition {
-    frei =0,
+    frei = 0,
     Ganze_Breite = 101,
     Linke_Hälfte = 201,
     Rechte_Hälfte = 202,
@@ -45,6 +45,4 @@ public enum XPosition {
     Spalten_6_Position_4 = 604,
     Spalten_6_Position_5 = 605,
     Spalten_6_Rechts = 606,
-
-
 }

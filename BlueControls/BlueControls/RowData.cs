@@ -78,7 +78,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         Row = row;
         PinStateSortAddition = "2";
         Y = -1;
-        Chapter = chapter;
+        RowChapter = chapter;
         Expanded = true;
         DrawHeight = 18;
         CaptionPos = Rectangle.Empty;
@@ -94,13 +94,13 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     public string AdditionalSort { get; set; }
     public Rectangle CaptionPos { get; set; }
-    public string Chapter { get; }
     public int DrawHeight { get; private set; }
     public bool Expanded { get; set; }
     public bool IsDisposed { get; private set; }
     public bool MarkYellow { get; set; }
     public string PinStateSortAddition { get; set; }
     public RowItem Row { get; }
+    public string RowChapter { get; }
     public bool ShowCap { get; set; }
     public int Y { get; set; }
 
@@ -125,7 +125,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         DrawHeight = Math.Max(DrawHeight, 18);
     }
 
-    public string CompareKey() => PinStateSortAddition + ";" + Chapter + ";" + AdditionalSort;
+    public string CompareKey() => PinStateSortAddition + ";" + RowChapter + ";" + AdditionalSort;
 
     public int CompareTo(object obj) {
         if (obj is RowData robj) {
@@ -144,7 +144,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
     }
 
     public void GetDataFrom(RowData thisRowData) {
-        if (Row != thisRowData.Row || Chapter != thisRowData.Chapter) {
+        if (Row != thisRowData.Row || RowChapter != thisRowData.RowChapter) {
             Develop.DebugPrint(FehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
         }
 
@@ -159,7 +159,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         MarkYellow = thisRowData.MarkYellow;
     }
 
-    public override string ToString() => Row.IsDisposed ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
+    public override string ToString() => Row.IsDisposed ? RowChapter + " -> null" : RowChapter + " -> " + Row.CellFirstString();
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {

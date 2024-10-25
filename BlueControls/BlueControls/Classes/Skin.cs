@@ -863,7 +863,7 @@ public static class Skin {
     public static ImageCodeEffect AdditionalState(States state) => state.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;
 
     public static List<string>? AllStyles() {
-       InitStyles(); 
+        InitStyles();
         return StyleDb?.Column.First()?.Contents();
     }
 
@@ -1211,7 +1211,7 @@ public static class Skin {
     /// <returns></returns>
 
     public static BlueFont GetBlueFont(string style, PadStyles format, States state, float scale) {
-      InitStyles(); 
+        InitStyles();
         if (StyleDb is not { IsDisposed: false } db) { return BlueFont.DefaultFont; }
 
         var f1 = new FilterItem(db.Column["Name"], BlueDatabase.Enums.FilterType.Istgleich_GroﬂKleinEgal, style);
@@ -1226,9 +1226,8 @@ public static class Skin {
 
         var font = BlueFont.Get(s);
 
-        if(scale == 1f) {
-
-            if(!db.ReadOnly) {
+        if (scale == 1f) {
+            if (!db.ReadOnly) {
                 r.CellSet("font", font.ParseableItems().FinishParseable(), "Automatische Korrektur");
             }
 
@@ -1318,8 +1317,7 @@ public static class Skin {
     }
 
     public static void InitStyles() {
-        
-        StyleDb??= Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+        StyleDb ??= Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
     }
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate

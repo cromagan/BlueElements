@@ -158,10 +158,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (parentFormula == null) { return; }
 
-
-        if (source.Parent is  ItemCollectionPadItem { IsDisposed: false } icpi) {
-
-
+        if (source.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
             foreach (var thisKey in source.Parents) {
                 var it = icpi[thisKey];
 
