@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.Enums;
 using System.Drawing;
 
 namespace BlueControls.Extended_Text;
@@ -25,7 +26,9 @@ internal class ExtCharCrlfCode : ExtChar {
 
     #region Constructors
 
-    internal ExtCharCrlfCode(BlueFont font) : base(font) { }
+    internal ExtCharCrlfCode(ExtText parent, PadStyles stil, BlueFont font) : base(parent, stil, font) { }
+
+    internal ExtCharCrlfCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
     #endregion
 

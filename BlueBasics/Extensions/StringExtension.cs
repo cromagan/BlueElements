@@ -196,7 +196,7 @@ public static partial class Extensions {
     }
 
     public static string? Decrypt(this string cipherText, string key) {
-        key = (key + "!äQsWERadf§$%öü,");
+        key = key + "!äQsWERadf§$%öü,";
         var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
         try {
@@ -224,7 +224,7 @@ public static partial class Extensions {
         try {
             byte[] array;
 
-            key = (key + "!äQsWERadf§$%öü,");
+            key = key + "!äQsWERadf§$%öü,";
             var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
             using (var aes = Aes.Create()) {

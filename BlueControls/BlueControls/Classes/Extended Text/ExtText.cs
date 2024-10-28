@@ -53,13 +53,13 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended {
+public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposableExtended, IStyleable {
 
     #region Fields
 
     private int? _height;
+    private string _sheetStyle = string.Empty;
     private Size _textDimensions;
-
 
     private string? _tmpHtmlText;
 
@@ -68,8 +68,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     private int? _width;
 
     private float _zeilenabstand;
-
-    public BlueFont Font { get; private set; } = BlueFont.DefaultFont;
 
     #endregion
 
@@ -93,6 +91,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     public ExtText(Design design, States state) : this() {
         var sh = Skin.DesignOf(design, state);
         Font = sh.Font;
+        _sheetStyle = Constants.Win11;
     }
 
     public ExtText(string sheetStyle) : this() {
@@ -111,9 +110,9 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     #region Properties
 
-    public string AllowedChars { get; set; }   // Todo: Implementieren
-
+    public string AllowedChars { get; set; }    // Todo: Implementieren
     public Alignment Ausrichtung { get; set; }
+
 
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
@@ -124,6 +123,8 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
     public Point DrawingPos { get; set; }
+
+    public BlueFont Font { get; private set; } = BlueFont.DefaultFont;
 
     public string HtmlText {
         get {
@@ -138,13 +139,13 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-
     public bool IsDisposed { get; private set; }
 
-    public int MaxTextLenght { get; } // TODO: Implementieren
+    public int MaxTextLenght { get; }
 
     public bool Multiline { get; set; }
 
+    // TODO: Implementieren
     public string PlainText {
         get {
             if (IsDisposed) { return string.Empty; }
@@ -159,6 +160,16 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
+    public string SheetStyle {
+        get => _sheetStyle;
+        set {
+            if (IsDisposed) { return; }
+            if (_sheetStyle == value) { return; }
+            _sheetStyle = value;
+            OnStyleChanged();
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
@@ -189,15 +200,9 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     #region Methods
 
-    public void ChangeStyle(BlueFont f) {
-        ChangeStyle(0, Count - 1, f);
-    }
-
-    public void ChangeStyle(int first, int last, BlueFont f) {
-
-
+    public void ChangeStyle(int first, int last, PadStyles stil) {
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
-            this[cc].Font = f;
+            this[cc].Stil = stil;
         }
         ResetPosition(true);
     }
@@ -244,23 +249,19 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return xNr >= 0 ? xNr : yNr >= 0 ? yNr : cZ >= 0 ? cZ : 0;
     }
 
-    public void Check(int first, int last, bool checkstate) {
-        for (var cc = first; cc <= last; cc++) {
+    //public void Check(int first, int last, bool checkstate) {
+    //    for (var cc = first; cc <= last; cc++) {
+    //        //var tmp = this[cc].SheetStyle.TrimEnd(" Checked");
+    //        //var st = this[cc].GetStyle();
 
-            var tmp = this[cc].SheetStyle.TrimEnd(" Checked");
-            var st = this[cc].GetStyle();
+    //        if (checkstate) {
+    //            this[cc].SheetStyle = tmp;
 
-            if (checkstate) {
-
-                this[cc].SheetStyle = tmp;
-
-            } else {
-
-                this[cc].SheetStyle = tmp + " Checked";
-            }
-        }
-
-    }
+    //        } else {
+    //            this[cc].SheetStyle = tmp + " Checked";
+    //        }
+    //    }
+    //}
 
     public Rectangle CursorPixelPosX(int charPos) {
         while (_width == null) { ReBreak(); }
@@ -322,17 +323,17 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return _height ?? -1;
     }
 
-    public bool InsertChar(AsciiKey ascii, int position, BlueFont font) {
+    public bool InsertChar(AsciiKey ascii, int position) {
         if ((int)ascii < 13) { return false; }
-        var c = new ExtCharAscii((char)ascii, font, MarkState.None);
+        var c = new ExtCharAscii(this, position, (char)ascii);
         Insert(position, c);
         return true;
     }
 
-    public bool InsertImage(string imagecode, int position, BlueFont font) {
+    public bool InsertImage(string imagecode, int position) {
         if (string.IsNullOrEmpty(imagecode)) { return false; }
 
-        var c = new ExtCharImageCode(imagecode, font);
+        var c = new ExtCharImageCode(this, position, imagecode);
 
         Insert(position, c);
         return true;
@@ -345,6 +346,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
+    public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     public string Substring(int startIndex, int lenght) => ConvertCharToPlainText(startIndex, startIndex + lenght - 1);
 
@@ -374,7 +376,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(Font));
+    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this, position));
 
     internal void Mark(MarkState markstate, int first, int last) {
         try {
@@ -418,37 +420,37 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         } while (true);
     }
 
-    private int AddSpecialEntities(string htmltext, int position, BlueFont f, MarkState markState) {
+    private int AddSpecialEntities(string htmltext, int position, PadStyles stil, BlueFont font) {
         var endpos = htmltext.IndexOf(';', position + 1);
 
         if (endpos <= position || endpos > position + 10) {
             // Ein nicht konvertiertes &, einfach so übernehmen.
-            Add(new ExtCharAscii('&', f, markState));
+            Add(new ExtCharAscii(this, stil, font, '&'));
             return position + 1;
         }
 
         switch (htmltext.Substring(position, endpos - position + 1)) {
-            case "&uuml;": Add(new ExtCharAscii('ü', f, markState)); return endpos;
-            case "&auml;": Add(new ExtCharAscii('ä', f, markState)); return endpos;
-            case "&ouml;": Add(new ExtCharAscii('ö', f, markState)); return endpos;
-            case "&Uuml;": Add(new ExtCharAscii('Ü', f, markState)); return endpos;
-            case "&Auml;": Add(new ExtCharAscii('Ä', f, markState)); return endpos;
-            case "&Ouml;": Add(new ExtCharAscii('Ö', f, markState)); return endpos;
-            case "&szlig;": Add(new ExtCharAscii('ß', f, markState)); return endpos;
-            case "&quot;": Add(new ExtCharAscii('\"', f, markState)); return endpos;
-            case "&amp;": Add(new ExtCharAscii('&', f, markState)); return endpos;
-            case "&lt;": Add(new ExtCharAscii('<', f, markState)); return endpos;
-            case "&gt;": Add(new ExtCharAscii('>', f, markState)); return endpos;
-            case "&Oslash;": Add(new ExtCharAscii('Ø', f, markState)); return endpos;
-            case "&oslash;": Add(new ExtCharAscii('ø', f, markState)); return endpos;
-            case "&bull;": Add(new ExtCharAscii('•', f, markState)); return endpos;
-            case "&eacute;": Add(new ExtCharAscii('é', f, markState)); return endpos;
-            case "&Eacute;": Add(new ExtCharAscii('É', f, markState)); return endpos;
-            case "&euro;": Add(new ExtCharAscii('€', f, markState)); return endpos;
+            case "&uuml;": Add(new ExtCharAscii(this, stil, font, 'ü')); return endpos;
+            case "&auml;": Add(new ExtCharAscii(this, stil, font, 'ä')); return endpos;
+            case "&ouml;": Add(new ExtCharAscii(this, stil, font, 'ö')); return endpos;
+            case "&Uuml;": Add(new ExtCharAscii(this, stil, font, 'Ü')); return endpos;
+            case "&Auml;": Add(new ExtCharAscii(this, stil, font, 'Ä')); return endpos;
+            case "&Ouml;": Add(new ExtCharAscii(this, stil, font, 'Ö')); return endpos;
+            case "&szlig;": Add(new ExtCharAscii(this, stil, font, 'ß')); return endpos;
+            case "&quot;": Add(new ExtCharAscii(this, stil, font, '\"')); return endpos;
+            case "&amp;": Add(new ExtCharAscii(this, stil, font, '&')); return endpos;
+            case "&lt;": Add(new ExtCharAscii(this, stil, font, '<')); return endpos;
+            case "&gt;": Add(new ExtCharAscii(this, stil, font, '>')); return endpos;
+            case "&Oslash;": Add(new ExtCharAscii(this, stil, font, 'Ø')); return endpos;
+            case "&oslash;": Add(new ExtCharAscii(this, stil, font, 'ø')); return endpos;
+            case "&bull;": Add(new ExtCharAscii(this, stil, font, '•')); return endpos;
+            case "&eacute;": Add(new ExtCharAscii(this, stil, font, 'é')); return endpos;
+            case "&Eacute;": Add(new ExtCharAscii(this, stil, font, 'É')); return endpos;
+            case "&euro;": Add(new ExtCharAscii(this, stil, font, '€')); return endpos;
         }
 
         Develop.DebugPrint(FehlerArt.Info, "Unbekannter Code: " + htmltext.Substring(position, endpos - position + 1));
-        Add(new ExtCharAscii('&', f, markState));
+        Add(new ExtCharAscii(this, stil, font, '&'));
         return position + 1;
     }
 
@@ -456,7 +458,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         if (Count == 0) { return string.Empty; }
 
         var t = new StringBuilder();
-
 
         var lastStufe = Font;
 
@@ -472,15 +473,13 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return t.ToString();
     }
 
-
     private void ConvertTextToChar(string cactext, bool isRich) {
         var pos = 0;
         var zeichen = -1;
-        var style = PadStyles.Standard;
-        var markstate = MarkState.None;
+        var stil = PadStyles.Standard;
         Clear();
         ResetPosition(true);
-        var font = Font;
+        var font = Font ?? BlueFont.DefaultFont;
 
         if (!string.IsNullOrEmpty(cactext)) {
             cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
@@ -491,7 +490,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                 if (isRich) {
                     switch (ch) {
                         case '<': {
-                                DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style, ref markstate);
+                                DoHtmlCode(cactext, pos, ref zeichen, ref font, ref stil);
                                 var op = 1;
                                 do {
                                     pos++;
@@ -505,19 +504,19 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
                         case '&':
                             zeichen++;
-                            pos = AddSpecialEntities(cactext, pos, font, markstate);
+                            pos = AddSpecialEntities(cactext, pos, stil, font);
                             break;
 
                         default:
                             // Normales Zeichen
                             zeichen++;
-                            Add(new ExtCharAscii(ch, font, markstate));
+                            Add(new ExtCharAscii(this, stil, font, ch));
                             break;
                     }
                 } else {
                     // Normales Zeichen
                     zeichen++;
-                    Add(new ExtCharAscii(ch, font, markstate));
+                    Add(new ExtCharAscii(this, stil, font, ch));
                 }
                 pos++;
             } while (true);
@@ -525,7 +524,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         ResetPosition(true);
     }
 
-    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont? font, ref PadStyles style, ref MarkState markState) {
+    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
         if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
 
         var endpos = htmlText.IndexOf('>', start + 1);
@@ -548,59 +547,73 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
         switch (cod) {
             case "B":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, true, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/B":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, false, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "I":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, true, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/I":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, false, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "U":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, true, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/U":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, false, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "STRIKE":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, true, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/STRIKE":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, false, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
-            case "3":
-                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
-                break;
+            //case "3":
+            //    stil = PadStyles.Undefiniert;
+            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+            //    break;
 
-            case "/3":
-                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
-                break;
+            //case "/3":
+            //    stil = PadStyles.Undefiniert;
+            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+            //break;
 
             case "FONTSIZE":
+                stil = PadStyles.Undefiniert;
                 _ = FloatTryParse(attribut, out var fs);
                 font = BlueFont.Get(font.FontName, fs, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "FONTNAME":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(attribut, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "FONTCOLOR":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, attribut, font.ColorOutline.ToHtmlCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack.ToHtmlCode());
                 break;
 
             case "FONTOUTLINE":
+                stil = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack.ToHtmlCode());
                 break;
 
@@ -612,62 +625,62 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             //    break;
             case "BR":
                 position++;
-                Add(new ExtCharCrlfCode(font));
+                Add(new ExtCharCrlfCode(this, stil, font));
                 break;
 
             case "TAB":
                 position++;
-                Add(new ExtCharTabCode(font));
+                Add(new ExtCharTabCode(this, stil, font));
                 break;
 
             case "ZBX_STORE":
                 position++;
-                Add(new ExtCharStoreXCode(font));
+                Add(new ExtCharStoreXCode(this, stil, font));
                 break;
 
             case "TOP":
                 position++;
-                Add(new ExtCharTopCode(font));
+                Add(new ExtCharTopCode(this, stil, font));
                 break;
 
             case "IMAGECODE":
                 var x = !attribut.Contains("|") ? QuickImage.Get(attribut, (int)font.Oberlänge(1)) : QuickImage.Get(attribut);
                 position++;
-                Add(new ExtCharImageCode(x, font));
+                Add(new ExtCharImageCode(this, stil, font, x));
                 break;
 
             case "H7":
-                style = PadStyles.Hervorgehoben;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Hervorgehoben;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
             case "H6":
-                style = PadStyles.Alternativ;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Alternativ;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
             case "H5":
-                style = PadStyles.Kleiner_Zusatz;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Kleiner_Zusatz;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
             case "H0":
             case "H4":
-                style = PadStyles.Standard;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Standard;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
             case "H3":
-                style = PadStyles.Kapitel;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Kapitel;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
             case "H2":
-                style = PadStyles.Untertitel;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Untertitel;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
             case "H1":
-                style = PadStyles.Überschrift;
-                font = Skin.GetFont(font, style); break;
+                stil = PadStyles.Überschrift;
+                font = Skin.GetBlueFont(_sheetStyle, stil); break;
 
-            case "MARKSTATE":
-                markState = (MarkState)IntParse(attribut);
-                break;
+            //case "MARKSTATE":
+            //    markState = (MarkState)IntParse(attribut);
+            //    break;
 
             case "":
                 // ist evtl. ein <> ausruck eines Textes
@@ -675,7 +688,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    private void DrawState(Graphics gr, float czoom, MarkState state) {
+    private void DrawState(Graphics gr, float scale, MarkState state) {
         var tmas = -1;
         for (var pos = 0; pos < Count; pos++) {
             var tempVar = this[pos];
@@ -686,9 +699,9 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (!marked || pos == Count - 1) {
                 if (tmas > -1) {
                     if (pos == Count - 1) {
-                        DrawZone(gr, czoom, state, tmas, pos);
+                        DrawZone(gr, scale, state, tmas, pos);
                     } else {
-                        DrawZone(gr, czoom, state, tmas, pos - 1);
+                        DrawZone(gr, scale, state, tmas, pos - 1);
                     }
                     tmas = -1;
                 }
@@ -696,25 +709,25 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
     }
 
-    private void DrawStates(Graphics gr, float czoom) {
-        DrawState(gr, czoom, MarkState.Field);
-        DrawState(gr, czoom, MarkState.MyOwn);
-        DrawState(gr, czoom, MarkState.Other);
-        DrawState(gr, czoom, MarkState.Ringelchen);
+    private void DrawStates(Graphics gr, float scale) {
+        DrawState(gr, scale, MarkState.Field);
+        DrawState(gr, scale, MarkState.MyOwn);
+        DrawState(gr, scale, MarkState.Other);
+        DrawState(gr, scale, MarkState.Ringelchen);
     }
 
-    private void DrawZone(Graphics gr, float czoom, MarkState thisState, int markStart, int markEnd) {
-        var startX = (this[markStart].Pos.X * czoom) + DrawingPos.X;
-        var startY = (this[markStart].Pos.Y * czoom) + DrawingPos.Y;
-        var endX = (this[markEnd].Pos.X * czoom) + DrawingPos.X + (this[markEnd].Size.Width * czoom);
-        var endy = (this[markEnd].Pos.Y * czoom) + DrawingPos.Y + (this[markEnd].Size.Height * czoom);
+    private void DrawZone(Graphics gr, float scale, MarkState thisState, int markStart, int markEnd) {
+        var startX = (this[markStart].Pos.X * scale) + DrawingPos.X;
+        var startY = (this[markStart].Pos.Y * scale) + DrawingPos.Y;
+        var endX = (this[markEnd].Pos.X * scale) + DrawingPos.X + (this[markEnd].Size.Width * scale);
+        var endy = (this[markEnd].Pos.Y * scale) + DrawingPos.Y + (this[markEnd].Size.Height * scale);
 
         switch (thisState) {
             case MarkState.None:
                 break;
 
             case MarkState.Ringelchen:
-                gr.DrawLine(new Pen(Color.Red, 3 * czoom), startX, (int)(startY + (this[markStart].Size.Height * czoom * 0.9)), endX, (int)(startY + (this[markStart].Size.Height * czoom * 0.9)));
+                gr.DrawLine(new Pen(Color.Red, 3 * scale), startX, (int)(startY + (this[markStart].Size.Height * scale * 0.9)), endX, (int)(startY + (this[markStart].Size.Height * scale * 0.9)));
                 break;
 
             case MarkState.Field:

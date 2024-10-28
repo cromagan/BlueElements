@@ -168,7 +168,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
                 // Mehrzeiligen Text generieren und Zeichnen
                 var sh = Skin.DesignOf(buttontype, state);
                 etxt.SheetStyle = sh.SheetStyle;
-                etxt.ChangeStyle(sh.Stil);
+                //etxt.ChangeStyle(sh.Stil);
                 etxt.Zeilenabstand = 0.65f;
                 etxt.DrawingPos = new Point(0, 43);
                 etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
@@ -182,7 +182,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
             var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
             var sh = Skin.DesignOf(buttontype, state);
             etxt.SheetStyle = sh.SheetStyle;
-            etxt.ChangeStyle(sh.Stil);
+            //etxt.ChangeStyle(sh.Stil);
             etxt.TextDimensions = displayRectangle.Size;
             etxt.HtmlText = tt;
             etxt.Draw(gr, 1);

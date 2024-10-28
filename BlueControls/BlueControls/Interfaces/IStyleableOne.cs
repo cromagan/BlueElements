@@ -54,7 +54,9 @@ public static class StyleableOneExtension {
     }
 
     public static void InvalidateFont(this IStyleableOne o) {
-        o.Font = null;
+        if (o.Stil != PadStyles.Undefiniert) {
+            o.Font = null;
+        }
     }
 
     #endregion

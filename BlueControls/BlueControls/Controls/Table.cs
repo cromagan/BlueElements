@@ -28,7 +28,6 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -91,7 +90,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
-    private string _sheetStyle = Constants.Win11;
+    private string _sheetStyle = Win11;
 
     private bool _showNumber;
 
@@ -313,7 +312,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public float Zoom {
         get => _zoom;
         set {
-            if (Math.Abs(_zoom - value) < Constants.DefaultTolerance) { return; }
+            if (Math.Abs(_zoom - value) < DefaultTolerance) { return; }
 
             _zoom = value;
             Invalidate();
@@ -1490,7 +1489,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         SliderY.Minimum = 0;
         SliderY.Maximum = Math.Max(maxY - displayRectangleWoSlider.Height + lastC.Bottom + GetPix(18), 0);
-        SliderY.LargeChange = GetPix((displayRectangleWoSlider.Height - ca.HeadSize()));
+        SliderY.LargeChange = GetPix(displayRectangleWoSlider.Height - ca.HeadSize());
         SliderY.Enabled = SliderY.Maximum > 0;
 
         var maxX = 0;
@@ -1500,7 +1499,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         SliderX.Minimum = 0;
-        SliderX.Maximum = (maxX - displayRectangleWoSlider.Width + 1);
+        SliderX.Maximum = maxX - displayRectangleWoSlider.Width + 1;
         SliderX.LargeChange = displayRectangleWoSlider.Width;
         SliderX.Enabled = SliderX.Maximum > 0;
 
@@ -2886,7 +2885,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     /// <param name="ca"></param>
     /// <param name="displayRectangleWoSlider"></param>
     private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca, Rectangle displayRectangleWoSlider, int u) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed) { return; }
 
         ColumnViewItem? prevViewItemWithOtherCaption = null;
         //ColumnViewItem? prevPermanentViewItemWithOtherCaption;

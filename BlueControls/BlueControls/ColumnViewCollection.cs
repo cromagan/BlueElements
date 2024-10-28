@@ -21,7 +21,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Interfaces;
@@ -45,7 +44,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private int _clientWidth = 16;
     private Database? _database;
     private int? _headSize;
-    private string _sheetStyle = Constants.Win11;
+    private string _sheetStyle = Win11;
 
     #endregion
 

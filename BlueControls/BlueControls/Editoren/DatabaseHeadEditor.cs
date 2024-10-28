@@ -425,7 +425,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         #region Sortierung
 
-        var colnam = lbxSortierSpalten.Items.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item)).ToList();
+        var colnam = lbxSortierSpalten.Items.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
         Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
 
         #endregion

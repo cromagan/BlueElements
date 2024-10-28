@@ -490,7 +490,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _sampleTextSym;
     }
 
-    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < Constants.DefaultTolerance ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
+    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < DefaultTolerance ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
 
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }

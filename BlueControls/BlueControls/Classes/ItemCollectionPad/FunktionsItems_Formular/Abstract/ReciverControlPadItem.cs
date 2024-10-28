@@ -414,7 +414,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
 
         var anzahlSpaltenImFormular = (int)_xPosition / 100;
-        var aufXPosition = (int)(_xPosition - anzahlSpaltenImFormular * 100);
+        var aufXPosition = (int)(_xPosition - (anzahlSpaltenImFormular * 100));
 
         var wi = (icpi.UsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));

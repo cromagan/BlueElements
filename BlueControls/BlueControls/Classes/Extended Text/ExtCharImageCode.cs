@@ -20,6 +20,7 @@
 using System;
 using System.Drawing;
 using BlueBasics;
+using BlueControls.Enums;
 using static BlueBasics.Constants;
 
 namespace BlueControls.Extended_Text;
@@ -34,9 +35,13 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharImageCode(QuickImage? qi, BlueFont font) : base(font) => _qi = qi;
+    public ExtCharImageCode(ExtText parent, PadStyles stil, BlueFont font, QuickImage? qi) : base(parent, stil, font) => _qi = qi;
 
-    public ExtCharImageCode(string imagecode, BlueFont font) : base(font) => _qi = QuickImage.Get(imagecode);
+    public ExtCharImageCode(ExtText parent, PadStyles stil, BlueFont font, string imagecode) : base(parent, stil, font) => _qi = QuickImage.Get(imagecode);
+
+    internal ExtCharImageCode(ExtText parent, int styleFromPos, string imagecode) : base(parent, styleFromPos) {
+        _qi = QuickImage.Get(imagecode);
+    }
 
     #endregion
 

@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -202,7 +201,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public string SheetStyle {
         get {
             if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return Constants.Win11;
+            return Win11;
         }
     }
 
@@ -394,7 +393,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         if (_viewType == ViewType.PermanentColumn) { sliderx = 0; }
 
-        return new Rectangle((int)((int)X * scale + -sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
+        return new Rectangle((int)(((int)X * scale) - sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
     }
 
     public Rectangle ReduceButtonLocation(float scale, float sliderx) {

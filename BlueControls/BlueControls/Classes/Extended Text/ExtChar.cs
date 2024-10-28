@@ -17,28 +17,52 @@
 
 #nullable enable
 
+using System;
 using System.Drawing;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar {
+public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     #region Fields
 
     public PointF Pos = PointF.Empty;
     private BlueFont? _font;
+    private ExtText? _parent;
     private SizeF _size;
+    private PadStyles _style = PadStyles.Undefiniert;
 
     #endregion
 
     #region Constructors
 
-    public ExtChar(BlueFont font) : base() {
-        _font = font;
+    public ExtChar(ExtText parent, PadStyles stil, BlueFont font) : base() {
         _size = SizeF.Empty;
+        _style = stil;
+        _parent = parent;
+        _font = font;
+        _parent.StyleChanged += _parent_StyleChanged;
+    }
+
+    public ExtChar(ExtText parent, int styleFromPos) : base() {
+        styleFromPos = Math.Max(styleFromPos, 0);
+        styleFromPos = Math.Min(styleFromPos, parent.Count - 1);
+
+        if (styleFromPos < 0) {
+            Stil = PadStyles.Standard;
+            _font = Skin.GetBlueFont(parent.SheetStyle, Stil);
+        } else {
+            _font = parent[styleFromPos].Font;
+            Stil = parent[styleFromPos].Stil;
+        }
+
+        _size = SizeF.Empty;
+        _parent = parent;
+        _parent.StyleChanged += _parent_StyleChanged;
     }
 
     #endregion
@@ -55,7 +79,15 @@ public abstract class ExtChar {
         }
     }
 
+    public bool IsDisposed { get; private set; }
     public MarkState Marking { get; set; }
+
+    public string SheetStyle {
+        get {
+            if (_parent is IStyleable ist) { return ist.SheetStyle; }
+            return string.Empty;
+        }
+    }
 
     public SizeF Size {
         get {
@@ -64,13 +96,39 @@ public abstract class ExtChar {
         }
     }
 
-    public string SheetStyle { get; set; }
+    public PadStyles Stil {
+        get => _style;
+        set {
+            if (_style == value) { return; }
+            _style = value;
+            this.InvalidateFont();
+        }
+    }
 
     #endregion
 
     #region Methods
 
+    public void Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
     public abstract void Draw(Graphics gr, Point posModificator, float zoom);
+
+    public PadStyles GetStyle() {
+        if (Font == null || Skin.StyleDb is not Database db) { return PadStyles.Standard; }
+
+        var f1 = new FilterItem(db.Column["Font"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
+        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
+
+        var r = db.Row[f1, f2];
+
+        if (r == null) { return PadStyles.Standard; }
+
+        return (PadStyles)r.CellGetInteger("Style");
+    }
 
     public abstract string HtmlText();
 
@@ -96,20 +154,35 @@ public abstract class ExtChar {
 
     public abstract string PlainText();
 
-    public PadStyles GetStyle() {
-        if (Font == null || Skin.StyleDb is not Database db) { return PadStyles.Standard; }
-
-        var f1 = new FilterItem(db.Column["Font"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
-        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
-
-        var r = db.Row[f1, f2];
-
-        if (r == null) { return PadStyles.Standard; }
-
-        return (PadStyles)r.CellGetInteger("Style");
-    }
-
     protected abstract SizeF CalculateSize();
 
+    protected virtual void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+
+                if (_parent != null) {
+                    _parent.StyleChanged -= _parent_StyleChanged;
+                    _parent = null;
+                }
+            }
+
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            IsDisposed = true;
+        }
+    }
+
+    private void _parent_StyleChanged(object sender, System.EventArgs e) {
+        this.InvalidateFont();
+    }
+
     #endregion
+
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~ExtChar()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
 }

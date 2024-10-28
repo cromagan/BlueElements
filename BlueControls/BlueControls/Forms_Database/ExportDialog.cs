@@ -151,8 +151,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));
         var maxY = Math.Max(1, (int)Math.Floor(druckB.Height / (oneItem.Height + abstand + 0.01)));
 
-        var offx = (druckB.Width - (oneItem.Width * maxX) - abstand * (maxX - 1)) / 2;
-        var offy = (druckB.Height - (oneItem.Height * maxY) - abstand * (maxY - 1)) / 2;
+        var offx = (druckB.Width - (oneItem.Width * maxX) - (abstand * (maxX - 1))) / 2;
+        var offy = (druckB.Height - (oneItem.Height * maxY) - (abstand * (maxY - 1))) / 2;
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
@@ -163,7 +163,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                 //    it.GridShow = -1;
                 //}
                 pad.Items.Add(it);
-                it.SetCoordinates(oneItem with { X = druckB.Left + x * (oneItem.Width + abstand) + offx, Y = druckB.Top + y * (oneItem.Height + abstand) + offy });
+                it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)) + offx, Y = druckB.Top + (y * (oneItem.Height + abstand)) + offy });
 
                 //it.SetLeftTopPoint(druckB.Left + x * (oneItem.Width + abstand) + offx, druckB.Top + y * (oneItem.Height + abstand) + offy);
 

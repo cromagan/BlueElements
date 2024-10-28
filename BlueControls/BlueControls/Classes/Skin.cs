@@ -1209,6 +1209,8 @@ public static class Skin {
     /// <returns></returns>
 
     public static BlueFont GetBlueFont(string style, PadStyles format) {
+        if (format == PadStyles.Undefiniert || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
+
         InitStyles();
         if (StyleDb is not { IsDisposed: false } db) { return BlueFont.DefaultFont; }
 
@@ -1222,9 +1224,7 @@ public static class Skin {
                 using var fc = new FilterCollection(f1, "RowAdder");
                 fc.Add(f2);
                 db.Row.GenerateAndAdd(style, fc, "Unbekannter Stil");
-
             }
-
 
             return BlueFont.DefaultFont;
         }

@@ -1037,7 +1037,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         var showAdd = AddAllowed != AddType.None && isInForm;
 
-        showAdd = (showAdd && (Math.Abs(SliderY.Value - SliderY.Maximum) < Constants.IntTolerance || _mousemoved));
+        showAdd = showAdd && (Math.Abs(SliderY.Value - SliderY.Maximum) < Constants.IntTolerance || _mousemoved);
 
         if (showAdd) {
             btnPlus.Left = 2;

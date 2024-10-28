@@ -21,6 +21,8 @@ using System;
 using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Extended_Text;
 
@@ -34,9 +36,12 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    internal ExtCharAscii(char charcode, BlueFont font, MarkState markState) : base(font) {
+    internal ExtCharAscii(ExtText parent, PadStyles stil, BlueFont font, char charcode) : base(parent, stil, font) {
         _char = charcode;
-        Marking = markState;
+    }
+
+    internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) {
+        _char = charcode;
     }
 
     #endregion
@@ -55,7 +60,7 @@ public class ExtCharAscii : ExtChar {
         var drawY = (Pos.Y * zoom) + posModificator.Y;
 
         try {
-            Font?.DrawString(gr, _char.ToString(), drawX, drawY, zoom, StringFormat.GenericTypographic);
+            this.GetFont().DrawString(gr, _char.ToString(), drawX, drawY, zoom, StringFormat.GenericTypographic);
         } catch { }
 
         //if (Math.Abs(zoom - 1) < DefaultTolerance) {

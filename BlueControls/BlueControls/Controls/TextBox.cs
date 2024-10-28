@@ -332,21 +332,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             case "#Caption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.ChangeStyle(_markStart, _markEnd - 1, Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift));
+                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Überschrift);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#NoCaption":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.ChangeStyle(_markStart, _markEnd - 1, Skin.GetBlueFont(Constants.Win11, PadStyles.Standard));
+                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
                 RaiseEventIfTextChanged(false);
                 return;
 
             case "#Bold":
                 if (_markStart < 0 || _markEnd < 0) { return; }
                 Selection_Repair(true);
-                _eTxt.ChangeStyle(_markStart, _markEnd - 1, Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben));
+                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
                 RaiseEventIfTextChanged(false);
                 return;
 
@@ -421,10 +421,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         nt = nt.RemoveChars(Constants.Char_NotFromClip);
         if (!MultiLine) { nt = nt.RemoveChars("\r\n"); }
 
-        var f = Skin.DesignOf(Design, States.Standard).Font;
-
         foreach (var t in nt) {
-            if (_eTxt.InsertChar((AsciiKey)t, _cursorCharPos, f)) { _cursorCharPos++; }
+            if (_eTxt.InsertChar((AsciiKey)t, _cursorCharPos)) { _cursorCharPos++; }
         }
 
         RaiseEventIfTextChanged(false);
@@ -484,9 +482,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             default:
                 if (keyAscii >= AsciiKey.Space) //Ascii-Codes (Außer 127 = DEL)
                 {
-                    var f = Skin.DesignOf(Design, States.Standard).Font;
                     Char_DelBereich(-1, -1);
-                    if (_eTxt.InsertChar(keyAscii, _cursorCharPos, f)) { _cursorCharPos++; }
+                    if (_eTxt.InsertChar(keyAscii, _cursorCharPos)) { _cursorCharPos++; }
                 }
                 break;
         }
@@ -532,17 +529,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        //if (state == enStates.Checked_Disabled) {
-        //    Develop.DebugPrint("Checked Disabled");
-        //    state = enStates.Checked_Disabled;
-        //}
-        //if (state == enStates.Standard_Disabled) {
-        //    if (_MarkStart > -1) { Develop.DebugPrint("Disabled & Markstart:" + _MarkStart); }
-        //    if (_MarkEnd > -1) { Develop.DebugPrint("Disabled & MarkEnd:" + _MarkStart); }
-        //    MarkClear();
-        //}
-        // Erst den Typ richtig stellen, dann den State ändern!
-
         var effectWidth = Width;
         var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
@@ -620,7 +606,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
         Cursor_Show(gr);
-        MarkAndGenerateZone(gr);
+        MarkAndGenerateZone(gr, state);
         _eTxt.Draw(gr, 1);
         if (!string.IsNullOrEmpty(_suffix)) {
             Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
@@ -857,8 +843,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _cursorCharPos = x;
         if (r is not { Count: 1 }) { return; }
         Char_DelBereich(-1, -1);
-        var f = Skin.DesignOf(Design, States.Standard).Font;
-        if (_eTxt.InsertImage(r[0], _cursorCharPos, f)) { _cursorCharPos++; }
+
+        if (_eTxt.InsertImage(r[0], _cursorCharPos)) { _cursorCharPos++; }
         RaiseEventIfTextChanged(false);
     }
 
@@ -1029,31 +1015,33 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void MarkAndGenerateZone(Graphics gr) {
-        _eTxt.Check(0, _eTxt.Count - 1, false);
+    private void MarkAndGenerateZone(Graphics gr, States state) {
+        //_eTxt.Check(0, _eTxt.Count - 1, false);
         if (_markStart < 0 || _markEnd < 0) { return; }
         Selection_Repair(false);
         var maS = Math.Min(_markStart, _markEnd);
         var maE = Math.Max(_markStart, _markEnd);
         if (_markStart == _markEnd) { return; }
-        _eTxt.Check(maS, maE - 1, true);
-        //var tmpcharS = maS;
+        //_eTxt.Check(maS, maE - 1, true);
+        var tmpcharS = maS;
 
-        //for (var cc = maS; cc <= maE; cc++) {
-        //    if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
-        //    {
-        //        Rectangle r = new((int)(_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X),
-        //            (int)(_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y),
-        //            (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X),
-        //            (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
-        //        if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
-        //        if (_eTxt[tmpcharS].State != States.Undefiniert) {
-        //            Skin.Draw_Back(gr, Design, _eTxt[tmpcharS].State, r, null, false);
-        //            Skin.Draw_Border(gr, Design, _eTxt[tmpcharS].State, r);
-        //        }
-        //        tmpcharS = cc;
-        //    }
-        //}
+        var sr = state | States.Checked;
+
+        for (var cc = maS; cc <= maE; cc++) {
+            if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) {
+                Rectangle r = new((int)(_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X),
+                    (int)(_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y),
+                    (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X),
+                    (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
+                if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
+
+                //if (_eTxt[tmpcharS].State != States.Undefiniert) {
+                Skin.Draw_Back(gr, Design, sr, r, null, false);
+                Skin.Draw_Border(gr, Design, sr, r);
+                //}
+                tmpcharS = cc;
+            }
+        }
     }
 
     private void MarkClear() {

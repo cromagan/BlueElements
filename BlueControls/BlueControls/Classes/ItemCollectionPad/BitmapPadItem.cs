@@ -320,16 +320,16 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                     }
 
                 case SizeModes.BildAbschneiden: {
-                        var scale2 = Math.Max((positionModified.Width) / Bitmap.Width, (positionModified.Height) / Bitmap.Height);
-                        var tmpw = (positionModified.Width) / scale2;
-                        var tmph = (positionModified.Height) / scale2;
+                        var scale2 = Math.Max(positionModified.Width / Bitmap.Width, positionModified.Height / Bitmap.Height);
+                        var tmpw = positionModified.Width / scale2;
+                        var tmph = positionModified.Height / scale2;
                         r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
                         r2 = positionModified;
                         break;
                     }
                 default: // Is = enSizeModes.WeißerRand
                 {
-                        var scale2 = Math.Min((positionModified.Width) / Bitmap.Width, (positionModified.Height) / Bitmap.Height);
+                        var scale2 = Math.Min(positionModified.Width / Bitmap.Width, positionModified.Height / Bitmap.Height);
                         r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale2)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale2)) / 2) + positionModified.Top, Bitmap.Width * scale2, Bitmap.Height * scale2);
                         break;
                     }
