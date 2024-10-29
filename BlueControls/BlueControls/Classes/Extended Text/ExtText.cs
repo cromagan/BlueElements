@@ -424,32 +424,17 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         var endpos = htmltext.IndexOf(';', position + 1);
 
         if (endpos <= position || endpos > position + 10) {
-            // Ein nicht konvertiertes &, einfach so übernehmen.
             Add(new ExtCharAscii(this, stil, font, '&'));
             return position + 1;
         }
 
-        switch (htmltext.Substring(position, endpos - position + 1)) {
-            case "&uuml;": Add(new ExtCharAscii(this, stil, font, 'ü')); return endpos;
-            case "&auml;": Add(new ExtCharAscii(this, stil, font, 'ä')); return endpos;
-            case "&ouml;": Add(new ExtCharAscii(this, stil, font, 'ö')); return endpos;
-            case "&Uuml;": Add(new ExtCharAscii(this, stil, font, 'Ü')); return endpos;
-            case "&Auml;": Add(new ExtCharAscii(this, stil, font, 'Ä')); return endpos;
-            case "&Ouml;": Add(new ExtCharAscii(this, stil, font, 'Ö')); return endpos;
-            case "&szlig;": Add(new ExtCharAscii(this, stil, font, 'ß')); return endpos;
-            case "&quot;": Add(new ExtCharAscii(this, stil, font, '\"')); return endpos;
-            case "&amp;": Add(new ExtCharAscii(this, stil, font, '&')); return endpos;
-            case "&lt;": Add(new ExtCharAscii(this, stil, font, '<')); return endpos;
-            case "&gt;": Add(new ExtCharAscii(this, stil, font, '>')); return endpos;
-            case "&Oslash;": Add(new ExtCharAscii(this, stil, font, 'Ø')); return endpos;
-            case "&oslash;": Add(new ExtCharAscii(this, stil, font, 'ø')); return endpos;
-            case "&bull;": Add(new ExtCharAscii(this, stil, font, '•')); return endpos;
-            case "&eacute;": Add(new ExtCharAscii(this, stil, font, 'é')); return endpos;
-            case "&Eacute;": Add(new ExtCharAscii(this, stil, font, 'É')); return endpos;
-            case "&euro;": Add(new ExtCharAscii(this, stil, font, '€')); return endpos;
+        var entity = htmltext.Substring(position, endpos - position + 1);
+        if (Constants.ReverseHtmlEntities.TryGetValue(entity, out char c)) {
+            Add(new ExtCharAscii(this, stil, font, c));
+            return endpos;
         }
 
-        Develop.DebugPrint(FehlerArt.Info, "Unbekannter Code: " + htmltext.Substring(position, endpos - position + 1));
+        Develop.DebugPrint(FehlerArt.Info, "Unbekannter Code: " + entity);
         Add(new ExtCharAscii(this, stil, font, '&'));
         return position + 1;
     }
@@ -457,74 +442,84 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     private string ConvertCharToHtmlText() {
         if (Count == 0) { return string.Empty; }
 
-        var t = new StringBuilder();
-
+        // Ungefähre Größe vorallokieren - reduziert Reallokationen
+        var t = new StringBuilder(Count * 2);
         var lastStufe = Font;
 
         for (var z = 0; z < Count; z++) {
             if (lastStufe != this[z].Font) {
-                _ = t.Append("<H" + this[z].GetStyle() + ">");
+                t.Append("<H").Append(this[z].GetStyle()).Append('>');
                 lastStufe = this[z].Font;
             }
-
-            _ = t.Append(this[z].HtmlText());
+            t.Append(this[z].HtmlText());
         }
-
         return t.ToString();
     }
 
     private void ConvertTextToChar(string cactext, bool isRich) {
-        var pos = 0;
-        var zeichen = -1;
-        var stil = PadStyles.Standard;
+        if (string.IsNullOrEmpty(cactext)) {
+            Clear();
+            ResetPosition(true);
+            return;
+        }
+
+        // Vorverarbeitung des Texts
+        cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
+
         Clear();
         ResetPosition(true);
+        var stil = PadStyles.Standard;
         var font = Font ?? BlueFont.DefaultFont;
 
-        if (!string.IsNullOrEmpty(cactext)) {
-            cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
-            var lang = cactext.Length - 1;
-            do {
-                if (pos > lang) { break; }
-                var ch = cactext[pos];
-                if (isRich) {
-                    switch (ch) {
-                        case '<': {
-                                DoHtmlCode(cactext, pos, ref zeichen, ref font, ref stil);
-                                var op = 1;
-                                do {
-                                    pos++;
-                                    if (pos > lang) { break; }
-                                    if (cactext[pos] == '>') { op--; }
-                                    if (cactext[pos] == '<') { op++; }
-                                    if (op == 0) { break; }
-                                } while (true);
-                                break;
-                            }
+        // StringBuilder für temporäre String-Operationen
+        var temp = new StringBuilder(100);
+        var pos = 0;
+        var zeichen = -1;
 
-                        case '&':
-                            zeichen++;
-                            pos = AddSpecialEntities(cactext, pos, stil, font);
-                            break;
+        while (pos < cactext.Length) {
+            char ch = cactext[pos];
 
-                        default:
-                            // Normales Zeichen
+            if (isRich) {
+                switch (ch) {
+                    case '<':
+                        if (temp.Length > 0) {
                             zeichen++;
-                            Add(new ExtCharAscii(this, stil, font, ch));
-                            break;
-                    }
-                } else {
-                    // Normales Zeichen
-                    zeichen++;
-                    Add(new ExtCharAscii(this, stil, font, ch));
+                            Add(new ExtCharAscii(this, stil, font, temp.ToString()[0]));
+                            temp.Clear();
+                        }
+                        // HTML-Code verarbeiten
+                        DoHtmlCode(cactext, pos, ref zeichen, ref font, ref stil);
+                        // Position zum Ende des HTML-Tags bewegen
+                        var endTag = cactext.IndexOf('>', pos + 1);
+                        pos = endTag != -1 ? endTag : cactext.Length;
+                        break;
+
+                    case '&':
+                        if (temp.Length > 0) {
+                            zeichen++;
+                            Add(new ExtCharAscii(this, stil, font, temp.ToString()[0]));
+                            temp.Clear();
+                        }
+                        pos = AddSpecialEntities(cactext, pos, stil, font);
+                        zeichen++;
+                        break;
+
+                    default:
+                        zeichen++;
+                        Add(new ExtCharAscii(this, stil, font, ch));
+                        break;
                 }
-                pos++;
-            } while (true);
+            } else {
+                zeichen++;
+                Add(new ExtCharAscii(this, stil, font, ch));
+            }
+            pos++;
         }
+
         ResetPosition(true);
     }
 
-    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
+private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
         if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
 
         var endpos = htmlText.IndexOf('>', start + 1);

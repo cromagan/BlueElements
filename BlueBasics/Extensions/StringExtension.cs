@@ -120,10 +120,28 @@ public static partial class Extensions {
     public static bool ContainsWord(this string input, string value, RegexOptions options) => input.IndexOfWord(value, 0, options) >= 0;
 
     public static string ConvertFromHtmlToRich(this string txt) {
-        txt = txt.Replace("\r\n", "<br>");
-        txt = txt.Replace("<<>", "&lt;");
-        txt = txt.Replace("<>>", "&gt;");
-        return txt;
+        if (string.IsNullOrEmpty(txt)) { return string.Empty; }
+
+        // Vorallokierung mit geschätzter Größe (+10% für mögliche Ersetzungen)
+        var sb = new StringBuilder(txt.Length + (txt.Length / 10));
+
+        // Einmaliger Durchlauf durch den String
+        for (int i = 0; i < txt.Length; i++) {
+            if (txt[i] == '\r' && i + 1 < txt.Length && txt[i + 1] == '\n') {
+                sb.Append("<br>");
+                i++; // Überspringe das \n
+            } else if (txt[i] == '<' && i + 1 < txt.Length && txt[i + 1] == '<' && i + 2 < txt.Length && txt[i + 2] == '>') {
+                sb.Append("&lt;");
+                i += 2; // Überspringe die restlichen Zeichen
+            } else if (txt[i] == '<' && i + 1 < txt.Length && txt[i + 1] == '>' && i + 2 < txt.Length && txt[i + 2] == '>') {
+                sb.Append("&gt;");
+                i += 2; // Überspringe die restlichen Zeichen
+            } else {
+                sb.Append(txt[i]);
+            }
+        }
+
+        return sb.ToString();
     }
 
     public static int CountString(this string text, string value) {

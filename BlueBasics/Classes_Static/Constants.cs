@@ -48,6 +48,39 @@ public static class Constants {
     public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
     public static readonly int ColumnCaptionSizeY = 22;
 
+
+    public static readonly Dictionary<char, string> HtmlEntities = new() {
+        {'ü', "&uuml;"}, {'ä', "&auml;"}, {'ö', "&ouml;"},
+        {'Ü', "&Uuml;"}, {'Ä', "&Auml;"}, {'Ö', "&Ouml;"},
+        {'ß', "&szlig;"}, {'"', "&quot;"}, {'&', "&amp;"},
+        {'<', "&lt;"}, {'>', "&gt;"}, {'Ø', "&Oslash;"},
+        {'ø', "&oslash;"}, {'•', "&bull;"}, {'é', "&eacute;"},
+        {'É', "&Eacute;"}, {'€', "&euro;"}
+    };
+
+
+    public static readonly Dictionary<string, char> ReverseHtmlEntities = new() {
+    {"&uuml;", 'ü'},
+    {"&auml;", 'ä'},
+    {"&ouml;", 'ö'},
+    {"&Uuml;", 'Ü'},
+    {"&Auml;", 'Ä'},
+    {"&Ouml;", 'Ö'},
+    {"&szlig;", 'ß'},
+    {"&quot;", '"'},
+    {"&amp;", '&'},
+    {"&lt;", '<'},
+    {"&gt;", '>'},
+    {"&Oslash;", 'Ø'},
+    {"&oslash;", 'ø'},
+    {"&bull;", '•'},
+    {"&eacute;", 'é'},
+    {"&Eacute;", 'É'},
+    {"&euro;", '€'}
+};
+
+
+
     public static readonly string[] DateTimeFormats = [
         "dd.MM.yyyy HH:mm:ss",
                                                        "dd.MM.yyyy",
