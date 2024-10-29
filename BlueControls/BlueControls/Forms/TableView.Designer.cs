@@ -1050,8 +1050,8 @@ namespace BlueControls.Forms {
         private Button grpAufräumen;
         private Button btnUserInfo;
         private Button btnSuchInScript;
-        private Button btnZoomOut;
-        private Button btnZoomIn;
-        private Button btnZoomFit;
+        protected Button btnZoomOut;
+        protected Button btnZoomIn;
+        protected Button btnZoomFit;
     }
 }

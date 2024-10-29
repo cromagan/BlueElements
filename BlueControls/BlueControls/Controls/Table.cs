@@ -1574,10 +1574,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             DoubleClick?.Invoke(this, ea);
 
             if (!Mouse_IsInHead()) {
-                if (_mouseOverRow != null || MousePos().Y <= ca.HeadSize() + 18) {
-                    DoubleClick?.Invoke(this, ea);
+                //if (_mouseOverRow != null || MousePos().Y <= ca.HeadSize() + 18) {
                     Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true);
-                }
+                //}
             }
             _isinDoubleClick = false;
         }
@@ -2495,7 +2494,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             box.Text = contentHolderCellRow.CellGetString(contentHolderCellColumn);
         } else {
             // Neue Zeile...
-            box.Location = new Point(headPos.X, headPos.Y);
+            box.Location = new Point(headPos.X, headPos.Bottom);
             box.Size = new Size(headPos.Width + addWith, GetPix(18));
             box.Text = string.Empty;
         }
