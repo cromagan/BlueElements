@@ -39,7 +39,7 @@ public static class Develop {
 
     #region Fields
 
-    public static bool AllReadOnly = true;
+    public static bool AllReadOnly = false;
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
