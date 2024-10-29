@@ -24,9 +24,6 @@ using System.Drawing.Text;
 namespace BlueBasics;
 
 public static partial class Extensions {
-
-    #region Methods
-
     //public static Size FormatedText_NeededSize(this Font font, string text, QuickImage? qi, int minSize) {
     //    try {
     //        var pSize = SizeF.Empty;
@@ -61,21 +58,28 @@ public static partial class Extensions {
     //    }
     //}
 
-    public static SizeF MeasureString(this Font font, string text) {
-        try {
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            SetTextRenderingHint(g, font);
-            return g.MeasureString(text, font, 9999, StringFormat.GenericDefault);
-        } catch {
-            return SizeF.Empty;
-        }
-    }
+    #region Methods
 
-    public static SizeF MeasureString(this Font font, string text, StringFormat stringformat) {
+    public static SizeF MeasureString(this Font font, string text) => font.MeasureString(text, StringFormat.GenericDefault);
+
+    public static SizeF MeasureString(this Font font, string text, StringFormat stringFormat) {
+        if (string.IsNullOrEmpty(text)) return SizeF.Empty;
+
         try {
+            // Graphics-Objekt wiederverwendbar machen über static
             using var g = Graphics.FromHwnd(IntPtr.Zero);
             SetTextRenderingHint(g, font);
-            return g.MeasureString(text, font, 9999, stringformat);
+
+            // Prüfen auf Leerzeichen am Ende
+            if (text.EndsWith(" ")) {
+                // Wir messen den Text mit einem zusätzlichen x am Ende
+                var withX = g.MeasureString(text + 'x', font, 9999, stringFormat);
+                var x = g.MeasureString("x", font, 9999, stringFormat);
+
+                return new SizeF(withX.Width - x.Width, withX.Height);
+            }
+
+            return g.MeasureString(text, font, 9999, stringFormat);
         } catch {
             return SizeF.Empty;
         }

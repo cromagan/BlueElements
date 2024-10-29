@@ -113,7 +113,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     public string AllowedChars { get; set; }    // Todo: Implementieren
     public Alignment Ausrichtung { get; set; }
 
-
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
@@ -145,7 +144,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public bool Multiline { get; set; }
 
-    // TODO: Implementieren
     public string PlainText {
         get {
             if (IsDisposed) { return string.Empty; }
@@ -519,7 +517,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         ResetPosition(true);
     }
 
-private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
+    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
         if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
 
         var endpos = htmlText.IndexOf('>', start + 1);
@@ -810,7 +808,8 @@ private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFo
         _height = 0;
         if (Count == 0) { return; }
 
-        List<string> ri = [];
+        var estimatedRows = Count / 50; // Geschätzte Zeilenanzahl
+        var ri = new List<string>(estimatedRows);
         var vZbxPixel = 0f;
         var isX = 0f;
         var isY = 0f;

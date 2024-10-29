@@ -508,24 +508,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void Dispose(bool disposing) {
-        try {
-            if (disposing) {
-                Blinker.Tick -= Blinker_Tick;
-                //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
-                components?.Dispose();
-            }
-        } finally {
-            base.Dispose(disposing);
-            //   Dictionary.Release()
-            _cursorCharPos = 0;
-            _markStart = 0;
-            _markEnd = 0;
-            _mouseValue = 0;
-            _cursorVisible = false;
-            //_suffix = string.Empty;
+        if (disposing) {
+            Blinker.Tick -= Blinker_Tick;
             _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
             _eTxt.Dispose();
+            components?.Dispose();
         }
+
+        base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -606,8 +596,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
         Cursor_Show(gr);
-        MarkAndGenerateZone(gr, state);
+
         _eTxt.Draw(gr, 1);
+        MarkAndGenerateZone(gr, state);
+
         if (!string.IsNullOrEmpty(_suffix)) {
             Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
             if (_eTxt.Count > 0) {
@@ -1016,32 +1008,40 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void MarkAndGenerateZone(Graphics gr, States state) {
-        //_eTxt.Check(0, _eTxt.Count - 1, false);
-        if (_markStart < 0 || _markEnd < 0) { return; }
         Selection_Repair(false);
-        var maS = Math.Min(_markStart, _markEnd);
-        var maE = Math.Max(_markStart, _markEnd);
-        if (_markStart == _markEnd) { return; }
-        //_eTxt.Check(maS, maE - 1, true);
-        var tmpcharS = maS;
+        if (_markStart < 0 || _markEnd < 0) { return; }
+
+        var mas = Math.Min(_markStart, _markEnd);
+        var mae = Math.Max(_markStart, _markEnd);
+
+        if (mas == mae) { return; }
 
         var sr = state | States.Checked;
 
-        for (var cc = maS; cc <= maE; cc++) {
-            if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) {
-                Rectangle r = new((int)(_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X),
-                    (int)(_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y),
-                    (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X),
-                    (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
-                if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
-
-                //if (_eTxt[tmpcharS].State != States.Undefiniert) {
-                Skin.Draw_Back(gr, Design, sr, r, null, false);
-                Skin.Draw_Border(gr, Design, sr, r);
-                //}
-                tmpcharS = cc;
+        for (var cc = mas; cc < mae; cc++) {
+            if (_eTxt[cc].IsVisible(1f, _eTxt.DrawingPos, _eTxt.DrawingArea)) {
+                var f = _eTxt[cc].Font;
+                _eTxt[cc].Font = Skin.GetBlueFont(Design.TextBox, sr);
+                _eTxt[cc].Draw(gr, _eTxt.DrawingPos, 1f);
+                _eTxt[cc].Font = f;
             }
         }
+
+        //for (var cc = maS; cc <= maE; cc++) {
+        //    if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) {
+        //        Rectangle r = new((int)(_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X),
+        //            (int)(_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y),
+        //            (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X),
+        //            (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
+        //        if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
+
+        //        //if (_eTxt[tmpcharS].State != States.Undefiniert) {
+        //        Skin.Draw_Back(gr, Design, sr, r, null, false);
+        //        Skin.Draw_Border(gr, Design, sr, r);
+        //        //}
+        //        tmpcharS = cc;
+        //    }
+        //}
     }
 
     private void MarkClear() {

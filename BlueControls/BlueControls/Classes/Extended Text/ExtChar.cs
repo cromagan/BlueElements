@@ -138,17 +138,30 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     public abstract bool IsSpace();
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="zoom"></param>
-    /// <param name="drawingPos">Muss bereits Skaliert sein</param>
-    /// <returns></returns>
-    public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => drawingArea is { Width: < 1, Height: < 1 } ||
-        ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
-         && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
-         && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
-         && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
+    public bool IsVisible(float zoom, Point drawingPos, Rectangle area) {
+        if (area.Width < 1 || area.Height < 1) { return true; }
+
+        var px = (Pos.X * zoom) + drawingPos.X;
+        if (px > area.Right) { return false; }
+
+        var py = (Pos.Y * zoom) + drawingPos.Y;
+        if (py > area.Bottom) { return false; }
+
+        return px + Size.Width * zoom >= area.Left &&
+               py + Size.Height * zoom >= area.Top;
+    }
+
+    ///// <summary>
+    /////
+    ///// </summary>
+    ///// <param name="zoom"></param>
+    ///// <param name="drawingPos">Muss bereits Skaliert sein</param>
+    ///// <returns></returns>
+    //public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => drawingArea is { Width: < 1, Height: < 1 } ||
+    //    ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
+    //     && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
+    //     && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
+    //     && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
 
     public abstract bool IsWordSeperator();
 
