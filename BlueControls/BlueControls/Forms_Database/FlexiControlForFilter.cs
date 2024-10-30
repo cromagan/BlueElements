@@ -157,7 +157,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (filterSingle != null) {
             _doFilterDeleteButton = filterSingle.FilterType != FilterType.Instr_GroßKleinEgal ||
                                     filterSingle.SearchValue.Count > 1 ||
-                                    f.GetComboBox() is { IsDisposed: false } cb && cb.WasThisValueClicked();
+                                    (f.GetComboBox() is { IsDisposed: false } cb && cb.WasThisValueClicked());
             _fromInputFilter = true;
             _origin = filterSingle.Origin;
         } else {

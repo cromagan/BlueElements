@@ -47,7 +47,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
 
-    private ConnectedFormula.ConnectedFormula? _cFormula;
+    private ConnectedFormula.ConnectedFormula? _formula = null;
 
     #endregion
 
@@ -88,7 +88,39 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Properties
 
-    public ConnectedFormula.ConnectedFormula? CFormula => _cFormula;
+    public ConnectedFormula.ConnectedFormula? Formula {
+        get => _formula;
+        private set {
+            if (!Generic.IsAdministrator()) { value = null; }
+            if (value != null && !value.LockEditing()) { value = null; }
+
+            if (_formula == value) { return; }
+
+            if (_formula != null) {
+                _formula.Editing -= _cFormula_Editing;
+                _formula.UnlockEditing();
+            }
+
+            _formula = value;
+
+            if (_formula != null) {
+                _formula.Editing += _cFormula_Editing;
+            }
+
+            if (_formula?.Pages is { } pg) {
+                foreach (var thisp in pg) {
+                    if (thisp is ItemCollectionPadItem { IsDisposed: false } icp && icp.Caption.ToLower() == "head") {
+                        Pad.Items = icp;
+                        break;
+                    }
+                }
+            } else {
+                Pad.Items = null;
+            }
+
+            CheckButtons();
+        }
+    }
 
     public IEditable? ToEdit {
         set {
@@ -219,11 +251,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //MultiUserFile.SaveAll(true);
 
         //if (sender == btnSaveAs) {
-        //    if (CFormula == null) { return; }
+        //    if (Formula == null) { return; }
         //}
 
         //if (sender == btnNeuDB) {
-        //    if (CFormula != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
+        //    if (Formula != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
         //}
 
         //_ = SaveTab.ShowDialog();
@@ -235,7 +267,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //}
         //if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
-        //CFormula?.SaveAsAndChangeTo(SaveTab.FileName);
+        //Formula?.SaveAsAndChangeTo(SaveTab.FileName);
 
         //FormulaSet(SaveTab.FileName, null);
     }
@@ -248,9 +280,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
 
     private void btnRegionAdd_Click(object sender, System.EventArgs e) {
-        if (CFormula == null) { return; }
+        if (Formula == null) { return; }
 
-        var x = new RegionFormulaPadItem(string.Empty, CFormula) {
+        var x = new RegionFormulaPadItem(string.Empty, Formula) {
             Bei_Export_sichtbar = true
         };
         AddCentered(x);
@@ -268,10 +300,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var it = new RowEntryPadItem();
         p.Add(it);
 
-        CFormula.Pages.Add(p);
+        Formula.Pages.Add(p);
 
         Pad.Items = p;
-        CFormula?.Repair();
+        Formula?.Repair();
 
         //it.Datenbank_wählen();
 
@@ -291,9 +323,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
-        if (CFormula == null) { return; }
+        if (Formula == null) { return; }
 
-        var x = new TabFormulaPadItem(string.Empty, CFormula) {
+        var x = new TabFormulaPadItem(string.Empty, Formula) {
             Bei_Export_sichtbar = true
         };
         AddCentered(x);
@@ -307,9 +339,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
     private void btnWeitereCF_Click(object sender, System.EventArgs e) {
-        if (CFormula == null) { return; }
+        if (Formula == null) { return; }
 
-        var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty, CFormula);
+        var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty, Formula);
 
         if (l.Count == 0) { return; }
 
@@ -345,7 +377,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         try {
             if (IsDisposed) { return; }
 
-            var x = _cFormula?.AllPages() ?? [];
+            var x = _formula?.AllPages() ?? [];
 
             TabPage? later = null;
 
@@ -407,32 +439,17 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
-        if (_cFormula != null) {
-            _cFormula.Editing -= _cFormula_Editing;
-            _cFormula.UnlockEditing();
-        }
+        Formula = formular;
 
-        if (!Generic.IsAdministrator()) { formular = null; }
-        if (formular != null && !formular.LockEditing()) { formular = null; }
+        //if (notAllowedchilds != null && Formula != null && editable) {
+        //    var l = new List<string>();
+        //    l.AddRange(Formula.NotAllowedChilds);
+        //    l.AddRange(notAllowedchilds);
 
-        if (_cFormula == formular) { return; }
+        //    Formula.NotAllowedChilds = l.AsReadOnly();
+        //}
 
-        _cFormula = formular;
-        var editable = false;
-
-        if (_cFormula != null) {
-            _cFormula.Editing += _cFormula_Editing;
-        }
-
-        if (notAllowedchilds != null && CFormula != null && editable) {
-            var l = new List<string>();
-            l.AddRange(CFormula.NotAllowedChilds);
-            l.AddRange(notAllowedchilds);
-
-            CFormula.NotAllowedChilds = l.AsReadOnly();
-        }
-
-        if (_cFormula?.Pages is { } pg) {
+        if (_formula?.Pages is { } pg) {
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icp && icp.Caption.ToLower() == "head") {
                     Pad.Items = icp;
@@ -505,7 +522,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             s = tabSeiten.SelectedTab.Text;
         }
 
-        if (_cFormula?.Pages is { } pg) {
+        if (_formula?.Pages is { } pg) {
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
                     if (s == icp.Caption) {

@@ -147,8 +147,8 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
         var py = (Pos.Y * zoom) + drawingPos.Y;
         if (py > area.Bottom) { return false; }
 
-        return px + Size.Width * zoom >= area.Left &&
-               py + Size.Height * zoom >= area.Top;
+        return px + (Size.Width * zoom) >= area.Left &&
+               py + (Size.Height * zoom) >= area.Top;
     }
 
     ///// <summary>

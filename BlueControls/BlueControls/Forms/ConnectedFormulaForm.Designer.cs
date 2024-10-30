@@ -258,13 +258,13 @@ namespace BlueControls.Forms {
             this.LoadTab.Title = "Bitte Datenbank laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // CFormula
+            // Formula
             // 
             this.CFormula.CausesValidation = false;
             this.CFormula.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFormula.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFormula.Location = new System.Drawing.Point(0, 110);
-            this.CFormula.Name = "CFormula";
+            this.CFormula.Name = "Formula";
             this.CFormula.Size = new System.Drawing.Size(1202, 316);
             this.CFormula.TabIndex = 98;
             this.CFormula.TabStop = false;

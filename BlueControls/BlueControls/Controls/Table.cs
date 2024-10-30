@@ -2611,7 +2611,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWoSlider, ColumnViewCollection ca, Rectangle r) {
+    private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWoSlider, Rectangle r) {
         if (IsDisposed) { return; }
 
         if (cellInThisDatabaseColumn.Column is not { IsDisposed: false } tmpc) { return; }
@@ -2621,7 +2621,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Draw_Border(gr, cellInThisDatabaseColumn, r, displayRectangleWoSlider.Height);
     }
 
-    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen, ColumnViewCollection ca, Rectangle r) {
+    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, bool firstOnScreen, ColumnViewCollection ca, Rectangle r) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (viewItem.Column is not { IsDisposed: false } cellInThisDatabaseColumn) { return; }
 
@@ -2981,14 +2981,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             //    }
             //}
 
-            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
-            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
-            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
-            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.Cells, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.Cells, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
             // Den CursorLines zeichnen
             Draw_Cursor(gr, displayRectangleWoSlider, true);
-            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
-            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
+            Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
 
             // Überschriften 1-3 Zeichnen
             Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider, 0);
@@ -3025,7 +3025,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private void Draw_Table_What(Graphics gr, List<RowData> sr, TableDrawColumn col, TableDrawType type, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, ColumnViewCollection ca) {
+    private void Draw_Table_What(Graphics gr, List<RowData> sr, TableDrawColumn col, TableDrawType type, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection ca) {
         if (IsDisposed) { return; }
 
         var lfdno = 0;
@@ -3041,11 +3041,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                     switch (type) {
                         case TableDrawType.ColumnBackBody:
-                            Draw_Column_Body(gr, viewItem, displayRectangleWoSlider, ca, r);
+                            Draw_Column_Body(gr, viewItem, displayRectangleWoSlider, r);
                             break;
 
                         case TableDrawType.Cells:
-                            Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, firstOnScreen, ca, r);
+                            Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, firstOnScreen, ca, r);
                             break;
 
                         case TableDrawType.ColumnHead:
@@ -3353,7 +3353,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private RowData? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
-        if (IsDisposed || Database is not { IsDisposed: false } || pixelY <= ca.HeadSize()) { return null; }
+        if (IsDisposed || Database is not { IsDisposed: false } || pixelY <= ca.HeadSize() * _zoom) { return null; }
         var s = RowsFilteredAndPinned();
 
         return s?.FirstOrDefault(thisRowItem => thisRowItem != null && pixelY >= DrawY(ca, thisRowItem) && pixelY <= DrawY(ca, thisRowItem) + GetPix(thisRowItem.DrawHeight) && thisRowItem.Expanded);

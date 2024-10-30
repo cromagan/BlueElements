@@ -447,7 +447,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                 for (var x = 1; x < f.Width - 1; x++) {
                     for (var y = (int)(f.Height - 1); y >= miny; y--) {
                         // Bei 32bpp ist jedes Pixel 4 Bytes
-                        var pixel = ptr[y * stride + x * 4];
+                        var pixel = ptr[(y * stride) + (x * 4)];
                         if (y > miny && pixel == 0) {
                             miny = y;
                             break;
