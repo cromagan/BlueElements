@@ -53,6 +53,7 @@ public partial class Form : System.Windows.Forms.Form {
     public Form() : this(Design.Form_Standard) { }
 
     public Form(Design design) : base() {
+        Allgemein.CheckMemory();
         Design = design;
         if (!Skin.Inited) { Skin.LoadSkin(); }
         BackColor = Skin.Color_Back(Design, States.Standard);

@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Linq;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -36,16 +38,21 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     #region Fields
 
-    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
+
 
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
-
     private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
-    private static readonly List<BlueFont> FontsAll = [];
+    private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
 
+    private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
+    private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
-    private SizeF[] _charSize = new SizeF[256];
+
+
+
+    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
+
 
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
@@ -62,6 +69,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private QuickImage? _nameInStyleSym;
 
     private float _oberlänge = -1;
+
     private Bitmap? _sampleTextSym;
 
     private float _sizeTestedAndFailed = float.MaxValue;
@@ -146,20 +154,27 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, Color colorBack) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower, colorBack.ToHtmlCode());
 
     public static BlueFont Get(string toParse) {
-        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) { return DefaultFont; }
+        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) {
+            return DefaultFont;
+        }
 
-        if (FontsAll.Get(toParse.Replace(" ", string.Empty).ToUpperInvariant()) is { } found) { return found; }
-
+        // Erst den String vorverarbeiten
         toParse = toParse.Replace(",", ", "); // TODO: vor 01.10.2021 Entferen wenn inv bei den exports repariert wurde
-        var f = new BlueFont();
 
-        f.Parse(toParse);
+        //// String für späteren Gebrauch zwischenspeichern
+        //var parsedString = toParse;
 
-        // Kann beim Initialisieren von anderen Fonts tatsächlih noch null sein
-        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
-        FontsAll?.Add(f);
+        //// Einen temporären Font erstellen um den korrekten Key zu erhalten
+        //var tempFont = new BlueFont();
+        //tempFont.Parse(parsedString);
+        //var key = tempFont.KeyName;
 
-        return f;
+        // GetOrAdd mit einer Factory, die bei Bedarf einen neuen Font erstellt
+        return _blueFontCache.GetOrAdd(toParse.ToUpperInvariant(), _ => {
+            var newFont = new BlueFont();
+            newFont.Parse(toParse);
+            return newFont;
+        });
     }
 
     public static Brush GetBrush(Color color) {
@@ -241,6 +256,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
+
+
 
     public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1f, StringFormat.GenericDefault);
 
@@ -349,7 +366,15 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
 
-    public SizeF MeasureString(string text, StringFormat stringFormat) => _fontOl.MeasureString(text, stringFormat);
+    public SizeF MeasureString(string text, StringFormat stringFormat) {
+        // Für sehr kurze Strings lohnt sich das Caching nicht
+        if (text.Length <= 2) {
+            return _fontOl.MeasureString(text, stringFormat);
+        }
+
+        var key = $"{text}_{stringFormat.FormatFlags}";
+        return _stringSizeCache.GetOrAdd(key, _ => _fontOl.MeasureString(text, stringFormat));
+    }
 
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
@@ -370,13 +395,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         // bei einer einzelnen Operation aber langsamer
         KeyName = parsed.Replace(" ", string.Empty).ToUpperInvariant();
 
-        // Schnellere Array-Initialisierung
-        _charSize = new SizeF[256];
-        var defaultSize = new SizeF(-1, -1);
-        for (var i = 0; i < _charSize.Length; i++) {
-            _charSize[i] = defaultSize;
-        }
-
         // Flags direkt in einer Operation setzen
         var ftst = FontStyle.Regular |
                    (Italic ? FontStyle.Italic : 0) |
@@ -392,6 +410,13 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         _font = new Font(FontName, s, ftst);
         _fontOl = new Font(FontName, s, ftst2);
+
+
+        _charSizeCache.Clear();
+        _stringSizeCache.Clear();
+        _transformCache.Clear();
+
+
 
         // Oberlängenberechnung
         var multi = 50 / _fontOl.Size;
@@ -449,18 +474,23 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     public bool ParseThis(string key, string value) {
+
+        var needsCacheReset = false;
+
         switch (key) {
             case "name":
             case "fontname":
                 FontName = value;
-                return true;
+                needsCacheReset = true;
+                break;
 
             case "size":
             case "fontsize":
                 Size = FloatParse(value.FromNonCritical());
                 if (Size < 0.1f) { Size = 0.1f; }
                 Size = (float)Math.Round((double)Size, 3, MidpointRounding.AwayFromZero);
-                return true;
+                needsCacheReset = true;
+                break;
 
             case "color":
                 ColorMain = value.FromHtmlCode();
@@ -484,7 +514,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
             case "capitals":
                 Kapitälchen = true;
-                return true;
+                needsCacheReset = true;
+                break;
 
             case "strikeout":
                 StrikeOut = true;
@@ -500,12 +531,24 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
             case "onlylower":
                 OnlyLower = true;
-                return true;
+                needsCacheReset = true;
+                break;
 
             case "onlyupper":
                 OnlyUpper = true;
-                return true;
+                needsCacheReset = true;
+                break;
         }
+
+        if (needsCacheReset) {
+            _charSizeCache.Clear();
+            _stringSizeCache.Clear();
+            _transformCache.Clear();
+            return true;
+        }
+
+      
+
 
         return false;
     }
@@ -513,6 +556,16 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public Pen Pen(float additionalScale) {
         var lineWidth = CalculateLineWidth(additionalScale);
         return GetPen(ColorMain, lineWidth);
+    }
+
+    // Optional: Batch-Verarbeitung für Performancegewinn bei vielen Zeichen
+    public void PreloadCommonChars() {
+        const string commonChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
+
+        // Parallele Vorberechnung der häufigsten Zeichen
+        Parallel.ForEach(commonChars, c => {
+            _ = CharSize(c);
+        });
     }
 
     public string ReadableText() {
@@ -534,7 +587,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _sampleTextSym;
     }
 
-    public BlueFont Scale(float scale) => Math.Abs(1 - scale) < DefaultTolerance ? this : Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
+    public BlueFont Scale(float scale) {
+        if (Math.Abs(1 - scale) < DefaultTolerance) return this;
+
+        return Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut,
+                   Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
+    }
 
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
@@ -563,15 +621,135 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _symbolOfLineSym;
     }
 
-    internal SizeF CharSize(char c) {
-        // Direkter Zugriff auf vorberechnete Größe wenn möglich
-        if (c <= _charSize.GetUpperBound(0)) {
-            ref SizeF size = ref _charSize[c];
-            return (size.Height <= 0 || (size.Width < 1 && c > 30))
-                ? (size = Compute_Size(c))
-                : size;
+
+
+    public static void TrimAllCaches(int maxItemsPerFont = 1000, int maxFonts = 100) {
+        // Parallele Verarbeitung aller Fonts
+        Parallel.ForEach(_blueFontCache.Values, font => {
+            try {
+                font.TrimCache(maxItemsPerFont);
+            } catch {
+                // Fehler beim Trimmen eines einzelnen Fonts sollte nicht 
+                // das Trimmen der anderen Fonts verhindern
+            }
+        });
+
+
+
+        // _blueFontCache reduzieren
+        if (_blueFontCache.Count > maxFonts) {
+            var keysToRemove = _blueFontCache.Keys
+                .OrderBy(k => {
+                    // DefaultFont hat höchste Priorität und wird nie entfernt
+                    if (_blueFontCache.TryGetValue(k, out var font) && font == DefaultFont) {
+                        return int.MinValue;
+                    }
+                    return 0;
+                })
+                .Skip(maxFonts)
+                .ToList();
+
+            foreach (var key in keysToRemove) {
+                // Dispose nur wenn Font wirklich entfernt wurde
+                if (_blueFontCache.TryRemove(key, out var font)) {
+                    font._font?.Dispose();
+                    font._fontOl?.Dispose();
+                    //font._nameInStyleSym?.Dispose();
+                    font._sampleTextSym?.Dispose();
+                    //font._symbolForReadableTextSym?.Dispose();
+                    //font._symbolOfLineSym?.Dispose();
+                }
+            }
         }
-        return Compute_Size(c);
+
+
+
+
+
+
+
+
+
+        // Zusätzlich die statischen Caches aufräumen
+        if (_brushCache.Count > maxItemsPerFont) {
+            var keysToRemove = _brushCache.Keys
+                .Take(_brushCache.Count - maxItemsPerFont)
+                .ToList();
+            foreach (var key in keysToRemove) {
+                if (_brushCache.TryRemove(key, out var brush)) {
+                    brush.Dispose();
+                }
+            }
+        }
+
+        if (_fontCache.Count > maxItemsPerFont) {
+            var keysToRemove = _fontCache.Keys
+                .Take(_fontCache.Count - maxItemsPerFont)
+                .ToList();
+            foreach (var key in keysToRemove) {
+                if (_fontCache.TryRemove(key, out var font)) {
+                    font.Dispose();
+                }
+            }
+        }
+
+        if (_penCache.Count > maxItemsPerFont) {
+            var keysToRemove = _penCache.Keys
+                .Take(_penCache.Count - maxItemsPerFont)
+                .ToList();
+            foreach (var key in keysToRemove) {
+                if (_penCache.TryRemove(key, out var pen)) {
+                    pen.Dispose();
+                }
+            }
+        }
+    }
+
+
+    public void TrimCache(int maxItems = 1000) {
+        var currentSize = _charSizeCache.Count;
+        if (currentSize <= maxItems) return;
+
+        var itemsToRemove = currentSize - maxItems;
+        var keysToRemove = _charSizeCache.Keys.Take(itemsToRemove).ToList();
+
+        foreach (var key in keysToRemove) {
+            _charSizeCache.TryRemove(key, out _);
+        }
+
+        // Auch String-Cache aufräumen
+        var stringsToRemove = _stringSizeCache.Count - maxItems;
+        if (stringsToRemove > 0) {
+            var stringKeysToRemove = _stringSizeCache.Keys.Take(stringsToRemove).ToList();
+            foreach (var key in stringKeysToRemove) {
+                _stringSizeCache.TryRemove(key, out _);
+            }
+        }
+    }
+
+    internal SizeF CharSize(char c) {
+        return _charSizeCache.GetOrAdd(c, ch => {
+            if (ch <= 31) { return new SizeF(0, _zeilenabstand); }
+
+            // Transformation und Small-Caps Berechnung wie bisher
+            char transformedChar = c;
+            bool isSmallCaps = false;
+
+            if (OnlyUpper || (Kapitälchen && char.IsLower(c))) {
+                transformedChar = char.ToUpper(c);
+                isSmallCaps = Kapitälchen && c != transformedChar;
+            } else if (OnlyLower) {
+                transformedChar = char.ToLower(c);
+            }
+
+            // Messung über StringFormat.GenericTypographic für präzisere Ergebnisse
+            var s = _fontOl.MeasureString($".{transformedChar}.", StringFormat.GenericTypographic);
+
+            return new SizeF(
+                (isSmallCaps ? (s.Width * 0.8f) : s.Width) - _widthOf2Points,
+                _zeilenabstand
+            );
+        });
     }
 
     internal float KapitälchenPlus(float scale) => _kapitälchenPlus * scale;
@@ -599,29 +777,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return result;
     }
 
-    private SizeF Compute_Size(char c) {
-        if (c <= 31) {
-            return new SizeF(0, _zeilenabstand);
-        }
-
-        // Zeichentransformation nur einmal durchführen
-        char transformedChar = c;
-        bool isSmallCaps = false;
-
-        if (OnlyUpper || (Kapitälchen && char.IsLower(c))) {
-            transformedChar = char.ToUpper(c);
-            isSmallCaps = Kapitälchen && c != transformedChar;
-        } else if (OnlyLower) {
-            transformedChar = char.ToLower(c);
-        }
-
-        var s = _fontOl.MeasureString($".{transformedChar}.", StringFormat.GenericTypographic);
-
-        return new SizeF(
-            (isSmallCaps ? (s.Width * 0.8f) : s.Width) - _widthOf2Points,
-            _zeilenabstand
-        );
-    }
 
     private void DrawString(Graphics gr, string text, bool isCapital, float x, float y, float scale, StringFormat stringFormat) {
         var font = isCapital ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);

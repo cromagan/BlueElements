@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Specialized;
 using BlueBasics;
 using BlueBasics.Interfaces;
@@ -35,6 +36,26 @@ public static class Allgemein {
     #endregion
 
     #region Methods
+
+
+    public static void CheckMemory() {
+        try {
+            var availableMemoryMB = GC.GetTotalMemory(false) / 1024 / 1024; // In MB
+            var totalSystemMemoryMB = Environment.SystemPageSize * (double)Environment.WorkingSet / 1024 / 1024;
+
+            // Wenn mehr als 20% des Systemspeichers oder mehr als 1GB für diese Instanz verwendet wird
+            if (availableMemoryMB > Math.Min(totalSystemMemoryMB * 0.2, 1024)) {
+                BlueFont.TrimAllCaches(1000, 100);
+                Generic.CollectGarbage();
+                
+            }
+        } catch {
+            // Fallback, wenn Speicherabfrage fehlschlägt
+            BlueFont.TrimAllCaches(1000, 100);
+            Generic.CollectGarbage();
+        }
+    }
+
 
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }
