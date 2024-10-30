@@ -46,6 +46,7 @@ namespace BlueControls.Controls
             this.btnDropDown.Name = "btnDropDown";
             this.btnDropDown.Size = new Size(24, 150);
             this.btnDropDown.TabIndex = 1;
+            this.btnDropDown.MouseEnter += new EventHandler(this.btnDropDown_MouseEnter);
             this.btnDropDown.LostFocus += new EventHandler(this.btnDropDown_LostFocus);
             this.btnDropDown.MouseUp += new MouseEventHandler(this.ShowMenu);
             // 

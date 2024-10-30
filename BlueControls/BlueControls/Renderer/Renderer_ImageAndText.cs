@@ -288,7 +288,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
                 _constantHeight = IntParse(value.FromNonCritical());
                 return true;
         }
-        return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() => "Standard";

@@ -186,9 +186,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
         }
     }
 
-    private void _parent_StyleChanged(object sender, System.EventArgs e) {
-        this.InvalidateFont();
-    }
+    private void _parent_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
 
     #endregion
 

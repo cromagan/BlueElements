@@ -539,9 +539,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        CalculateColorIds();
-    }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) => CalculateColorIds();
 
     protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
         Point cap;

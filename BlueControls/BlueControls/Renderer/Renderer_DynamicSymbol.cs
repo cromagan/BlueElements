@@ -49,7 +49,6 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-
         if (scaleddrawarea is { Width: > 4, Height: > 4 }) {
             using var bmp = new Bitmap(scaleddrawarea.Width, scaleddrawarea.Height);
 
@@ -78,36 +77,20 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
         return result;
     }
 
-    public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
-            //case "showpic":
-            //    _bild_anzeigen = value.FromPlusMinus();
-            //    return true;
-
-            //case "showtext":
-            //    _text_anzeigen = value.FromPlusMinus();
-            //    return true;
-
-            //case "showcheckstate":
-            //    _checkstatus_anzeigen = value.FromPlusMinus();
-            //    return true;
-        }
-        return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
-    }
+    public override bool ParseThis(string key, string value) => base.ParseThis(key, value);
 
     public override string ReadableText() => "Skript als Symbol anzeigen";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
+    protected override Size CalculateContentSize(string content, TranslationType translate) =>
         //var font = Skin.DesignOf(design, state).BFont?.Font();
 
         //if (font == null) { return new Size(16, 32); }
         //var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
         //return font.FormatedText_NeededSize(replacedText, QImage(content), 32);
-        return new Size(48, 48);
-    }
+        new Size(48, 48);
 
     /// <summary>
     /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.

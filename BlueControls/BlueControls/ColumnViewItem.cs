@@ -320,9 +320,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         _captionBitmap = null;
     }
 
-    public void Invalidate_X() {
-        X = null;
-    }
+    public void Invalidate_X() => X = null;
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
@@ -407,13 +405,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _column_PropertyChanged(object sender, System.EventArgs e) {
-        Invalidate_All();
-    }
+    private void _column_PropertyChanged(object sender, System.EventArgs e) => Invalidate_All();
 
-    private void _parent_StyleChanged(object? sender, System.EventArgs e) {
-        Invalidate_All();
-    }
+    private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_All();
 
     private int CalculateColumnContentWidth() {
         if (_column is not { IsDisposed: false }) { return 16; }

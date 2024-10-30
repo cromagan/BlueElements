@@ -54,17 +54,13 @@ public class Renderer_Font : Renderer_Abstract {
 
     public override List<string> ParseableItems() => [];
 
-    public override bool ParseThis(string key, string value) {
-        return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
-    }
+    public override bool ParseThis(string key, string value) => base.ParseThis(key, value);
 
     public override string ReadableText() => "Schriftart darstellen";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Klee);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
-        return BlueFont.Get(content).FormatedText_NeededSize(txt, null, 16);
-    }
+    protected override Size CalculateContentSize(string content, TranslationType translate) => BlueFont.Get(content).FormatedText_NeededSize(txt, null, 16);
 
     /// <summary>
     /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.

@@ -41,7 +41,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
-    private string _sheetStyle;
+    private string _sheetStyle = Constants.Win11;
     private PadStyles _style = PadStyles.Standard;
 
     #endregion
@@ -70,6 +70,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         get => _sheetStyle;
         set {
             if (_sheetStyle == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _sheetStyle = value;
             OnPropertyChanged();
         }
@@ -79,6 +80,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         get => _style;
         set {
             if (_style == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _style = value;
             this.InvalidateFont();
         }
@@ -112,9 +114,25 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
         base.OnPropertyChanged();
     }
 
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Style", _sheetStyle);
+
+        return result;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _lastCode = ParseableItems().FinishParseable();
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "style":
+                _sheetStyle = value.FromNonCritical();
+                return true;
+        }
+        return true;   // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
     }
 
     public abstract string ReadableText();

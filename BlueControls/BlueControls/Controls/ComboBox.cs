@@ -154,6 +154,10 @@ public partial class ComboBox : TextBox, ITranslateable {
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
+    protected override Design Design => GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage
+                                                            ? Design.Ribbon_ComboBox_Textbox
+                                                            : Design.ComboBox_Textbox;
+
     #endregion
 
     #region Indexers
@@ -307,10 +311,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         btnDropDown.Invalidate();
     }
 
-    protected override Design Design => GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage
-                                                            ? Design.Ribbon_ComboBox_Textbox
-                                                            : Design.ComboBox_Textbox;
-
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);
         FloatingForm.Close(this);
@@ -380,6 +380,8 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
+
+    private void btnDropDown_MouseEnter(object sender, System.EventArgs e) => btnEdit.Visible = false;
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -231,9 +232,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         var f = isCap ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
 
         // Größenmessung nur einmal durchführen wenn nötig
-        var si = (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent())
-            ? MeasureString(transformedText, stringFormat)
-            : SizeF.Empty;
+
+        SizeF si = SizeF.Empty;
+
+        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
+            si = (text.Length == 1) ? CharSize(text[0]) : MeasureString(transformedText, stringFormat);
+        }
 
         // Hintergrund zeichnen
         if (!ColorBack.IsMagentaOrTransparent()) {
@@ -346,70 +350,80 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower, ColorBack.ToHtmlCode());
 
     public void ParseFinished(string parsed) {
+        // StringBuilder ist bei vielen Replace-Operationen schneller,
+        // bei einer einzelnen Operation aber langsamer
         KeyName = parsed.Replace(" ", string.Empty).ToUpperInvariant();
 
+        // Schnellere Array-Initialisierung
         _charSize = new SizeF[256];
-        for (var z = 0; z <= _charSize.GetUpperBound(0); z++) {
-            _charSize[z] = new SizeF(-1, -1);
+        var defaultSize = new SizeF(-1, -1);
+        for (var i = 0; i < _charSize.Length; i++) {
+            _charSize[i] = defaultSize;
         }
 
-        var ftst = FontStyle.Regular;
-        var ftst2 = FontStyle.Regular;
+        // Flags direkt in einer Operation setzen
+        var ftst = FontStyle.Regular |
+                   (Italic ? FontStyle.Italic : 0) |
+                   (Bold ? FontStyle.Bold : 0) |
+                   (Underline ? FontStyle.Underline : 0) |
+                   (StrikeOut ? FontStyle.Strikeout : 0);
 
-        if (Italic) {
-            ftst |= FontStyle.Italic;
-            ftst2 |= FontStyle.Italic;
-        }
+        var ftst2 = FontStyle.Regular |
+                    (Italic ? FontStyle.Italic : 0) |
+                    (Bold ? FontStyle.Bold : 0);
 
-        if (Bold) {
-            ftst |= FontStyle.Bold;
-            ftst2 |= FontStyle.Bold;
-        }
-
-        if (Underline) {
-            ftst |= FontStyle.Underline;
-        }
-
-        if (StrikeOut) {
-            ftst |= FontStyle.Strikeout;
-        }
-
-        var s = Size / Skin.Scale;
-        if (s < 0.1f) { s = 0.1f; }
+        var s = Math.Max(Size / Skin.Scale, 0.1f);
 
         _font = new Font(FontName, s, ftst);
         _fontOl = new Font(FontName, s, ftst2);
 
-        // Die Oberlänge immer berechnen, Symbole benötigen die exacte höhe
-        var multi = 50 / _fontOl.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
-        Font tmpfont = new(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
+        // Oberlängenberechnung
+        var multi = 50 / _fontOl.Size;
+        using var tmpfont = new Font(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
         var f = tmpfont.MeasureString("Z");
-        Bitmap bmp = new((int)(f.Width + 1), (int)(f.Height + 1));
-        var gr = Graphics.FromImage(bmp);
+
+        using var bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
+        using var gr = Graphics.FromImage(bmp);
+
         for (var du = 0; du <= 1; du++) {
             gr.Clear(Color.White);
-            if (du == 1) {
-                tmpfont = new Font(_fontOl.Name, _fontOl.Size * multi * 0.8F / Skin.Scale, _fontOl.Style);
-            }
-            DrawString(gr, "Z", tmpfont, Brushes.Black, 0, 0);
+
+            using var currentFont = du == 1
+                ? new Font(_fontOl.Name, _fontOl.Size * multi * 0.8F / Skin.Scale, _fontOl.Style)
+                : tmpfont;
+
+            DrawString(gr, "Z", currentFont, Brushes.Black, 0, 0);
             var miny = (int)(f.Height / 2.0);
 
-            for (var x = 1; x <= f.Width - 1; x++) {
-                for (var y = (int)(f.Height - 1); y >= miny; y--) {
-                    if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
+            // Schnellere Pixelmanipulation durch LockBits
+            var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+            var bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, bmp.PixelFormat);
+
+            unsafe {
+                var ptr = (byte*)bmpData.Scan0;
+                var stride = bmpData.Stride;
+
+                for (var x = 1; x < f.Width - 1; x++) {
+                    for (var y = (int)(f.Height - 1); y >= miny; y--) {
+                        // Bei 32bpp ist jedes Pixel 4 Bytes
+                        var pixel = ptr[y * stride + x * 4];
+                        if (y > miny && pixel == 0) {
+                            miny = y;
+                            break;
+                        }
+                    }
                 }
             }
+
+            bmp.UnlockBits(bmpData);
+
             if (du == 0) {
                 _oberlänge = miny / multi;
-                if (!Kapitälchen) { break; }
+                if (!Kapitälchen) break;
             } else {
                 _kapitälchenPlus = _oberlänge - (miny / multi);
             }
         }
-
-        bmp.Dispose();
-        gr.Dispose();
-        tmpfont.Dispose();
 
         _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
         //http://www.vb-helper.com/howto_net_rainbow_text.html
@@ -419,7 +433,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         _pen = GeneratePen(1.0F);
         BrushColorMain = new SolidBrush(ColorMain);
         BrushColorOutline = new SolidBrush(ColorOutline);
-        //_code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
     }
 
     public bool ParseThis(string key, string value) {
@@ -535,35 +548,14 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     internal SizeF CharSize(char c) {
+        // Direkter Zugriff auf vorberechnete Größe wenn möglich
         if (c <= _charSize.GetUpperBound(0)) {
-            if (_charSize[c].Height <= 0) {
-                _charSize[c] = Compute_Size(c);
-            }
-            return _charSize[c].Width < 1 && c > 30 ? Compute_Size(c) : _charSize[c];
+            ref SizeF size = ref _charSize[c];
+            return (size.Height <= 0 || (size.Width < 1 && c > 30))
+                ? (size = Compute_Size(c))
+                : size;
         }
         return Compute_Size(c);
-    }
-
-    internal SizeF Compute_Size(char c) {
-        if (c <= (char)31) {
-            return new SizeF(0, _zeilenabstand);
-        }
-
-        string characterToMeasure;
-        if (Kapitälchen && char.ToUpper(c) != c) {
-            characterToMeasure = char.ToUpper(c).ToString();
-        } else if (OnlyUpper) {
-            characterToMeasure = char.ToUpper(c).ToString();
-        } else if (OnlyLower) {
-            characterToMeasure = char.ToLower(c).ToString();
-        } else {
-            characterToMeasure = char.ToString(c);
-        }
-        var s = _fontOl.MeasureString($".{characterToMeasure}.", StringFormat.GenericTypographic);
-        if (Kapitälchen && char.ToUpper(c) != c) {
-            s = s with { Width = s.Width * 0.8f };
-        }
-        return new SizeF(s.Width - _widthOf2Points, _zeilenabstand);
     }
 
     internal float KapitälchenPlus(float scale) => _kapitälchenPlus * scale;
@@ -591,9 +583,31 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return result;
     }
 
-    private Pen GeneratePen(float additionalScale) {
-        return new Pen(ColorMain, CalculateLineWidth(additionalScale));
+    private SizeF Compute_Size(char c) {
+        if (c <= 31) {
+            return new SizeF(0, _zeilenabstand);
+        }
+
+        // Zeichentransformation nur einmal durchführen
+        char transformedChar = c;
+        bool isSmallCaps = false;
+
+        if (OnlyUpper || (Kapitälchen && char.IsLower(c))) {
+            transformedChar = char.ToUpper(c);
+            isSmallCaps = Kapitälchen && c != transformedChar;
+        } else if (OnlyLower) {
+            transformedChar = char.ToLower(c);
+        }
+
+        var s = _fontOl.MeasureString($".{transformedChar}.", StringFormat.GenericTypographic);
+
+        return new SizeF(
+            (isSmallCaps ? (s.Width * 0.8f) : s.Width) - _widthOf2Points,
+            _zeilenabstand
+        );
     }
+
+    private Pen GeneratePen(float additionalScale) => new Pen(ColorMain, CalculateLineWidth(additionalScale));
 
     private bool SizeOk(float sizeToCheck) {
         // Windwows macht seltsamerweiße bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015

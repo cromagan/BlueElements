@@ -1574,8 +1574,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             DoubleClick?.Invoke(this, ea);
 
             if (!Mouse_IsInHead()) {
-                //if (_mouseOverRow != null || MousePos().Y <= ca.HeadSize() + 18) {
+                var rc = RowCaptionOnCoordinate(MousePos().X, MousePos().Y);
+
+                if (string.IsNullOrEmpty(rc)) {
                     Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true);
+                }
+
+                //if (_mouseOverRow != null || MousePos().Y <= ca.HeadSize() + 18) {
                 //}
             }
             _isinDoubleClick = false;
@@ -2517,9 +2522,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return true;
     }
 
-    private (ColumnViewItem?, RowData?) CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos) {
-        return (ColumnOnCoordinate(ca, xpos), RowOnCoordinate(ca, ypos));
-    }
+    private (ColumnViewItem?, RowData?) CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos) => (ColumnOnCoordinate(ca, xpos), RowOnCoordinate(ca, ypos));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3180,9 +3183,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate();
     }
 
-    private bool IsOnScreen(Rectangle head, Rectangle displayRectangleWoSlider) {
-        return !IsDisposed && head.Right > 0 && head.Left <= displayRectangleWoSlider.Width;
-    }
+    private bool IsOnScreen(Rectangle head, Rectangle displayRectangleWoSlider) => !IsDisposed && head.Right > 0 && head.Left <= displayRectangleWoSlider.Width;
 
     private bool IsOnScreen(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? row, Rectangle displayRectangleWoSlider) {
         if (viewItem?.Column == null) { return false; }
@@ -3193,13 +3194,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private bool IsOnScreen(ColumnViewCollection ca, RowData? vrow, Rectangle displayRectangleWoSlider) => vrow != null && DrawY(ca, vrow) + vrow.DrawHeight >= GetPix(ca.HeadSize()) && DrawY(ca, vrow) <= displayRectangleWoSlider.Height;
 
-    private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) {
-        return viewItem.AutoFilterLocation(_zoom, SliderX.Value).Contains(e.Location);
-    }
+    private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(_zoom, SliderX.Value).Contains(e.Location);
 
-    private bool Mouse_IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) {
-        return viewItem.ReduceButtonLocation(_zoom, SliderX.Value).Contains(e.Location);
-    }
+    private bool Mouse_IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.ReduceButtonLocation(_zoom, SliderX.Value).Contains(e.Location);
 
     private void Neighbour(ColumnViewItem? column, RowData? row, Direction direction, out ColumnViewItem? newColumn, out RowData? newRow) {
         if (CurrentArrangement is not { IsDisposed: false } ca) {

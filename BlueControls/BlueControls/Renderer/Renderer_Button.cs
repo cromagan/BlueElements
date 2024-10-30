@@ -99,8 +99,6 @@ public class Renderer_Button : Renderer_Abstract {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-
-
         scaleddrawarea.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
 
         Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, scaleddrawarea, true);
@@ -138,7 +136,7 @@ public class Renderer_Button : Renderer_Abstract {
                 _checkstatus_anzeigen = value.FromPlusMinus();
                 return true;
         }
-        return true; // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
+        return base.ParseThis(key, value);
     }
 
     public override string ReadableText() => "Als Knopf anzeigen";
