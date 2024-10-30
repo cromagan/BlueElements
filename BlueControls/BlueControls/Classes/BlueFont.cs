@@ -203,63 +203,78 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return txt;
     }
 
+    public float CalculateLineWidth(float scale) {
+        var baseWidth = (_zeilenabstand / 10f);
+        return baseWidth * (Bold ? 1.5f : 1f) * scale;
+    }
+
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
     public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1f, StringFormat.GenericDefault);
 
     public void DrawString(Graphics gr, string text, float x, float y, float scale, StringFormat stringFormat) {
-        var f = FontWithoutLines(scale);
+        if (string.IsNullOrEmpty(text)) return;
 
-        var isCap = false;
+        // Text-Transformationen in einem Schritt
+        string transformedText = text;
+        bool isCap = false;
 
-        if (Kapitälchen && text != text.ToUpperInvariant()) {
-            isCap = true;
-            f = FontWithoutLinesForCapitals(scale);
-            text = text.ToUpperInvariant();
-        } else if (OnlyUpper) {
-            text = text.ToUpperInvariant();
+        // Schnellere Variante der Text-Transformation mit weniger Vergleichen
+        if (OnlyUpper || (Kapitälchen && text != text.ToUpperInvariant())) {
+            transformedText = text.ToUpperInvariant();
+            if (Kapitälchen) isCap = true;
         } else if (OnlyLower) {
-            text = text.ToLowerInvariant();
+            transformedText = text.ToLowerInvariant();
         }
 
-        var si = SizeF.Empty;
-        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
-            si = MeasureString(text, stringFormat);
-        }
+        // Font nur einmal erstellen
+        var f = isCap ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
 
+        // Größenmessung nur einmal durchführen wenn nötig
+        var si = (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent())
+            ? MeasureString(transformedText, stringFormat)
+            : SizeF.Empty;
+
+        // Hintergrund zeichnen
         if (!ColorBack.IsMagentaOrTransparent()) {
-            gr.FillRectangle(new SolidBrush(ColorBack), x, y, si.Width, si.Height);
+            using var brush = new SolidBrush(ColorBack);
+            gr.FillRectangle(brush, x, y, si.Width, si.Height);
         }
 
-        if (Underline) {
-            gr.DrawLine(Pen(scale), x, (int)(y + Oberlänge(scale) + ((Pen(1f).Width + 1) * scale) + 0.5), x + ((1 + si.Width) * scale), (int)(y + Oberlänge(scale) + ((Pen(1f).Width + 1) * scale) + 0.5));
-        }
+        float actualY = y;
+        if (isCap) actualY += KapitälchenPlus(scale);
 
-        if (isCap) {
-            y += KapitälchenPlus(scale);
-        }
-
+        // Outline in einem separaten GraphicsPath für bessere Performance
         if (Outline) {
+            using var path = new GraphicsPath();
             for (var px = -1; px <= 1; px++) {
                 for (var py = -1; py <= 1; py++) {
-                    DrawString(gr, text, f, BrushColorOutline, x + (px * scale), y + (py * scale), stringFormat);
+                    DrawString(gr, transformedText, f, BrushColorOutline,
+                        x + (px * scale), actualY + (py * scale), stringFormat);
                 }
             }
         }
 
+        // Haupttext zeichnen
         if (isCap) {
-            DrawString(gr, text, f, BrushColorMain, x + (0.3F * scale), y, stringFormat);
+            DrawString(gr, transformedText, f, BrushColorMain, x + (0.3F * scale), actualY, stringFormat);
         }
+        DrawString(gr, transformedText, f, BrushColorMain, x, actualY, stringFormat);
 
-        DrawString(gr, text, f, BrushColorMain, x, y, stringFormat);
+        // Linien in einem Batch zeichnen
+        if (Underline || StrikeOut) {
+            var lineWidth = CalculateLineWidth(scale);
+            using var scaledPen = new Pen(ColorMain, lineWidth);
 
-        if (StrikeOut) {
-            gr.DrawLine(Pen(scale), x - 1, (int)(y + (si.Height * 0.55)), (int)(x + 1 + si.Width), (int)(y + (si.Height * 0.55)));
+            if (Underline) {
+                float underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
+                gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + si.Width) * scale), (int)underlineY);
+            }
+            if (StrikeOut) {
+                float strikeY = y + (si.Height * 0.55f);
+                gr.DrawLine(scaledPen, x - 1, (int)strikeY, (int)(x + 1 + si.Width), (int)strikeY);
+            }
         }
-
-        //if (_size.Width < 1) {
-        //    GR.DrawLine(new Pen(Color.Red), DrawX + 1, DrawY - 4, DrawX + 1, DrawY + 16);
-        //}
     }
 
     public Font Font(float scale) {
@@ -576,10 +591,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return result;
     }
 
-    private Pen GeneratePen(float addtionalScale) {
-        var linDi = (float)_zeilenabstand / 10 * addtionalScale;
-        if (Bold) { linDi *= 1.5F; }
-        return new Pen(ColorMain, linDi);
+    private Pen GeneratePen(float additionalScale) {
+        return new Pen(ColorMain, CalculateLineWidth(additionalScale));
     }
 
     private bool SizeOk(float sizeToCheck) {

@@ -56,8 +56,8 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
             Stil = PadStyles.Standard;
             _font = Skin.GetBlueFont(parent.SheetStyle, Stil);
         } else {
-            _font = parent[styleFromPos].Font;
             Stil = parent[styleFromPos].Stil;
+            _font = parent[styleFromPos].Font;
         }
 
         _size = SizeF.Empty;
