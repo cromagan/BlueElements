@@ -43,6 +43,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     private static readonly List<BlueFont> FontsAll = [];
 
+    private readonly ConcurrentDictionary<string, string> _transformCache = new();
     private SizeF[] _charSize = new SizeF[256];
 
     /// <summary>
@@ -240,81 +241,26 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public void DrawString(Graphics gr, string text, float x, float y, float scale, StringFormat stringFormat) {
         if (string.IsNullOrEmpty(text)) return;
 
-        // Text-Transformationen in einem Schritt
-        string transformedText = text;
-        bool isCap = false;
-
-        // Schnellere Variante der Text-Transformation mit weniger Vergleichen
-        if (OnlyUpper || (Kapitälchen && text != text.ToUpperInvariant())) {
-            transformedText = text.ToUpperInvariant();
-            if (Kapitälchen) isCap = true;
-        } else if (OnlyLower) {
-            transformedText = text.ToLowerInvariant();
+        // Schnelle Prüfung, ob überhaupt eine Transformation nötig ist
+        if (!OnlyUpper && !OnlyLower && !Kapitälchen) {
+            DrawString(gr, text, false, x, y, scale, stringFormat);
+            return;
         }
 
-        // Größenmessung nur einmal durchführen wenn nötig
-
-        SizeF si = SizeF.Empty;
-
-        // Font nur einmal erstellen
-        var tmpFont = isCap ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
-
-        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
-            si = (text.Length == 1) ? CharSize(text[0]) : MeasureString(transformedText, stringFormat);
-        }
-
-        // Hintergrund zeichnen
-        if (!ColorBack.IsMagentaOrTransparent()) {
-            using var brush = new SolidBrush(ColorBack);
-            gr.FillRectangle(brush, x, y, si.Width, si.Height);
-        }
-
-        float actualY = y;
-        if (isCap) actualY += KapitälchenPlus(scale);
-
-        // Outline in einem separaten GraphicsPath für bessere Performance
-        if (Outline) {
-            using var path = new GraphicsPath();
-            for (var px = -1; px <= 1; px++) {
-                for (var py = -1; py <= 1; py++) {
-                    DrawString(gr, transformedText, tmpFont, BrushColorOutline,
-                        x + (px * scale), actualY + (py * scale), stringFormat);
-                }
+        // Transformation nur wenn nötig aus dem Cache holen
+        var transformedText = _transformCache.GetOrAdd(text, t => {
+            if (OnlyUpper || (Kapitälchen && t != t.ToUpperInvariant())) {
+                return t.ToUpperInvariant();
             }
-        }
-
-        // Haupttext zeichnen
-        if (isCap) {
-            DrawString(gr, transformedText, tmpFont, BrushColorMain, x + (0.3F * scale), actualY, stringFormat);
-        }
-        DrawString(gr, transformedText, tmpFont, BrushColorMain, x, actualY, stringFormat);
-
-        // Linien in einem Batch zeichnen
-        if (Underline || StrikeOut) {
-            var lineWidth = CalculateLineWidth(scale);
-            using var scaledPen = new Pen(ColorMain, lineWidth);
-
-            if (Underline) {
-                float underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
-                gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + si.Width) * scale), (int)underlineY);
+            if (OnlyLower) {
+                return t.ToLowerInvariant();
             }
-            if (StrikeOut) {
-                float strikeY = y + (si.Height * 0.55f);
-                gr.DrawLine(scaledPen, x - 1, (int)strikeY, (int)(x + 1 + si.Width), (int)strikeY);
-            }
-        }
+            return t;
+        });
+
+        var isCapital = Kapitälchen && text != transformedText;
+        DrawString(gr, transformedText, isCapital, x, y, scale, stringFormat);
     }
-
-    //public Font FontWithoutLines(float scale) {
-    //    if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) { return _fontOl; }
-    //    var gr = _fontOl.Size * scale / Skin.Scale;
-
-    //    return SizeOk(gr) ? new Font(FontName, gr, _fontOl.Style, _fontOl.Unit)
-    //        : new Font("Arial", gr, _fontOl.Style, _fontOl.Unit);
-    //}
-
-    //public Font FontWithoutLinesForCapitals(float scale) =>
-    //    new(_fontOl.Name, _fontOl.Size * scale * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
 
     public Font Font(float scale) {
         if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) {
@@ -669,6 +615,58 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             (isSmallCaps ? (s.Width * 0.8f) : s.Width) - _widthOf2Points,
             _zeilenabstand
         );
+    }
+
+    private void DrawString(Graphics gr, string text, bool isCapital, float x, float y, float scale, StringFormat stringFormat) {
+        var font = isCapital ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
+
+        SizeF size = SizeF.Empty;
+        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
+            size = (text.Length == 1) ? CharSize(text[0]) : MeasureString(text, stringFormat);
+        }
+
+        float actualY = y;
+        if (isCapital) actualY += KapitälchenPlus(scale);
+
+        // Hintergrund
+        if (!ColorBack.IsMagentaOrTransparent()) {
+            using var brush = new SolidBrush(ColorBack);
+            gr.FillRectangle(brush, x, y, size.Width, size.Height);
+        }
+
+        // Outline
+        if (Outline) {
+            const int outlineSize = 1;
+            for (var px = -outlineSize; px <= outlineSize; px++) {
+                for (var py = -outlineSize; py <= outlineSize; py++) {
+                    if (px == 0 && py == 0) continue; // Überspringen der Mitte
+                    float dx = x + (px * scale);
+                    float dy = actualY + (py * scale);
+                    DrawString(gr, text, font, BrushColorOutline, dx, dy, stringFormat);
+                }
+            }
+        }
+
+        // Haupttext
+        if (isCapital) {
+            DrawString(gr, text, font, BrushColorMain, x + (0.3F * scale), actualY, stringFormat);
+        }
+        DrawString(gr, text, font, BrushColorMain, x, actualY, stringFormat);
+
+        // Linien
+        if (Underline || StrikeOut) {
+            var lineWidth = CalculateLineWidth(scale);
+            using var scaledPen = new Pen(ColorMain, lineWidth);
+
+            if (Underline) {
+                float underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
+                gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + size.Width) * scale), (int)underlineY);
+            }
+            if (StrikeOut) {
+                float strikeY = y + (size.Height * 0.55f);
+                gr.DrawLine(scaledPen, x - 1, (int)strikeY, (int)(x + 1 + size.Width), (int)strikeY);
+            }
+        }
     }
 
     private Pen GeneratePen(float additionalScale) => new Pen(ColorMain, CalculateLineWidth(additionalScale));
