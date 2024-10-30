@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -38,7 +39,10 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
     internal Brush BrushColorMain = Brushes.Red;
     internal Brush BrushColorOutline = Brushes.Red;
+    private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
+
     private static readonly List<BlueFont> FontsAll = [];
+
     private SizeF[] _charSize = new SizeF[256];
 
     /// <summary>
@@ -52,15 +56,25 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private Font _fontOl = new("Arial", 9);
 
     private float _kapitälchenPlus = -1;
+
     private QuickImage? _nameInStyleSym;
+
     private float _oberlänge = -1;
+
     private Pen _pen = new(Brushes.Red);
+
     private Bitmap? _sampleTextSym;
+
     private float _sizeTestedAndFailed = float.MaxValue;
+
     private float _sizeTestedAndOk = float.MinValue;
+
     private QuickImage? _symbolForReadableTextSym;
+
     private QuickImage? _symbolOfLineSym;
+
     private float _widthOf2Points;
+
     private int _zeilenabstand = -1;
 
     #endregion
@@ -76,10 +90,15 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public string CaptionForEditor => "Schriftart";
 
     public float CharHeight => _zeilenabstand;
+
     public Color ColorBack { get; private set; } = Color.Transparent;
+
     public Color ColorMain { get; private set; } = Color.Black;
+
     public Color ColorOutline { get; private set; } = Color.Transparent;
+
     public Type? Editor { get; set; }
+
     public string FontName { get; private set; } = "Arial";
 
     public bool Italic { get; private set; }
@@ -142,6 +161,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         FontsAll?.Add(f);
 
         return f;
+    }
+
+    public static Font GetFont(string fontName, float emSize, FontStyle style, GraphicsUnit unit, Func<Font> createFont) {
+        var key = $"{fontName}_{emSize}_{style}_{unit}";
+        return _fontCache.GetOrAdd(key, _ => createFont());
     }
 
     public static implicit operator Font(BlueFont font) => font._font;
@@ -228,12 +252,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             transformedText = text.ToLowerInvariant();
         }
 
-        // Font nur einmal erstellen
-        var f = isCap ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
-
         // Größenmessung nur einmal durchführen wenn nötig
 
         SizeF si = SizeF.Empty;
+
+        // Font nur einmal erstellen
+        var tmpFont = isCap ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
 
         if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
             si = (text.Length == 1) ? CharSize(text[0]) : MeasureString(transformedText, stringFormat);
@@ -253,7 +277,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             using var path = new GraphicsPath();
             for (var px = -1; px <= 1; px++) {
                 for (var py = -1; py <= 1; py++) {
-                    DrawString(gr, transformedText, f, BrushColorOutline,
+                    DrawString(gr, transformedText, tmpFont, BrushColorOutline,
                         x + (px * scale), actualY + (py * scale), stringFormat);
                 }
             }
@@ -261,9 +285,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         // Haupttext zeichnen
         if (isCap) {
-            DrawString(gr, transformedText, f, BrushColorMain, x + (0.3F * scale), actualY, stringFormat);
+            DrawString(gr, transformedText, tmpFont, BrushColorMain, x + (0.3F * scale), actualY, stringFormat);
         }
-        DrawString(gr, transformedText, f, BrushColorMain, x, actualY, stringFormat);
+        DrawString(gr, transformedText, tmpFont, BrushColorMain, x, actualY, stringFormat);
 
         // Linien in einem Batch zeichnen
         if (Underline || StrikeOut) {
@@ -281,24 +305,64 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
     }
 
+    //public Font FontWithoutLines(float scale) {
+    //    if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) { return _fontOl; }
+    //    var gr = _fontOl.Size * scale / Skin.Scale;
+
+    //    return SizeOk(gr) ? new Font(FontName, gr, _fontOl.Style, _fontOl.Unit)
+    //        : new Font("Arial", gr, _fontOl.Style, _fontOl.Unit);
+    //}
+
+    //public Font FontWithoutLinesForCapitals(float scale) =>
+    //    new(_fontOl.Name, _fontOl.Size * scale * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
+
     public Font Font(float scale) {
-        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
+        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) {
+            return _font;
+        }
 
         var emSize = _fontOl.Size * scale / Skin.Scale;
-        return SizeOk(emSize) ? new Font(FontName, emSize, _font.Style, _font.Unit)
-            : new Font("Arial", emSize, _font.Style, _font.Unit);
+
+        return GetFont(
+            FontName,
+            emSize,
+            _font.Style,
+            _font.Unit,
+            () => SizeOk(emSize)
+                ? new Font(FontName, emSize, _font.Style, _font.Unit)
+                : new Font("Arial", emSize, _font.Style, _font.Unit)
+        );
     }
 
     public Font FontWithoutLines(float scale) {
-        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) { return _fontOl; }
-        var gr = _fontOl.Size * scale / Skin.Scale;
+        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) {
+            return _fontOl;
+        }
 
-        return SizeOk(gr) ? new Font(FontName, gr, _fontOl.Style, _fontOl.Unit)
-            : new Font("Arial", gr, _fontOl.Style, _fontOl.Unit);
+        var emSize = _fontOl.Size * scale / Skin.Scale;
+
+        return GetFont(
+            FontName,
+            emSize,
+            _fontOl.Style,
+            _fontOl.Unit,
+            () => SizeOk(emSize)
+                ? new Font(FontName, emSize, _fontOl.Style, _fontOl.Unit)
+                : new Font("Arial", emSize, _fontOl.Style, _fontOl.Unit)
+        );
     }
 
-    public Font FontWithoutLinesForCapitals(float scale) =>
-        new(_fontOl.Name, _fontOl.Size * scale * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
+    public Font FontWithoutLinesForCapitals(float scale) {
+        var emSize = _fontOl.Size * scale * 0.8F / Skin.Scale;
+
+        return GetFont(
+            _fontOl.Name,
+            emSize,
+            _fontOl.Style,
+            _fontOl.Unit,
+            () => new Font(_fontOl.Name, emSize, _fontOl.Style, _fontOl.Unit)
+        );
+    }
 
     public Size FormatedText_NeededSize(string text, QuickImage? qi, int minSize) {
         try {
