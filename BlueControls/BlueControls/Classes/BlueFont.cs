@@ -37,10 +37,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     #region Fields
 
     public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
-    internal Brush BrushColorMain = Brushes.Red;
-    internal Brush BrushColorOutline = Brushes.Red;
+
+    private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
 
+    private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
     private static readonly List<BlueFont> FontsAll = [];
 
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
@@ -61,9 +62,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private QuickImage? _nameInStyleSym;
 
     private float _oberl‰nge = -1;
-
-    private Pen _pen = new(Brushes.Red);
-
     private Bitmap? _sampleTextSym;
 
     private float _sizeTestedAndFailed = float.MaxValue;
@@ -164,9 +162,17 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return f;
     }
 
+    public static Brush GetBrush(Color color) {
+        return _brushCache.GetOrAdd(color.ToArgb(), c => new SolidBrush(color));
+    }
+
     public static Font GetFont(string fontName, float emSize, FontStyle style, GraphicsUnit unit, Func<Font> createFont) {
         var key = $"{fontName}_{emSize}_{style}_{unit}";
         return _fontCache.GetOrAdd(key, _ => createFont());
+    }
+
+    public static Pen GetPen(Color color, float width) {
+        return _penCache.GetOrAdd((color.ToArgb(), width), key => new Pen(color, width));
     }
 
     public static implicit operator Font(BlueFont font) => font._font;
@@ -440,9 +446,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         //https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
         //http://www.typo-info.de/schriftgrad.htm
         _zeilenabstand = _fontOl.Height;
-        _pen = GeneratePen(1.0F);
-        BrushColorMain = new SolidBrush(ColorMain);
-        BrushColorOutline = new SolidBrush(ColorOutline);
     }
 
     public bool ParseThis(string key, string value) {
@@ -507,7 +510,10 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return false;
     }
 
-    public Pen Pen(float addtionalScale) => Math.Abs(addtionalScale - 1) < DefaultTolerance ? _pen : GeneratePen(addtionalScale);
+    public Pen Pen(float additionalScale) {
+        var lineWidth = CalculateLineWidth(additionalScale);
+        return GetPen(ColorMain, lineWidth);
+    }
 
     public string ReadableText() {
         var t = FontName + ", " + Size + " pt, ";
@@ -636,22 +642,25 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         // Outline
         if (Outline) {
+            var outlineBrush = GetOutlineBrush();
             const int outlineSize = 1;
             for (var px = -outlineSize; px <= outlineSize; px++) {
                 for (var py = -outlineSize; py <= outlineSize; py++) {
                     if (px == 0 && py == 0) continue; // ‹berspringen der Mitte
                     float dx = x + (px * scale);
                     float dy = actualY + (py * scale);
-                    DrawString(gr, text, font, BrushColorOutline, dx, dy, stringFormat);
+                    DrawString(gr, text, font, outlineBrush, dx, dy, stringFormat);
                 }
             }
         }
 
+        var mainBrush = GetMainBrush();
+
         // Haupttext
         if (isCapital) {
-            DrawString(gr, text, font, BrushColorMain, x + (0.3F * scale), actualY, stringFormat);
+            DrawString(gr, text, font, mainBrush, x + (0.3F * scale), actualY, stringFormat);
         }
-        DrawString(gr, text, font, BrushColorMain, x, actualY, stringFormat);
+        DrawString(gr, text, font, mainBrush, x, actualY, stringFormat);
 
         // Linien
         if (Underline || StrikeOut) {
@@ -670,6 +679,10 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     private Pen GeneratePen(float additionalScale) => new Pen(ColorMain, CalculateLineWidth(additionalScale));
+
+    private Brush GetMainBrush() => GetBrush(ColorMain);
+
+    private Brush GetOutlineBrush() => GetBrush(ColorOutline);
 
     private bool SizeOk(float sizeToCheck) {
         // Windwows macht seltsamerweiﬂe bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015
