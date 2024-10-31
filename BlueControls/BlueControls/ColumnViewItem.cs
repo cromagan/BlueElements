@@ -45,6 +45,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private int? _drawWidth;
 
+    private BlueFont? _font_Head_Colored;
+    private BlueFont? _font_Head_Default;
+    private BlueFont? _font_Numbers;
+    private BlueFont? _font_TextInFilter;
     private ColumnViewCollection? _parent;
 
     private bool _reduced;
@@ -137,16 +141,62 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             UnRegisterEvents();
             _column = value;
-            Invalidate_All();
+            Invalidate_Fonts();
             RegisterEvents();
         }
     }
 
     public int? Contentwidth { get; private set; }
-    public BlueFont Font_Head_Colored { get; private set; } = BlueFont.DefaultFont;
-    public BlueFont Font_Head_Default { get; internal set; } = BlueFont.DefaultFont;
-    public BlueFont Font_Numbers { get; private set; } = BlueFont.DefaultFont;
-    public BlueFont Font_TextInFilter { get; private set; } = BlueFont.DefaultFont;
+
+    public BlueFont Font_Head_Colored {
+        get {
+            if (IsDisposed) { return BlueFont.DefaultFont; }
+
+            if (_font_Head_Colored == null) {
+                if (_column != null) {
+                    var baseFont = Font_Head_Default;
+                    _font_Head_Colored = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, false, _column.ForeColor, Color.Transparent, baseFont.Kapitälchen, baseFont.OnlyLower, baseFont.OnlyLower, Color.Transparent);
+                } else {
+                    _font_Head_Colored = Font_Head_Default;
+                }
+            }
+            return _font_Head_Colored;
+        }
+    }
+
+    public BlueFont Font_Head_Default {
+        get {
+            if (IsDisposed) { return BlueFont.DefaultFont; }
+            if (_font_Head_Default == null) {
+                _font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
+            }
+            return _font_Head_Default;
+        }
+    }
+
+    public BlueFont Font_Numbers {
+        get {
+            if (IsDisposed) { return BlueFont.DefaultFont; }
+
+            if (_font_Numbers == null) {
+                var baseFont = Font_Head_Default;
+                _font_Numbers = BlueFont.Get(baseFont.FontName, baseFont.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
+            }
+            return _font_Numbers;
+        }
+    }
+
+    public BlueFont Font_TextInFilter {
+        get {
+            if (IsDisposed) { return BlueFont.DefaultFont; }
+            if (_font_TextInFilter == null) {
+                var baseFont = Font_Head_Default;
+                _font_TextInFilter = BlueFont.Get(baseFont.FontName, baseFont.Size - 2, true, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
+            }
+            return _font_TextInFilter;
+        }
+    }
+
     public bool IsDisposed { get; private set; }
 
     public ColumnLineStyle LineLeft {
@@ -307,6 +357,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return _renderer;
     }
 
+    public void Invalidate_ContentWidth() {
+        Contentwidth = null;
+        Invalidate_DrawWidth();
+    }
+
     public void Invalidate_DrawWidth() {
         if (_drawWidth is null) { return; }
 
@@ -407,9 +462,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _column_PropertyChanged(object sender, System.EventArgs e) => Invalidate_All();
+    private void _column_PropertyChanged(object sender, System.EventArgs e) => Invalidate_Fonts();
 
-    private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_All();
+    private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_Fonts();
 
     private int CalculateColumnContentWidth() {
         if (_column is not { IsDisposed: false }) { return 16; }
@@ -438,12 +493,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return newContentWidth;
     }
 
-
-    public void Invalidate_ContentWidth() {
-        Contentwidth = null;
-        Invalidate_DrawWidth();
-    }
-
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Column == _column) { Invalidate_ContentWidth(); }
     }
@@ -463,19 +512,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    private void Invalidate_All() {
+    private void Invalidate_Fonts() {
+        _font_Head_Default = null;
+        _font_Head_Colored = null;
+        _font_Numbers = null;
+        _font_TextInFilter = null;
         Invalidate_Head();
         Invalidate_ContentWidth();
-        Font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
-        Font_Numbers = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
-
-        Font_TextInFilter = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size - 2, true, false, false, false, true, Color.White, Color.Red, false, false, false, Color.Transparent);
-
-        if (Column != null) {
-            Font_Head_Colored = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size, Font_Head_Default.Bold, Font_Head_Default.Italic, Font_Head_Default.Underline, Font_Head_Default.StrikeOut, false, Column.ForeColor, Color.Transparent, Font_Head_Default.Kapitälchen, Font_Head_Default.OnlyLower, Font_Head_Default.OnlyLower, Color.Transparent);
-        } else {
-            Font_Head_Colored = Font_Head_Default;
-        }
     }
 
     private void RegisterEvents() {
