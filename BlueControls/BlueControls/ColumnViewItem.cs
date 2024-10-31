@@ -43,6 +43,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private QuickImage? _captionBitmap;
     private ColumnItem? _column;
 
+    private int? _contentWidth = null;
     private int? _drawWidth;
 
     private BlueFont? _font_Head_Colored;
@@ -146,7 +147,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public int? Contentwidth { get; private set; }
+    public int Contentwidth {
+        get {
+            if (_contentWidth is { } v) { return v; }
+
+            _contentWidth = CalculateContentWith(_column, GetRenderer(SheetStyle));
+            return (int)_contentWidth;
+        }
+    }
 
     public BlueFont Font_Head_Colored {
         get {
@@ -276,6 +284,29 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Methods
 
+    public static int CalculateContentWith(ColumnItem? column, Renderer_Abstract renderer) {
+        if (column is not { IsDisposed: false }) { return 16; }
+        if (column.Database is not { IsDisposed: false } db) { return 16; }
+        if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
+
+        column.RefreshColumnsData();
+
+        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
+
+        try {
+            //  Parallel.ForEach führt ab und zu zu DeadLocks
+            foreach (var thisRowItem in db.Row) {
+                var wx = renderer.ContentSize(thisRowItem.CellGetString(column), column.DoOpticalTranslation).Width;
+                newContentWidth = Math.Max(newContentWidth, wx);
+            }
+        } catch {
+            Develop.CheckStackForOverflow();
+            return CalculateContentWith(column, renderer);
+        }
+
+        return newContentWidth;
+    }
+
     public Rectangle AutoFilterLocation(float scale, float sliderx) {
         if (!AutoFilterSymbolPossible) { return Rectangle.Empty; }
 
@@ -321,6 +352,18 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         //GC.SuppressFinalize(this);
     }
 
+    public void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                UnRegisterEvents();
+                Parent = null;
+                _column = null;
+                Invalidate_Fonts();
+            }
+            IsDisposed = true;
+        }
+    }
+
     public int DrawWidth() {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
@@ -342,8 +385,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             _drawWidth = 16;
         } else {
             _drawWidth = _viewType == ViewType.PermanentColumn
-                ? Math.Min(CalculateColumnContentWidth(), (int)(Parent.ClientWidth * 0.3))
-                : Math.Min(CalculateColumnContentWidth(), (int)(Parent.ClientWidth * 0.6));
+                ? Math.Min(Contentwidth, (int)(Parent.ClientWidth * 0.3))
+                : Math.Min(Contentwidth, (int)(Parent.ClientWidth * 0.6));
         }
 
         _drawWidth = Math.Max((int)_drawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
@@ -358,7 +401,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public void Invalidate_ContentWidth() {
-        Contentwidth = null;
+        _contentWidth = null;
         Invalidate_DrawWidth();
     }
 
@@ -466,50 +509,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_Fonts();
 
-    private int CalculateColumnContentWidth() {
-        if (_column is not { IsDisposed: false }) { return 16; }
-        if (_column.Database is not { IsDisposed: false } db) { return 16; }
-        if (_column.FixedColumnWidth > 0) { return _column.FixedColumnWidth; }
-        if (Contentwidth is { } v) { return v; }
-
-        _column.RefreshColumnsData();
-
-        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
-
-        var renderer = GetRenderer(SheetStyle);
-
-        try {
-            //  Parallel.ForEach führt ab und zu zu DeadLocks
-            foreach (var thisRowItem in db.Row) {
-                var wx = renderer.ContentSize(thisRowItem.CellGetString(_column), _column.DoOpticalTranslation).Width;
-                newContentWidth = Math.Max(newContentWidth, wx);
-            }
-        } catch {
-            Develop.CheckStackForOverflow();
-            return CalculateColumnContentWidth();
-        }
-
-        Contentwidth = newContentWidth;
-        return newContentWidth;
-    }
-
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Column == _column) { Invalidate_ContentWidth(); }
-    }
-
-    private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-                UnRegisterEvents();
-                Parent = null;
-                _column = null;
-            }
-
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
-        }
     }
 
     private void Invalidate_Fonts() {

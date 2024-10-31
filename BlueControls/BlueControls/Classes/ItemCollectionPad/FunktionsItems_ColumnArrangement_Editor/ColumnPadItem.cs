@@ -45,13 +45,15 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Constructors
 
-    public ColumnPadItem(ColumnItem c, bool permanent, Renderer_Abstract? renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
+    public ColumnPadItem(ColumnItem c, bool permanent, Renderer_Abstract renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
         Column = c;
         Permanent = permanent;
         Renderer = renderer;
 
         if (Column is { IsDisposed: false }) {
             Column.PropertyChanged += Column_PropertyChanged;
+
+            Size = new SizeF(Math.Min(ColumnViewItem.CalculateContentWith(Column, renderer), 300), 300);
         }
     }
 
@@ -73,7 +75,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //}
     public bool Permanent { get; set; }
 
-    public Renderer_Abstract? Renderer { get; }
+    public Renderer_Abstract Renderer { get; }
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen
@@ -152,9 +154,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        var wi = 300;// Math.Max(Column.Contentwidth ?? 0, 24);
+        //var wi = 300;// Math.Max(Column.Contentwidth ?? 0, 24);
 
-        var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
+        var bmp = new Bitmap((int)Size.Width, (int)Size.Height);
         var gr = Graphics.FromImage(bmp);
 
         gr.Clear(Column.BackColor);

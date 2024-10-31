@@ -134,6 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnBefehlsUebersicht.Size = new Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 4;
             this.btnBefehlsUebersicht.Text = "Befehls-Übersicht";
+            this.btnBefehlsUebersicht.Click += new EventHandler(DatabaseScriptEditor.btnBefehlsUebersicht_Click);
             // 
             // grpAusführen
             // 
