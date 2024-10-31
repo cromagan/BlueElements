@@ -494,7 +494,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return (myRow, string.Empty, false);
     }
 
-    public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
+    public bool Clear(string comment) {
+        using var fc = new FilterCollection(Database, "rowcol clear");
+        return Remove(fc, null, comment);
+    }
 
     /// <summary>
     /// Alle Angegebenen Zeilen werden die gleichen Werte erhalten.

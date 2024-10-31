@@ -42,7 +42,10 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = true,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = true
+        DropdownWerteAndererZellenAnzeigen = true,
+        DefaultRenderer = "ImageAndText",
+        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageWidth=16, ImageHeight=16}"
+
     };
 
     public new static readonly ColumnFormatHolder Bit = new(FormatHolder.Bit) {
@@ -56,7 +59,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = true,
         TextBearbeitungErlaubt = false,
         DropDownItems = new(["+", "-"]),
-        DropdownWerteAndererZellenAnzeigen = true
+        DropdownWerteAndererZellenAnzeigen = true,
+        DefaultRenderer = "ImageAndText",
+        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageReplace=+[G]Häkchen|o[G]Kreis2|-[G]Kreuz, ImageWidth=16, ImageHeight=16}"
     };
 
     public new static readonly ColumnFormatHolder Date = new(FormatHolder.Date) {
@@ -70,7 +75,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder DateTime = new(FormatHolder.DateTime) {
@@ -84,7 +91,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder Email = new(FormatHolder.Email) {
@@ -98,7 +107,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder Float = new(FormatHolder.Float) {
@@ -112,7 +123,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     // ReSharper disable once UnusedMember.Global
@@ -127,7 +140,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder Long = new(FormatHolder.Long) {
@@ -141,7 +156,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder LongPositive = new(FormatHolder.LongPositive) {
@@ -155,7 +172,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder PhoneNumber = new(FormatHolder.PhoneNumber) {
@@ -169,7 +188,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder SystemName = new(FormatHolder.SystemName) {
@@ -183,7 +204,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     public new static readonly ColumnFormatHolder Text = new(FormatHolder.Text) {
@@ -197,7 +220,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     // ReSharper disable once UnusedMember.Global
@@ -212,7 +237,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "ImageAndText",
+        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=-, ShowText=+}"
     };
 
     public static readonly ColumnFormatHolder TextOptions = new(FormatHolder.Text) {
@@ -241,7 +268,9 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownBearbeitungErlaubt = false,
         TextBearbeitungErlaubt = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false
+        DropdownWerteAndererZellenAnzeigen = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
     #endregion
@@ -268,6 +297,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     public ScriptType ScriptType { get; set; }
     public SortierTyp SortType { get; set; }
     public bool TextBearbeitungErlaubt { get; set; }
+    public string DefaultRenderer { get; set; }
+    public string RendererSettings { get; set; }
 
     #endregion
 }

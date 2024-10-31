@@ -62,7 +62,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
     #region Properties
 
     /// <summary>
-    /// Wenn "Ähnliche" als Knopf vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
+    /// Wenn "Ähnliche" als Schaltfläche vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
     /// </summary>
     [DefaultValue("")]
     public string ÄhnlicheAnsichtName {

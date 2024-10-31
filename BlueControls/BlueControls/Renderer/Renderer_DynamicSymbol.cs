@@ -81,7 +81,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     public override string ReadableText() => "Skript als Symbol anzeigen";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stern);
 
     protected override Size CalculateContentSize(string content, TranslationType translate) =>
         //var font = Skin.DesignOf(design, state).BFont?.Font();

@@ -77,10 +77,10 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public string Bild_ersetzen {
         get => _imagereplacement.JoinWithCr();
         set {
-            var old = _imagereplacement.JoinWithCr();
+            var old = Bild_ersetzen;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _imagereplacement = value.SplitAndCutByCr().ToList();
+            _imagereplacement = value.SplitByCr().ToList();
             OnPropertyChanged();
 
             if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
@@ -155,10 +155,22 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public string Text_ersetzen {
         get => _opticalReplace.JoinWithCr();
         set {
-            if (string.Equals(_opticalReplace.JoinWithCr(), value, StringComparison.OrdinalIgnoreCase)) { return; }
-            _opticalReplace = value.SplitAndCutByCr().ToList();
+
+            var old = Text_ersetzen;
+            if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
+
+     
+
+            _opticalReplace = value.SplitByCr().ToList();
+
+
+
+
             OnPropertyChanged();
-            OnDoUpdateSideOptionMenu();
+
+            if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
+                OnDoUpdateSideOptionMenu();
+            }
         }
     }
 
@@ -235,7 +247,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         result.ParseableAdd("ShowText", _text_anzeigen);
 
         // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
-        if (_text_anzeigen) {
+        if (_text_anzeigen) {       
             result.ParseableAdd("TextReplace", _opticalReplace, true);
         }
 

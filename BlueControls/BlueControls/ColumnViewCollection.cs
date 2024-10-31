@@ -300,11 +300,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem == null ? -1 : _internal.IndexOf(columnViewItem);
 
-    public void Invalidate_DrawWithOfAllItems() {
-        foreach (var thisViewItem in _internal) {
-            thisViewItem?.Invalidate_DrawWidth();
-        }
-    }
 
     public void Invalidate_HeadSize() {
         _headSize = null;
@@ -475,7 +470,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
     private void OnStyleChanged() {
-        Invalidate_DrawWithOfAllItems();
         Invalidate_HeadSize();
         Font_RowChapter = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift);
         RowChapterHeight = (int)Font_RowChapter.CharHeight + 1;

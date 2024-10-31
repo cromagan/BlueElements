@@ -71,10 +71,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         Parent = parent;
         ViewType = ViewType.None;
         Column = null;
-        X = null;
         //AutoFilterLocation = Rectangle.Empty;
         //ReduceLocation = Rectangle.Empty;
-        Invalidate_DrawWidth();
+        Invalidate_ContentWidth();
+        Invalidate_X();
         Reduced = false;
         Renderer = string.Empty;
         RendererSettings = string.Empty;
@@ -308,6 +308,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public void Invalidate_DrawWidth() {
+        if (_drawWidth is null) { return; }
+
         _drawWidth = null;
 
         if (_parent != null) {
@@ -436,8 +438,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return newContentWidth;
     }
 
+
+    public void Invalidate_ContentWidth() {
+        Contentwidth = null;
+        Invalidate_DrawWidth();
+    }
+
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
-        if (e.Column == _column) { Invalidate_DrawWidth(); }
+        if (e.Column == _column) { Invalidate_ContentWidth(); }
     }
 
     private void Dispose(bool disposing) {
@@ -457,7 +465,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private void Invalidate_All() {
         Invalidate_Head();
-        Invalidate_DrawWidth();
+        Invalidate_ContentWidth();
         Font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
         Font_Numbers = BlueFont.Get(Font_Head_Default.FontName, Font_Head_Default.Size, false, false, false, false, true, Color.Black, Color.White, false, false, false, Color.Transparent);
 

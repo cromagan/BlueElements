@@ -224,7 +224,7 @@ namespace BlueControls.Forms {
             this.btnButton.Name = "btnButton";
             this.btnButton.Size = new System.Drawing.Size(136, 22);
             this.btnButton.TabIndex = 6;
-            this.btnButton.Text = "Knopf";
+            this.btnButton.Text = "Schaltfläche";
             this.btnButton.Click += new System.EventHandler(this.btnButton_Click);
             // 
             // btnBild

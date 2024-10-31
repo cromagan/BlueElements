@@ -189,7 +189,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     public bool AutoSizeableHeight => false;
 
-    [Description("Die Beschriftung des Knopfes.")]
+    [Description("Die Beschriftung der Schaltfläche.")]
     public string Beschriftung {
         get => _anzeige;
         set {
@@ -200,7 +200,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         }
     }
 
-    [Description("Ein Bild für den Knopf. Beispiel: PlusZeichen|16")]
+    [Description("Ein Bild für die Schaltfläche. Beispiel: PlusZeichen|16")]
     public string Bild {
         get => _image;
         set {
@@ -211,7 +211,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         }
     }
 
-    [Description("Eine Information, die dem Benutzer angezeigt wird,\r\nwenn er mit der Maus über den Knopf fährt..")]
+    [Description("Eine Information, die dem Benutzer angezeigt wird,\r\nwenn er den Mauszeiger über die Schaltfläche bewegt.")]
     public string ButtonQuickInfo {
         get => _quickinfo;
         set {
@@ -223,7 +223,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
     }
 
     public override bool DatabaseInputMustMatchOutputDatabase => false;
-    public override string Description => "Ein Knopf, den der Benutzer drücken kann und eine Aktion startet.";
+    public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und eine Aktion startet.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
     public ButtonArgs Drückbar_wenn {

@@ -874,10 +874,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db1.Loaded -= _Database_DatabaseLoaded;
             db1.Loading -= _Database_StoreView;
             db1.ViewChanged -= _Database_ViewChanged;
-            db1.Column.ColumnPropertyChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
-            //db1.Row.RowRemoved -= Row_RowRemoved; // macht Filter_PropertyChanged
+            db1.Row.RowRemoved -= Row_RowRemoved;
             db1.Row.RowGotData -= _Database_Row_RowGotData;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
@@ -905,10 +904,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db2.Loaded += _Database_DatabaseLoaded;
             db2.Loading += _Database_StoreView;
             db2.ViewChanged += _Database_ViewChanged;
-            db2.Column.ColumnPropertyChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
-            //db2.Row.RowRemoved += Row_RowRemoved; // macht Filter_PropertyChanged
+            db2.Row.RowRemoved += Row_RowRemoved;
             db2.Row.RowGotData += _Database_Row_RowGotData;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
@@ -922,6 +920,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         ShowWaitScreen = false;
         OnDatabaseChanged();
+    }
+
+    private void Row_RowRemoved(object sender, RowEventArgs e) {
+        Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
@@ -2078,23 +2080,21 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
         }
 
-        if (CurrentArrangement is { IsDisposed: false } ca) {
-            if (ca[e.Column] != null) {
-                if (e.Column.MultiLine) {
+        if (e.Column.MultiLine) {
+            if (CurrentArrangement is { IsDisposed: false } ca) {
+                if (ca[e.Column] is { IsDisposed: false }) {
+
                     Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern...
                 }
+
+                //cv.Invalidate_ContentWidth(); // Kann auf sich selbst aufpassen
             }
         }
 
-        CurrentArrangement?[e.Column]?.Invalidate_DrawWidth();
         Invalidate();
     }
 
-    private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) {
-        if (IsDisposed) { return; }
-        CurrentArrangement?.Invalidate_DrawWithOfAllItems();
-        CurrentArrangement?.Invalidate_HeadSize();
-    }
+
 
     private void _Database_DatabaseLoaded(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

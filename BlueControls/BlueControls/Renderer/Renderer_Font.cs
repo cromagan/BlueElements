@@ -58,7 +58,7 @@ public class Renderer_Font : Renderer_Abstract {
 
     public override string ReadableText() => "Schriftart darstellen";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Klee);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Schriftart);
 
     protected override Size CalculateContentSize(string content, TranslationType translate) => BlueFont.Get(content).FormatedText_NeededSize(txt, null, 16);
 

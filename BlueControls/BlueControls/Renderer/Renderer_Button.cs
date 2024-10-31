@@ -66,7 +66,7 @@ public class Renderer_Button : Renderer_Abstract {
         }
     }
 
-    public override string Description => "Stellt den Inhalt als Knopf dar.\r\nFormat: checked(+/-);BildCode;Text";
+    public override string Description => "Stellt den Inhalt als Schaltfläche dar.\r\nFormat: checked(+/-);BildCode;Text";
 
     public bool Text_anzeigen {
         get => _text_anzeigen;
@@ -139,9 +139,9 @@ public class Renderer_Button : Renderer_Abstract {
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() => "Als Knopf anzeigen";
+    public override string ReadableText() => "Als Schaltfläche anzeigen";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Schaltfläche);
 
     protected override Size CalculateContentSize(string content, TranslationType translate) {
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);

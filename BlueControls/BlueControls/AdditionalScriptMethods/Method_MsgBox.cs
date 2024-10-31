@@ -36,14 +36,14 @@ public class Method_MsgBox : Method {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "msgbox";
     public override List<string> Constants => [];
-    public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer einen Knopf drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
+    public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer eine Schaltfläche drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
     public override MethodType MethodType => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableFloat.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "MsgBox(Text, Bild, Knopfbeschriftung, ...);";
+    public override string Syntax => "MsgBox(Text, Bild, Schaltflächenbeschriftung, ...);";
 
     #endregion
 

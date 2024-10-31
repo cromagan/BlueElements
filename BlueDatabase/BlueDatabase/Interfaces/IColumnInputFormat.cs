@@ -30,12 +30,14 @@ public interface IColumnInputFormat : IInputFormat {
 
     public bool AfterEditQuickSortRemoveDouble { get; set; }
     public AlignmentHorizontal Align { get; set; }
+    public string DefaultRenderer { get; set; }
     public TranslationType DoOpticalTranslation { get; set; }
     public bool DropdownAllesAbwählenErlaubt { get; set; }
     public bool DropdownBearbeitungErlaubt { get; set; }
     public ReadOnlyCollection<string> DropDownItems { get; set; }
     public bool DropdownWerteAndererZellenAnzeigen { get; set; }
     public ColumnFunction Function { get; set; }
+    public string RendererSettings { get; set; }
     public ScriptType ScriptType { get; set; }
     public SortierTyp SortType { get; set; }
     public bool TextBearbeitungErlaubt { get; set; }
@@ -64,6 +66,8 @@ public static class ColumnInputFormatExtensions {
         t.SortType = source.SortType;
         t.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
         t.MaxTextLenght = source.MaxTextLenght;
+        t.DefaultRenderer = source.DefaultRenderer;
+        t.RendererSettings = source.RendererSettings;
     }
 
     #endregion
