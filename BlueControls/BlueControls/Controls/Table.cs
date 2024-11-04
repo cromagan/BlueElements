@@ -2748,9 +2748,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!IsOnScreen(r, displayRectangleWoSlider)) { return; }
 
-        gr.FillRectangle(new SolidBrush(viewItem.BackColor), r);
+        gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnHead), r);
         Draw_Border(gr, viewItem, r, r.Bottom);
-        gr.FillRectangle(new SolidBrush(Color.FromArgb(100, 200, 200, 200)), r);
+        gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), r);
 
         var down = 0;
         if (!string.IsNullOrEmpty(viewItem.CaptionGroup3)) {
@@ -2923,7 +2923,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                         if (le < re) {
                             Rectangle r = new(le, pccy, re - le, pcch);
-                            gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption.BackColor), r);
+                            gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption.BackColor_ColumnHead), r);
                             gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
                             gr.DrawRectangle(Skin.PenLinieKräftig, r);
                             Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, prevViewItem.Font_Head_Default.Scale(_zoom), Translate);
@@ -3037,7 +3037,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             lfdno++;
             if (IsOnScreen(r, displayRectangleWoSlider)) {
-                if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && r.Right > ca.WiederHolungsSpaltenWidth) ||
+                if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && r.Right > GetPix(ca.WiederHolungsSpaltenWidth)) ||
                     (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                     switch (type) {
                         case TableDrawType.ColumnBackBody:

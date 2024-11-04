@@ -40,11 +40,11 @@ public static class Allgemein {
 
     public static void CheckMemory() {
         try {
-            var availableMemoryMB = GC.GetTotalMemory(false) / 1024 / 1024; // In MB
-            var totalSystemMemoryMB = Environment.SystemPageSize * (double)Environment.WorkingSet / 1024 / 1024;
+            var availableMemoryGB = GC.GetTotalMemory(false) / 1024 / 1024 / 1024; // In MB
+            var totalSystemMemoryGB = Environment.SystemPageSize * (double)Environment.WorkingSet / 1024 / 1024 / 1024;
 
             // Wenn mehr als 20% des Systemspeichers oder mehr als 1GB für diese Instanz verwendet wird
-            if (availableMemoryMB > Math.Min(totalSystemMemoryMB * 0.2, 1024)) {
+            if (availableMemoryGB > Math.Min(totalSystemMemoryGB * 0.2, 8)) {
                 BlueFont.TrimAllCaches(1000, 100);
                 Generic.CollectGarbage();
                 

@@ -35,11 +35,13 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, IPropertyChangedFeedback {
 
     #region Fields
 
     public static readonly int AutoFilterSize = 22;
+    private Color _backColor_ColumnCell = Color.Transparent;
+    private Color _backColor_ColumnHead = Color.Transparent;
     private QuickImage? _captionBitmap;
     private ColumnItem? _column;
 
@@ -50,6 +52,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private BlueFont? _font_Head_Default;
     private BlueFont? _font_Numbers;
     private BlueFont? _font_TextInFilter;
+    private bool _horizontal = false;
     private ColumnViewCollection? _parent;
 
     private bool _reduced;
@@ -87,6 +90,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? PropertyChanged;
+
+    #endregion
+
     #region Properties
 
     public bool AutoFilterSymbolPossible {
@@ -95,9 +104,34 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public Color BackColor {
+    public Color BackColor_ColumnCell {
         get {
-            return Column?.BackColor ?? Color.White;
+            if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
+                return Column.BackColor.MixColor(Color.LightGray, 0.6);
+            }
+
+            return _backColor_ColumnCell;
+        }
+        set {
+            if (_backColor_ColumnCell.ToArgb() == value.ToArgb()) { return; }
+            _backColor_ColumnCell = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Color BackColor_ColumnHead {
+        get {
+            if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
+                return Column.BackColor;
+            }
+
+            return _backColor_ColumnHead;
+        }
+
+        set {
+            if (_backColor_ColumnHead.ToArgb() == value.ToArgb()) { return; }
+            _backColor_ColumnHead = value;
+            OnPropertyChanged();
         }
     }
 
@@ -205,6 +239,21 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
+    public bool Horizontal {
+        get {
+            if (Column == null) {
+                return false;
+            }
+
+            return _horizontal;
+        }
+        set {
+            if (_horizontal = value) { return; }
+            _horizontal = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool IsDisposed { get; private set; }
 
     public ColumnLineStyle LineLeft {
@@ -253,7 +302,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string Renderer { get; set; }
 
-    //public Rectangle ReduceLocation { get; set; }
     public string RendererSettings { get; set; }
 
     public string SheetStyle {
@@ -424,6 +472,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
+    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [];
@@ -434,6 +484,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             result.ParseableAdd("Renderer", Renderer);
             result.ParseableAdd("RendererSettings", RendererSettings);
         }
+
+        if (_column is not { } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
+            result.ParseableAdd("BackColorColumnHead", _backColor_ColumnHead);
+            result.ParseableAdd("BackColorColumnCell", _backColor_ColumnCell);
+        }
+
+        result.ParseableAdd("FontHorizontal", _horizontal);
 
         return result;
     }
@@ -470,6 +527,18 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             case "renderersettings":
                 RendererSettings = value.FromNonCritical();
+                return true;
+
+            case "backcolorcolumnhead":
+                _backColor_ColumnHead = value.FromHtmlCode();
+                return true;
+
+            case "backcolorcolumncell":
+                _backColor_ColumnCell = value.FromHtmlCode();
+                return true;
+
+            case "fonthorizontal":
+                _horizontal = value.FromPlusMinus();
                 return true;
         }
 

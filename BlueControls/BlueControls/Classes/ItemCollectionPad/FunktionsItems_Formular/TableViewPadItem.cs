@@ -53,6 +53,8 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem() : this(string.Empty, null, null) { }
 
+    public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null,  cformula) { }
+
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
