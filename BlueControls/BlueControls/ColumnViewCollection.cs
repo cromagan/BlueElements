@@ -210,13 +210,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         //}
     }
 
-    public void Add(ColumnItem? column, bool permanent) {
+    public void Add(ColumnItem column) {
         if (column is not { IsDisposed: false }) { return; }
 
-        Add(permanent
-            ? new ColumnViewItem(column, ViewType.PermanentColumn, this)
-            : new ColumnViewItem(column, ViewType.Column, this));
+        Add(new ColumnViewItem(column, this));
     }
+
+    public void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
     public object Clone() => new ColumnViewCollection(Database, ParseableItems().FinishParseable());
 
@@ -299,7 +299,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem == null ? -1 : _internal.IndexOf(columnViewItem);
-
 
     public void Invalidate_HeadSize() {
         _headSize = null;
@@ -423,6 +422,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return x;
     }
 
+    public void RemoveAll() {
+        _internal.Clear();
+    }
+
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
@@ -430,13 +433,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
+                Add(new ColumnViewItem(thisColumn, this));
             }
         }
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
+                Add(new ColumnViewItem(thisColumn, this));
             }
         }
     }
@@ -448,7 +451,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             var thisColumn = Database?.Column[thisColumnName];
 
             if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
+                Add(new ColumnViewItem(thisColumn, this));
             }
         }
     }
@@ -466,8 +469,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public override string ToString() => ParseableItems().FinishParseable();
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
     private void OnStyleChanged() {
         Invalidate_HeadSize();

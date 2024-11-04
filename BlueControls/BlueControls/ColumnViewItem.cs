@@ -67,9 +67,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Constructors
 
-    public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent) : this(parent) {
+    public ColumnViewItem(ColumnItem column, ColumnViewCollection parent) : this(parent) {
         Column = column;
-        ViewType = type;
+        ViewType = ViewType.Column;
         Renderer = string.Empty;
     }
 

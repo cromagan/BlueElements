@@ -223,8 +223,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         if (IsDisposed || Database is not { IsDisposed: false } db || TableView.ErrorMessage(db, EditableErrorReasonType.EditAcut)) { return; }
 
         ColumnItem? vorlage = null;
-        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column?.Database == db) {
-            vorlage = cpi.Column;
+        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.CVI?.Column?.Database == db) {
+            vorlage = cpi.CVI?.Column;
         }
 
         var mitDaten = false;
@@ -269,7 +269,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         var ca = CloneOfCurrentArrangement();
 
         if (!IsAllColumnView() && ca != null) {
-            ca.Add(newc, false);
+            ca.Add(newc);
             ChangeCurrentArrangementto(ca);
         }
 
@@ -292,7 +292,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
         if (r is not { Count: not 0 }) { return; }
-        ca.Add(db.Column[r[0]], false);
+        ca.Add(db.Column[r[0]]);
         ChangeCurrentArrangementto(ca);
         ShowOrder();
     }
@@ -352,16 +352,15 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         if (Generating || Sorting) { return; }
 
-        //var tcvc = ColumnViewCollection.ParseAll(db);
 
-        //if (tcvc.Count == 0) { return; }
 
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
-        var did = false;
+
+        var oldcode = ca.ParseableItems().FinishParseable();
+
+        ca.RemoveAll();
 
         Fixing++;
-
-        #region Items Ordnen / erstellen / Permament
 
         var permanentPossible = true;
 
@@ -369,89 +368,38 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
         do {
             var leftestItem = LeftestItem(itemsdone);
-            if (leftestItem == null) { break; }
+            if (leftestItem?.CVI is not { } cvi) { break; }
 
-            var columnIndexWhoShouldBeThere = ca.IndexOf(ca[leftestItem.Column]);
+            var item = new ColumnViewItem(ca, cvi.ParseableItems().FinishParseable());
 
-            #region  Noch nicht in der View, wurde also hinzugfügt. Auch fest hizufügen
+            if (!permanentPossible) { item.ViewType = ViewType.Column; }
+            if (item.ViewType != ViewType.PermanentColumn) { permanentPossible = false; }
 
-            if (columnIndexWhoShouldBeThere < 0) {
-                ca.Add(leftestItem.Column, leftestItem.Permanent);
-                columnIndexWhoShouldBeThere = ca.IndexOf(ca[leftestItem.Column]);
-                did = true;
-            }
-
-            #endregion
-
-            #region Stimmen Positionen überein?
-
-            var columnIndexWhoIsOnPos = ca.IndexOf(ca[itemsdone.Count]);
-            if (columnIndexWhoShouldBeThere != itemsdone.Count) {
-                // Position stimmt nicht, also swapen
-                ca.Swap(columnIndexWhoIsOnPos, columnIndexWhoShouldBeThere);
-                did = true;
-            }
-
-            #endregion
-
-            #region Permanent
-
-            if (ca[itemsdone.Count] is { } cvi) {
-                if (permanentPossible) {
-                    if (leftestItem.Permanent) {
-                        cvi.ViewType = ViewType.PermanentColumn;
-                    } else {
-                        permanentPossible = false;
-                    }
-                } else {
-                    leftestItem.Permanent = false;
-                    cvi.ViewType = ViewType.Column;
-                }
-            }
-
-            #endregion
-
+            ca.Add(item);
             itemsdone.Add(leftestItem);
         } while (true);
 
-        #endregion
+        var did = oldcode != ca.ParseableItems().FinishParseable();
 
         #region Prüfen, ob Items gelöscht wurde, diese dann ebenfalls löschen
 
-        if (ca.Count > itemsdone.Count) {
-            if (!IsAllColumnView()) {
-
-                #region Code für Ansichten > 0
-
-                while (ca.Count > itemsdone.Count) {
-                    // Item, dass nun durch die Swaps an die letzten
-                    // Stellen gewandert und zu viel sind, einfach am Ende weglöschen
-                    ca.RemoveAt(ca.Count - 1);
-                    did = true;
+        if (IsAllColumnView()) {
+            foreach (var thiscol in db.Column) {
+                if (thiscol != null && ca[thiscol] is null) {
+                    if (MessageBox.Show("Spalte <b>" + thiscol.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
+                            "Ja", "Nein") == 0) {
+                        db.Column.Remove(thiscol, "Benutzer löscht im ColArrangement Editor");
+                        did = true;
+                    }
                 }
-
-                #endregion
-            } else {
-
-                #region Code für Ansicht 0
-
-                var col = ca[ca.Count - 1]?.Column;
-                if (col != null && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
-                        "Ja", "Nein") == 0) {
-                    db.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
-                    did = true;
-                }
-
-                #endregion
             }
         }
-
         #endregion
 
         Fixing--;
-        ChangeCurrentArrangementto(ca);
 
         if (did) {
+            ChangeCurrentArrangementto(ca);
             db.RepairAfterParse();
             ShowOrder();
         }
@@ -467,7 +415,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
         foreach (var thisIt in ic) {
             if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
-                if (fi.Column?.Database == db) {
+                if (fi.CVI?.Column?.Database == db) {
                     if (found == null || fi.UsedArea.X < found.UsedArea.X) {
                         found = fi;
                     }
@@ -508,7 +456,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
             if (thisColumnViewItem?.Column is { IsDisposed: false } c) {
-                var it = new ColumnPadItem(c, thisColumnViewItem.ViewType == ViewType.PermanentColumn, thisColumnViewItem.GetRenderer(Constants.Win11));
+                var it = new ColumnPadItem(thisColumnViewItem, thisColumnViewItem.GetRenderer(Constants.Win11));
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.UsedArea.Right;
@@ -576,7 +524,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
                             var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
-                                var it2 = new ColumnPadItem(c2, false, thisc.GetRenderer(Constants.Win11));
+                                var it2 = new ColumnPadItem(new ColumnViewItem(c2, ca), thisc.GetRenderer(Constants.Win11));
                                 Pad.Items.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
                                 if (it != null) {

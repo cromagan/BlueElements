@@ -600,8 +600,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
             db.RepairAfterParse();
             var tcvc = ColumnViewCollection.ParseAll(db);
 
-            tcvc[1].Add(sp, false);
-            tcvc[1].Add(b, false);
+            tcvc[1].Add(sp);
+            tcvc[1].Add(b);
 
             db.ColumnArrangements = tcvc.ToString(false);
 

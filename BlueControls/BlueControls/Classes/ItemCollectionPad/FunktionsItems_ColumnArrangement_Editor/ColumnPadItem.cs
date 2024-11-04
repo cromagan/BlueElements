@@ -45,15 +45,15 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Constructors
 
-    public ColumnPadItem(ColumnItem c, bool permanent, Renderer_Abstract renderer) : base(c.Database?.TableName + "|" + c.KeyName) {
-        Column = c;
-        Permanent = permanent;
+    public ColumnPadItem(ColumnViewItem cvi, Renderer_Abstract renderer) : base(cvi.Column?.Database?.TableName + "|" + cvi.Column?.KeyName) {
+        CVI = cvi;
         Renderer = renderer;
 
-        if (Column is { IsDisposed: false }) {
-            Column.PropertyChanged += Column_PropertyChanged;
+        if (CVI.Column is { IsDisposed: false } col) {
+            col.PropertyChanged += Column_PropertyChanged;
+            CVI.PropertyChanged += Column_PropertyChanged;
 
-            Size = new SizeF(Math.Min(ColumnViewItem.CalculateContentWith(Column, renderer), 300), 300);
+            Size = new SizeF(Math.Min(ColumnViewItem.CalculateContentWith(col, renderer), 300), 300);
         }
     }
 
@@ -64,9 +64,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-Column";
 
-    public ColumnItem? Column { get; }
+    public ColumnViewItem? CVI { get; }
 
-    public string Datenbank => IsDisposed || Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
+    public string Datenbank => IsDisposed || CVI?.Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
 
     public override string Description => string.Empty;
 
@@ -88,25 +88,26 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        if (Column?.Database is not { IsDisposed: false } db || Column.IsDisposed) { return []; }
+        if (CVI?.Column is not { IsDisposed: false } col) { return []; }
+        if (col.Database is not { IsDisposed: false } db) { return []; }
 
         db.Editor = typeof(DatabaseHeadEditor);
-        Column.Editor = typeof(ColumnEditor);
+        col.Editor = typeof(ColumnEditor);
 
         List<GenericControl> result =
         [
             new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Datenbank),
-            new FlexiControlForDelegate(Column.Edit, "Spalte: " + Column.Caption, ImageCode.Spalte),
+            new FlexiControlForDelegate(col.Edit, "Spalte: " + col.Caption, ImageCode.Spalte),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => Permanent),
             new FlexiControl(),
+            //new FlexiControl(),
+            //new FlexiControlForProperty<string>(() => Column.CaptionGroup1),
+            //new FlexiControlForProperty<string>(() => Column.CaptionGroup2),
+            //new FlexiControlForProperty<string>(() => Column.CaptionGroup3),
             new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Column.CaptionGroup1),
-            new FlexiControlForProperty<string>(() => Column.CaptionGroup2),
-            new FlexiControlForProperty<string>(() => Column.CaptionGroup3),
-            new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Column.QuickInfo, 5),
-            new FlexiControlForProperty<string>(() => Column.AdminInfo, 5)
+            new FlexiControlForProperty<string>(() => col.QuickInfo, 5),
+            new FlexiControlForProperty<string>(() => col.AdminInfo, 5)
         ];
 
         return result;
@@ -116,8 +117,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Database", Column?.Database);
-        result.ParseableAdd("ColumnName", Column);
+        //result.ParseableAdd("Database", Column?.Database);
+        //result.ParseableAdd("ColumnName", Column);
 
         return result;
     }
@@ -141,15 +142,15 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {
-            if (Column is { IsDisposed: false }) {
-                Column.PropertyChanged -= Column_PropertyChanged;
+            if (CVI?.Column is { IsDisposed: false } col) {
+                col.PropertyChanged -= Column_PropertyChanged;
+                CVI.PropertyChanged -= Column_PropertyChanged;
             }
-            //Column = null;
         }
     }
 
     protected override void GeneratePic() {
-        if (Column is not { IsDisposed: false }) {
+        if (CVI?.Column is not { IsDisposed: false } col) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
@@ -159,12 +160,12 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         var bmp = new Bitmap((int)Size.Width, (int)Size.Height);
         var gr = Graphics.FromImage(bmp);
 
-        gr.Clear(Column.BackColor);
+        gr.Clear(CVI.BackColor_ColumnHead);
         //gr.DrawString(Column.Caption, CellFont, )
         //Table.Draw_FormatedText(gr,)
 
         for (var z = 0; z < 3; z++) {
-            var n = Column.CaptionGroup(z);
+            var n = col.CaptionGroup(z);
             if (!string.IsNullOrEmpty(n)) {
                 Skin.Draw_FormatedText(gr, n, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, ColumnFont, true);
             }
@@ -172,16 +173,16 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         gr.TranslateTransform(bmp.Width / 2f, 50);
         gr.RotateTransform(-90);
-        Skin.Draw_FormatedText(gr, Column.Caption, null, Alignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
+        Skin.Draw_FormatedText(gr, col.Caption, null, Alignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
 
         gr.TranslateTransform(-bmp.Width / 2f, -50);
         gr.ResetTransform();
 
         gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
 
-        var r = Column.Database?.Row.First();
+        var r = col.Database?.Row.First();
         if (r is { IsDisposed: false }) {
-            Renderer?.Draw(gr, r.CellGetString(Column), new Rectangle(0, 210, bmp.Width, 90), Column.DoOpticalTranslation, (Alignment)Column.Align, 1f);
+            Renderer?.Draw(gr, r.CellGetString(col), new Rectangle(0, 210, bmp.Width, 90), col.DoOpticalTranslation, (Alignment)col.Align, 1f);
         }
 
         GeneratedBitmap = bmp;
