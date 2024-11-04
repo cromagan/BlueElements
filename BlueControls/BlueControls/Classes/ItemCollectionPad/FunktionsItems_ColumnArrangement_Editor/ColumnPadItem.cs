@@ -70,11 +70,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override string Description => string.Empty;
 
-    //        _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
-    //    }
-    //}
-    public bool Permanent { get; set; }
-
     public Renderer_Abstract Renderer { get; }
 
     /// <summary>
@@ -88,7 +83,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        if (CVI?.Column is not { IsDisposed: false } col) { return []; }
+        if (CVI is not { IsDisposed: false } cvi) { return []; }
+        if (cvi.Column is not { IsDisposed: false } col) { return []; }
         if (col.Database is not { IsDisposed: false } db) { return []; }
 
         db.Editor = typeof(DatabaseHeadEditor);
@@ -99,7 +95,11 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Datenbank),
             new FlexiControlForDelegate(col.Edit, "Spalte: " + col.Caption, ImageCode.Spalte),
             new FlexiControl(),
-            new FlexiControlForProperty<bool>(() => Permanent),
+            new FlexiControlForProperty<bool>(() => cvi.Permanent),
+            new FlexiControlForProperty<bool>(() => cvi.Horizontal),
+            new FlexiControlForProperty<Color>(() => cvi.BackColor_ColumnHead),
+            new FlexiControlForProperty<Color>(() => cvi.BackColor_ColumnCell),
+            new FlexiControlForProperty<Color>(() => cvi.FontColor_Caption),
             new FlexiControl(),
             //new FlexiControl(),
             //new FlexiControlForProperty<string>(() => Column.CaptionGroup1),

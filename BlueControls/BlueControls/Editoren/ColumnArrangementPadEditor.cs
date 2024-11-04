@@ -79,12 +79,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         }
     }
 
-    public int Fixing { get; private set; }
-
-    public bool Generating { get; private set; }
-
-    public bool Sorting { get; private set; }
-
     public IEditable? ToEdit {
         set {
             if (value is ColumnViewCollection cvc) {
@@ -350,17 +344,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
     private void FixColumnArrangement() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        if (Generating || Sorting) { return; }
-
-
 
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
         var oldcode = ca.ParseableItems().FinishParseable();
 
         ca.RemoveAll();
-
-        Fixing++;
 
         var permanentPossible = true;
 
@@ -394,9 +383,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
                 }
             }
         }
-        #endregion
 
-        Fixing--;
+        #endregion
 
         if (did) {
             ChangeCurrentArrangementto(ca);
@@ -427,7 +415,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
     }
 
     private void Pad_MouseUp(object? sender, MouseEventArgs? e) {
-        if (Generating || Sorting || Fixing > 0) { return; }
         SortColumns();
         FixColumnArrangement();
     }
@@ -439,15 +426,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         Pad.Items.Endless = true;
         Pad.Items.ForPrinting = true;
 
-        if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
-
-        Generating = true;
         Pad.Items.Clear();
 
         ColumnPadItem? anyitem = null;
 
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) {
-            Generating = false;
             return;
         }
 
@@ -466,7 +449,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
         #endregion
 
-        if (anyitem == null) { Generating = false; return; }
+        if (anyitem == null) { return; }
 
         #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
 
@@ -546,14 +529,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         SortColumns();
 
         chkShowCaptions.Checked = ca.ShowHead;
-
-        //Pad.ZoomFit();
-        Generating = false;
     }
 
     private void SortColumns() {
-        if (Sorting || Fixing > 0) { Develop.DebugPrint("Sorting falsch!"); }
-        Sorting = true;
         var done = new List<AbstractPadItem>();
         var left = 0f;
         do {
@@ -563,8 +541,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
             x.SetLeftTopPoint(left, 0);
             left = x.UsedArea.Right;
         } while (true);
-
-        Sorting = false;
     }
 
     private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, _arrangement);

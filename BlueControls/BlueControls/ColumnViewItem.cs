@@ -42,6 +42,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public static readonly int AutoFilterSize = 22;
     private Color _backColor_ColumnCell = Color.Transparent;
     private Color _backColor_ColumnHead = Color.Transparent;
+    private Color _fontColor_Caption = Color.Transparent;
+
     private QuickImage? _captionBitmap;
     private ColumnItem? _column;
 
@@ -103,11 +105,25 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             return Column?.AutoFilterSymbolPossible() ?? false;
         }
     }
+    public Color FontColor_Caption {
+        get {
+            if (Column != null && _fontColor_Caption.IsMagentaOrTransparent()) {
+                return Column.ForeColor;
+            }
 
+            return _fontColor_Caption;
+        }
+        set {
+            if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
+            _fontColor_Caption = value;
+            Invalidate_Fonts();
+            OnPropertyChanged();
+        }
+    }
     public Color BackColor_ColumnCell {
         get {
             if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
-                return Column.BackColor.MixColor(Color.LightGray, 0.6);
+                return Column.BackColor;
             }
 
             return _backColor_ColumnCell;
@@ -122,7 +138,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public Color BackColor_ColumnHead {
         get {
             if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
-                return Column.BackColor;
+                return Column.BackColor.MixColor(Color.LightGray, 0.6);
             }
 
             return _backColor_ColumnHead;
@@ -197,7 +213,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_font_Head_Colored == null) {
                 if (_column != null) {
                     var baseFont = Font_Head_Default;
-                    _font_Head_Colored = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, false, _column.ForeColor, Color.Transparent, baseFont.Kapitälchen, baseFont.OnlyLower, baseFont.OnlyLower, Color.Transparent);
+                    _font_Head_Colored = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, false, FontColor_Caption, Color.Transparent, baseFont.Kapitälchen, baseFont.OnlyLower, baseFont.OnlyLower, Color.Transparent);
                 } else {
                     _font_Head_Colored = Font_Head_Default;
                 }
@@ -290,6 +306,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
+    public bool Permanent {
+        get {
+            return _viewType == ViewType.PermanentColumn;
+        }
+        set {
+            if (value) {
+                ViewType = ViewType.PermanentColumn;
+            } else {
+                ViewType = ViewType.Column;
+            }
+        }
+    }
+
     public bool Reduced {
         get => _reduced;
         set {
@@ -319,6 +348,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_viewType != value) {
                 _viewType = value;
                 Invalidate_DrawWidth();
+                OnPropertyChanged();
             }
         }
     }
@@ -490,6 +520,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             result.ParseableAdd("BackColorColumnCell", _backColor_ColumnCell);
         }
 
+        if (_column is not { } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
+            result.ParseableAdd("FontColorCaption", _fontColor_Caption);
+        }
+
         result.ParseableAdd("FontHorizontal", _horizontal);
 
         return result;
@@ -535,6 +569,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             case "backcolorcolumncell":
                 _backColor_ColumnCell = value.FromHtmlCode();
+                return true;
+
+
+            case "fontcolorcaption":
+                _fontColor_Caption = value.FromHtmlCode();
                 return true;
 
             case "fonthorizontal":

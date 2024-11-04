@@ -67,7 +67,7 @@ public static partial class Extensions {
 
     public static Color FromHtmlCode(this string color) {
         if (!color.IsHtmlColorCode()) {
-            Develop.DebugPrint("Farbcode ungültig: " + color);
+            //Develop.DebugPrint("Farbcode ungültig: " + color);
             return Color.Magenta;
         }
         var a = 255;
