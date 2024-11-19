@@ -123,7 +123,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     /// </summary>
     public Point DrawingPos { get; set; }
 
-    public BlueFont Font { get; private set; } = BlueFont.DefaultFont;
+    public BlueFont Font { get; } = BlueFont.DefaultFont;
 
     public string HtmlText {
         get {
@@ -467,7 +467,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         Clear();
         ResetPosition(true);
         var stil = PadStyles.Standard;
-        var font = Font ?? BlueFont.DefaultFont;
+        var font = Font;
 
         // StringBuilder für temporäre String-Operationen
         var temp = new StringBuilder(100);
@@ -518,8 +518,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     }
 
     private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
-        if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
-
         var endpos = htmlText.IndexOf('>', start + 1);
         if (endpos <= start) {
             Develop.DebugPrint("String-Fehler, > erwartet. " + htmlText);
@@ -644,32 +642,39 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
             case "H7":
                 stil = PadStyles.Hervorgehoben;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             case "H6":
                 stil = PadStyles.Alternativ;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             case "H5":
                 stil = PadStyles.Kleiner_Zusatz;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             case "H0":
             case "H4":
                 stil = PadStyles.Standard;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             case "H3":
                 stil = PadStyles.Kapitel;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             case "H2":
                 stil = PadStyles.Untertitel;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             case "H1":
                 stil = PadStyles.Überschrift;
-                font = Skin.GetBlueFont(_sheetStyle, stil); break;
+                font = Skin.GetBlueFont(_sheetStyle, stil);
+                break;
 
             //case "MARKSTATE":
             //    markState = (MarkState)IntParse(attribut);

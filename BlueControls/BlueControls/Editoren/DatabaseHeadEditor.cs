@@ -88,11 +88,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 db = Database.GetById(ci, false, null, true);
             }
 
-            if (db is { IsDisposed: false }) {
-                Database = db;
-            } else {
-                Database = null;
-            }
+            Database = db is { IsDisposed: false } ? db : null;
         }
     }
 

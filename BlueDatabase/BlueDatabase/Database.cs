@@ -1552,27 +1552,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="s"></param>
-    /// <param name="produktivphase"></param>
-    /// <param name="row"></param>
-    /// <param name="attributes"></param>
-    /// <param name="dbVariables"></param>
-    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    /// <returns></returns>
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="eventname"></param>
-    /// <param name="scriptname"></param>
-    /// <param name="produktivphase"></param>
-    /// <param name="row"></param>
-    /// <param name="attributes"></param>
-    /// <param name="dbVariables"></param>
-    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    /// <returns></returns>
+
     public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         var columnListtmp = columnList?.ToList();
         columnListtmp ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -2124,7 +2104,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thiscol in columns) {
             thiscol.IsInCache = DateTime.UtcNow;
 
-            if (thiscol.LinkedDatabase is { IsDisposed: false and false } db &&
+            if (thiscol.LinkedDatabase is { IsDisposed: false } db &&
                 db.Column[thiscol.LinkedCell_ColumnNameOfLinkedDatabase] is { IsDisposed: false } col) {
                 db.RefreshColumnsData(col);
             }
@@ -2282,7 +2262,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is { IsDisposed: false and false } db) {
+                if (thisa is { IsDisposed: false } db) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }
@@ -3129,7 +3109,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
-            if (thisFile is { IsDisposed: false and false } db) {
+            if (thisFile is { IsDisposed: false } db) {
                 if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                     _ = thisFile.Save();
                     Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);

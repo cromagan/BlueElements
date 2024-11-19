@@ -58,12 +58,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? StyleChanged;
-
-    #endregion
-
     #region Properties
 
     public static string ClassId => "ROW";

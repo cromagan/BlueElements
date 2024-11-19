@@ -2567,9 +2567,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             ColumnLineStyle lin;
 
             if (z == 0) {
-                xPos = r.Left; lin = column.LineLeft;
+                xPos = r.Left;
+                lin = column.LineLeft;
             } else {
-                xPos = r.Right; lin = column.LineRight;
+                xPos = r.Right;
+                lin = column.LineRight;
             }
 
             switch (lin) {
@@ -2879,7 +2881,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     /// <param name="gr"></param>
     /// <param name="ca"></param>
     /// <param name="displayRectangleWoSlider"></param>
-    private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca, Rectangle displayRectangleWoSlider, int u) {
+    /// <param name="columnno"></param>
+    private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca, Rectangle displayRectangleWoSlider, int columnno) {
         if (IsDisposed) { return; }
 
         ColumnViewItem? prevViewItemWithOtherCaption = null;
@@ -2888,13 +2891,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var prevCaptionGroup = string.Empty;
 
         var pcch = GetPix(ColumnCaptionSizeY);
-        var pccy = GetPix(u * ColumnCaptionSizeY);
+        var pccy = GetPix(columnno * ColumnCaptionSizeY);
 
         foreach (var thisViewItem in ca) {
             var thisItem = thisViewItem.RealHead(_zoom, SliderX.Value);
 
             if (IsOnScreen(thisItem, displayRectangleWoSlider)) {
-                var newCaptionGroup = thisViewItem?.Column?.CaptionGroup(u) ?? string.Empty;
+                var newCaptionGroup = thisViewItem.Column?.CaptionGroup(columnno) ?? string.Empty;
 
                 if (newCaptionGroup != prevCaptionGroup) {
 
@@ -3038,7 +3041,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             break;
 
                         case TableDrawType.Cells:
-                            //                            Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, firstOnScreen, ca, r);
+                            Draw_Column_Cells(gr, sr, viewItem, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, firstOnScreen, ca, r);
                             break;
 
                         case TableDrawType.ColumnHead:

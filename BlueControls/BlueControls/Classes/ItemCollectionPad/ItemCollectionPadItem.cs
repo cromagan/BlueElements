@@ -1028,10 +1028,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             thisIt.Dispose();
         }
 
-        if (disposing) {
-            _sheetStyle = null;
-        }
-
         Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
         Connections.RemoveAll();
     }

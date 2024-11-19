@@ -42,18 +42,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public static readonly int AutoFilterSize = 22;
     private Color _backColor_ColumnCell = Color.Transparent;
     private Color _backColor_ColumnHead = Color.Transparent;
-    private Color _fontColor_Caption = Color.Transparent;
-
     private QuickImage? _captionBitmap;
     private ColumnItem? _column;
-
     private int? _contentWidth = null;
     private int? _drawWidth;
-
     private BlueFont? _font_Head_Colored;
     private BlueFont? _font_Head_Default;
     private BlueFont? _font_Numbers;
     private BlueFont? _font_TextInFilter;
+    private Color _fontColor_Caption = Color.Transparent;
     private bool _horizontal = false;
     private ColumnViewCollection? _parent;
 
@@ -100,26 +97,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Properties
 
-    public bool AutoFilterSymbolPossible {
-        get {
-            return Column?.AutoFilterSymbolPossible() ?? false;
-        }
-    }
-    public Color FontColor_Caption {
-        get {
-            if (Column != null && _fontColor_Caption.IsMagentaOrTransparent()) {
-                return Column.ForeColor;
-            }
+    public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
-            return _fontColor_Caption;
-        }
-        set {
-            if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
-            _fontColor_Caption = value;
-            Invalidate_Fonts();
-            OnPropertyChanged();
-        }
-    }
     public Color BackColor_ColumnCell {
         get {
             if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
@@ -151,11 +130,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public string Caption {
-        get {
-            return Column?.Caption ?? "[Spalte]";
-        }
-    }
+    public string Caption => Column?.Caption ?? "[Spalte]";
 
     public QuickImage? CaptionBitmap {
         get {
@@ -167,23 +142,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public string CaptionGroup1 {
-        get {
-            return Column?.CaptionGroup1 ?? string.Empty;
-        }
-    }
+    public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
 
-    public string CaptionGroup2 {
-        get {
-            return Column?.CaptionGroup2 ?? string.Empty;
-        }
-    }
+    public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;
 
-    public string CaptionGroup3 {
-        get {
-            return Column?.CaptionGroup3 ?? string.Empty;
-        }
-    }
+    public string CaptionGroup3 => Column?.CaptionGroup3 ?? string.Empty;
 
     public ColumnItem? Column {
         get => _column;
@@ -225,10 +188,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public BlueFont Font_Head_Default {
         get {
             if (IsDisposed) { return BlueFont.DefaultFont; }
-            if (_font_Head_Default == null) {
-                _font_Head_Default = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
-            }
-            return _font_Head_Default;
+
+            return _font_Head_Default ??= Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
         }
     }
 
@@ -255,6 +216,22 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
+    public Color FontColor_Caption {
+        get {
+            if (Column != null && _fontColor_Caption.IsMagentaOrTransparent()) {
+                return Column.ForeColor;
+            }
+
+            return _fontColor_Caption;
+        }
+        set {
+            if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
+            _fontColor_Caption = value;
+            Invalidate_Fonts();
+            OnPropertyChanged();
+        }
+    }
+
     public bool Horizontal {
         get {
             if (Column == null) {
@@ -272,17 +249,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool IsDisposed { get; private set; }
 
-    public ColumnLineStyle LineLeft {
-        get {
-            return Column?.LineLeft ?? ColumnLineStyle.Dünn;
-        }
-    }
+    public ColumnLineStyle LineLeft => Column?.LineLeft ?? ColumnLineStyle.Dünn;
 
-    public ColumnLineStyle LineRight {
-        get {
-            return Column?.LineRight ?? ColumnLineStyle.Ohne;
-        }
-    }
+    public ColumnLineStyle LineRight => Column?.LineRight ?? ColumnLineStyle.Ohne;
 
     ///// <summary>
     ///// Koordinate der Spalte mit einbrechneten Slider
@@ -307,16 +276,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public bool Permanent {
-        get {
-            return _viewType == ViewType.PermanentColumn;
-        }
-        set {
-            if (value) {
-                ViewType = ViewType.PermanentColumn;
-            } else {
-                ViewType = ViewType.Column;
-            }
-        }
+        get => _viewType == ViewType.PermanentColumn;
+        set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
     }
 
     public bool Reduced {
@@ -570,7 +531,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             case "backcolorcolumncell":
                 _backColor_ColumnCell = value.FromHtmlCode();
                 return true;
-
 
             case "fontcolorcaption":
                 _fontColor_Caption = value.FromHtmlCode();

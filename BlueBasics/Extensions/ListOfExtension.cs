@@ -265,8 +265,8 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
 
-    public static void Remove<T>(this List<T?>? items, string name) where T : class, IHasKeyName {
-        if (string.IsNullOrEmpty(name) || items == null) { return; }
+    public static void Remove<T>(this List<T> items, string name) where T : class, IHasKeyName {
+        if (string.IsNullOrEmpty(name)) { return; }
 
         items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
     }

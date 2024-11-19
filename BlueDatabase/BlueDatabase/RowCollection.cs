@@ -362,7 +362,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? oldrow = null;
 
         foreach (var thisDb in l) {
-            if (thisDb is { IsDisposed: false and false } db) {
+            if (thisDb is { IsDisposed: false } db) {
                 if (!db.CanDoValueChangedScript()) { continue; }
 
                 var rowToCheck = db.Row.NextRowToCheck(false);
@@ -431,7 +431,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         List<Database> l = [.. Database.AllFiles];
 
         foreach (var thisDb in l) {
-            if (thisDb is { IsDisposed: false and false } db) {
+            if (thisDb is { IsDisposed: false } db) {
                 if (!db.CanDoValueChangedScript()) { continue; }
                 r.AddRange(db.Row);
             }
@@ -929,7 +929,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
-        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, 10, null, true, false);
+        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, 10, null, true, false);
     }
 
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);

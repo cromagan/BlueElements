@@ -67,12 +67,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? StyleChanged;
-
-    #endregion
-
     #region Properties
 
     // ReSharper disable once UnusedMember.Global

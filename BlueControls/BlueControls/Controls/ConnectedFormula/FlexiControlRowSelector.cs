@@ -135,11 +135,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
             }
         }
 
-        if (cb.ItemCount < 2) {
-            f.DisabledReason = "Keine Auswahl möglich.";
-        } else {
-            f.DisabledReason = string.Empty;
-        }
+        f.DisabledReason = cb.ItemCount < 2 ? "Keine Auswahl möglich." : string.Empty;
 
         #endregion
 
