@@ -65,7 +65,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     public CreativePad(ItemCollectionPadItem page, RowItem? row) : this() {
         Items = page;
         Unselect();
-        MouseHighlight = false;
 
         if (row is { }) {
             Items.ResetVariables();

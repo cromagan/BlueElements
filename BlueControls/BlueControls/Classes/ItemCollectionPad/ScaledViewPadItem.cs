@@ -195,6 +195,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
         }
         return base.ParseThis(key, value);

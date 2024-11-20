@@ -56,7 +56,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, Renderer_Abstract renderer) : base(false, false) {
+    public FlexiControlForFilter(ColumnItem? column, CaptionPosition defaultCaptionPosition, Renderer_Abstract renderer) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 

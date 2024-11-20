@@ -55,8 +55,11 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     #region Properties
 
     public static string ClassId => "Symbol";
+
     public override string Description => string.Empty;
+
     public BlueFont? Font { get; set; }
+
     public Color Hintergrundfarbe { get; set; }
 
     public float Randdicke { get; set; }
@@ -140,6 +143,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
 
             case "fill": // alt: 28.11.2019
@@ -152,6 +156,11 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     public override string ReadableText() => "Symbol";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stern, 16);
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        UnRegisterEvents();
+    }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -196,6 +205,27 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        this.InvalidateFont();
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
+    }
+
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
+        }
     }
 
     #endregion

@@ -62,7 +62,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     /// </summary>
     public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiControlForCell(string columnName, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false) {
+    public FlexiControlForCell(string columnName, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

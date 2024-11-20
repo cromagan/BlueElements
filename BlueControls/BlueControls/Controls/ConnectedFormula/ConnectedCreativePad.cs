@@ -47,7 +47,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
     #region Constructors
 
-    public ConnectedCreativePad(ItemCollectionPadItem? itemCollectionPad) : base(false, false) {
+    public ConnectedCreativePad(ItemCollectionPadItem? itemCollectionPad) : base(false, false, false) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
@@ -56,7 +56,6 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         pad.Unselect();
         pad.ShowInPrintMode = true;
         pad.EditAllowed = false;
-        MouseHighlight = false;
     }
 
     public ConnectedCreativePad() : this(null) { }

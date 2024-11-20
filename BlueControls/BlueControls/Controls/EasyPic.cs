@@ -53,7 +53,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     #region Constructors
 
-    public EasyPic() : base(false, false) {
+    public EasyPic() : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

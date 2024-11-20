@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -197,6 +198,14 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
         }
 
         var icp = new ItemCollectionPadItem(_layoutFileName);
+
+        if (!icp.Any()) {
+            GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
+            return;
+        }
+
+
+
         icp.ResetVariables();
         icp.ReplaceVariables(db, _rowKey);
         GeneratedBitmap = icp.ToBitmap(1);

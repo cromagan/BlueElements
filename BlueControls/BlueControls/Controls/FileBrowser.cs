@@ -59,7 +59,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     #region Constructors
 
-    public FileBrowser() : base(false, false) => InitializeComponent();
+    public FileBrowser() : base(false, false, false) => InitializeComponent();
 
     #endregion
 

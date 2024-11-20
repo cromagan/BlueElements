@@ -76,15 +76,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Constructors
 
-    public TextBox() : base(true, true) {
+    public TextBox() : base(true, true, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         _eTxt = new ExtText(Design.TextBox, States.Standard); // Design auf Standard setzen wegen Virtal member call
         _eTxt.PropertyChanged += _eTxt_PropertyChanged;
-
-        MouseHighlight = false;
     }
 
     #endregion

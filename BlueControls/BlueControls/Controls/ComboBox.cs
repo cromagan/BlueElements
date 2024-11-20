@@ -68,7 +68,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        MouseHighlight = true;
         SetStyle(ControlStyles.ContainerControl, true);
         btnDropDown.Left = Width - btnDropDown.Width;
         btnDropDown.Top = 0;

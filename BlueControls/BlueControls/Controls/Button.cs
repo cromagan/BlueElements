@@ -65,7 +65,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     #region Constructors
 
-    public Button() : base(true, false) => _etxt = new ExtText(Design.Button, States.Standard);
+    public Button() : base(true, false, true) => _etxt = new ExtText(Design.Button, States.Standard);
 
     #endregion
 

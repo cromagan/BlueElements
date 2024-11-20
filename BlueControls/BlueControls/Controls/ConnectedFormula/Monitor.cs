@@ -40,7 +40,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
 
     #region Constructors
 
-    public Monitor() : base(false, false) {
+    public Monitor() : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

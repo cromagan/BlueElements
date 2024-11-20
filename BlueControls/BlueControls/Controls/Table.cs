@@ -108,12 +108,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     #region Constructors
 
-    public Table() : base(true, false) {
+    public Table() : base(true, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        MouseHighlight = false;
         Filter.PropertyChanged += Filter_PropertyChanged;
         Filter.RowsChanged += Filter_PropertyChanged;
     }

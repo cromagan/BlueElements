@@ -42,7 +42,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
     #region Constructors
 
-    public InputRowOutputFilterControl(string filterwert, ColumnItem? outputcolumn, FilterTypeRowInputItem type) : base(false, false) {
+    public InputRowOutputFilterControl(string filterwert, ColumnItem? outputcolumn, FilterTypeRowInputItem type) : base(false, false, false) {
         _filterwert = filterwert;
         _outputcolumn = outputcolumn;
         _type = type;

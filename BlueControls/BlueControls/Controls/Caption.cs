@@ -52,12 +52,11 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Constructors
 
-    public Caption() : base(true, false) {
+    public Caption() : base(true, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
-        MouseHighlight = false;
     }
 
     #endregion

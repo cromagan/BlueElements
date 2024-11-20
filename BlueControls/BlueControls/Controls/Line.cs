@@ -37,12 +37,11 @@ public class Line : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public Line() : base(false, false) {
+    public Line() : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         //  InitializeComponent()
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
-        MouseHighlight = false;
     }
 
     #endregion

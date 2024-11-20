@@ -38,6 +38,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     #region Fields
 
     private readonly PointM _bezugslinie1 = new(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
+
     private readonly PointM _bezugslinie2 = new(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
 
     /// <summary>
@@ -51,6 +52,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private readonly PointM _point2 = new(null, "Punkt 2", 0, 0);
 
     private readonly PointM _schnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
+
     private readonly PointM _schnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
 
     /// <summary>
@@ -61,9 +63,11 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private float _länge;
 
     private PadStyles _style = PadStyles.Standard;
+
     private string _textOben = string.Empty;
 
     private float _textScale = 3.07f;
+
     private float _winkel;
 
     #endregion
@@ -117,6 +121,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
+
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPadItem.Dpi), Nachkommastellen, MidpointRounding.AwayFromZero);
 
     public int Nachkommastellen { get; set; }
@@ -289,6 +294,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -325,6 +331,11 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
         x.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
         return x;
+    }
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        UnRegisterEvents();
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
@@ -377,6 +388,19 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         }
     }
 
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        this.InvalidateFont();
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
+    }
+
     private void CalculateOtherPoints() {
         var tmppW = -90;
         var mhlAb = MmToPixel(1.5f * _textScale / 3.07f, ItemCollectionPadItem.Dpi); // Den Abstand der Maßhilsfline, in echten MM
@@ -399,6 +423,14 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private void ComputeData() {
         _länge = GetLenght(_point1, _point2);
         _winkel = GetAngle(_point1, _point2);
+    }
+
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
+        }
     }
 
     #endregion

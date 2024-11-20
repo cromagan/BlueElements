@@ -63,6 +63,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     private PointM? _jointReferenceSecond;
 
     private string _keyName;
+    private object? _parent;
     private RectangleF _usedArea;
 
     #endregion
@@ -85,6 +86,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     #region Events
 
     public event EventHandler? DoUpdateSideOptionMenu;
+
+    public event EventHandler? ParentChanged;
+
+    public event EventHandler? ParentChanging;
 
     #endregion
 
@@ -152,8 +157,16 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
+    public object? Parent {
+        get => _parent;
+        set {
+            if (value == _parent) { return; }
 
-    public virtual object? Parent { get; set; }
+            OnParentChanging();
+            _parent = value;
+            OnParentChanged();
+        }
+    }
 
     /// <summary>
     /// Diese Punkte müssen gleichzeitig bewegt werden,
@@ -594,7 +607,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
     }
 
-    internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();//foreach (var thispoint in JointPoints) {//    thispoint.KeyName = Generic.GetUniqueKey();//}//foreach (var thispoint in MovablePoint) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//foreach (var thispoint in PointsForSuccesfullyMove) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//_jointMiddle.KeyName = Generic.GetUniqueKey();//_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();//_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
+    internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();
 
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
         _jointReferenceFirst ??= firstPoint;
@@ -613,6 +626,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         JointMiddle.SetTo((firstPoint.X + secondPoint.X) / 2, (firstPoint.Y + secondPoint.Y) / 2, false);
     }
 
+    //foreach (var thispoint in JointPoints) {//    thispoint.KeyName = Generic.GetUniqueKey();//}//foreach (var thispoint in MovablePoint) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//foreach (var thispoint in PointsForSuccesfullyMove) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//_jointMiddle.KeyName = Generic.GetUniqueKey();//_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();//_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
     protected abstract RectangleF CalculateUsedArea();
 
     protected virtual void Dispose(bool disposing) {
@@ -635,6 +649,10 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+
+    protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
+
+    protected virtual void OnParentChanging() => ParentChanging?.Invoke(this, System.EventArgs.Empty);
 
     private void JointMiddle_Moved(object sender, MoveEventArgs e) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }

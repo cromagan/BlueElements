@@ -64,6 +64,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
     public static string ClassId => "DynamicSymbol";
 
     public override string Description => string.Empty;
+
     public BlueFont? Font { get; set; }
 
     public string Script {
@@ -159,6 +160,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -167,6 +169,11 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
     public override string ReadableText() => "Dynamisches Symbol";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Formel, 16);
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        UnRegisterEvents();
+    }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left, scale);
@@ -215,7 +222,28 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         //gr.ResetTransform();
     }
 
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        this.InvalidateFont();
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
+    }
+
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+
     private void Skript_Bearbeiten() => IUniqueWindowExtension.ShowOrCreate<DynamicSymbolScriptEditor>(this);
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
+        }
+    }
 
     #endregion
 }

@@ -49,7 +49,7 @@ public static class StyleableOneExtension {
     }
 
     public static BlueFont GetFont(this IStyleableOne o) {
-        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Stil) ?? BlueFont.DefaultFont;
+        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Stil);
         return o.Font;
     }
 

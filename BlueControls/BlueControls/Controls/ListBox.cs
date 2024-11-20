@@ -88,7 +88,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     #region Constructors
 
-    public ListBox() : base(true, false) {
+    public ListBox() : base(true, false, true) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

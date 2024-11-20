@@ -30,7 +30,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Constructors
 
-    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap) : base(doubleBuffer, useBackgroundBitmap) { }
+    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) { }
 
     #endregion
 

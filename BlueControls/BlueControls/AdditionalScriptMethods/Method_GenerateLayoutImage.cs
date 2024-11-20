@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
@@ -72,6 +73,9 @@ public class Method_GenerateLayoutImage : Method_Database {
         #endregion
 
         var l = new ItemCollectionPadItem(ind);
+
+        if (!l.Any()) { return new DoItFeedback(ld, "Layout nicht gefunden oder fehlerhaft."); }
+
         l.ResetVariables();
         var scx = l.ReplaceVariables(r);
 

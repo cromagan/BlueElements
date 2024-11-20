@@ -49,9 +49,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public GenericControlReciver() : base(false, false) { }
+    public GenericControlReciver() : base(false, false, false) { }
 
-    public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap) : base(doubleBuffer, useBackgroundBitmap) { }
+    public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) { }
 
     #endregion
 

@@ -22,7 +22,6 @@ using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.Extended_Text;
 

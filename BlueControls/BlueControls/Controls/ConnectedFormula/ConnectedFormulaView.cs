@@ -54,14 +54,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     public ConnectedFormulaView() : this(string.Empty, "Head") { }
 
-    public ConnectedFormulaView(string mode, string page) : base(false, false) {
+    public ConnectedFormulaView(string mode, string page) : base(false, false, false) {
         InitializeComponent();
         base.Mode = mode;
         Page = page;
         InitFormula(null, null);
 
         SetNotFocusable();
-        MouseHighlight = false;
 
         updater.Enabled = true;
     }

@@ -52,7 +52,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
     #region Constructors
 
-    public Filterleiste() : base(false, false) {
+    public Filterleiste() : base(false, false, false) {
         InitializeComponent();
         FillFilters();
     }

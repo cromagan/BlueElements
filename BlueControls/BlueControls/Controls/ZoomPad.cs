@@ -61,7 +61,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public ZoomPad() : base(true, true) => InitializeComponent();
+    public ZoomPad() : base(true, true, false) => InitializeComponent();
 
     #endregion
 

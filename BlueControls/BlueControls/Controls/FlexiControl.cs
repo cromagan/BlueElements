@@ -68,7 +68,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Constructors
 
-    public FlexiControl() : base(false, false) {
+    public FlexiControl() : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -82,7 +82,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <param name="captionText"></param>
     /// <param name="width"></param>
     /// <param name="isCaption"></param>
-    public FlexiControl(string captionText, int width, bool isCaption) : base(false, false) {
+    public FlexiControl(string captionText, int width, bool isCaption) : base(false, false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         if (isCaption) {

@@ -89,7 +89,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     }
 
     public override string Description => string.Empty;
+
     public BlueFont? Font { get; set; }
+
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
     public string Platzhalter_Für_Layout {
@@ -234,6 +236,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -284,6 +287,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
+        UnRegisterEvents();
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
@@ -362,6 +366,27 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 Font f = new("Arial", 8);
                 BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
             }
+        }
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        this.InvalidateFont();
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
+    }
+
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
         }
     }
 

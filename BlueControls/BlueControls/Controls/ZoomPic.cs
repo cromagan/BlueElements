@@ -44,7 +44,6 @@ public partial class ZoomPic : ZoomPad {
 
     public ZoomPic() : base() {
         InitializeComponent();
-        MouseHighlight = false;
     }
 
     #endregion

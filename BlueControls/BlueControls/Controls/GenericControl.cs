@@ -42,7 +42,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     #region Fields
 
-    protected bool MouseHighlight = true;
+    private readonly bool _mouseHighlight;
     private Bitmap? _bitmapOfControl;
     private bool _generatingBitmapOfControl;
     private bool _mousePressing;
@@ -55,9 +55,9 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     #region Constructors
 
-    protected GenericControl() : this(false, false) { }
+    protected GenericControl() : this(false, false, false) { }
 
-    protected GenericControl(bool doubleBuffer, bool useBackgroundBitmap) : base() {
+    protected GenericControl(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base() {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetStyle(ControlStyles.ContainerControl, false);
         SetStyle(ControlStyles.ResizeRedraw, false);
@@ -71,6 +71,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             SetDoubleBuffering();
         }
         _useBackBitmap = useBackgroundBitmap;
+        _mouseHighlight = mouseHighlight;
     }
 
     #endregion
@@ -378,7 +379,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         if (IsDisposed) { return; }
         if (GetStyle(ControlStyles.Selectable)) {
             //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
-            MouseHighlight = false;
             base.OnLostFocus(e);
             Invalidate();
         }
@@ -575,10 +575,10 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         if (!Enabled) { return States.Standard_Disabled; }
 
         var s = States.Standard;
-        if (MouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
+        if (_mouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
 
         if (_mousePressing) {
-            if (MouseHighlight) { s |= States.Standard_MousePressed; }
+            if (_mouseHighlight) { s |= States.Standard_MousePressed; }
             if (GetStyle(ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
         } else if (GetStyle(ControlStyles.Selectable) && CanFocus && Focused) {
             s |= States.Standard_HasFocus;

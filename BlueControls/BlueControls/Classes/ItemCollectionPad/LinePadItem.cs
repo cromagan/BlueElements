@@ -40,10 +40,15 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     #region Fields
 
     private readonly PointM _point1;
+
     private readonly PointM _point2;
+
     private string _calcTempPointsCode = string.Empty;
+
     private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
+
     private PadStyles _style = PadStyles.Standard;
+
     private List<PointF>? _tempPoints;
 
     #endregion
@@ -73,8 +78,11 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     #region Properties
 
     public static string ClassId => "LINE";
+
     public override string Description => string.Empty;
+
     public BlueFont? Font { get; set; }
+
     public ConectorStyle Linien_Verhalten { get; set; }
 
     public string SheetStyle {
@@ -117,19 +125,6 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         return false;
     }
 
-    //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
-    //{
-    //    _Internal = vInternal;
-    //    Point1.SetTo(cPoint1);
-    //    Point2.SetTo(cPoint2);
-    //    Style = vFormat;
-    //    Art = vArt;
-    //    if (string.IsNullOrEmpty(_Internal))
-    //    {
-    //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-    //    }
-    //}
-
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<AbstractListItem> verhalt =
         [
@@ -151,6 +146,18 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         return result;
     }
 
+    //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
+    //{
+    //    _Internal = vInternal;
+    //    Point1.SetTo(cPoint1);
+    //    Point2.SetTo(cPoint2);
+    //    Style = vFormat;
+    //    Art = vArt;
+    //    if (string.IsNullOrEmpty(_Internal))
+    //    {
+    //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
+    //    }
+    //}
     public override void InitialPosition(int x, int y, int width, int height) {
         _point1.SetTo(x, y + (height / 2), false);
         _point2.SetTo(x + width, y + (height / 2), false);
@@ -172,6 +179,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -212,6 +220,11 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
     }
 
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        UnRegisterEvents();
+    }
+
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_style != PadStyles.Undefiniert) {
             CalcTempPoints();
@@ -220,6 +233,19 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
                 gr.DrawLine(this.GetFont().Pen(scale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
             }
         }
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        this.InvalidateFont();
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
     }
 
     private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointM p1, PointM p2) {
@@ -318,6 +344,8 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         } while (true);
     }
 
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+
     private bool IsVerdeckt(float x, float y) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
 
@@ -351,6 +379,12 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         PointM p1 = new(x1, y1);
         PointM p2 = new(x2, y2);
         return icpi.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
+    }
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
+        }
     }
 
     private bool Vereinfache(int p1) {

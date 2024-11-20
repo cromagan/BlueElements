@@ -838,6 +838,10 @@ public static class Skin {
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
     public static Database? StyleDb;
+
+    public static ColumnItem? StyleDb_Font;
+    public static ColumnItem? StyleDb_Name;
+    public static ColumnItem? StyleDb_Style;
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
@@ -1202,20 +1206,18 @@ public static class Skin {
 
     public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).Font;
 
-    /// <summary>
-    /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.
-    /// </summary>
-    /// <param name="sheetStyle"></param>
-    /// <returns></returns>
-
     public static BlueFont GetBlueFont(string style, PadStyles format) {
+        if ((int)format > 100) { return BlueFont.DefaultFont; }
         if (format == PadStyles.Undefiniert || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
         InitStyles();
-        if (StyleDb is not { IsDisposed: false } db) { return BlueFont.DefaultFont; }
+        if (StyleDb is not { IsDisposed: false } db ||
+            StyleDb_Style is not { IsDisposed: false } cs ||
+            StyleDb_Name is not { IsDisposed: false } cn ||
+            StyleDb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
-        var f1 = new FilterItem(db.Column["Name"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, style);
-        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich, ((int)format).ToString());
+        var f1 = new FilterItem(cn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, style);
+        var f2 = new FilterItem(cs, BlueDatabase.Enums.FilterType.Istgleich, ((int)format).ToString());
 
         var r = db.Row[f1, f2];
 
@@ -1229,15 +1231,21 @@ public static class Skin {
             return BlueFont.DefaultFont;
         }
 
-        var s = r.CellGetString("font");
-
-        var font = BlueFont.Get(s);
+        var font = GetBlueFont(r);
 
         if (!db.ReadOnly) {
-            r.CellSet("font", font.ParseableItems().FinishParseable(), "Automatische Korrektur");
+            r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
         }
 
         return font;
+    }
+
+    public static BlueFont GetBlueFont(RowItem? r) {
+        if (r == null || StyleDb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
+
+        var s = r.CellGetString(cf);
+
+        return BlueFont.Get(s);
     }
 
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
@@ -1321,6 +1329,10 @@ public static class Skin {
 
     public static void InitStyles() {
         StyleDb ??= Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+
+        StyleDb_Name = StyleDb?.Column["Name"];
+        StyleDb_Style = StyleDb?.Column["Style"];
+        StyleDb_Font = StyleDb?.Column["Font"];
     }
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
@@ -1590,6 +1602,37 @@ public static class Skin {
         PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
     }
 
+    public static PadStyles RepairStyle(PadStyles style) {
+        switch ((int)style) {
+            case < 100:
+                return style;
+
+            case 10001:
+                return PadStyles.Überschrift;
+
+            case 10002:
+                return PadStyles.Untertitel;
+
+            case 10003:
+                return PadStyles.Kapitel;
+
+            case 10004:
+                return PadStyles.Standard;
+
+            case 10005:
+                return PadStyles.Kleiner_Zusatz;
+
+            case 10006:
+                return PadStyles.Alternativ;
+
+            case 10007:
+                return PadStyles.Hervorgehoben;
+
+            default:
+                return PadStyles.Standard;
+        }
+    }
+
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
 
     //internal static BlueFont? GetBlueFont(PadStyles padStyle, string sheetStyle, int stufe) {
@@ -1667,7 +1710,6 @@ public static class Skin {
     //    Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
     //    return GetBlueFont(design, state);
     //}
-
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
         switch (kon) {
             case Enums.Kontur.Rechteck:

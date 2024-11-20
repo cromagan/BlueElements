@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueControls.Enums;
-
 namespace BlueControls.Interfaces;
 
 /// <summary>
@@ -29,15 +27,6 @@ public interface IStyleable {
     #region Properties
 
     public string SheetStyle { get; }
-
-    #endregion
-}
-
-public static class StyleableExtension {
-
-    #region Methods
-
-    public static BlueFont GetFont(this IStyleable o, PadStyles stufe) => Skin.GetBlueFont(o.SheetStyle, stufe) ?? BlueFont.DefaultFont;
 
     #endregion
 }

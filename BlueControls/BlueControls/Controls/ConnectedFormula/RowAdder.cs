@@ -63,7 +63,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
     #region Constructors
 
-    public RowAdder() : base(false, false) => InitializeComponent();
+    public RowAdder() : base(false, false, false) => InitializeComponent();
 
     #endregion
 

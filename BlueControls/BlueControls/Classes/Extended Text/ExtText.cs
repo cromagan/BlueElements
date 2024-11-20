@@ -21,12 +21,15 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Windows.Media;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using static BlueBasics.Converter;
+using Color = System.Drawing.Color;
+using Pen = System.Drawing.Pen;
 
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
@@ -90,12 +93,15 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public ExtText(Design design, States state) : this() {
         var sh = Skin.DesignOf(design, state);
-        Font = sh.Font;
+        StyleBeginns = sh.Stil;
+        //Font = sh.Font;
         _sheetStyle = Constants.Win11;
     }
 
-    public ExtText(string sheetStyle) : this() {
-        Font = Skin.GetBlueFont(sheetStyle, PadStyles.Standard);
+    public ExtText(string sheetStyle, PadStyles stylebeginns) : this() {
+        //Font = Skin.GetBlueFont(sheetStyle, PadStyles.Standard);
+        _sheetStyle = sheetStyle;
+        StyleBeginns = stylebeginns;
     }
 
     #endregion
@@ -123,7 +129,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     /// </summary>
     public Point DrawingPos { get; set; }
 
-    public BlueFont Font { get; } = BlueFont.DefaultFont;
+    //public BlueFont Font { get; } = BlueFont.DefaultFont;
 
     public string HtmlText {
         get {
@@ -139,9 +145,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     }
 
     public bool IsDisposed { get; private set; }
-
     public int MaxTextLenght { get; }
-
     public bool Multiline { get; set; }
 
     public string PlainText {
@@ -165,9 +169,14 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             OnStyleChanged();
+
+            DoQuickFont();
+
             OnPropertyChanged();
         }
     }
+
+    public PadStyles StyleBeginns { get; set; } = PadStyles.Standard;
 
     /// <summary>
     /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
@@ -247,20 +256,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return xNr >= 0 ? xNr : yNr >= 0 ? yNr : cZ >= 0 ? cZ : 0;
     }
 
-    //public void Check(int first, int last, bool checkstate) {
-    //    for (var cc = first; cc <= last; cc++) {
-    //        //var tmp = this[cc].SheetStyle.TrimEnd(" Checked");
-    //        //var st = this[cc].GetStyle();
-
-    //        if (checkstate) {
-    //            this[cc].SheetStyle = tmp;
-
-    //        } else {
-    //            this[cc].SheetStyle = tmp + " Checked";
-    //        }
-    //    }
-    //}
-
     public Rectangle CursorPixelPosX(int charPos) {
         while (_width == null) { ReBreak(); }
 
@@ -290,6 +285,11 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
 
+    //        } else {
+    //            this[cc].SheetStyle = tmp + " Checked";
+    //        }
+    //    }
+    //}
     public void Delete(int first, int last) {
         var tempVar = last - first;
         for (var z = 1; z <= tempVar; z++) {
@@ -300,10 +300,16 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         ResetPosition(true);
     }
 
+    //        if (checkstate) {
+    //            this[cc].SheetStyle = tmp;
     public void Dispose() {
         IsDisposed = true;
     }
 
+    //public void Check(int first, int last, bool checkstate) {
+    //    for (var cc = first; cc <= last; cc++) {
+    //        //var tmp = this[cc].SheetStyle.TrimEnd(" Checked");
+    //        //var st = this[cc].GetStyle();
     public void Draw(Graphics gr, float zoom) {
         while (_width == null) { ReBreak(); }
         DrawStates(gr, zoom);
@@ -442,7 +448,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
         // Ungefähre Größe vorallokieren - reduziert Reallokationen
         var t = new StringBuilder(Count * 2);
-        var lastStufe = Font;
+        var lastStufe = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
 
         for (var z = 0; z < Count; z++) {
             if (lastStufe != this[z].Font) {
@@ -466,8 +472,9 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
         Clear();
         ResetPosition(true);
-        var stil = PadStyles.Standard;
-        var font = Font;
+        var stil = StyleBeginns;
+        var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
+        
 
         // StringBuilder für temporäre String-Operationen
         var temp = new StringBuilder(100);
@@ -683,6 +690,20 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             case "":
                 // ist evtl. ein <> ausruck eines Textes
                 break;
+        }
+    }
+
+    private void DoQuickFont() {
+        var last = PadStyles.Undefiniert;
+        var f = BlueFont.DefaultFont;
+
+        foreach (var thisChar in this) {
+            if (thisChar.Stil != last) {
+                last = thisChar.Stil;
+                f = thisChar.Font;
+            } else {
+                thisChar.Font = f;
+            }
         }
     }
 

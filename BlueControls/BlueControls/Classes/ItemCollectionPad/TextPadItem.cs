@@ -92,6 +92,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     }
 
     public override string Description => string.Empty;
+
     public BlueFont? Font { get; set; }
 
     public string SheetStyle {
@@ -192,6 +193,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
             case "style":
                 _style = (PadStyles)IntParse(value);
+                _style = Skin.RepairStyle(_style);
                 return true;
 
             case "additionalscale":
@@ -233,13 +235,17 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         return true;
     }
 
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        UnRegisterEvents();
+    }
+
     //public override void CalculateSlavePoints() {
     //    base.CalculateSlavePoints();
     //    InvalidateText();
     //}
-
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2, 16);
-
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (_style != PadStyles.Undefiniert) {
             gr.SetClip(positionModified);
@@ -262,6 +268,21 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         }
     }
 
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        InvalidateText();
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
+    }
+
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) => InvalidateText();
+
     private void InvalidateText() {
         this.InvalidateFont();
         _txt = null;
@@ -275,7 +296,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 return;
             }
 
-            _txt = new ExtText(SheetStyle);
+            _txt = new ExtText(SheetStyle, _style);
             _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
@@ -283,6 +304,12 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
             _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale), -1);
             _txt.Ausrichtung = _ausrichtung;
+        }
+    }
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
         }
     }
 

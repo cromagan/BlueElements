@@ -118,10 +118,13 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     public abstract void Draw(Graphics gr, Point posModificator, float zoom);
 
     public PadStyles GetStyle() {
-        if (Font == null || Skin.StyleDb is not Database db) { return PadStyles.Standard; }
+        if (Font == null ||
+            Skin.StyleDb is not { IsDisposed: false } db ||
+            Skin.StyleDb_Font is not { IsDisposed: false } cf ||
+            Skin.StyleDb_Style is not { IsDisposed: false } cs) { return PadStyles.Standard; }
 
-        var f1 = new FilterItem(db.Column["Font"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
-        var f2 = new FilterItem(db.Column["Style"], BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
+        var f1 = new FilterItem(cf, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
+        var f2 = new FilterItem(cs, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
 
         var r = db.Row[f1, f2];
 

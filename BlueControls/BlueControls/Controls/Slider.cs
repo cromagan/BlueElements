@@ -67,7 +67,7 @@ public partial class Slider : IBackgroundNone {
 
     #region Constructors
 
-    public Slider() : base(false, false) {
+    public Slider() : base(false, false, true) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
