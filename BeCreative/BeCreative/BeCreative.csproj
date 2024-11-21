@@ -94,9 +94,17 @@
       <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
       <Name>BlueDatabase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BlueInternet\BlueInternet\BlueInternet.csproj">
+      <Project>{7f05b524-a65b-46f7-a798-e5bb27938f6e}</Project>
+      <Name>BlueInternet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BluePaint\BluePaint\BluePaint.csproj">
       <Project>{f357f648-987a-4442-93a9-bfc421561dd2}</Project>
       <Name>BluePaint</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj">
+      <Project>{3acc6ee6-b919-4952-8502-f62baeeefc60}</Project>
+      <Name>BlueScript</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

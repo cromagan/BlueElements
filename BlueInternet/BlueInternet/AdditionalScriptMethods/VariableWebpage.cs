@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueScript.Structures;
 using CefSharp.OffScreen;
 using static BlueBasics.Interfaces.ParseableExtension;
@@ -26,6 +27,8 @@ namespace BlueScript.Variables;
 public class VariableWebpage : Variable {
 
     #region Fields
+
+    public static readonly List<string> WebPageVal = [VariableWebpage.ShortName_Variable];
 
     private ChromiumWebBrowser? _browser;
 

@@ -67,8 +67,7 @@ public static class Generic {
 
     private static List<Type> AllTypes {
         get {
-            if (_allTypes != null)
-                return _allTypes;
+            if (_allTypes != null) { return _allTypes; }
 
             _allTypes = [];
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -370,17 +369,21 @@ public static class Generic {
     }
 
     private static bool HasMatchingConstructor(Type type, object?[] constructorArgs) {
-        // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
-        if (constructorArgs.Length == 0) {
-            return type.GetConstructor(Type.EmptyTypes) != null;
+        try {
+            // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
+            if (constructorArgs.Length == 0) {
+                return type.GetConstructor(Type.EmptyTypes) != null;
+            }
+
+            // Überprüfen Sie, ob ein Konstruktor existiert, der den Typen der bereitgestellten Argumente entspricht
+            var constructorInfo = type.GetConstructor(
+                constructorArgs.Select(arg => arg?.GetType()).ToArray()
+            );
+
+            return constructorInfo != null;
+        } catch {
+            return false;
         }
-
-        // Überprüfen Sie, ob ein Konstruktor existiert, der den Typen der bereitgestellten Argumente entspricht
-        var constructorInfo = type.GetConstructor(
-            constructorArgs.Select(arg => arg?.GetType()).ToArray()
-        );
-
-        return constructorInfo != null;
     }
 
     #endregion

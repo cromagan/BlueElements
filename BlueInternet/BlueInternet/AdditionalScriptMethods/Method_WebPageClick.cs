@@ -21,6 +21,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using static BlueScript.Variables.VariableWebpage;
 
 //using CefSharp.WinForms;
 
@@ -28,12 +29,12 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_AddSymbol : Method_WebPage {
+internal class Method_WebPageClick : Method_WebPage {
 
     #region Properties
 
     public override List<List<string>> Args => [WebPageVal, StringVal];
-    public override string Command => "addsymbol";
+    public override string Command => "webpageclick";
     public override List<string> Constants => [];
     public override string Description => "Fügt ein Pad-Item-Symbol einer Collection hinzu";
     public override bool GetCodeBlockAfter => false;
@@ -42,7 +43,7 @@ internal class Method_AddSymbol : Method_WebPage {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddSymbol(Collection, id)";
+    public override string Syntax => "WebPageClick(WebPage, id)";
 
     #endregion
 

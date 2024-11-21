@@ -23,6 +23,7 @@ using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using static BlueScript.Variables.VariableWebpage;
 
 //using CefSharp.WinForms;
 

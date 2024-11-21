@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
-using System.Windows.Media;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -474,7 +473,6 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         ResetPosition(true);
         var stil = StyleBeginns;
         var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
-        
 
         // StringBuilder für temporäre String-Operationen
         var temp = new StringBuilder(100);

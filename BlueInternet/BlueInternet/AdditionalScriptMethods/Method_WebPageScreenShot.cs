@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Threading;
+using static BlueScript.Variables.VariableWebpage;
 
 //using CefSharp.WinForms;
 

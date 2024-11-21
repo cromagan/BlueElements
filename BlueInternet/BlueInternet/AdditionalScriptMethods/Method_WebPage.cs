@@ -28,12 +28,6 @@ namespace BlueDatabase.AdditionalScriptMethods;
 
 public abstract class Method_WebPage : Method {
 
-    #region Fields
-
-    public static readonly List<string> WebPageVal = [VariableWebpage.ShortName_Variable];
-
-    #endregion
-
     #region Methods
 
     public static bool AllImagesLoaded(ChromiumWebBrowser wb) {
