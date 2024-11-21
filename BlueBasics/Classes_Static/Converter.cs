@@ -137,9 +137,7 @@ public static class Converter {
     /// <param name="s"></param>
     /// <returns></returns>
     public static int IntParse(string? s) {
-        if (string.IsNullOrEmpty(s)) { return 0; }
-
-        if (IntTryParse(s, out var v)) { return v; }
+        if (int.TryParse(s, out var v)) { return v; }
 
         return 0;
     }
@@ -158,39 +156,11 @@ public static class Converter {
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
     /// </summary>
     /// <param name="s"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
-    public static bool IntTryParse(string? s, out int result) {
-        result = 0;
-        if (string.IsNullOrEmpty(s)) { return false; }
-
-        return int.TryParse(s, out result);
-    }
-
-    /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
-    /// </summary>
-    /// <param name="s"></param>
     /// <returns></returns>
     public static long LongParse(string? s) {
-        if (string.IsNullOrEmpty(s)) { return 0; }
-
-        if (LongTryParse(s, out var v)) { return v; }
+        if (long.TryParse(s, out var v)) { return v; }
 
         return 0;
-    }
-
-    /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
-    /// </summary>
-    /// <param name="s"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
-    public static bool LongTryParse(string? s, out long result) {
-        result = 0;
-        if (string.IsNullOrEmpty(s)) { return false; }
-
-        return long.TryParse(s, out result);
     }
 
     public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;

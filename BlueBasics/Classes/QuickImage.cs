@@ -52,8 +52,8 @@ public sealed class QuickImage : IReadableText, IEditable {
         var w = (imageCode + "||||||||||").Split('|');
 
         Name = w[0];
-        IntTryParse(w[1], out var width);
-        IntTryParse(w[2], out var height);
+        int.TryParse(w[1], out var width);
+        int.TryParse(w[2], out var height);
 
         Effekt = (ImageCodeEffect)IntParse(w[3]);
         Färbung = w[4];

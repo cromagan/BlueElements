@@ -74,7 +74,7 @@ public static partial class Extensions {
         switch (sortType) {
             case SortierTyp.ZahlenwertInt:
                 if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
-                if (IntTryParse(isValue, out var w)) {
+                if (int.TryParse(isValue, out var w)) {
                     return w >= 0
                         ? compareKeySOk + "A" + w.ToStringInt10()
                         : compareKeySOk + w.ToStringInt10();
@@ -441,7 +441,7 @@ public static partial class Extensions {
 
     public static bool IsHtmlColorCode(this string? txt) => txt != null && !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Char_Numerals + "abcdefABCDEF");
 
-    public static bool IsLong(this string? txt) => txt is not null && LongTryParse(txt, out _);
+    public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
 
     public static bool IsNumeral(this string? txt) => txt is not null && (txt.IsLong() || txt.IsDouble());
 

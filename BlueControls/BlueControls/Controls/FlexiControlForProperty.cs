@@ -403,7 +403,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<int> ai:
-                _ = IntTryParse(Value, out var i);
+                _ = int.TryParse(Value, out var i);
                 if (ai.Get() != i) { ai.Set(i); }
                 break;
 
@@ -441,7 +441,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 if (_accessor.Get() is null) {
                 } else if (_accessor.Get() is IEditable) {
                 } else if (_accessor.Get() is Enum) {
-                    _ = IntTryParse(Value, out var ef);
+                    _ = int.TryParse(Value, out var ef);
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
                 } else {
