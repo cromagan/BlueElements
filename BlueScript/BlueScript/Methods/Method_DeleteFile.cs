@@ -66,9 +66,7 @@ internal class Method_DeleteFile : Method {
         }
         files = files.SortedDistinctList();
 
-        if (!scp.ProduktivPhase) {
-            return new DoItFeedback(ld, "Löschen im Testmodus deaktiviert.");
-        }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         foreach (var filn in files) {
             if (!filn.IsFormat(FormatHolder.FilepathAndName)) {

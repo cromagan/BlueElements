@@ -59,7 +59,7 @@ public class Method_CellSetRow : Method_Database {
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zellen setzen Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (row == MyRow(scp)) {
             return new DoItFeedback(ld, "Die eigene Zelle kann nur über die Variabeln geändert werden.");

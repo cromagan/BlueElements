@@ -21,27 +21,27 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Mistral.SDK;
+using Anthropic.SDK;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_LoadMistralAi : Method {
+internal class Method_Ai : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-    public override string Command => "loadmistralai";
+    public override string Command => "ai";
     public override List<string> Constants => [];
-    public override string Description => "Initialisiert die KI von Mistral";
+    public override string Description => "Initialisiert die KI von Claude";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableMistralAi.ShortName_Variable;
+    public override string Returns => VariableAi.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "LoadMistralAi(APIKey)";
+    public override string Syntax => "Ai(APIKey)";
 
     #endregion
 
@@ -56,11 +56,11 @@ internal class Method_LoadMistralAi : Method {
         try {
             Generic.CollectGarbage();
 
-            var client = new MistralClient(attvar.ValueStringGet(0));
+            var client = new AnthropicClient(attvar.ValueStringGet(0));
 
-            return new DoItFeedback(new VariableMistralAi(client));
+            return new DoItFeedback(new VariableAi(client));
         } catch {
-            return new DoItFeedback(new VariableMistralAi(null as MistralClient));
+            return new DoItFeedback(new VariableAi(null as AnthropicClient));
         }
     }
 

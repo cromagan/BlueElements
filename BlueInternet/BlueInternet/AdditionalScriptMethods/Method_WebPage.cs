@@ -17,11 +17,9 @@
 
 using BlueBasics;
 using BlueScript.Methods;
-using BlueScript.Variables;
 using CefSharp;
 using CefSharp.OffScreen;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BlueDatabase.AdditionalScriptMethods;

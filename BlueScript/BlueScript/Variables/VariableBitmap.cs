@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueScript.Structures;
@@ -27,6 +28,8 @@ namespace BlueScript.Variables;
 public class VariableBitmap : Variable {
 
     #region Fields
+
+    public static readonly List<string> BmpVal = [VariableBitmap.ShortName_Variable];
 
     private Bitmap? _bmp;
 

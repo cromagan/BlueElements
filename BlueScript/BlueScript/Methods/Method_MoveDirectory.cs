@@ -63,7 +63,7 @@ internal class Method_MoveDirectory : Method {
 
         if (DirectoryExists(dep)) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert bereits."); }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Verschieben im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!MoveDirectory(sop, dep, false)) {
             return new DoItFeedback(ld, "Verschieben fehlgeschlagen.");

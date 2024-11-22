@@ -67,7 +67,7 @@ internal class Method_MoveFile : Method {
             return new DoItFeedback(ld, "Zieldatei existiert bereits.");
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Verschieben im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!MoveFile(sop, dep, false)) {
             return new DoItFeedback(ld, "Verschieben fehlgeschlagen.");

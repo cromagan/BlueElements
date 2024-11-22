@@ -108,6 +108,8 @@ public struct DoItFeedback {
 
     public static DoItFeedback KlammerFehler(LogData ld) => new(ld, "Fehler bei der Klammersetzung.");
 
+    public static DoItFeedback TestModusInaktiv(LogData ld) => new(ld, "Im Testmodus deaktiviert.");
+
     public static DoItFeedback Null() => new();
 
     public static DoItFeedback Schreibgschützt(LogData ld) => new(ld, "Variable ist schreibgeschützt.");

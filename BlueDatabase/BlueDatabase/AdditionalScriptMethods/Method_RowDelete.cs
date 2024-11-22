@@ -74,7 +74,7 @@ public class Method_RowDelete : Method_Database, IUseableForButton {
             return new DoItFeedback(ld, "Fehler im Filter");
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile löschen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var r = RowCollection.Remove(allFi, null, "Script Command: RowDelete");
 

@@ -71,7 +71,7 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
         var m = CellCollection.EditableErrorReason(srs, myRow, EditableErrorReasonType.EditAcut, false, false, true, false);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zellen setzen Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (myRow == MyRow(scp)) {
             return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden.");

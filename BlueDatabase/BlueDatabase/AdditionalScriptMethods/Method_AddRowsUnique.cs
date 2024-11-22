@@ -76,7 +76,7 @@ public class Method_AddRowsUnique : Method_Database {
             return new DoItFeedback(ld, "Stapelspeicherüberlauf");
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var c = db.Column.First();
 

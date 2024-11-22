@@ -56,7 +56,7 @@ internal class Method_ImportCsv : Method_Database {
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Import im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var sx = db.ImportCsv(txt, true, true, sep, false, false);
 

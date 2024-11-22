@@ -69,7 +69,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(ld, "Stapelspeicherüberlauf"); }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "CallDatabase im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         #region Attributliste erzeugen
 

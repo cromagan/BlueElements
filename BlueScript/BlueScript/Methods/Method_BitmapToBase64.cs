@@ -24,6 +24,7 @@ using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
@@ -33,7 +34,7 @@ internal class Method_BitmapToBase64 : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], StringVal];
+    public override List<List<string>> Args => [BmpVal, StringVal];
     public override string Command => "bitmaptobase64";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";

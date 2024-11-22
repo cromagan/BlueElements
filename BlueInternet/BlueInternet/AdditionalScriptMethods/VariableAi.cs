@@ -18,40 +18,40 @@
 #nullable enable
 
 using System.Collections.Generic;
+using Anthropic.SDK;
 using BlueScript.Structures;
-using Mistral.SDK;
 using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 
-public class VariableMistralAi : Variable {
+public class VariableAi : Variable {
 
     #region Fields
 
-    public static readonly List<string> MistralAiVal = [VariableMistralAi.ShortName_Variable];
+    public static readonly List<string> AiVal = [VariableAi.ShortName_Variable];
 
-    private MistralClient? _client;
+    private AnthropicClient? _client;
 
     #endregion
 
     #region Constructors
 
-    public VariableMistralAi(string name, MistralClient? value, bool ronly, string comment) : base(name, ronly, comment) => _client = value;
+    public VariableAi(string name, AnthropicClient? value, bool ronly, string comment) : base(name, ronly, comment) => _client = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableMistralAi(string name) : this(name, null, true, string.Empty) { }
+    public VariableAi(string name) : this(name, null, true, string.Empty) { }
 
-    public VariableMistralAi(MistralClient? value) : this(DummyName(), value, true, string.Empty) { }
+    public VariableAi(AnthropicClient? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "mai";
-    public static string ShortName_Variable => "*mai";
+    public static string ClassId => "ari";
+    public static string ShortName_Variable => "*ari";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _client == null;
@@ -59,7 +59,7 @@ public class VariableMistralAi : Variable {
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
-    public MistralClient? ValueClient {
+    public AnthropicClient? ValueClient {
         get => _client;
         set {
             if (ReadOnly) { return; }
@@ -80,7 +80,7 @@ public class VariableMistralAi : Variable {
     public override void DisposeContent() => _client?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableMistralAi v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (variable is not VariableAi v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueClient = v.ValueClient;
         return DoItFeedback.Null();

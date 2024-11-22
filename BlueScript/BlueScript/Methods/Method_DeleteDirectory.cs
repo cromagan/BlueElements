@@ -65,7 +65,7 @@ internal class Method_DeleteDirectory : Method {
             return DoItFeedback.Wahr();
         }
 
-        if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Löschen im Testmodus deaktiviert."); }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         try {
             return new DoItFeedback(IO.DeleteDir(filn, false));

@@ -25,6 +25,7 @@ using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
@@ -33,7 +34,7 @@ internal class Method_SaveImage : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, [VariableBitmap.ShortName_Variable]];
+    public override List<List<string>> Args => [StringVal, StringVal, BmpVal];
     public override string Command => "saveimage";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Speichert das Bild auf die Festplatte";
