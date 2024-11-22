@@ -15,52 +15,51 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Anthropic.SDK;
-using BlueBasics;
+using System.IO;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_Ai : Method {
+internal class Method_GetFilesAll : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
-    public override string Command => "ai";
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "getfilesall";
     public override List<string> Constants => [];
-    public override string Description => "Initialisiert die KI von Claude";
+    public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis inkl. Unterverzeichnisse zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableAi.ShortName_Variable;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "Ai(APIKey)";
+    public override string Syntax => "GetFilesAll(Path, Suffix)";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        //https://keyholesoftware.com/2019/02/11/create-your-own-web-bots-in-net-with-cefsharp/
+        var pf = attvar.ValueStringGet(0);
 
-        // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,
-        // darf diese Routine nicht fehlschlagen.
+        if (!DirectoryExists(pf)) {
+            return new DoItFeedback(ld, "Verzeichnis existiert nicht");
+        }
 
         try {
-            Generic.CollectGarbage();
-
-            var client = new AnthropicClient(attvar.ValueStringGet(0));
-
-            return new DoItFeedback(new VariableAi(client));
+            return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueStringGet(1), SearchOption.AllDirectories));
         } catch {
-            return new DoItFeedback(new VariableAi(null as AnthropicClient));
+            return DoItFeedback.InternerFehler(ld);
         }
     }
 

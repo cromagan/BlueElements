@@ -34,7 +34,7 @@ internal class Method_SaveImage : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, BmpVal];
+    public override List<List<string>> Args => [StringVal, StringVal, BmpVar];
     public override string Command => "saveimage";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Speichert das Bild auf die Festplatte";

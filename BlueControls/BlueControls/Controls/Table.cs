@@ -1425,7 +1425,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (CurrentArrangement is not { IsDisposed: false } ca) {
+        if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count <1) {
             DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft", null);
             return;
         }

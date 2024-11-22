@@ -189,7 +189,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Invalidate_RowsInput();
         }
 
-        Invalidate();
+        //Invalidate();
     }
 
     public RowItem? RowSingleOrNull() {
@@ -358,9 +358,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
             if (!RowsInputManualSeted) { RowsInput = null; }
             RowsInputChangedHandled = false;
+            Invalidate();
         }
 
-        Invalidate();
+      
     }
 
     protected override void OnCreateControl() {

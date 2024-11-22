@@ -35,6 +35,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Fields
 
+    private bool _bearbeitbar = false;
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -54,6 +55,17 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
+
+    public bool Bearbeitbar {
+        get => _bearbeitbar;
+
+        set {
+            if (IsDisposed) { return; }
+            if (value == _bearbeitbar) { return; }
+            _bearbeitbar = value;
+            OnPropertyChanged();
+        }
+    }
 
     [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Bild_Dateiname {
@@ -81,7 +93,8 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new EasyPic {
-            OriginalText = Bild_Dateiname
+            OriginalText = Bild_Dateiname,
+            Editable = Bearbeitbar
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -94,6 +107,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
             .. base.GetProperties(widthOfControl),
             new FlexiControl("Einstellungen:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Bild_Dateiname),
+            new FlexiControlForProperty<bool>(() => Bearbeitbar),
 
         ];
         return result;
@@ -104,6 +118,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         List<string> result = [.. base.ParseableItems()];
 
         result.ParseableAdd("ImageName", _bild_Dateiname);
+        result.ParseableAdd("Editable", _bearbeitbar);
         return result;
     }
 
@@ -111,6 +126,10 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         switch (key) {
             case "imagename":
                 _bild_Dateiname = value.FromNonCritical();
+                return true;
+
+            case "editable":
+                _bearbeitbar = value.FromPlusMinus();
                 return true;
         }
 

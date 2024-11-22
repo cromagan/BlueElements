@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -43,6 +44,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     private Bitmap? _bitmap;
 
+    private bool _editable = true;
     private string _filename = string.Empty;
 
     private string _originalText = string.Empty;
@@ -53,7 +55,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     #region Constructors
 
-    public EasyPic() : base(false, false, false) {
+    public EasyPic() : base(true, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -72,6 +74,16 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     #region Properties
 
+    [DefaultValue(true)]
+    public bool Editable {
+        get => _editable;
+        set {
+            if (_editable == value) { return; }
+            _editable = value;
+            InvalidateAndCheckButtons();
+        }
+    }
+
     [DefaultValue("")]
     public string FileName {
         get => _filename;
@@ -85,15 +97,16 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
             } else {
                 _bitmap = (Bitmap?)Image_FromFile(_filename);
             }
-            ZoomFitInvalidateAndCheckButtons();
+            InvalidateAndCheckButtons();
         }
     }
 
     public string OriginalText {
         get => _originalText;
         set {
+            if (_originalText == value) { return; }
             _originalText = value;
-            ZoomFitInvalidateAndCheckButtons();
+            InvalidateAndCheckButtons();
         }
     }
 
@@ -123,7 +136,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
         if (DeleteFile(_filename, false)) {
             _bitmap = null;
-            ZoomFitInvalidateAndCheckButtons();
+            InvalidateAndCheckButtons();
             return true;
         }
 
@@ -206,8 +219,10 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
-        _panelMoveDirection = 1;
-        _panelMover.Enabled = true;
+        if (_editable) {
+            _panelMoveDirection = 1;
+            _panelMover.Enabled = true;
+        }
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
@@ -224,7 +239,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     protected override void OnResize(System.EventArgs e) {
         base.OnResize(e);
-        ZoomFitInvalidateAndCheckButtons();
+        InvalidateAndCheckButtons();
     }
 
     private void _paneMover_Tick(object sender, System.EventArgs e) {
@@ -235,7 +250,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
             }
         }
         if (_panelMoveDirection >= 0) {
-            if (!ContainsMouse()) { _panelMoveDirection = -1; }
+            if (!_editable || !ContainsMouse()) { _panelMoveDirection = -1; }
         }
         if (_panelMoveDirection > 0) {
             if (!EditPanelFrame.Visible) {
@@ -267,7 +282,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         _bitmap = ScreenShot.GrabArea(ParentForm()).CloneOfBitmap();
 
         SaveNewPicToDisc();
-        ZoomFitInvalidateAndCheckButtons();
+        InvalidateAndCheckButtons();
     }
 
     private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
@@ -285,6 +300,15 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return true;
     }
 
+    private void InvalidateAndCheckButtons() {
+        _panelMoveDirection = -1;
+        _panelMover.Enabled = true;
+        btnDeleteImage.Enabled = _bitmap != null && _editable;
+        btnLoad.Enabled = _editable;
+        btnScreenshot.Enabled = _editable;
+        //Invalidate();
+    }
+
     private void Lade_Click(object sender, System.EventArgs e) {
         if (!DeleteImageInFileSystem()) { return; }
         if (!HasFileName()) { return; }
@@ -297,7 +321,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         if (!HasFileName()) { return; }
         _bitmap = Image_FromFile(OpenDia.FileName) as Bitmap;
         SaveNewPicToDisc();
-        ZoomFitInvalidateAndCheckButtons();
+        InvalidateAndCheckButtons();
     }
 
     private void SaveNewPicToDisc() {
@@ -307,7 +331,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         //using var fs = new FileStream(_filename, FileMode.Create, FileAccess.Write);
         //_bitmap.Save(fs, ImageFormat.Png);
 
-        if (!HasFileName() || _bitmap == null) { return; }
+        if (!HasFileName() || _bitmap == null || !_editable) { return; }
 
         try {
             using var compatibleBitmap = new Bitmap(_bitmap);
@@ -320,18 +344,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         } catch (Exception ex) {
             System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }
-    }
-
-    private void ZoomFitInvalidateAndCheckButtons() {
-        _panelMoveDirection = -1;
-        _panelMover.Enabled = true;
-        if (_bitmap == null) {
-            btnDeleteImage.Enabled = false;
-            Invalidate();
-            return;
-        }
-        btnDeleteImage.Enabled = true;
-        Invalidate();
     }
 
     #endregion

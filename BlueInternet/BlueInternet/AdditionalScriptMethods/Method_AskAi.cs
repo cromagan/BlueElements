@@ -15,14 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using Anthropic.SDK.Constants;
+using Anthropic.SDK.Messaging;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using static BlueScript.Variables.VariableAi;
-using Anthropic.SDK.Constants;
-using Anthropic.SDK.Messaging;
 
 //using CefSharp.WinForms;
 
@@ -56,25 +57,28 @@ internal class Method_AskAi : Method {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        try {
-            var messages = new List<Message>()
-            {
-                new Message(RoleType.User, attvar.ValueStringGet(1))
-            };
+        var tries = 0;
 
-            var parameters = new MessageParameters() {
-                Messages = messages,
-                MaxTokens = 100,
-                Model = AnthropicModels.Claude35Sonnet,
-                Stream = false,
-                Temperature = 1.0m,
-            };
-            var firstResult = client.Messages.GetClaudeMessageAsync(parameters).GetAwaiter().GetResult();
+        do {
+            try {
+                var messages = new List<Message> { new Message(RoleType.User, attvar.ValueStringGet(1)) };
 
-            return new DoItFeedback(firstResult.Message.ToString());
-        } catch {
-            return new DoItFeedback(ld, "Allgemeiner Fehler bei der Übergabe an die KI.");
-        }
+                var parameters = new MessageParameters {
+                    Messages = messages,
+                    MaxTokens = 1024,
+                    Model = AnthropicModels.Claude35Sonnet,
+                    Stream = false,
+                    Temperature = 1.0m,
+                };
+                var firstResult = client.Messages.GetClaudeMessageAsync(parameters).GetAwaiter().GetResult();
+
+                return new DoItFeedback(firstResult.Message.ToString());
+            } catch {
+                tries++;
+                Generic.Pause(10, false);
+            }
+        } while (tries < 10);
+        return new DoItFeedback(ld, "Allgemeiner Fehler bei der Übergabe an die KI.");
     }
 
     #endregion

@@ -36,7 +36,7 @@ internal class Method_GetFiles : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "getfiles";
     public override List<string> Constants => [];
-    public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
+    public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück - ohne die Unterverzeichnisse. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
@@ -56,7 +56,11 @@ internal class Method_GetFiles : Method {
             return new DoItFeedback(ld, "Verzeichnis existiert nicht");
         }
 
-        return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueStringGet(1)));
+        try {
+            return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueStringGet(1)));
+        } catch {
+            return DoItFeedback.InternerFehler(ld);
+        }
     }
 
     #endregion

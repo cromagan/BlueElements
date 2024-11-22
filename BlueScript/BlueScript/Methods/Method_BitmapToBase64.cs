@@ -34,7 +34,7 @@ internal class Method_BitmapToBase64 : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVal, StringVal];
+    public override List<List<string>> Args => [BmpVar, StringVal];
     public override string Command => "bitmaptobase64";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";

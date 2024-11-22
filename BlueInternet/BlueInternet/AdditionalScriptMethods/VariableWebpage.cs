@@ -28,7 +28,7 @@ public class VariableWebpage : Variable {
 
     #region Fields
 
-    public static readonly List<string> WebPageVal = [VariableWebpage.ShortName_Variable];
+    public static readonly List<string> WebPageVal = [ShortName_Variable];
 
     private ChromiumWebBrowser? _browser;
 

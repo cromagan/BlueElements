@@ -29,7 +29,7 @@ public class VariableBitmap : Variable {
 
     #region Fields
 
-    public static readonly List<string> BmpVal = [VariableBitmap.ShortName_Variable];
+    public static readonly List<string> BmpVar = [VariableBitmap.ShortName_Variable];
 
     private Bitmap? _bmp;
 

@@ -135,7 +135,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Indexers
 
-    public ColumnViewItem? this[int index] => _internal[index];
+    public ColumnViewItem? this[int index] => index >= 0 && index < _internal.Count ? _internal[index] : null;
 
     public ColumnViewItem? this[ColumnItem? column] {
         get {

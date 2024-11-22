@@ -28,7 +28,7 @@ public class VariableAi : Variable {
 
     #region Fields
 
-    public static readonly List<string> AiVal = [VariableAi.ShortName_Variable];
+    public static readonly List<string> AiVal = [ShortName_Variable];
 
     private AnthropicClient? _client;
 

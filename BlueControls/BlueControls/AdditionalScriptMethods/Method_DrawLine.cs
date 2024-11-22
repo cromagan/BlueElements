@@ -32,7 +32,7 @@ public class Method_DrawLine : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVal, FloatVal, FloatVal, FloatVal, FloatVal];
+    public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
     public override string Command => "drawline";
     public override List<string> Constants => [];
     public override string Description => "Zeichnet eine Linie auf dem angegebenen Bild.";
