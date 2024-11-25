@@ -45,11 +45,11 @@ internal class Method_MoveFile : Method {
 
     public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
+    public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "MoveFile(SourceCompleteName, DestinatonCompleteName)";
+    public override string Syntax => "MoveFile(SourceCompleteName, DestinationCompleteName)";
 
     #endregion
 
@@ -59,21 +59,18 @@ internal class Method_MoveFile : Method {
         var sop = attvar.ValueStringGet(0);
         var dep = attvar.ValueStringGet(1);
 
-        //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback(infos.LogData, s, "Verzeichnis existiert nicht"); }
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert nicht"); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert nicht:" + dep.FilePath()); }
         if (!FileExists(sop)) { return new DoItFeedback(ld, "Quelldatei existiert nicht."); }
 
-        if (FileExists(dep)) {
-            return new DoItFeedback(ld, "Zieldatei existiert bereits.");
-        }
+        if (FileExists(dep)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!MoveFile(sop, dep, false)) {
-            return new DoItFeedback(ld, "Verschieben fehlgeschlagen.");
+            return DoItFeedback.Falsch();
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Wahr();
     }
 
     #endregion

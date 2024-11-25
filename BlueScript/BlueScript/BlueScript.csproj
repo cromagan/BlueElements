@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />
+    <Compile Include="Methods\Method_Filesuffix.cs" />
+    <Compile Include="Methods\Method_Filepath.cs" />
     <Compile Include="Methods\Method_GetFilesAll.cs" />
     <Compile Include="Methods\Method_If.cs" />
     <Compile Include="Methods\Method_Sqrt.cs" />

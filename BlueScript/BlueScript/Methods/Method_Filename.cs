@@ -35,7 +35,7 @@ internal class Method_Filename : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "filename";
     public override List<string> Constants => [];
-    public override string Description => "Gibt den Dateinaamen ohne Pfad und ohne Suffix zurück";
+    public override string Description => "Gibt den Dateinamen ohne Pfad und ohne Suffix zurück";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;

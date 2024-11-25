@@ -19,36 +19,36 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_RemoveXmlTags : Method {
+internal class Method_Filesuffix : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-    public override string Command => "removexmltags";
+    public override string Command => "filesuffix";
     public override List<string> Constants => [];
-    public override string Description => "Entfernt aus dem Text < > Tags.\r\n#Hasttag: Klammern, HTML, XML";
+    public override string Description => "Gibt den Dateisuffix zurück";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "RemoveXMLTags(text)";
+    public override string Syntax => "FileSuffix(FilePathAndName)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).RemoveXmlTags());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).FileSuffix());
 
     #endregion
 }

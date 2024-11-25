@@ -46,11 +46,11 @@ internal class Method_MoveDirectory : Method {
 
     public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
+    public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "MoveDirectory(SourceCompleteName, DestinatonCompleteName)";
+    public override string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
 
     #endregion
 
@@ -61,15 +61,15 @@ internal class Method_MoveDirectory : Method {
         if (!DirectoryExists(sop)) { return new DoItFeedback(ld, "Quell-Verzeichnis existiert nicht."); }
         var dep = attvar.ValueStringGet(1);
 
-        if (DirectoryExists(dep)) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert bereits."); }
+        if (DirectoryExists(dep)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!MoveDirectory(sop, dep, false)) {
-            return new DoItFeedback(ld, "Verschieben fehlgeschlagen.");
+            return DoItFeedback.Falsch();
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Wahr();
     }
 
     #endregion
