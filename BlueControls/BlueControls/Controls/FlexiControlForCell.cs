@@ -355,6 +355,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
 
         Invalidate_FilterInput();
+        Invalidate();
     }
 
     private void F_ControlRemoved(object sender, ControlEventArgs e) {

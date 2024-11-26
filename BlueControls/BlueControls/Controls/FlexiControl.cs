@@ -1051,7 +1051,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
 
     private void UpdateValueToControl() {
-        if (!Allinitialized) { CreateSubControls(); }
+        if (!Allinitialized && !Initializing) { CreateSubControls(); }
         IsFilling = true;
         foreach (Control control in Controls) {
             switch (control) {
