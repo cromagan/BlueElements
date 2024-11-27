@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -261,26 +262,34 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             h.GridSnap = Pages.GridSnap;
             Pages.Add(h);
         }
+
         RepairReciver(Pages);
 
         foreach (var thisP in Pages) {
             if (thisP is ItemCollectionPadItem { IsDisposed: false } icp) {
-                RowEntryPadItem? found = null;
+                if (icp.Caption.Equals("Head", StringComparison.OrdinalIgnoreCase) || icp.Count() > 0) {
+                    RowEntryPadItem? found = null;
 
-                foreach (var thisit in icp) {
-                    if (thisit is RowEntryPadItem repi) {
-                        found = repi;
-                        break;
+                    foreach (var thisit in icp) {
+                        if (thisit is RowEntryPadItem repi) {
+                            found = repi;
+                            break;
+                        }
                     }
-                }
 
-                if (found == null) {
-                    found = new RowEntryPadItem();
-                    icp.Add(found);
-                }
+                    if (found == null) {
+                        found = new RowEntryPadItem();
+                        icp.Add(found);
+                    }
 
-                found.SetCoordinates(new RectangleF((icp.UsedArea.Width / 2) - 150, -30, 300, 30));
-                found.Bei_Export_sichtbar = false;
+                    found.SetCoordinates(new RectangleF((icp.UsedArea.Width / 2) - 150, -30, 300, 30));
+                    found.Bei_Export_sichtbar = false;
+                } else {
+                    icp.Dispose();
+                    Pages.Remove(thisP);
+                    Repair();
+                    return;
+                }
             }
         }
     }

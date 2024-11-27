@@ -250,9 +250,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return txt;
     }
 
-    public float CalculateLineWidth(float scale) {
-        var baseWidth = (_zeilenabstand / 10f);
-        return baseWidth * (Bold ? 1.5f : 1f) * scale;
+    public float CalculateLineWidth(float additionalscale) {
+        var baseWidth = (_zeilenabstand / 25f);
+        return baseWidth * (Bold ? 1.5f : 1f) * additionalscale;
     }
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);

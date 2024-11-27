@@ -344,7 +344,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
             var f = this.GetFont(geszoom);
             var pfeilG = f.Size * 0.8f;
-            var pen2 = f.Pen(scale);
+            var pen2 = f.Pen(1f);
 
             //DrawOutline(gr, zoom, shiftX, shiftY, Color.Red);
             //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Right).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
