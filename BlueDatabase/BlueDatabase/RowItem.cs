@@ -734,10 +734,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
-    public bool UpdateRow(bool extendedAllowed, bool important, string reason) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
+    public ScriptEndedFeedback UpdateRow(bool extendedAllowed, bool important, string reason) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
-        if (!important && Database.ExecutingScriptAnyDatabase > 0) { return false; }
+        if (!important && Database.ExecutingScriptAnyDatabase > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
 
         if (important) {
             var tim = Stopwatch.StartNew();
@@ -749,14 +749,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return RepairAllLinks(); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) {
+            return new ScriptEndedFeedback(new VariableCollection(), RepairAllLinks());
+
+            }
 
         var hasScript = db.EventScript.Get(ScriptEventTypes.value_changed).Count;
-        if (hasScript > 1) { return false; }
+        if (hasScript > 1) {  return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
-        if (!extendedAllowed && mustBeExtended) { return false; }
+        if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
             db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
@@ -773,15 +776,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen.";
 
                 RowCollection.FailedRows.AddIfNotExists(this);
-                return false;
+                return ok;
             }
 
             if (!ok.AllOk) {
-                LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
-                return false;
+                //LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
+                return ok;
             }
 
-            if (!RepairAllLinks()) { return false; }
+            if (!RepairAllLinks()) {
+                return new ScriptEndedFeedback(new VariableCollection(), RepairAllLinks());
+            }
 
             CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
 
@@ -791,9 +796,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             CheckRowDataIfNeeded();
             RowCollection.AddBackgroundWorker(this);
             db.OnInvalidateView();
-            return true;
+            return ok;
         } catch {
-            return false;
+            return new ScriptEndedFeedback("Interner Fehler", false, true, "Allgemein");
         }
     }
 
@@ -907,7 +912,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                 RowCollection.WaitDelay = 0;
 
-                if (column.Function == ColumnFunction.Schlüsselspalte) {
+                if (column.Function is ColumnFunction.Schlüsselspalte or ColumnFunction.First ) {
                     SetValueInternal(srs, string.Empty, reason);
                 } else {
                     if (!string.IsNullOrEmpty(CellGetString(srs))) {
@@ -971,7 +976,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (reason == Reason.SetCommand) {
                 if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (column.Function == ColumnFunction.Schlüsselspalte) {
+                    if (column.Function is ColumnFunction.Schlüsselspalte or ColumnFunction.First) {
                         if (db.Column.SysRowState is { IsDisposed: false } srs) {
                             SetValueInternal(srs, string.Empty, reason);
                         }

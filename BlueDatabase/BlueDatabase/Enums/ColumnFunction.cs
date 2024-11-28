@@ -23,6 +23,10 @@ public enum ColumnFunction {
 
     // Unbekannt = -1,
     // Nothing = 0,
+
+    /// <summary>
+    /// Ohne besondere Funktion
+    /// </summary>
     Normal = 1,
 
     //Bit = 2,
@@ -63,6 +67,9 @@ public enum ColumnFunction {
     /// </summary>
     Werte_aus_anderer_Datenbank_als_DropDownItems = 76,
 
+    /// <summary>
+    /// Legt automatisch Verknüpfungen zu anderen Zellen an / hält diese Gleich
+    /// </summary>
     RelationText = 77,
 
     // KeyForSame = 78
@@ -70,13 +77,42 @@ public enum ColumnFunction {
 
     //Verknüpfung_zu_anderer_Datenbank = 80,
 
+
+    /// <summary>
+    /// Besodere Spalte, löst eine extended Changed aus bei Wertänderung
+    /// </summary>
     Schlüsselspalte = 81,
 
+
+    /// <summary>
+    /// Zeigt eine Zelle einer anderen Datenbank an
+    /// </summary>
     Verknüpfung_zu_anderer_Datenbank = 82,
 
+
+    /// <summary>
+    /// Werte werden in echtzeit - evtl. für jeden Benutzer anderes - berechnet. Wird nicht gespeichert.
+    /// </summary>
     Virtuelle_Spalte = 83,
 
-    Zeile = 84
+
+    /// <summary>
+    /// Hat den Wert einer anderen Spalte, für schnelle Zugriffe
+    /// </summary>
+    Zeile = 84,
+
+
+    /// <summary>
+    /// Dieser Wert ist er Hauptwert der Zeile. Nur einmal pro datenbank erlaubt
+    /// </summary>
+    First = 85,
+
+
+    /// <summary>
+    /// Dieser Spalte kann zum Aufsplitten der Datenbank benutzt werden. . Nur einmal pro Datenbank erlaubt
+    /// </summary>
+    Split = 86
+
 
     // bis 999 wird geprüft
 }
@@ -91,27 +127,36 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.RelationText
                                                                                     or ColumnFunction.Schlüsselspalte
                                                                                     or ColumnFunction.Virtuelle_Spalte
-                                                                                    or ColumnFunction.Zeile;
+                                                                                    or ColumnFunction.Zeile 
+                                                                                    or ColumnFunction.Split
+                                                                                    or ColumnFunction.First;
 
     public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Virtuelle_Spalte
-                                                                                     or ColumnFunction.Zeile;
+                                                                                     or ColumnFunction.Zeile
+                                                                                     or ColumnFunction.Schlüsselspalte
+                                                                                     or ColumnFunction.First;
 
     public static bool CanBeCheckedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte
                                                                                      or ColumnFunction.Virtuelle_Spalte
-                                                                                     or ColumnFunction.Zeile;
+                                                                                     or ColumnFunction.Zeile
+                                                                                     or ColumnFunction.Split
+                                                                                     or ColumnFunction.First;
 
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                       or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                      or ColumnFunction.RelationText;
+                                                                                      or ColumnFunction.RelationText
+                                                                                      or ColumnFunction.Virtuelle_Spalte
+                                                                                      or ColumnFunction.First;
 
     public static bool DropdownItemsOfOtherCellsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                                  or ColumnFunction.RelationText;
+                                                                                                  or ColumnFunction.RelationText
+                                                                                                  or ColumnFunction.First;
 
     public static bool DropdownUnselectAllAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                             or ColumnFunction.RelationText
@@ -127,7 +172,7 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems;
 
     public static bool SpellCheckingPossible(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                     or ColumnFunction.RelationText
+                                                                                       or ColumnFunction.RelationText
                                                                                        or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
                                                                                        or ColumnFunction.Schlüsselspalte;
 

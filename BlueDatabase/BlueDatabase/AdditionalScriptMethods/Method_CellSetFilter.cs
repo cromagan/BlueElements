@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueDatabase.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -57,6 +58,9 @@ public class Method_CellSetFilter : Method_Database {
         if (db is not { IsDisposed: false }) { return new DoItFeedback(ld, "Datenbank verworfen."); }
 
         if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
+
+
+        if(!columnToSet.Function.CanBeChangedByRules()) { return new DoItFeedback(ld, "Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(4)); }
 
         var r = allFi.Rows;
         if (r.Count is 0 or > 1) {

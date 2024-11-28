@@ -1213,9 +1213,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
 
+            case ColumnFunction.Split:
+            case ColumnFunction.First:
             case ColumnFunction.Schlüsselspalte:
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
-                    return "Schlüsselspalten dürfen im Skript nur als ReadOnly vorhanden sein.";
+                    return "Diese spalte darf im Skript nur als ReadOnly vorhanden sein.";
                 }
                 break;
 
@@ -1525,7 +1527,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case "SYS_CHAPTER":
 
-                if (_function is not ColumnFunction.Normal and not ColumnFunction.Schlüsselspalte) {
+                if (_function is not ColumnFunction.Normal and not ColumnFunction.Schlüsselspalte and not ColumnFunction.Split and not ColumnFunction.First) {
                     _function = ColumnFunction.Normal;
                 }
 
@@ -1800,7 +1802,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
 
+        if (_function == ColumnFunction.First) { return QuickImage.Get(ImageCode.Stern, 16); }
         if (_function == ColumnFunction.Schlüsselspalte) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
+
+
+        if (_function == ColumnFunction.Split) { return QuickImage.Get(ImageCode.Datei, 16); }
 
         if (_function == ColumnFunction.RelationText) { return QuickImage.Get(ImageCode.Herz, 16); }
 
@@ -1918,6 +1924,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 //if (EditType_To_Check == enEditTypeFormula.Button) { return true; }
                 return false;
 
+
+            case ColumnFunction.First:
+            case ColumnFunction.Split:
             case ColumnFunction.Schlüsselspalte:
                 if (editTypeToCheck == EditTypeFormula.als_Überschrift_anzeigen) { return true; }
                 return false;
@@ -2266,6 +2275,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             //    return EditTypeTable.Font_AuswahlDialog;
 
             case ColumnFunction.Zeile:
+            case ColumnFunction.Split:
+            case ColumnFunction.First:
             case ColumnFunction.Schlüsselspalte:
                 return EditTypeTable.None;
 

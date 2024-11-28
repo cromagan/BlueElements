@@ -283,7 +283,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisfi in fc) {
             if (thisfi.FilterType is not FilterType.Istgleich
                 and not FilterType.Istgleich_GroßKleinEgal
-                 and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt", true); }
+                and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt", true); }
             if (thisfi.Column == null) { return (null, "Leere Spalte angekommen", true); }
             if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich", true); }
             db2 ??= db1;
@@ -618,8 +618,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="comment"></param>
     /// <returns></returns>
     public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, FilterCollection? fc, bool fullprocessing, string comment) {
-        var db = Database;
-        if (db is not { IsDisposed: false }) {
+        if (Database is not { IsDisposed: false } db) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
             throw new Exception();
         }
@@ -635,6 +634,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (item != null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             throw new Exception();
+        }
+
+        foreach (var thisColum in db.Column) {
+            if (thisColum.Function == ColumnFunction.First && string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Initialwert fehlt!");
+                throw new Exception();
+            }
+
+            if (thisColum.Function == ColumnFunction.Split) {
+                var inval = fc?.InitValue(thisColum, string.IsNullOrWhiteSpace(valueOfCellInFirstColumn));
+                if (inval == null || string.IsNullOrWhiteSpace(inval)) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Initialwert fehlt!");
+                    throw new Exception();
+                }
+            }
         }
 
         var u = Generic.UserName;

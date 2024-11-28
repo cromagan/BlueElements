@@ -341,7 +341,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (column.Function is not ColumnFunction.Normal
                            and not ColumnFunction.Schlüsselspalte
                            and not ColumnFunction.RelationText
-                           and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) { return string.Empty; }
+                           and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+                           and not ColumnFunction.Split) { return string.Empty; }
 
         if (!firstToo && db.Column.First() == column) { return string.Empty; }
 
