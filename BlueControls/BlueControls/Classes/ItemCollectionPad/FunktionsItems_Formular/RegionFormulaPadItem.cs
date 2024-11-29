@@ -106,7 +106,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             txt = _child.FileNameWithoutSuffix();
         }
 
-        var con = new ConnectedFormulaView(mode, "Head") {
+        var con = new ConnectedFormulaView(mode, cf?.GetPage("Head")) {
             GroupBoxStyle = _rahmenStil
         };
 
@@ -115,7 +115,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         }
 
         con.DoDefaultSettings(parent, this, mode);
-        con.InitFormula(cf, DatabaseInput);
+        //con.InitFormula(cf, DatabaseInput);
 
         return con;
     }

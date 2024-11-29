@@ -38,6 +38,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueScript;
@@ -90,6 +91,22 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
         IsSaved = true;
     }
+
+    public  RowEntryPadItem? GetRowEntryItem() {
+
+
+        foreach (var thisit in this) {
+            if (thisit is RowEntryPadItem repi) {
+                return repi;
+
+            }
+        }
+
+        return null;
+
+    }
+
+
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
         if (IO.FileExists(layoutFileName)) {
@@ -1249,6 +1266,49 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
+
+
+    /// <summary>
+    /// Prüft, ob das Formular sichtbare Elemente hat.
+    /// Zeilenselectionen werden dabei ignoriert.
+    /// </summary>
+    /// <returns></returns>
+    internal bool HasVisibleItemsForMe(string mode) {
+        if (IsDisposed) { return false; }
+
+        foreach (var thisItem in this) {
+            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
+                if (cspi.IsVisibleForMe(mode, false)) { return true; }
+            }
+        }
+
+        return false;
+    }
+
+
+
+    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
+        if (Parent is ConnectedFormula.ConnectedFormula cf) { return cf; }
+
+        if (Parent is ItemCollectionPadItem icpi) { return icpi.GetConnectedFormula(); }
+        return null;
+    }
+
+    public ItemCollectionPadItem? GetSubItemCollection( string keyOrCaption) {
+
+        foreach (var thisP in this) {
+            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp2) {
+                if (string.Equals(icp2.KeyName, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
+                if (string.Equals(icp2.Caption, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
+            }
+        }
+
+        return null;
+
+    }
+
+
+
 
     #endregion
 }

@@ -517,7 +517,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         if (Table.Database != db) {
-            CFO.InitFormula(null, null);
+            CFO.Page = null;
         }
 
         FilterLeiste.Table = Table;
@@ -567,7 +567,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     protected virtual void FillFormula(RowItem? r) {
         if (CFO is null) { return; }
 
-        CFO.GetConnectedFormulaFromDatabase(r?.Database);
+        CFO.GetHeadPageFrom(r?.Database);
         CFO.SetToRow(r);
     }
 

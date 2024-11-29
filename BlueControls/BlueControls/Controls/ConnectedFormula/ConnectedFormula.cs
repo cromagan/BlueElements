@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -103,6 +104,11 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
             _pages = value;
 
+            if (_pages != null) {
+                _pages.Parent = this;
+            }
+       
+
             RegisterPadDataEvents();
 
             OnPropertyChanged();
@@ -164,6 +170,15 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return p;
     }
 
+    public ItemCollectionPadItem? GetPage(string keyOrCaption) {
+        if (Pages is not { IsDisposed: false } pg) { return null; }
+
+
+      return  pg.GetSubItemCollection(keyOrCaption);
+
+
+    }
+
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
@@ -180,37 +195,42 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
 
-        var l = new List<AbstractPadItem>();
-
+    
         if (Pages == null) {
             Pages = new ItemCollectionPadItem();
             Pages.Breite = 100;
             Pages.Höhe = 100;
         }
 
-        l.AddRange(Pages);
+        Pages.Parent = this;
 
-        foreach (var thisIt in l) {
-            if (thisIt is not ItemCollectionPadItem { IsDisposed: false }) {
-                if (string.IsNullOrEmpty(thisIt.Page)) { thisIt.Page = "Head"; }
+        var tmpPages = new List<AbstractPadItem>();
+        tmpPages.AddRange(Pages);
 
-                var found = GetPage(thisIt.Page);
+        foreach (var thisIt in tmpPages) {
+            if (thisIt is  ItemCollectionPadItem { IsDisposed: false } icpi) {
+                if (string.IsNullOrEmpty(icpi.Page)) { icpi.Page = "Head"; }
 
-                if (found == null) {
-                    found = new ItemCollectionPadItem {
-                        Caption = thisIt.Page,
-                        Breite = Pages.Breite,
-                        Höhe = Pages.Höhe,
-                        SheetStyle = Pages.SheetStyle,
-                        RandinMm = Pages.RandinMm,
-                        GridShow = Pages.GridShow,
-                        GridSnap = Pages.GridSnap
-                    };
-                    Pages.Add(found);
-                }
+                icpi.Parent = Pages;
 
+                //if (found == null) {
+                //    found = new ItemCollectionPadItem {
+                //        Caption = thisIt.Page,
+                //        Breite = Pages.Breite,
+                //        Höhe = Pages.Höhe,
+                //        SheetStyle = Pages.SheetStyle,
+                //        RandinMm = Pages.RandinMm,
+                //        GridShow = Pages.GridShow,
+                //        GridSnap = Pages.GridSnap
+                //    };
+                //    Pages.Add(found);
+                //}
+
+
+
+            } 
+            else {
                 Pages.Remove(thisIt);
-                found.Add(thisIt);
             }
         }
     }
@@ -226,8 +246,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             case "paditemdata":
                 UnRegisterPadDataEvents();
                 _pages = new ItemCollectionPadItem();
+                _pages.Parent = this;
                 _pages.Parse(value.FromNonCritical());
-                _pages.Parent = null;
                 RegisterPadDataEvents();
                 return true;
 
@@ -249,9 +269,11 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public void Repair() {
         Pages ??= new ItemCollectionPadItem();
 
+        Pages.Parent = this;
+
         Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
-        if (!AllPages().Contains("Head", false)) {
+        if (GetPage("Head") is not { }) {
             var h = new ItemCollectionPadItem();
             h.Caption = "Head";
             h.Breite = Pages.Breite;
@@ -268,14 +290,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         foreach (var thisP in Pages) {
             if (thisP is ItemCollectionPadItem { IsDisposed: false } icp) {
                 if (icp.Caption.Equals("Head", StringComparison.OrdinalIgnoreCase) || icp.Count() > 0) {
-                    RowEntryPadItem? found = null;
-
-                    foreach (var thisit in icp) {
-                        if (thisit is RowEntryPadItem repi) {
-                            found = repi;
-                            break;
-                        }
-                    }
+                    var found = icp.GetRowEntryItem();
 
                     if (found == null) {
                         found = new RowEntryPadItem();
@@ -293,6 +308,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             }
         }
     }
+
 
     public QuickImage SymbolForReadableText() {
         if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
@@ -335,23 +351,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
     }
 
-    /// <summary>
-    /// Prüft, ob das Formular sichtbare Elemente hat.
-    /// Zeilenselectionen werden dabei ignoriert.
-    /// </summary>
-    /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
-    /// <returns></returns>
-    internal bool HasVisibleItemsForMe(string page, string mode) {
-        if (GetPage(page) is not { IsDisposed: false } pg) { return false; }
 
-        foreach (var thisItem in pg) {
-            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
-                if (cspi.IsVisibleForMe(mode, false)) { return true; }
-            }
-        }
-
-        return false;
-    }
 
     internal bool IsEditing() {
         var e = new EditingEventArgs();
@@ -364,19 +364,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     protected override void OnLoaded() {
         Repair();
         base.OnLoaded();
-    }
-
-    private ItemCollectionPadItem? GetPage(string caption) {
-        if (Pages is not { IsDisposed: false } pg) { return null; }
-
-        foreach (var thisP in pg) {
-            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp2 &&
-                string.Equals(icp2.Caption, caption, StringComparison.OrdinalIgnoreCase)) {
-                return icp2;
-            }
-        }
-
-        return null;
     }
 
     private void PadData_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();

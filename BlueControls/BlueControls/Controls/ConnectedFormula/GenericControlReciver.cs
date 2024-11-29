@@ -148,7 +148,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="source"></param>
     /// <param name="mode"></param>
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverControlPadItem source, string mode) {
-        Name = source.DefaultItemToControlName(parentFormula?.ConnectedFormula?.Filename);
+        Name = source.DefaultItemToControlName(parentFormula?.Page?.KeyName);
         Mode = mode;
         if (source is AbstractPadItem ali) { GeneratedFrom = ali; }
 

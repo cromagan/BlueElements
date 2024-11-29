@@ -24,6 +24,7 @@ using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -79,7 +80,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnElementBearbeiten_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (CFormula.ConnectedFormula == null) { return; }
+        if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
         if (_lastItem is not { IsDisposed: false } api) { return; }
@@ -87,26 +88,26 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
-        if (!CFormula.ConnectedFormula.LockEditing()) { return; }
+        if (!cf.LockEditing()) { return; }
         InputBoxEditor.Show(api, true);
 
         MultiUserFile.SaveAll(true);
-        CFormula.ConnectedFormula.UnlockEditing();
+       cf.UnlockEditing();
         Database.ForceSaveAll();
         CFormula.InvalidateView();
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (CFormula.ConnectedFormula == null) { return; }
+        if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
-        if (!CFormula.ConnectedFormula.LockEditing()) { return; }
+        if (!cf.LockEditing()) { return; }
 
-        using var x = new ConnectedFormulaEditor(CFormula.ConnectedFormula.Filename, null);
+        using var x = new ConnectedFormulaEditor(cf.Filename, null);
 
         x.ShowDialog();
-        CFormula.ConnectedFormula.UnlockEditing();
+        cf.UnlockEditing();
         CFormula.InvalidateView();
     }
 
@@ -124,7 +125,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnScript_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (CFormula.ConnectedFormula == null) { return; }
+        if (CFormula.Page == null) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
         if (_lastObject is not { } api) { return; }
@@ -133,13 +134,13 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);
 
-    private void CheckButtons() => btnFormular.Enabled = CFormula.ConnectedFormula != null;
+    private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;
 
     private void FormulaSet(string? filename) {
-        FormulaSet(null as ConnectedFormula.ConnectedFormula);
+
 
         if (filename == null || !FileExists(filename)) {
-            //CheckButtons();
+           FormulaSet(null as ItemCollectionPadItem);
             return;
         }
 
@@ -147,17 +148,17 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         LoadTab.FileName = filename;
         var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
         if (tmpFormula == null) { return; }
-        FormulaSet(tmpFormula);
+        FormulaSet(tmpFormula.GetPage("Head"));
     }
 
-    private void FormulaSet(ConnectedFormula.ConnectedFormula? cf) {
+    private void FormulaSet(ItemCollectionPadItem? page) {
         if (IsDisposed) { return; }
 
-        if (cf is { IsDisposed: false }) {
+    
             DropMessages = Generic.IsAdministrator();
-        }
+        
 
-        CFormula.InitFormula(cf, null);
+        CFormula.Page = page;
 
         CheckButtons();
 
@@ -173,7 +174,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //    if (oldf != null) {
         //        RemoveRow();
         //        oldf.Loaded -= _cf_Loaded;
-        //        oldf.Changed -= _cf_PropertyChanged;
+        //        oldf.Changed -= _page_PropertyChanged;
         //    }
 
         //    InvalidateView();
@@ -181,7 +182,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         //    if (cf != null) {
         //        cf.Loaded += _cf_Loaded;
-        //        cf.Changed += _cf_PropertyChanged;
+        //        cf.Changed += _page_PropertyChanged;
         //    }
         //}
 

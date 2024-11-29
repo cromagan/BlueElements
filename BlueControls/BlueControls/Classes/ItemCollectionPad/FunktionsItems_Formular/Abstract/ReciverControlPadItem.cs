@@ -80,7 +80,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public abstract AllowedInputFilter AllowedInputFilter { get; }
 
     /// <summary>
-    /// Holt die Datebank aus dem erst Parent, da das Output
+    /// Holt die Datebank aus dem erst Parent, anschließend aus dem Output
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>

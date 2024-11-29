@@ -78,7 +78,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TabControl();
-        con.Name = this.DefaultItemToControlName(ParentFormula?.Filename);
+        con.Name = this.DefaultItemToControlName(parent?.Page?.KeyName);
         // Die Input-Settings werden direkt auf das erzeugte
         //con.DoInputSettings(parent, this);
         //con.DoOutputSettings(parent, this);
@@ -91,24 +91,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
         // ist das eigentlich nicht nötig
 
-        foreach (var thisc in _childs) {
-            ConnectedFormula.ConnectedFormula? cf;
-            string pg;
-            string pgvis;
 
-            #region Connected Formuala (cf)  ermitteln und evtl. von festplatte laden
+        var tmpc = ListOfChildsPages();
 
-            if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-                cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
-                pg = "Head";
-                pgvis = string.Empty;
-            } else {
-                cf = ParentFormula;
-                pg = thisc;
-                pgvis = thisc;
-            }
-
-            #endregion
+        foreach (var thisPage in tmpc) {
 
             #region Prüfen, ob der Tab schon vorhanden ist (existsTab)
 
@@ -116,7 +102,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
             foreach (var thisTab in tabctrl.TabPages) {
                 if (thisTab is TabPage tb) {
-                    if (tb.Name == thisc.FileNameWithoutSuffix()) {
+                    if (tb.Name == thisPage.KeyName) {
                         existTab = tb;
                         break;
                     }
@@ -125,8 +111,8 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
             #endregion
 
-            if (cf != null) {
-                if (cf.HasVisibleItemsForMe(pgvis, mode)) {
+      
+                if (thisPage.HasVisibleItemsForMe( mode)) {
                     ConnectedFormulaView? cc;
 
                     if (existTab == null) {
@@ -134,15 +120,15 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                         #region Neuen Tab und ConnectedFormulaView (cc) erstellen
 
                         var t = new TabPage {
-                            Name = thisc.FileNameWithoutSuffix(),
-                            Text = thisc.FileNameWithoutSuffix()
+                            Name = thisPage.KeyName,
+                            Text = thisPage.Caption,
                         };
                         tabctrl.TabPages.Add(t);
 
-                        cc = new ConnectedFormulaView(mode, pg);
+                        cc = new ConnectedFormulaView(mode, thisPage);
                         cc.GroupBoxStyle = GroupBoxStyle.Nothing;
                         t.Controls.Add(cc);
-                        cc.InitFormula(cf, cc.DatabaseInput);
+                        //cc.InitFormula(thisPage, cc.DatabaseInput);
                         cc.Dock = DockStyle.Fill;
                         cc.DoDefaultSettings(parentView, this, mode);
 
@@ -181,7 +167,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                         #endregion
                     }
                 }
-            }
+            
         }
     }
 
@@ -288,6 +274,65 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
+    public List<ItemCollectionPadItem> ListOfChildsPages() {
+
+
+
+        var tmp = new List<ItemCollectionPadItem>();
+
+        foreach (var thisc in _childs) {
+
+            ItemCollectionPadItem? thisicpi= null;
+
+
+            if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+                var cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
+
+                thisicpi = cf?.GetPage("Head");
+                //pg = "Head";
+                //pgvis = string.Empty;
+            } else {
+
+
+                if (Parent is ConnectedFormula.ConnectedFormula cf) {
+                    // TODO: Überflüssig???? 29.11.2024
+                    thisicpi = cf.GetPage("Head");
+                }
+
+                if (Parent is ItemCollectionPadItem icpi) {
+                    thisicpi = icpi.GetConnectedFormula()?.GetPage(thisc);
+                }
+
+
+
+
+                //cf = ParentFormula;
+                //pg = thisc;
+                //pgvis = thisc;
+            }
+
+            if(thisicpi != null) {tmp.Add(thisicpi);}
+
+
+
+            //if () {
+            //    var cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
+
+            //    if (cf != null) {
+            //        cf.Editor = typeof(ConnectedFormulaEditor);
+            //        childs.AddAndCheck(ItemOf(cf));
+            //    }
+            //} else {
+            //    childs.AddAndCheck(new TextListItem(thisc, thisc, QuickImage.Get(ImageCode.Register, 16), false, true, string.Empty));
+            //}
+        }
+
+
+        return tmp;
+
+    }
+
+
     private ListBox Childs() {
         var childs = new ListBox {
             AddAllowed = AddType.OnlySuggests,
@@ -297,32 +342,35 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
             ItemEditAllowed = true,
             CheckBehavior = CheckBehavior.AllSelected,
         };
+        
 
+        
         ParentFormula?.AddChilds(childs.Suggestions, ParentFormula.NotAllowedChilds);
 
-        foreach (var thisf in _childs) {
-            if (File.Exists(thisf)) {
-                var c = ConnectedFormula.ConnectedFormula.GetByFilename(thisf);
-
-                if (c != null) {
-                    c.Editor = typeof(ConnectedFormulaEditor);
-                    childs.AddAndCheck(ItemOf(c));
-                }
-            } else {
-                childs.AddAndCheck(new TextListItem(thisf, thisf, QuickImage.Get(ImageCode.Register, 16), false, true, string.Empty));
-            }
+        foreach (var thisc in ListOfChildsPages()) {
+            childs.AddAndCheck(ItemOf(thisc));
         }
+
+      
 
         childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
         childs.Disposed += Childs_Disposed;
+        childs.ParentChanged += Childs_ParentChanged;
 
         return childs;
+    }
+
+    private void Childs_ParentChanged(object sender, System.EventArgs e) {
+        if (sender is ListBox childs && childs.Parent == null) {
+            childs.Dispose();
+        }
     }
 
     private void Childs_Disposed(object sender, System.EventArgs e) {
         if (sender is ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.Disposed -= Childs_Disposed;
+            childs.ParentChanged -= Childs_ParentChanged;
         }
     }
 

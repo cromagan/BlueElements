@@ -43,54 +43,27 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     #region Fields
 
-    private ConnectedFormula.ConnectedFormula? _connectedFormula;
     private bool _generated;
-
     private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
+    private ItemCollectionPadItem? _page;
 
     #endregion
 
     #region Constructors
 
-    public ConnectedFormulaView() : this(string.Empty, "Head") { }
+    public ConnectedFormulaView() : this(string.Empty, null) { }
 
-    public ConnectedFormulaView(string mode, string page) : base(false, false, false) {
+    public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
         InitializeComponent();
-        base.Mode = mode;
-        Page = page;
-        InitFormula(null, null);
-
         SetNotFocusable();
 
-        updater.Enabled = true;
+        base.Mode = mode;
+        Page = page;
     }
 
     #endregion
 
     #region Properties
-
-    public ConnectedFormula.ConnectedFormula? ConnectedFormula {
-        get => _connectedFormula;
-        private set {
-            if (value == _connectedFormula) { return; }
-
-            if (_connectedFormula != null) {
-                _connectedFormula.Loaded -= _cf_Loaded;
-                _connectedFormula.PropertyChanged -= _cf_PropertyChanged;
-            }
-
-            _connectedFormula = value;
-
-            if (_connectedFormula != null) {
-                _connectedFormula.Loaded += _cf_Loaded;
-                _connectedFormula.PropertyChanged += _cf_PropertyChanged;
-            }
-
-            InvalidateView();
-            Invalidate_FilterOutput();
-            Invalidate_RowsInput();
-        }
-    }
 
     public new ControlCollection Controls {
         get {
@@ -99,6 +72,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
+    //        InvalidateView();
+    //        Invalidate_FilterOutput();
+    //        Invalidate_RowsInput();
+    //    }
+    //}
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
         get => _groupBoxStyle;
@@ -109,6 +87,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
+    //        if (_connectedFormula != null) {
+    //            _connectedFormula.Loaded += _cf_Loaded;
+    //            _connectedFormula.PropertyChanged += _page_PropertyChanged;
+    //        }
     public override string Mode {
         get => base.Mode;
         set {
@@ -118,8 +100,56 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    public string Page { get; }
+    public ItemCollectionPadItem? Page {
+        get => _page;
+        set {
+            if (value == _page) { return; }
 
+            if (_page != null) {
+                //_page.Loaded -= _cf_Loaded;
+                _page.PropertyChanged -= _page_PropertyChanged;
+                _page.ItemAdded -= _page_ItemAdded;
+                _page.ItemRemoved -= _page_ItemRemoved;
+
+                if (_page.GetRowEntryItem()?.DatabaseOutput is { IsDisposed: false } db1) {
+                    db1.DisposingEvent -= _database_Disposing;
+                }
+            }
+            _page = value;
+
+            if (_page != null) {
+                //_page.Loaded += _cf_Loaded;
+                _page.PropertyChanged += _page_PropertyChanged;
+                _page.ItemAdded += _page_ItemAdded;
+                _page.ItemRemoved += _page_ItemRemoved;
+                if (_page.GetRowEntryItem()?.DatabaseOutput is { IsDisposed: false } db1) {
+                    db1.DisposingEvent += _database_Disposing;
+                }
+            }
+
+            //if (FilterOutput.Database != database) {
+            //    if (FilterOutput.Database is { IsDisposed: false } db1) {
+            //        db1.DisposingEvent -= _database_Disposing;
+            //    }
+
+            //    FilterOutput.Database = database;
+
+            //    if (FilterOutput.Database is { IsDisposed: false } db2) {
+            //        db2.DisposingEvent += _database_Disposing;
+            //    }
+            //}
+
+            //InitFormula(null, null);
+
+            updater.Enabled = true;
+
+            InvalidateView();
+            Invalidate_FilterOutput();
+            Invalidate_RowsInput();
+        }
+    }
+
+    //        _connectedFormula = value;
     public RowItem? ShowingRow {
         // Used: Only BZL
         get {
@@ -132,16 +162,20 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     #region Methods
 
+    //        if (_connectedFormula != null) {
+    //            _connectedFormula.Loaded -= _cf_Loaded;
+    //            _connectedFormula.PropertyChanged -= _page_PropertyChanged;
+    //        }
     public void GenerateView() {
         if (IsDisposed) { return; }
         if (_generated) { return; }
         if (!Visible) { return; }
-        if (ConnectedFormula == null || Width < 30 || Height < 10) {
+        if (_page == null || Width < 30 || Height < 10) {
             _generated = true;
             return;
         }
 
-        if (ConnectedFormula.IsEditing()) { return; }
+        if (_page.GetConnectedFormula()?.IsEditing() ?? true) { return; }
 
         #region Zuerst alle Controls als unused markieren
 
@@ -168,59 +202,53 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             y2 = Skin.Padding;
         }
 
-        if (_connectedFormula?.Pages is { } pages) {
-            foreach (var thisP in pages) {
-                if (thisP is ItemCollectionPadItem { IsDisposed: false } icp && string.Equals(icp.Caption, Page, StringComparison.OrdinalIgnoreCase)) {
-                    var l = ItemCollectionPadItem.ResizeControls(icp, Width - x1 - x2, Height - y1 - y2, Mode);
-                    var autoc = new List<FlexiControlForCell>();
+        var l = ItemCollectionPadItem.ResizeControls(_page, Width - x1 - x2, Height - y1 - y2, Mode);
+        var autoc = new List<FlexiControlForCell>();
 
-                    foreach (var thisit in icp) {
-                        if (thisit is IItemToControl thisitco) {
-                            var con = SearchOrGenerate(thisitco, false, Mode);
+        foreach (var thisit in _page) {
+            if (thisit is IItemToControl thisitco) {
+                var con = SearchOrGenerate(thisitco, false, Mode);
 
-                            if (con != null) {
-                                _ = unused.Remove(con);
+                if (con != null) {
+                    _ = unused.Remove(con);
 
-                                if (thisit is ReciverControlPadItem cspi) {
-                                    con.Visible = cspi.IsVisibleForMe(Mode, true);
-                                } else {
-                                    con.Visible = true;
-                                }
+                    if (thisit is ReciverControlPadItem cspi) {
+                        con.Visible = cspi.IsVisibleForMe(Mode, true);
+                    } else {
+                        con.Visible = true;
+                    }
 
-                                if (thisit is IAutosizable) {
-                                    foreach (var (item, newpos) in l) {
-                                        if (item == thisit) {
-                                            con.Left = (int)newpos.Left + x1;
-                                            con.Top = (int)newpos.Top + y1;
-                                            con.Width = (int)newpos.Width;
-                                            con.Height = (int)newpos.Height;
-                                        }
-                                    }
-                                }
-
-                                if (thisit is RowEntryPadItem rep) {
-                                    DoDefaultSettings(null, rep, Mode);
-                                }
-
-                                if (thisit is TabFormulaPadItem tabItem) {
-                                    tabItem.CreateTabs((TabControl)con, this, Mode);
-                                }
-
-                                if (con.Visible && con is FlexiControlForCell fo &&
-                                    thisit is EditFieldPadItem {
-                                        AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
-                                        CaptionPosition.Links_neben_dem_Feld_unsichtbar
-                                    }) { autoc.Add(fo); }
+                    if (thisit is IAutosizable) {
+                        foreach (var (item, newpos) in l) {
+                            if (item == thisit) {
+                                con.Left = (int)newpos.Left + x1;
+                                con.Top = (int)newpos.Top + y1;
+                                con.Width = (int)newpos.Width;
+                                con.Height = (int)newpos.Height;
                             }
                         }
                     }
 
-                    DoAutoX(autoc);
+                    if (thisit is RowEntryPadItem rep) {
+                        DoDefaultSettings(null, rep, Mode);
+                    }
 
-                    _generated = true;
+                    if (thisit is TabFormulaPadItem tabItem) {
+                        tabItem.CreateTabs((TabControl)con, this, Mode);
+                    }
+
+                    if (con.Visible && con is FlexiControlForCell fo &&
+                        thisit is EditFieldPadItem {
+                            AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
+                            CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                        }) { autoc.Add(fo); }
                 }
             }
         }
+
+        DoAutoX(autoc);
+
+        _generated = true;
 
         foreach (var thisc in unused) {
             base.Controls.Remove(thisc);
@@ -232,49 +260,24 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    public void GetConnectedFormulaFromDatabase(Database? database) {
+    //public ConnectedFormula.ConnectedFormula? ConnectedFormula {
+    //    get => _connectedFormula;
+    //    private set {
+    //        if (value == _connectedFormula) { return; }
+    public void GetHeadPageFrom(Database? database) {
         if (database is { IsDisposed: false }) {
             var f = database.FormulaFileName();
 
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
-                if (tmpFormula != ConnectedFormula) {
-                    InitFormula(tmpFormula, database);
+                if (tmpFormula is { IsDisposed: false }) {
+                    Page = tmpFormula.GetPage("Head");
                 }
                 return;
             }
         }
 
-        ConnectedFormula = null;
-    }
-
-    public void InitFormula(ConnectedFormula.ConnectedFormula? cf, Database? database) {
-        if (IsDisposed) { return; }
-
-        if (ConnectedFormula == cf && FilterOutput.Database == database) { return; }
-
-        SuspendLayout();
-
-        Invalidate_FilterOutput();
-        Invalidate_RowsInput();
-
-        ConnectedFormula = cf;
-
-        if (FilterOutput.Database != database) {
-            if (FilterOutput.Database is { IsDisposed: false } db1) {
-                db1.DisposingEvent -= _database_Disposing;
-            }
-
-            FilterOutput.Database = database;
-
-            if (FilterOutput.Database is { IsDisposed: false } db2) {
-                db2.DisposingEvent += _database_Disposing;
-            }
-        }
-
-        InvalidateView();
-        ResumeLayout();
-        Invalidate();
+        Page = null;
     }
 
     public void InvalidateView() {
@@ -283,18 +286,22 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
+    //    InvalidateView();
+    //    ResumeLayout();
+    //    Invalidate();
+    //}
     public Control? SearchOrGenerate(IItemToControl? thisit, bool onlySerach, string mode) {
         if (thisit == null) { return null; }
 
         try {
             foreach (var thisC in base.Controls) {
-                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(ConnectedFormula?.Filename) && !cx.IsDisposed) { return cx; }
+                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.KeyName) && !cx.IsDisposed) { return cx; }
             }
 
             if (onlySerach) { return null; }
 
             var c = thisit.CreateControl(this, mode);
-            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(ConnectedFormula?.Filename)) {
+            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(Page?.KeyName)) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;
             }
@@ -312,13 +319,23 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
+    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
+        if (Page == null) { return null; }
+
+        return Page.GetConnectedFormula();
+    }
+
+    //        if (FilterOutput.Database is { IsDisposed: false } db2) {
+    //            db2.DisposingEvent += _database_Disposing;
+    //        }
+    //    }
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            InitFormula(null, null);
+            Page = null;
             components?.Dispose();
             updater.Enabled = false;
             updater.Tick -= updater_Tick;
@@ -327,6 +344,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         base.Dispose(disposing);
     }
 
+    //        FilterOutput.Database = database;
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         var s = States.Standard;
@@ -343,6 +361,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         base.DrawControl(gr, state);
     }
 
+    //    if (FilterOutput.Database != database) {
+    //        if (FilterOutput.Database is { IsDisposed: false } db1) {
+    //            db1.DisposingEvent -= _database_Disposing;
+    //        }
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
 
@@ -363,6 +385,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
+    //    Page = page;
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
@@ -373,11 +396,22 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
+    private void _database_Disposing(object sender, System.EventArgs e) => Page = null;
 
-    private void _cf_PropertyChanged(object sender, System.EventArgs e) => InvalidateView();
+    private void _page_ItemAdded(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _database_Disposing(object sender, System.EventArgs e) => InitFormula(null, null);
+    private void _page_ItemRemoved(object sender, System.EventArgs e) => InvalidateView();
+
+    //    public void InitFormula(ItemCollectionPadItem? page, Database? database) {
+    //    if (IsDisposed) { return; }
+
+    //    if (page == _page && FilterOutput.Database == database) { return; }
+
+    //    SuspendLayout();
+
+    //    Invalidate_FilterOutput();
+    //    Invalidate_RowsInput();
+    private void _page_PropertyChanged(object sender, System.EventArgs e) => InvalidateView();
 
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
