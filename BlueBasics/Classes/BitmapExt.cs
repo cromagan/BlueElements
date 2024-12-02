@@ -473,6 +473,26 @@ public class BitmapExt : IDisposableExtended {
         return newBmp;
     }
 
+    /// <summary>
+    /// Stimmen x,y, width oder height nicht, werden sie in den Bereich eingepasst. So, dass immer ein bitmap mit heigth/Width rauskommt.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
+    public Bitmap Crop(int x, int y, int width, int height) {
+        if (_bitmap != null) {
+            if (x < 0) { x = 0; }
+            if (y < 0) { y = 0; }
+            if (x + width > _bitmap.Width) { width = _bitmap.Width - x; }
+            if (y + height > _bitmap.Height) { height = _bitmap.Height - y; }
+            return Crop(new Rectangle(x, y, width, height));
+        }
+
+        return Crop(new Rectangle(x, y, width, height));
+    }
+
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);

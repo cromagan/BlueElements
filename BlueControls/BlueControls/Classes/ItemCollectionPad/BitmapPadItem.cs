@@ -43,13 +43,13 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     #region Fields
 
-    private SizeModes _bild_Modus;
+    private SizeModes _bild_modus;
     private Bitmap? _bitmap;
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-    private string _platzhalter_Für_Layout = string.Empty;
+    private string _platzhalter_für_layout = string.Empty;
 
-    private PadStyles _style = PadStyles.Standard;
+    private PadStyles _style;
 
     #endregion
 
@@ -61,7 +61,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         _bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
         Hintergrund_Weiß_Füllen = true;
-        _bild_Modus = SizeModes.EmptySpace;
+        _bild_modus = SizeModes.EmptySpace;
         _style = PadStyles.Undefiniert; // Kein Rahmen
     }
 
@@ -73,9 +73,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public static string ClassId => "IMAGE";
 
     public SizeModes Bild_Modus {
-        get => _bild_Modus; set {
-            if (_bild_Modus == value) { return; }
-            _bild_Modus = value;
+        get => _bild_modus; set {
+            if (_bild_modus == value) { return; }
+            _bild_modus = value;
             OnPropertyChanged();
         }
     }
@@ -95,9 +95,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
     public string Platzhalter_Für_Layout {
-        get => _platzhalter_Für_Layout; set {
-            if (_platzhalter_Für_Layout == value) { return; }
-            _platzhalter_Für_Layout = value;
+        get => _platzhalter_für_layout; set {
+            if (_platzhalter_für_layout == value) { return; }
+            _platzhalter_für_layout = value;
             OnPropertyChanged();
         }
     }
@@ -215,7 +215,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "modus":
-                _bild_Modus = (SizeModes)IntParse(value);
+                _bild_modus = (SizeModes)IntParse(value);
                 return true;
 
             case "whiteback":
@@ -231,7 +231,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 return true;
 
             case "placeholder":
-                _platzhalter_Für_Layout = value.FromNonCritical();
+                _platzhalter_für_layout = value.FromNonCritical();
                 return true;
 
             case "style":
