@@ -109,8 +109,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (_formula?.Pages is { } pg) {
                 foreach (var thisp in pg) {
-                    if (thisp is ItemCollectionPadItem { IsDisposed: false } icp && icp.Caption.ToLower() == "head") {
-                        Pad.Items = icp;
+                    if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
+                        Pad.Items = icpi;
                         break;
                     }
                 }
@@ -457,8 +457,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (_formula?.Pages is { } pg) {
             foreach (var thisp in pg) {
-                if (thisp is ItemCollectionPadItem { IsDisposed: false } icp && icp.Caption.ToLower() == "head") {
-                    Pad.Items = icp;
+                if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
+                    Pad.Items = icpi;
                     break;
                 }
             }

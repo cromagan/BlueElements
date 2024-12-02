@@ -899,7 +899,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (string.Equals(_caption, "Head")) { return QuickImage.Get(ImageCode.Diskette); }
+        if (IsHead()) { return QuickImage.Get(ImageCode.Diskette); }
 
         return QuickImage.Get(ImageCode.Gruppe);
     }
@@ -927,8 +927,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     internal string BestCaption() {
-        if (string.Equals(_caption, "Head", StringComparison.OrdinalIgnoreCase) &&
-            GetConnectedFormula() is { } cf) {
+        if (IsHead() && GetConnectedFormula() is { } cf) {
             return cf.Filename.FileNameWithoutSuffix();
         }
 
@@ -1020,6 +1019,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         return false;
     }
+
+    internal bool IsHead() => string.Equals(_caption, "Head", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht

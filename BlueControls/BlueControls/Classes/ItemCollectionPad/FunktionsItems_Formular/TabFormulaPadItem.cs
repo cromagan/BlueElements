@@ -323,7 +323,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
         foreach (var thisIt in lb.Items) {
             if (thisIt is ReadableListItem rli && rli.Item is ItemCollectionPadItem icpi) {
-                if (string.Equals(icpi.Caption, "Head", StringComparison.OrdinalIgnoreCase)) {
+                if (icpi.IsHead()) {
                     _childs.AddIfNotExists(icpi.GetConnectedFormula()?.Filename ?? string.Empty);
                 } else {
                     _childs.AddIfNotExists(icpi.Caption);

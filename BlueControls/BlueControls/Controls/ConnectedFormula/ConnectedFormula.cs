@@ -292,16 +292,16 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         #region Sicherstellen, dass jede Page ein RowEntryItem hat
 
         foreach (var thisP in Pages) {
-            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp) {
-                if (icp.Caption.Equals("Head", StringComparison.OrdinalIgnoreCase) || icp.Count() > 0) {
-                    var found = icp.GetRowEntryItem();
+            if (thisP is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                if (icpi.IsHead() || icpi.Count() > 0) {
+                    var found = icpi.GetRowEntryItem();
 
                     if (found == null) {
                         found = new RowEntryPadItem();
-                        icp.Add(found);
+                        icpi.Add(found);
                     }
 
-                    found.SetCoordinates(new RectangleF((icp.UsedArea.Width / 2) - 150, -30, 300, 30));
+                    found.SetCoordinates(new RectangleF((icpi.UsedArea.Width / 2) - 150, -30, 300, 30));
                     found.Bei_Export_sichtbar = false;
                 }
             }
@@ -342,9 +342,9 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var thisf in _pages) {
-                if (thisf is ItemCollectionPadItem { IsDisposed: false } icp) {
-                    if (!notAllowedChilds.Contains(icp.KeyName) && !string.Equals("Head", icp.Caption, StringComparison.OrdinalIgnoreCase)) {
-                        list.Add(ItemOf(icp));
+                if (thisf is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                    if (!notAllowedChilds.Contains(icpi.KeyName) && !icpi.IsHead()) {
+                        list.Add(ItemOf(icpi));
                     }
                 }
             }
