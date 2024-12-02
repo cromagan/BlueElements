@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -97,25 +96,17 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        ConnectedFormula.ConnectedFormula? cf = null;
+        var icpi = GetChild(_child);
 
-        var txt = "?";
-
-        if (_child.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-            cf = ConnectedFormula.ConnectedFormula.GetByFilename(_child);
-            txt = _child.FileNameWithoutSuffix();
-        }
-
-        var con = new ConnectedFormulaView(mode, cf?.GetPage("Head")) {
+        var con = new ConnectedFormulaView(mode, icpi) {
             GroupBoxStyle = _rahmenStil
         };
 
         if (_rahmenStil != GroupBoxStyle.Nothing) {
-            con.Text = txt;
+            con.Text = icpi?.BestCaption() ?? "?";
         }
 
         con.DoDefaultSettings(parent, this, mode);
-        //con.InitFormula(cf, DatabaseInput);
 
         return con;
     }

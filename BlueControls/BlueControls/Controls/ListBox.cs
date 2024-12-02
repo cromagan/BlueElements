@@ -36,7 +36,6 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad;
 using BlueDatabase.Interfaces;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -592,7 +591,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
             if (BreakAfterItems < 1) { senkrechtAllowed = Orientation.Waagerecht; }
             var sliderWidth = 0;
             if (sliderY != null) {
-                if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
+                if (BreakAfterItems < 1 && heightAdded + addy > controlDrawingArea.Height) {
                     sliderWidth = sliderY.Width;
                 }
             }
@@ -675,6 +674,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
             if (sliderY != null) {
                 bool setTo0;
+
                 if (sliderWidth > 0) {
                     if (maxy - controlDrawingArea.Height <= 0) {
                         sliderY.Enabled = false;
@@ -694,6 +694,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                     setTo0 = true;
                     sliderY.Visible = false;
                 }
+
                 if (setTo0) {
                     sliderY.Minimum = 0;
                     sliderY.Maximum = 0;
@@ -1237,8 +1238,6 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         Invalidate();
     }
-
-
 
     #endregion
 }

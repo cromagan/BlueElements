@@ -92,22 +92,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         IsSaved = true;
     }
 
-    public  RowEntryPadItem? GetRowEntryItem() {
-
-
-        foreach (var thisit in this) {
-            if (thisit is RowEntryPadItem repi) {
-                return repi;
-
-            }
-        }
-
-        return null;
-
-    }
-
-
-
     public ItemCollectionPadItem(string layoutFileName) : this() {
         if (IO.FileExists(layoutFileName)) {
             this.Parse(File.ReadAllText(layoutFileName, Win1252));
@@ -603,6 +587,27 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return result;
     }
 
+    public RowEntryPadItem? GetRowEntryItem() {
+        foreach (var thisit in this) {
+            if (thisit is RowEntryPadItem repi) {
+                return repi;
+            }
+        }
+
+        return null;
+    }
+
+    public ItemCollectionPadItem? GetSubItemCollection(string keyOrCaption) {
+        foreach (var thisP in this) {
+            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp2) {
+                if (string.Equals(icp2.KeyName, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
+                if (string.Equals(icp2.Caption, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
+            }
+        }
+
+        return null;
+    }
+
     public AbstractPadItem? HotItem(Point point, bool topLevel, float scale, float shiftX, float shiftY) {
         // Berechne die unscaled Koordinaten für dieses Item
 
@@ -800,11 +805,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() {
-        if (!string.IsNullOrEmpty(_caption)) { return _caption; }
-
-        return "Unter-Gruppe";
-    }
+    public override string ReadableText() => BestCaption();
 
     public void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
@@ -897,7 +898,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         OnPropertyChanged();
     }
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Gruppe);
+    public override QuickImage SymbolForReadableText() {
+        if (string.Equals(_caption, "Head")) { return QuickImage.Get(ImageCode.Diskette); }
+
+        return QuickImage.Get(ImageCode.Gruppe);
+    }
 
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
@@ -919,6 +924,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         l.AddRange(Table.Permission_AllUsed(false));
 
         return Database.RepairUserGroups(l);
+    }
+
+    internal string BestCaption() {
+        if (string.Equals(_caption, "Head", StringComparison.OrdinalIgnoreCase) &&
+            GetConnectedFormula() is { } cf) {
+            return cf.Filename.FileNameWithoutSuffix();
+        }
+
+        if (string.IsNullOrEmpty(_caption)) { return "?"; }
+
+        return _caption;
     }
 
     internal ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn) {
@@ -955,6 +971,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return t;
     }
 
+    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
+        if (Parent is ConnectedFormula.ConnectedFormula cf) { return cf; }
+
+        if (Parent is ItemCollectionPadItem icpi) { return icpi.GetConnectedFormula(); }
+        return null;
+    }
+
     internal PointM? GetJointPoint(string pointName, AbstractPadItem? notOfMe) {
         foreach (var thisIt in _internal) {
             if (thisIt != notOfMe) {
@@ -979,6 +1002,23 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         return l;
+    }
+
+    /// <summary>
+    /// Prüft, ob das Formular sichtbare Elemente hat.
+    /// Zeilenselectionen werden dabei ignoriert.
+    /// </summary>
+    /// <returns></returns>
+    internal bool HasVisibleItemsForMe(string mode) {
+        if (IsDisposed) { return false; }
+
+        foreach (var thisItem in this) {
+            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
+                if (cspi.IsVisibleForMe(mode, false)) { return true; }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -1266,49 +1306,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
-
-
-    /// <summary>
-    /// Prüft, ob das Formular sichtbare Elemente hat.
-    /// Zeilenselectionen werden dabei ignoriert.
-    /// </summary>
-    /// <returns></returns>
-    internal bool HasVisibleItemsForMe(string mode) {
-        if (IsDisposed) { return false; }
-
-        foreach (var thisItem in this) {
-            if (thisItem is ReciverControlPadItem { MustBeInDrawingArea: true } cspi) {
-                if (cspi.IsVisibleForMe(mode, false)) { return true; }
-            }
-        }
-
-        return false;
-    }
-
-
-
-    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
-        if (Parent is ConnectedFormula.ConnectedFormula cf) { return cf; }
-
-        if (Parent is ItemCollectionPadItem icpi) { return icpi.GetConnectedFormula(); }
-        return null;
-    }
-
-    public ItemCollectionPadItem? GetSubItemCollection( string keyOrCaption) {
-
-        foreach (var thisP in this) {
-            if (thisP is ItemCollectionPadItem { IsDisposed: false } icp2) {
-                if (string.Equals(icp2.KeyName, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
-                if (string.Equals(icp2.Caption, keyOrCaption, StringComparison.OrdinalIgnoreCase)) { return icp2; }
-            }
-        }
-
-        return null;
-
-    }
-
-
-
 
     #endregion
 }

@@ -578,5 +578,22 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
     }
 
+    protected ItemCollectionPadItem? GetChild(string nameidorfile) {
+        if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
+            var cf = ConnectedFormula.ConnectedFormula.GetByFilename(nameidorfile);
+            return cf?.GetPage("Head");
+        } else {
+            if (Parent is ConnectedFormula.ConnectedFormula cf) {
+                // TODO: Überflüssig???? 29.11.2024
+                return cf.GetPage("Head");
+            }
+
+            if (Parent is ItemCollectionPadItem icpi) {
+                return icpi.GetConnectedFormula()?.GetPage(nameidorfile);
+            }
+        }
+        return null;
+    }
+
     #endregion
 }

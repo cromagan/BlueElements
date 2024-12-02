@@ -23,7 +23,6 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -100,16 +99,17 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         get => _pages;
         private set {
             if (_pages == value) { return; }
-            UnRegisterPadDataEvents();
+
+            if (_pages != null) {
+                _pages.PropertyChanged -= PadData_PropertyChanged;
+            }
 
             _pages = value;
 
             if (_pages != null) {
                 _pages.Parent = this;
+                _pages.PropertyChanged += PadData_PropertyChanged;
             }
-       
-
-            RegisterPadDataEvents();
 
             OnPropertyChanged();
         }
@@ -173,10 +173,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public ItemCollectionPadItem? GetPage(string keyOrCaption) {
         if (Pages is not { IsDisposed: false } pg) { return null; }
 
-
-      return  pg.GetSubItemCollection(keyOrCaption);
-
-
+        return pg.GetSubItemCollection(keyOrCaption);
     }
 
     public override List<string> ParseableItems() {
@@ -195,44 +192,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
 
-    
-        if (Pages == null) {
-            Pages = new ItemCollectionPadItem();
-            Pages.Breite = 100;
-            Pages.Höhe = 100;
-        }
-
-        Pages.Parent = this;
-
-        var tmpPages = new List<AbstractPadItem>();
-        tmpPages.AddRange(Pages);
-
-        foreach (var thisIt in tmpPages) {
-            if (thisIt is  ItemCollectionPadItem { IsDisposed: false } icpi) {
-                if (string.IsNullOrEmpty(icpi.Page)) { icpi.Page = "Head"; }
-
-                icpi.Parent = Pages;
-
-                //if (found == null) {
-                //    found = new ItemCollectionPadItem {
-                //        Caption = thisIt.Page,
-                //        Breite = Pages.Breite,
-                //        Höhe = Pages.Höhe,
-                //        SheetStyle = Pages.SheetStyle,
-                //        RandinMm = Pages.RandinMm,
-                //        GridShow = Pages.GridShow,
-                //        GridSnap = Pages.GridSnap
-                //    };
-                //    Pages.Add(found);
-                //}
-
-
-
-            } 
-            else {
-                Pages.Remove(thisIt);
-            }
-        }
+        Repair();
     }
 
     public override bool ParseThis(string key, string value) {
@@ -244,11 +204,9 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
             case "page":
             case "paditemdata":
-                UnRegisterPadDataEvents();
-                _pages = new ItemCollectionPadItem();
-                _pages.Parent = this;
-                _pages.Parse(value.FromNonCritical());
-                RegisterPadDataEvents();
+                var tmpPages = new ItemCollectionPadItem();
+                tmpPages.Parse(value.FromNonCritical());
+                Pages = tmpPages;
                 return true;
 
             case "databasefiles":
@@ -267,25 +225,71 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public void Repair() {
-        Pages ??= new ItemCollectionPadItem();
+
+        #region Sicherstellen, das Pages initialisiert ist
+
+        if (Pages == null) {
+            Pages = new ItemCollectionPadItem();
+            Pages.Breite = 100;
+            Pages.Höhe = 100;
+        }
 
         Pages.Parent = this;
 
         Pages.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
-        if (GetPage("Head") is not { }) {
-            var h = new ItemCollectionPadItem();
-            h.Caption = "Head";
-            h.Breite = Pages.Breite;
-            h.Höhe = Pages.Höhe;
-            h.SheetStyle = Pages.SheetStyle;
-            h.RandinMm = Pages.RandinMm;
-            h.GridShow = Pages.GridShow;
-            h.GridSnap = Pages.GridSnap;
-            Pages.Add(h);
+        #endregion
+
+        #region Sicherstellen, dass in Pages auch nur Seiten sind
+
+        var tmpPages = new List<AbstractPadItem>();
+        tmpPages.AddRange(Pages);
+
+        var moveToHead = new List<AbstractPadItem>();
+
+        foreach (var thisIt in tmpPages) {
+            if (thisIt is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                if (string.IsNullOrEmpty(icpi.Page)) { icpi.Page = "Head"; }
+                icpi.Parent = Pages;
+            } else {
+                Pages.Remove(thisIt);
+                moveToHead.Add(thisIt);
+            }
         }
 
+        #endregion
+
+        #region Sicherstellen, dass die Page "Head" vorhanden ist
+
+        var foundhead = GetPage("Head");
+
+        if (foundhead == null) {
+            foundhead = new ItemCollectionPadItem {
+                Caption = "Head",
+                Breite = Pages.Breite,
+                Höhe = Pages.Höhe,
+                SheetStyle = Pages.SheetStyle,
+                RandinMm = Pages.RandinMm,
+                GridShow = Pages.GridShow,
+                GridSnap = Pages.GridSnap,
+                Parent = Pages
+            };
+            Pages.Add(foundhead);
+        }
+
+        #endregion
+
+        #region Items, die irgendwie in den Pages waren, zum Head schieben
+
+        foreach (var thisIt in moveToHead) {
+            foundhead.Add(thisIt);
+        }
+
+        #endregion
+
         RepairReciver(Pages);
+
+        #region Sicherstellen, dass jede Page ein RowEntryItem hat
 
         foreach (var thisP in Pages) {
             if (thisP is ItemCollectionPadItem { IsDisposed: false } icp) {
@@ -299,16 +303,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
                     found.SetCoordinates(new RectangleF((icp.UsedArea.Width / 2) - 150, -30, 300, 30));
                     found.Bei_Export_sichtbar = false;
-                } else {
-                    icp.Dispose();
-                    Pages.Remove(thisP);
-                    Repair();
-                    return;
                 }
             }
         }
-    }
 
+        #endregion
+    }
 
     public QuickImage SymbolForReadableText() {
         if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
@@ -351,8 +351,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
     }
 
-
-
     internal bool IsEditing() {
         var e = new EditingEventArgs();
 
@@ -368,12 +366,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     private void PadData_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
-    private void RegisterPadDataEvents() {
-        if (_pages != null) {
-            _pages.PropertyChanged += PadData_PropertyChanged;
-        }
-    }
-
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {
             if (thisIt is ItemCollectionPadItem { IsDisposed: false } icp2) {
@@ -383,12 +375,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             if (thisIt is ReciverControlPadItem itcf) {
                 itcf.ParentFormula = this;
             }
-        }
-    }
-
-    private void UnRegisterPadDataEvents() {
-        if (_pages != null) {
-            _pages.PropertyChanged -= PadData_PropertyChanged;
         }
     }
 
