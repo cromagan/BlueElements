@@ -51,7 +51,7 @@ public class Method_CellSetFilter : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName);
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         var db = allFi.Database;

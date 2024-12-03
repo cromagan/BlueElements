@@ -101,6 +101,7 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptMethods\Method_CheckScreen.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ResizeImage.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowFirstLatest.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ScaledView.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Dimension.cs" />
     <Compile Include="AdditionalScriptMethods\Method_MirrorPadItem.cs" />

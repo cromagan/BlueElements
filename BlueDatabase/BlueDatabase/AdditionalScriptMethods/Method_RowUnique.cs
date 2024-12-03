@@ -96,7 +96,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
         if (allFi is null || allFi.Count == 0) {
             return new DoItFeedback(ld, "Fehler im Filter");
         }

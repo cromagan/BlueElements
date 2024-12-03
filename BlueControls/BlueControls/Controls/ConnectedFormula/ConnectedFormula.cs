@@ -245,7 +245,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         var tmpPages = new List<AbstractPadItem>();
         tmpPages.AddRange(Pages);
 
-        var moveToHead = new List<AbstractPadItem>();
+        var moveToOtherPage = new List<AbstractPadItem>();
 
         foreach (var thisIt in tmpPages) {
             if (thisIt is ItemCollectionPadItem { IsDisposed: false } icpi) {
@@ -253,36 +253,39 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 icpi.Parent = Pages;
             } else {
                 Pages.Remove(thisIt);
-                moveToHead.Add(thisIt);
+                moveToOtherPage.Add(thisIt);
             }
         }
 
         #endregion
 
-        #region Sicherstellen, dass die Page "Head" vorhanden ist
+        #region Items, die irgendwie in den Pages waren, zum der richtigen Page schieben
 
-        var foundhead = GetPage("Head");
+        foreach (var thisIt in moveToOtherPage) {
 
-        if (foundhead == null) {
-            foundhead = new ItemCollectionPadItem {
-                Caption = "Head",
-                Breite = Pages.Breite,
-                Höhe = Pages.Höhe,
-                SheetStyle = Pages.SheetStyle,
-                RandinMm = Pages.RandinMm,
-                GridShow = Pages.GridShow,
-                GridSnap = Pages.GridSnap,
-                Parent = Pages
-            };
-            Pages.Add(foundhead);
-        }
+            #region Sicherstellen, dass die Page  vorhanden ist
 
-        #endregion
+            var pagen = thisIt.Page;
+            if (string.IsNullOrEmpty(pagen)) { pagen = "Head"; }
+            var mypage = GetPage(pagen);
 
-        #region Items, die irgendwie in den Pages waren, zum Head schieben
+            if (mypage == null) {
+                mypage = new ItemCollectionPadItem {
+                    Caption = pagen,
+                    Breite = Pages.Breite,
+                    Höhe = Pages.Höhe,
+                    SheetStyle = Pages.SheetStyle,
+                    RandinMm = Pages.RandinMm,
+                    GridShow = Pages.GridShow,
+                    GridSnap = Pages.GridSnap,
+                    Parent = Pages
+                };
+                Pages.Add(mypage);
+            }
 
-        foreach (var thisIt in moveToHead) {
-            foundhead.Add(thisIt);
+            #endregion
+
+            mypage.Add(thisIt);
         }
 
         #endregion

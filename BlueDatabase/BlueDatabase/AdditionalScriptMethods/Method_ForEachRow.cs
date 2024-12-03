@@ -65,7 +65,7 @@ internal class Method_ForEachRow : Method_Database {
             return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
         }
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName);
 
         if (allFi is null) { return new DoItFeedback(infos.LogData, "Fehler im Filter"); }
 

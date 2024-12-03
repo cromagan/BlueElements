@@ -70,7 +70,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         #region  Filter ermitteln (allfi)
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3, MyDatabase(scp), scp.ScriptName);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
 

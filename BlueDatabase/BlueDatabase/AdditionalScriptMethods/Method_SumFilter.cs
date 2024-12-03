@@ -25,23 +25,23 @@ using BlueScript.Variables;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_ContentsFilter : Method_Database {
+public class Method_SumFilter : Method_Database {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FilterVar];
-    public override string Command => "contentsfilter";
+    public override string Command => "sumfilter";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
+    public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge summiert zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.MyDatabaseRow;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableFloat.ShortName_Plain;
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "ContentsFilter(Colum, Filter, ...)";
+    public override string Syntax => "SumFilter(Colum, Filter, ...)";
 
     #endregion
 
@@ -59,8 +59,13 @@ public class Method_ContentsFilter : Method_Database {
 
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        var x = returncolumn.Contents(allFi.Rows);
-        return new DoItFeedback(x);
+        var x = returncolumn.Summe(allFi.Rows);
+
+        if(x is not double xd) {
+            return new DoItFeedback(ld, "Summe konnte nicht berechnet werden.");
+        }
+
+        return new DoItFeedback(xd);
     }
 
     #endregion

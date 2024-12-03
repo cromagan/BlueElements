@@ -19,15 +19,13 @@
 
 using System.Collections.Generic;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_RowCount : Method {
+public class Method_RowCount : Method_Database {
 
     #region Properties
 
@@ -48,7 +46,7 @@ public class Method_RowCount : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
         if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         var r = allFi.Rows;

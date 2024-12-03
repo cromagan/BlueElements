@@ -55,21 +55,26 @@ public class Method_Filter : Method_Database {
 
     #region Methods
 
-    public static FilterCollection? ObjectToFilter(VariableCollection attributes, int ab) {
+    public static FilterCollection? ObjectToFilter(VariableCollection attributes, int ab, Database? sourcedatabase, string user) {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
             if (attributes[z] is not VariableFilterItem fi) { return null; } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
 
-            //var fi = new FilterItem(attributes[z].ObjectData());
+            if (fi.FilterItem is not { } fii) { return null; }
 
-            if (!fi.FilterItem.IsOk()) { return null; }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
-
-            if (z > ab) {
-                if (fi.FilterItem.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+            if(fii.Column?.Database is  { } db) {
+                fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcedatabase ?? db, user);
             }
 
-            if (fi.FilterItem.Clone() is FilterItem fin) {
+
+            if (!fii.IsOk()) { return null; }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
+
+            if (z > ab) {
+                if (fii.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+            }
+
+            if (fii.Clone() is FilterItem fin) {
                 // Müssen Clone sein. Die  Routine kann mehrfach ausgelöst werden und dann gehört der Filter bereits einer Collection an
                 allFi.Add(fin);
             }

@@ -22,15 +22,13 @@ using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_Row : Method, IUseableForButton {
+public class Method_Row : Method_Database, IUseableForButton {
 
     #region Properties
 
@@ -77,16 +75,14 @@ public class Method_Row : Method, IUseableForButton {
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
         if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
 
         var r = allFi.Rows;
 
         if (r.Count > 1) { return new DoItFeedback(ld, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
-        if (r.Count is 0 or > 1) {
-            return RowToObjectFeedback(null);
-        }
+        if (r.Count == 0) {            return RowToObjectFeedback(null);        }
 
         return RowToObjectFeedback(r[0]);
     }

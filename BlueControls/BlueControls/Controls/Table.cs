@@ -1425,7 +1425,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count <1) {
+        if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count < 1) {
             DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft", null);
             return;
         }
@@ -2885,7 +2885,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (IsDisposed) { return; }
 
         ColumnViewItem? prevViewItemWithOtherCaption = null;
-        //ColumnViewItem? prevPermanentViewItemWithOtherCaption;
         ColumnViewItem? prevViewItem = null;
         var prevCaptionGroup = string.Empty;
 
@@ -2899,39 +2898,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 var newCaptionGroup = thisViewItem.Column?.CaptionGroup(columnno) ?? string.Empty;
 
                 if (newCaptionGroup != prevCaptionGroup) {
-
                     #region Ende einer Gruppierung gefunden
 
                     if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { } && prevViewItemWithOtherCaption is { }) {
-                        var le = Math.Max(prevViewItemWithOtherCaption.RealHead(_zoom, SliderX.Value).Left, 0);
-                        var re = Math.Min(thisItem.Left, displayRectangleWoSlider.Width);
-                        //if (thisViewItem?.ViewType != ViewType.PermanentColumn && prevViewItemWithOtherCaption.ViewType != ViewType.PermanentColumn) {
-                        //    le = Math.Max(le, permaX);
-                        //}
-
-                        //if (thisViewItem?.ViewType != ViewType.PermanentColumn && prevViewItemWithOtherCaption.ViewType == ViewType.PermanentColumn) {
-                        //    var tmp2 = prevPermanentViewItemWithOtherCaption.DrawWidth();
-                        //    re = Math.Max(re, prevPermanentViewItemWithOtherCaption.X_WithSlider ?? 0 + tmp2);
-                        //}
-
-                        #region Die eigentliche Zeichen-Routine
-
-                        if (le < re) {
-                            Rectangle r = new(le, pccy, re - le, pcch);
-                            gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption.BackColor_ColumnHead), r);
-                            gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
-                            gr.DrawRectangle(Skin.PenLinieKräftig, r);
-                            Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, prevViewItem.Font_Head_Default.Scale(_zoom), Translate);
-                        }
-
-                        #endregion
+                        Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, thisItem, displayRectangleWoSlider, pccy, pcch, prevCaptionGroup);
                     }
 
                     prevViewItemWithOtherCaption = thisViewItem;
-
-                    //if (thisViewItem?.ViewType == ViewType.PermanentColumn) {
-                    //    prevPermanentViewItemWithOtherCaption = thisViewItem;
-                    //}
 
                     #endregion
                 }
@@ -2940,7 +2913,27 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 prevCaptionGroup = newCaptionGroup;
             }
         }
+
+        // Zeichen-Routine für das letzte Element aufrufen
+        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { } && prevViewItemWithOtherCaption is { }) {
+            Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, displayRectangleWoSlider, pccy, pcch, prevCaptionGroup);
+        }
     }
+
+    private void Draw_Column_Head_Captions_Now(Graphics gr, ColumnViewItem prevViewItemWithOtherCaption, Rectangle thisItem, Rectangle displayRectangleWoSlider, int pccy, int pcch, string prevCaptionGroup) {
+        var le = Math.Max(prevViewItemWithOtherCaption.RealHead(_zoom, SliderX.Value).Left, 0);
+        var re = thisItem.Left > 0 ? Math.Min(thisItem.Left, displayRectangleWoSlider.Width) : displayRectangleWoSlider.Width;
+
+        if (le < re) {
+            Rectangle r = new(le, pccy, re - le, pcch);
+            gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption.BackColor_ColumnHead), r);
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
+            gr.DrawRectangle(Skin.PenLinieKräftig, r);
+            Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, prevViewItemWithOtherCaption.Font_Head_Default.Scale(_zoom), Translate);
+        }
+    }
+
+
 
     private void Draw_Cursor(Graphics gr, Rectangle displayRectangleWoSlider, bool onlyCursorLines) {
         if (_tmpCursorRect.Width < 1) { return; }

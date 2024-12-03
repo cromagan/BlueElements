@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptMethods\Method_AddRowsUnique.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_SumFilter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />

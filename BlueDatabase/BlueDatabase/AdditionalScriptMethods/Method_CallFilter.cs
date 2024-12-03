@@ -21,15 +21,13 @@ using System.Collections.Generic;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallFilter : Method, IUseableForButton {
+public class Method_CallFilter : Method_Database, IUseableForButton {
 
     #region Properties
 
@@ -66,7 +64,7 @@ public class Method_CallFilter : Method, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
         if (allFi.Database is not { IsDisposed: false }) { return new DoItFeedback(ld, "Datenbankfehler!"); }
