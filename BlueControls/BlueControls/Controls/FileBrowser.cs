@@ -277,9 +277,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         var i = ScreenShot.GrabArea(ParentForm());
 
+        if (i.Area is not { } bmp) { return; }
+
         var dateiPng = TempFile(_directory.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString4(), "PNG");
-        i.Save(dateiPng, ImageFormat.Png);
-        i.Dispose();
+        bmp.Save(dateiPng, ImageFormat.Png);
+
         CollectGarbage();
 
         ReloadDirectory();

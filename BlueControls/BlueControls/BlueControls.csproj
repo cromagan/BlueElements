@@ -99,7 +99,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalScriptMethods\Method_CheckScreen.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CheckBitmap.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Screenshot.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ResizeImage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowFirstLatest.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ScaledView.cs" />

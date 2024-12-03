@@ -129,7 +129,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         if (Bitmap != null) {
             if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
-        Bitmap = ScreenShot.GrabArea(null).CloneOfBitmap();
+        Bitmap = ScreenShot.GrabArea(null).Area;
         OnPropertyChanged();
     }
 

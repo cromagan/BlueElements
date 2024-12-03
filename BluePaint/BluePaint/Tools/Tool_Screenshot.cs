@@ -41,7 +41,7 @@ public partial class Tool_Screenshot {
         OnHideMainWindow();
         Generic.Pause(1, true);
         var pic = ScreenShot.GrabArea(null);
-        OnOverridePic(pic.CloneOfBitmap(), true);
+        OnOverridePic(pic.Area, true);
         OnShowMainWindow();
     }
 

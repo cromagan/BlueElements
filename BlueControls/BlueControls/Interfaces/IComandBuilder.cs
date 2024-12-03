@@ -20,4 +20,10 @@
 namespace BlueControls.Interfaces;
 
 public interface IComandBuilder {
+
+    #region Methods
+
+    public string GetCode();
+
+    #endregion
 }

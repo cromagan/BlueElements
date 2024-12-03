@@ -31,20 +31,14 @@ namespace BlueControls;
 /// Eine Klasse, die alle möglichen Arten von Screenshots zurückgibt.
 /// </summary>
 public sealed partial class ScreenShot {
-    //[AccessedThroughProperty(nameof(Hook))]
-    //private SystemInputHook _Hook;
-
-    //private List<clsScreenData> AllS = new();
 
     #region Fields
 
     private const int DrawSize = 20;
     private readonly string _drawText = string.Empty;
     private readonly ScreenData _feedBack;
-    private Bitmap? _clipedArea;
+    private readonly bool _onlyMouseDown;
     private bool _mousesWasUp;
-
-    private Bitmap? _screenShotBmp;
 
     #endregion
 
@@ -55,28 +49,12 @@ public sealed partial class ScreenShot {
         _feedBack = new ScreenData();
     }
 
-    private ScreenShot(string text) : this() => _drawText = text;
+    private ScreenShot(string text, bool onlyMouseDown) : this() {
+        _drawText = text;
+        _onlyMouseDown = onlyMouseDown;
+    }
 
     #endregion
-
-    //private SystemInputHook Hook {
-    //    [DebuggerNonUserCode]
-    //    get => _Hook;
-    //    [MethodImpl(MethodImplOptions.Synchronized), DebuggerNonUserCode]
-    //    set {
-    //        if (_Hook != null) {
-    //            _Hook.MouseUp -= Hook_MouseUp;
-    //            _Hook.MouseDown -= Hook_MouseDown;
-    //            _Hook.MouseMove -= Hook_MouseMove;
-    //        }
-    //        _Hook = value;
-    //        if (value != null) {
-    //            _Hook.MouseUp += Hook_MouseUp;
-    //            _Hook.MouseDown += Hook_MouseDown;
-    //            _Hook.MouseMove += Hook_MouseMove;
-    //        }
-    //    }
-    //}
 
     #region Methods
 
@@ -94,8 +72,6 @@ public sealed partial class ScreenShot {
         } while (true);
     }
 
-    //public static Bitmap GrabArea(Rectangle r) => r.Width < 2 || r.Height < 2 ? null : Area(GrabAllScreens(), r);
-
     /// <summary>
     /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
     /// </summary>
@@ -103,25 +79,27 @@ public sealed partial class ScreenShot {
     /// <returns></returns>
     /// <remarks></remarks>
     public static ScreenData GrabArea(Form? frm) {
-        using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.");
-        return x.GrabAreaInternal(frm);
+        using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false);
+        return x.Start(frm);
+    }
+
+    internal static ScreenData GrabAndClick(string txt, Form? frm) {
+        using ScreenShot x = new(txt, true);
+        return x.Start(frm);
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         if (!_mousesWasUp) { return; }
         _feedBack.Point1 = new Point(e.X, e.Y);
+
+        if (_onlyMouseDown) {
+            Close();
+        }
     }
 
-    //public static Bitmap GrabContinuus() {
-    //    ScreenShot x = new();
-    //    var im = x.GrabContinuusIntern();
-    //    x?.Dispose();
-    //    Generic.CollectGarbage();
-    //    return im;
-    //}
     protected override void OnMouseMove(MouseEventArgs? e) {
-        if (e == null || _screenShotBmp == null) { return; }
+        if (e == null || _feedBack.Screen == null) { return; }
 
         base.OnMouseMove(e);
         if (e.Button == MouseButtons.None && !_mousesWasUp) {
@@ -136,10 +114,10 @@ public sealed partial class ScreenShot {
         using var gr = Graphics.FromImage(BackgroundImage);
         gr.Clear(Color.Black);
 
-        gr.DrawImage(_screenShotBmp, 0, 0);
+        gr.DrawImage(_feedBack.Screen, 0, 0);
 
         PrintText(gr, e);
-        Magnify(_screenShotBmp, new Point(e.X, e.Y), gr, false);
+        Magnify(_feedBack.Screen, new Point(e.X, e.Y), gr, false);
         if (e.Button != MouseButtons.None) {
             gr.DrawLine(new Pen(Color.Red), 0, _feedBack.Point1.Y, Width, _feedBack.Point1.Y);
             gr.DrawLine(new Pen(Color.Red), _feedBack.Point1.X, 0, _feedBack.Point1.X, Height);
@@ -161,160 +139,19 @@ public sealed partial class ScreenShot {
         }
         _feedBack.Point2 = new Point(e.X, e.Y);
 
-        var r = _feedBack.GrabedArea();
+        var r = _feedBack.AreaRectangle();
         if (r.Width < 2 || r.Height < 2) { return; }
 
-        _clipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+        _feedBack.Area = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
-        if (_screenShotBmp != null) {
-            using var gr = Graphics.FromImage(_clipedArea);
+        if (_feedBack.Screen != null) {
+            using var gr = Graphics.FromImage(_feedBack.Area);
             gr.Clear(Color.Black);
-            gr.DrawImage(_screenShotBmp, 0, 0, r, GraphicsUnit.Pixel);
+            gr.DrawImage(_feedBack.Screen, 0, 0, r, GraphicsUnit.Pixel);
         }
 
         Close();
     }
-
-    private ScreenData GrabAreaInternal(Form? frm) {
-        try {
-            //System.Windows.Forms.FormWindowState ws = 0;
-            var op = 0d;
-
-            QuickInfo.Close();
-
-            if (frm != null) {
-                //ws = frm.WindowState;
-                op = frm.Opacity;
-                frm.Opacity = 0;
-                frm.Refresh();
-                //Develop.DoEvents();
-                //frm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
-                //Generic.Pause(0.5, true); // 0.3 ist zu wenig!
-            }
-
-            _screenShotBmp = GrabAllScreens();
-            BackgroundImage = new Bitmap(_screenShotBmp.Width, _screenShotBmp.Height, PixelFormat.Format32bppPArgb);
-            using var gr = Graphics.FromImage(BackgroundImage);
-            gr.DrawImage(_screenShotBmp, 0, 0);
-
-            var r = Generic.RectangleOfAllScreens();
-            Left = r.Left;
-            Top = r.Top;
-            Width = r.Width;
-            Height = r.Height;
-            OnMouseMove(null);
-            _ = ShowDialog();
-
-            if (frm != null) {
-                frm.Opacity = op;
-                //frm.WindowState = ws;
-            }
-            // New Bitmap davor, um die Bitmaptiefe zu korrigiern
-            //if (MaxW > 0 && MaxH > 0) {
-            //    // Auch hier NEW Bitmap, da evtl. das Original-Bild zurück gegeben wird.
-            //    FeedBack.Pic = new Bitmap(BitmapExt.Resize(ClipedArea, MaxW, MaxH, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
-            //    FeedBack.IsResized = true;
-            //} else {
-            _feedBack.CloneFromBitmap(_clipedArea);
-            //FeedBack.IsResized = false;
-            //}
-            _clipedArea?.Dispose();
-            return _feedBack;
-        } catch {
-            return new ScreenData();
-        }
-    }
-
-    //private Bitmap GrabContinuusIntern() {
-    //    AllS = new List<clsScreenData>();
-    //    DrawText = "Bitte ziehen sie einen Rahmen um den gewünschten Bereich.\r\nDieser wird anschließend nach jedem Mauszug abfotografiert.\r\nBeendet wird der Modus mit der rechten Maustaste.";
-    //    DrawSize = 10;
-    //    AllS.GenerateAndAdd(GrabAreaInternal(null, -1, -1));
-    //    Rahm = new Overlay();
-    //    Hook = new SystemInputHook();
-    //    Hook.InstallHook();
-    //    HookStartPoint = new Point(int.MinValue, int.MinValue);
-    //    HookEndPoint = new Point(int.MinValue, int.MinValue);
-    //    LastMouse = new Point(int.MinValue, int.MinValue);
-    //    Rahm.Show();
-    //    do {
-    //        Develop.DoEvents();
-    //        if (HookFinish) { break; }
-    //        if (HookStartPoint.X > int.MinValue && HookEndPoint.X > int.MinValue) {
-    //            Hook.RemoveHook();
-    //            if (HookStartPoint.ToString() != HookEndPoint.ToString()) {
-    //                Rahm.Visible = false;
-    //                clsScreenData l = new() {
-    //                    Pic = GrabArea(AllS[0].GrabedArea()),
-    //                    HookP1 = HookStartPoint,
-    //                    HookP2 = HookEndPoint
-    //                };
-    //                AllS.GenerateAndAdd(l);
-    //            }
-    //            HookStartPoint = new Point(int.MinValue, int.MinValue);
-    //            HookEndPoint = new Point(int.MinValue, int.MinValue);
-    //            LastMouse = new Point(int.MinValue, int.MinValue);
-    //            Generic.Pause(0.5, false);
-    //            Rahm.Visible = true;
-    //            Hook.InstallHook();
-    //        }
-    //    } while (true);
-    //    Hook.RemoveHook();
-    //    Rahm?.Dispose();
-    //    var MinX = 0;
-    //    var MinY = 0;
-    //    var maxx = AllS[0].GrabedArea().Width;
-    //    var maxy = AllS[0].GrabedArea().Height;
-    //    var VersX = 0;
-    //    var VersY = 0;
-    //    for (var z = 1; z < AllS.Count; z++) {
-    //        VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
-    //        VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
-    //        MinX = Math.Min(VersX, MinX);
-    //        MinY = Math.Min(VersY, MinY);
-    //        maxx = Math.Max(VersX + AllS[0].GrabedArea().Width, maxx);
-    //        maxy = Math.Max(VersY + AllS[0].GrabedArea().Height, maxy);
-    //    }
-    //    Generic.CollectGarbage();
-    //    Bitmap bmp = new(maxx - MinX, maxy - MinY, PixelFormat.Format32bppPArgb);
-    //    var gr = Graphics.FromImage(bmp);
-    //    gr.Clear(Color.White);
-    //    VersX = MinX * -1;
-    //    VersY = MinY * -1;
-    //    for (var z = 0; z < AllS.Count; z++) {
-    //        VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
-    //        VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
-    //        gr.DrawImage(AllS[z].Pic, VersX, VersY);
-    //        AllS[z].Pic?.Dispose();
-    //    }
-    //    return bmp;
-    //}
-
-    //private void Hook_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
-    //    if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-    //        HookFinish = true;
-    //        return;
-    //    }
-    //    if (HookStartPoint.X > int.MinValue) { return; }
-    //    if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookStartPoint = new Point(LastMouse.X, LastMouse.Y); }
-    //}
-
-    //private void Hook_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e) {
-    //    LastMouse = new Point(e.X, e.Y);
-    //    if (Rahm != null) {
-    //        Rahm.Left = (int)(e.X - (Rahm.Width / 2.0));
-    //        Rahm.Top = (int)(e.Y - (Rahm.Width / 2.0));
-    //    }
-    //}
-
-    //private void Hook_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-    //    if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-    //        HookFinish = true;
-    //        return;
-    //    }
-    //    if (HookEndPoint.X > int.MinValue) { return; }
-    //    if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookEndPoint = new Point(LastMouse.X, LastMouse.Y); }
-    //}
 
     private void PrintText(Graphics gr, MouseEventArgs? e) {
         Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
@@ -324,6 +161,39 @@ public sealed partial class ScreenShot {
         var yPos = e == null ? 0 : e.Y > f.Height + 50 ? 0 : (int)(Height - f.Height - 5);
         gr.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
         BlueFont.DrawString(gr, _drawText, fn, bf, 2, yPos + 2);
+    }
+
+    private ScreenData Start(Form? frm) {
+        try {
+            var op = 0d;
+
+            QuickInfo.Close();
+
+            if (frm != null) {
+                op = frm.Opacity;
+                frm.Opacity = 0;
+                frm.Refresh();
+            }
+
+            _feedBack.Screen = GrabAllScreens();
+            BackgroundImage = new Bitmap(_feedBack.Screen.Width, _feedBack.Screen.Height, PixelFormat.Format32bppPArgb);
+            using var gr = Graphics.FromImage(BackgroundImage);
+            gr.DrawImage(_feedBack.Screen, 0, 0);
+
+            var r = Generic.RectangleOfAllScreens();
+            Left = r.Left;
+            Top = r.Top;
+            Width = r.Width;
+            Height = r.Height;
+            OnMouseMove(null);
+            _ = ShowDialog();
+
+            if (frm != null) { frm.Opacity = op; }
+
+            return _feedBack;
+        } catch {
+            return new ScreenData();
+        }
     }
 
     #endregion

@@ -23,22 +23,20 @@ using BlueBasics;
 
 namespace BlueControls;
 
-public class ScreenData : BitmapExt {
-    //public Point HookP1;
-    //public Point HookP2;
-    //public bool IsResized;
-    //public BitmapExt Bmp;
+public class ScreenData {
 
     #region Fields
 
+    public Bitmap? Area;
     public Point Point1;
     public Point Point2;
+    public Bitmap? Screen;
 
     #endregion
 
     #region Methods
 
-    public Rectangle GrabedArea() =>
+    public Rectangle AreaRectangle() =>
         new(Math.Min(Point1.X, Point2.X), Math.Min(Point1.Y, Point2.Y),
             Math.Max(Point1.X - Point2.X, Point2.X - Point1.X) + 1,
             Math.Max(Point1.Y - Point2.Y, Point2.Y - Point1.Y) + 1);
