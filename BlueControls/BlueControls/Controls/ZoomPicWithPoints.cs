@@ -43,8 +43,10 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     #region Fields
 
-    public string Feedback = string.Empty;
-
+    /// <summary>
+    /// Wenn eine Aktion ausgeführt wird, ein String, der den Aktionsnamen beinhaltet
+    /// </summary>
+    public string UserAction = string.Empty;
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private readonly List<PointM> _points = [];
@@ -138,7 +140,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         // Used: Only BZL
         _mittelLinie = mittelline;
         _helper = helper;
-        Feedback = pointName;
+        UserAction = pointName;
         _pointAdding = true;
         Invalidate();
     }
@@ -226,8 +228,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     protected override void OnImageMouseUp(MouseEventArgs1_1 e) {
-        if (_pointAdding && !string.IsNullOrEmpty(Feedback)) {
-            PointSet(Feedback, e.X, e.Y);
+        if (_pointAdding && !string.IsNullOrEmpty(UserAction)) {
+            PointSet(UserAction, e.X, e.Y);
             _pointAdding = false;
         }
         base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
