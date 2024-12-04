@@ -64,7 +64,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         if (db == MyDatabase(scp)) { return new DoItFeedback(ld, "Befehl Call benutzen!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol, "Datenbanksperre: " + m); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(ld, "Stapelspeicherüberlauf"); }

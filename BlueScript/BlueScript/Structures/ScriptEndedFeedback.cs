@@ -27,7 +27,7 @@ public class ScriptEndedFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript, bool successful) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
@@ -35,7 +35,9 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(protocol);
         BreakFired = breakFired;
         EndScript = endscript;
-        Successful = successful;
+
+        NotSuccessfulReason = variables.GetString("NotSuccessfulReason") ?? "Variablenfehler";
+        Successful = string.IsNullOrEmpty( NotSuccessfulReason);
         ScriptNeedFix = scriptNeedFix;
     }
 
@@ -56,6 +58,7 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(Protocol);
 
         AllOk = false;
+        NotSuccessfulReason = "Start abgebrochen: " + errormessage;
         Successful = false;
         ScriptNeedFix = scriptNeedFix;
     }
@@ -63,7 +66,7 @@ public class ScriptEndedFeedback {
     /// <summary>
     /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
     /// </summary>
-    public ScriptEndedFeedback(VariableCollection variables, bool successful) {
+    public ScriptEndedFeedback(VariableCollection variables, string successful) {
         GiveItAnotherTry = false;
 
         Protocol = [];
@@ -71,7 +74,8 @@ public class ScriptEndedFeedback {
 
         AllOk = true;
         ScriptNeedFix = false;
-        Successful = successful;
+        NotSuccessfulReason = successful;
+        Successful = string.IsNullOrEmpty(NotSuccessfulReason);
         Variables = variables;
     }
 
@@ -89,7 +93,7 @@ public class ScriptEndedFeedback {
     public bool ScriptNeedFix { get; }
 
     public bool Successful { get; }
-
+    public string NotSuccessfulReason { get; }
     public VariableCollection? Variables { get; }
 
     #endregion

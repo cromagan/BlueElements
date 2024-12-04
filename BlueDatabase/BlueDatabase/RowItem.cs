@@ -355,11 +355,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
         if (!sef.AllOk) {
-            LastCheckedMessage += "Das Skript enthält Fehler und muss repariert werden..";
+            LastCheckedMessage += "Das Skript enthält Fehler und muss repariert werden.";
             return;
         }
         if (!sef.Successful) {
-            LastCheckedMessage += "Das Skript konnte die Zeile nicht durchrechnen.";
+            LastCheckedMessage += "Das Skript konnte die Zeile nicht durchrechnen: " + sef.NotSuccessfulReason;
             return;
         }
 
@@ -644,8 +644,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     ///
     /// </summary>
     /// <returns>True wenn alles in Ordnung ist</returns>
-    public bool RepairAllLinks() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
+    public string RepairAllLinks() {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
 
         foreach (var thisColumn in db.Column) {
             if (thisColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
@@ -654,7 +654,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }
             }
         }
-        return true;
+        return string.Empty;
     }
 
     /// <summary>
@@ -773,7 +773,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!ok.Successful) {
                 db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
-                LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen.";
+                LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen." + ok.NotSuccessfulReason;
 
                 RowCollection.FailedRows.AddIfNotExists(this);
                 return ok;
@@ -784,8 +784,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return ok;
             }
 
-            if (!RepairAllLinks()) {
-                return new ScriptEndedFeedback(new VariableCollection(), RepairAllLinks());
+            var reas = RepairAllLinks();
+
+            if (!string.IsNullOrEmpty(reas)) {
+                return new ScriptEndedFeedback(new VariableCollection(), reas);
             }
 
             CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden

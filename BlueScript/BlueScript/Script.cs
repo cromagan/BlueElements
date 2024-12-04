@@ -182,7 +182,7 @@ public class Script {
 
         do {
             if (pos >= redScriptText.Length || endScript) {
-                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, endScript, varCol.GetBoolean("Successful") ?? false);
+                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, endScript);
             }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
@@ -191,14 +191,14 @@ public class Script {
             } else {
                 var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (!f.AllOk) {
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false, varCol.GetBoolean("Successful") ?? false);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false);
                 }
 
                 endScript = f.EndSkript;
 
                 pos = f.Position;
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
-                if (f.BreakFired) { return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, true, false, varCol.GetBoolean("Successful") ?? false); }
+                if (f.BreakFired) { return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, true, false); }
             }
         } while (true);
     }

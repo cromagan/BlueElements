@@ -462,10 +462,15 @@ public abstract class Method : IReadableTextWithKey {
 
     public QuickImage? SymbolForReadableText() => null;
 
-    protected void SetNotSuccesful(VariableCollection varCol) {
+    protected void SetNotSuccesful(VariableCollection varCol, string reason) {
         var b = varCol.Get("successful");
 
         if (b is VariableBool vb) { vb.ValueBool = false; }
+
+        var s = varCol.Get("notsuccessfulreason");
+
+        if (s is VariableString vs) { vs.ValueString = reason; }
+
     }
 
     private static List<string>? SplitAttributeToString(string attributtext) {
