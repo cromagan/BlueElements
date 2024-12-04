@@ -916,7 +916,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void AddSystemInfo(string type, string user) {
         var t = SystemInfo.SplitAndCutByCrToList();
-        t.TagSet(type, user);
+        t.Add(type + ": " + user);
+
+        //t.TagSet(type, user);
         SystemInfo = t.SortedDistinctList().JoinWithCr();
     }
 
@@ -1834,7 +1836,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void SystemInfoReset(bool always) {
         if (always || string.IsNullOrEmpty(SystemInfo)) {
-            SystemInfo = "Seit UTC: " + DateTime.Now.ToString5();
+            SystemInfo = "Seit UTC: " + DateTime.UtcNow.ToString5();
         }
     }
 
