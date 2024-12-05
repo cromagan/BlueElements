@@ -22,15 +22,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.eventScriptEditor = new ScriptEditorUserControl();
-            this.ribMain = new RibbonBar();
-            this.tabStart = new TabPage();
-            this.grpAktionen = new GroupBox();
-            this.btnSaveLoad = new Button();
-            this.grpInfos = new GroupBox();
-            this.btnBefehlsUebersicht = new Button();
-            this.grpAusführen = new GroupBox();
-            this.btnAusführen = new Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabStart.SuspendLayout();

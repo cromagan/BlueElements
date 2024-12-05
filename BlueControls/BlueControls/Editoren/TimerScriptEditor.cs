@@ -30,7 +30,7 @@ using BlueScript.Structures;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class TimerScriptEditor : FormWithStatusBar, IUniqueWindow {
+public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
     #region Fields
 
@@ -40,24 +40,9 @@ public sealed partial class TimerScriptEditor : FormWithStatusBar, IUniqueWindow
 
     #region Constructors
 
-    public TimerScriptEditor() {
+    public TimerScriptEditor() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        eventScriptEditor.Enabled = false;
-
-        //var l = new List<string> {
-        //        "In die Variable MENU muss das Menu erstellt werden.",
-        //        "Dies muss folgendes Format sein:",
-        //        "Backen",
-        //        "Backen\\Zutaten",
-        //        "Backen\\Zutaten\\Mehl",
-        //        " ",
-        //        "Parallel dazu kann die Variable Infos erstellt werden.",
-        //        "Freie Texte."
-        //    };
-        //l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
-
-        FormManager.RegisterForm(this);
     }
 
     #endregion
@@ -94,19 +79,10 @@ public sealed partial class TimerScriptEditor : FormWithStatusBar, IUniqueWindow
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
-
-        if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
-            DatabaseScriptEditor._befehlsReferenz.Close();
-            DatabaseScriptEditor._befehlsReferenz.Dispose();
-            DatabaseScriptEditor._befehlsReferenz = null;
-        }
-
         base.OnFormClosing(e);
 
         Object = null; // erst das Item!
     }
-
-    protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
 

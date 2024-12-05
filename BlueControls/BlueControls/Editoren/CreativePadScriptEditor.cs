@@ -31,7 +31,7 @@ using BlueScript.Structures;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDatabase, IUniqueWindow {
+public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasDatabase {
 
     #region Fields
 
@@ -43,26 +43,9 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
     #region Constructors
 
-    public CreativePadScriptEditor() {
+    public CreativePadScriptEditor() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        eventScriptEditor.Enabled = false;
-
-        //var l = new List<string> {
-        //        "In die Variable MENU muss das Menu erstellt werden.",
-        //        "Dies muss folgendes Format sein:",
-        //        "Backen",
-        //        "Backen\\Zutaten",
-        //        "Backen\\Zutaten\\Mehl",
-        //        " ",
-        //        "Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.",
-        //        " ",
-        //        "Parallel dazu kann die Variable Infos erstellt werden.",
-        //        "Freie Texte."
-        //    };
-        //l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
-
-        FormManager.RegisterForm(this);
     }
 
     #endregion
@@ -127,12 +110,6 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
-
-        if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
-            DatabaseScriptEditor._befehlsReferenz.Close();
-            DatabaseScriptEditor._befehlsReferenz.Dispose();
-            DatabaseScriptEditor._befehlsReferenz = null;
-        }
 
         base.OnFormClosing(e);
 

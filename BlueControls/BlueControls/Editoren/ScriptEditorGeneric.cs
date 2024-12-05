@@ -34,28 +34,17 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
 
     #region Fields
 
+    private static Befehlsreferenz? _befehlsReferenz;
     private DynamicSymbolPadItem? _item;
 
     #endregion
 
     #region Constructors
 
-    public ScriptEditorGeneric() {
+    public ScriptEditorGeneric() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         eventScriptEditor.Enabled = false;
-
-        //var l = new List<string> {
-        //        "In die Variable MENU muss das Menu erstellt werden.",
-        //        "Dies muss folgendes Format sein:",
-        //        "Backen",
-        //        "Backen\\Zutaten",
-        //        "Backen\\Zutaten\\Mehl",
-        //        " ",
-        //        "Parallel dazu kann die Variable Infos erstellt werden.",
-        //        "Freie Texte."
-        //    };
-        //l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
 
         FormManager.RegisterForm(this);
     }
@@ -95,10 +84,10 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
-        if (DatabaseScriptEditor._befehlsReferenz is { Visible: true }) {
-            DatabaseScriptEditor._befehlsReferenz.Close();
-            DatabaseScriptEditor._befehlsReferenz.Dispose();
-            DatabaseScriptEditor._befehlsReferenz = null;
+        if (_befehlsReferenz is { Visible: true }) {
+            _befehlsReferenz.Close();
+            _befehlsReferenz.Dispose();
+            _befehlsReferenz = null;
         }
 
         base.OnFormClosing(e);

@@ -16,7 +16,7 @@ using TabControl = BlueControls.Controls.TabControl;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
-    public sealed partial class DatabaseScriptEditor : FormWithStatusBar {
+    public sealed partial class DatabaseScriptEditor  {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {

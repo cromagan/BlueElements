@@ -42,11 +42,9 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
+public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasDatabase {
 
     #region Fields
-
-    public static Befehlsreferenz? _befehlsReferenz;
 
     private bool _allowTemporay;
 
@@ -60,13 +58,10 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
 
     #region Constructors
 
-    public DatabaseScriptEditor() {
+    public DatabaseScriptEditor() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         tbcScriptEigenschaften.Enabled = false;
-        eventScriptEditor.Enabled = false;
-
-        FormManager.RegisterForm(this);
     }
 
     #endregion
@@ -207,14 +202,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
-
-        if (_befehlsReferenz is { Visible: true }) {
-            _befehlsReferenz.Close();
-            _befehlsReferenz.Dispose();
-            _befehlsReferenz = null;
-        }
-
-        base.OnFormClosing(e);
 
         Item = null; // erst das Item!
         Database = null;
