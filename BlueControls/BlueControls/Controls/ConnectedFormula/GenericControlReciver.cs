@@ -322,15 +322,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected string FilterHash() {
-        if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) { return "NoFilter"; }
+        if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) { return ("NoFilter|" + Mode).GetHashString(); }
 
         if (!fc.IsOk()) { return string.Empty; }
 
-        if (fc.HasAlwaysFalse()) { return "FALSE"; }
+        if (fc.HasAlwaysFalse()) { return ("FALSE|" + Mode).GetHashString(); }
         var fn = (FilterCollection)fc.Clone("Normalize");
         fn.Normalize();
 
-        var n = "F" + fn.ParseableItems().FinishParseable().GetHashString();
+        var n = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetHashString();
         fn.Dispose();
 
         return n;

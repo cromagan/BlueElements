@@ -212,9 +212,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public string SheetStyle {
-        get => _sheetStyle;
+        get {
+            if (Parent is IStyleable ist) { return ist.SheetStyle; }
+            return _sheetStyle;
+        }
         set {
             if (IsDisposed) { return; }
+
+            if (Parent is IStyleable ist) { value = ist.SheetStyle; }
+
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             OnStyleChanged();
@@ -1085,6 +1091,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             thisIt.PropertyChanged -= Item_PropertyChanged;
             thisIt.Dispose();
         }
+        UnRegisterEvents();
 
         Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
         Connections.RemoveAll();
@@ -1149,6 +1156,21 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         #endregion
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged += Icpi_StyleChanged;
+        }
+
+        Icpi_StyleChanged(Parent, System.EventArgs.Empty);
+    }
+
+    protected override void OnParentChanging() {
+        base.OnParentChanging();
+        UnRegisterEvents();
     }
 
     private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -1244,6 +1266,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
+    private void Icpi_StyleChanged(object? sender, System.EventArgs e) {
+        if (sender is IStyleable ist) {
+            SheetStyle = ist.SheetStyle;
+        }
+    }
+
     private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
 
     private void OnItemAdded() {
@@ -1285,6 +1313,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                     break;
             }
+        }
+    }
+
+    private void UnRegisterEvents() {
+        if (Parent is ItemCollectionPadItem icpi) {
+            icpi.StyleChanged -= Icpi_StyleChanged;
         }
     }
 
