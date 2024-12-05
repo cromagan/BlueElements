@@ -89,6 +89,12 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
 
         if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
 
+        if (newrow is { } r) {
+            RowCollection.InvalidatedRows.AddIfNotExists(newrow);
+            if (scp.AdditionalInfo is RowItem masterRow && r.Database is { } db) {
+                masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Zugehöriger Eintrag: {r.CellFirstString()} ({db.Caption})");
+            }
+        }
         return Method_Row.RowToObjectFeedback(newrow);
     }
 

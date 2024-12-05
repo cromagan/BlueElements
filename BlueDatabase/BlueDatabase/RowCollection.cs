@@ -212,7 +212,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (r.NeedsRowUpdate(false, true)) {
                     if (masterRow?.Database != null) {
                         r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n.ToStringInt2()} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
+                        masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
                     } else {
                         r.UpdateRow(extendedAllowed, true, "Normales Update");
                     }
