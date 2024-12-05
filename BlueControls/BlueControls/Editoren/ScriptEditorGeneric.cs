@@ -28,19 +28,11 @@ using BlueControls.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using FastColoredTextBoxNS;
-
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-
-using BlueControls.ItemCollectionList;
-
-using BlueScript.Methods;
-
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public abstract partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenu {
+public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenu {
 
     #region Fields
 
@@ -76,7 +68,7 @@ public abstract partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWi
 
     #region Properties
 
-    public abstract object? Object { get; set; }
+    public virtual object? Object { get; set; }
 
     public string Script {
         get => txtSkript.Text.TrimEnd(" ");
@@ -97,7 +89,8 @@ public abstract partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWi
         OnContextMenuItemClicked(e);
     }
 
-    public abstract ScriptEndedFeedback ExecuteScript(bool testmode);
+    public virtual ScriptEndedFeedback ExecuteScript(bool testmode) =>
+        new ScriptEndedFeedback("Fehler", false, false, "Unbekannt");
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
@@ -132,7 +125,7 @@ public abstract partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWi
         Message(f.AllOk ? "Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden." : f.ProtocolText);
     }
 
-    public abstract void WriteInfosBack();
+    public virtual void WriteInfosBack() { }
 
     protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 

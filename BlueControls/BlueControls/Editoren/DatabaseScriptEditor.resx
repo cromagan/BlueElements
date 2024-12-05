@@ -117,9 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="chkAuslöser_valuechanged.QuickInfo" xml:space="preserve">
-    <value>Das Skript wird nach dem Ändern eines
-Wertes einer Zelle ausgeführt.
+  <data name="chkExtendend.QuickInfo" xml:space="preserve">
+    <value>Ob das Skript im erweiteren oder normalen Modus ausgeführt werden soll.
+
+Nur bei "Wert geändert" verfügbar
 
 Dieses Skript unterstützt zwei Ausführungsarten:
 Einfach und Erweitert.
@@ -129,10 +130,9 @@ Erweitert darf länger dauern und den benutzer unterbrechen. Es wurd nach Schlü
 
 In welchen Modus sich das Skript befindet, kann mit der Variable 'Extended' abgefragt werden.</value>
   </data>
-  <data name="chkExtendend.QuickInfo" xml:space="preserve">
-    <value>Ob das Skript im erweiteren oder normalen Modus ausgeführt werden soll.
-
-Nur bei "Wert geändert" verfügbar
+  <data name="chkAuslöser_valuechanged.QuickInfo" xml:space="preserve">
+    <value>Das Skript wird nach dem Ändern eines
+Wertes einer Zelle ausgeführt.
 
 Dieses Skript unterstützt zwei Ausführungsarten:
 Einfach und Erweitert.

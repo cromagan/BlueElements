@@ -197,7 +197,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     #region Methods
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
-        if (IsDisposed || Database is not { IsDisposed: false }) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) {
             return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
         }
 
@@ -206,7 +206,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         }
 
         if (!_item.IsOk()) {
-            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
+            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false,
+                "Allgemein");
         }
 
         WriteInfosBack();
@@ -214,27 +215,31 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         RowItem? r = null;
 
         if (_item.NeedRow) {
-            if (Database.Row.Count == 0) {
-                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
-            }
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
+            if (db.Row.Count == 0) {
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false,
+                    "Allgemein");
             }
 
-            r = Database?.Row[txbTestZeile.Text];
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = db.Row.First()?.CellFirstString() ?? string.Empty;
+            }
+
+            r = db.Row[txbTestZeile.Text];
             if (r is not { IsDisposed: false }) {
                 return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             }
         }
 
         if (!testmode) {
-            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return null; }
+            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
+                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
+            }
         }
 
         var ext = chkExtendend is { Checked: true, Visible: true };
 
         _allowTemporay = true;
-        var f = Database?.ExecuteScript(_item, !testmode, r, null, true, ext);
+        var f = db.ExecuteScript(_item, !testmode, r, null, true, ext);
         _allowTemporay = false;
 
         return f;

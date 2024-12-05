@@ -94,7 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.Controls.Add(this.btnSaveLoad);
             this.grpAktionen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAktionen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAktionen.Location = new System.Drawing.Point(152, 3);
+            this.grpAktionen.Location = new System.Drawing.Point(160, 3);
             this.grpAktionen.Name = "grpAktionen";
             this.grpAktionen.Size = new System.Drawing.Size(64, 75);
             this.grpAktionen.TabIndex = 2;
@@ -121,17 +121,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpInfos.Location = new System.Drawing.Point(72, 3);
             this.grpInfos.Name = "grpInfos";
-            this.grpInfos.Size = new System.Drawing.Size(80, 75);
+            this.grpInfos.Size = new System.Drawing.Size(88, 75);
             this.grpInfos.TabIndex = 1;
             this.grpInfos.TabStop = false;
             this.grpInfos.Text = "Infos";
             // 
             // btnBefehlsUebersicht
             // 
-            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(0, 2);
+            this.btnBefehlsUebersicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnBefehlsUebersicht.ImageCode = "Bruchlinie";
+            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(8, 2);
             this.btnBefehlsUebersicht.Name = "btnBefehlsUebersicht";
-            this.btnBefehlsUebersicht.Size = new System.Drawing.Size(0, 22);
+            this.btnBefehlsUebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 0;
+            this.btnBefehlsUebersicht.Text = "Befehls-übersicht";
             // 
             // grpAusführen
             // 
@@ -253,6 +256,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txtSkript.Size = new System.Drawing.Size(689, 219);
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
+            this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
+            this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             // 
             // grpVariablen
             // 
@@ -323,22 +328,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ResumeLayout(false);
 
         }
-        public RibbonBar ribMain;
-        public TabPage tabStart;
-        public GroupBox grpInfos;
-        private Button btnBefehlsUebersicht;
-        public GroupBox grpAusführen;
-        public GroupBox grpAktionen;
-        private Button btnSaveLoad;
-        private Button btnAusführen;
-        public Controls.TabControl tbcScriptEigenschaften;
-        private TabPage tabScriptEditor;
-        private SplitContainer splitContainer1;
-        private GroupBox grpCode;
-        private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
-        private System.ComponentModel.IContainer components;
-        private VariableEditor grpVariablen;
-        private GroupBox grpAusgabeFenster;
-        private Controls.TextBox txbSkriptInfo;
+        protected RibbonBar ribMain;
+        protected TabPage tabStart;
+        protected GroupBox grpInfos;
+        protected Button btnBefehlsUebersicht;
+        protected GroupBox grpAusführen;
+        protected GroupBox grpAktionen;
+        protected Button btnSaveLoad;
+        protected Button btnAusführen;
+        protected Controls.TabControl tbcScriptEigenschaften;
+        protected TabPage tabScriptEditor;
+        protected SplitContainer splitContainer1;
+        protected GroupBox grpCode;
+        protected FastColoredTextBoxNS.FastColoredTextBox txtSkript;
+        protected System.ComponentModel.IContainer components;
+        protected VariableEditor grpVariablen;
+        protected GroupBox grpAusgabeFenster;
+        protected Controls.TextBox txbSkriptInfo;
     }
 }
