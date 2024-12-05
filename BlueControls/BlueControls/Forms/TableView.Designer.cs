@@ -128,7 +128,6 @@ namespace BlueControls.Forms {
             // 
             this.capStatusBar.Location = new System.Drawing.Point(304, 0);
             this.capStatusBar.Size = new System.Drawing.Size(1025, 24);
-            this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
             // 
             // pnlStatusBar
             // 

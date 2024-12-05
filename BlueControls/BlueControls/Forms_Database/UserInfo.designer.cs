@@ -25,11 +25,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new Size(853, 24);
-            this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
-            // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new Point(0, 416);

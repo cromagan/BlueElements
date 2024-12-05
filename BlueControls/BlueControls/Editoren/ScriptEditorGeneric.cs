@@ -30,7 +30,7 @@ using BlueScript.Structures;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class TimerScriptEditor : FormWithStatusBar, IUniqueWindow {
+public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
 
     #region Fields
 
@@ -40,7 +40,7 @@ public sealed partial class TimerScriptEditor : FormWithStatusBar, IUniqueWindow
 
     #region Constructors
 
-    public TimerScriptEditor() {
+    public ScriptEditorGeneric() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         eventScriptEditor.Enabled = false;
@@ -109,6 +109,15 @@ public sealed partial class TimerScriptEditor : FormWithStatusBar, IUniqueWindow
     protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
+
+    private void btnSave_Click(object sender, System.EventArgs e) {
+        btnSaveLoad.Enabled = false;
+
+        WriteInfosBack();
+        MultiUserFile.SaveAll(false);
+
+        btnSaveLoad.Enabled = true;
+    }
 
     private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
         if (IsDisposed) {

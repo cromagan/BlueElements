@@ -30,7 +30,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             ComponentResourceManager resources = new ComponentResourceManager(typeof(DatabaseScriptEditor));
-            this.eventScriptEditor = new ScriptEditor();
             this.tbcScriptEigenschaften = new TabControl();
             this.tabSkriptEditor = new TabPage();
             this.tabKopfdaten = new TabPage();
@@ -59,18 +58,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cpZeile = new Caption();
             this.txbTestZeile = new TextBox();
             this.btnVersionErhöhen = new Button();
-            this.ribMain = new RibbonBar();
-            this.tabStart = new TabPage();
-            this.grpAktionen = new GroupBox();
-            this.btnSaveLoad = new Button();
-            this.grpInfos = new GroupBox();
             this.btnDatenbankKopf = new Button();
             this.btnSpaltenuebersicht = new Button();
-            this.btnBefehlsUebersicht = new Button();
             this.btnZusatzDateien = new Button();
-            this.grpAusführen = new GroupBox();
             this.chkExtendend = new Button();
-            this.btnAusführen = new Button();
             this.btnTest = new Button();
             this.chkAuslöser_Fehlerfrei = new Button();
             this.pnlStatusBar.SuspendLayout();
@@ -87,11 +78,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new Size(1060, 24);
-            this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
             // 
             // pnlStatusBar
             // 
@@ -449,64 +435,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnVersionErhöhen.Text = "Version erhöhen";
             this.btnVersionErhöhen.Click += new EventHandler(this.btnVersionErhöhen_Click);
             // 
-            // ribMain
-            // 
-            this.ribMain.Controls.Add(this.tabStart);
-            this.ribMain.Dock = DockStyle.Top;
-            this.ribMain.HotTrack = true;
-            this.ribMain.Location = new Point(0, 0);
-            this.ribMain.Name = "ribMain";
-            this.ribMain.SelectedIndex = 0;
-            this.ribMain.Size = new Size(1297, 110);
-            this.ribMain.TabDefault = null;
-            this.ribMain.TabDefaultOrder = new string[0];
-            this.ribMain.TabIndex = 97;
-            // 
-            // tabStart
-            // 
-            this.tabStart.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabStart.Controls.Add(this.grpAktionen);
-            this.tabStart.Controls.Add(this.grpInfos);
-            this.tabStart.Controls.Add(this.grpAusführen);
-            this.tabStart.Location = new Point(4, 25);
-            this.tabStart.Name = "tabStart";
-            this.tabStart.Padding = new Padding(3);
-            this.tabStart.Size = new Size(1289, 81);
-            this.tabStart.TabIndex = 0;
-            this.tabStart.Text = "Start";
-            // 
-            // grpAktionen
-            // 
-            this.grpAktionen.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAktionen.Controls.Add(this.btnSaveLoad);
-            this.grpAktionen.Controls.Add(this.btnVersionErhöhen);
-            this.grpAktionen.Dock = DockStyle.Left;
-            this.grpAktionen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            this.grpAktionen.Location = new Point(800, 3);
-            this.grpAktionen.Name = "grpAktionen";
-            this.grpAktionen.Size = new Size(208, 75);
-            this.grpAktionen.TabIndex = 2;
-            this.grpAktionen.TabStop = false;
-            this.grpAktionen.Text = "Aktionen";
-            // 
-            // btnSaveLoad
-            // 
-            this.btnSaveLoad.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            this.btnSaveLoad.ImageCode = "Diskette|16";
-            this.btnSaveLoad.Location = new Point(8, 2);
-            this.btnSaveLoad.Name = "btnSaveLoad";
-            this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";
-            this.btnSaveLoad.Size = new Size(48, 66);
-            this.btnSaveLoad.TabIndex = 45;
-            this.btnSaveLoad.Text = "Daten aktual.";
-            this.btnSaveLoad.Click += new EventHandler(this.btnSave_Click);
-            // 
             // grpInfos
             // 
             this.grpInfos.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpInfos.Controls.Add(this.btnDatenbankKopf);
             this.grpInfos.Controls.Add(this.btnSpaltenuebersicht);
-            this.grpInfos.Controls.Add(this.btnBefehlsUebersicht);
             this.grpInfos.Controls.Add(this.btnZusatzDateien);
             this.grpInfos.Dock = DockStyle.Left;
             this.grpInfos.GroupBoxStyle = GroupBoxStyle.RibbonBar;
@@ -539,24 +472,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSpaltenuebersicht.Text = "Spalten-Übersicht";
             this.btnSpaltenuebersicht.Click += new EventHandler(this.btnSpaltenuebersicht_Click);
             // 
-            // btnBefehlsUebersicht
-            // 
-            this.btnBefehlsUebersicht.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            this.btnBefehlsUebersicht.ImageCode = "Tabelle|16";
-            this.btnBefehlsUebersicht.Location = new Point(208, 2);
-            this.btnBefehlsUebersicht.Name = "btnBefehlsUebersicht";
-            this.btnBefehlsUebersicht.Size = new Size(64, 66);
-            this.btnBefehlsUebersicht.TabIndex = 4;
-            this.btnBefehlsUebersicht.Text = "Befehls-Übersicht";
-            this.btnBefehlsUebersicht.Click += new EventHandler(DatabaseScriptEditor.btnBefehlsUebersicht_Click);
-            // 
             // btnZusatzDateien
             // 
             this.btnZusatzDateien.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             this.btnZusatzDateien.ImageCode = "Ordner|16";
             this.btnZusatzDateien.Location = new Point(144, 2);
             this.btnZusatzDateien.Name = "btnZusatzDateien";
-            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdatein öffnen.\r\nIn diesen können z.B. Skript-Routinen enthal" +
+            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdateien öffnen.\r\nIn diesen können z.B. Skript-Routinen enthal" +
     "ten sein\r\ndie mit CallByFilename aufgerufen werden können.";
             this.btnZusatzDateien.Size = new Size(64, 66);
             this.btnZusatzDateien.TabIndex = 5;
@@ -565,20 +487,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // grpAusführen
             // 
-            this.grpAusführen.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAusführen.Controls.Add(this.chkExtendend);
-            this.grpAusführen.Controls.Add(this.btnAusführen);
             this.grpAusführen.Controls.Add(this.btnTest);
             this.grpAusführen.Controls.Add(this.txbTestZeile);
             this.grpAusführen.Controls.Add(this.cpZeile);
-            this.grpAusführen.Dock = DockStyle.Left;
-            this.grpAusführen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            this.grpAusführen.Location = new Point(3, 3);
-            this.grpAusführen.Name = "grpAusführen";
-            this.grpAusführen.Size = new Size(517, 75);
-            this.grpAusführen.TabIndex = 0;
-            this.grpAusführen.TabStop = false;
-            this.grpAusführen.Text = "Ausführen";
             // 
             // chkExtendend
             // 
@@ -593,14 +505,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnAusführen
             // 
-            this.btnAusführen.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            this.btnAusführen.ImageCode = "Abspielen|16|||FFFF00||||||Warnung";
-            this.btnAusführen.Location = new Point(64, 2);
-            this.btnAusführen.Name = "btnAusführen";
-            this.btnAusführen.QuickInfo = "Werte werden dauerhaft in\r\nden Datenbanken verändert!";
-            this.btnAusführen.Size = new Size(60, 66);
-            this.btnAusführen.TabIndex = 3;
-            this.btnAusführen.Text = "Aus-führen";
             this.btnAusführen.Click += new EventHandler(this.btnAusführen_Click);
             // 
             // btnTest
@@ -632,7 +536,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ClientSize = new Size(1297, 677);
             this.Controls.Add(this.tbcScriptEigenschaften);
             this.Controls.Add(this.grpVerfügbareSkripte);
-            this.Controls.Add(this.ribMain);
             this.MinimizeBox = false;
             this.Name = "DatabaseScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
@@ -659,7 +562,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
         private GroupBox grpVerfügbareSkripte;
         private ListBox lstEventScripts;
-        private ScriptEditor eventScriptEditor;
         private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;
         private Button chkAuslöser_newrow;
@@ -673,21 +575,13 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkAuslöser_export;
         private Button btnVersionErhöhen;
         private Button btnVerlauf;
-        private RibbonBar ribMain;
-        private TabPage tabStart;
-        private GroupBox grpInfos;
-        private Button btnBefehlsUebersicht;
         private Button btnZusatzDateien;
-        private GroupBox grpAusführen;
         private Button btnTest;
-        private GroupBox grpAktionen;
         private TabControl tbcScriptEigenschaften;
         private TabPage tabKopfdaten;
         private TabPage tabSkriptEditor;
-        private Button btnSaveLoad;
         private Button btnSpaltenuebersicht;
         private Button btnDatenbankKopf;
-        private Button btnAusführen;
         private GroupBox grpAuslöser;
         private GroupBox grpRechte;
         private GroupBox grpEigenschaften;

@@ -205,17 +205,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
 
     #region Methods
 
-    public static void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
-        if (_befehlsReferenz is { Visible: true }) {
-            _befehlsReferenz.Close();
-            _befehlsReferenz.Dispose();
-            _befehlsReferenz = null;
-        }
-
-        _befehlsReferenz = new Befehlsreferenz();
-        _befehlsReferenz.Show();
-    }
-
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
@@ -292,17 +281,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase, IUniqueWindow {
     }
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
-
-    private void btnSave_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-
-        btnSaveLoad.Enabled = false;
-
-        WriteInfosBack();
-        _ = db.Save();
-
-        btnSaveLoad.Enabled = true;
-    }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 

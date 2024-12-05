@@ -73,11 +73,6 @@ namespace BlueControls.Forms {
             this.tabRightSide.SuspendLayout();
             this.SuspendLayout();
             // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new Size(512, 24);
-            this.capStatusBar.Text = "<imagecode=Häkchen|16> Nix besonderes zu berichten...";
-            // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new Point(0, 337);

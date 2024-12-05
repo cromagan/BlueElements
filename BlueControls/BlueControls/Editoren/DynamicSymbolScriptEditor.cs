@@ -110,15 +110,6 @@ public sealed partial class DynamicSymbolScriptEditor : FormWithStatusBar, IUniq
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
 
-    private void btnSave_Click(object sender, System.EventArgs e) {
-        btnSaveLoad.Enabled = false;
-
-        WriteInfosBack();
-        MultiUserFile.SaveAll(false);
-
-        btnSaveLoad.Enabled = true;
-    }
-
     private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
         if (IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");

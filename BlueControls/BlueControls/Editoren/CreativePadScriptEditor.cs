@@ -150,15 +150,6 @@ public sealed partial class CreativePadScriptEditor : FormWithStatusBar, IHasDat
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
-    private void btnSave_Click(object sender, System.EventArgs e) {
-        btnSaveLoad.Enabled = false;
-
-        WriteInfosBack();
-        MultiUserFile.SaveAll(false);
-
-        btnSaveLoad.Enabled = true;
-    }
-
     private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false }) {
             e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");

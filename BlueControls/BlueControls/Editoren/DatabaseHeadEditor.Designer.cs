@@ -79,11 +79,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpUndoActions.SuspendLayout();
             this.SuspendLayout();
             // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new Size(1244, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
-            // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new Point(0, 732);
