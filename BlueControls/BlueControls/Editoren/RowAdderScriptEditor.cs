@@ -21,14 +21,11 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
-using BlueScript.EventArgs;
 using BlueScript.Structures;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
@@ -88,7 +85,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
         }
     }
 
-    public object? Object {
+    public override object? Object {
         get {
             if (IsDisposed) { return null; }
 
@@ -103,12 +100,12 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
             _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
 
             if (value is RowAdderPadItem cpi) {
-                eventScriptEditor.Enabled = true;
-                eventScriptEditor.Script = cpi.Script;
+                tbcScriptEigenschaften.Enabled = true;
+                Script = cpi.Script;
                 _item = cpi;
             } else {
-                eventScriptEditor.Enabled = false;
-                eventScriptEditor.Script = string.Empty;
+                tbcScriptEigenschaften.Enabled = false;
+                Script = string.Empty;
             }
         }
     }
@@ -127,6 +124,44 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
 
     #region Methods
 
+    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+        if (IsDisposed || Database is not { IsDisposed: false }) {
+            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
+        }
+
+        if (_item == null) {
+            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+        }
+
+        WriteInfosBack();
+
+        if (!_item.IsOk()) {
+            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
+        }
+
+        if (Database.Row.Count == 0) {
+            return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+        }
+        if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+            txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
+        }
+
+        var r = Database?.Row[txbTestZeile.Text];
+        if (r is not { IsDisposed: false }) {
+            return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
+        }
+
+        return RowAdder.ExecuteScript(_item.Script, "Testmodus", _item.EntityID, r);
+    }
+
+    public override void WriteInfosBack() {
+        //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
+
+        if (_item != null) {
+            _item.Script = Script;
+        }
+    }
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
@@ -140,52 +175,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
         Close();
     }
 
-    private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
-
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
-
-    private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false }) {
-            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
-            return;
-        }
-
-        if (_item == null) {
-            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
-            return;
-        }
-
-        WriteInfosBack();
-
-        if (!_item.IsOk()) {
-            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
-            return;
-        }
-
-        if (Database.Row.Count == 0) {
-            e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
-            return;
-        }
-        if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-            txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
-        }
-
-        var r = Database?.Row[txbTestZeile.Text];
-        if (r is not { IsDisposed: false }) {
-            e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
-            return;
-        }
-
-        e.Feedback = RowAdder.ExecuteScript(_item.Script, "Testmodus", _item.EntityID, r);
-    }
-
-    private void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
-
-        if (_item != null) {
-            _item.Script = eventScriptEditor.Script;
-        }
-    }
 
     #endregion
 }

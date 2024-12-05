@@ -64,7 +64,6 @@
     <Compile Include="ScriptDescription.cs" />
     <Compile Include="Enums\MethodType.cs" />
     <Compile Include="Enums\ScriptIssueType.cs" />
-    <Compile Include="EventArgs\ScriptEventArgs.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Methods\Method_AddPrefix.cs" />
@@ -165,6 +164,7 @@
     <Compile Include="Variables\Variable.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="EventArgs\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
   <ItemGroup>

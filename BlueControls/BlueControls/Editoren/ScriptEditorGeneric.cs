@@ -18,24 +18,41 @@
 #nullable enable
 
 using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad;
-using BlueScript.EventArgs;
+using BlueScript.Methods;
 using BlueScript.Structures;
+using FastColoredTextBoxNS;
+
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+
+using BlueControls.ItemCollectionList;
+
+using BlueScript.Methods;
+
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
+public abstract partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenu {
 
     #region Fields
 
     private static Befehlsreferenz? _befehlsReferenz;
-    private DynamicSymbolPadItem? _item;
+
+    private string _lastVariableContent = string.Empty;
+
+    private string? _lastWord = string.Empty;
+
+    private bool _menuDone;
+
+    private AutocompleteMenu? _popupMenu;
 
     #endregion
 
@@ -44,42 +61,80 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
     public ScriptEditorGeneric() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        eventScriptEditor.Enabled = false;
-
-        FormManager.RegisterForm(this);
+        tabScriptEditor.Enabled = false;
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
+
+    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 
     #region Properties
 
-    public object? Object {
-        get {
-            if (IsDisposed) { return null; }
-            return _item;
-        }
-        set {
-            if (value is not DynamicSymbolPadItem) { value = null; }
-            if (_item == value) { return; }
+    public abstract object? Object { get; set; }
 
-            WriteInfosBack();
-
-            _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
-
-            if (value is DynamicSymbolPadItem cpi) {
-                eventScriptEditor.Enabled = true;
-                eventScriptEditor.Script = cpi.Script;
-                _item = cpi;
-            } else {
-                eventScriptEditor.Enabled = false;
-                eventScriptEditor.Script = string.Empty;
-            }
-        }
+    public string Script {
+        get => txtSkript.Text.TrimEnd(" ");
+        set => txtSkript.Text = value.TrimEnd(" ") + "    ";
     }
 
     #endregion
 
     #region Methods
+
+    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
+        switch (e.Item.KeyName.ToLowerInvariant()) {
+            case "variableninhalt kopieren":
+                _ = Generic.CopytoClipboard(_lastVariableContent);
+                return;
+        }
+
+        OnContextMenuItemClicked(e);
+    }
+
+    public abstract ScriptEndedFeedback ExecuteScript(bool testmode);
+
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        if (!string.IsNullOrEmpty(_lastVariableContent)) {
+            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren"));
+        }
+
+        OnContextMenuInit(e);
+    }
+
+    public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
+
+    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+    public void TesteScript(bool testmode) {
+        Message("Starte Skript");
+
+        grpVariablen.Clear();
+
+        var f = ExecuteScript(testmode);
+
+        //if (f == null) {
+        //    var m = Method.GetMethods(MethodType.Standard | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
+
+        //    var scp = new ScriptProperties("Skript-Editor: " + f., m, false, [], null, 0);
+        //    var s = new Script(null, scp);
+        //    f = s.Parse(0, "Main", null);
+        //}
+
+        grpVariablen.ToEdit = f.Variables;
+        WriteCommandsToList();
+
+        Message(f.AllOk ? "Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden." : f.ProtocolText);
+    }
+
+    public abstract void WriteInfosBack();
+
+    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
@@ -91,13 +146,9 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
         }
 
         base.OnFormClosing(e);
-
-        Object = null; // erst das Item!
     }
 
-    protected override void OnLoad(System.EventArgs e) => base.OnLoad(e);//var didMessage = false;//var im = QuickImage.Images();//foreach (var thisIm in im) {//    cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));//}//lstEventScripts.ItemClear();//if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }//foreach (var thisSet in Database.EventScript) {//    if (thisSet != null) {//        var cap = "Sonstige";//        if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }//        var it = ItemOf(thisSet);//        it.UserDefCompareKey = cap + Constants.SecondSortChar;//        lstEventScripts.ItemAdd(it);//        if (lstEventScripts[cap] == null) {//            lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + Constants.FirstSortChar));//        }//        if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {//            didMessage = true;//            EnableScript();//        }//    }//}
-
-    private void btnAusführen_Click(object sender, System.EventArgs e) => eventScriptEditor.TesteScript("MAIN");
+    private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;
@@ -108,49 +159,66 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow {
         btnSaveLoad.Enabled = true;
     }
 
-    private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
-        if (IsDisposed) {
-            e.Feedback = new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
-            return;
+    private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
+        if (e.Button == MouseButtons.Right) {
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _lastWord, e);
         }
-
-        if (_item == null) {
-            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
-            return;
-        }
-
-        WriteInfosBack();
-
-        //if (!_item.IsOk()) {
-        //    e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
-        //    return;
-        //}
-
-        //if (Database.Row.Count == 0) {
-        //    e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
-        //    return;
-        //}
-        //if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-        //    txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
-        //}
-
-        //RowItem? r = Database?.Row[txbTestZeile.Text];
-        //if (r is not { IsDisposed: false }) {
-        //    e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
-        //    return;
-        //}
-
-        var r = _item.UsedArea.ToRect();
-        using var bmp = new Bitmap(Math.Max(r.Width, 16), Math.Max(r.Height, 16));
-
-        e.Feedback = DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp);
     }
 
-    private void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
+    private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
+        try {
+            _lastWord = string.Empty;
+            _lastVariableContent = string.Empty;
+            foreach (var thisc in Method.AllMethods) {
+                if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
+                    e.ToolTipTitle = thisc.Syntax;
+                    e.ToolTipText = thisc.HintText();
+                    return;
+                }
+            }
 
-        if (_item != null) {
-            _item.Script = eventScriptEditor.Script;
+            var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
+            _lastWord = hoveredWordnew;
+
+            var r = grpVariablen.RowOfVariable(hoveredWordnew);
+
+            //foreach (var r in tableVariablen.Database.Row) {
+            if (r is { IsDisposed: false }) {
+                //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.OrdinalIgnoreCase)) {
+                var inh = r.CellGetString("Inhalt");
+                _lastVariableContent = inh;
+                inh = inh.Replace("\r", ";");
+                inh = inh.Replace("\n", ";");
+                if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
+                var ro = string.Empty;
+                if (r.CellGetBoolean("RO")) { ro = "[ReadOnly] "; }
+
+                e.ToolTipTitle = ro + "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
+                e.ToolTipText = r.CellGetString("Kommentar") + " ";
+            }
+        } catch (Exception ex) {
+            Develop.DebugPrint("Fehler beim Tooltip generieren", ex);
+        }
+    }
+
+    private void WriteCommandsToList() {
+        if (!_menuDone) {
+            _menuDone = true;
+            _popupMenu = new AutocompleteMenu(txtSkript) {
+                //popupMenu.Items.ImageList = imageList1;
+                SearchPattern = @"[\w\.:=!<>]",
+                AllowTabKey = true
+            };
+            List<AutocompleteItem> items = [];
+            foreach (var thisc in Method.AllMethods) {
+                items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
+                items.Add(new AutocompleteItem(thisc.Command));
+                if (!string.IsNullOrEmpty(thisc.Returns)) {
+                    items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
+                }
+            }
+            //set as autocomplete source
+            _popupMenu.Items.SetAutocompleteItems(items);
         }
     }
 

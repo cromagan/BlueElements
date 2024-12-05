@@ -28,12 +28,10 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript.EventArgs;
 using BlueScript.Structures;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
@@ -51,8 +49,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private Database? _database;
 
     private DatabaseScriptDescription? _item;
-
-    private bool _testmode = true;
 
     #endregion
 
@@ -122,7 +118,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
             if (value != null) {
                 tbcScriptEigenschaften.Enabled = true;
-                eventScriptEditor.Enabled = true;
+                tbcScriptEigenschaften.Enabled = true;
                 txbName.Text = value.KeyName;
                 txbQuickInfo.Text = value.QuickInfo;
 
@@ -140,7 +136,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 chkAuslöser_Fehlerfrei.Checked = value.EventTypes.HasFlag(ScriptEventTypes.correct_changed);
                 //chkAendertWerte.Checked = value.ChangeValues;
-                eventScriptEditor.Script = value.Script;
+                Script = value.Script;
 
                 lstPermissionExecute.ItemClear();
                 var l = Table.Permission_AllUsed(false).ToList();
@@ -155,13 +151,13 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 btnVerlauf.Enabled = _item != null;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
-                eventScriptEditor.Enabled = false;
+                tbcScriptEigenschaften.Enabled = false;
                 txbTestZeile.Enabled = false;
 
                 txbName.Text = string.Empty;
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
-                eventScriptEditor.Script = string.Empty;
+                Script = string.Empty;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_prepaireformula.Checked = false;
@@ -175,7 +171,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         }
     }
 
-    public object? Object {
+    public override object? Object {
         get => Database;
         set {
             if (value is Database db) {
@@ -199,6 +195,80 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     #endregion
 
     #region Methods
+
+    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+        if (IsDisposed || Database is not { IsDisposed: false }) {
+            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
+        }
+
+        if (_item == null) {
+            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+        }
+
+        if (!_item.IsOk()) {
+            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
+        }
+
+        WriteInfosBack();
+
+        RowItem? r = null;
+
+        if (_item.NeedRow) {
+            if (Database.Row.Count == 0) {
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+            }
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
+            }
+
+            r = Database?.Row[txbTestZeile.Text];
+            if (r is not { IsDisposed: false }) {
+                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
+            }
+        }
+
+        if (!testmode) {
+            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return null; }
+        }
+
+        var ext = chkExtendend is { Checked: true, Visible: true };
+
+        _allowTemporay = true;
+        var f = Database?.ExecuteScript(_item, !testmode, r, null, true, ext);
+        _allowTemporay = false;
+
+        return f;
+    }
+
+    //    switch (e.Item.ToLowerInvariant()) {
+    //        case "spalteneigenschaftenbearbeiten":
+    //            if (c != null && !c.IsDisposed) {
+    //                TableView.OpenColumnEditor(c, null, null);
+    //            }
+    public override void WriteInfosBack() {
+        if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database is not
+            {
+                IsDisposed: false
+            }) { return; }
+
+        if (_item != null) {
+            _item.Script = Script;
+        }
+
+        #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
+
+        var t2 = new List<DatabaseScriptDescription>();
+
+        foreach (var thisItem in lstEventScripts.Items) {
+            if (thisItem is ReadableListItem { Item: DatabaseScriptDescription dbs }) { t2.Add(dbs); }
+        }
+
+        //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
+        Database.EventScript = new(t2);
+        Database.ScriptNeedFix = string.Empty;
+
+        #endregion
+    }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
@@ -262,18 +332,12 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         capFehler.Text = "<imagecode=Warnung|16> " + _item.ErrorReason();
     }
 
-    private void btnAusführen_Click(object sender, System.EventArgs e) {
-        _testmode = false;
-        eventScriptEditor.TesteScript(txbName.Text);
-    }
-
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void btnTest_Click(object sender, System.EventArgs e) {
-        _testmode = true;
-        eventScriptEditor.TesteScript(txbName.Text);
+        TesteScript(true);
     }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {
@@ -394,53 +458,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         return true;
     }
 
-    private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false }) {
-            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
-            return;
-        }
-
-        if (_item == null) {
-            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
-            return;
-        }
-
-        if (!_item.IsOk()) {
-            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
-            return;
-        }
-
-        WriteInfosBack();
-
-        RowItem? r = null;
-
-        if (_item.NeedRow) {
-            if (Database.Row.Count == 0) {
-                e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
-                return;
-            }
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
-            }
-
-            r = Database?.Row[txbTestZeile.Text];
-            if (r is not { IsDisposed: false }) {
-                e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
-                return;
-            }
-        }
-
-        if (!_testmode) {
-            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
-        }
-
-        var ext = chkExtendend is { Checked: true, Visible: true };
-
-        _allowTemporay = true;
-        e.Feedback = Database?.ExecuteScript(_item, !_testmode, r, null, true, ext);
-        _allowTemporay = false;
-    }
-
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
 
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
@@ -476,19 +493,11 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         _item.PropertyChanged += _item_PropertyChanged;
     }
 
-    private void ScriptEditor_PropertyChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.Script = eventScriptEditor.Script;
-    }
-
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.KeyName = txbName.Text;
     }
 
-    //            break;
-    //    }
-    //}
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.QuickInfo = txbQuickInfo.Text;
@@ -499,6 +508,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         _item.PropertyChanged -= _item_PropertyChanged;
     }
+
+    #endregion
 
     //private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
     //    //Todo: Implementieren
@@ -514,36 +525,4 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     //    ColumnItem? c = null;
 
     //    if (e.HotItem is string txt) { c = Database?.Column[txt); }
-
-    //    switch (e.Item.ToLowerInvariant()) {
-    //        case "spalteneigenschaftenbearbeiten":
-    //            if (c != null && !c.IsDisposed) {
-    //                TableView.OpenColumnEditor(c, null, null);
-    //            }
-    private void WriteInfosBack() {
-        if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database is not
-            {
-                IsDisposed: false
-            }) { return; }
-
-        if (_item != null) {
-            _item.Script = eventScriptEditor.Script;
-        }
-
-        #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
-
-        var t2 = new List<DatabaseScriptDescription>();
-
-        foreach (var thisItem in lstEventScripts.Items) {
-            if (thisItem is ReadableListItem { Item: DatabaseScriptDescription dbs }) { t2.Add(dbs); }
-        }
-
-        //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
-        Database.EventScript = new(t2);
-        Database.ScriptNeedFix = string.Empty;
-
-        #endregion
-    }
-
-    #endregion
 }

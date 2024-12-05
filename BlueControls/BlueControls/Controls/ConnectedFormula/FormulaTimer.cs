@@ -17,18 +17,7 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
-using BlueScript;
-using BlueScript.Methods;
-using BlueScript.Variables;
 
 namespace BlueControls.Controls;
 
@@ -37,8 +26,13 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone {
     #region Constructors
 
     public FormulaTimer() : base(false, false, false) => InitializeComponent();
-    public int Seconds { get; set; }
+
+    #endregion
+
+    #region Properties
+
     public string Script { get; internal set; }
+    public int Seconds { get; set; }
 
     #endregion
 

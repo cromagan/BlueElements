@@ -6,8 +6,6 @@ using System.Windows.Forms;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueScript.EventArgs;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
@@ -31,7 +29,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void InitializeComponent() {
             ComponentResourceManager resources = new ComponentResourceManager(typeof(DatabaseScriptEditor));
             this.tbcScriptEigenschaften = new TabControl();
-            this.tabSkriptEditor = new TabPage();
             this.tabKopfdaten = new TabPage();
             this.capFehler = new Caption();
             this.txbQuickInfo = new TextBox();
@@ -66,7 +63,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_Fehlerfrei = new Button();
             this.pnlStatusBar.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
-            this.tabSkriptEditor.SuspendLayout();
             this.tabKopfdaten.SuspendLayout();
             this.grpRechte.SuspendLayout();
             this.grpEigenschaften.SuspendLayout();
@@ -84,22 +80,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.pnlStatusBar.Location = new Point(237, 653);
             this.pnlStatusBar.Size = new Size(1060, 24);
             // 
-            // eventScriptEditor
-            // 
-            this.eventScriptEditor.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.eventScriptEditor.Dock = DockStyle.Fill;
-            this.eventScriptEditor.Location = new Point(3, 3);
-            this.eventScriptEditor.Name = "eventScriptEditor";
-            this.eventScriptEditor.Script = "";
-            this.eventScriptEditor.Size = new Size(1046, 508);
-            this.eventScriptEditor.TabIndex = 6;
-            this.eventScriptEditor.TabStop = false;
-            this.eventScriptEditor.ExecuteScript += new EventHandler<ScriptEventArgs>(this.eventScriptEditor_ExecuteScript);
-            this.eventScriptEditor.PropertyChanged += new EventHandler(this.ScriptEditor_PropertyChanged);
-            // 
             // tbcScriptEigenschaften
             // 
-            this.tbcScriptEigenschaften.Controls.Add(this.tabSkriptEditor);
             this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
             this.tbcScriptEigenschaften.Dock = DockStyle.Fill;
             this.tbcScriptEigenschaften.HotTrack = true;
@@ -111,17 +93,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 0;
             this.tbcScriptEigenschaften.SelectedIndexChanged += new EventHandler(this.GlobalTab_SelectedIndexChanged);
-            // 
-            // tabSkriptEditor
-            // 
-            this.tabSkriptEditor.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSkriptEditor.Controls.Add(this.eventScriptEditor);
-            this.tabSkriptEditor.Location = new Point(4, 25);
-            this.tabSkriptEditor.Name = "tabSkriptEditor";
-            this.tabSkriptEditor.Padding = new Padding(3);
-            this.tabSkriptEditor.Size = new Size(1052, 514);
-            this.tabSkriptEditor.TabIndex = 1;
-            this.tabSkriptEditor.Text = "Skript-Editor";
             // 
             // tabKopfdaten
             // 
@@ -503,10 +474,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkExtendend.Tag = "";
             this.chkExtendend.Text = "Erweiterte Ausführung";
             // 
-            // btnAusführen
-            // 
-            this.btnAusführen.Click += new EventHandler(this.btnAusführen_Click);
-            // 
             // btnTest
             // 
             this.btnTest.ButtonStyle = ButtonStyle.Button_Big_Borderless;
@@ -546,7 +513,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.pnlStatusBar.ResumeLayout(false);
             this.tbcScriptEigenschaften.ResumeLayout(false);
-            this.tabSkriptEditor.ResumeLayout(false);
             this.tabKopfdaten.ResumeLayout(false);
             this.grpRechte.ResumeLayout(false);
             this.grpEigenschaften.ResumeLayout(false);
@@ -577,9 +543,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnVerlauf;
         private Button btnZusatzDateien;
         private Button btnTest;
-        private TabControl tbcScriptEigenschaften;
         private TabPage tabKopfdaten;
-        private TabPage tabSkriptEditor;
         private Button btnSpaltenuebersicht;
         private Button btnDatenbankKopf;
         private GroupBox grpAuslöser;

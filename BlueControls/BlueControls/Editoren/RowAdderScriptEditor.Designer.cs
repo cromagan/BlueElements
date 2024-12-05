@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueScript.EventArgs;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
@@ -39,10 +38,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.pnlStatusBar.Location = new Point(0, 653);
             this.pnlStatusBar.Size = new Size(1297, 24);
             // 
-            // eventScriptEditor
-            // 
-            this.eventScriptEditor.ExecuteScript += new EventHandler<ScriptEventArgs>(this.eventScriptEditor_ExecuteScript);
-            // 
             // grpInfos
             // 
             this.grpInfos.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -69,10 +64,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusführen.TabIndex = 0;
             this.grpAusführen.TabStop = false;
             this.grpAusführen.Text = "Ausführen";
-            // 
-            // btnAusführen
-            // 
-            this.btnAusführen.Click += new EventHandler(this.btnAusführen_Click);
             // 
             // txbTestZeile
             // 
@@ -113,7 +104,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.WindowState = FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.eventScriptEditor, 0);
             this.pnlStatusBar.ResumeLayout(false);
             this.ribMain.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);

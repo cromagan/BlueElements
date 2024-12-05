@@ -552,12 +552,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Classes\SkinDesign.cs" />
-    <Compile Include="Editoren\ScriptEditorUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editoren\ScriptEditorUserControl.Designer.cs">
-      <DependentUpon>ScriptEditorUserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Classes\SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -1017,10 +1011,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Befehlsreferenz.resx">
       <DependentUpon>Befehlsreferenz.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\ScriptEditorUserControl.resx">
-      <DependentUpon>ScriptEditorUserControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\VariableEditor.resx">
       <DependentUpon>VariableEditor.cs</DependentUpon>
