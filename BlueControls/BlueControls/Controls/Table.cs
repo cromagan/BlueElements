@@ -2898,6 +2898,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 var newCaptionGroup = thisViewItem.Column?.CaptionGroup(columnno) ?? string.Empty;
 
                 if (newCaptionGroup != prevCaptionGroup) {
+
                     #region Ende einer Gruppierung gefunden
 
                     if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { } && prevViewItemWithOtherCaption is { }) {
@@ -2932,8 +2933,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, prevViewItemWithOtherCaption.Font_Head_Default.Scale(_zoom), Translate);
         }
     }
-
-
 
     private void Draw_Cursor(Graphics gr, Rectangle displayRectangleWoSlider, bool onlyCursorLines) {
         if (_tmpCursorRect.Width < 1) { return; }

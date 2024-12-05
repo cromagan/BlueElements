@@ -437,16 +437,25 @@ public class DatabaseMu : Database {
 
         if (Develop.AllReadOnly) { return; }
 
-        _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
+        try {
+            _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
+        } catch {
+            Generic.Pause(3, false);
+            Develop.CheckStackForOverflow();
+            StartWriter();
+            return;
+        }
 
-        _writer.AutoFlush = true;
-        _writer.WriteLine("- DB " + DatabaseVersion);
-        _writer.WriteLine("- Filename " + Filename);
-        _writer.WriteLine("- User " + UserName);
+        try {
+            _writer.AutoFlush = true;
+            _writer.WriteLine("- DB " + DatabaseVersion);
+            _writer.WriteLine("- Filename " + Filename);
+            _writer.WriteLine("- User " + UserName);
 
-        var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
-        _writer.WriteLine(l.ParseableItems().FinishParseable());
-        _writer.Flush();
+            var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
+            _writer.WriteLine(l.ParseableItems().FinishParseable());
+            _writer.Flush();
+        } catch { }
     }
 
     /// <summary>

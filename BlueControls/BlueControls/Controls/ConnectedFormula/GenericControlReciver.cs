@@ -189,7 +189,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Invalidate_RowsInput();
         }
 
-        //Invalidate();
+        Invalidate();
     }
 
     public RowItem? RowSingleOrNull() {
