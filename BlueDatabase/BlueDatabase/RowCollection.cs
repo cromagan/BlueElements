@@ -186,7 +186,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (InvalidatedRows.Count == 0) { return; }
             if (t.Elapsed.TotalMinutes > 5) { return; }
             Generic.Pause(1, true);
-        } while (Database.ExecutingScriptAnyDatabase != 0);
+        } while (Database.ExecutingScriptAnyDatabase.Count > 0);
 
         var ra = 0;
         var n = 0;
@@ -244,7 +244,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3 + WaitDelay) { break; }
             }
 
-            if (Database.ExecutingScriptAnyDatabase > 0) { break; }
+            if (Database.ExecutingScriptAnyDatabase.Count > 0) { break; }
 
             WaitDelay = Pendingworker.Count * 5;
             if (Pendingworker.Count > 2) { break; }

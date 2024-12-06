@@ -249,7 +249,15 @@ public class DatabaseMu : Database {
                 var da = f.Substring(f.Length - 19);
 
                 if (DateTimeTryParse(da, out var d2)) {
-                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 8) { del = false; }
+                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 1.5) { del = false; }
+                    if (del && DateTime.UtcNow.Subtract(d2).TotalHours < 8) {
+                        try {
+                            FileInfo fi = new(thisf);
+                            if (fi.Length > 400) { del = false; }
+                        } catch {
+                            del = false;
+                        }
+                    }
                 }
             }
 

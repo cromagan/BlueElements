@@ -1415,7 +1415,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         db.LastUsedDate = DateTime.UtcNow;
 
-        if (db.ExecutingScript > 0 && _rowsFilteredAndPinned is null) {
+        if (db.ExecutingScript.Count > 0 && _rowsFilteredAndPinned is null) {
             DrawWaitScreen(gr, string.Empty, null);
             return;
         }

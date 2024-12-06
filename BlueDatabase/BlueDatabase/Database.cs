@@ -105,8 +105,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _eventScriptTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
+
     //private float _globalScale = 1f;
     private string _globalShowPass = string.Empty;
+
     private bool _isInSave;
     private bool _readOnly;
     private string _scriptNeedFix = string.Empty;
@@ -219,7 +221,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static string DatabaseId => nameof(Database);
 
-    public static int ExecutingScriptAnyDatabase { get; set; }
+    public static List<string> ExecutingScriptAnyDatabase { get; } = [];
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
@@ -326,7 +328,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public int ExecutingScript { get; private set; }
+    public List<string> ExecutingScript { get; } = [];
 
     public string Filename { get; protected set; } = string.Empty;
 
@@ -1303,7 +1305,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         //---------- Save ------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.Save)) {
-            if (ExecutingScript > 0) { return "Es wird noch ein Skript ausgeführt."; }
+            if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
             if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
@@ -1390,8 +1392,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
         if (!script.NeedRow) { row = null; }
 
-        ExecutingScript++;
-        ExecutingScriptAnyDatabase++;
+        var n = row?.CellFirstString() ?? "ohne Zeile";
+
+        var scriptId = $"{Caption}/{name}/{n}";
+
+        ExecutingScript.Add(scriptId);
+        ExecutingScriptAnyDatabase.Add(scriptId);
         try {
             var rowstamp = string.Empty;
 
@@ -1436,35 +1442,35 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (!scf.AllOk) {
-                ExecutingScript--;
-                ExecutingScriptAnyDatabase--;
+                ExecutingScript.Remove(scriptId);
+                ExecutingScriptAnyDatabase.Remove(scriptId);
                 OnDropMessage(FehlerArt.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
                 return scf;
             }
 
             if (row != null) {
                 if (row.IsDisposed) {
-                    ExecutingScript--;
-                    ExecutingScriptAnyDatabase--;
+                    ExecutingScript.Remove(scriptId);
+                    ExecutingScriptAnyDatabase.Remove(scriptId);
                     return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName);
                 }
 
                 if (Column.SysRowChangeDate is null) {
-                    ExecutingScript--;
-                    ExecutingScriptAnyDatabase--;
+                    ExecutingScript.Remove(scriptId);
+                    ExecutingScriptAnyDatabase.Remove(scriptId);
                     return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName);
                 }
 
                 if (row.RowStamp() != rowstamp) {
-                    ExecutingScript--;
-                    ExecutingScriptAnyDatabase--;
+                    ExecutingScript.Remove(scriptId);
+                    ExecutingScriptAnyDatabase.Remove(scriptId);
                     return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName);
                 }
             }
 
             if (!produktivphase) {
-                ExecutingScript--;
-                ExecutingScriptAnyDatabase--;
+                ExecutingScript.Remove(scriptId);
+                ExecutingScriptAnyDatabase.Remove(scriptId);
                 return scf;
             }
 
@@ -1495,18 +1501,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #endregion
 
-            ExecutingScript--;
-            ExecutingScriptAnyDatabase--;
+            ExecutingScript.Remove(scriptId);
+            ExecutingScriptAnyDatabase.Remove(scriptId);
 
-            if (produktivphase && ExecutingScript == 0 && ExecutingScriptAnyDatabase == 0) {
+            if (produktivphase && ExecutingScript.Count == 0 && ExecutingScriptAnyDatabase.Count == 0) {
                 RowCollection.DoAllInvalidatedRows(row, extended);
             }
 
             return scf;
         } catch {
             Develop.CheckStackForOverflow();
-            ExecutingScript--;
-            ExecutingScriptAnyDatabase--;
+            ExecutingScript.Remove(scriptId);
+            ExecutingScriptAnyDatabase.Remove(scriptId);
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended);
         }
     }
@@ -1552,7 +1558,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, dbVariables, extended);
         }
     }
-
 
     public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         var columnListtmp = columnList?.ToList();

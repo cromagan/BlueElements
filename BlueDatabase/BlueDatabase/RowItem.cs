@@ -737,12 +737,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, bool important, string reason) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
-        if (!important && Database.ExecutingScriptAnyDatabase > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
+        if (!important && Database.ExecutingScriptAnyDatabase.Count > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
 
         if (important) {
             var tim = Stopwatch.StartNew();
 
-            while (db.ExecutingScript > 0) {
+            while (db.ExecutingScript.Count > 0) {
                 if (tim.Elapsed.TotalSeconds > 10) {
                     break;
                 }
@@ -751,11 +751,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (db.Column.SysRowState is not { IsDisposed: false } srs) {
             return new ScriptEndedFeedback(new VariableCollection(), RepairAllLinks());
-
-            }
+        }
 
         var hasScript = db.EventScript.Get(ScriptEventTypes.value_changed).Count;
-        if (hasScript > 1) {  return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
+        if (hasScript > 1) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
@@ -914,7 +913,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                 RowCollection.WaitDelay = 0;
 
-                if (column.Function is ColumnFunction.Schlüsselspalte or ColumnFunction.First ) {
+                if (column.Function is ColumnFunction.Schlüsselspalte or ColumnFunction.First) {
                     SetValueInternal(srs, string.Empty, reason);
                 } else {
                     if (!string.IsNullOrEmpty(CellGetString(srs))) {
