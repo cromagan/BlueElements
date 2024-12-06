@@ -21,7 +21,6 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
-using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
 
@@ -88,7 +87,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
         var r = _item.UsedArea.ToRect();
         using var bmp = new Bitmap(Math.Max(r.Width, 16), Math.Max(r.Height, 16));
 
-        return DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp);
+        return TimerPadItem.ExecuteScript(_item.Script, "Testmodus", bmp);
     }
 
     public override void WriteInfosBack() {

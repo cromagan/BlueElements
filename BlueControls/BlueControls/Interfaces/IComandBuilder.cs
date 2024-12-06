@@ -17,11 +17,18 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Interfaces;
+
 namespace BlueControls.Interfaces;
 
-public interface IComandBuilder {
+public interface IComandBuilder : IHasKeyName {
 
     #region Methods
+
+    public string ComandDescription();
+
+    public QuickImage ComandImage();
 
     public string GetCode();
 

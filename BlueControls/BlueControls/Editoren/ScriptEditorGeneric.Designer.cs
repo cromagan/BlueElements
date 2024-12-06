@@ -36,6 +36,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVariablen = new BlueControls.VariableEditor();
             this.grpAusgabeFenster = new BlueControls.Controls.GroupBox();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
+            this.tabAssistent = new System.Windows.Forms.TabPage();
+            this.lstAssistant = new BlueControls.Controls.ListBox();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -51,6 +53,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpCode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
             this.grpAusgabeFenster.SuspendLayout();
+            this.tabAssistent.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
@@ -164,6 +167,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tbcScriptEigenschaften
             // 
             this.tbcScriptEigenschaften.Controls.Add(this.tabScriptEditor);
+            this.tbcScriptEigenschaften.Controls.Add(this.tabAssistent);
             this.tbcScriptEigenschaften.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbcScriptEigenschaften.HotTrack = true;
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(0, 110);
@@ -173,6 +177,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften.TabDefault = null;
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 98;
+            this.tbcScriptEigenschaften.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tbcScriptEigenschaften_Selecting);
             // 
             // tabScriptEditor
             // 
@@ -298,6 +303,29 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbSkriptInfo.TabIndex = 1;
             this.txbSkriptInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
+            // tabAssistent
+            // 
+            this.tabAssistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAssistent.Controls.Add(this.lstAssistant);
+            this.tabAssistent.Location = new System.Drawing.Point(4, 25);
+            this.tabAssistent.Name = "tabAssistent";
+            this.tabAssistent.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAssistent.Size = new System.Drawing.Size(711, 514);
+            this.tabAssistent.TabIndex = 2;
+            this.tabAssistent.Text = "Befehls-Assistent";
+            // 
+            // lstAssistant
+            // 
+            this.lstAssistant.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstAssistant.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstAssistant.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
+            this.lstAssistant.Location = new System.Drawing.Point(8, 8);
+            this.lstAssistant.Name = "lstAssistant";
+            this.lstAssistant.Size = new System.Drawing.Size(416, 496);
+            this.lstAssistant.TabIndex = 0;
+            this.lstAssistant.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstAssistant_ItemClicked);
+            // 
             // ScriptEditorGeneric
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -326,6 +354,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpCode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
             this.grpAusgabeFenster.ResumeLayout(false);
+            this.tabAssistent.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -346,5 +375,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         protected GroupBox grpAusgabeFenster;
         protected Controls.TextBox txbSkriptInfo;
         private System.ComponentModel.IContainer components;
+        private TabPage tabAssistent;
+        private Controls.ListBox lstAssistant;
     }
 }

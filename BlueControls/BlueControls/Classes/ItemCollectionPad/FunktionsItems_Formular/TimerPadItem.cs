@@ -28,6 +28,10 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using BlueScript;
+using BlueScript.Methods;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -92,10 +96,37 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
 
     #region Methods
 
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp) {
+        //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
+
+        VariableCollection vars =
+        [
+            new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
+            new VariableString("User", Generic.UserName, true,
+                "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."),
+
+            new VariableString("Usergroup", Generic.UserGroup, true,
+                "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
+            new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
+        ];
+
+        //var m = Method.GetMethods(MethodType.);
+
+        //using var gr = Graphics.FromImage(bmp);
+
+        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], bmp, 0);
+
+        var sc = new Script(vars, scp) {
+            ScriptText = scripttext
+        };
+        return sc.Parse(0, "Main", null);
+    }
+
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new FormulaTimer {
             Seconds = _sekunden,
             Script = _script,
+            Name = this.DefaultItemToControlName(parent?.Page?.KeyName)
         };
 
         //con.DoDefaultSettings(parent, this, mode);

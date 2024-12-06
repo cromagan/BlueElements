@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -38,7 +39,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
     public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, StringVal];
 
-    public override string Command => "checkscreen";
+    public override string Command => "checkbitmap";
 
     public override List<string> Constants => [];
     public override string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist";
@@ -49,11 +50,15 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "CheckScreen(BMP, X,Y,Base64_BMP_ImageCode)";
+    public override string Syntax => "CheckBitmap(BMP, X,Y,Base64_BMP_ImageCode)";
 
     #endregion
 
     #region Methods
+
+    public string ComandDescription() => "Prüfe, ob auf dem Bildchirm etwas Bestimmtes zu sehen ist.";
+
+    public QuickImage ComandImage() => QuickImage.Get(ImageCode.Bild, 16);
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
@@ -68,9 +73,11 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
     public string GetCode() {
         var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", null);
 
-        //if (c.GrabedArea())
+        if (c.Screen is not { } bmp) { return string.Empty; }
 
-        return string.Empty;
+        using var bmps = new BitmapExt(c.Screen);
+        using var bmpa = bmps.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
+        return $"var sc = Screenshot();\r\nIf (CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp)}\"))  {{\r\n\r\n}}\r\n";
     }
 
     #endregion

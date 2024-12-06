@@ -25,6 +25,7 @@ using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using FastColoredTextBoxNS;
@@ -38,6 +39,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private static Befehlsreferenz? _befehlsReferenz;
 
+    private bool _assistantDone = false;
     private string _lastVariableContent = string.Empty;
 
     private string? _lastWord = string.Empty;
@@ -161,6 +163,36 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         MultiUserFile.SaveAll(false);
 
         btnSaveLoad.Enabled = true;
+    }
+
+    private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        foreach (var thisc in Method.AllMethods) {
+            if (thisc is IComandBuilder ic) {
+                if (e.Item.KeyName == ic.KeyName) {
+                    var c = ic.GetCode();
+
+                    if (!string.IsNullOrEmpty(c)) {
+                        Script = Script + "\r\n" + c;
+                    }
+
+                    return;
+                }
+            }
+        }
+    }
+
+    private void tbcScriptEigenschaften_Selecting(object sender, TabControlCancelEventArgs e) {
+        if (e.TabPage == tabAssistent && !_assistantDone) {
+            _assistantDone = true;
+
+            foreach (var thisc in Method.AllMethods) {
+                if (thisc is IComandBuilder ic) {
+                    var t = new TextListItem(ic.ComandDescription(), ic.KeyName, ic.ComandImage(), false, true, string.Empty);
+
+                    lstAssistant.ItemAdd(t);
+                }
+            }
+        }
     }
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
