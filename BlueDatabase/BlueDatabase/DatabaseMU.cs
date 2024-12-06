@@ -43,7 +43,7 @@ public class DatabaseMu : Database {
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
     /// </summary>
-    private bool _hasManyFragments;
+    private bool _masterNeeded;
 
     private string _myFragmentsFilename = string.Empty;
     private StreamWriter? _writer;
@@ -189,10 +189,9 @@ public class DatabaseMu : Database {
         if (ReadOnly) { return; }
         if (files is not { Count: >= 1 }) { return; }
 
-        _hasManyFragments = files.Count > 8 || ChangesNotIncluded.Count > 40;
+        _masterNeeded = files.Count > 8 || ChangesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
 
         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { return; }
-        //if (!Directory.Exists(OldFragmengtsPath())) { return; }
 
         #region Dateien, mit jungen Änderungen wieder entfernen, damit andere Datenbanken noch Zugriff haben
 
@@ -206,15 +205,10 @@ public class DatabaseMu : Database {
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
-        if (!Develop.AllReadOnly && ChangesNotIncluded.Any() && AmITemporaryMaster(5, 55)) {
-            if (files.Count > 10 || ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
-                //var tmp = _fileStateUTCDate;
-
-                //_fileStateUTCDate = IsInCache;
-                // Nicht FileStateUTCDate - sonst springt der Writer an!
+        if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
+            if (ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
                 OnDropMessage(FehlerArt.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
                 if (!SaveInternal(IsInCache)) {
-                    //_fileStateUTCDate = tmp;
                     return;
                 }
 
@@ -418,8 +412,8 @@ public class DatabaseMu : Database {
 
         if (RowCollection.WaitDelay > 90) { return true; }
 
-        if (_hasManyFragments) { return true; }
-        if (DateTime.UtcNow.Subtract(FileStateUtcDate).TotalDays > 3) { return true; } // Letze Komplettierung
+        if (_masterNeeded) { return true; }
+        if (DateTime.UtcNow.Subtract(FileStateUtcDate).TotalDays > 3) { return true; } // Letze Komplettierung, aber _masterneeded prüft das auch schon
 
         var masters = 0;
         foreach (var thisDb in AllFiles) {
