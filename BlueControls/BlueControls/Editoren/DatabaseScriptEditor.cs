@@ -97,6 +97,9 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 }
 
                 _database.ScriptNeedFix = string.Empty;
+                tbcScriptEigenschaften.Enabled = true;
+            } else {
+                tbcScriptEigenschaften.Enabled = false;
             }
         }
     }

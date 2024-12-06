@@ -53,7 +53,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public ScriptEditorGeneric() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        tabScriptEditor.Enabled = false;
+        tbcScriptEigenschaften.Enabled = false;
     }
 
     #endregion
@@ -142,6 +142,17 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
+
+    private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
+        if (_befehlsReferenz is { Visible: true }) {
+            _befehlsReferenz.Close();
+            _befehlsReferenz.Dispose();
+            _befehlsReferenz = null;
+        }
+
+        _befehlsReferenz = new Befehlsreferenz();
+        _befehlsReferenz.Show();
+    }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;

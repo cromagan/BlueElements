@@ -96,7 +96,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.Controls.Add(this.btnSpaltenuebersicht);
             this.grpInfos.Controls.Add(this.btnZusatzDateien);
             this.grpInfos.Location = new System.Drawing.Point(533, 3);
-            this.grpInfos.Size = new System.Drawing.Size(280, 75);
+            this.grpInfos.Size = new System.Drawing.Size(270, 75);
             this.grpInfos.Controls.SetChildIndex(this.btnBefehlsUebersicht, 0);
             this.grpInfos.Controls.SetChildIndex(this.btnZusatzDateien, 0);
             this.grpInfos.Controls.SetChildIndex(this.btnSpaltenuebersicht, 0);
@@ -117,7 +117,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // grpAktionen
             // 
-            this.grpAktionen.Location = new System.Drawing.Point(813, 3);
+            this.grpAktionen.Controls.Add(this.btnVersionErhöhen);
+            this.grpAktionen.Location = new System.Drawing.Point(803, 3);
+            this.grpAktionen.Size = new System.Drawing.Size(200, 75);
+            this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhöhen, 0);
+            this.grpAktionen.Controls.SetChildIndex(this.btnSaveLoad, 0);
+            // 
+            // btnAusführen
+            // 
+            this.btnAusführen.ImageCode = "Abspielen|16|||ffff00||||||Warnung";
+            this.btnAusführen.Location = new System.Drawing.Point(64, 2);
             // 
             // tbcScriptEigenschaften
             // 
@@ -145,7 +154,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // txtSkript
             // 
             this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
-            this.txtSkript.Size = new System.Drawing.Size(1030, 219);
+            this.txtSkript.Size = new System.Drawing.Size(1712, 219);
             // 
             // grpVariablen
             // 
@@ -154,10 +163,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpAusgabeFenster
             // 
             this.grpAusgabeFenster.Location = new System.Drawing.Point(635, 0);
-            // 
-            // txbSkriptInfo
-            // 
-            this.txbSkriptInfo.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.None;
             // 
             // capStatusBar
             // 
@@ -486,7 +491,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnVersionErhöhen.Location = new System.Drawing.Point(64, 2);
             this.btnVersionErhöhen.Name = "btnVersionErhöhen";
             this.btnVersionErhöhen.QuickInfo = "Skript-Version erhöhen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
-            this.btnVersionErhöhen.Size = new System.Drawing.Size(136, 22);
+            this.btnVersionErhöhen.Size = new System.Drawing.Size(130, 22);
             this.btnVersionErhöhen.TabIndex = 37;
             this.btnVersionErhöhen.Text = "Version erhöhen";
             this.btnVersionErhöhen.Click += new System.EventHandler(this.btnVersionErhöhen_Click);
@@ -495,7 +500,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
-            this.btnDatenbankKopf.Location = new System.Drawing.Point(200, 2);
+            this.btnDatenbankKopf.Location = new System.Drawing.Point(72, 2);
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
             this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
             this.btnDatenbankKopf.TabIndex = 45;
@@ -506,7 +511,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnSpaltenuebersicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSpaltenuebersicht.ImageCode = "Spalte||||||||||Information";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(72, 2);
+            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(136, 2);
             this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
             this.btnSpaltenuebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnSpaltenuebersicht.TabIndex = 44;
@@ -517,7 +522,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnZusatzDateien.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnZusatzDateien.ImageCode = "Ordner|16";
-            this.btnZusatzDateien.Location = new System.Drawing.Point(136, 2);
+            this.btnZusatzDateien.Location = new System.Drawing.Point(200, 2);
             this.btnZusatzDateien.Name = "btnZusatzDateien";
             this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdateien öffnen.\r\nIn diesen können z.B. Skript-Routinen entha" +
     "lten sein\r\ndie mit CallByFilename aufgerufen werden können.";
@@ -541,7 +546,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnTest.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnTest.ImageCode = "Abspielen|16";
-            this.btnTest.Location = new System.Drawing.Point(64, 2);
+            this.btnTest.Location = new System.Drawing.Point(0, 2);
             this.btnTest.Name = "btnTest";
             this.btnTest.QuickInfo = "Keine Änderung der Daten\r\nin den Datenbanken.";
             this.btnTest.Size = new System.Drawing.Size(60, 66);

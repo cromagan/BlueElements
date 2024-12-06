@@ -94,7 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.Controls.Add(this.btnSaveLoad);
             this.grpAktionen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAktionen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAktionen.Location = new System.Drawing.Point(160, 3);
+            this.grpAktionen.Location = new System.Drawing.Point(152, 3);
             this.grpAktionen.Name = "grpAktionen";
             this.grpAktionen.Size = new System.Drawing.Size(64, 75);
             this.grpAktionen.TabIndex = 2;
@@ -121,7 +121,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpInfos.Location = new System.Drawing.Point(72, 3);
             this.grpInfos.Name = "grpInfos";
-            this.grpInfos.Size = new System.Drawing.Size(88, 75);
+            this.grpInfos.Size = new System.Drawing.Size(80, 75);
             this.grpInfos.TabIndex = 1;
             this.grpInfos.TabStop = false;
             this.grpInfos.Text = "Infos";
@@ -135,6 +135,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnBefehlsUebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 0;
             this.btnBefehlsUebersicht.Text = "Befehls-übersicht";
+            this.btnBefehlsUebersicht.Click += new System.EventHandler(this.btnBefehlsUebersicht_Click);
             // 
             // grpAusführen
             // 
@@ -242,6 +243,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -305,7 +307,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.MinimizeBox = false;
             this.Name = "ScriptEditorGeneric";
             this.Text = "Skript Editor";
-            this.TopMost = true;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
@@ -341,9 +342,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         protected SplitContainer splitContainer1;
         protected GroupBox grpCode;
         protected FastColoredTextBoxNS.FastColoredTextBox txtSkript;
-        protected System.ComponentModel.IContainer components;
         protected VariableEditor grpVariablen;
         protected GroupBox grpAusgabeFenster;
         protected Controls.TextBox txbSkriptInfo;
+        private System.ComponentModel.IContainer components;
     }
 }

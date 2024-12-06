@@ -22,6 +22,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -30,7 +31,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
     #region Fields
 
-    private DynamicSymbolPadItem? _item;
+    private TimerPadItem? _item;
 
     #endregion
 
@@ -51,14 +52,14 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             return _item;
         }
         set {
-            if (value is not DynamicSymbolPadItem) { value = null; }
+            if (value is not TimerPadItem) { value = null; }
             if (_item == value) { return; }
 
             WriteInfosBack();
 
             _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
 
-            if (value is DynamicSymbolPadItem cpi) {
+            if (value is TimerPadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = cpi.Script;
                 _item = cpi;
