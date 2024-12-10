@@ -111,6 +111,7 @@
     <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Gamma.cs" />
     <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Invert.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
+    <Compile Include="Enums\MouseEventFlags.cs" />
     <Compile Include="Enums\ScriptEventTypes.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="EventArgs\CancelReasonEventArgs.cs" />

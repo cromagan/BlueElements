@@ -33,6 +33,11 @@ public static partial class Extensions {
 
     public static string ToString4(this DateTime value) => value.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
+    /// <summary>
+    /// Deutsche normale Zeitanzeige mit Sekunden
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string ToString5(this DateTime value) => value.ToString("dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
     public static string ToString6(this DateTime value) => value.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);

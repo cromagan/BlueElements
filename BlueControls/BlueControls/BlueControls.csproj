@@ -99,6 +99,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptMethods\Method_MouseDownUp.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CheckBitmap.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Screenshot.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ResizeImage.cs" />

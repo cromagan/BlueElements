@@ -169,7 +169,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         foreach (var thisc in Method.AllMethods) {
             if (thisc is IComandBuilder ic) {
                 if (e.Item.KeyName == ic.KeyName) {
-                    var c = ic.GetCode();
+                    var c = ic.GetCode(this);
 
                     if (!string.IsNullOrEmpty(c)) {
                         Script = Script + "\r\n" + c;

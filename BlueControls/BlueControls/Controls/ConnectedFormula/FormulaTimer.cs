@@ -17,11 +17,25 @@
 
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using BlueBasics;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls;
 
-internal partial class FormulaTimer : GenericControl, IBackgroundNone {
+internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.Windows.Forms.UserControl  /// Usercontrol
+{
+    #region Fields
+
+    private int _last = -5;
+
+    private bool _wasok = true;
+
+    #endregion
 
     #region Constructors
 
@@ -31,14 +45,53 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone {
 
     #region Properties
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public virtual string Mode { get; set; } = string.Empty;
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Script { get; internal set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Seconds { get; set; }
 
     #endregion
 
     #region Methods
 
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+
+        main.Enabled = false;
+        Script = string.Empty;
+    }
+
+    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
+
     private void main_Tick(object sender, System.EventArgs e) {
+        if (!_wasok) { return; }
+
+        _last++;
+        if (_last < Seconds) { return; }
+
+        capAuslösezeit.Text = DateTime.Now.ToString5();
+
+        var t = TimerPadItem.ExecuteScript(Script, Mode);
+
+        if (!t.Successful || !t.AllOk) {
+            _wasok = false;
+            capMessage.Text = "Skript fehlerhaft. " + t.ProtocolText;
+            return;
+        }
+
+        capMessage.Text = t.Variables?.GetString("Feedback") ?? "-";
+
+        _last = 0;
     }
 
     #endregion

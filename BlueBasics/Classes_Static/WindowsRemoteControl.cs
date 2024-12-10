@@ -127,6 +127,8 @@ public static class WindowsRemoteControl {
 
     public static void LeftAltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfKeyup, 0);
 
+    public static void MouseAction(MouseEventFlags flags, int x, int y) => mouse_event((uint)flags, x, y, 0, 0);
+
     /// <summary>
     /// Diese Funktion bewegt den Mauscursor an einen bestimmten Punkt.
     /// </summary>
@@ -291,6 +293,9 @@ public static class WindowsRemoteControl {
     //    CAPSLOCK_ON = &H80    '  the capslock light is on.
     [DllImport("user32.dll", EntryPoint = "keybd_event", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+
+    [DllImport("user32.dll")]
+    private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
 
     [DllImport("user32.dll", EntryPoint = "SendInput", SetLastError = true)]
     private static extern uint SendInput(uint nInputs, Input[] pInputs, int cbSize);

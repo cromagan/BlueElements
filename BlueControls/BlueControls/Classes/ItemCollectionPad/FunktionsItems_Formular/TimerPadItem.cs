@@ -37,10 +37,11 @@ using static BlueBasics.Converter;
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 // ReSharper disable once UnusedMember.Global
-public class TimerPadItem : RectanglePadItem, IItemToControl {
+public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Fields
 
+    private FlexiControlForDelegate? _button;
     private string _script = string.Empty;
     private int _sekunden = 1;
 
@@ -59,6 +60,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
     // ReSharper disable once UnusedMember.Global
     public static string ClassId => "FI-Timer";
 
+    public bool AutoSizeableHeight => false;
     public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und eine Aktion startet.";
 
     public string Script {
@@ -67,6 +69,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
         set {
             if (value == _script) { return; }
             _script = value;
+            this.RaiseVersion();
             OnPropertyChanged();
         }
     }
@@ -80,6 +83,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
 
             if (_sekunden == value) { return; }
             _sekunden = value;
+            this.RaiseVersion();
             OnPropertyChanged();
         }
     }
@@ -96,7 +100,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -108,13 +112,15 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
             new VariableString("Usergroup", Generic.UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
+            new VariableString("Feedback", "Skript ausgeführt.", false, "Der Text wird im Timer Element angezeigt")
+
         ];
 
         //var m = Method.GetMethods(MethodType.);
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], bmp, 0);
+        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], null, 0);
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
@@ -126,7 +132,8 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
         var con = new FormulaTimer {
             Seconds = _sekunden,
             Script = _script,
-            Name = this.DefaultItemToControlName(parent?.Page?.KeyName)
+            Name = this.DefaultItemToControlName(parent?.Page?.KeyName),
+            Mode = mode
         };
 
         //con.DoDefaultSettings(parent, this, mode);
@@ -137,12 +144,15 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
+        _button = new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript);
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
-        result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+        result.Add(_button);
         result.Add(new FlexiControlForProperty<int>(() => Sekunden));
 
         return result;
     }
+
+    public bool IsVisibleForMe(string mode, bool nowDrawing) => true;
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -178,8 +188,17 @@ public class TimerPadItem : RectanglePadItem, IItemToControl {
     /// Internes Skript
     /// </summary>
     public void Skript_Bearbeiten() {
-        var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
-        //se.Database = DatabaseInput;
+        var f = GenericControl.ParentForm(_button);
+
+        if (f != null) { f.Opacity = 0f; }
+
+        var tse = new TimerScriptEditor();
+        tse.Object = this;
+        tse.ShowDialog();
+
+        //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
+
+        if (f != null) { f.Opacity = 1f; }
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);

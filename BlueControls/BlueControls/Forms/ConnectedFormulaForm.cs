@@ -92,7 +92,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         InputBoxEditor.Show(api, true);
 
         MultiUserFile.SaveAll(true);
-       cf.UnlockEditing();
+        cf.UnlockEditing();
         Database.ForceSaveAll();
         CFormula.InvalidateView();
     }
@@ -104,11 +104,13 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         if (!cf.LockEditing()) { return; }
 
+        this.Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);
 
         x.ShowDialog();
         cf.UnlockEditing();
         CFormula.InvalidateView();
+        this.Opacity = 1f;
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -137,10 +139,8 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;
 
     private void FormulaSet(string? filename) {
-
-
         if (filename == null || !FileExists(filename)) {
-           FormulaSet(null as ItemCollectionPadItem);
+            FormulaSet(null as ItemCollectionPadItem);
             return;
         }
 
@@ -154,9 +154,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void FormulaSet(ItemCollectionPadItem? page) {
         if (IsDisposed) { return; }
 
-    
-            DropMessages = Generic.IsAdministrator();
-        
+        DropMessages = Generic.IsAdministrator();
 
         CFormula.Page = page;
 

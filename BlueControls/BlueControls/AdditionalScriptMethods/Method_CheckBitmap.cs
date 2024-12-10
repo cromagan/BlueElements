@@ -22,6 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -70,14 +71,14 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
         return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp) == attvar.ValueStringGet(3));
     }
 
-    public string GetCode() {
-        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", null);
+    public string GetCode(Form? form) {
+        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form);
 
         if (c.Screen is not { } bmp) { return string.Empty; }
 
         using var bmps = new BitmapExt(c.Screen);
         using var bmpa = bmps.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
-        return $"var sc = Screenshot();\r\nIf (CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp)}\"))  {{\r\n\r\n}}\r\n";
+        return $"var sc = Screenshot();\r\nvar result = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp)}\");\r\n";
     }
 
     #endregion
