@@ -47,7 +47,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
 
-    private ConnectedFormula.ConnectedFormula? _formula = null;
+    private ConnectedFormula.ConnectedFormula? _formula;
 
     #endregion
 
@@ -289,7 +289,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnRegisterKarte_Click(object sender, System.EventArgs e) {
-
         if (Formula is not { IsDisposed: false } cf) { return; }
         if (cf.Pages is not { IsDisposed: false }) { return; }
 
@@ -303,8 +302,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var it = new RowEntryPadItem();
         p.Add(it);
-
-     
 
         cf.Pages.Add(p);
 

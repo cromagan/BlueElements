@@ -39,7 +39,7 @@ public partial class Tool_Eraser : GenericTool {
         if (Razi.Checked) {
             e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
         }
-        //e.FillRectangle(Brush_RedTransp, new Rectangle(e.Current.TrimmedX, e.Current.TrimmedY, 1, 1));
+
         if (!DrawBox.Checked) {
             return;
         }

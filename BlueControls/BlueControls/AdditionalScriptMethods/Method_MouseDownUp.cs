@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueScript.Enums;
@@ -83,11 +84,11 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
     }
 
     public string GetCode(Form? form) {
-        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geklickt werden soll.", form);
+        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geklickt werden soll.", form, Helpers.None);
 
-        if (c.Screen is not { } bmp) { return string.Empty; }
+        if (c.Screen is not { }) { return string.Empty; }
 
-        return $"MouseDownUp({c.Point1.X}, {c.Point1.Y}, 0.2, {c.Point1.X}, {c.Point1.Y});\r\n";
+        return $"MouseDownUp({c.Point1.X}, {c.Point1.Y}, 0.2, {c.Point1.X}, {c.Point1.Y});";
     }
 
     #endregion

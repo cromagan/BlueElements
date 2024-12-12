@@ -35,8 +35,8 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Fields
 
-    private bool _bearbeitbar = false;
-    private string _bild_Dateiname = string.Empty;
+    private bool _bearbeitbar;
+    private string _bild_dateiname = string.Empty;
 
     #endregion
 
@@ -69,12 +69,12 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Bild_Dateiname {
-        get => _bild_Dateiname;
+        get => _bild_dateiname;
 
         set {
             if (IsDisposed) { return; }
-            if (value == _bild_Dateiname) { return; }
-            _bild_Dateiname = value;
+            if (value == _bild_dateiname) { return; }
+            _bild_dateiname = value;
             OnPropertyChanged();
         }
     }
@@ -117,7 +117,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ImageName", _bild_Dateiname);
+        result.ParseableAdd("ImageName", _bild_dateiname);
         result.ParseableAdd("Editable", _bearbeitbar);
         return result;
     }
@@ -125,7 +125,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "imagename":
-                _bild_Dateiname = value.FromNonCritical();
+                _bild_dateiname = value.FromNonCritical();
                 return true;
 
             case "editable":

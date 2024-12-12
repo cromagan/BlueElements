@@ -35,6 +35,8 @@ namespace BlueControls {
         private readonly ScreenData _feedBack;
         private readonly bool _onlyMouseDown;
 
+        private Helpers _helpers = Helpers.None;
+
         #endregion
 
         #region Constructors
@@ -44,9 +46,10 @@ namespace BlueControls {
             _feedBack = new ScreenData();
         }
 
-        private ScreenShot(string text, bool onlyMouseDown) : this() {
+        private ScreenShot(string text, bool onlyMouseDown, Helpers helper) : this() {
             _drawText = text;
             _onlyMouseDown = onlyMouseDown;
+            _helpers = helper;
         }
 
         #endregion
@@ -74,12 +77,12 @@ namespace BlueControls {
         /// <returns></returns>
         /// <remarks></remarks>
         public static ScreenData GrabArea(Form? frm) {
-            using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false);
+            using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
             return x.Start(frm);
         }
 
-        internal static ScreenData GrabAndClick(string txt, Form? frm) {
-            using ScreenShot x = new(txt, true);
+        internal static ScreenData GrabAndClick(string txt, Form? frm, Helpers helper) {
+            using ScreenShot x = new(txt, true, helper);
             return x.Start(frm);
         }
 
@@ -109,7 +112,7 @@ namespace BlueControls {
                 _feedBack.Screen = GrabAllScreens();
                 zoomPic.Bmp = _feedBack.Screen;
                 zoomPic.InfoText = _drawText;
-                zoomPic.Helper = _onlyMouseDown ? Helpers.Magnifier : Helpers.FilledRectancle | Helpers.Magnifier;
+                zoomPic.Helper = _helpers;
 
                 // Zeige die Form
                 _ = ShowDialog();

@@ -51,8 +51,12 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected bool Fitting = true;
 
+    private Rectangle _lastPaintArea;
+    private Size _lastSize;
+    private bool _lastSliderXVisible;
+    private bool _lastSliderYVisible;
+    private bool _screenshotMode;
     private float _shiftX;
-
     private float _shiftY;
     private float _zoom = 1;
     private float _zoomFit = 1;
@@ -67,30 +71,52 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Properties
 
-    [DefaultValue(0)]
+    [DefaultValue(false)]
+    public bool ScreenshotMode {
+        get => _screenshotMode;
+        set {
+            if (_screenshotMode == value) { return; }
+            _screenshotMode = value;
+
+            // Slider verstecken/anzeigen
+            SliderX.Visible = !value;
+            SliderY.Visible = !value;
+
+            if (value) {
+                UpdateScreenshotLayout();
+            }
+
+            Invalidate();
+        }
+    }
+
+    [DefaultValue(0f)]
     public float ShiftX {
         get => _shiftX;
         set {
+            if (_screenshotMode) { return; }
             if (Math.Abs(value - _shiftX) < DefaultTolerance) { return; }
             _shiftX = value;
             Invalidate();
         }
     }
 
-    [DefaultValue(0)]
+    [DefaultValue(0f)]
     public float ShiftY {
         get => _shiftY;
         set {
+            if (_screenshotMode) { return; }
             if (Math.Abs(value - _shiftY) < DefaultTolerance) { return; }
             _shiftY = value;
             Invalidate();
         }
     }
 
-    [DefaultValue(1)]
+    [DefaultValue(1f)]
     public float Zoom {
         get => _zoom;
         set {
+            if (_screenshotMode) { return; }
             value = Math.Max(_zoomFit / 10f, value);
             value = Math.Min(20, value);
 
@@ -127,11 +153,27 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     /// </summary>
     /// <returns></returns>
     public Rectangle AvailablePaintArea() {
-        var wi = Size.Width;
-        if (SliderY.Visible) { wi -= SliderY.Width; }
-        var he = Size.Height;
-        if (SliderX.Visible) { he -= SliderX.Height; }
-        return new Rectangle(0, 0, wi, he);
+        // Schneller Check ob sich etwas geändert hat
+        if (_lastSize == Size &&
+            _lastSliderXVisible == SliderX.Visible &&
+            _lastSliderYVisible == SliderY.Visible) {
+            return _lastPaintArea;
+        }
+
+        // Nur bei Änderungen neu berechnen
+
+        // Cache aktualisieren
+        _lastPaintArea = new(
+            0,
+            0,
+            Size.Width - (SliderY.Visible ? SliderY.Width : 0),
+            Size.Height - (SliderX.Visible ? SliderX.Height : 0)
+        );
+        _lastSize = Size;
+        _lastSliderXVisible = SliderX.Visible;
+        _lastSliderYVisible = SliderY.Visible;
+
+        return _lastPaintArea;
     }
 
     public void ZoomFit() {
@@ -152,26 +194,6 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         MouseEventArgs x = new(e.Button, e.Clicks, e.X, e.Y, -1);
         OnMouseWheel(x);
     }
-
-    ///// <summary>
-    ///// Kümmert sich um Slider und Maximal-Setting.
-    ///// Bei einem negativen Wert wird der neue Zoom nicht gesetzt.
-    ///// </summary>
-    ///// <param name="newzoom"></param>
-    //protected void CalculateZoomFitAndSliders(float newzoom) {
-    //    var mb = MaxBounds();
-    //    _ZoomFit = ItemCollectionPadItem.ZoomFitValue(mb, SliderY.Width + 32, SliderX.Height + 32, Size);
-    //    if (newzoom >= 0) {
-    //        Zoom = newzoom;
-
-    //        Fitting = Math.Abs(Zoom - newzoom) < 0.01;
-    //    }
-    //    ComputeSliders(mb);
-    //    if (newzoom >= 0) {
-    //        ZoomOrShiftChanged();
-    //        Invalidate();
-    //    }
-    //}
 
     protected override void DrawControl(Graphics gr, States state) {
         //base.DrawControl(gr, state);
@@ -262,14 +284,30 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
-        if (Fitting) { ZoomFit(); }
-
-        base.OnSizeChanged(e);
+        if (_screenshotMode) {
+            UpdateScreenshotLayout();
+        } else {
+            base.OnSizeChanged(e);
+        }
     }
 
     private void SliderX_ValueChanged(object sender, System.EventArgs e) => ShiftX = SliderX.Value;
 
     private void SliderY_ValueChanged(object sender, System.EventArgs e) => ShiftY = SliderY.Value;
+
+    private void UpdateScreenshotLayout() {
+        // Im Screenshot-Modus immer Zoom-Fit aktivieren
+        _zoomFit = ItemCollectionPadItem.ZoomFitValue(MaxBounds(), AvailablePaintArea().Size);
+        _zoom = _zoomFit;
+
+        // Bild zentrieren
+        var centerPos = ItemCollectionPadItem.CenterPos(MaxBounds(), AvailablePaintArea().Size, _zoom);
+        _shiftX = centerPos.X;
+        _shiftY = centerPos.Y;
+
+        // Fitting aktivieren damit bei Größenänderung automatisch angepasst wird
+        Fitting = true;
+    }
 
     #endregion
 }

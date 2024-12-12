@@ -23,16 +23,21 @@ namespace BlueControls.Enums;
 
 [Flags]
 public enum Helpers {
-    Ohne = 0,
-    SmallCircle = 1,
-    SymetricalHorizontal = 2,
-    SymetricalVertical = 4,
-    MouseDownPoint = 8,
-    HorizontalLine = 16,
-    VerticalLine = 32,
-    DrawToPoint = 64,
-    FilledRectancle = 128,
-    PointNames = 256,
-    Magnifier = 512,
-    HorizontalVerticalLine = HorizontalLine | VerticalLine
+    // Sollten die Rountnen benötigt werden, nach
+    // ZoomPicWithPoints.DrawHelpers
+    // verschieben
+
+    None = 0,
+    SmallCircle_unused = 1 << 0,   // 1
+    SymetricalHorizontal = 1 << 1,   // 2
+    SymetricalVertical_unused = 1 << 2,   // 4
+    MouseDownPoint = 1 << 3,   // 8
+    HorizontalLine = 1 << 4,   // 16
+    VerticalLine = 1 << 5,   // 32
+    DrawToPoint_unused = 1 << 6,   // 64
+    FilledRectancle = 1 << 7,   // 128
+    PointNames = 1 << 8,   // 256
+    Magnifier = 1 << 9,   // 512
+    DrawRectangle = 1 << 10,  // 1024
+    Draw20x10 = 1 << 11,  // 2048
 }

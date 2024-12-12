@@ -93,11 +93,21 @@ public partial class ZoomPic : ZoomPad {
     protected override void DrawControl(Graphics gr, States state) {
         base.DrawControl(gr, state);
 
-        LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
-            LinearGradientMode.Vertical);
-        gr.FillRectangle(lgb, ClientRectangle);
+        // Get drawable area considering scrollbars
+        var drawArea = AvailablePaintArea();
+
+        // Create and draw gradient background
+        using LinearGradientBrush lgb = new(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+        gr.FillRectangle(lgb, drawArea);
+
         if (_bmp != null && _bmp.IsValid()) {
-            var r = new RectangleF(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
+            // Calculate image rectangle considering scrollbars
+            var imageRect = new RectangleF(0, 0, _bmp.Width, _bmp.Height)
+                .ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
+
+            // Clip to available area
+            gr.SetClip(drawArea);
+
             if (Zoom < 1 || AlwaysSmooth) {
                 gr.SmoothingMode = SmoothingMode.AntiAlias;
                 gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -105,14 +115,15 @@ public partial class ZoomPic : ZoomPad {
                 gr.SmoothingMode = SmoothingMode.HighSpeed;
                 gr.InterpolationMode = InterpolationMode.NearestNeighbor;
             }
+
             gr.PixelOffsetMode = PixelOffsetMode.Half;
-            gr.DrawImage(_bmp, r);
+            gr.DrawImage(_bmp, imageRect);
+            gr.ResetClip();
         }
+
         OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _mouseDown, _mouseCurrent));
-        var apa = AvailablePaintArea();
-        //apa.Width -= 1;
-        //apa.Height -= 1;
-        Skin.Draw_Border(gr, Design.Table_And_Pad, state, apa);
+
+        Skin.Draw_Border(gr, Design.Table_And_Pad, state, drawArea);
     }
 
     protected override RectangleF MaxBounds() => _bmp != null && _bmp.IsValid() ? new RectangleF(0, 0, _bmp.Width, _bmp.Height) : new RectangleF(0, 0, 0, 0);

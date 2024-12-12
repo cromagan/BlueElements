@@ -44,14 +44,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private Color _backColor_ColumnHead = Color.Transparent;
     private QuickImage? _captionBitmap;
     private ColumnItem? _column;
-    private int? _contentWidth = null;
+    private int? _contentWidth;
     private int? _drawWidth;
     private BlueFont? _font_Head_Colored;
     private BlueFont? _font_Head_Default;
     private BlueFont? _font_Numbers;
     private BlueFont? _font_TextInFilter;
     private Color _fontColor_Caption = Color.Transparent;
-    private bool _horizontal = false;
+    private bool _horizontal;
     private ColumnViewCollection? _parent;
 
     private bool _reduced;

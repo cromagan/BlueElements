@@ -129,7 +129,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public int WiederHolungsSpaltenWidth { get; private set; } = 0;
+    public int WiederHolungsSpaltenWidth { get; private set; }
 
     #endregion
 

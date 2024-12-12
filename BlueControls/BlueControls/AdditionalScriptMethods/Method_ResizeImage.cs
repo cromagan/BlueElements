@@ -25,7 +25,6 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -34,7 +33,7 @@ public class Method_ResizeImage : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal];
+    public override List<List<string>> Args => [VariableBitmap.BmpVar, FloatVal, FloatVal];
     public override string Command => "resizeimage";
     public override List<string> Constants => [];
     public override string Description => "Verändert die Größe des Bildes";

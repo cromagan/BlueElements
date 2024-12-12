@@ -22,6 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueScript.Enums;
@@ -43,7 +44,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
     public override string Command => "checkbitmap";
 
     public override List<string> Constants => [];
-    public override string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist";
+    public override string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist. Zum Erstellen des Befehls den Assistenten benutzen.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
@@ -51,7 +52,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "CheckBitmap(BMP, X,Y,Base64_BMP_ImageCode)";
+    public override string Syntax => "CheckBitmap(BMP, X,Y, HasCode)";
 
     #endregion
 
@@ -68,17 +69,23 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
         var y = attvar.ValueIntGet(2);
         using var bmps = new BitmapExt(bmp);
         using var bmpa = bmps.Crop(x - 10, y - 5, 20, 10);
-        return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp) == attvar.ValueStringGet(3));
+        return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetHashString() == attvar.ValueStringGet(3));
     }
 
     public string GetCode(Form? form) {
-        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form);
+        var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form, Helpers.Draw20x10);
 
         if (c.Screen is not { } bmp) { return string.Empty; }
 
-        using var bmps = new BitmapExt(c.Screen);
+        var n = InputBox.Show("Variablenname:", "result", FormatHolder.SystemName);
+
+        if (string.IsNullOrEmpty(n)) {
+            n = "result";
+        }
+
+        using var bmps = new BitmapExt(bmp);
         using var bmpa = bmps.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
-        return $"var sc = Screenshot();\r\nvar result = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp)}\");\r\n";
+        return $"var sc = Screenshot();\r\nvar {n} = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetHashString()}\");";
     }
 
     #endregion

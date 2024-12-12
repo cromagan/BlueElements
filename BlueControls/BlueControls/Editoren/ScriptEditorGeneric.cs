@@ -39,7 +39,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private static Befehlsreferenz? _befehlsReferenz;
 
-    private bool _assistantDone = false;
+    private bool _assistantDone;
     private string _lastVariableContent = string.Empty;
 
     private string? _lastWord = string.Empty;
@@ -172,7 +172,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                     var c = ic.GetCode(this);
 
                     if (!string.IsNullOrEmpty(c)) {
-                        Script = Script + "\r\n" + c;
+                        Script = Script + "\r\n" + c + "\r\n";
                     }
 
                     return;

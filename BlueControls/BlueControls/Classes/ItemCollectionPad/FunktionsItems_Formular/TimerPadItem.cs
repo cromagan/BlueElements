@@ -133,7 +133,8 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             Seconds = _sekunden,
             Script = _script,
             Name = this.DefaultItemToControlName(parent?.Page?.KeyName),
-            Mode = mode
+            Mode = mode,
+            Connected
         };
 
         //con.DoDefaultSettings(parent, this, mode);

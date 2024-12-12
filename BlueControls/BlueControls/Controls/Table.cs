@@ -67,7 +67,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private readonly object _lockUserAction = new();
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
-    private bool _controlPressing = false;
+    private bool _controlPressing;
     private ColumnViewCollection? _currentArrangement;
     private DateTime? _databaseDrawError;
     private bool _editButton;
