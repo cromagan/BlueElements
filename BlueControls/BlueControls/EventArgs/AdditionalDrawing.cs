@@ -24,22 +24,26 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.EventArgs;
 
-public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent {
+public class AdditionalDrawing : System.EventArgs {
 
     #region Constructors
 
-    public AdditionalDrawing(Graphics gr, float zoom, float shiftX, float shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current) {
+    public AdditionalDrawing(Graphics gr, float zoom, float shiftX, float shiftY, MouseEventArgs1_1? mouseDown, MouseEventArgs1_1? current) : base() {
         G = gr;
         Zoom = zoom;
         ShiftX = shiftX;
         ShiftY = shiftY;
+        MouseDown = mouseDown;
+        Current = current;
     }
 
     #endregion
 
     #region Properties
 
+    public MouseEventArgs1_1? Current { get; }
     public Graphics G { get; }
+    public MouseEventArgs1_1? MouseDown { get; }
     public float ShiftX { get; }
     public float ShiftY { get; }
     public float Zoom { get; }
@@ -78,6 +82,8 @@ public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent {
         var x = rectangle.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
         G.FillRectangle(brush, x);
     }
+
+    public Rectangle TrimmedRectangle() => new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
 
     #endregion
 }

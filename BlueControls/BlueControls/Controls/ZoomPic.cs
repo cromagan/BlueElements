@@ -138,11 +138,6 @@ public partial class ZoomPic : ZoomPad {
         OnImageMouseMove(_mouseCurrent);
     }
 
-    //private bool IsInBitmap() {
-    //    if (_bmp == null) { return false; }
-    //    if (MousePos11 == null) { return false; }
-    //    return IsInBitmap(MousePos11.X, MousePos11.Y);
-    //}
     /// <summary>
     /// Zuerst ImageMouseUp, dann MouseUp
     /// </summary>

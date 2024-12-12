@@ -32,33 +32,37 @@ namespace BlueControls.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            this.SliderX = new Slider();
-            this.SliderY = new Slider();
+            this.SliderX = new BlueControls.Controls.Slider();
+            this.SliderY = new BlueControls.Controls.Slider();
             this.SuspendLayout();
             // 
             // SliderX
             // 
-            this.SliderX.Dock = DockStyle.Bottom;
-            this.SliderX.Location = new Point(0, 221);
+            this.SliderX.CausesValidation = false;
+            this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.SliderX.Location = new System.Drawing.Point(0, 221);
             this.SliderX.Name = "SliderX";
-            this.SliderX.Size = new Size(365, 18);
-            this.SliderX.ValueChanged += new EventHandler(this.SliderX_ValueChanged);
+            this.SliderX.Size = new System.Drawing.Size(365, 18);
+            this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
             // SliderY
             // 
-            this.SliderY.Dock = DockStyle.Right;
-            this.SliderY.Location = new Point(365, 0);
+            this.SliderY.CausesValidation = false;
+            this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
+            this.SliderY.Location = new System.Drawing.Point(365, 0);
             this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = Orientation.Senkrecht;
-            this.SliderY.Size = new Size(18, 239);
-            this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChanged);
+            this.SliderY.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
+            this.SliderY.Size = new System.Drawing.Size(18, 239);
+            this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
             // 
             // ZoomPad
             // 
             this.Controls.Add(this.SliderX);
             this.Controls.Add(this.SliderY);
-            this.Size = new Size(383, 239);
+            this.Name = "ZoomPad";
+            this.Size = new System.Drawing.Size(383, 239);
             this.ResumeLayout(false);
+
         }
         #endregion
 

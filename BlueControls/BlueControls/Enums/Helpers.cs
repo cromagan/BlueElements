@@ -33,5 +33,6 @@ public enum Helpers {
     DrawToPoint = 64,
     FilledRectancle = 128,
     PointNames = 256,
+    Magnifier = 512,
     HorizontalVerticalLine = HorizontalLine | VerticalLine
 }

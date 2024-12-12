@@ -26,8 +26,8 @@ public class MouseEventArgs1_1DownAndCurrent : System.EventArgs {
 
     #region Constructors
 
-    public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 down, MouseEventArgs1_1 current) : base() {
-        MouseDown = down;
+    public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base() {
+        MouseDown = mouseDown;
         Current = current;
     }
 

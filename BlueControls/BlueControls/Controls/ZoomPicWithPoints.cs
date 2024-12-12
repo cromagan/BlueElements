@@ -47,10 +47,13 @@ public partial class ZoomPicWithPoints : ZoomPic {
     /// Wenn eine Aktion ausgeführt wird, ein String, der den Aktionsnamen beinhaltet
     /// </summary>
     public string UserAction = string.Empty;
+
+    private const int DrawSize = 20;
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private readonly List<PointM> _points = [];
     private Helpers _helper = Helpers.Ohne;
+    private string _infoText = string.Empty;
     private Orientation _mittelLinie = Orientation.Ohne;
     private bool _pointAdding;
 
@@ -70,6 +73,16 @@ public partial class ZoomPicWithPoints : ZoomPic {
         set {
             if (_helper == value) { return; }
             _helper = value;
+            Invalidate();
+        }
+    }
+
+    [DefaultValue("")]
+    public string InfoText {
+        get => _infoText;
+        set {
+            if (_infoText == value) { return; }
+            _infoText = value;
             Invalidate();
         }
     }
@@ -217,13 +230,23 @@ public partial class ZoomPicWithPoints : ZoomPic {
     protected override void OnDoAdditionalDrawing(AdditionalDrawing e) {
         base.OnDoAdditionalDrawing(e);
         DrawMittelLinien(e);
-        /// Punkte
+        // Punkte
         foreach (var thisPoint in _points) {
             if (_helper.HasFlag(Helpers.PointNames)) {
                 thisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, Design.Button_EckpunktSchieber, States.Standard);
             } else {
                 thisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, Design.Button_EckpunktSchieber, States.Standard);
             }
+        }
+
+        // Info Text
+        if (!string.IsNullOrEmpty(_infoText)) {
+            PrintInfoText(e.G);
+        }
+
+        // Magnifier
+        if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && !MousePos11.IsEmpty) {
+            BitmapExt.Magnify(Bmp, new Point(MousePos11.X, MousePos11.Y), e.G, false);
         }
     }
 
@@ -326,6 +349,62 @@ public partial class ZoomPicWithPoints : ZoomPic {
         foreach (var thisO in names) {
             var s = Tags.TagGet(thisO);
             _points.Add(new PointM(null, s));
+        }
+    }
+
+    //private void PrintInfoText(Graphics gr) {
+    //    Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
+    //    Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
+    //    Font fn = new("Arial", DrawSize, FontStyle.Bold);
+    //    var f = gr.MeasureString(_infoText, fn);
+    //    var yPos = MousePos11.Y > f.Height + 50 ? 0 : (int)(Height - f.Height - 5);
+    //    gr.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
+    //    BlueFont.DrawString(gr, _infoText, fn, bf, 2, yPos + 2);
+    //}
+
+    private void PrintInfoText(Graphics gr) {
+        if (string.IsNullOrEmpty(_infoText)) { return; }
+
+        // Grundlegendes Setup
+        using var bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
+        using var bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
+        using var fn = new Font("Arial", DrawSize, FontStyle.Bold);
+
+        // Hole alle Bildschirme
+        var screens = Screen.AllScreens;
+
+        foreach (var screen in screens) {
+            // Konvertiere Bildschirmkoordinaten in Control-Koordinaten
+            var screenBounds = screen.Bounds;
+            var controlPoint = this.PointToClient(new Point(screenBounds.X, screenBounds.Y));
+
+            // Berechne die Position für diesen Bildschirm
+            var textSize = gr.MeasureString(_infoText, fn);
+
+            // Prüfe ob die Maus auf diesem Bildschirm ist
+            var mouseScreenPoint = this.PointToScreen(new Point((int)MousePos11.X, (int)MousePos11.Y));
+            bool mouseOnThisScreen = screen.Bounds.Contains(mouseScreenPoint);
+
+            // Bestimme Y-Position: Wenn Maus im oberen Bereich, dann Text unten, sonst oben
+            float yPos;
+            if (mouseOnThisScreen) {
+                var relativeMouseY = mouseScreenPoint.Y - screenBounds.Y;
+                yPos = relativeMouseY < (screenBounds.Height / 2)
+                    ? controlPoint.Y + screenBounds.Height - textSize.Height   // Unten
+                    : controlPoint.Y;  // Oben
+            } else {
+                yPos = controlPoint.Y ; // Standardmäßig oben, wenn Maus nicht auf diesem Screen
+            }
+
+            // Zeichne Hintergrund und Text
+            var rectBackground = new RectangleF(
+                controlPoint.X,
+                yPos - 5,
+                screenBounds.Width,
+                textSize.Height + 10);
+
+            gr.FillRectangle(bs, rectBackground);
+            BlueFont.DrawString(gr, _infoText, fn, bf, controlPoint.X + 2, yPos);
         }
     }
 

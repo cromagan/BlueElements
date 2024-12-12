@@ -69,6 +69,10 @@ namespace BeCreative {
 
         private void btnLayout_Click(object sender, EventArgs e) => DoForm(new PadEditorWithFileAccess());
 
+        private void button1_Click(object sender, EventArgs e) {
+            var t = ScreenShot.GrabArea(this);
+        }
+
         private void DoForm(System.Windows.Forms.Form frm) {
             if (frm.IsDisposed) {
                 DebugPrint("Fenster verworfen!");
