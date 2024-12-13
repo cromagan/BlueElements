@@ -31,6 +31,7 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             this.ribMain = new BlueControls.Controls.RibbonBar();
             this.tabFile = new System.Windows.Forms.TabPage();
+            this.btnTopMost = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnLastFormulas = new BlueControls.Controls.LastFilesCombo();
             this.btnOeffnen = new BlueControls.Controls.Button();
@@ -39,6 +40,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
+            this.btnScript = new BlueControls.Controls.Button();
             this.btnElementBearbeiten = new BlueControls.Controls.Button();
             this.capClicked = new BlueControls.Controls.Caption();
             this.btnAusgehendeDatenbank = new BlueControls.Controls.Button();
@@ -46,7 +48,6 @@ namespace BlueControls.Forms {
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
-            this.btnScript = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -58,12 +59,12 @@ namespace BlueControls.Forms {
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(1202, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(606, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 426);
-            this.pnlStatusBar.Size = new System.Drawing.Size(1202, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(606, 24);
             // 
             // ribMain
             // 
@@ -75,7 +76,7 @@ namespace BlueControls.Forms {
             this.ribMain.Location = new System.Drawing.Point(0, 0);
             this.ribMain.Name = "ribMain";
             this.ribMain.SelectedIndex = 1;
-            this.ribMain.Size = new System.Drawing.Size(1202, 110);
+            this.ribMain.Size = new System.Drawing.Size(606, 110);
             this.ribMain.TabDefault = this.tabFile;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 97;
@@ -84,24 +85,36 @@ namespace BlueControls.Forms {
             // 
             this.tabFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabFile.Controls.Add(this.grpDatei);
-            this.tabFile.Location = new System.Drawing.Point(4, 25);
+            this.tabFile.Location = new System.Drawing.Point(4, 29);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(1194, 81);
+            this.tabFile.Size = new System.Drawing.Size(598, 77);
             this.tabFile.TabIndex = 3;
             this.tabFile.Text = "Datei";
+            // 
+            // btnTopMost
+            // 
+            this.btnTopMost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTopMost.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
+            this.btnTopMost.ImageCode = "Pinnadel|24";
+            this.btnTopMost.Location = new System.Drawing.Point(176, 2);
+            this.btnTopMost.Name = "btnTopMost";
+            this.btnTopMost.Size = new System.Drawing.Size(32, 22);
+            this.btnTopMost.TabIndex = 5;
+            this.btnTopMost.CheckedChanged += new System.EventHandler(this.btnTopMost_CheckedChanged);
             // 
             // grpDatei
             // 
             this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpDatei.CausesValidation = false;
+            this.grpDatei.Controls.Add(this.btnTopMost);
             this.grpDatei.Controls.Add(this.btnLastFormulas);
             this.grpDatei.Controls.Add(this.btnOeffnen);
             this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpDatei.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
-            this.grpDatei.Size = new System.Drawing.Size(176, 81);
+            this.grpDatei.Size = new System.Drawing.Size(320, 77);
             this.grpDatei.TabIndex = 4;
             this.grpDatei.TabStop = false;
             this.grpDatei.Text = "Datei";
@@ -135,9 +148,9 @@ namespace BlueControls.Forms {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
+            this.tabAllgemein.Location = new System.Drawing.Point(4, 29);
             this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Size = new System.Drawing.Size(1194, 81);
+            this.tabAllgemein.Size = new System.Drawing.Size(1194, 77);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
             // 
@@ -146,9 +159,9 @@ namespace BlueControls.Forms {
             this.tabAdmin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabAdmin.Controls.Add(this.grpAdminAllgemein);
             this.tabAdmin.Controls.Add(this.grpAdminBearbeiten);
-            this.tabAdmin.Location = new System.Drawing.Point(4, 25);
+            this.tabAdmin.Location = new System.Drawing.Point(4, 29);
             this.tabAdmin.Name = "tabAdmin";
-            this.tabAdmin.Size = new System.Drawing.Size(1194, 81);
+            this.tabAdmin.Size = new System.Drawing.Size(1194, 77);
             this.tabAdmin.TabIndex = 0;
             this.tabAdmin.Text = "Administration";
             // 
@@ -162,7 +175,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(400, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 81);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 77);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -192,10 +205,22 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 81);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 77);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
+            // 
+            // btnScript
+            // 
+            this.btnScript.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnScript.Enabled = false;
+            this.btnScript.ImageCode = "Skript|16";
+            this.btnScript.Location = new System.Drawing.Point(216, 46);
+            this.btnScript.Name = "btnScript";
+            this.btnScript.Size = new System.Drawing.Size(120, 22);
+            this.btnScript.TabIndex = 47;
+            this.btnScript.Text = "Skript";
+            this.btnScript.Click += new System.EventHandler(this.btnScript_Click);
             // 
             // btnElementBearbeiten
             // 
@@ -258,36 +283,25 @@ namespace BlueControls.Forms {
             this.LoadTab.Title = "Bitte Datenbank laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // Formula
+            // CFormula
             // 
             this.CFormula.CausesValidation = false;
             this.CFormula.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFormula.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFormula.Location = new System.Drawing.Point(0, 110);
-            this.CFormula.Name = "Formula";
-            this.CFormula.Size = new System.Drawing.Size(1202, 316);
+            this.CFormula.Name = "CFormula";
+            this.CFormula.Page = null;
+            this.CFormula.Size = new System.Drawing.Size(606, 316);
             this.CFormula.TabIndex = 98;
             this.CFormula.TabStop = false;
             this.CFormula.Text = "CFO";
             this.CFormula.ChildGotFocus += new System.EventHandler<System.Windows.Forms.ControlEventArgs>(this.CFormula_ChildGotFocus);
             // 
-            // btnScript
-            // 
-            this.btnScript.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnScript.Enabled = false;
-            this.btnScript.ImageCode = "Skript|16";
-            this.btnScript.Location = new System.Drawing.Point(216, 46);
-            this.btnScript.Name = "btnScript";
-            this.btnScript.Size = new System.Drawing.Size(120, 22);
-            this.btnScript.TabIndex = 47;
-            this.btnScript.Text = "Skript";
-            this.btnScript.Click += new System.EventHandler(this.btnScript_Click);
-            // 
             // ConnectedFormulaForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1202, 450);
+            this.ClientSize = new System.Drawing.Size(606, 450);
             this.Controls.Add(this.CFormula);
             this.Controls.Add(this.ribMain);
             this.Name = "ConnectedFormulaForm";
@@ -327,5 +341,6 @@ namespace BlueControls.Forms {
         private Caption capClicked;
         private Button btnElementBearbeiten;
         private Button btnScript;
+        public Button btnTopMost;
     }
 }

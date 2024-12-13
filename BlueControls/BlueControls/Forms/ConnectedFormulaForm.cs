@@ -134,6 +134,8 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         api.OpenScriptEditor();
     }
 
+    private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) => TopMost = btnTopMost.Checked;
+
     private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);
 
     private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;

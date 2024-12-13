@@ -100,7 +100,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -112,8 +112,10 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             new VariableString("Usergroup", Generic.UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
-            new VariableString("Feedback", "Skript ausgeführt.", false, "Der Text wird im Timer Element angezeigt")
-
+            new VariableString("Feedback", "Skript ausgeführt.", false, "Der Text wird im Timer Element angezeigt"),
+            new VariableString("Value0", value0, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
+            new VariableString("Value1", value1, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
+            new VariableString("Value2", value2, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung.")
         ];
 
         //var m = Method.GetMethods(MethodType.);
@@ -134,7 +136,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             Script = _script,
             Name = this.DefaultItemToControlName(parent?.Page?.KeyName),
             Mode = mode,
-            Connected
+            ConnectedFormula = parent
         };
 
         //con.DoDefaultSettings(parent, this, mode);

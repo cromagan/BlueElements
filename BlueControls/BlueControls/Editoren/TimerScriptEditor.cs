@@ -81,7 +81,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
         WriteInfosBack();
 
-        return TimerPadItem.ExecuteScript(_item.Script, "Testmodus");
+        return TimerPadItem.ExecuteScript(_item.Script, "Testmodus", string.Empty, string.Empty, string.Empty);
     }
 
     public override void WriteInfosBack() {

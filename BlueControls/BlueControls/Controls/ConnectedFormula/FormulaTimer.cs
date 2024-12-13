@@ -20,6 +20,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Security;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -31,19 +32,26 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 {
     #region Fields
 
-    private int _last = -5;
-
+    private int _last;
+    private string _value0 = string.Empty;
+    private string _value1 = string.Empty;
+    private string _value2 = string.Empty;
     private bool _wasok = true;
 
     #endregion
 
     #region Constructors
 
-    public FormulaTimer() : base(false, false, false) => InitializeComponent();
+    public FormulaTimer() : base(false, false, false) {
+        InitializeComponent();
+        _last = -1;
+    }
 
     #endregion
 
     #region Properties
+
+    public ConnectedFormulaView? ConnectedFormula { get; internal set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -81,7 +89,12 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
         capAuslösezeit.Text = DateTime.Now.ToString5();
 
-        var t = TimerPadItem.ExecuteScript(Script, Mode);
+        if (ConnectedFormula?.GetConnectedFormula()?.IsEditing() ?? true) {
+            capMessage.Text = "Editor geöffnet.";
+            return;
+        }
+
+        var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2);
 
         if (!t.Successful || !t.AllOk) {
             _wasok = false;
@@ -91,6 +104,9 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
         capMessage.Text = t.Variables?.GetString("Feedback") ?? "-";
 
+        _value0 = t.Variables?.GetString("value0") ?? string.Empty;
+        _value1 = t.Variables?.GetString("value1") ?? string.Empty;
+        _value2 = t.Variables?.GetString("value2") ?? string.Empty;
         _last = 0;
     }
 
