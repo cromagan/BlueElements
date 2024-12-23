@@ -201,9 +201,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
         }
 
-        if (RowsInput is not { Count: 1 }) { return null; }
-        RowsInput[0].CheckRowDataIfNeeded();
-        return RowsInput[0];
+        if (RowsInput is not { Count: 1 } r) { return null; }
+        r[0].CheckRowDataIfNeeded();
+        return r[0];
     }
 
     public void SetToRow(RowItem? row) {
