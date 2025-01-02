@@ -36,6 +36,8 @@ public partial class Tool_Eraser : GenericTool {
     #region Methods
 
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
+        if (e.Current == null) { return; }
+
         if (Razi.Checked) {
             e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
         }
