@@ -565,6 +565,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
         if (filter is not { Length: not 0 }) { return true; }
 
+        //if (Database.Column.SplitColumn is { } csp) {
+        //    var found = false;
+        //    foreach (var thisF in filter) {
+        //        if (thisF.Column == csp) { found = true; break; }
+        //    }
+        //    if (!found) { return false; }
+        //}
+
         //Database.RefreshColumnsData(filter);
         if (filter.Length == 1) { return MatchesTo(filter[0]); }
 

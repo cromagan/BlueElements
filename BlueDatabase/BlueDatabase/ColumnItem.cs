@@ -1216,10 +1216,24 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case ColumnFunction.Split:
+                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
+                    return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
+                }
+                if(!string.IsNullOrEmpty( _autoFilterJoker)) { return "Der Autofilter-Joker darf bei dieser Spalte nicht gesetzt sein."; }
+                if(_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Erweiterte Filter sind bei dieser Spalte nicht erlaubt."; }
+                if (_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return "Texteingabe-Filter sind bei dieser Spalte nicht erlaubt."; }
+                if (_ignoreAtRowFilter) { return "Diese Spalte muss bei Zeilenfiltern ignoriert werden."; }
+
+                if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Auto-Filter müssen bei dieser Spalte erlaubt sein."; }
+
+                break;
+
+
+
             case ColumnFunction.First:
             case ColumnFunction.Schlüsselspalte:
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
-                    return "Diese spalte darf im Skript nur als ReadOnly vorhanden sein.";
+                    return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
                 }
                 break;
 
@@ -1808,7 +1822,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_function == ColumnFunction.Schlüsselspalte) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
 
 
-        if (_function == ColumnFunction.Split) { return QuickImage.Get(ImageCode.Datei, 16); }
+        if (_function == ColumnFunction.Split) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
         if (_function == ColumnFunction.RelationText) { return QuickImage.Get(ImageCode.Herz, 16); }
 

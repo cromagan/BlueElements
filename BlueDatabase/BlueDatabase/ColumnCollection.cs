@@ -97,7 +97,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// </summary>
     //    /// <returns></returns>
 
+    public ColumnItem? FirstColumn { get; private set; }
     public bool IsDisposed { get; private set; }
+    public ColumnItem? SplitColumn { get; private set; }
 
     public ColumnItem? SysChapter { get; private set; }
 
@@ -290,46 +292,57 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChangeDate = null;
         SysChapter = null;
         SysRowState = null;
+        SplitColumn = null;
+        FirstColumn = null;
 
         foreach (var thisColumnItem in this) {
-            if (thisColumnItem != null && thisColumnItem.IsSystemColumn()) {
-                switch (thisColumnItem.KeyName.ToUpperInvariant()) {
-                    case "SYS_LOCKED":
-                        SysLocked = thisColumnItem;
-                        break;
+            if (thisColumnItem != null) {
+                if (thisColumnItem.Function == ColumnFunction.Split) {
+                    SplitColumn = thisColumnItem;
+                }
+                if (thisColumnItem.Function == ColumnFunction.First) {
+                    FirstColumn = thisColumnItem;
+                }
 
-                    case "SYS_CREATOR":
-                        SysRowCreator = thisColumnItem;
-                        break;
+                if (thisColumnItem.IsSystemColumn()) {
+                    switch (thisColumnItem.KeyName.ToUpperInvariant()) {
+                        case "SYS_LOCKED":
+                            SysLocked = thisColumnItem;
+                            break;
 
-                    case "SYS_CHANGER":
-                        SysRowChanger = thisColumnItem;
-                        break;
+                        case "SYS_CREATOR":
+                            SysRowCreator = thisColumnItem;
+                            break;
 
-                    case "SYS_DATECREATED":
-                        SysRowCreateDate = thisColumnItem;
-                        break;
+                        case "SYS_CHANGER":
+                            SysRowChanger = thisColumnItem;
+                            break;
 
-                    case "SYS_CORRECT":
-                        SysCorrect = thisColumnItem;
-                        break;
+                        case "SYS_DATECREATED":
+                            SysRowCreateDate = thisColumnItem;
+                            break;
 
-                    case "SYS_DATECHANGED":
-                        SysRowChangeDate = thisColumnItem;
-                        break;
+                        case "SYS_CORRECT":
+                            SysCorrect = thisColumnItem;
+                            break;
 
-                    case "SYS_CHAPTER":
-                        SysChapter = thisColumnItem;
-                        break;
+                        case "SYS_DATECHANGED":
+                            SysRowChangeDate = thisColumnItem;
+                            break;
 
-                    case "SYS_ROWSTATE":
-                        SysRowState = thisColumnItem;
-                        break;
+                        case "SYS_CHAPTER":
+                            SysChapter = thisColumnItem;
+                            break;
 
-                    default:
+                        case "SYS_ROWSTATE":
+                            SysRowState = thisColumnItem;
+                            break;
 
-                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.KeyName);
-                        break;
+                        default:
+
+                            Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.KeyName);
+                            break;
+                    }
                 }
             }
         }
