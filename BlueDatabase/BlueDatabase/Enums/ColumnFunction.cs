@@ -20,7 +20,6 @@
 namespace BlueDatabase.Enums;
 
 public enum ColumnFunction {
-
     // Unbekannt = -1,
     // Nothing = 0,
 
@@ -77,42 +76,35 @@ public enum ColumnFunction {
 
     //Verknüpfung_zu_anderer_Datenbank = 80,
 
-
     /// <summary>
     /// Besodere Spalte, löst eine extended Changed aus bei Wertänderung
     /// </summary>
     Schlüsselspalte = 81,
-
 
     /// <summary>
     /// Zeigt eine Zelle einer anderen Datenbank an
     /// </summary>
     Verknüpfung_zu_anderer_Datenbank = 82,
 
-
     /// <summary>
     /// Werte werden in echtzeit - evtl. für jeden Benutzer anderes - berechnet. Wird nicht gespeichert.
     /// </summary>
     Virtuelle_Spalte = 83,
-
 
     /// <summary>
     /// Hat den Wert einer anderen Spalte, für schnelle Zugriffe
     /// </summary>
     Zeile = 84,
 
-
     /// <summary>
     /// Dieser Wert ist er Hauptwert der Zeile. Nur einmal pro datenbank erlaubt
     /// </summary>
     First = 85,
 
-
     /// <summary>
-    /// Dieser Spalte kann zum Aufsplitten der Datenbank benutzt werden. . Nur einmal pro Datenbank erlaubt
+    /// Dieser Spalte kann zum Aufsplitten der Datenbank benutzt werden. Nur einmal pro Datenbank erlaubt
     /// </summary>
-    Split = 86
-
+    Split_Medium = 86
 
     // bis 999 wird geprüft
 }
@@ -127,8 +119,8 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.RelationText
                                                                                     or ColumnFunction.Schlüsselspalte
                                                                                     or ColumnFunction.Virtuelle_Spalte
-                                                                                    or ColumnFunction.Zeile 
-                                                                                    or ColumnFunction.Split
+                                                                                    or ColumnFunction.Zeile
+                                                                                    or ColumnFunction.Split_Medium
                                                                                     or ColumnFunction.First;
 
     public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
@@ -144,7 +136,7 @@ public static class ColumnFunctionExtensions {
                                                                                      or ColumnFunction.Schlüsselspalte
                                                                                      or ColumnFunction.Virtuelle_Spalte
                                                                                      or ColumnFunction.Zeile
-                                                                                     or ColumnFunction.Split
+                                                                                     or ColumnFunction.Split_Medium
                                                                                      or ColumnFunction.First;
 
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal

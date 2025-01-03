@@ -342,7 +342,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                            and not ColumnFunction.Schlüsselspalte
                            and not ColumnFunction.RelationText
                            and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                           and not ColumnFunction.Split) { return string.Empty; }
+                           and not ColumnFunction.Split_Medium) { return string.Empty; }
 
         if (!firstToo && db.Column.First() == column) { return string.Empty; }
 

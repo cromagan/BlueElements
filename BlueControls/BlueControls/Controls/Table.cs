@@ -2768,13 +2768,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #endregion
 
-        #region Filter-Knopf mit Trichter
+        #region Trichter-Text && trichterState
 
         var trichterText = string.Empty;
-        QuickImage? trichterIcon = null;
         var trichterState = States.Undefiniert;
-
-        var autofilter = viewItem.AutoFilterLocation(_zoom, SliderX.Value);
         var fi = Filter[viewItem.Column];
 
         if (viewItem.AutoFilterSymbolPossible) {
@@ -2786,6 +2783,27 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 trichterState = States.Standard;
             }
         }
+
+        #endregion
+
+        #region Roten Rand für Split-Spalten
+
+        if (viewItem.Column is { } && viewItem.Column == viewItem.Column?.Database?.Column.SplitColumn) {
+            var t = r;
+            t.Inflate(-3, -3);
+            gr.DrawRectangle(new Pen(Color.Red, 6), t);
+            Draw_Border(gr, viewItem, r, r.Bottom);
+            trichterText = string.Empty;
+        }
+
+        #endregion
+
+        #region Filter-Knopf mit Trichter
+
+        QuickImage? trichterIcon = null;
+
+        var autofilter = viewItem.AutoFilterLocation(_zoom, SliderX.Value);
+
         var p2 = GetPix(2);
         var p4 = GetPix(4);
         var p5 = GetPix(5);

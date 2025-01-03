@@ -297,7 +297,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null) {
-                if (thisColumnItem.Function == ColumnFunction.Split) {
+                if (thisColumnItem.Function == ColumnFunction.Split_Medium) {
                     SplitColumn = thisColumnItem;
                 }
                 if (thisColumnItem.Function == ColumnFunction.First) {

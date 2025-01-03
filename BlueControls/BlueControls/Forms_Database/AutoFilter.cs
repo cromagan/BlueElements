@@ -138,13 +138,21 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             }
 
             var tmp = renderer.ValueReadable(string.Empty, ShortenStyle.Replaced, _column.DoOpticalTranslation);
+            bool nichtleereallowed;
             if (string.IsNullOrEmpty(tmp)) {
                 leere = ItemOf("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
-                nichtleere = ItemOf("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");
+                nichtleereallowed = true;
             } else {
                 leere = ItemOf(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
-                nichtleere = ItemOf("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
+                nichtleereallowed = false;
             }
+
+            if (_column is { } && _column == _column.Database?.Column.SplitColumn) {
+                nichtleereallowed = false;
+            }
+
+            nichtleere = ItemOf("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), nichtleereallowed, Constants.FirstSortChar + "03");
+
             lsbStandardFilter.ItemAdd(leere);
             lsbStandardFilter.ItemAdd(nichtleere);
 
@@ -354,6 +362,11 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     private void TXTBox_Enter(object sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(txbEingabe.Text)) {
             CloseAndDispose("FilterDelete", null);
+            return;
+        }
+
+        if (_column.Function == ColumnFunction.Split_Medium) {
+            CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_GroßKleinEgal, txbEingabe.Text));
             return;
         }
 
