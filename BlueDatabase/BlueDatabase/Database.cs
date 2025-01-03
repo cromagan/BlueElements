@@ -865,75 +865,78 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static bool SaveToFile(Database db, int minLen, string filn) {
         // Used: Only BZL
-        var bytes = ToListOfByte(db, minLen, db.FileStateUtcDate);
+        var chunks = ToListOfByte(db, minLen, db.FileStateUtcDate, false);
 
-        if (bytes == null) { return false; }
+        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return false; }
 
-        try {
-            using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
-            x.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
-            x.Flush();
-            x.Close();
-        } catch { return false; }
+       return mainchunk.Save(filn);
 
-        return true;
+
     }
 
-    public static List<byte>? ToListOfByte(Database db, int minLen, DateTime fileStateUtcDateToSave) {
+
+
+    public static List<DatabaseChunk>? ToListOfByte(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
+        var mainChunk = new DatabaseChunk();
+
+        var chunks = new List<DatabaseChunk>() { mainChunk };
+
         try {
             var x = db.LastChange;
-            List<byte> l = [];
+  
             // Wichtig, Reihenfolge und Länge NIE verändern!
-            SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
-            SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
-            SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
+            mainChunk.SaveToByteList(DatabaseDataType.Formatkennung, "BlueDatabase");
+            mainChunk.SaveToByteList(DatabaseDataType.Version, DatabaseVersion);
+            mainChunk.SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+
+            // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
             // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
             //if (string.IsNullOrEmpty(GlobalShowPass)) {
-            //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
+            //    chunk.SaveToByteList(DatabaseDataType.CryptionState, false.ToPlusMinus());
             //} else {
-            //    SaveToByteList(l, DatabaseDataType.CryptionState, true.ToPlusMinus());
-            //    SaveToByteList(l, DatabaseDataType.CryptionTest, "OK");
+            //    chunk.SaveToByteList(DatabaseDataType.CryptionState, true.ToPlusMinus());
+            //    chunk.SaveToByteList(DatabaseDataType.CryptionTest, "OK");
             //}
-            SaveToByteList(l, DatabaseDataType.GlobalShowPass, db.GlobalShowPass);
+            mainChunk.SaveToByteList(DatabaseDataType.GlobalShowPass, db.GlobalShowPass);
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
-            SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
-            SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
-            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
-            SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
+            mainChunk.SaveToByteList(DatabaseDataType.Creator, db.Creator);
+            mainChunk.SaveToByteList(DatabaseDataType.CreateDateUTC, db.CreateDate);
+            mainChunk.SaveToByteList(DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
+            mainChunk.SaveToByteList(DatabaseDataType.Caption, db.Caption);
 
-            SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
-            SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
+            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
+            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
 
             //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString(false));
             //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString(false));
-            SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
+            mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
+            mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
+            mainChunk.SaveToByteList(DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
             //SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToStringFloat2());
             //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
             //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
             //SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);
             //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));
             //SaveToByteList(l, enDatabaseDataType.FilterImagePfad, _filterImagePfad);
-            SaveToByteList(l, DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
+            mainChunk.SaveToByteList(DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
             //SaveToByteList(l, DatabaseDataType.FirstColumn, db.FirstColumn);
-            SaveToByteList(l, DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
-            SaveToByteList(l, DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
-            SaveToByteList(l, db.Column);
+            mainChunk.SaveToByteList(DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
+            mainChunk.SaveToByteList(DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
+            mainChunk.SaveToByteList(db.Column);
             //Row.SaveToByteList(l);
             //SaveToByteList(l, db.Cell, db);
             // Ganz neue Datenbank
-            SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
+            mainChunk.SaveToByteList(DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
-            SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
+            mainChunk.SaveToByteList(DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
             //SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
 
-            SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
-            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
-            SaveToByteList(l, DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
+            mainChunk.SaveToByteList(DatabaseDataType.EventScript, db.EventScript.ToString(true));
+            mainChunk.SaveToByteList(DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
+            mainChunk.SaveToByteList(DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
-            SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
+            mainChunk.SaveToByteList(DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
             if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
 
@@ -955,20 +958,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             const int undoCount = 5000;
             //SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
             if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
-            SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
-            SaveToByteList(l, DatabaseDataType.EOF, "END");
+            mainChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
 
-            if (l.Count < minLen) {
-                //Develop.DebugPrint(FehlerArt.Fehler, "ToString Fehler!");
+            mainChunk.SaveToByteList(DatabaseDataType.EOF, "END");
+
+            if (mainChunk.DataLenght < minLen) {
                 return null;
             }
 
             if (x != db.LastChange) { return null; } // Stand stimmt nicht mehr
 
-            return l;
+            return chunks;
         } catch {
             Develop.CheckStackForOverflow();
-            return ToListOfByte(db, minLen, fileStateUtcDateToSave);
+            return ToListOfByte(db, minLen, fileStateUtcDateToSave, chunksAllowed);
         }
     }
 
@@ -2186,15 +2189,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Filename = newFileName;
 
-        var l = ToListOfByte(this, 100, FileStateUtcDate);
+        var chunks = ToListOfByte(this, 100, FileStateUtcDate, false);
 
-        if (l == null) { return; }
+        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
-        using FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-        x.Write(l.ToArray(), 0, l.ToArray().Length);
-        x.Flush();
-        x.Close();
-        OnInvalidateView();
+        mainchunk.Save(newFileName);
+
     }
 
     public override string ToString() {
@@ -2362,13 +2362,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
         Develop.SetUserDidSomething();
-        var dataUncompressed = ToListOfByte(this, 1200, setfileStateUtcDateTo);
+        var chunks = ToListOfByte(this, 1200, setfileStateUtcDateTo, false);
 
-        if (dataUncompressed == null) { return false; }
-        Develop.SetUserDidSomething();
+        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) {  return false; }
 
-        var tmpFileName = WriteTempFileToDisk(dataUncompressed);
-        Develop.SetUserDidSomething();
+
+        var tmpFileName = mainchunk.WriteTempFileToDisk();
+ 
         if (string.IsNullOrEmpty(tmpFileName)) { return false; }
 
         if (FileExists(Backupdateiname())) {
@@ -2837,138 +2837,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return (pointer, type, value, colName, rowKey);
     }
 
-    private static void SaveToByteList(ColumnItem c, ref List<byte> l) {
-        if (c.Database is not { IsDisposed: false } db) { return; }
 
-        var name = c.KeyName;
 
-        SaveToByteList(l, DatabaseDataType.ColumnName, c.KeyName, name);
-        SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
-        SaveToByteList(l, DatabaseDataType.ColumnFunction, ((int)c.Function).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.DefaultRenderer, c.DefaultRenderer, name);
-        SaveToByteList(l, DatabaseDataType.RendererSettings, c.RendererSettings, name);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);
-        SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
-        //SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, name);
-        SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.RoundAfterEdit.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
-        //SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, name);
-        SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
-        SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
-        SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)c.LineLeft).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
-        //SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, name);
-        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.QuickInfo, name);
-        SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
-        SaveToByteList(l, DatabaseDataType.ColumnSystemInfo, c.SystemInfo, name);
-        //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
-        SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, name);
-        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseTableName, name);
-        //SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
-        //SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
-        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
-        SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
-        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);
-        SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
-        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
-
-        if (c.Function != ColumnFunction.Virtuelle_Spalte) {
-            foreach (var thisR in db.Row) {
-                SaveToByteList(l, c, thisR);
-            }
-        }
-    }
-
-    private static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
-        if (column.Database is not { IsDisposed: false } db) { return; }
-
-        var cellContent = db.Cell.GetStringCore(column, row);
-        if (string.IsNullOrEmpty(cellContent)) { return; }
-
-        list.Add((byte)Routinen.CellFormatUTF8_V402);
-
-        var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(list, rowKeyByte.Length, 1);
-        list.AddRange(rowKeyByte);
-
-        var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(list, cellContentByte.Length, 2);
-        list.AddRange(cellContentByte);
-    }
-
-    private static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, string columnname) {
-        list.Add((byte)Routinen.ColumnUTF8_V401);
-        list.Add((byte)databaseDataType);
-
-        var n = columnname.UTF8_ToByte();
-        SaveToByteList(list, n.Length, 1);
-        list.AddRange(n);
-
-        var b = content.UTF8_ToByte();
-        SaveToByteList(list, b.Length, 3);
-        list.AddRange(b);
-    }
-
-    private static void SaveToByteList(List<byte> list, ColumnCollection c) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
-        foreach (var columnitem in c) {
-            if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName)) {
-                SaveToByteList(columnitem, ref list);
-            }
-        }
-    }
-
-    private static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.DatenAllgemeinUTF8);
-        list.Add((byte)databaseDataType);
-        SaveToByteList(list, b.Length, 3);
-        list.AddRange(b);
-    }
-
-    private static void SaveToByteList(ICollection<byte> list, long numberToAdd, int byteCount) {
-        do {
-            byteCount--;
-            var te = (long)Math.Pow(255, byteCount);
-            // ReSharper disable once PossibleLossOfFraction
-            var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
-
-            list.Add(mu);
-            numberToAdd %= te;
-        } while (byteCount > 0);
-    }
 
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+
+
 
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
@@ -3345,20 +3219,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return RefreshRowData((List<RowItem>)[row]);
     }
 
-    private string WriteTempFileToDisk(List<byte> dataUncompressed) {
-        if (dataUncompressed.Count < 50) { return string.Empty; }
 
-        var datacompressed = dataUncompressed.ToArray().ZipIt();
-
-        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
-
-        using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-        x.Write(datacompressed, 0, datacompressed.Length);
-        x.Flush();
-        x.Close();
-
-        return tmpFileName;
-    }
 
     #endregion
 }

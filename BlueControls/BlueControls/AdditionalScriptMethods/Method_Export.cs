@@ -124,14 +124,10 @@ internal class Method_Export : Method_Database, IUseableForButton {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
-                        var bytes = Database.ToListOfByte(db, 100, db.FileStateUtcDate);
+                        var chunks = Database.ToListOfByte(db, 100, db.FileStateUtcDate, false);
 
-                        if (bytes == null) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
-
-                        using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
-                        x.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
-                        x.Flush();
-                        x.Close();
+                        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
+                        mainchunk.Save(filn);
                         break;
                     }
 
