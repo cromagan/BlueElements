@@ -25,30 +25,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
-            this.ribMain.SuspendLayout();
-            this.tabStart.SuspendLayout();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
-            this.grpAktionen.SuspendLayout();
-            this.tbcScriptEigenschaften.SuspendLayout();
-            this.tabScriptEditor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.grpCode.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
-            this.grpAusgabeFenster.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // ribMain
-            // 
-            this.ribMain.Size = new System.Drawing.Size(1297, 110);
-            // 
-            // tabStart
-            // 
-            this.tabStart.Size = new System.Drawing.Size(1289, 81);
             // 
             // grpInfos
             // 
@@ -56,64 +36,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.Location = new System.Drawing.Point(464, 3);
             this.grpInfos.Size = new System.Drawing.Size(144, 75);
             this.grpInfos.Controls.SetChildIndex(this.btnDatenbankKopf, 0);
-            this.grpInfos.Controls.SetChildIndex(this.btnBefehlsUebersicht, 0);
             // 
             // grpAusführen
             // 
             this.grpAusführen.Controls.Add(this.txbTestZeile);
             this.grpAusführen.Controls.Add(this.cpZeile);
             this.grpAusführen.Size = new System.Drawing.Size(461, 75);
+            this.grpAusführen.Controls.SetChildIndex(this.btnAusführen, 0);
             this.grpAusführen.Controls.SetChildIndex(this.cpZeile, 0);
             this.grpAusführen.Controls.SetChildIndex(this.txbTestZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.btnAusführen, 0);
             // 
             // grpAktionen
             // 
             this.grpAktionen.Location = new System.Drawing.Point(608, 3);
-            // 
-            // tbcScriptEigenschaften
-            // 
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(1297, 567);
-            // 
-            // tabScriptEditor
-            // 
-            this.tabScriptEditor.Size = new System.Drawing.Size(1289, 538);
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Size = new System.Drawing.Size(1283, 532);
-            this.splitContainer1.SplitterDistance = 272;
-            // 
-            // grpCode
-            // 
-            this.grpCode.Size = new System.Drawing.Size(1283, 272);
-            // 
-            // txtSkript
-            // 
-            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
-            this.txtSkript.Size = new System.Drawing.Size(1267, 231);
-            // 
-            // grpVariablen
-            // 
-            this.grpVariablen.Size = new System.Drawing.Size(872, 256);
-            // 
-            // grpAusgabeFenster
-            // 
-            this.grpAusgabeFenster.Location = new System.Drawing.Point(872, 0);
-            this.grpAusgabeFenster.Size = new System.Drawing.Size(411, 256);
-            // 
-            // txbSkriptInfo
-            // 
-            this.txbSkriptInfo.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.None;
-            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 223);
-            // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new System.Drawing.Size(1297, 24);
-            // 
-            // pnlStatusBar
-            // 
-            this.pnlStatusBar.Size = new System.Drawing.Size(1297, 24);
             // 
             // txbTestZeile
             // 
@@ -146,23 +81,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // RowAdderScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(1297, 677);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Name = "RowAdderScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
-            this.ribMain.ResumeLayout(false);
-            this.tabStart.ResumeLayout(false);
             this.grpInfos.ResumeLayout(false);
             this.grpAusführen.ResumeLayout(false);
-            this.grpAktionen.ResumeLayout(false);
-            this.tbcScriptEigenschaften.ResumeLayout(false);
-            this.tabScriptEditor.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.grpCode.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
-            this.grpAusgabeFenster.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 

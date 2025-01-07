@@ -1,16 +1,10 @@
-using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using ListBox = BlueControls.Controls.ListBox;
-using TabControl = BlueControls.Controls.TabControl;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -60,20 +54,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.chkExtendend = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
-            this.ribMain.SuspendLayout();
-            this.tabStart.SuspendLayout();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.grpAktionen.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
-            this.tabScriptEditor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.grpCode.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
-            this.grpAusgabeFenster.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.tabKopfdaten.SuspendLayout();
             this.grpRechte.SuspendLayout();
@@ -82,14 +66,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVerfügbareSkripte.SuspendLayout();
             this.SuspendLayout();
             // 
-            // ribMain
-            // 
-            this.ribMain.Size = new System.Drawing.Size(1297, 110);
-            // 
-            // tabStart
-            // 
-            this.tabStart.Size = new System.Drawing.Size(1289, 81);
-            // 
             // grpInfos
             // 
             this.grpInfos.Controls.Add(this.btnDatenbankKopf);
@@ -97,7 +73,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.Controls.Add(this.btnZusatzDateien);
             this.grpInfos.Location = new System.Drawing.Point(533, 3);
             this.grpInfos.Size = new System.Drawing.Size(270, 75);
-            this.grpInfos.Controls.SetChildIndex(this.btnBefehlsUebersicht, 0);
             this.grpInfos.Controls.SetChildIndex(this.btnZusatzDateien, 0);
             this.grpInfos.Controls.SetChildIndex(this.btnSpaltenuebersicht, 0);
             this.grpInfos.Controls.SetChildIndex(this.btnDatenbankKopf, 0);
@@ -121,7 +96,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.Location = new System.Drawing.Point(803, 3);
             this.grpAktionen.Size = new System.Drawing.Size(200, 75);
             this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhöhen, 0);
-            this.grpAktionen.Controls.SetChildIndex(this.btnSaveLoad, 0);
             // 
             // btnAusführen
             // 
@@ -132,46 +106,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(237, 110);
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(1060, 543);
+            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(547, 427);
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 0;
             this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
-            this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabScriptEditor, 0);
             this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabKopfdaten, 0);
-            // 
-            // tabScriptEditor
-            // 
-            this.tabScriptEditor.Size = new System.Drawing.Size(1052, 514);
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Size = new System.Drawing.Size(1046, 508);
-            // 
-            // grpCode
-            // 
-            this.grpCode.Size = new System.Drawing.Size(1046, 260);
-            // 
-            // txtSkript
-            // 
-            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
-            this.txtSkript.Size = new System.Drawing.Size(1712, 219);
-            // 
-            // grpVariablen
-            // 
-            this.grpVariablen.Size = new System.Drawing.Size(635, 244);
-            // 
-            // grpAusgabeFenster
-            // 
-            this.grpAusgabeFenster.Location = new System.Drawing.Point(635, 0);
-            // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new System.Drawing.Size(1060, 24);
-            // 
-            // pnlStatusBar
-            // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(237, 653);
-            this.pnlStatusBar.Size = new System.Drawing.Size(1060, 24);
             // 
             // tabKopfdaten
             // 
@@ -190,7 +129,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(711, 514);
+            this.tabKopfdaten.Size = new System.Drawing.Size(539, 398);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -219,7 +158,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxPic.Location = new System.Drawing.Point(371, 32);
+            this.cbxPic.Location = new System.Drawing.Point(199, 32);
             this.cbxPic.Name = "cbxPic";
             this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Size = new System.Drawing.Size(256, 24);
@@ -238,7 +177,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capImage.CausesValidation = false;
-            this.capImage.Location = new System.Drawing.Point(371, 8);
+            this.capImage.Location = new System.Drawing.Point(199, 8);
             this.capImage.Name = "capImage";
             this.capImage.Size = new System.Drawing.Size(152, 24);
             this.capImage.Text = "Bild:";
@@ -247,9 +186,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.grpRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpRechte.Controls.Add(this.lstPermissionExecute);
-            this.grpRechte.Location = new System.Drawing.Point(472, 64);
+            this.grpRechte.Location = new System.Drawing.Point(472, 80);
             this.grpRechte.Name = "grpRechte";
-            this.grpRechte.Size = new System.Drawing.Size(224, 208);
+            this.grpRechte.Size = new System.Drawing.Size(224, 192);
             this.grpRechte.TabIndex = 25;
             this.grpRechte.TabStop = false;
             this.grpRechte.Text = "Rechte";
@@ -265,7 +204,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstPermissionExecute.Location = new System.Drawing.Point(8, 16);
             this.lstPermissionExecute.Name = "lstPermissionExecute";
             this.lstPermissionExecute.RemoveAllowed = true;
-            this.lstPermissionExecute.Size = new System.Drawing.Size(208, 184);
+            this.lstPermissionExecute.Size = new System.Drawing.Size(208, 168);
             this.lstPermissionExecute.TabIndex = 18;
             this.lstPermissionExecute.Translate = false;
             this.lstPermissionExecute.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstPermissionExecute_ItemClicked);
@@ -411,7 +350,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnVerlauf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVerlauf.Enabled = false;
             this.btnVerlauf.ImageCode = "Undo|32";
-            this.btnVerlauf.Location = new System.Drawing.Point(643, 8);
+            this.btnVerlauf.Location = new System.Drawing.Point(471, 8);
             this.btnVerlauf.Name = "btnVerlauf";
             this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
             this.btnVerlauf.Size = new System.Drawing.Size(64, 66);
@@ -435,7 +374,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbName.Location = new System.Drawing.Point(8, 32);
             this.txbName.Name = "txbName";
             this.txbName.RaiseChangeDelay = 5;
-            this.txbName.Size = new System.Drawing.Size(347, 24);
+            this.txbName.Size = new System.Drawing.Size(175, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 
@@ -447,7 +386,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVerfügbareSkripte.Location = new System.Drawing.Point(0, 110);
             this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(237, 567);
+            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(237, 427);
             this.grpVerfügbareSkripte.TabIndex = 2;
             this.grpVerfügbareSkripte.TabStop = false;
             this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
@@ -461,7 +400,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Location = new System.Drawing.Point(8, 16);
             this.lstEventScripts.Name = "lstEventScripts";
             this.lstEventScripts.RemoveAllowed = true;
-            this.lstEventScripts.Size = new System.Drawing.Size(222, 544);
+            this.lstEventScripts.Size = new System.Drawing.Size(222, 404);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
             this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
@@ -557,28 +496,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             // DatabaseScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(1297, 677);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.grpVerfügbareSkripte);
             this.Name = "DatabaseScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
             this.Controls.SetChildIndex(this.ribMain, 0);
-            this.Controls.SetChildIndex(this.grpVerfügbareSkripte, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
+            this.Controls.SetChildIndex(this.grpVerfügbareSkripte, 0);
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
-            this.ribMain.ResumeLayout(false);
-            this.tabStart.ResumeLayout(false);
             this.grpInfos.ResumeLayout(false);
             this.grpAusführen.ResumeLayout(false);
             this.grpAktionen.ResumeLayout(false);
             this.tbcScriptEigenschaften.ResumeLayout(false);
-            this.tabScriptEditor.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.grpCode.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
-            this.grpAusgabeFenster.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.tabKopfdaten.ResumeLayout(false);
             this.grpRechte.ResumeLayout(false);

@@ -58,12 +58,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(716, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(784, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 653);
-            this.pnlStatusBar.Size = new System.Drawing.Size(716, 24);
+            this.pnlStatusBar.Location = new System.Drawing.Point(0, 537);
+            this.pnlStatusBar.Size = new System.Drawing.Size(784, 24);
             // 
             // ribMain
             // 
@@ -73,7 +73,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ribMain.Location = new System.Drawing.Point(0, 0);
             this.ribMain.Name = "ribMain";
             this.ribMain.SelectedIndex = 0;
-            this.ribMain.Size = new System.Drawing.Size(716, 110);
+            this.ribMain.Size = new System.Drawing.Size(784, 110);
             this.ribMain.TabDefault = null;
             this.ribMain.TabDefaultOrder = new string[0];
             this.ribMain.TabIndex = 97;
@@ -84,10 +84,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabStart.Controls.Add(this.grpAktionen);
             this.tabStart.Controls.Add(this.grpInfos);
             this.tabStart.Controls.Add(this.grpAusführen);
-            this.tabStart.Location = new System.Drawing.Point(4, 29);
+            this.tabStart.Location = new System.Drawing.Point(4, 25);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStart.Size = new System.Drawing.Size(708, 77);
+            this.tabStart.Size = new System.Drawing.Size(776, 81);
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             // 
@@ -99,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktionen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAktionen.Location = new System.Drawing.Point(152, 3);
             this.grpAktionen.Name = "grpAktionen";
-            this.grpAktionen.Size = new System.Drawing.Size(64, 71);
+            this.grpAktionen.Size = new System.Drawing.Size(64, 75);
             this.grpAktionen.TabIndex = 2;
             this.grpAktionen.TabStop = false;
             this.grpAktionen.Text = "Aktionen";
@@ -124,7 +124,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpInfos.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpInfos.Location = new System.Drawing.Point(72, 3);
             this.grpInfos.Name = "grpInfos";
-            this.grpInfos.Size = new System.Drawing.Size(80, 71);
+            this.grpInfos.Size = new System.Drawing.Size(80, 75);
             this.grpInfos.TabIndex = 1;
             this.grpInfos.TabStop = false;
             this.grpInfos.Text = "Infos";
@@ -148,7 +148,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusführen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAusführen.Location = new System.Drawing.Point(3, 3);
             this.grpAusführen.Name = "grpAusführen";
-            this.grpAusführen.Size = new System.Drawing.Size(69, 71);
+            this.grpAusführen.Size = new System.Drawing.Size(69, 75);
             this.grpAusführen.TabIndex = 0;
             this.grpAusführen.TabStop = false;
             this.grpAusführen.Text = "Ausführen";
@@ -173,7 +173,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(0, 110);
             this.tbcScriptEigenschaften.Name = "tbcScriptEigenschaften";
             this.tbcScriptEigenschaften.SelectedIndex = 0;
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(716, 543);
+            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(784, 427);
             this.tbcScriptEigenschaften.TabDefault = null;
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 98;
@@ -183,10 +183,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabScriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabScriptEditor.Controls.Add(this.splitContainer1);
-            this.tabScriptEditor.Location = new System.Drawing.Point(4, 29);
+            this.tabScriptEditor.Location = new System.Drawing.Point(4, 25);
             this.tabScriptEditor.Name = "tabScriptEditor";
             this.tabScriptEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabScriptEditor.Size = new System.Drawing.Size(708, 510);
+            this.tabScriptEditor.Size = new System.Drawing.Size(776, 398);
             this.tabScriptEditor.TabIndex = 1;
             this.tabScriptEditor.Text = "Skript-Editor";
             // 
@@ -205,8 +205,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.splitContainer1.Panel2.Controls.Add(this.grpVariablen);
             this.splitContainer1.Panel2.Controls.Add(this.grpAusgabeFenster);
-            this.splitContainer1.Size = new System.Drawing.Size(702, 504);
-            this.splitContainer1.SplitterDistance = 257;
+            this.splitContainer1.Size = new System.Drawing.Size(770, 392);
+            this.splitContainer1.SplitterDistance = 199;
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 5;
             // 
@@ -217,7 +217,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpCode.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpCode.Location = new System.Drawing.Point(0, 0);
             this.grpCode.Name = "grpCode";
-            this.grpCode.Size = new System.Drawing.Size(702, 257);
+            this.grpCode.Size = new System.Drawing.Size(770, 199);
             this.grpCode.TabIndex = 3;
             this.grpCode.TabStop = false;
             this.grpCode.Text = "Code";
@@ -259,7 +259,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txtSkript.RightBracket2 = '}';
             this.txtSkript.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.txtSkript.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("txtSkript.ServiceColors")));
-            this.txtSkript.Size = new System.Drawing.Size(686, 216);
+            this.txtSkript.Size = new System.Drawing.Size(754, 156);
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
@@ -272,7 +272,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
-            this.grpVariablen.Size = new System.Drawing.Size(291, 239);
+            this.grpVariablen.Size = new System.Drawing.Size(359, 185);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
             this.grpVariablen.ToEdit = null;
@@ -283,9 +283,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAusgabeFenster.Controls.Add(this.txbSkriptInfo);
             this.grpAusgabeFenster.Dock = System.Windows.Forms.DockStyle.Right;
             this.grpAusgabeFenster.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
-            this.grpAusgabeFenster.Location = new System.Drawing.Point(291, 0);
+            this.grpAusgabeFenster.Location = new System.Drawing.Point(359, 0);
             this.grpAusgabeFenster.Name = "grpAusgabeFenster";
-            this.grpAusgabeFenster.Size = new System.Drawing.Size(411, 239);
+            this.grpAusgabeFenster.Size = new System.Drawing.Size(411, 185);
             this.grpAusgabeFenster.TabIndex = 3;
             this.grpAusgabeFenster.TabStop = false;
             this.grpAusgabeFenster.Text = "Ausgabe";
@@ -298,7 +298,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSkriptInfo.Location = new System.Drawing.Point(8, 24);
             this.txbSkriptInfo.Name = "txbSkriptInfo";
-            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 210);
+            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 156);
             this.txbSkriptInfo.TabIndex = 1;
             this.txbSkriptInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -306,10 +306,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabAssistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabAssistent.Controls.Add(this.lstAssistant);
-            this.tabAssistent.Location = new System.Drawing.Point(4, 29);
+            this.tabAssistent.Location = new System.Drawing.Point(4, 25);
             this.tabAssistent.Name = "tabAssistent";
             this.tabAssistent.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAssistent.Size = new System.Drawing.Size(711, 510);
+            this.tabAssistent.Size = new System.Drawing.Size(708, 514);
             this.tabAssistent.TabIndex = 2;
             this.tabAssistent.Text = "Befehls-Assistent";
             // 
@@ -327,8 +327,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // ScriptEditorGeneric
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.ClientSize = new System.Drawing.Size(716, 677);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.tbcScriptEigenschaften);
             this.Controls.Add(this.ribMain);
             this.MinimizeBox = false;
@@ -357,24 +357,24 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ResumeLayout(false);
 
         }
-        protected RibbonBar ribMain;
-        protected TabPage tabStart;
+        private TabPage tabStart;
         protected GroupBox grpInfos;
-        protected Button btnBefehlsUebersicht;
+        private Button btnBefehlsUebersicht;
         protected GroupBox grpAusführen;
         protected GroupBox grpAktionen;
-        protected Button btnSaveLoad;
+        private Button btnSaveLoad;
         protected Button btnAusführen;
         protected Controls.TabControl tbcScriptEigenschaften;
-        protected TabPage tabScriptEditor;
-        protected SplitContainer splitContainer1;
-        protected GroupBox grpCode;
-        protected FastColoredTextBoxNS.FastColoredTextBox txtSkript;
-        protected VariableEditor grpVariablen;
-        protected GroupBox grpAusgabeFenster;
-        protected Controls.TextBox txbSkriptInfo;
+        private TabPage tabScriptEditor;
+        private SplitContainer splitContainer1;
+        private GroupBox grpCode;
+        private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
+        private VariableEditor grpVariablen;
+        private GroupBox grpAusgabeFenster;
+        private Controls.TextBox txbSkriptInfo;
         private System.ComponentModel.IContainer components;
         private TabPage tabAssistent;
         private Controls.ListBox lstAssistant;
+        protected RibbonBar ribMain;
     }
 }

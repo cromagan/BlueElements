@@ -25,82 +25,21 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.cpad = new BlueControls.Controls.CreativePad();
-            this.ribMain.SuspendLayout();
-            this.tabStart.SuspendLayout();
-            this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
-            this.grpAktionen.SuspendLayout();
-            this.tbcScriptEigenschaften.SuspendLayout();
-            this.tabScriptEditor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.grpCode.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
-            this.grpAusgabeFenster.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
-            // ribMain
-            // 
-            this.ribMain.Size = new System.Drawing.Size(1297, 110);
-            // 
-            // tabStart
-            // 
-            this.tabStart.Size = new System.Drawing.Size(1289, 81);
-            // 
-            // grpAusführen
-            // 
-            this.grpAusführen.Controls.Add(this.txbTestZeile);
-            this.grpAusführen.Controls.Add(this.cpZeile);
-            this.grpAusführen.Controls.SetChildIndex(this.cpZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.txbTestZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.btnAusführen, 0);
-            // 
             // tbcScriptEigenschaften
             // 
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(840, 567);
-            // 
-            // tabScriptEditor
-            // 
-            this.tabScriptEditor.Size = new System.Drawing.Size(832, 538);
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Size = new System.Drawing.Size(826, 532);
-            this.splitContainer1.SplitterDistance = 272;
-            // 
-            // grpCode
-            // 
-            this.grpCode.Size = new System.Drawing.Size(826, 272);
-            // 
-            // txtSkript
-            // 
-            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
-            this.txtSkript.Size = new System.Drawing.Size(810, 231);
-            // 
-            // grpVariablen
-            // 
-            this.grpVariablen.Size = new System.Drawing.Size(415, 256);
-            // 
-            // grpAusgabeFenster
-            // 
-            this.grpAusgabeFenster.Location = new System.Drawing.Point(415, 0);
-            this.grpAusgabeFenster.Size = new System.Drawing.Size(411, 256);
-            // 
-            // txbSkriptInfo
-            // 
-            this.txbSkriptInfo.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.None;
-            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 223);
+            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(327, 451);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(840, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(327, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Size = new System.Drawing.Size(840, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(327, 24);
             // 
             // btnDatenbankKopf
             // 
@@ -134,21 +73,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cpad.CausesValidation = false;
             this.cpad.Dock = System.Windows.Forms.DockStyle.Right;
-            this.cpad.Location = new System.Drawing.Point(840, 110);
+            this.cpad.Location = new System.Drawing.Point(327, 110);
             this.cpad.Name = "cpad";
-            this.cpad.ShiftX = 0F;
-            this.cpad.ShiftY = 0F;
             this.cpad.ShowJointPoint = true;
-            this.cpad.Size = new System.Drawing.Size(457, 567);
+            this.cpad.Size = new System.Drawing.Size(457, 451);
             this.cpad.TabIndex = 0;
             this.cpad.TabStop = false;
             this.cpad.Text = "connectedCreativePad1";
-            this.cpad.Zoom = 1F;
             // 
             // CreativePadScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(1297, 677);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.cpad);
             this.Name = "CreativePadScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
@@ -156,20 +92,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Controls.SetChildIndex(this.cpad, 0);
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.ribMain.ResumeLayout(false);
-            this.tabStart.ResumeLayout(false);
-            this.grpInfos.ResumeLayout(false);
             this.grpAusführen.ResumeLayout(false);
-            this.grpAktionen.ResumeLayout(false);
-            this.tbcScriptEigenschaften.ResumeLayout(false);
-            this.tabScriptEditor.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.grpCode.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
-            this.grpAusgabeFenster.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
