@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -349,8 +349,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         //if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
         if (db.Column.First() is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
 
-        db.RefreshColumnsData(colsToRefresh.ToArray());
-
         #endregion
 
         var lockMe = new object();
@@ -520,32 +518,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5), "Undo-Befehl");
         //row.Database?.Row.ExecuteValueChangedEvent(true);
-    }
-
-    /// <summary>
-    /// Füllt die Liste rowsToExpand auf, bis sie 100 Einträge enthält.
-    /// </summary>
-    /// <param name="rowsToExpand"></param>
-    /// <param name="sortedRows"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    public static bool FillUp100(List<RowItem> rowsToExpand, List<RowData> sortedRows) {
-        if (rowsToExpand.Count is > 99 or 0) { return false; }
-
-        if (rowsToExpand[0].IsDisposed) { return false; }
-        if (rowsToExpand[0].Database is not { IsDisposed: false }) { return false; }
-
-        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
-
-        var tmpRowsToExpand = new List<RowItem>();
-        tmpRowsToExpand.AddRange(rowsToExpand);
-
-        foreach (var thisRow in tmpRowsToExpand) {
-            var all = FillUp(rowsToExpand, thisRow, sortedRows, (100 / tmpRowsToExpand.Count) + 1);
-            if (all) { return true; }
-            if (rowsToExpand.Count > 200) { return false; }
-        }
-
-        return false;
     }
 
     public static void ImportBdb(Database database) {
@@ -1451,29 +1423,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var firstVisibleRow = sortedRowData.Count;
         var lastVisibleRow = -1;
 
-        var rowsToRefreh = new List<RowItem>();
-
         foreach (var thisRow in sortedRowData) {
             if (thisRow?.Row is { IsDisposed: false } r) {
                 if (IsOnScreen(ca, thisRow, displayRectangleWoSlider)) {
-                    if (r.IsInCache == null) { _ = rowsToRefreh.AddIfNotExists(r); }
-
                     var T = sortedRowData.IndexOf(thisRow);
                     firstVisibleRow = Math.Min(T, firstVisibleRow);
                     lastVisibleRow = Math.Max(T, lastVisibleRow);
                 }
             }
         }
-
-        _ = FillUp100(rowsToRefreh, sortedRowData);
-
-        //var (didreload, errormessage) = Database.RefreshRowData(rowsToRefreh);
-
-        //if (!string.IsNullOrEmpty(errormessage)) {
-        //    FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, errormessage, true);
-        //}
-
-        //Invalidate_SortedRowData();
 
         #region Slider
 
@@ -1931,61 +1889,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             //Database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             _isinVisibleChanged = false;
         }
-    }
-
-    /// <summary>
-    /// Füllt die Liste rowsToExpand um expandCount Einträge auf. Ausgehend von rowToCheck
-    /// </summary>
-    /// <param name="rowsToExpand"></param>
-    /// <param name="rowToCheck"></param>
-    /// <param name="sortedRows"></param>
-    /// <param name="expandCount"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    private static bool FillUp(ICollection<RowItem> rowsToExpand, RowItem rowToCheck, IReadOnlyList<RowData> sortedRows, int expandCount) {
-        var indexPosition = -1;
-
-        for (var z = 0; z < sortedRows.Count; z++) {
-            var tmpr = sortedRows[z];
-            if (!tmpr.MarkYellow && tmpr.Row == rowToCheck) { indexPosition = z; break; }
-        }
-
-        if (indexPosition == -1) { return false; } // Wie bitte?
-
-        var modi = 0;
-
-        while (expandCount > 0) {
-            modi++;
-            var n1 = indexPosition - modi;
-            var n2 = indexPosition + modi;
-
-            if (n1 < 0 && n2 >= sortedRows.Count) { return true; }
-
-            #region Zeile "vorher" prüfen und aufnehmen
-
-            if (n1 >= 0) {
-                var tmpr = sortedRows[n1].Row;
-                if (tmpr is { IsDisposed: false, IsInCache: null } && !rowsToExpand.Contains(tmpr)) {
-                    rowsToExpand.Add(tmpr);
-                    expandCount--;
-                }
-            }
-
-            #endregion
-
-            #region Zeile "nachher" prüfen und aufnehmen
-
-            if (n2 < sortedRows.Count) {
-                var tmpr = sortedRows[n2].Row;
-                if (tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
-                    rowsToExpand.Add(tmpr);
-                    expandCount--;
-                }
-            }
-
-            #endregion
-        }
-
-        return false;
     }
 
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
@@ -3006,7 +2909,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             //return;
 
-            if (db.HasPendingChanges && !string.IsNullOrEmpty(db.Filename)) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+            //if (db.HasPendingChanges && !string.IsNullOrEmpty(db.Filename)) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
             if (db.ReadOnly) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8);
                 if (!string.IsNullOrEmpty(db.FreezedReason)) {

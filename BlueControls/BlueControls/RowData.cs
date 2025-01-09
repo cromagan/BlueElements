@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -113,7 +113,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         DrawHeight = 18;
 
         foreach (var thisViewItem in ca) {
-            if (CellCollection.IsInCache(thisViewItem.Column, Row) && thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
+            if (thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer(style);
 
                 DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation).Height);

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -362,10 +362,9 @@ public class DatabaseMu : Database {
         return oo;
     }
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunk) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, chunk);
         if (!string.IsNullOrEmpty(f)) { return f; }
-        HasPendingChanges = false; // Datenbank kann keine Pendings haben
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
@@ -374,7 +373,7 @@ public class DatabaseMu : Database {
         if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
+        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", chunk);
 
         try {
             lock (_writer) {
@@ -454,7 +453,7 @@ public class DatabaseMu : Database {
             _writer.WriteLine("- Filename " + Filename);
             _writer.WriteLine("- User " + UserName);
 
-            var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
+            var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty);
             _writer.WriteLine(l.ParseableItems().FinishParseable());
             _writer.Flush();
         } catch { }

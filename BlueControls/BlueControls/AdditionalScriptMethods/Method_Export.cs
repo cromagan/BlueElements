@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -127,7 +127,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                         var chunks = Database.ToListOfByte(db, 100, db.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
-                        mainchunk.Save(filn);
+                        mainchunk.Save(filn, 100);
                         break;
                     }
 

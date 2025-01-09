@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
@@ -30,14 +31,33 @@ using static BlueBasics.IO;
 namespace BlueDatabase;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class DatabaseChunk {
-
-    public long DataLenght => _bytes.Count;
+public class DatabaseChunk : IHasKeyName {
 
     #region Fields
 
-    public readonly string Filename = string.Empty;
+    public readonly bool IsMain;
     private readonly List<byte> _bytes = new List<byte>();
+
+    #endregion
+
+    #region Constructors
+
+    public DatabaseChunk(string chunkName, string kennung, bool isMain) {
+        KeyName = chunkName;
+        IsMain = isMain;
+        // Wichtig, Reihenfolge und Länge NIE verändern!
+        SaveToByteList(DatabaseDataType.Formatkennung, kennung);
+        SaveToByteList(DatabaseDataType.Version, Database.DatabaseVersion);
+        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+    }
+
+    #endregion
+
+    #region Properties
+
+    public long DataLenght => _bytes.Count;
+
+    public string KeyName { get; private set; }
 
     #endregion
 
@@ -51,7 +71,9 @@ public class DatabaseChunk {
         _bytes.AddRange(bytes);
     }
 
-    public bool Save(string filename) {
+    public bool Save(string filename, int minBytes) {
+        if (_bytes.Count < minBytes) { return false; }
+
         try {
             Develop.SetUserDidSomething();
             var datacompressed = _bytes.ToArray().ZipIt();
@@ -75,7 +97,11 @@ public class DatabaseChunk {
         var cellContent = db.Cell.GetStringCore(column, row);
         if (string.IsNullOrEmpty(cellContent)) { return; }
 
-        BytesAdd((byte)Routinen.CellFormatUTF8_V402);
+        BytesAdd((byte)Routinen.CellFormatUTF8_V403);
+
+        var columnKeyByte = column.KeyName.UTF8_ToByte();
+        SaveToByteList(columnKeyByte.Length, 1);
+        BytesAddRange(columnKeyByte);
 
         var rowKeyByte = row.KeyName.UTF8_ToByte();
         SaveToByteList(rowKeyByte.Length, 1);
@@ -129,8 +155,6 @@ public class DatabaseChunk {
     }
 
     public void SaveToByteList(ColumnItem c) {
-        if (c.Database is not { IsDisposed: false } db) { return; }
-
         var name = c.KeyName;
 
         SaveToByteList(DatabaseDataType.ColumnName, c.KeyName, name);
@@ -192,24 +216,34 @@ public class DatabaseChunk {
         SaveToByteList(DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
         SaveToByteList(DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
-
-        if (c.Function != ColumnFunction.Virtuelle_Spalte) {
-            foreach (var thisR in db.Row) {
-                SaveToByteList(c, thisR);
-            }
-        }
     }
 
-    public string WriteTempFileToDisk() {
-        if (_bytes.Count < 50) { return string.Empty; }
+    internal bool DoExtendedSave(string filename, int minbytes) {
+        string backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
+        string tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+        if (!Save(tempfile, minbytes)) { return false; }
 
-        if (Save(tmpFileName)) {
-            return tmpFileName;
+        if (FileExists(backup)) {
+            if (!DeleteFile(backup, false)) { return false; }
+        }
+        Develop.SetUserDidSomething();
+        // Haupt-Datei wird zum Backup umbenannt
+        MoveFile(filename, backup, false); // Kein Abbruch hier, die DAtei könnte ja nicht existieren
+        Develop.SetUserDidSomething();
+
+        if (FileExists(filename)) {
+            // Paralleler Prozess hat gespeichert?!?
+            _ = DeleteFile(tempfile, false);
+
+            return false;
         }
 
-        return string.Empty;
+        // --- TmpFile wird zum Haupt ---
+        _ = MoveFile(tempfile, filename, true);
+        Develop.SetUserDidSomething();
+
+        return true;
     }
 
     #endregion

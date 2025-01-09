@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -634,7 +634,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         var fi2 = _internal.ToArray();
 
-        db.RefreshColumnsData(fi2);
+        foreach (var fi in fi2) {
+            if (fi.Column == db.Column.SplitColumn) { db.LoadChunk(fi.SearchValue[0]); }
+        }
 
         List<RowItem> tmpVisibleRows = [];
         var lockMe = new object();

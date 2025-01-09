@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -49,8 +49,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     #region Constructors
 
-    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType,
-        [searchValue]) { }
+    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType, [searchValue]) { }
 
     /// <summary>
     /// Ein AlwaysFalse Filter
@@ -73,8 +72,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         SearchValue = new List<string>().AsReadOnly();
 
         this.Parse(filterCode);
-
-        _column?.RefreshColumnsData();
     }
 
     public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToStringFloat5() + "|" + to.ToStringFloat5()) { }
@@ -96,8 +93,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         _column = column;
         _filterType = filterType;
         _origin = origin;
-
-        _column?.RefreshColumnsData();
 
         if (searchValue is { Count: > 0 }) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
@@ -123,8 +118,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         } else {
             SearchValue = new List<string>().AsReadOnly();
         }
-
-        _column?.RefreshColumnsData();
     }
 
     #endregion
@@ -154,7 +147,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             if (value == _column) { return; }
             OnChanging();
             _column = value;
-            _column?.RefreshColumnsData();
             OnPropertyChanged();
         }
     }
@@ -298,6 +290,11 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             }
         }
 
+        if (_column != null && _column.Function is ColumnFunction.Split_Medium) {
+            if (SearchValue.Count != 1) { return "Split-Spalte mit ungültiger Suche"; }
+            if (_filterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal and not FilterType.Istgleich_MultiRowIgnorieren) { return "Falscher Typ"; }
+        }
+
         return string.Empty;
     }
 
@@ -373,7 +370,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case "columnname":
             case "column":
                 _column = Database?.Column[value];
-                _column?.RefreshColumnsData();
                 return true;
 
             case "columnkey":

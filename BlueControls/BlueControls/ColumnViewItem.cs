@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -327,8 +327,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (column is not { IsDisposed: false }) { return 16; }
         if (column.Database is not { IsDisposed: false } db) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
-
-        column.RefreshColumnsData();
 
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
 

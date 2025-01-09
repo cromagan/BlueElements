@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 #nullable enable
+
+using System;
 
 namespace BlueDatabase.Enums;
 
@@ -48,5 +50,9 @@ public enum Routinen : byte {
     CellFormatUTF8_V401 = 8,
 
     ColumnUTF8_V401 = 9,
-    CellFormatUTF8_V402 = 10
+
+    [Obsolete("Wird zukünftig entfernt werden", false)]
+    CellFormatUTF8_V402 = 10, // Ohne ColumnName, mit RowKey
+    
+    CellFormatUTF8_V403 = 11 // Mit ColumnName und RowKey
 }

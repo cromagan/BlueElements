@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -30,7 +30,7 @@ public class UndoItem : IParseable {
 
     #region Constructors
 
-    public UndoItem(string tablename, DatabaseDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) {
+    public UndoItem(string tablename, DatabaseDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container, string chunk) {
         Command = command;
         ColName = column;
         RowKey = row;
@@ -41,9 +41,10 @@ public class UndoItem : IParseable {
         TableName = tablename;
         Comment = comment;
         Container = container;
+        Chunk = chunk;
     }
 
-    public UndoItem(string tablename, DatabaseDataType command, IHasKeyName? column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
+    public UndoItem(string tablename, DatabaseDataType command, IHasKeyName? column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container, string chunk) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container, chunk) { }
 
     public UndoItem(string s) => this.Parse(s);
 
@@ -55,8 +56,8 @@ public class UndoItem : IParseable {
 
     public string ChangedTo { get; private set; } = string.Empty;
 
+    public string Chunk { get; private set; } = string.Empty;
     public string ColName { get; private set; } = string.Empty;
-
     public DatabaseDataType Command { get; private set; } = 0;
 
     public string Comment { get; private set; } = string.Empty;
@@ -92,6 +93,7 @@ public class UndoItem : IParseable {
         result.ParseableAdd("RK", RowKey);
         result.ParseableAdd("P", PreviousValue);
         result.ParseableAdd("C", ChangedTo);
+        result.ParseableAdd("CH", Chunk);
         result.ParseableAdd("CMT", Comment);
         return result;
     }
@@ -157,6 +159,10 @@ public class UndoItem : IParseable {
             case "cmt":
                 Comment = value.FromNonCritical();
                 return true;
+
+            case "ch":
+                Chunk = value.FromNonCritical();
+                return true;
         }
 
         return false;
@@ -170,7 +176,10 @@ public class UndoItem : IParseable {
         return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUtc + ", " + User + ")</i>";
     }
 
-    internal bool LogsUndo(Database database) => database.Column[ColName] is { IsDisposed: false, ShowUndo: true };
+    internal bool LogsUndo(Database database) {
+        if (Command != DatabaseDataType.Value_withoutSizeData) { return true; }
+        return database.Column[ColName] is { IsDisposed: false, ShowUndo: true };
+    }
 
     #endregion
 }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -462,6 +462,14 @@ public static partial class Extensions {
         return char.IsPunctuation(value) || char.IsSeparator(value) || tr.Contains(value.ToString());
     }
 
+    public static string Left(this string value, int length) {
+        if (string.IsNullOrEmpty(value) || length <= 0) {
+            return string.Empty;
+        }
+
+        return (length < value.Length) ? value.Substring(0, length) : value;
+    }
+
     public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<string>>? klammern) {
         var gans = false;
         var pos = startpos;
@@ -662,6 +670,14 @@ public static partial class Extensions {
         var charArray = tXt.ToCharArray();
         Array.Reverse(charArray);
         return new string(charArray);
+    }
+
+    public static string Right(this string value, int length) {
+        if (string.IsNullOrEmpty(value) || length <= 0) {
+            return string.Empty;
+        }
+
+        return (length < value.Length) ? value.Substring(value.Length - length) : value;
     }
 
     /// <summary>

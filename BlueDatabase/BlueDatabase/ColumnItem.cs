@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -41,8 +41,6 @@ namespace BlueDatabase;
 public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColumnInputFormat, IErrorCheckable, IHasDatabase, IDisposableExtendedWithEvent, IEditable {
 
     #region Fields
-
-    public DateTime? IsInCache = null;
 
     internal List<string>? UcaseNamesSortedByLenght;
     private const string TmpNewDummy = "TMPNEWDUMMY";
@@ -984,8 +982,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
         var m = 0;
 
-        Database.RefreshColumnsData(this);
-
         foreach (var thisRow in Database.Row) {
             var t = thisRow.CellGetString(this);
             m = Math.Max(m, t.StringtoUtf8().Length);
@@ -1003,8 +999,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         ////if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
         ////if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
         var m = 0;
-
-        Database.RefreshColumnsData(this);
 
         var l = Contents();
 
@@ -1116,8 +1110,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public List<string> Contents(IEnumerable<RowItem>? rows) {
         if (rows == null || !rows.Any()) { return []; }
-
-        RefreshColumnsData();
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
@@ -1402,14 +1394,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
         }
         return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(":");
-    }
-
-    public void RefreshColumnsData() {
-        if (IsInCache != null) { return; }
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        if (_name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
-
-        Database?.RefreshColumnsData(this);
     }
 
     public void Repair() {

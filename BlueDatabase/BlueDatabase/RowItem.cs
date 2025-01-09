@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -51,8 +51,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public List<string>? LastCheckedRowFeedback;
 
     private Database? _database;
-
-    private DateTime? _isInCache;
 
     private string? _tmpQuickInfo;
 
@@ -112,14 +110,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public Type? Editor { get; set; }
 
     public bool IsDisposed { get; private set; }
-
-    public DateTime? IsInCache {
-        get => _isInCache;
-        set {
-            _isInCache = value;
-            OnRowGotData(new RowEventArgs(this));
-        }
-    }
 
     public string KeyName { get; private set; }
 
@@ -346,10 +336,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
         if (LastCheckedEventArgs != null) { return; }
 
-        //_ = Database.RefreshRowData(this, false);
-
-        //if (IsInCache == null) { Develop.DebugPrint(FehlerArt.Fehler, "Refresh-Fehler"); }
-
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
@@ -434,8 +420,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.SortDefinition?.Columns is { } lc) { colsToRefresh.AddRange(lc); }
         if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
         if (db.Column.First() is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
-
-        db.RefreshColumnsData(colsToRefresh.ToArray());
 
         return CompareKey(colsToRefresh);
     }
@@ -546,8 +530,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return KeyName == fi.SearchValue[0];
         }
 
-        //fi.Column?.RefreshColumnsData(); // Muss beim Ändern der Colum Property ausgeführt werden
-
         if (fi.Column == null) {
             if (!fi.FilterType.HasFlag(FilterType.GroßKleinEgal)) { fi.FilterType |= FilterType.GroßKleinEgal; }
             if (fi.FilterType is not FilterType.Instr_GroßKleinEgal and not FilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
@@ -574,7 +556,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!found) { return false; }
         }
 
-        //Database.RefreshColumnsData(filter);
         if (filter.Length == 1) { return MatchesTo(filter[0]); }
 
         var ok = true;
@@ -962,8 +943,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         while (true) {
             if (IsDisposed || column.Database is not { IsDisposed: false } db) { return "Datenbank ungültig"; }
             if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
-
-            db.RefreshCellData(column, this, reason);
 
             var cellKey = CellCollection.KeyOfCell(column, this);
 

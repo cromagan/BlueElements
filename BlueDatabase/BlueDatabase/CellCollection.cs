@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -102,8 +102,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (column.Database != row.Database || column.Database != Database) { return null; }
 
-            db.RefreshCellData(column, row, Reason.SetCommand);
-
             var cellKey = KeyOfCell(column, row);
             return ContainsKey(cellKey) ? this[cellKey] : null;
         }
@@ -178,7 +176,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (db.Column.SysLocked != null) {
                 if (db.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds < 0) {
-                    db.RefreshColumnsData(db.Column.SysLocked);
                     if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
                         return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
                     }
@@ -308,13 +305,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //}
 
         //return (fc, string.Empty);
-    }
-
-    public static bool IsInCache(ColumnItem? column, RowItem? row) {
-        if (column is not { IsDisposed: false }) { return false; }
-        if (row is not { IsDisposed: false }) { return false; }
-        if (column.Database is not { IsDisposed: false }) { return false; }
-        return column.IsInCache != null || row.IsInCache != null;
     }
 
     public static string KeyOfCell(string colname, string rowKey) => colname.ToUpperInvariant() + "|" + rowKey;
