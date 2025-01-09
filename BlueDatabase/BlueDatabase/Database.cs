@@ -1950,11 +1950,30 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
+    public void LoadAllChunks() {
+        if (IsDisposed) { return; }
+        if (string.IsNullOrEmpty(Filename)) { return; }
+        Column.GetSystems();
+        if (Column.SplitColumn == null) { return; }
+
+        var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
+
+        if (!DirectoryExists(chunkPath)) { return; }
+
+        var chunkFiles = Directory.GetFiles(chunkPath, $"*.{Filename.FileSuffix()}c");
+        foreach (var file in chunkFiles) {
+            var chunkName = file.FileNameWithoutSuffix();
+            if (!_chunksLoaded.Contains(chunkName)) {
+                LoadChunk(file);
+            }
+        }
+    }
+
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
-        //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
+
         if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
@@ -1971,6 +1990,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 return;
             }
         }
+
         Filename = fileNameToLoad;
         //ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
@@ -1981,12 +2001,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var bLoaded = LoadBytesFromDisk(Filename);
         if (bLoaded == null) { return; }
 
-        Parse(bLoaded, needPassword, false);
+        if (!Parse(bLoaded, needPassword, false)) { return; }
 
+        // Jetzt prüfen auf Split-Column und Chunks nachladen
         if (Column.SplitColumn != null) {
-            var cf = ChunkFileName("Additional");
-            if (FileExists(cf)) {
-                bLoaded = LoadBytesFromDisk(cf);
+            var additionalFile = ChunkFileName("Additional");
+
+            if (FileExists(additionalFile)) {
+                bLoaded = LoadBytesFromDisk(additionalFile);
                 if (bLoaded != null) {
                     Parse(bLoaded, needPassword, true);
                 }
@@ -2127,6 +2149,32 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return false;
     }
 
+    public void ReorganizeChunks() {
+        if (IsDisposed) { return; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
+        if (string.IsNullOrEmpty(Filename)) { return; }
+
+        // Erst alle Chunks laden
+        LoadAllChunks();
+
+        _chunksChanged.Add("ALLCHUNKS");
+
+        // Alle bestehenden Chunks erst speichern
+        SaveInternal(FileStateUtcDate);
+
+        Column.GetSystems();
+        if (Column.SplitColumn != null) { return; }
+
+        var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
+
+        var chunkFiles = Directory.GetFiles(chunkPath, $"*.{Filename.FileSuffix()}c");
+
+        // Alte Chunk-Dateien löschen
+        foreach (var file in chunkFiles) {
+            DeleteFile(file, false);
+        }
+    }
+
     public void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten DatabaseMU nicht mehr funktioniert
 
@@ -2202,6 +2250,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(chunkname)) { return false; }
 
         if (_chunksLoaded.Contains(chunkname)) { return true; }
+
+        OnDropMessage(FehlerArt.Info, $"Lade Zeilen von '{value}' der Datenbank {Caption} nach ({chunkname})");
 
         _chunksLoaded.Add(chunkname);
 
@@ -2353,7 +2403,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (chunks == null || chunks.Count == 0) { return false; }
 
         foreach (var thisChunk in chunks) {
-            if (_chunksChanged.Contains(thisChunk.KeyName) || _chunksChanged.Contains("ALL")) {
+            if (_chunksChanged.Contains(thisChunk.KeyName) || _chunksChanged.Contains("ALLCHUNKS")) {
                 string filename;
 
                 if (thisChunk.IsMain) {
@@ -2362,6 +2412,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     filename = ChunkFileName(thisChunk.KeyName);
                 }
                 if (!thisChunk.DoExtendedSave(filename, 5)) { return false; }
+                _chunksLoaded.AddIfNotExists(thisChunk.KeyName);
             }
         }
 
@@ -3155,7 +3206,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Freeze("Parse Fehler!");
         }
 
-        if (isChunkLoader) {
+        if (!isChunkLoader) {
 
             #region unbenutzte (gelöschte) Spalten entfernen
 

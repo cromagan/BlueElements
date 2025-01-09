@@ -550,9 +550,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_function == value) { return; }
+            var wasSplit = _function == ColumnFunction.Split_Medium;
 
             _ = Database?.ChangeData(DatabaseDataType.ColumnFunction, this, null, ((int)_function).ToString(), ((int)value).ToString(), Generic.UserName, DateTime.UtcNow, string.Empty);
             Invalidate_ColumAndContent();
+
+            var willBeSplit = _function == ColumnFunction.Split_Medium;
+
+            if (wasSplit != willBeSplit) {
+                Database?.ReorganizeChunks();
+            }
+
             OnPropertyChanged();
         }
     }
