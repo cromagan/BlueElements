@@ -31,7 +31,7 @@ public static class DatabaseDataTypeExtension {
 
     //public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
-    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 109 or 123 or 134 or 151 or 153 or 178 or 185 or 191 or 249;
+    public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 16 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 109 or 123 or 134 or 151 or 153 or 178 or 185 or 191 or 249;
 
     #endregion
 
@@ -64,7 +64,7 @@ public enum DatabaseDataType : byte {
 
     //Beschreibung = 14
     //Schlagwörter = 15
-    Formatkennung = 16,
+    //Formatkennung = 16,
 
     //FormatVersion = 17
     Tags = 18,
@@ -136,6 +136,12 @@ public enum DatabaseDataType : byte {
     /// Datum/Uhrzeit, bis zu dem die Undos engelesen und fest verankert wurden.
     /// </summary>
     FileStateUTCDate = 74,
+
+
+    LastEditUser = 75,
+    LastEditApp = 76,
+    LastEditMachineName = 77,
+    LastEditTimeUTC = 78,
 
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,

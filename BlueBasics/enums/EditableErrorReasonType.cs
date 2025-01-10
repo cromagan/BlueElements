@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -47,13 +47,13 @@ public enum EditableErrorReasonType {
 
     Save = 16,
 
-    /// <summary>
-    ///  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werden sollen
-    /// </summary>
-    Load = 32,
+    ///// <summary>
+    /////  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werden sollen
+    ///// </summary>
+    //Load = 32,
 
-    /// <summary>
-    /// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werden. Nur für Kontrollzwecke benutzen!
-    /// </summary>
-    LoadForCheckingOnly = 64
+    ///// <summary>
+    ///// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werden. Nur für Kontrollzwecke benutzen!
+    ///// </summary>
+    //LoadForCheckingOnly = 64
 }

@@ -55,6 +55,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public const string DatabaseVersion = "4.10";
     public static readonly ObservableCollection<Database> AllFiles = [];
+    public static readonly string Chunk_Additional = "_additional";
+
+    public static readonly string Chunk_MainData = "MainData";
 
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
@@ -86,8 +89,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
-    private readonly List<string> _chunksChanged = new();
-    private readonly List<string> _chunksLoaded = new();
+    /// <summary>
+    /// Flüchtiger Speicher, wird nur zum Halten von Daten verwendet.
+    /// </summary>
+    private readonly List<DatabaseChunk> _chunks = new();
+
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<DatabaseScriptDescription> _eventScript = [];
     private readonly List<string> _permissionGroupsNewRow = [];
@@ -638,6 +644,113 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
+    public static List<DatabaseChunk>? GenerateNewChunks(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
+        var chunks = new List<DatabaseChunk>();
+
+        chunksAllowed = chunksAllowed && db.Column.SplitColumn != null;
+
+        var mainChunk = new DatabaseChunk(db.Filename, Chunk_MainData);
+        mainChunk.UpdateCurrentValues();
+
+        chunks.Add(mainChunk);
+
+        try {
+            var x = db.LastChange;
+
+            mainChunk.SaveToByteList(DatabaseDataType.GlobalShowPass, db.GlobalShowPass);
+            mainChunk.SaveToByteList(DatabaseDataType.Creator, db.Creator);
+            mainChunk.SaveToByteList(DatabaseDataType.CreateDateUTC, db.CreateDate);
+            mainChunk.SaveToByteList(DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
+            mainChunk.SaveToByteList(DatabaseDataType.Caption, db.Caption);
+
+            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
+            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
+
+            mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
+            mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
+            mainChunk.SaveToByteList(DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
+
+            mainChunk.SaveToByteList(DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
+            mainChunk.SaveToByteList(DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
+            mainChunk.SaveToByteList(DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
+            mainChunk.SaveToByteList(db.Column);
+
+            mainChunk.SaveToByteList(DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
+
+            mainChunk.SaveToByteList(DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
+
+            mainChunk.SaveToByteList(DatabaseDataType.EventScript, db.EventScript.ToString(true));
+            mainChunk.SaveToByteList(DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
+            mainChunk.SaveToByteList(DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
+            mainChunk.SaveToByteList(DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
+
+            foreach (var thisRow in db.Row) {
+
+                #region Chunk bestimmen
+
+                var chunk = mainChunk;
+                if (chunksAllowed && db.Column.SplitColumn is { } spc) {
+                    var chunkname = GetChunkName(db, thisRow.CellGetString(spc));
+                    if (string.IsNullOrEmpty(chunkname)) { return null; }
+
+                    chunk = chunks.Get(chunkname);
+
+                    if (chunk == null) {
+                        chunk = new DatabaseChunk(db.Filename, chunkname);
+                        chunk.UpdateCurrentValues();
+                        chunks.Add(chunk);
+                    }
+                }
+
+                #endregion
+
+                foreach (var thisColumn in db.Column) {
+                    if (thisColumn.Function != ColumnFunction.Virtuelle_Spalte) {
+                        chunk.SaveToByteList(thisColumn, thisRow);
+                    }
+                }
+            }
+
+            if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
+
+            // Beim Erstellen des Undo-Speichers die Undos nicht verändern, da auch bei einem nicht
+            // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
+            List<string> works2 = [];
+            foreach (var thisWorkItem in db.Undo) {
+                if (thisWorkItem != null) {
+                    if (thisWorkItem.LogsUndo(db)) {
+                        works2.Add(thisWorkItem.ParseableItems().FinishParseable());
+                    }
+                }
+            }
+
+            if (chunksAllowed) {
+                mainChunk = new DatabaseChunk(db.Filename, Chunk_Additional);
+                mainChunk.UpdateCurrentValues();
+                chunks.Add(mainChunk);
+            }
+
+            const int undoCount = 5000;
+            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
+            mainChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
+
+            long l = 0;
+            foreach (var thisChunk in chunks) {
+                mainChunk.SaveToByteList(DatabaseDataType.EOF, "END");
+                l += thisChunk.DataLenght;
+            }
+
+            if (l < minLen) { return null; }
+
+            if (x != db.LastChange) { return null; } // Stand stimmt nicht mehr
+
+            return chunks;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return GenerateNewChunks(db, minLen, fileStateUtcDateToSave, chunksAllowed);
+        }
+    }
+
     public static Database? GetByFilename(string filname, bool readOnly, NeedPassword? needPassword, bool checktablename, string mustbefreezed) {
         var l = new ConnectionInfo(filname, null, mustbefreezed);
         return GetById(l, readOnly, needPassword, checktablename);
@@ -835,6 +948,199 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return tmp;
     }
 
+    public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
+        var colName = string.Empty;
+        var rowKey = string.Empty;
+        string value;
+        DatabaseDataType type;
+
+        switch ((Routinen)bLoaded[pointer]) {
+            //case Routinen.CellFormat: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
+            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
+            //        //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+            //        pointer += 11 + les + 4;
+            //        break;
+            //    }
+            //case Routinen.CellFormatUTF8: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
+            //        // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+            //        pointer += 11 + les + 4;
+            //        break;
+            //    }
+            //case Routinen.CellFormatUTF8_V400: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode7(bLoaded, pointer + 5);
+            //        rowKey = NummerCode7(bLoaded, pointer + 12);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //var  width = NummerCode2(bLoaded, pointer + 19 + les);
+            //        //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
+            //        pointer += 19 + les + 4;
+            //        break;
+            //    }
+            case Routinen.CellFormatUTF8_V401: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+                    var les = NummerCode3(bLoaded, pointer + 2);
+                    rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
+                    value = b.ToStringUtf8();
+                    pointer += 12 + les;
+                    //colKey = -1;
+                    break;
+                }
+
+            //case Routinen.DatenAllgemein: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = -1;
+            //        rowKey = -1;
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 5, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 5 + les;
+            //        break;
+            //    }
+            case Routinen.DatenAllgemeinUTF8: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+                    var les = NummerCode3(bLoaded, pointer + 2);
+                    rowKey = string.Empty;
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
+                    value = b.ToStringUtf8();
+                    //width = 0;
+                    //height = 0;
+                    pointer += 5 + les;
+                    break;
+                }
+            //case Routinen.Column: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 11 + les;
+            //        break;
+            //    }
+            //case Routinen.ColumnUTF8: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 11 + les;
+            //        break;
+            //    }
+            //case Routinen.ColumnUTF8_V400: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode7(bLoaded, pointer + 5);
+            //        rowKey = NummerCode7(bLoaded, pointer + 12);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 19 + les;
+            //        break;
+            //    }
+            case Routinen.ColumnUTF8_V401: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+
+                    var cles = NummerCode1(bLoaded, pointer + 2);
+                    var cb = new byte[cles];
+                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
+                    colName = cb.ToStringUtf8();
+
+                    var les = NummerCode3(bLoaded, pointer + 3 + cles);
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
+                    value = b.ToStringUtf8();
+
+                    pointer += 6 + les + cles;
+                    break;
+                }
+
+            case Routinen.CellFormatUTF8_V402: {
+                    type = DatabaseDataType.UTF8Value_withoutSizeData;
+
+                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
+                    var rowKeyByte = new byte[lenghtRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
+                    rowKey = rowKeyByte.ToStringUtf8();
+
+                    var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
+                    var valueByte = new byte[lenghtValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
+                    value = valueByte.ToStringUtf8();
+
+                    pointer += 2 + lenghtRowKey + 2 + lenghtValue;
+
+                    break;
+                }
+
+            case Routinen.CellFormatUTF8_V403: {
+                    type = DatabaseDataType.UTF8Value_withoutSizeData;
+
+                    var lenghtColumnKey = NummerCode1(bLoaded, pointer + 1);
+                    var columnKeyByte = new byte[lenghtColumnKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, columnKeyByte, 0, lenghtColumnKey);
+                    colName = columnKeyByte.ToStringUtf8();
+
+                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 2 + lenghtColumnKey);
+                    var rowKeyByte = new byte[lenghtRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 3 + lenghtColumnKey, rowKeyByte, 0, lenghtRowKey);
+                    rowKey = rowKeyByte.ToStringUtf8();
+
+                    var lenghtValue = NummerCode2(bLoaded, pointer + 3 + lenghtRowKey + lenghtColumnKey);
+                    var valueByte = new byte[lenghtValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 5 + lenghtRowKey + lenghtColumnKey, valueByte, 0, lenghtValue);
+                    value = valueByte.ToStringUtf8();
+
+                    pointer += 5 + lenghtRowKey + lenghtValue + lenghtColumnKey;
+
+                    break;
+                }
+
+            default: {
+                    type = 0;
+                    value = string.Empty;
+                    //width = 0;
+                    //height = 0;
+                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
+                    break;
+                }
+        }
+
+        return (pointer, type, value, colName, rowKey);
+    }
+
     /// <summary>
     /// Standardisiert Benutzergruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
     /// </summary>
@@ -867,119 +1173,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static bool SaveToFile(Database db, int minLen, string filn) {
         // Used: Only BZL, nach Chunks Obsolete
-        var chunks = ToListOfByte(db, minLen, db.FileStateUtcDate, false);
+        var chunks = GenerateNewChunks(db, minLen, db.FileStateUtcDate, false);
 
         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return false; }
 
         return mainchunk.Save(filn, minLen);
-    }
-
-    public static List<DatabaseChunk>? ToListOfByte(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
-        var chunks = new List<DatabaseChunk>();
-
-        chunksAllowed = chunksAllowed && db.Column.SplitColumn != null;
-
-        string kennung = "BlueDatatable";
-
-        if (chunksAllowed) { kennung = "BlueDatatable"; }
-
-        var mainChunk = new DatabaseChunk("MainData", kennung, true);
-
-        chunks.Add(mainChunk);
-
-        try {
-            var x = db.LastChange;
-
-            mainChunk.SaveToByteList(DatabaseDataType.GlobalShowPass, db.GlobalShowPass);
-            mainChunk.SaveToByteList(DatabaseDataType.Creator, db.Creator);
-            mainChunk.SaveToByteList(DatabaseDataType.CreateDateUTC, db.CreateDate);
-            mainChunk.SaveToByteList(DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
-            mainChunk.SaveToByteList(DatabaseDataType.Caption, db.Caption);
-
-            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
-            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
-
-            mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
-            mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
-            mainChunk.SaveToByteList(DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
-
-            mainChunk.SaveToByteList(DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
-            mainChunk.SaveToByteList(DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
-            mainChunk.SaveToByteList(DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
-            mainChunk.SaveToByteList(db.Column);
-
-            mainChunk.SaveToByteList(DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
-
-            mainChunk.SaveToByteList(DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
-
-            mainChunk.SaveToByteList(DatabaseDataType.EventScript, db.EventScript.ToString(true));
-            mainChunk.SaveToByteList(DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
-            mainChunk.SaveToByteList(DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
-            mainChunk.SaveToByteList(DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
-
-            foreach (var thisRow in db.Row) {
-
-                #region Chunk bestimmen
-
-                var chunk = mainChunk;
-                if (chunksAllowed && db.Column.SplitColumn is { } spc) {
-                    var chunkname = GetChunkName(db, thisRow.CellGetString(spc));
-                    if (string.IsNullOrEmpty(chunkname)) { return null; }
-
-                    chunk = chunks.Get(chunkname);
-
-                    if (chunk == null) {
-                        chunk = new DatabaseChunk(chunkname, kennung, false);
-                        chunks.Add(chunk);
-                    }
-                }
-
-                #endregion
-
-                foreach (var thisColumn in db.Column) {
-                    if (thisColumn.Function != ColumnFunction.Virtuelle_Spalte) {
-                        chunk.SaveToByteList(thisColumn, thisRow);
-                    }
-                }
-            }
-
-            if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
-
-            // Beim Erstellen des Undo-Speichers die Undos nicht verändern, da auch bei einem nicht
-            // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
-            List<string> works2 = [];
-            foreach (var thisWorkItem in db.Undo) {
-                if (thisWorkItem != null) {
-                    if (thisWorkItem.LogsUndo(db)) {
-                        works2.Add(thisWorkItem.ParseableItems().FinishParseable());
-                    }
-                }
-            }
-
-            if (chunksAllowed) {
-                mainChunk = new DatabaseChunk("Additional", kennung, false);
-                chunks.Add(mainChunk);
-            }
-
-            const int undoCount = 5000;
-            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
-            mainChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
-
-            long l = 0;
-            foreach (var thisChunk in chunks) {
-                mainChunk.SaveToByteList(DatabaseDataType.EOF, "END");
-                l += thisChunk.DataLenght;
-            }
-
-            if (l < minLen) { return null; }
-
-            if (x != db.LastChange) { return null; } // Stand stimmt nicht mehr
-
-            return chunks;
-        } catch {
-            Develop.CheckStackForOverflow();
-            return ToListOfByte(db, minLen, fileStateUtcDateToSave, chunksAllowed);
-        }
     }
 
     public static string UndoText(ColumnItem? column, RowItem? row) {
@@ -1088,7 +1286,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        string chunk = "MainData";
+        string chunk = Chunk_MainData;
 
         if (Column.SplitColumn is { } spc && row is { } r) {
             var v = r.CellGetString(spc);
@@ -1289,7 +1487,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (DoingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
 
-        if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
+        if (mode is EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
         //if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) { return "Datenbank wird noch geladen"; }
 
@@ -1305,10 +1503,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
         }
 
-        //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
-        if (mode.HasFlag(EditableErrorReasonType.Load) || mode.HasFlag(EditableErrorReasonType.LoadForCheckingOnly)) {
-            if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-        }
+        ////----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
+        //if (mode.HasFlag(EditableErrorReasonType.Load) || mode.HasFlag(EditableErrorReasonType.LoadForCheckingOnly)) {
+        //    if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+        //}
 
         //----------Alle Edits und Save ------------------------------------------------------------------------
         //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
@@ -1687,6 +1885,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
+    public bool HasChangedChunks() {
+        foreach (var thisChunk in _chunks) {
+            if (thisChunk.DataChanged) { return true; }
+        }
+        return false;
+    }
+
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
             var db = GetByFilename(thisFile, true, null, false, "Import");
@@ -1722,8 +1927,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (deleteImportet) {
-                Save();
-                if (_chunksChanged.Count > 0) { return "Speicher-Fehler!"; }
+                var ok = Save();
+                if (!ok) { return "Speicher-Fehler!"; }
                 db.Dispose();
                 var d = DeleteFile(thisFile, false);
                 if (!d) { return "Lösch-Fehler!"; }
@@ -1950,23 +2155,25 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    public void LoadAllChunks() {
-        if (IsDisposed) { return; }
-        if (string.IsNullOrEmpty(Filename)) { return; }
+    public bool LoadAllChunks() {
+        if (IsDisposed) { return false; }
+        if (string.IsNullOrEmpty(Filename)) { return true; }
         Column.GetSystems();
-        if (Column.SplitColumn == null) { return; }
+        if (Column.SplitColumn == null) { return true; }
 
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
-        if (!DirectoryExists(chunkPath)) { return; }
+        if (!DirectoryExists(chunkPath)) { return true; }
 
         var chunkFiles = Directory.GetFiles(chunkPath, $"*.{Filename.FileSuffix()}c");
         foreach (var file in chunkFiles) {
             var chunkName = file.FileNameWithoutSuffix();
-            if (!_chunksLoaded.Contains(chunkName)) {
-                LoadChunk(file);
-            }
+
+            var ok = LoadChunkWithChunkId(Filename, chunkName);
+            if (!ok) { return false; }
         }
+
+        return true;
     }
 
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
@@ -1998,21 +2205,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         OnLoading();
 
-        var bLoaded = LoadBytesFromDisk(Filename);
-        if (bLoaded == null) { return; }
+        var MainChunk = new DatabaseChunk(Filename, Chunk_MainData);
+        MainChunk.LoadBytesFromDisk();
 
-        if (!Parse(bLoaded, needPassword, false)) { return; }
+        if (MainChunk.DataLenght < 1) { return; }
+
+        if (!Parse(MainChunk, needPassword)) { return; }
 
         // Jetzt prüfen auf Split-Column und Chunks nachladen
         if (Column.SplitColumn != null) {
-            var additionalFile = ChunkFileName("Additional");
-
-            if (FileExists(additionalFile)) {
-                bLoaded = LoadBytesFromDisk(additionalFile);
-                if (bLoaded != null) {
-                    Parse(bLoaded, needPassword, true);
-                }
-            }
+            var adChunk = new DatabaseChunk(Filename, Chunk_Additional);
+            adChunk.LoadBytesFromDisk();
+            Parse(adChunk, needPassword);
         }
 
         if (FileStateUtcDate.Year < 2000) {
@@ -2048,7 +2252,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
         //}
 
-        Parse(bLoaded, null, false);
+        var MainChunk = new DatabaseChunk(bLoaded);
+        Parse(MainChunk, null);
 
         RepairAfterParse();
         Freeze("Stream-Datenbank");
@@ -2155,9 +2360,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(Filename)) { return; }
 
         // Erst alle Chunks laden
-        LoadAllChunks();
+        if (!LoadAllChunks()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Chunk laden!");
+            return;
+        }
 
-        _chunksChanged.Add("ALLCHUNKS");
+        _chunks.Clear();
 
         // Alle bestehenden Chunks erst speichern
         SaveInternal(FileStateUtcDate);
@@ -2205,7 +2413,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public virtual bool Save() {
         if (_isInSave) { return false; }
 
-        if (_chunksChanged.Count == 0) { return false; }
+        if (!HasChangedChunks()) { return true; }
 
         _isInSave = true;
         var v = SaveInternal(FileStateUtcDate);
@@ -2222,7 +2430,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Filename = newFileName;
 
-        var chunks = ToListOfByte(this, 100, FileStateUtcDate, false);
+        var chunks = GenerateNewChunks(this, 100, FileStateUtcDate, false);
 
         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
@@ -2244,25 +2452,29 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
-    internal bool LoadChunk(string value) {
+    internal bool LoadChunkfromValue(string value) {
         var chunkname = GetChunkName(this, value);
 
         if (string.IsNullOrEmpty(chunkname)) { return false; }
 
-        if (_chunksLoaded.Contains(chunkname)) { return true; }
+        return LoadChunkWithChunkId(value, chunkname);
+    }
+
+    internal bool LoadChunkWithChunkId(string value, string chunkname) {
+        if (_chunks.Get(chunkname) is { } chk) {
+            if (!chk.NeedsReload) { return true; }
+
+            ClearChunkRelatedData(chunkname);
+        }
 
         OnDropMessage(FehlerArt.Info, $"Lade Zeilen von '{value}' der Datenbank {Caption} nach ({chunkname})");
 
-        _chunksLoaded.Add(chunkname);
+        var chunk = new DatabaseChunk(Filename, chunkname);
+        chunk.LoadBytesFromDisk();
 
-        var fn = ChunkFileName(chunkname);
+        if (chunk.LoadBytesFromDisk == null) { return false; }
 
-        if (!FileExists(fn)) { return true; }
-
-        var bLoaded = LoadBytesFromDisk(fn);
-        if (bLoaded == null) { return false; }
-
-        return Parse(bLoaded, null, true);
+        return Parse(chunk, null);
     }
 
     internal void OnDropMessage(FehlerArt type, string message) {
@@ -2398,25 +2610,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
         Develop.SetUserDidSomething();
-        var chunks = ToListOfByte(this, 1200, setfileStateUtcDateTo, true);
+        var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
+        if (chunksnew == null || chunksnew.Count == 0) { return false; }
+        foreach (var thisChunk in chunksnew) {
+            if (_chunks.Get(thisChunk.KeyName) is not { } chk || chk.DataChanged) {
+                if (!thisChunk.DoExtendedSave(5)) { return false; }
 
-        if (chunks == null || chunks.Count == 0) { return false; }
-
-        foreach (var thisChunk in chunks) {
-            if (_chunksChanged.Contains(thisChunk.KeyName) || _chunksChanged.Contains("ALLCHUNKS")) {
-                string filename;
-
-                if (thisChunk.IsMain) {
-                    filename = Filename;
-                } else {
-                    filename = ChunkFileName(thisChunk.KeyName);
-                }
-                if (!thisChunk.DoExtendedSave(filename, 5)) { return false; }
-                _chunksLoaded.AddIfNotExists(thisChunk.KeyName);
+                _chunks.Remove(thisChunk.KeyName);
+                _chunks.Add(thisChunk);
             }
         }
-
-        _chunksChanged.Clear();
 
         FileStateUtcDate = setfileStateUtcDateTo;
         return true;
@@ -2444,7 +2647,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         LastChange = DateTime.UtcNow;
 
         if (!string.IsNullOrEmpty(chunk)) {
-            LoadChunk(chunk);
+            LoadChunkWithChunkId(Filename, chunk);
         }
 
         if (type.IsCellValue()) {
@@ -2515,15 +2718,23 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         switch (type) {
-            case DatabaseDataType.Formatkennung:
-                break;
+            //case DatabaseDataType.Formatkennung:
+            //    break;
 
             case DatabaseDataType.Version:
                 LoadedVersion = value.Trim();
-                //if (LoadedVersion != DatabaseVersion) {
-                //    Freeze("Versions-Konflikt");
-                //    LoadedVersion = value.Trim();
-                //}
+                break;
+
+            case DatabaseDataType.LastEditUser:
+                break;
+
+            case DatabaseDataType.LastEditApp:
+                break;
+
+            case DatabaseDataType.LastEditMachineName:
+                break;
+
+            case DatabaseDataType.LastEditTimeUTC:
                 break;
 
             case DatabaseDataType.Werbung:
@@ -2657,8 +2868,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
-        _chunksChanged.AddIfNotExists(chunk);
-        _chunksChanged.AddIfNotExists("Additional");
+        if (_chunks.Get(chunk) is { } chk1) { chk1.DataChanged = true; }
+        if (_chunks.Get(Chunk_Additional) is { } chk2) { chk2.DataChanged = true; }
 
         return string.Empty;
     }
@@ -2707,199 +2918,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return nu;
     }
 
-    private static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
-        var colName = string.Empty;
-        var rowKey = string.Empty;
-        string value;
-        DatabaseDataType type;
-
-        switch ((Routinen)bLoaded[pointer]) {
-            //case Routinen.CellFormat: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringWin1252();
-            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
-            //        //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-            //        pointer += 11 + les + 4;
-            //        break;
-            //    }
-            //case Routinen.CellFormatUTF8: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
-            //        // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-            //        pointer += 11 + les + 4;
-            //        break;
-            //    }
-            //case Routinen.CellFormatUTF8_V400: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode7(bLoaded, pointer + 5);
-            //        rowKey = NummerCode7(bLoaded, pointer + 12);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //var  width = NummerCode2(bLoaded, pointer + 19 + les);
-            //        //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
-            //        pointer += 19 + les + 4;
-            //        break;
-            //    }
-            case Routinen.CellFormatUTF8_V401: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
-                    value = b.ToStringUtf8();
-                    pointer += 12 + les;
-                    //colKey = -1;
-                    break;
-                }
-
-            //case Routinen.DatenAllgemein: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = -1;
-            //        rowKey = -1;
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 5, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringWin1252();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 5 + les;
-            //        break;
-            //    }
-            case Routinen.DatenAllgemeinUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    rowKey = string.Empty;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringUtf8();
-                    //width = 0;
-                    //height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
-            //case Routinen.Column: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringWin1252();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 11 + les;
-            //        break;
-            //    }
-            //case Routinen.ColumnUTF8: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 11 + les;
-            //        break;
-            //    }
-            //case Routinen.ColumnUTF8_V400: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode7(bLoaded, pointer + 5);
-            //        rowKey = NummerCode7(bLoaded, pointer + 12);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 19 + les;
-            //        break;
-            //    }
-            case Routinen.ColumnUTF8_V401: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-
-                    var cles = NummerCode1(bLoaded, pointer + 2);
-                    var cb = new byte[cles];
-                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
-                    colName = cb.ToStringUtf8();
-
-                    var les = NummerCode3(bLoaded, pointer + 3 + cles);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
-                    value = b.ToStringUtf8();
-
-                    pointer += 6 + les + cles;
-                    break;
-                }
-
-            case Routinen.CellFormatUTF8_V402: {
-                    type = DatabaseDataType.UTF8Value_withoutSizeData;
-
-                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
-                    var rowKeyByte = new byte[lenghtRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
-                    rowKey = rowKeyByte.ToStringUtf8();
-
-                    var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
-                    var valueByte = new byte[lenghtValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
-                    value = valueByte.ToStringUtf8();
-
-                    pointer += 2 + lenghtRowKey + 2 + lenghtValue;
-
-                    break;
-                }
-
-            case Routinen.CellFormatUTF8_V403: {
-                    type = DatabaseDataType.UTF8Value_withoutSizeData;
-
-                    var lenghtColumnKey = NummerCode1(bLoaded, pointer + 1);
-                    var columnKeyByte = new byte[lenghtColumnKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, columnKeyByte, 0, lenghtColumnKey);
-                    colName = columnKeyByte.ToStringUtf8();
-
-                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 2 + lenghtColumnKey);
-                    var rowKeyByte = new byte[lenghtRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 3 + lenghtColumnKey, rowKeyByte, 0, lenghtRowKey);
-                    rowKey = rowKeyByte.ToStringUtf8();
-
-                    var lenghtValue = NummerCode2(bLoaded, pointer + 3 + lenghtRowKey + lenghtColumnKey);
-                    var valueByte = new byte[lenghtValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 5 + lenghtRowKey + lenghtColumnKey, valueByte, 0, lenghtValue);
-                    value = valueByte.ToStringUtf8();
-
-                    pointer += 5 + lenghtRowKey + lenghtValue + lenghtColumnKey;
-
-                    break;
-                }
-
-            default: {
-                    type = 0;
-                    value = string.Empty;
-                    //width = 0;
-                    //height = 0;
-                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
-                    break;
-                }
-        }
-
-        return (pointer, type, value, colName, rowKey);
-    }
-
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
@@ -2919,13 +2937,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
 
-        if (_chunksChanged.Count == 0) {
+        var changed = !HasChangedChunks();
+
+        if (!changed) {
             _checkerTickCount = 0;
             return;
         }
 
-        if (_chunksChanged.Count > 0 &&
-            ((_checkerTickCount > 20 && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds > 20) ||
+        if (((_checkerTickCount > 20 && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds > 20) ||
             _checkerTickCount > 180)) {
             if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
 
@@ -2934,12 +2953,23 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    private string ChunkFileName(string chunkname) {
-        var folder = Filename.FilePath();
-        var databasename = Filename.FileNameWithoutSuffix();
-        var suffix = Filename.FileSuffix();
+    private void ClearChunkRelatedData(string chunkName) {
+        Develop.DebugPrint_NichtImplementiert(true);
+        // Spalten mit Splitfunktion ermitteln
+        if (Column.SplitColumn is not { } splitColumn) { return; }
 
-        return $"{folder}{databasename}\\{chunkname}.{suffix}c";
+        // Zeilen finden, die zum zu löschenden Chunk gehören
+        var rowsToRemove = Row.Where(r =>
+            GetChunkName(this, r.CellGetString(splitColumn)) == chunkName
+        ).ToList();
+
+        // Zeilen und zugehörige Zellen entfernen
+        foreach (var row in rowsToRemove) {
+            Row.ExecuteCommand(DatabaseDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
+        }
+
+        // Verwaiste Zellen entfernen
+        Cell.RemoveOrphans();
     }
 
     private void Column_ColumnDisposed(object sender, ColumnEventArgs e) {
@@ -3065,40 +3095,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    /// <summary>
-    /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
-    /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
-    /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
-    /// </summary>
-    /// <param name="checkmode"></param>
-    /// <returns></returns>
-    private byte[]? LoadBytesFromDisk(string filename) {
-        var startTime = DateTime.UtcNow;
-
-        while (true) {
-            try {
-                var f = EditableErrorReason(EditableErrorReasonType.Load);
-                if (string.IsNullOrEmpty(f)) {
-                    var bLoaded = File.ReadAllBytes(filename);
-                    if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
-                    return bLoaded;
-                }
-
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20) {
-                    Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + filename);
-                }
-
-                Pause(0.5, false);
-            } catch (Exception ex) {
-                // Home Office kann lange blokieren....
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                    return null;
-                }
-            }
-        }
-    }
-
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
@@ -3108,15 +3104,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private bool Parse(byte[] data, NeedPassword? needPassword, bool isChunkLoader) {
+    private bool Parse(DatabaseChunk chunk, NeedPassword? needPassword) {
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
 
-        if (!isChunkLoader) {
+        if (chunk.IsMain) {
+            _chunks.Clear();
             Undo.Clear();
             Row.RemoveNullOrEmpty();
             Cell.Clear();
         }
+
+        _chunks.Add(chunk);
+
+        var data = chunk.Bytes;
 
         try {
             ColumnItem? column = null;
@@ -3206,7 +3207,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Freeze("Parse Fehler!");
         }
 
-        if (!isChunkLoader) {
+        if (chunk.IsMain) {
 
             #region unbenutzte (gelöschte) Spalten entfernen
 

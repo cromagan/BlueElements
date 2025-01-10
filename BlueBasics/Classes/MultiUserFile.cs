@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -225,13 +225,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datei eingefroren: " + FreezedReason; }
 
-        //----------Load ------------------------------------------------------------------------
-        if (mode is EditableErrorReasonType.Load or EditableErrorReasonType.LoadForCheckingOnly) {
-            if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-            //if (_initialLoadDone && AmIBlocker(true)) { return "Die Datei ist garade von dem PC geblockt und kann nur geschrieben werden."; }
-            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 0.1) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            return string.Empty;
-        }
+        ////----------Load ------------------------------------------------------------------------
+        //if (mode is EditableErrorReasonType.Load or EditableErrorReasonType.LoadForCheckingOnly) {
+        //    if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+        //    //if (_initialLoadDone && AmIBlocker(true)) { return "Die Datei ist garade von dem PC geblockt und kann nur geschrieben werden."; }
+        //    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 0.1) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+        //    return string.Empty;
+        //}
 
         //----------Alle Edits und Save ------------------------------------------------------------------------
 
@@ -309,14 +309,14 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <returns>Gibt TRUE zurück, wenn die am Ende der Routine die Datei auf dem aktuellesten Stand ist</returns>
     public bool Load_Reload() {
-        if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return false; }
+        //if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return false; }
 
         try {
             _isLoading = true;
 
             if (_initialLoadDone && !ReloadNeeded) { return true; }
 
-            var (data, tmpLastSaveCode) = LoadFromDisk(EditableErrorReasonType.Load);
+            var (data, tmpLastSaveCode) = LoadFromDisk();
             if (data.Length < 10) { return false; }
 
             this.Parse(data);
@@ -534,7 +534,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
-    private (string data, string fileinfo) LoadFromDisk(EditableErrorReasonType checkmode) {
+    private (string data, string fileinfo) LoadFromDisk() {
         string fileinfo;
         string data;
         var tim = Stopwatch.StartNew();
@@ -543,17 +543,16 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             try {
                 if (_initialLoadDone && !ReloadNeeded) { return (string.Empty, string.Empty); } // Problem hat sich aufgelöst
 
-                var f = EditableErrorReason(checkmode);
-                if (string.IsNullOrEmpty(f)) {
+    
                     var tmpFileInfo = GetFileInfo(Filename, true);
                     data = File.ReadAllText(Filename, Constants.Win1252);
                     fileinfo = GetFileInfo(Filename, true);
                     if (tmpFileInfo == fileinfo) { break; }
 
-                    f = "Datei wurde während des Ladens verändert.";
-                }
 
-                if (tim.ElapsedMilliseconds > 20000) { Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + Filename); }
+                
+
+                if (tim.ElapsedMilliseconds > 20000) { Develop.DebugPrint(FehlerArt.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
 
                 Pause(0.5, false);
             } catch (Exception ex) {
@@ -622,7 +621,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         _ = MoveFile(tmpFileName, Filename, true);
 
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-        var (data, fileinfo) = LoadFromDisk(EditableErrorReasonType.LoadForCheckingOnly);
+        var (data, fileinfo) = LoadFromDisk();
         if (dataUncompressed != data) {
             // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichtert und ungeladen.
             _checkedAndReloadNeed = true;

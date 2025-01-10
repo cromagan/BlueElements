@@ -21,12 +21,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -35,29 +38,62 @@ public class DatabaseChunk : IHasKeyName {
 
     #region Fields
 
-    public readonly bool IsMain;
-    private readonly List<byte> _bytes = new List<byte>();
+    public readonly string MainFileName = string.Empty;
+    private List<byte> _bytes = new List<byte>();
+    private string _fileinfo = string.Empty;
+    private bool _loadFailed = false;
 
     #endregion
 
     #region Constructors
 
-    public DatabaseChunk(string chunkName, string kennung, bool isMain) {
+    public DatabaseChunk(string mainFileName, string chunkName) {
+        MainFileName = mainFileName;
         KeyName = chunkName;
-        IsMain = isMain;
-        // Wichtig, Reihenfolge und Länge NIE verändern!
-        SaveToByteList(DatabaseDataType.Formatkennung, kennung);
-        SaveToByteList(DatabaseDataType.Version, Database.DatabaseVersion);
-        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+    }
+
+    public DatabaseChunk(byte[] bLoaded) {
+        _bytes = bLoaded.ToList();
+        KeyName = Database.Chunk_MainData;
     }
 
     #endregion
 
     #region Properties
 
-    public long DataLenght => _bytes.Count;
-
+    public byte[] Bytes => _bytes.ToArray();
+    public bool DataChanged { get; set; } = false;
+    public long DataLenght => _bytes?.Count ?? 0;
+    public bool IsMain => KeyName == Database.Chunk_MainData;
     public string KeyName { get; private set; }
+
+    public string LastEditApp { get; private set; } = string.Empty;
+
+    public string LastEditMachineName { get; private set; } = string.Empty;
+
+    public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
+
+    public string LastEditUser { get; private set; } = string.Empty;
+
+    public bool NeedsReload {
+        get {
+            var nf = GetFileInfo(ChunkFileName, true);
+
+            return nf != _fileinfo;
+        }
+    }
+
+    private string ChunkFileName {
+        get {
+            if (IsMain) { return MainFileName; }
+
+            var folder = MainFileName.FilePath();
+            var databasename = MainFileName.FileNameWithoutSuffix();
+            var suffix = MainFileName.FileSuffix();
+
+            return $"{folder}{databasename}\\{KeyName}.{suffix}c";
+        }
+    }
 
     #endregion
 
@@ -71,8 +107,61 @@ public class DatabaseChunk : IHasKeyName {
         _bytes.AddRange(bytes);
     }
 
+    public bool DataOk(int minLen) {
+        if (_loadFailed) { return true; }
+
+        return _bytes.Count >= minLen;
+    }
+
+    /// <summary>
+    /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
+    /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
+    /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
+    /// </summary>
+    /// <param name="checkmode"></param>
+    /// <returns></returns>
+    public void LoadBytesFromDisk() {
+        var c = ChunkFileName;
+
+        if (!FileExists(c)) {
+            _bytes.Clear();
+            return;
+        }
+
+        var startTime = DateTime.UtcNow;
+
+        while (true) {
+            try {
+                //var f = EditableErrorReason(EditableErrorReasonType.Load);
+
+                _fileinfo = GetFileInfo(ChunkFileName, true);
+                var bLoaded = File.ReadAllBytes(c);
+                if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
+                _bytes = bLoaded.ToList();
+                ParseLockData();
+                return;
+
+                //if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20) {
+                //    Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + ChunkFileName);
+                //}
+
+                //Pause(0.5, false);
+            } catch (Exception ex) {
+                // Home Office kann lange blokieren....
+                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + c + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
+                    _bytes.Clear();
+                    _loadFailed = true;
+                    return;
+                }
+            }
+
+            Pause(0.5, false);
+        }
+    }
+
     public bool Save(string filename, int minBytes) {
-        if (_bytes.Count < minBytes) { return false; }
+        if (!DataOk(minBytes)) { return false; }
 
         try {
             Develop.SetUserDidSomething();
@@ -85,6 +174,8 @@ public class DatabaseChunk : IHasKeyName {
             x.Write(datacompressed, 0, datacompressed.Length);
             x.Flush();
             x.Close();
+
+            _fileinfo = GetFileInfo(ChunkFileName, true);
             Develop.SetUserDidSomething();
         } catch { return false; }
 
@@ -218,7 +309,25 @@ public class DatabaseChunk : IHasKeyName {
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
     }
 
-    internal bool DoExtendedSave(string filename, int minbytes) {
+    public void UpdateCurrentValues() {
+        // Zuerst Werte setzen
+        LastEditTimeUtc = DateTime.UtcNow;
+        LastEditUser = UserName;
+        LastEditApp = Develop.AppExe();
+        LastEditMachineName = Environment.MachineName;
+
+        // Dann die Werte zur ByteList hinzufügen
+        SaveToByteList(DatabaseDataType.Version, Database.DatabaseVersion);
+        SaveToByteList(DatabaseDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
+        SaveToByteList(DatabaseDataType.LastEditUser, LastEditUser);
+        SaveToByteList(DatabaseDataType.LastEditApp, LastEditApp);
+        SaveToByteList(DatabaseDataType.LastEditMachineName, LastEditMachineName);
+        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+    }
+
+    internal bool DoExtendedSave(int minbytes) {
+        string filename = ChunkFileName;
+
         string backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         string tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
@@ -244,6 +353,37 @@ public class DatabaseChunk : IHasKeyName {
         Develop.SetUserDidSomething();
 
         return true;
+    }
+
+    private void ParseLockData() {
+        int pointer = 0;
+        var data = _bytes.ToArray();
+
+        while (pointer < data.Length) {
+            var (newPointer, type, value, _, _) = Database.Parse(data, pointer);
+            pointer = newPointer;
+
+            switch (type) {
+                case DatabaseDataType.LastEditTimeUTC:
+                    LastEditTimeUtc = DateTimeParse(value);
+                    break;
+
+                case DatabaseDataType.LastEditUser:
+                    LastEditUser = value;
+                    break;
+
+                case DatabaseDataType.LastEditApp:
+                    LastEditApp = value;
+                    break;
+
+                case DatabaseDataType.LastEditMachineName:
+                    LastEditMachineName = value;
+                    break;
+
+                case DatabaseDataType.Werbung:
+                    return;
+            }
+        }
     }
 
     #endregion

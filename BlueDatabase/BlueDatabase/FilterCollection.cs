@@ -635,7 +635,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var fi2 = _internal.ToArray();
 
         foreach (var fi in fi2) {
-            if (fi.Column == db.Column.SplitColumn) { db.LoadChunk(fi.SearchValue[0]); }
+            if (fi.Column != null && fi.Column == db.Column.SplitColumn) { db.LoadChunkfromValue(fi.SearchValue[0]); }
         }
 
         List<RowItem> tmpVisibleRows = [];
