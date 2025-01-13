@@ -721,27 +721,23 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                 #region Chunk bestimmen
 
-                var chunk = mainChunk;
+                var rowchunk = mainChunk;
                 if (chunksAllowed && db.Column.SplitColumn is { } spc) {
-                    var chunkname = GetChunkName(db, thisRow.CellGetString(spc));
+                    var chunkname = thisRow.GetChunkName(chunksAllowed);
                     if (string.IsNullOrEmpty(chunkname)) { return null; }
 
-                    chunk = chunks.Get(chunkname);
+                    rowchunk = chunks.Get(chunkname);
 
-                    if (chunk == null) {
-                        chunk = new DatabaseChunk(db.Filename, chunkname);
-                        chunk.InitByteList();
-                        chunks.Add(chunk);
+                    if (rowchunk == null) {
+                        rowchunk = new DatabaseChunk(db.Filename, chunkname);
+                        rowchunk.InitByteList();
+                        chunks.Add(rowchunk);
                     }
                 }
 
                 #endregion
 
-                foreach (var thisColumn in db.Column) {
-                    if (thisColumn.Function != ColumnFunction.Virtuelle_Spalte) {
-                        chunk.SaveToByteList(thisColumn, thisRow);
-                    }
-                }
+                rowchunk.SaveToByteList(thisRow);
             }
 
             if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
@@ -763,7 +759,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             long l = 0;
             foreach (var thisChunk in chunks) {
-                mainChunk.SaveToByteList(DatabaseDataType.EOF, "END");
+                mainChunk.SaveToByteListEOF();
                 l += thisChunk.DataLenght;
             }
 
@@ -869,6 +865,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         #endregion
 
         return null;
+    }
+
+    public static string GetChunkName(Database db, string value) {
+        if (db.Column.SplitColumn is not { } spc) { return string.Empty; }
+
+        switch (spc.Function) {
+            case ColumnFunction.Split_Medium:
+                return value.GetHashString().Right(2).ToLower();
+
+            case ColumnFunction.Split_Large:
+                return value.GetHashString().Right(3).ToLower();
+
+            case ColumnFunction.Split_Name:
+                var t = ColumnItem.MakeValidColumnName(value);
+                return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(10);
+        }
+
+        return string.Empty;
     }
 
     public static bool IsValidTableName(string tablename, bool allowSystemnames) {
@@ -1313,12 +1327,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        string chunk = Chunk_MainData;
-
-        if (Column.SplitColumn is { } spc && row is { } r) {
-            var v = r.CellGetString(spc);
-            chunk = GetChunkName(this, v);
-        }
+        string chunk = row?.GetChunkName(true) ?? Database.Chunk_MainData;
 
         if (!ReadOnly) {
             var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment, chunk);
@@ -2486,6 +2495,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
+    internal string IsChunkEditable(string chunkid) {
+        if (!LoadChunkWithChunkId(string.Empty, chunkid, true)) { return "Chunk Lade-Fehler"; }
+
+        var c = _chunks.Get(chunkid);
+
+        if (c == null) { return "Interner Chunk-Fehler"; }
+
+        var row = Row.RowsOfChunk(chunkid);
+
+        return c.IsEditable(row);
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -2517,7 +2538,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var chunk = new DatabaseChunk(Filename, chunkname);
         chunk.LoadBytesFromDisk();
 
-        if (chunk.LoadBytesFromDisk == null) { return false; }
+        //if (chunk.LoadBytesFromDisk == null) { return false; }
 
         return Parse(chunk, null);
     }
@@ -2657,16 +2678,37 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
         Develop.SetUserDidSomething();
+
+        #region Neue Chunks-Erstellen
+
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return false; }
         foreach (var thisChunk in chunksnew) {
             if (_chunks.Get(thisChunk.KeyName) is not { } chk || chk.DataChanged) {
                 if (!thisChunk.DoExtendedSave(5)) { return false; }
 
-                _chunks.Remove(thisChunk.KeyName);
-                _chunks.Add(thisChunk);
+                _chunks.Remove(thisChunk.KeyName); // Den alten Fehlerhaften Chunk entfernen
+                _chunks.Add(thisChunk); // den neuen korrigierten dafür hinzufügen
             }
         }
+
+        #endregion
+
+        #region Nun gibt es noch Chunk-Leichen
+
+        // Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
+        var chunks = new List<DatabaseChunk>();
+        chunks.AddRange(_chunks);
+        foreach (var thisChunk in chunks) {
+            if (thisChunk.DataChanged) {
+                thisChunk.Delete();
+                _chunks.Remove(thisChunk.KeyName); // Den alten Fehlerhaften Chunk entfernen
+                //thisChunk.InitByteList();
+                //if (!thisChunk.DoExtendedSave(5)) { return false; }
+            }
+        }
+
+        #endregion
 
         FileStateUtcDate = setfileStateUtcDateTo;
         return true;
@@ -2938,24 +2980,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return false;
     }
 
-    private static string GetChunkName(Database db, string value) {
-        if (db.Column.SplitColumn is not { } spc) { return string.Empty; }
-
-        switch (spc.Function) {
-            case ColumnFunction.Split_Medium:
-                return value.GetHashString().Right(2).ToLower();
-
-            case ColumnFunction.Split_Large:
-                return value.GetHashString().Right(3).ToLower();
-
-            case ColumnFunction.Split_Name:
-                var t = ColumnItem.MakeValidColumnName(value);
-                return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(10);
-        }
-
-        return string.Empty;
-    }
-
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
     private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
@@ -3005,14 +3029,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    private void ClearChunkRelatedData(string chunkName) {
+    private void ClearChunkRelatedData(string chunkId) {
         // Spalten mit Splitfunktion ermitteln
         if (Column.SplitColumn is not { } spc) { return; }
 
-        // Zeilen finden, die zum zu löschenden Chunk gehören
-        var rowsToRemove = Row.Where(r =>
-            GetChunkName(this, r.CellGetString(spc)) == chunkName
-        ).ToList();
+        var rowsToRemove = Row.RowsOfChunk(chunkId);
 
         if (rowsToRemove.Count == 0) { return; }
 
@@ -3170,7 +3191,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Cell.Clear();
         }
 
-        _chunks.Add(chunk);
+        if (chunk.Bytes.Length == 0) {
+            // Datei gelöscht
+            _chunks.Remove(chunk.KeyName);
+            return true;
+        }
+
+        _chunks.AddIfNotExists(chunk);
 
         var data = chunk.Bytes;
 

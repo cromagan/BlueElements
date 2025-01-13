@@ -364,7 +364,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Istgleich_UND_GroﬂKleinEgal
                 and not FilterType.Instr
                 and not FilterType.Instr_GroﬂKleinEgal
-                and not FilterType.Instr_UND_GroﬂKleinEgal)
+                and not FilterType.Instr_UND_GroﬂKleinEgal
+                and not FilterType.Istgleich_MultiRowIgnorieren
+                and not FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren)
         }) { return string.Empty; }
 
         return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);

@@ -168,18 +168,26 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (checkUserRights && !db.PermissionCheck(db.PermissionGroupsNewRow, null)) {
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
-        } else {
-            //if (row.IsDisposed) { return "Die Zeile wurde verworfen."; }
-            if (row.Database != db) {
-                return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft.";
+            if (db.Column?.SplitColumn is { }) {
+                return "Chunk ohne Angabe noch nicht programmiert.";
             }
-
+        } else {
             if (db.Column.SysLocked != null) {
                 if (!db.PowerEdit) {
                     if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
                         return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
                     }
                 }
+            }
+
+            if (db.Column?.SplitColumn is { }) {
+                if (row == null) {
+                    return "Chunk ohne Angabe noch nicht programmiert.";
+                }
+
+                var cn = row.GetChunkName(true);
+
+                return db.IsChunkEditable(cn);
             }
         }
 

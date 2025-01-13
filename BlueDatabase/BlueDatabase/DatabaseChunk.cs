@@ -337,6 +337,16 @@ public class DatabaseChunk : IHasKeyName {
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
     }
 
+    public void SaveToByteList(List<RowItem> thisRow) {
+        foreach (RowItem rowItem in thisRow) { SaveToByteList(rowItem); }
+    }
+
+    internal bool Delete() {
+        _bytes.Clear();
+        string filename = ChunkFileName;
+        return DeleteFile(filename, false);
+    }
+
     internal bool DoExtendedSave(int minbytes) {
         string filename = ChunkFileName;
 
@@ -368,6 +378,48 @@ public class DatabaseChunk : IHasKeyName {
         _fileinfo = GetFileInfo(ChunkFileName, true);
 
         return true;
+    }
+
+    internal string IsEditable(List<RowItem>? rows) {
+        if (NeedsReload(false)) { return "Bearbeitung blockiert"; }
+
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 1) {
+            if (LastEditUser != UserName) { return $"Aktueller Bearbeiter: {LastEditUser}"; }
+            if (LastEditApp != Develop.AppExe()) { return $"Anderes Programm bearbeitet: {LastEditApp}"; }
+            if (LastEditMachineName != Environment.MachineName) { return $"Anderes Computer bearbeitet: {LastEditMachineName}"; }
+            return string.Empty;
+        }
+
+        if (rows == null) {
+            return "Letzte Bearbeitung zu lange her";
+        }
+
+        _bytes.Clear();
+
+        InitByteList();
+        SaveToByteList(rows);
+        SaveToByteListEOF();
+
+        if (!DoExtendedSave(5)) {
+            LastEditTimeUtc = DateTime.MinValue;
+            return "Bearbeitung konnte nicht gesetzt werden.";
+        }
+
+        return string.Empty;
+    }
+
+    internal void SaveToByteList(RowItem thisRow) {
+        if (thisRow.Database is not { } db) { return; }
+
+        foreach (var thisColumn in db.Column) {
+            if (thisColumn.Function != ColumnFunction.Virtuelle_Spalte) {
+                SaveToByteList(thisColumn, thisRow);
+            }
+        }
+    }
+
+    internal void SaveToByteListEOF() {
+        SaveToByteList(DatabaseDataType.EOF, "END");
     }
 
     private void ParseLockData() {

@@ -143,11 +143,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    /// <summary>
-    /// Durchsucht  Datenbank mit dem angegeben Filter..
-    /// </summary>
-    /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
-
     public RowItem? this[params FilterItem[] filter] {
         get {
             var parallelQuery = _internal.Values.AsParallel()
@@ -162,6 +157,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Methods
 
+    /// <summary>
+    /// Durchsucht  Datenbank mit dem angegeben Filter..
+    /// </summary>
+    /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
         if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { return; }
         if (db.EventScript.Get(ScriptEventTypes.value_changed_extra_thread).Count != 1) { return; }
@@ -802,6 +801,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         #endregion
+    }
+
+    public List<RowItem> RowsOfChunk(string chunkid) {
+        return this.Where(r =>
+                   r.GetChunkName(true) == chunkid
+               ).ToList();
     }
 
     public RowItem? SearchByKey(string? key) {

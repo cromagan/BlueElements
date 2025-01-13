@@ -914,6 +914,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    internal string GetChunkName(bool chunksAllowed) {
+        if (!chunksAllowed || Database?.Column.SplitColumn is not { } spc) { return Database.Chunk_MainData; }
+
+        return Database.GetChunkName(Database, CellGetString(spc));
+    }
+
     internal void Repair() {
         if (Database is not { IsDisposed: false } db) { return; }
 
