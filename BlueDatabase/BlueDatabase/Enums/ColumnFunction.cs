@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -104,7 +104,10 @@ public enum ColumnFunction {
     /// <summary>
     /// Dieser Spalte kann zum Aufsplitten der Datenbank benutzt werden. Nur einmal pro Datenbank erlaubt
     /// </summary>
-    Split_Medium = 86
+
+    Split_Name = 90,
+    Split_Medium = 95,
+    Split_Large = 96,
 
     // bis 999 wird geprüft
 }
@@ -121,6 +124,8 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.Virtuelle_Spalte
                                                                                     or ColumnFunction.Zeile
                                                                                     or ColumnFunction.Split_Medium
+                                                                                    or ColumnFunction.Split_Large
+                                                                                    or ColumnFunction.Split_Name
                                                                                     or ColumnFunction.First;
 
     public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
@@ -137,6 +142,8 @@ public static class ColumnFunctionExtensions {
                                                                                      or ColumnFunction.Virtuelle_Spalte
                                                                                      or ColumnFunction.Zeile
                                                                                      or ColumnFunction.Split_Medium
+                                                                                     or ColumnFunction.Split_Large
+                                                                                     or ColumnFunction.Split_Name
                                                                                      or ColumnFunction.First;
 
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal

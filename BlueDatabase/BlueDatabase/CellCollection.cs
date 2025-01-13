@@ -175,7 +175,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column.SysLocked != null) {
-                if (db.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds < 0) {
+                if (!db.PowerEdit) {
                     if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
                         return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
                     }
@@ -334,7 +334,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var linkedDatabase = column.LinkedDatabase;
         if (linkedDatabase is not { IsDisposed: false }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
 
-        // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
+        // Repair nicht mehr erlauben, ergibt rekursive Schleife, wir sind hier ja schon im repair
         var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
         if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
 

@@ -550,14 +550,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_function == value) { return; }
-            var wasSplit = _function == ColumnFunction.Split_Medium;
+
+            var wasSplit = _function is ColumnFunction.Split_Medium or ColumnFunction.Split_Large or ColumnFunction.Split_Name;
+            var oldd = _function;
 
             _ = Database?.ChangeData(DatabaseDataType.ColumnFunction, this, null, ((int)_function).ToString(), ((int)value).ToString(), Generic.UserName, DateTime.UtcNow, string.Empty);
             Invalidate_ColumAndContent();
 
-            var willBeSplit = _function == ColumnFunction.Split_Medium;
+            var willBeSplit = _function is ColumnFunction.Split_Medium or ColumnFunction.Split_Large or ColumnFunction.Split_Name;
 
-            if (wasSplit != willBeSplit) {
+            if ((wasSplit || willBeSplit) && oldd != _function) {
+                Database?.Column.GetSystems();
                 Database?.ReorganizeChunks();
             }
 
@@ -870,7 +873,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public bool TextBearbeitungErlaubt {
-        get => Database?.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0 || _textBearbeitungErlaubt;
+        get => _textBearbeitungErlaubt;
         set {
             if (IsDisposed) { return; }
             if (_textBearbeitungErlaubt == value) { return; }
@@ -1213,6 +1216,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
 
+            case ColumnFunction.Split_Name:
+            case ColumnFunction.Split_Large:
             case ColumnFunction.Split_Medium:
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
                     return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
@@ -1530,8 +1535,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_CHAPTER":
-
-                if (_function is not ColumnFunction.Normal and not ColumnFunction.Schlüsselspalte and not ColumnFunction.Split_Medium and not ColumnFunction.First) {
+                if (_function is not ColumnFunction.Normal
+                             and not ColumnFunction.Schlüsselspalte
+                             and not ColumnFunction.Split_Medium
+                             and not ColumnFunction.Split_Large
+                             and not ColumnFunction.Split_Name
+                             and not ColumnFunction.First) {
                     _function = ColumnFunction.Normal;
                 }
 
@@ -1809,7 +1818,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_function == ColumnFunction.First) { return QuickImage.Get(ImageCode.Stern, 16); }
         if (_function == ColumnFunction.Schlüsselspalte) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
 
-        if (_function == ColumnFunction.Split_Medium) { return QuickImage.Get(ImageCode.Diskette, 16); }
+        if (_function is ColumnFunction.Split_Medium or ColumnFunction.Split_Name or ColumnFunction.Split_Large) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
         if (_function == ColumnFunction.RelationText) { return QuickImage.Get(ImageCode.Herz, 16); }
 
@@ -1929,6 +1938,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case ColumnFunction.First:
             case ColumnFunction.Split_Medium:
+            case ColumnFunction.Split_Name:
+            case ColumnFunction.Split_Large:
             case ColumnFunction.Schlüsselspalte:
                 if (editTypeToCheck == EditTypeFormula.als_Überschrift_anzeigen) { return true; }
                 return false;
@@ -1939,7 +1950,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    internal static string MakeValidColumnName(string columnname) => columnname.ToUpperInvariant().Replace(" ", "_").ReduceToChars(AllowedCharsVariableName);
+    internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(" ", "_").Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return "Die Datenbank wurde verworfen."; }
@@ -2278,6 +2289,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case ColumnFunction.Zeile:
             case ColumnFunction.Split_Medium:
+            case ColumnFunction.Split_Large:
+            case ColumnFunction.Split_Name:
             case ColumnFunction.First:
             case ColumnFunction.Schlüsselspalte:
                 return EditTypeTable.None;

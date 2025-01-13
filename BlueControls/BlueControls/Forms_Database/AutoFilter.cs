@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -365,12 +365,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             return;
         }
 
-        if (_column.Function == ColumnFunction.Split_Medium) {
+        if (_column != null && _column.Database?.Column.SplitColumn == _column) {
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_GroßKleinEgal, txbEingabe.Text));
             return;
         }
 
-        if (_column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
+        if (_column != null && _column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
             if (txbEingabe.Text.Contains("-")) {
                 var tmp = txbEingabe.Text.Replace(" ", string.Empty);
                 var l = MathFormulaParser.LastMinusIndex(tmp);

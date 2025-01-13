@@ -55,8 +55,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public const string DatabaseVersion = "4.10";
     public static readonly ObservableCollection<Database> AllFiles = [];
-    public static readonly string Chunk_Additional = "_additional";
-
+    public static readonly string Chunk_AdditionalUndo = "_undo";
+    public static readonly string Chunk_AdditionalUseCases = "_uses";
     public static readonly string Chunk_MainData = "MainData";
 
     /// <summary>
@@ -118,6 +118,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _globalShowPass = string.Empty;
 
     private bool _isInSave;
+    private DateTime _powerEditTime = DateTime.MinValue;
     private bool _readOnly;
     private string _scriptNeedFix = string.Empty;
     private RowSortDefinition? _sortDefinition;
@@ -390,7 +391,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public DateTime PowerEdit { get; set; }
+    public bool PowerEdit {
+        get {
+            return _powerEditTime.Subtract(DateTime.UtcNow).TotalSeconds > 0;
+        }
+
+        set {
+            if (value) {
+                _powerEditTime = DateTime.UtcNow.AddSeconds(300);
+            } else {
+                _powerEditTime = DateTime.UtcNow.AddSeconds(-1);
+            }
+            OnInvalidateView();
+        }
+    }
 
     /// <summary>
     /// Prüft auch den FreezedReason
@@ -650,9 +664,21 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         chunksAllowed = chunksAllowed && db.Column.SplitColumn != null;
 
         var mainChunk = new DatabaseChunk(db.Filename, Chunk_MainData);
-        mainChunk.UpdateCurrentValues();
-
+        mainChunk.InitByteList();
         chunks.Add(mainChunk);
+
+        var undoChunk = mainChunk;
+        var usesChunk = mainChunk;
+
+        if (chunksAllowed) {
+            undoChunk = new DatabaseChunk(db.Filename, Chunk_AdditionalUndo);
+            undoChunk.InitByteList();
+            chunks.Add(undoChunk);
+
+            usesChunk = new DatabaseChunk(db.Filename, Chunk_AdditionalUseCases);
+            usesChunk.InitByteList();
+            chunks.Add(usesChunk);
+        }
 
         try {
             var x = db.LastChange;
@@ -673,7 +699,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             mainChunk.SaveToByteList(DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPfad);
             mainChunk.SaveToByteList(DatabaseDataType.RowQuickInfo, db.ZeilenQuickInfo);
             mainChunk.SaveToByteList(DatabaseDataType.StandardFormulaFile, db.StandardFormulaFile);
-            mainChunk.SaveToByteList(db.Column);
+
+            //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
+            foreach (var columnitem in db.Column) {
+                if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName) && !columnitem.IsDisposed) {
+                    mainChunk.SaveToByteList(columnitem);
+                    usesChunk.SaveToByteList(DatabaseDataType.ColumnSystemInfo, columnitem.SystemInfo, columnitem.KeyName);
+                }
+            }
 
             mainChunk.SaveToByteList(DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
 
@@ -697,7 +730,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     if (chunk == null) {
                         chunk = new DatabaseChunk(db.Filename, chunkname);
-                        chunk.UpdateCurrentValues();
+                        chunk.InitByteList();
                         chunks.Add(chunk);
                     }
                 }
@@ -724,15 +757,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-            if (chunksAllowed) {
-                mainChunk = new DatabaseChunk(db.Filename, Chunk_Additional);
-                mainChunk.UpdateCurrentValues();
-                chunks.Add(mainChunk);
-            }
-
             const int undoCount = 5000;
             if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
-            mainChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
+            undoChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
 
             long l = 0;
             foreach (var thisChunk in chunks) {
@@ -1290,7 +1317,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (Column.SplitColumn is { } spc && row is { } r) {
             var v = r.CellGetString(spc);
-
             chunk = GetChunkName(this, v);
         }
 
@@ -2158,8 +2184,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public bool LoadAllChunks() {
         if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return true; }
-        Column.GetSystems();
-        if (Column.SplitColumn == null) { return true; }
+        //Column.GetSystems();
+        //if (Column.SplitColumn == null) { return true; }
 
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
@@ -2169,7 +2195,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var file in chunkFiles) {
             var chunkName = file.FileNameWithoutSuffix();
 
-            var ok = LoadChunkWithChunkId(Filename, chunkName);
+            var ok = LoadChunkWithChunkId(Filename, chunkName, true);
             if (!ok) { return false; }
         }
 
@@ -2214,9 +2240,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         // Jetzt prüfen auf Split-Column und Chunks nachladen
         if (Column.SplitColumn != null) {
-            var adChunk = new DatabaseChunk(Filename, Chunk_Additional);
+            var adChunk = new DatabaseChunk(Filename, Chunk_AdditionalUndo);
             adChunk.LoadBytesFromDisk();
             Parse(adChunk, needPassword);
+
+            var usesChunk = new DatabaseChunk(Filename, Chunk_AdditionalUseCases);
+            usesChunk.LoadBytesFromDisk();
+            Parse(usesChunk, needPassword);
         }
 
         if (FileStateUtcDate.Year < 2000) {
@@ -2320,7 +2350,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
         try {
             if (IsAdministrator()) { return true; }
-            if (PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
+            if (PowerEdit) { return true; }
             if (allowed is not { Count: not 0 }) { return false; }
             if (allowed.Any(thisString => PermissionCheckWithoutAdmin(thisString, row))) {
                 return true;
@@ -2359,28 +2389,32 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
         if (string.IsNullOrEmpty(Filename)) { return; }
 
-        // Erst alle Chunks laden
+        #region Erst alle Chunks laden
+
         if (!LoadAllChunks()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Chunk laden!");
             return;
         }
 
-        _chunks.Clear();
+        #endregion
 
-        // Alle bestehenden Chunks erst speichern
-        SaveInternal(FileStateUtcDate);
+        _chunks.Clear(); // Chunks im Speicher löschen, werden eh neue erzeugt
 
-        Column.GetSystems();
-        if (Column.SplitColumn != null) { return; }
+        #region alte Chunk-Dateien löschen
 
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
-        var chunkFiles = Directory.GetFiles(chunkPath, $"*.{Filename.FileSuffix()}c");
+        if (DirectoryExists(chunkPath)) {
+            var chunkFiles = Directory.GetFiles(chunkPath, $"*.{Filename.FileSuffix()}c");
 
-        // Alte Chunk-Dateien löschen
-        foreach (var file in chunkFiles) {
-            DeleteFile(file, false);
+            foreach (var file in chunkFiles) {
+                DeleteFile(file, false);
+            }
         }
+
+        #endregion
+
+        SaveInternal(FileStateUtcDate);
     }
 
     public void RepairAfterParse() {
@@ -2452,19 +2486,30 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
-    internal bool LoadChunkfromValue(string value) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
+    /// <returns></returns>
+    internal bool LoadChunkfromValue(string value, bool important) {
         var chunkname = GetChunkName(this, value);
 
         if (string.IsNullOrEmpty(chunkname)) { return false; }
 
-        return LoadChunkWithChunkId(value, chunkname);
+        return LoadChunkWithChunkId(value, chunkname, important);
     }
 
-    internal bool LoadChunkWithChunkId(string value, string chunkname) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="chunkname"></param>
+    /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
+    /// <returns></returns>
+    internal bool LoadChunkWithChunkId(string value, string chunkname, bool important) {
         if (_chunks.Get(chunkname) is { } chk) {
-            if (!chk.NeedsReload) { return true; }
-
-            ClearChunkRelatedData(chunkname);
+            if (!chk.NeedsReload(important)) { return true; }
         }
 
         OnDropMessage(FehlerArt.Info, $"Lade Zeilen von '{value}' der Datenbank {Caption} nach ({chunkname})");
@@ -2511,6 +2556,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type == DatabaseDataType.SystemValue) { return; }
 
         Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunk));
+
+        if (_chunks.Get(Chunk_AdditionalUndo) is { } chk2) { chk2.DataChanged = true; }
     }
 
     protected virtual List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked) {
@@ -2647,7 +2694,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         LastChange = DateTime.UtcNow;
 
         if (!string.IsNullOrEmpty(chunk)) {
-            LoadChunkWithChunkId(Filename, chunk);
+            LoadChunkWithChunkId(Filename, chunk, true);
         }
 
         if (type.IsCellValue()) {
@@ -2869,8 +2916,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
         if (_chunks.Get(chunk) is { } chk1) { chk1.DataChanged = true; }
-        if (_chunks.Get(Chunk_Additional) is { } chk2) { chk2.DataChanged = true; }
-
         return string.Empty;
     }
 
@@ -2899,6 +2944,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         switch (spc.Function) {
             case ColumnFunction.Split_Medium:
                 return value.GetHashString().Right(2).ToLower();
+
+            case ColumnFunction.Split_Large:
+                return value.GetHashString().Right(3).ToLower();
+
+            case ColumnFunction.Split_Name:
+                var t = ColumnItem.MakeValidColumnName(value);
+                return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(10);
         }
 
         return string.Empty;
@@ -2954,14 +3006,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private void ClearChunkRelatedData(string chunkName) {
-        Develop.DebugPrint_NichtImplementiert(true);
         // Spalten mit Splitfunktion ermitteln
-        if (Column.SplitColumn is not { } splitColumn) { return; }
+        if (Column.SplitColumn is not { } spc) { return; }
 
         // Zeilen finden, die zum zu löschenden Chunk gehören
         var rowsToRemove = Row.Where(r =>
-            GetChunkName(this, r.CellGetString(splitColumn)) == chunkName
+            GetChunkName(this, r.CellGetString(spc)) == chunkName
         ).ToList();
+
+        if (rowsToRemove.Count == 0) { return; }
 
         // Zeilen und zugehörige Zellen entfernen
         foreach (var row in rowsToRemove) {
@@ -3105,6 +3158,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private bool Parse(DatabaseChunk chunk, NeedPassword? needPassword) {
+        ClearChunkRelatedData(chunk.KeyName);
+
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
 

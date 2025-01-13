@@ -228,11 +228,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<RowItem> PinnedRows { get; } = [];
 
-    public DateTime PowerEdit {
-        //private get => _database?.PowerEdit;
+    public bool PowerEdit {
         set {
             if (IsDisposed || Database is not { IsDisposed: false }) { return; }
             Database.PowerEdit = value;
+            Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
             Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
     }
@@ -2691,7 +2691,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #region Roten Rand für Split-Spalten
 
-        if (viewItem.Column is { } && viewItem.Column == viewItem.Column?.Database?.Column.SplitColumn) {
+        if (viewItem.Column is { } c && c == viewItem.Column?.Database?.Column.SplitColumn) {
             var t = r;
             t.Inflate(-3, -3);
             gr.DrawRectangle(new Pen(Color.Red, 6), t);
@@ -3310,8 +3310,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (IsDisposed || Database is not { IsDisposed: false } db || db.Column.Count == 0 || db.Column.First() is not { IsDisposed: false } fc) { return false; }
         if (db.Column.Count == 0) { return false; }
         if (CurrentArrangement?[fc] is not { } fcv) { return false; }
-
-        if (db.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 

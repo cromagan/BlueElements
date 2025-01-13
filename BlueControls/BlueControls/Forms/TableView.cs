@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -888,7 +888,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
         Notification.Show("5 Minuten (fast) rechtefreies<br>Bearbeiten aktiviert.", ImageCode.Stift);
-        Table.PowerEdit = DateTime.UtcNow.AddSeconds(300);
+        Table.PowerEdit = true; 
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {

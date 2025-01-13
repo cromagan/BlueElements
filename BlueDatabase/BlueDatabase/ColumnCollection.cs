@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -297,7 +297,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null) {
-                if (thisColumnItem.Function == ColumnFunction.Split_Medium) {
+                if (thisColumnItem.Function is ColumnFunction.Split_Medium
+                                            or ColumnFunction.Split_Large
+                                            or ColumnFunction.Split_Name) {
                     SplitColumn = thisColumnItem;
                 }
                 if (thisColumnItem.Function == ColumnFunction.First) {

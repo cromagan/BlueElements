@@ -290,9 +290,13 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             }
         }
 
-        if (_column != null && _column.Function is ColumnFunction.Split_Medium) {
+        if (_column != null && _column == _column.Database?.Column.SplitColumn) {
             if (SearchValue.Count != 1) { return "Split-Spalte mit ung¸ltiger Suche"; }
-            if (_filterType is not FilterType.Istgleich and not FilterType.Istgleich_GroﬂKleinEgal and not FilterType.Istgleich_MultiRowIgnorieren) { return "Falscher Typ"; }
+            if (_filterType is not FilterType.Istgleich
+                and not FilterType.Istgleich_GroﬂKleinEgal
+                and not FilterType.Istgleich_MultiRowIgnorieren
+                and not FilterType.Istgleich_ODER_GroﬂKleinEgal
+                and not FilterType.Istgleich_UND_GroﬂKleinEgal) { return "Falscher Typ"; }
         }
 
         return string.Empty;

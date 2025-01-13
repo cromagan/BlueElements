@@ -41,6 +41,8 @@ public class DatabaseChunk : IHasKeyName {
     public readonly string MainFileName = string.Empty;
     private List<byte> _bytes = new List<byte>();
     private string _fileinfo = string.Empty;
+    private DateTime _lastcheck = DateTime.MinValue;
+
     private bool _loadFailed = false;
 
     #endregion
@@ -75,14 +77,6 @@ public class DatabaseChunk : IHasKeyName {
 
     public string LastEditUser { get; private set; } = string.Empty;
 
-    public bool NeedsReload {
-        get {
-            var nf = GetFileInfo(ChunkFileName, true);
-
-            return nf != _fileinfo;
-        }
-    }
-
     private string ChunkFileName {
         get {
             if (IsMain) { return MainFileName; }
@@ -114,6 +108,29 @@ public class DatabaseChunk : IHasKeyName {
     }
 
     /// <summary>
+    /// Initialisiert die Byteliste
+    /// </summary>
+    public void InitByteList() {
+        // Zuerst Werte setzen
+        LastEditTimeUtc = DateTime.UtcNow;
+        LastEditUser = UserName;
+        LastEditApp = Develop.AppExe();
+        LastEditMachineName = Environment.MachineName;
+
+        _lastcheck = DateTime.UtcNow;
+
+        _bytes.Clear();
+
+        // Dann die Werte zur ByteList hinzufügen
+        SaveToByteList(DatabaseDataType.Version, Database.DatabaseVersion);
+        SaveToByteList(DatabaseDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
+        SaveToByteList(DatabaseDataType.LastEditUser, LastEditUser);
+        SaveToByteList(DatabaseDataType.LastEditApp, LastEditApp);
+        SaveToByteList(DatabaseDataType.LastEditMachineName, LastEditMachineName);
+        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+    }
+
+    /// <summary>
     /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
     /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
     /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
@@ -134,6 +151,7 @@ public class DatabaseChunk : IHasKeyName {
             try {
                 //var f = EditableErrorReason(EditableErrorReasonType.Load);
 
+                _lastcheck = DateTime.UtcNow;
                 _fileinfo = GetFileInfo(ChunkFileName, true);
                 var bLoaded = File.ReadAllBytes(c);
                 if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
@@ -160,6 +178,22 @@ public class DatabaseChunk : IHasKeyName {
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="chunkname"></param>
+    /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
+    /// <returns></returns>
+    public bool NeedsReload(bool important) {
+        if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
+            var nf = GetFileInfo(ChunkFileName, false);
+            return nf != _fileinfo;
+        }
+
+        return false;
+    }
+
     public bool Save(string filename, int minBytes) {
         if (!DataOk(minBytes)) { return false; }
 
@@ -175,7 +209,6 @@ public class DatabaseChunk : IHasKeyName {
             x.Flush();
             x.Close();
 
-            _fileinfo = GetFileInfo(ChunkFileName, true);
             Develop.SetUserDidSomething();
         } catch { return false; }
 
@@ -216,15 +249,6 @@ public class DatabaseChunk : IHasKeyName {
         BytesAddRange(b);
     }
 
-    public void SaveToByteList(ColumnCollection c) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
-        foreach (var columnitem in c) {
-            if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName)) {
-                SaveToByteList(columnitem);
-            }
-        }
-    }
-
     public void SaveToByteList(DatabaseDataType databaseDataType, string content) {
         var b = content.UTF8_ToByte();
         BytesAdd((byte)Routinen.DatenAllgemeinUTF8);
@@ -245,6 +269,10 @@ public class DatabaseChunk : IHasKeyName {
         } while (byteCount > 0);
     }
 
+    /// <summary>
+    /// Alle Spaltendaten außer Systeminfo
+    /// </summary>
+    /// <param name="c"></param>
     public void SaveToByteList(ColumnItem c) {
         var name = c.KeyName;
 
@@ -287,7 +315,7 @@ public class DatabaseChunk : IHasKeyName {
         SaveToByteList(DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
-        SaveToByteList(DatabaseDataType.ColumnSystemInfo, c.SystemInfo, name);
+        //SaveToByteList(DatabaseDataType.ColumnSystemInfo, c.SystemInfo, name);
         //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(DatabaseDataType.AllowedChars, c.AllowedChars, name);
@@ -307,22 +335,6 @@ public class DatabaseChunk : IHasKeyName {
         SaveToByteList(DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
         SaveToByteList(DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
-    }
-
-    public void UpdateCurrentValues() {
-        // Zuerst Werte setzen
-        LastEditTimeUtc = DateTime.UtcNow;
-        LastEditUser = UserName;
-        LastEditApp = Develop.AppExe();
-        LastEditMachineName = Environment.MachineName;
-
-        // Dann die Werte zur ByteList hinzufügen
-        SaveToByteList(DatabaseDataType.Version, Database.DatabaseVersion);
-        SaveToByteList(DatabaseDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
-        SaveToByteList(DatabaseDataType.LastEditUser, LastEditUser);
-        SaveToByteList(DatabaseDataType.LastEditApp, LastEditApp);
-        SaveToByteList(DatabaseDataType.LastEditMachineName, LastEditMachineName);
-        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
     }
 
     internal bool DoExtendedSave(int minbytes) {
@@ -351,6 +363,9 @@ public class DatabaseChunk : IHasKeyName {
         // --- TmpFile wird zum Haupt ---
         _ = MoveFile(tempfile, filename, true);
         Develop.SetUserDidSomething();
+
+        _lastcheck = DateTime.UtcNow;
+        _fileinfo = GetFileInfo(ChunkFileName, true);
 
         return true;
     }

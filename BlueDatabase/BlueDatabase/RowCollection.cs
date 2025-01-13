@@ -640,7 +640,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 throw new Exception();
             }
 
-            if (thisColum.Function == ColumnFunction.Split_Medium) {
+            if (thisColum == db.Column.SplitColumn) {
                 var inval = fc?.InitValue(thisColum, string.IsNullOrWhiteSpace(valueOfCellInFirstColumn));
                 if (inval == null || string.IsNullOrWhiteSpace(inval)) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Initialwert fehlt!");

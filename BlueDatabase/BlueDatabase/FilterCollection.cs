@@ -342,7 +342,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                            and not ColumnFunction.Schlüsselspalte
                            and not ColumnFunction.RelationText
                            and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                           and not ColumnFunction.Split_Medium) { return string.Empty; }
+                           and not ColumnFunction.Split_Medium
+                           and not ColumnFunction.Split_Large
+                           and not ColumnFunction.Split_Name) { return string.Empty; }
 
         if (!firstToo && db.Column.First() == column) { return string.Empty; }
 
@@ -366,6 +368,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }) { return string.Empty; }
 
         return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
+    }
+
+    public void Invalidate_FilteredRows() {
+        if (_rows == null) { return; }
+        _rows = null;
+        OnRowsChanged();
     }
 
     public bool IsDifferentTo(FilterCollection? fc) {
@@ -635,7 +643,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var fi2 = _internal.ToArray();
 
         foreach (var fi in fi2) {
-            if (fi.Column != null && fi.Column == db.Column.SplitColumn) { db.LoadChunkfromValue(fi.SearchValue[0]); }
+            if (fi.Column != null && fi.Column == db.Column.SplitColumn) { db.LoadChunkfromValue(fi.SearchValue[0], false); }
         }
 
         List<RowItem> tmpVisibleRows = [];
@@ -695,12 +703,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void Filter_PropertyChanging(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnChanging();
-    }
-
-    private void Invalidate_FilteredRows() {
-        if (_rows == null) { return; }
-        _rows = null;
-        OnRowsChanged();
     }
 
     private void OnChanging() {
