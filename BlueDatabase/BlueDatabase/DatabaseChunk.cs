@@ -381,7 +381,7 @@ public class DatabaseChunk : IHasKeyName {
     internal string IsEditable(List<RowItem>? rows) {
         if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 1) {
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
             if (LastEditUser != UserName) { return $"Aktueller Bearbeiter: {LastEditUser}"; }
             if (LastEditApp != Develop.AppExe()) { return $"Anderes Programm bearbeitet: {LastEditApp}"; }
             if (LastEditMachineName != Environment.MachineName) { return $"Anderes Computer bearbeitet: {LastEditMachineName}"; }

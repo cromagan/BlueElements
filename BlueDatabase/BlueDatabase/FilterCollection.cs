@@ -654,7 +654,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             foreach (var fi in fi2) {
                 if (fi.Column == db.Column.SplitColumn) {
 
-                    var (loaded, ok) = db.LoadChunkfromValue(fi.SearchValue[0], false);
+                    var (loaded, ok) = db.LoadChunkfromValue(fi.SearchValue[0], false, null);
                     if(!ok) { return []; }
 
                     if (loaded) { 
