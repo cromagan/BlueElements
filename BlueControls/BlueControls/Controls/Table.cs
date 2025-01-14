@@ -2003,8 +2003,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             _storedView = string.Empty;
         } else {
             ResetView();
-            CheckView();
         }
+
+
+        Invalidate_FilterInput();
+        Invalidate_RowsInput();
+        Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
+        Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
+        CheckView();
+
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);

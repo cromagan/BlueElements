@@ -252,9 +252,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
 
             if (reallydifferent) {
-                _rows = [];
-                _rows.AddRange(fc.Rows);
-                OnRowsChanged();
+
+                if (fc._rows != null) {
+                    _rows = [];
+                    _rows.AddRange(fc.Rows);
+                    OnRowsChanged();
+                } else {
+                    Invalidate_FilteredRows();
+                }
+
+
             }
         } else {
             if (Count > 0) {
@@ -643,10 +650,22 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed || Database is not { IsDisposed: false } db) { return []; }
 
         var fi2 = _internal.ToArray();
+        if (db.Column.SplitColumn != null) {
+            foreach (var fi in fi2) {
+                if (fi.Column == db.Column.SplitColumn) {
 
-        foreach (var fi in fi2) {
-            if (fi.Column != null && fi.Column == db.Column.SplitColumn) { db.LoadChunkfromValue(fi.SearchValue[0], false); }
+                    var (loaded, ok) = db.LoadChunkfromValue(fi.SearchValue[0], false);
+                    if(!ok) { return []; }
+
+                    if (loaded) { 
+                        // OnLoaded kann den Filter disposen
+                        return CalculateFilteredRows(); 
+                    }
+                    
+                }
+            }
         }
+
 
         List<RowItem> tmpVisibleRows = [];
         var lockMe = new object();
@@ -716,12 +735,17 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void RegisterDatabaseEvents() {
         if (_database != null) {
+            _database.Loaded += _database_Loaded;
             _database.DisposingEvent += _database_Disposing;
             _database.Row.RowRemoved += Row_RowRemoved;
             //_database.Row.RowRemoved += Row_RowRemoving;
             _database.Row.RowAdded += Row_Added;
             _database.Cell.CellValueChanged += _Database_CellValueChanged;
         }
+    }
+
+    private void _database_Loaded(object sender, System.EventArgs e) {
+        Invalidate_FilteredRows();
     }
 
     private void Row_Added(object sender, RowEventArgs e) {
@@ -738,6 +762,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void UnRegisterDatabaseEvents() {
         if (_database != null) {
+            _database.Loaded += _database_Loaded;
             _database.DisposingEvent -= _database_Disposing;
             _database.Row.RowRemoved -= Row_RowRemoved;
             _database.Row.RowAdded -= Row_Added;

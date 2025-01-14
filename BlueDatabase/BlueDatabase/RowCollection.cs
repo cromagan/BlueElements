@@ -904,7 +904,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var row = SearchByKey(rowkey);
             if (row == null) { return "Zeile nicht gefunden!"; }
 
-            OnRowRemoving(new RowEventArgs(row));
+
+            if (reason != Reason.NoUndo_NoInvalidate) {
+                OnRowRemoving(new RowEventArgs(row));
+            }
+
 
             if (reason == Reason.SetCommand) {
                 row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
@@ -912,12 +916,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
-                    row.SetValueInternal(thisColumn, string.Empty, Reason.AdditionalWorkAfterCommand);
+                    row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
             }
 
             if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
-            OnRowRemoved(new RowEventArgs(row));
+
+            if (reason != Reason.NoUndo_NoInvalidate) {
+                OnRowRemoved(new RowEventArgs(row));
+            }
             return string.Empty;
         }
 
@@ -961,9 +968,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
-        OnRowAdded(new RowEventArgs(row));
 
-        if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
+        if (reason != Reason.NoUndo_NoInvalidate ) {
+            OnRowAdded(new RowEventArgs(row));
             if (Database?.Column.SysRowState != null) {
                 InvalidatedRows.AddIfNotExists(row);
             }

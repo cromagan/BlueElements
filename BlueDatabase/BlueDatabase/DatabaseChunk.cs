@@ -379,7 +379,7 @@ public class DatabaseChunk : IHasKeyName {
     }
 
     internal string IsEditable(List<RowItem>? rows) {
-        if (NeedsReload(false)) { return "Bearbeitung blockiert"; }
+        if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 1) {
             if (LastEditUser != UserName) { return $"Aktueller Bearbeiter: {LastEditUser}"; }
