@@ -43,8 +43,6 @@ public class DatabaseChunk : IHasKeyName {
     private string _fileinfo = string.Empty;
     private DateTime _lastcheck = DateTime.MinValue;
 
-    private bool _loadFailed = false;
-
     #endregion
 
     #region Constructors
@@ -68,14 +66,11 @@ public class DatabaseChunk : IHasKeyName {
     public long DataLenght => _bytes?.Count ?? 0;
     public bool IsMain => KeyName == Database.Chunk_MainData;
     public string KeyName { get; private set; }
-
     public string LastEditApp { get; private set; } = string.Empty;
-
     public string LastEditMachineName { get; private set; } = string.Empty;
-
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
-
     public string LastEditUser { get; private set; } = string.Empty;
+    public bool LoadFailed { get; private set; } = false;
 
     private string ChunkFileName {
         get {
@@ -93,16 +88,8 @@ public class DatabaseChunk : IHasKeyName {
 
     #region Methods
 
-    public void BytesAdd(byte bytes) {
-        _bytes.Add(bytes);
-    }
-
-    public void BytesAddRange(byte[] bytes) {
-        _bytes.AddRange(bytes);
-    }
-
     public bool DataOk(int minLen) {
-        if (_loadFailed) { return true; }
+        if (LoadFailed) { return true; }
 
         return _bytes.Count >= minLen;
     }
@@ -111,6 +98,8 @@ public class DatabaseChunk : IHasKeyName {
     /// Initialisiert die Byteliste
     /// </summary>
     public void InitByteList() {
+        LoadFailed = false;
+
         // Zuerst Werte setzen
         LastEditTimeUtc = DateTime.UtcNow;
         LastEditUser = UserName;
@@ -169,7 +158,7 @@ public class DatabaseChunk : IHasKeyName {
                 if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + c + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
                     _bytes.Clear();
-                    _loadFailed = true;
+                    LoadFailed = true;
                     return;
                 }
             }
@@ -186,6 +175,8 @@ public class DatabaseChunk : IHasKeyName {
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns></returns>
     public bool NeedsReload(bool important) {
+        if (LoadFailed) { return true; }
+
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
             var nf = GetFileInfo(ChunkFileName, false);
             return nf != _fileinfo;
@@ -216,55 +207,59 @@ public class DatabaseChunk : IHasKeyName {
     }
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
+        if (LoadFailed) { return; }
         if (column.Database is not { IsDisposed: false } db) { return; }
 
         var cellContent = db.Cell.GetStringCore(column, row);
         if (string.IsNullOrEmpty(cellContent)) { return; }
 
-        BytesAdd((byte)Routinen.CellFormatUTF8_V403);
+        _bytes.Add((byte)Routinen.CellFormatUTF8_V403);
 
         var columnKeyByte = column.KeyName.UTF8_ToByte();
         SaveToByteList(columnKeyByte.Length, 1);
-        BytesAddRange(columnKeyByte);
+        _bytes.AddRange(columnKeyByte);
 
         var rowKeyByte = row.KeyName.UTF8_ToByte();
         SaveToByteList(rowKeyByte.Length, 1);
-        BytesAddRange(rowKeyByte);
+        _bytes.AddRange(rowKeyByte);
 
         var cellContentByte = cellContent.UTF8_ToByte();
         SaveToByteList(cellContentByte.Length, 2);
-        BytesAddRange(cellContentByte);
+        _bytes.AddRange(cellContentByte);
     }
 
     public void SaveToByteList(DatabaseDataType databaseDataType, string content, string columnname) {
-        BytesAdd((byte)Routinen.ColumnUTF8_V401);
-        BytesAdd((byte)databaseDataType);
+        if (LoadFailed) { return; }
+        _bytes.Add((byte)Routinen.ColumnUTF8_V401);
+        _bytes.Add((byte)databaseDataType);
 
         var n = columnname.UTF8_ToByte();
         SaveToByteList(n.Length, 1);
-        BytesAddRange(n);
+        _bytes.AddRange(n);
 
         var b = content.UTF8_ToByte();
         SaveToByteList(b.Length, 3);
-        BytesAddRange(b);
+        _bytes.AddRange(b);
     }
 
     public void SaveToByteList(DatabaseDataType databaseDataType, string content) {
+        if (LoadFailed) { return; }
         var b = content.UTF8_ToByte();
-        BytesAdd((byte)Routinen.DatenAllgemeinUTF8);
-        BytesAdd((byte)databaseDataType);
+        _bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
+        _bytes.Add((byte)databaseDataType);
         SaveToByteList(b.Length, 3);
-        BytesAddRange(b);
+        _bytes.AddRange(b);
     }
 
     public void SaveToByteList(long numberToAdd, int byteCount) {
+        if (LoadFailed) { return; }
         do {
             byteCount--;
             var te = (long)Math.Pow(255, byteCount);
             // ReSharper disable once PossibleLossOfFraction
             var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
 
-            BytesAdd(mu);
+            _bytes.Add(mu);
             numberToAdd %= te;
         } while (byteCount > 0);
     }
@@ -274,6 +269,8 @@ public class DatabaseChunk : IHasKeyName {
     /// </summary>
     /// <param name="c"></param>
     public void SaveToByteList(ColumnItem c) {
+        if (LoadFailed) { return; }
+
         var name = c.KeyName;
 
         SaveToByteList(DatabaseDataType.ColumnName, c.KeyName, name);
@@ -338,6 +335,7 @@ public class DatabaseChunk : IHasKeyName {
     }
 
     public void SaveToByteList(List<RowItem> thisRow) {
+        if (LoadFailed) { return; }
         foreach (RowItem rowItem in thisRow) { SaveToByteList(rowItem); }
     }
 
@@ -409,6 +407,7 @@ public class DatabaseChunk : IHasKeyName {
     }
 
     internal void SaveToByteList(RowItem thisRow) {
+        if (LoadFailed) { return; }
         if (thisRow.Database is not { } db) { return; }
 
         foreach (var thisColumn in db.Column) {
@@ -419,6 +418,7 @@ public class DatabaseChunk : IHasKeyName {
     }
 
     internal void SaveToByteListEOF() {
+        if (LoadFailed) { return; }
         SaveToByteList(DatabaseDataType.EOF, "END");
     }
 

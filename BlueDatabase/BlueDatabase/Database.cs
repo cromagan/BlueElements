@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -76,7 +77,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
     private static List<Type>? _databaseTypes;
-    private static bool _isInTimer;
+    private static volatile bool _isInTimer;
     private static DateTime _lastTableCheck = new(1900, 1, 1);
 
     /// <summary>
@@ -92,7 +93,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     /// Flüchtiger Speicher, wird nur zum Halten von Daten verwendet.
     /// </summary>
-    private readonly List<DatabaseChunk> _chunks = new();
+    private readonly ConcurrentDictionary<string, DatabaseChunk> _chunks = new();
 
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<DatabaseScriptDescription> _eventScript = [];
@@ -190,7 +191,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #region Destructors
 
-    ~Database() { Dispose(false); }
+    ~Database() {
+        try {
+            Dispose(false);
+        } catch {
+            // Finalizer darf keine Exceptions werfen
+        }
+    }
 
     #endregion
 
@@ -1921,10 +1928,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public bool HasChangedChunks() {
-        foreach (var thisChunk in _chunks) {
-            if (thisChunk.DataChanged) { return true; }
-        }
-        return false;
+        return _chunks.Values.Any(chunk => chunk.DataChanged);
     }
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
@@ -2498,13 +2502,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     internal string IsChunkEditable(string chunkid) {
         if (!LoadChunkWithChunkId(string.Empty, chunkid, true)) { return "Chunk Lade-Fehler"; }
 
-        var c = _chunks.Get(chunkid);
-
-        if (c == null) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(chunkid, out var chunk)) {
+            return "Interner Chunk-Fehler";
+        }
 
         var row = Row.RowsOfChunk(chunkid);
 
-        return c.IsEditable(row);
+        return chunk.IsEditable(row);
     }
 
     /// <summary>
@@ -2529,7 +2533,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns></returns>
     internal bool LoadChunkWithChunkId(string value, string chunkname, bool important) {
-        if (_chunks.Get(chunkname) is { } chk) {
+        if (_chunks.TryGetValue(chunkname, out var chk)) {
+            if (chk.LoadFailed) { return false; }
             if (!chk.NeedsReload(important)) { return true; }
         }
 
@@ -2569,16 +2574,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="userName"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
-    protected void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container, string chunk) {
+    protected void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container, string chunkId) {
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
         if (type == DatabaseDataType.SystemValue) { return; }
 
-        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunk));
+        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkId));
 
-        if (_chunks.Get(Chunk_AdditionalUndo) is { } chk2) { chk2.DataChanged = true; }
+        if (_chunks.TryGetValue(Chunk_AdditionalUndo, out var chunk)) { chunk.DataChanged = true; }
     }
 
     protected virtual List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked) {
@@ -2609,6 +2614,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
+            if (_checker != null) {
+                _checker.Dispose();
+            }
+
             _checker = new Timer(Checker_Tick);
             _ = _checker.Change(2000, 2000);
         }
@@ -2619,20 +2628,43 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
-        //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
         if (disposing) {
-            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
-            OnDisposingEvent();
-            Column.Dispose();
-            //Cell?.Dispose();
-            Row.Dispose();
-        }
-        _ = AllFiles.Remove(this);
-        _checker?.Dispose();
+            try {
+                OnDisposingEvent();
 
-        IsDisposed = true;
+                UnregisterEvents();
 
-        if (disposing) {
+                // Timer zuerst disposen
+                if (_checker != null) {
+                    _checker.Dispose();
+                    _checker = null;
+                }
+
+                if (_pendingChangesTimer != null) {
+                    _pendingChangesTimer.Dispose();
+                    _pendingChangesTimer = null;
+                }
+
+                // Dann Collections disposen
+                Column.Dispose();
+                Row.Dispose();
+
+                // Listen leeren
+                _chunks.Clear();
+                Undo.Clear();
+                _eventScript.Clear();
+                _variables.Clear();
+                _datenbankAdmin.Clear();
+                _permissionGroupsNewRow.Clear();
+                _tags.Clear();
+
+                // Aus statischer Liste entfernen
+                _ = AllFiles.Remove(this);
+            } catch (Exception ex) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Dispose: " + ex.Message);
+            }
+
+            IsDisposed = true;
             OnDisposed();
         }
     }
@@ -2684,11 +2716,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return false; }
         foreach (var thisChunk in chunksnew) {
-            if (_chunks.Get(thisChunk.KeyName) is not { } chk || chk.DataChanged) {
+            if (_chunks.TryGetValue(thisChunk.KeyName, out var chk) || chk.DataChanged) {
                 if (!thisChunk.DoExtendedSave(5)) { return false; }
 
-                _chunks.Remove(thisChunk.KeyName); // Den alten Fehlerhaften Chunk entfernen
-                _chunks.Add(thisChunk); // den neuen korrigierten dafür hinzufügen
+                _ = _chunks.TryRemove(thisChunk.KeyName, out _); // Den alten Fehlerhaften Chunk entfernen
+                _chunks.TryAdd(thisChunk.KeyName, thisChunk); // den neuen korrigierten dafür hinzufügen
             }
         }
 
@@ -2698,11 +2730,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         // Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
         var chunks = new List<DatabaseChunk>();
-        chunks.AddRange(_chunks);
+        chunks.AddRange(_chunks.Values);
         foreach (var thisChunk in chunks) {
             if (thisChunk.DataChanged) {
                 thisChunk.Delete();
-                _chunks.Remove(thisChunk.KeyName); // Den alten Fehlerhaften Chunk entfernen
+                _ = _chunks.TryRemove(thisChunk.KeyName, out _); // Den alten Fehlerhaften Chunk entfernen
                 //thisChunk.InitByteList();
                 //if (!thisChunk.DoExtendedSave(5)) { return false; }
             }
@@ -2952,12 +2984,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return (string.Empty, null, null);
     }
 
-    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunk) {
+    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
-        if (_chunks.Get(chunk) is { } chk1) { chk1.DataChanged = true; }
+        if (_chunks.TryGetValue(chunkId, out var chk)) {
+            chk.DataChanged = true;
+        }
+
         return string.Empty;
     }
 
@@ -3149,10 +3184,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private void GenerateTimer() {
-        if (_pendingChangesTimer != null) { return; }
-        _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _pendingChangesTimer = new Timer(CheckSysUndo);
-        _ = _pendingChangesTimer.Change(10000, 10000);
+        lock (this) {
+            if (_pendingChangesTimer != null) { return; }
+            _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
+            _pendingChangesTimer = new Timer(CheckSysUndo);
+            _ = _pendingChangesTimer.Change(10000, 10000);
+        }
     }
 
     private bool IsFileAllowedToLoad(string fileName) {
@@ -3179,6 +3216,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private bool Parse(DatabaseChunk chunk, NeedPassword? needPassword) {
+        if (chunk.LoadFailed) { return false; }
         ClearChunkRelatedData(chunk.KeyName);
 
         var pointer = 0;
@@ -3193,11 +3231,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (chunk.Bytes.Length == 0) {
             // Datei gelöscht
-            _chunks.Remove(chunk.KeyName);
+            _ = _chunks.TryRemove(chunk.KeyName, out _);
             return true;
         }
 
-        _chunks.AddIfNotExists(chunk);
+        _ = _chunks.TryAdd(chunk.KeyName, chunk);
 
         var data = chunk.Bytes;
 
@@ -3331,6 +3369,39 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 e.Bmp = bmp;
             }
         } catch { }
+    }
+
+    private void UnregisterEvents() {
+        try {
+            // QuickImage Event
+            QuickImage.NeedImage -= QuickImage_NeedImage;
+
+            // Column Events
+            if (Column != null) {
+                Column.ColumnDisposed -= Column_ColumnDisposed;
+                Column.ColumnRemoving -= Column_ColumnRemoving;
+            }
+
+            // Eigene Events auf null setzen
+            AdditionalRepair = null;
+            CanDoScript = null;
+            Disposed = null;
+            DisposingEvent = null;
+            DropMessage = null;
+            InvalidateView = null;
+            Loaded = null;
+            Loading = null;
+            ProgressbarInfo = null;
+            SortParameterChanged = null;
+            ViewChanged = null;
+
+            // EventScript Events
+            foreach (var script in _eventScript) {
+                script.PropertyChanged -= EventScript_PropertyChanged;
+            }
+        } catch (Exception ex) {
+            Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
+        }
     }
 
     #endregion
