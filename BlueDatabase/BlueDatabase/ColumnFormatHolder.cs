@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -45,7 +45,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownWerteAndererZellenAnzeigen = true,
         DefaultRenderer = "ImageAndText",
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageWidth=16, ImageHeight=16}"
-
     };
 
     public new static readonly ColumnFormatHolder Bit = new(FormatHolder.Bit) {
@@ -288,17 +287,17 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     public bool AfterEditQuickSortRemoveDouble { get; set; }
     public AlignmentHorizontal Align { get; set; }
+    public string DefaultRenderer { get; set; }
     public TranslationType DoOpticalTranslation { get; set; }
     public bool DropdownAllesAbwählenErlaubt { get; set; }
     public bool DropdownBearbeitungErlaubt { get; set; }
     public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
     public bool DropdownWerteAndererZellenAnzeigen { get; set; }
     public ColumnFunction Function { get; set; }
+    public string RendererSettings { get; set; }
     public ScriptType ScriptType { get; set; }
     public SortierTyp SortType { get; set; }
     public bool TextBearbeitungErlaubt { get; set; }
-    public string DefaultRenderer { get; set; }
-    public string RendererSettings { get; set; }
 
     #endregion
 }

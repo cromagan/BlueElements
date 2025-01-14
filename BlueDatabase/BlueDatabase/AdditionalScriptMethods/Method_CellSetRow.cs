@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -58,12 +58,11 @@ public class Method_CellSetRow : Method_Database {
         var columnToSet = db.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }
 
-
         if (!columnToSet.Function.CanBeChangedByRules()) {
             return new DoItFeedback(ld, "Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1));
         }
 
-            var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
+        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 

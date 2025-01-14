@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -63,7 +63,8 @@ public static partial class Extensions {
     public static SizeF MeasureString(this Font font, string text) => font.MeasureString(text, StringFormat.GenericDefault);
 
     public static SizeF MeasureString(this Font font, string text, StringFormat stringFormat) {
-        if (string.IsNullOrEmpty(text)) return SizeF.Empty;
+        if (string.IsNullOrEmpty(text))
+            return SizeF.Empty;
 
         try {
             // Graphics-Objekt wiederverwendbar machen über static

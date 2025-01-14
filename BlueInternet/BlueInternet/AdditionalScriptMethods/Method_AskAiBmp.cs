@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2024 Christian Peter
+// Copyright (c) 2025 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -64,9 +64,6 @@ internal class Method_AskAiBmp : Method {
         var tries = 0;
 
         do {
-
-
-
             try {
                 Generic.CollectGarbage();
                 // Convert the byte array to a base64 string
@@ -90,7 +87,6 @@ internal class Method_AskAiBmp : Method {
                     Temperature = 1.0m
                 };
 
-
                 var firstResult = client.Messages.GetClaudeMessageAsync(parameters).GetAwaiter().GetResult();
 
                 return new DoItFeedback(firstResult.Message.ToString());
@@ -98,10 +94,8 @@ internal class Method_AskAiBmp : Method {
                 tries++;
                 Generic.Pause(10, false);
             }
-
         } while (tries < 10);
         return new DoItFeedback(ld, "Allgemeiner Fehler bei der Übergabe an die KI.");
-
     }
 
     #endregion
