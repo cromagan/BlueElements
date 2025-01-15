@@ -766,12 +766,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                             n++;
 
                             var chunkname = Database.GetChunkName(db, thisWorkItem.Command, thisWorkItem.ChunkValue);
-                            if (string.IsNullOrEmpty(chunkname)) { return null; }
-
-                            var rowchunk = GetOrMakechunk(chunks, db, chunkname);
-
-                            rowchunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
-                            if (n > 10000) { break; }
+                            if (!string.IsNullOrEmpty(chunkname)) {
+                                var rowchunk = GetOrMakechunk(chunks, db, chunkname);
+                                rowchunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
+                                if (n > 10000) { break; }
+                            }
                         }
                     }
                 }
@@ -888,7 +887,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public static string GetChunkName(Database db, DatabaseDataType type, string value) {
-        if (db.Column.SplitColumn is not { } spc) { return string.Empty; }
+        if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData; }
 
         if (type is DatabaseDataType.Command_RemoveRow or DatabaseDataType.Command_AddRow
             or DatabaseDataType.Command_RemoveColumn or DatabaseDataType.Command_AddColumnByName
@@ -3095,7 +3094,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
 
         // Bestimme ob gespeichert werden muss
-        bool mustSave =  (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
+        bool mustSave = (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
                          _checkerTickCount > 110 ||
                          (Column.SplitColumn != null && _checkerTickCount > 50);
 
