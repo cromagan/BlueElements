@@ -393,7 +393,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
                 if (repairallowed && oldvalue != newvalue) {
-                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur");
+                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", row.GetChunkValue());
                 }
 
                 if (targetColumn?.Database != null) {
@@ -501,7 +501,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         column.UcaseNamesSortedByLenght = null;
 
-        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment);
+        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, row.GetChunkValue());
 
         if (!string.IsNullOrEmpty(message)) { return message; }
 

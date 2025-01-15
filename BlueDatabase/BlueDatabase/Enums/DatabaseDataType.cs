@@ -305,6 +305,6 @@ public enum DatabaseDataType : byte {
 
     //StatisticInOne = 252
     //Statistic = 253
-    //UndoOld = 254
+    Undo = 254,
     EOF = 255
 }

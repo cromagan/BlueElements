@@ -382,22 +382,22 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         OnRowChecked(LastCheckedEventArgs);
     }
 
-    public void CloneFrom(RowItem source, bool nameAndKeyToo) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+    //public void CloneFrom(RowItem source, bool nameAndKeyToo) {
+    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        var sdb = source.Database;
-        if (sdb is null || sdb.IsDisposed) { return; }
+    //    var sdb = source.Database;
+    //    if (sdb is null || sdb.IsDisposed) { return; }
 
-        if (nameAndKeyToo) { KeyName = source.KeyName; }
+    //    if (nameAndKeyToo) { KeyName = source.KeyName; }
 
-        foreach (var thisColumn in db.Column) {
-            var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
+    //    foreach (var thisColumn in db.Column) {
+    //        var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
 
-            _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, Generic.UserName, DateTime.UtcNow, "Zeilen-Klonung");
+    //        _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, Generic.UserName, DateTime.UtcNow, "Zeilen-Klonung", );
 
-            //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
-        }
-    }
+    //        //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
+    //    }
+    //}
 
     public string CompareKey(List<ColumnItem> columns) {
         StringBuilder r = new();
@@ -914,10 +914,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    internal string GetChunkName(bool chunksAllowed) {
-        if (!chunksAllowed || Database?.Column.SplitColumn is not { } spc) { return Database.Chunk_MainData; }
+    internal string GetChunkValue() {
+        if (Database?.Column.SplitColumn is not { } spc) { return string.Empty; }
 
-        return Database.GetChunkName(Database, CellGetString(spc));
+return CellGetString(spc);
+    }
+
+    internal string GetChunkName(bool chunksAllowed) {
+        if (!chunksAllowed || Database?.Column.SplitColumn is not { }) { return Database.Chunk_MainData; }
+
+        return Database.GetChunkName(Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue());
     }
 
     internal void Repair() {

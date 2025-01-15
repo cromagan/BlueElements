@@ -418,7 +418,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public static bool Remove(RowItem? row, string comment) {
         if (row is not { IsDisposed: false } r) { return false; }
-        return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment));
+        return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, r.GetChunkValue()));
     }
 
     /// <summary>
@@ -651,7 +651,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment);
+        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty);
         if (!string.IsNullOrEmpty(s)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
@@ -851,31 +851,31 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
-    internal void CloneFrom(Database sourceDatabase) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+    //internal void CloneFrom(Database sourceDatabase) {
+    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
-        if (!string.IsNullOrEmpty(f)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
-            throw new Exception();
-        }
+    //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+    //    if (!string.IsNullOrEmpty(f)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
+    //        throw new Exception();
+    //    }
 
-        // Zeilen, die zu viel sind, löschen
-        foreach (var thisRow in this) {
-            var l = sourceDatabase.Row.SearchByKey(thisRow.KeyName);
-            if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
-        }
+    //    // Zeilen, die zu viel sind, löschen
+    //    foreach (var thisRow in this) {
+    //        var l = sourceDatabase.Row.SearchByKey(thisRow.KeyName);
+    //        if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
+    //    }
 
-        // Zeilen erzeugen und Format übertragen
-        foreach (var thisRow in sourceDatabase.Row) {
-            var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
-            l.CloneFrom(thisRow, true);
-        }
+    //    // Zeilen erzeugen und Format übertragen
+    //    foreach (var thisRow in sourceDatabase.Row) {
+    //        var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
+    //        l.CloneFrom(thisRow, true);
+    //    }
 
-        if (sourceDatabase.Row.Count != Count) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Clone Fehlgeschlagen");
-        }
-    }
+    //    if (sourceDatabase.Row.Count != Count) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Clone Fehlgeschlagen");
+    //    }
+    //}
 
     internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }

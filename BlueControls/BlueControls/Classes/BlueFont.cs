@@ -37,8 +37,6 @@ namespace BlueControls;
 public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IEditable, IParseable {
 
     #region Fields
-
-    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
     private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
@@ -46,6 +44,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
+    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
 
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
@@ -147,7 +146,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, Color colorBack) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower, colorBack.ToHtmlCode());
 
     public static BlueFont Get(string toParse) {
-        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) {
+        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{") || _blueFontCache == null) {
             return DefaultFont;
         }
 
