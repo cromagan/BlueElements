@@ -3071,43 +3071,38 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private void Checker_Tick(object state) {
-        if (IsDisposed) { return; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
+        // Grundlegende Überprüfungen
+        if (IsDisposed || !string.IsNullOrEmpty(FreezedReason)) { return; }
 
+        // Script-Überprüfung
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
-        if (e.Cancel) { return; }
+        if (e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
 
-        RowCollection.ExecuteValueChangedEvent();
-
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 10) { return; }
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3) { return; }
-
-        if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
-        if (!LogUndo) { return; }
-
-        _checkerTickCount++;
-        if (_checkerTickCount < 0) { return; }
-
-        var changed = !HasChangedChunks();
-
-        if (!changed) {
+        if (!HasChangedChunks() || !LogUndo) {
             _checkerTickCount = 0;
             return;
         }
 
-        var mustsave = _checkerTickCount > 20 && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds > 20;
-        mustsave = mustsave || _checkerTickCount > 180;
+        _checkerTickCount++;
+        _checkerTickCount = Math.Min(_checkerTickCount, 5000);
 
-        if (Column.SplitColumn != null) {
-            mustsave = mustsave || _checkerTickCount > 50;
-        }
+        // Zeitliche Bedingungen prüfen
+        //var timeSinceLastChange = DateTime.UtcNow.Subtract(LastChange).TotalSeconds;
+        var timeSinceLastAction = DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds;
 
-        if (mustsave) {
-            if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
-            if (Save()) {
-                _checkerTickCount = 0;
-            }
+
+
+
+        // Bestimme ob gespeichert werden muss
+        bool mustSave =  (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
+                         _checkerTickCount > 110 ||
+                         (Column.SplitColumn != null && _checkerTickCount > 50);
+
+
+        // Speichern wenn nötig
+        if (mustSave && Save()) {
+            _checkerTickCount = 0;
         }
     }
 
