@@ -106,6 +106,10 @@ public class UndoItem : IParseable {
                 TableName = value;
                 return true;
 
+            case "ch":
+                //chunk
+                return true;
+
             case "undotype":
             case "st":
                 //_state = (ItemState)IntParse(pair.Value);

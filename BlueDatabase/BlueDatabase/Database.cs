@@ -59,6 +59,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public const string DatabaseVersion = "4.10";
     public static readonly ObservableCollection<Database> AllFiles = [];
     public static readonly string Chunk_AdditionalUseCases = "_uses";
+    public static readonly string Chunk_Variables = "_vars";
+    public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_MainData = "MainData";
 
     /// <summary>
@@ -593,6 +595,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (thisDb.Column.SplitColumn != null) {
                         thisDb.LoadChunkWithChunkId(Chunk_MainData, false, null);
                         thisDb.LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null);
+                        thisDb.LoadChunkWithChunkId(Chunk_Master, false, null);
+                        thisDb.LoadChunkWithChunkId(Chunk_Variables, false, null);
                     }
 
                     #region Datenbanken des gemeinsamen Servers ermittelen
@@ -682,11 +686,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         chunks.Add(mainChunk);
 
         var usesChunk = mainChunk;
+        var varChunk = mainChunk;
+        var masterUserChunk = mainChunk;
 
         if (chunksAllowed) {
             usesChunk = new DatabaseChunk(db.Filename, Chunk_AdditionalUseCases);
             usesChunk.InitByteList();
             chunks.Add(usesChunk);
+
+
+            varChunk = new DatabaseChunk(db.Filename, Chunk_Variables);
+            varChunk.InitByteList();
+            chunks.Add(varChunk);
+
+            masterUserChunk = new DatabaseChunk(db.Filename, Chunk_Master);
+            masterUserChunk.InitByteList();
+            chunks.Add(masterUserChunk);
+
+
         }
 
         try {
@@ -698,8 +715,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             mainChunk.SaveToByteList(DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
             mainChunk.SaveToByteList(DatabaseDataType.Caption, db.Caption);
 
-            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
-            mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
+            masterUserChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
+            masterUserChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
 
             mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
             mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
@@ -723,8 +740,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             mainChunk.SaveToByteList(DatabaseDataType.EventScript, db.EventScript.ToString(true));
             mainChunk.SaveToByteList(DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
-            mainChunk.SaveToByteList(DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
-            mainChunk.SaveToByteList(DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
+
+            usesChunk.SaveToByteList(DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);
+            varChunk.SaveToByteList(DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
             foreach (var thisRow in db.Row) {
 
@@ -895,20 +913,25 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Database.Chunk_AdditionalUseCases; }
+        if (type == DatabaseDataType.DatabaseVariables) { return Database.Chunk_Variables; }
+        if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC  
+                 or  DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Database.Chunk_Master; }
+
+
         if (type.IsCellValue() || type != DatabaseDataType.Undo) {
             switch (spc.Function) {
                 case ColumnFunction.Split_Medium:
-                    return value.GetHashString().Right(2).ToLower();
+                    return value.ToLower().GetHashString().Right(2).ToLower();
 
                 case ColumnFunction.Split_Large:
-                    return value.GetHashString().Right(3).ToLower();
+                    return value.ToLower().GetHashString().Right(3).ToLower();
 
                 case ColumnFunction.Split_Name:
                     var t = ColumnItem.MakeValidColumnName(value);
                     return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(10);
 
                 default:
-                    return "_RowData";
+                    return "_rowdata";
             }
         }
 
@@ -2556,12 +2579,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     internal (bool loaded, bool ok) LoadChunkWithChunkId(string chunkname, bool important, NeedPassword? needPassword) {
         //if (Column.SplitColumn == null) { return (false, true); }
 
+
+        if(string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
+
         if (_chunks.TryGetValue(chunkname, out var chk)) {
             if (chk.LoadFailed) { return (false, false); }
             if (!chk.NeedsReload(important)) { return (false, true); }
         }
 
-        OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkname}' der Datenbank {Caption}");
+        OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkname}' der Datenbank {Filename.FileNameWithoutSuffix()}");
 
         var chunk = new DatabaseChunk(Filename, chunkname);
         chunk.LoadBytesFromDisk();

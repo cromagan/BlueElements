@@ -176,6 +176,7 @@ public class DatabaseChunk : IHasKeyName {
     /// <returns></returns>
     public bool NeedsReload(bool important) {
         if (LoadFailed) { return true; }
+        if(string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Datenbanken
 
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
             var nf = GetFileInfo(ChunkFileName, false);
