@@ -119,7 +119,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
             if (thisFi.SearchValue.Count != 1) {
                 return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
             }
-            var l = allFi.InitValue(c, true);
+            var l = FilterCollection.InitValue(allFi.ToList(), c, true);
             if (thisFi.SearchValue[0] != l) {
                 return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
             }

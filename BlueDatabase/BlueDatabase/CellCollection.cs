@@ -122,7 +122,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
-    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
+    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked, List<FilterItem>? filter) {
         if (mode == EditableErrorReasonType.OnlyRead) {
             if (column == null || row == null) { return string.Empty; }
         }
@@ -149,7 +149,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             db2.PowerEdit = db.PowerEdit;
 
             if (lrow != null) {
-                var tmp = EditableErrorReason(lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false);
+                var tmp = EditableErrorReason(lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false, null);
                 return string.IsNullOrEmpty(tmp)
                     ? string.Empty
                     : "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp;
@@ -168,8 +168,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (checkUserRights && !db.PermissionCheck(db.PermissionGroupsNewRow, null)) {
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
-            if (db.Column?.SplitColumn is { }) {
-                return "Chunk ohne Angabe noch nicht programmiert.";
+
+            if (db.Column?.SplitColumn is { } spc) {
+                var cn = FilterCollection.InitValue(filter, spc, false);
+
+                if (string.IsNullOrEmpty(cn)) {
+                    return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
+                }
+                return db.IsChunkEditable(cn);
             }
         } else {
             if (db.Column.SysLocked != null) {
@@ -181,12 +187,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { }) {
-                if (row == null) {
-                    return "Chunk ohne Angabe noch nicht programmiert.";
-                }
-
                 var cn = row.GetChunkName(true);
-
                 return db.IsChunkEditable(cn);
             }
         }
@@ -343,7 +344,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (linkedDatabase is not { IsDisposed: false }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
 
         // Repair nicht mehr erlauben, ergibt rekursive Schleife, wir sind hier ja schon im repair
-        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
+        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true, null);
         if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
 
         if (row is not { IsDisposed: false }) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
@@ -366,7 +367,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        targetRow = RowCollection.GenerateAndAdd(fc, "LinkedCell aus " + db.TableName).newrow;
+                        targetRow = db.Row.GenerateAndAdd(fc.ToList(), "LinkedCell aus " + db.TableName).newrow;
                     } else {
                         cr = true;
                     }

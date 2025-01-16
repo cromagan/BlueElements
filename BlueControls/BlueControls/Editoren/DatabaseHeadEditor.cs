@@ -110,7 +110,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     public static void AddUndoToTable(Table tblUndo, UndoItem work, Database db, float maxAgeInDays) {
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
-        var r = tblUndo.Database?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), null, "New Undo Item");
+        var r = tblUndo.Database?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("ColumnName", work.ColName, string.Empty);

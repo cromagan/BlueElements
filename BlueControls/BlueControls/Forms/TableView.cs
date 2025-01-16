@@ -106,7 +106,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var db = tbl?.Database ?? column?.Database ?? row?.Database;
         if (db == null) { return; }
 
-        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false, null));
 
         if (tbl != null && row != null) {
             e.ContextMenu.Add(ItemOf("Anheften", true));
@@ -206,7 +206,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                     if (t is { Successful: true, AllOk: true }) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
                     } else {
-                        MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.NotSuccessfulReason}<br><br>{t.Protocol.JoinWithCr()}" , ImageCode.Kreuz, "Ok");
+                        MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.NotSuccessfulReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
                     }
                 }
 
@@ -888,7 +888,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
         Notification.Show("5 Minuten (fast) rechtefreies<br>Bearbeiten aktiviert.", ImageCode.Stift);
-        Table.PowerEdit = true; 
+        Table.PowerEdit = true;
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {

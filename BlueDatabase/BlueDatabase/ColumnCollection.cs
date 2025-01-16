@@ -97,14 +97,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// </summary>
     //    /// <returns></returns>
 
-    public ColumnItem? FirstColumn { get; private set; }
     public bool IsDisposed { get; private set; }
     public ColumnItem? SplitColumn { get; private set; }
-
     public ColumnItem? SysChapter { get; private set; }
-
     public ColumnItem? SysCorrect { get; private set; }
-
     public ColumnItem? SysLocked { get; private set; }
 
     /// <summary>
@@ -115,12 +111,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? SysRowChangeDate { get; private set; }
 
     public ColumnItem? SysRowChanger { get; private set; }
-
     public ColumnItem? SysRowCreateDate { get; private set; }
-
     public ColumnItem? SysRowCreator { get; private set; }
-
     public ColumnItem? SysRowState { get; private set; }
+    private ColumnItem? _firstColumn { get; set; }
 
     #endregion
 
@@ -293,7 +287,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysChapter = null;
         SysRowState = null;
         SplitColumn = null;
-        FirstColumn = null;
+        _firstColumn = null;
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null) {
@@ -303,7 +297,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                     SplitColumn = thisColumnItem;
                 }
                 if (thisColumnItem.Function == ColumnFunction.First) {
-                    FirstColumn = thisColumnItem;
+                    _firstColumn = thisColumnItem;
                 }
 
                 if (thisColumnItem.IsSystemColumn()) {

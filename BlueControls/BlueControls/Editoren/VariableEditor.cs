@@ -134,7 +134,7 @@ public partial class VariableEditor : EditorEasy {
         if (variables is not VariableCollection vc) { return false; }
 
         foreach (var thisv in vc) {
-            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, null, "Neue Variable");
+            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
 
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId, string.Empty);

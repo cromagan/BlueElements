@@ -1223,9 +1223,8 @@ public static class Skin {
 
         if (r == null) {
             if (!db.ReadOnly) {
-                using var fc = new FilterCollection(f1, "RowAdder");
-                fc.Add(f2);
-                db.Row.GenerateAndAdd(style, fc, "Unbekannter Stil");
+                var fc = new List<FilterItem> { f1, f2 };
+                db.Row.GenerateAndAdd(fc, "Unbekannter Stil");
             }
 
             return BlueFont.DefaultFont;

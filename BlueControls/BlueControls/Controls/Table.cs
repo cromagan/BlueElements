@@ -909,8 +909,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Zoom = nz;
     }
 
-    public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
-        var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
+    public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview, List<FilterItem>? filter) {
+        var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false, filter);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (checkEditmode) {
@@ -1563,7 +1563,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             switch (e.KeyCode) {
                 case Keys.Oemcomma: // normales ,
                     if (e.Modifiers == Keys.Control) {
-                        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true);
+                        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, null);
                         Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
                         if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
                         if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
@@ -1581,7 +1581,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             _isinKeyDown = false;
                             return;
                         }
-                        var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true);
+                        var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, null);
                         if (string.IsNullOrEmpty(l2)) {
                             UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true);
                         } else {
@@ -1595,7 +1595,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                         _isinKeyDown = false;
                         return;
                     }
-                    var l = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true);
+                    var l = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, null);
                     if (string.IsNullOrEmpty(l)) {
                         UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true);
                     } else {
@@ -1682,7 +1682,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditAcut, true, false, true);
+                            var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditAcut, true, false, true, null);
                             if (string.IsNullOrEmpty(l2)) {
                                 UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true);
                             } else {
@@ -1894,7 +1894,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
 
     private static void UserEdited(Table table, string newValue, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
-        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true);
+        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.Filter.ToList());
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
         if (cellInThisDatabaseColumn?.Column is not { Function: not ColumnFunction.Virtuelle_Spalte }) { return; } // Dummy prüfung
@@ -1928,25 +1928,33 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return; }
             if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return; }
+            if (table?.Database?.Column.First() is not { } colfirst) { return; }
 
-            var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true);
+            var fc = new List<FilterItem>() { new FilterItem(colfirst, FilterType.Istgleich, newValue) };
+            fc.AddRange(table.Filter.ToList());
+
+            var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true, fc);
             if (!string.IsNullOrEmpty(fe)) {
                 NotEditableInfo(fe);
                 return;
             }
 
-            var newr = db.Row.GenerateAndAdd(newValue, table.Filter, "Neue Zeile über Tabellen-Ansicht");
+            var newr = db.Row.GenerateAndAdd(fc, "Neue Zeile über Tabellen-Ansicht");
+
+            if (!string.IsNullOrEmpty(newr.message)) {
+                NotEditableInfo(newr.message);
+            }
 
             var l = table.RowsFiltered;
-            if (newr != null && !l.Contains(newr)) {
+            if (newr.newrow != null && !l.Contains(newr.newrow)) {
                 if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
-                    table.PinAdd(newr);
+                    table.PinAdd(newr.newrow);
                 }
             }
 
             var sr = table.RowsFilteredAndPinned();
-            if (newr != null) {
-                var rd = sr.Get(newr);
+            if (newr.newrow != null) {
+                var rd = sr.Get(newr.newrow);
                 table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
             }
 
@@ -1959,7 +1967,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (contentHolderCellRow != null) {
             if (newValue == contentHolderCellRow.CellGetString(contentHolderCellColumn)) { return; }
 
-            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true, false);
+            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true, false, null);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
@@ -2005,13 +2013,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             ResetView();
         }
 
-
         Invalidate_FilterInput();
         Invalidate_RowsInput();
         Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
         CheckView();
-
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
@@ -2233,7 +2239,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown) {
-        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true);
+        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true, Filter.ToList());
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (viewItem?.Column == null) { return; }// Klick ins Leere
 
@@ -2555,7 +2561,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
             } else {
-                txt = Filter.InitValue(cellInThisDatabaseColumn, false);
+                txt = FilterCollection.InitValue(Filter.ToList(), cellInThisDatabaseColumn, false);
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
             }
 
@@ -3320,7 +3326,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 
-        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false));
+        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, Filter.ToList()));
     }
 
     #endregion

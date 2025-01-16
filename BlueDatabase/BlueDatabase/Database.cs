@@ -59,9 +59,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public const string DatabaseVersion = "4.10";
     public static readonly ObservableCollection<Database> AllFiles = [];
     public static readonly string Chunk_AdditionalUseCases = "_uses";
-    public static readonly string Chunk_Variables = "_vars";
-    public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_MainData = "MainData";
+    public static readonly string Chunk_Master = "_master";
+    public static readonly string Chunk_Variables = "_vars";
 
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
@@ -694,7 +694,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             usesChunk.InitByteList();
             chunks.Add(usesChunk);
 
-
             varChunk = new DatabaseChunk(db.Filename, Chunk_Variables);
             varChunk.InitByteList();
             chunks.Add(varChunk);
@@ -702,8 +701,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             masterUserChunk = new DatabaseChunk(db.Filename, Chunk_Master);
             masterUserChunk.InitByteList();
             chunks.Add(masterUserChunk);
-
-
         }
 
         try {
@@ -914,9 +911,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Database.Chunk_AdditionalUseCases; }
         if (type == DatabaseDataType.DatabaseVariables) { return Database.Chunk_Variables; }
-        if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC  
-                 or  DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Database.Chunk_Master; }
-
+        if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC
+                 or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Database.Chunk_Master; }
 
         if (type.IsCellValue() || type != DatabaseDataType.Undo) {
             switch (spc.Function) {
@@ -928,7 +924,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                 case ColumnFunction.Split_Name:
                     var t = ColumnItem.MakeValidColumnName(value);
-                    return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(10);
+                    return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(12);
 
                 default:
                     return "_rowdata";
@@ -1977,7 +1973,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             foreach (var thisr in db.Row) {
-                var r = Row.GenerateAndAdd("Dummy", null, "BDB Import");
+                var r = Row.GenerateAndAdd("Dummy", "BDB Import");
 
                 if (r == null) { return "Zeile konnte nicht generiert werden."; }
 
@@ -2174,7 +2170,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 dictVorhanden.Remove(thisD.Key); // Speedup
             } else {
                 neuZ++;
-                row = Row.GenerateAndAdd(thisD.Value[0], null, "Import, fehlende Zeile");
+                row = Row.GenerateAndAdd(thisD.Value[0], "Import, fehlende Zeile");
             }
 
             if (row == null) {
@@ -2579,8 +2575,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     internal (bool loaded, bool ok) LoadChunkWithChunkId(string chunkname, bool important, NeedPassword? needPassword) {
         //if (Column.SplitColumn == null) { return (false, true); }
 
-
-        if(string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
+        if (string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
 
         if (_chunks.TryGetValue(chunkname, out var chk)) {
             if (chk.LoadFailed) { return (false, false); }
@@ -3116,14 +3111,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //var timeSinceLastChange = DateTime.UtcNow.Subtract(LastChange).TotalSeconds;
         var timeSinceLastAction = DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds;
 
-
-
-
         // Bestimme ob gespeichert werden muss
         bool mustSave = (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
                          _checkerTickCount > 110 ||
                          (Column.SplitColumn != null && _checkerTickCount > 50);
-
 
         // Speichern wenn nötig
         if (mustSave && Save()) {

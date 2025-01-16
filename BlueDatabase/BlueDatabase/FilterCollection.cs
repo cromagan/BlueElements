@@ -138,7 +138,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public ReadOnlyCollection<RowItem> Rows {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return new List<RowItem>().AsReadOnly(); }
-            _rows ??= CalculateFilteredRows();
+            _rows ??= CalculateFilteredRows(_internal.ToArray());
             return _rows.AsReadOnly();
         }
     }
@@ -146,7 +146,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public RowItem? RowSingleOrNull {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
-            _rows ??= CalculateFilteredRows();
+            _rows ??= CalculateFilteredRows(_internal.ToArray());
             return _rows.Count != 1 ? null : _rows[0];
         }
     }
@@ -169,6 +169,92 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     #endregion
 
     #region Methods
+
+    public static List<RowItem> CalculateFilteredRows(params FilterItem[] filter) {
+        if (filter == null || filter.Length == 0) { return []; }
+
+        if (filter[0].IsDisposed || filter[0].Database is not { IsDisposed: false } db) { return []; }
+
+        //var fi2 = _internal.ToArray();
+        if (db.Column.SplitColumn != null) {
+            foreach (var fi in filter) {
+                if (fi.Column == db.Column.SplitColumn) {
+                    var (loaded, ok) = db.LoadChunkfromValue(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+                    if (!ok) { return []; }
+
+                    if (loaded) {
+                        // OnLoaded kann den Filter disposen
+                        return CalculateFilteredRows(filter);
+                    }
+                }
+            }
+        }
+
+        List<RowItem> tmpVisibleRows = [];
+        var lockMe = new object();
+        try {
+            _ = Parallel.ForEach(db.Row, thisRowItem => {
+                if (thisRowItem != null) {
+                    if (thisRowItem.MatchesTo(filter)) {
+                        lock (lockMe) {
+                            tmpVisibleRows.Add(thisRowItem);
+                        }
+                    }
+                }
+            });
+        } catch {
+            Develop.CheckStackForOverflow();
+            return CalculateFilteredRows(filter);
+        }
+
+        return tmpVisibleRows;
+    }
+
+    /// <summary>
+    /// Gibt den Wert zur¸ck, der in eine neue Zeile reingeschrieben wird
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns></returns>
+    public static string InitValue(List<FilterItem>? filter, ColumnItem column, bool firstToo) {
+        if (filter == null || filter.Count == 0) { return string.Empty; }
+        if (column is not { IsDisposed: false }) { return string.Empty; }
+        if (column.Database is not { IsDisposed: false } db) { return string.Empty; }
+
+        if (column.Function is not ColumnFunction.Normal
+                           and not ColumnFunction.Schl¸sselspalte
+                           and not ColumnFunction.RelationText
+                           and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+                           and not ColumnFunction.Split_Medium
+                           and not ColumnFunction.Split_Large
+                           and not ColumnFunction.Split_Name) { return string.Empty; }
+
+        if (!firstToo && db.Column.First() == column) { return string.Empty; }
+
+        if (column == db.Column.SysCorrect ||
+            column == db.Column.SysRowChangeDate ||
+            column == db.Column.SysRowChanger ||
+            column == db.Column.SysRowCreator ||
+            column == db.Column.SysRowCreateDate ||
+            column == db.Column.SysLocked ||
+            column == db.Column.SysRowState) { return string.Empty; }
+
+        var fi = filter.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
+                              .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
+
+        if (fi is not {
+            FilterType: not (not FilterType.Istgleich
+                and not FilterType.Istgleich_GroﬂKleinEgal
+                and not FilterType.Istgleich_ODER_GroﬂKleinEgal
+                and not FilterType.Istgleich_UND_GroﬂKleinEgal
+                and not FilterType.Instr
+                and not FilterType.Instr_GroﬂKleinEgal
+                and not FilterType.Instr_UND_GroﬂKleinEgal
+                and not FilterType.Istgleich_MultiRowIgnorieren
+                and not FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren)
+        }) { return string.Empty; }
+
+        return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
+    }
 
     public void Add(FilterItem fi) {
         if (IsDisposed) { return; }
@@ -252,7 +338,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
 
             if (reallydifferent) {
-
                 if (fc._rows != null) {
                     _rows = [];
                     _rows.AddRange(fc.Rows);
@@ -260,8 +345,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 } else {
                     Invalidate_FilteredRows();
                 }
-
-
             }
         } else {
             if (Count > 0) {
@@ -333,50 +416,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (thisFi.FilterType == FilterType.AlwaysFalse) { return true; }
         }
         return false;
-    }
-
-    /// <summary>
-    /// Gibt den Wert zur¸ck, der in eine neue Zeile reingeschrieben wird
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns></returns>
-    public string InitValue(ColumnItem column, bool firstToo) {
-        if (Count == 0) { return string.Empty; }
-        if (column is not { IsDisposed: false }) { return string.Empty; }
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return string.Empty; }
-
-        if (column.Function is not ColumnFunction.Normal
-                           and not ColumnFunction.Schl¸sselspalte
-                           and not ColumnFunction.RelationText
-                           and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                           and not ColumnFunction.Split_Medium
-                           and not ColumnFunction.Split_Large
-                           and not ColumnFunction.Split_Name) { return string.Empty; }
-
-        if (!firstToo && db.Column.First() == column) { return string.Empty; }
-
-        if (column == db.Column.SysCorrect ||
-            column == db.Column.SysRowChangeDate ||
-            column == db.Column.SysRowChanger ||
-            column == db.Column.SysRowCreator ||
-            column == db.Column.SysRowCreateDate ||
-            column == db.Column.SysLocked ||
-            column == db.Column.SysRowState) { return string.Empty; }
-
-        var fi = this[column];
-        if (fi is not {
-            FilterType: not (not FilterType.Istgleich
-                and not FilterType.Istgleich_GroﬂKleinEgal
-                and not FilterType.Istgleich_ODER_GroﬂKleinEgal
-                and not FilterType.Istgleich_UND_GroﬂKleinEgal
-                and not FilterType.Instr
-                and not FilterType.Instr_GroﬂKleinEgal
-                and not FilterType.Instr_UND_GroﬂKleinEgal
-                and not FilterType.Istgleich_MultiRowIgnorieren
-                and not FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren)
-        }) { return string.Empty; }
-
-        return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
     }
 
     public void Invalidate_FilteredRows() {
@@ -613,6 +652,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
+    private void _database_Loaded(object sender, System.EventArgs e) {
+        Invalidate_FilteredRows();
+    }
+
     /// <summary>
     /// Lˆst keine Ereignisse aus
     /// </summary>
@@ -644,47 +687,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         foreach (var thisfio in fi) {
             AddAndRegisterEvents(thisfio);
         }
-    }
-
-    private List<RowItem> CalculateFilteredRows() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return []; }
-
-        var fi2 = _internal.ToArray();
-        if (db.Column.SplitColumn != null) {
-            foreach (var fi in fi2) {
-                if (fi.Column == db.Column.SplitColumn) {
-
-                    var (loaded, ok) = db.LoadChunkfromValue(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData,   false, null);
-                    if(!ok) { return []; }
-
-                    if (loaded) { 
-                        // OnLoaded kann den Filter disposen
-                        return CalculateFilteredRows(); 
-                    }
-                    
-                }
-            }
-        }
-
-
-        List<RowItem> tmpVisibleRows = [];
-        var lockMe = new object();
-        try {
-            _ = Parallel.ForEach(Database.Row, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (thisRowItem.MatchesTo(fi2)) {
-                        lock (lockMe) {
-                            tmpVisibleRows.Add(thisRowItem);
-                        }
-                    }
-                }
-            });
-        } catch {
-            Develop.CheckStackForOverflow();
-            return CalculateFilteredRows();
-        }
-
-        return tmpVisibleRows;
     }
 
     private void Dispose(bool disposing) {
@@ -742,10 +744,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _database.Row.RowAdded += Row_Added;
             _database.Cell.CellValueChanged += _Database_CellValueChanged;
         }
-    }
-
-    private void _database_Loaded(object sender, System.EventArgs e) {
-        Invalidate_FilteredRows();
     }
 
     private void Row_Added(object sender, RowEventArgs e) {

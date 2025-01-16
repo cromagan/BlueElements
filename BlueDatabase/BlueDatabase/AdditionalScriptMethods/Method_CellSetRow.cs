@@ -62,7 +62,7 @@ public class Method_CellSetRow : Method_Database {
             return new DoItFeedback(ld, "Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1));
         }
 
-        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
+        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false, null);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 

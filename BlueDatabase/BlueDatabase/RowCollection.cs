@@ -266,59 +266,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
-    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
-    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
-    /// Am Schluß wird noch das Skript ausgeführt.
-    /// </summary>
-    /// <param name="fc"></param>
-    /// <param name="comment"></param>
-    /// <returns></returns>
-    public static (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(FilterCollection fc, string comment) {
-        IReadOnlyCollection<string>? first = null;
-
-        Database? db2 = null;
-
-        foreach (var thisfi in fc) {
-            if (thisfi.FilterType is not FilterType.Istgleich
-                and not FilterType.Istgleich_GroßKleinEgal
-                and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt", true); }
-            if (thisfi.Column == null) { return (null, "Leere Spalte angekommen", true); }
-            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich", true); }
-            db2 ??= db1;
-
-            if (db1.Column.First() == thisfi.Column) {
-                if (first != null) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
-                first = thisfi.SearchValue;
-            }
-
-            if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich", true); }
-        }
-
-        if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
-
-        var f = db2.EditableErrorReason(EditableErrorReasonType.EditNormaly);
-        if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f, true); }
-
-        if (first == null || string.IsNullOrEmpty(first.JoinWithCr())) { return (null, "Der Wert für die erste Spalte fehlt", true); }
-
-        var s = db2.NextRowKey();
-        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
-
-        return (db2.Row.GenerateAndAdd(s, first.JoinWithCr(), fc, true, comment), string.Empty, false);
-
-        //foreach (var thisfi in fc) {
-        //    if (thisfi.Column is ColumnItem c) {
-        //        row.CellSet(c, thisfi.SearchValue.ToList());
-        //    }
-        //}
-
-        //_ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1, null);
-
-        //return row;
-    }
-
-    /// <summary>
     /// Sucht dopplete Einträge in der angegebenen Spalte. Dabei werden Multiline-Einträge auggesplittet.
     /// </summary>
     /// <param name="column"></param>
@@ -380,19 +327,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return null;
     }
 
-    public static bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
-        FilterCollection fc = new(fi.Database, "Remove Row") { fi };
-        var r = Remove(fc, pinned, comment);
-        fc.Dispose();
-        return r;
-    }
+    public static bool Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(fi), comment);
 
     public static bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
         var allrows = new List<RowItem>();
         if (fc?.Rows is { Count: > 0 } rows) { allrows.AddRange(rows); }
         if (pinned is { Count: > 0 }) { allrows.AddRange(pinned); }
 
-        if (allrows.Count == 0) { return false; }
+        return Remove(allrows, comment);
+    }
+
+    public static bool Remove(List<RowItem>? allrows, string comment) {
+        if (allrows == null || allrows.Count == 0) { return false; }
 
         var did = false;
 
@@ -483,7 +429,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message, stoptrying) = GenerateAndAdd(filter, coment);
+            var (newrow, message, stoptrying) = db.Row.GenerateAndAdd(filter.ToList(), coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message, stoptrying); }
             myRow = newrow;
         } else {
@@ -593,106 +539,58 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
 
-    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, FilterCollection? fc, string comment) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
-        if (!string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditNormaly))) { return null; }
-
-        var s = Database.NextRowKey();
-        if (string.IsNullOrEmpty(s)) { return null; }
-
-        return GenerateAndAdd(s, valueOfCellInFirstColumn, fc, true, comment);
-    }
-
-    //                foreach (var thisRow in rowsToExpand) {
-    //                    var s = database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
     /// <summary>
-    ///
+    /// Erstellt eine neue Zeile mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
+    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
+    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
+    /// Am Schluss wird noch das Skript ausgeführt.
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="valueOfCellInFirstColumn"></param>
     /// <param name="fc"></param>
-    /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, FilterCollection? fc, bool fullprocessing, string comment) {
-        if (Database is not { IsDisposed: false } db) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
-            throw new Exception();
+    public (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(List<FilterItem> filter, string comment) {
+        Database? db2 = null;
+
+        foreach (var thisfi in filter) {
+            if (thisfi.FilterType is not FilterType.Istgleich
+                and not FilterType.Istgleich_GroßKleinEgal
+                and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt", true); }
+
+            if (thisfi.Column == null) { return (null, "Leere Spalte angekommen", true); }
+            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich", true); }
+            db2 ??= db1;
+
+            if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich", true); }
         }
 
-        var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
 
-        if (!string.IsNullOrEmpty(f)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
-            throw new Exception();
-        }
+        if (db2.Column.First() is not { }) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
 
-        var item = SearchByKey(key);
-        if (item != null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
-            throw new Exception();
-        }
+        var f = db2.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f, true); }
 
-        foreach (var thisColum in db.Column) {
-            if (thisColum.Function == ColumnFunction.First && string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Initialwert fehlt!");
-                throw new Exception();
-            }
+        var s = db2.NextRowKey();
+        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
 
-            if (thisColum == db.Column.SplitColumn) {
-                var inval = fc?.InitValue(thisColum, string.IsNullOrWhiteSpace(valueOfCellInFirstColumn));
+        foreach (var thisColum in db2.Column) {
+            if (thisColum.Function == ColumnFunction.First || thisColum == db2.Column.SplitColumn) {
+                var inval = FilterCollection.InitValue(filter, thisColum, true);
                 if (inval == null || string.IsNullOrWhiteSpace(inval)) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Initialwert fehlt!");
-                    throw new Exception();
+                    return (null, "Initalwert fehlt.", false);
                 }
             }
         }
 
-        var u = Generic.UserName;
-        var d = DateTime.UtcNow;
+        return (db2.Row.GenerateAndAddInternal(s, filter, comment), string.Empty, false);
+    }
 
-        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty);
-        if (!string.IsNullOrEmpty(s)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
-            throw new Exception();
-        }
+    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
-        item = SearchByKey(key);
-        if (item == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen, ID Fehler");
-            throw new Exception();
-        }
+        if (db.Column.First() is not { } cf) { return null; }
 
-        if (fullprocessing) {
-            // Dann die Inital-Werte reinschreiben
-            if (fc != null) {
-                foreach (var thisColum in db.Column) {
-                    var val = fc.InitValue(thisColum, string.IsNullOrWhiteSpace(valueOfCellInFirstColumn));
-                    if (!string.IsNullOrWhiteSpace(val)) {
-                        item.CellSet(thisColum, val, "Initialwert neuer Zeile");
-                    }
-                }
-            }
-        }
-
-        if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
-            item.CellSet(db.Column.First(), valueOfCellInFirstColumn, "Initialwert neuer Zeile");
-        } else {
-            Develop.DebugPrint(FehlerArt.Warnung, "Null!");
-        }
-
-        if (item.CellFirstString() != db.Column.First()?.AutoCorrect(valueOfCellInFirstColumn, true)) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
-        }
-
-        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
-        //if (db.Column.HasKeyColumns()) {
-        //    _ = item.ExecuteScript(ScriptEventTypes.keyvalue_changed, string.Empty, true, true, true, 0.1f, null, true);
-        //}
-        //_ = item.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 0.1f, null, true);
-        //_ = item.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0.1f, null, true);
-
-        return item;
+        return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
     }
 
     //    List<Database> done = new();
@@ -851,32 +749,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
-    //internal void CloneFrom(Database sourceDatabase) {
-    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-
-    //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
-    //    if (!string.IsNullOrEmpty(f)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
-    //        throw new Exception();
-    //    }
-
-    //    // Zeilen, die zu viel sind, löschen
-    //    foreach (var thisRow in this) {
-    //        var l = sourceDatabase.Row.SearchByKey(thisRow.KeyName);
-    //        if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
-    //    }
-
-    //    // Zeilen erzeugen und Format übertragen
-    //    foreach (var thisRow in sourceDatabase.Row) {
-    //        var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
-    //        l.CloneFrom(thisRow, true);
-    //    }
-
-    //    if (sourceDatabase.Row.Count != Count) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Clone Fehlgeschlagen");
-    //    }
-    //}
-
     internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
 
@@ -904,11 +776,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var row = SearchByKey(rowkey);
             if (row == null) { return "Zeile nicht gefunden!"; }
 
-
             if (reason != Reason.NoUndo_NoInvalidate) {
                 OnRowRemoving(new RowEventArgs(row));
             }
-
 
             if (reason == Reason.SetCommand) {
                 row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
@@ -931,14 +801,28 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return "Befehl unbekannt";
     }
 
+    //    if (sourceDatabase.Row.Count != Count) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Clone Fehlgeschlagen");
+    //    }
+    //}
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
+    //    // Zeilen erzeugen und Format übertragen
+    //    foreach (var thisRow in sourceDatabase.Row) {
+    //        var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
+    //        l.CloneFrom(thisRow, true);
+    //    }
     internal void Repair() {
         foreach (var thisR in _internal) {
             thisR.Value.Repair();
         }
     }
 
+    //    // Zeilen, die zu viel sind, löschen
+    //    foreach (var thisRow in this) {
+    //        var l = sourceDatabase.Row.SearchByKey(thisRow.KeyName);
+    //        if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
+    //    }
     private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
         if (row1 == null) { return row2; }
         if (row2 == null) { return row1; }
@@ -951,11 +835,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
     }
 
+    //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+    //    if (!string.IsNullOrEmpty(f)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
+    //        throw new Exception();
+    //    }
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
         _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, 10, null, true, false);
     }
 
+    //internal void CloneFrom(Database sourceDatabase) {
+    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
@@ -969,7 +860,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
 
-        if (reason != Reason.NoUndo_NoInvalidate ) {
+        if (reason != Reason.NoUndo_NoInvalidate) {
             OnRowAdded(new RowEventArgs(row));
             if (Database?.Column.SysRowState != null) {
                 InvalidatedRows.AddIfNotExists(row);
@@ -990,6 +881,61 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             IsDisposed = true;
         }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="fc"></param>
+    /// <param name="comment"></param>
+    /// <returns></returns>
+    private RowItem GenerateAndAddInternal(string key, List<FilterItem> fc, string comment) {
+        if (Database is not { IsDisposed: false } db) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
+            throw new Exception();
+        }
+
+        var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+
+        if (!string.IsNullOrEmpty(f)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
+            throw new Exception();
+        }
+
+        var item = SearchByKey(key);
+        if (item != null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
+            throw new Exception();
+        }
+
+        var u = Generic.UserName;
+        var d = DateTime.UtcNow;
+
+        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty);
+        if (!string.IsNullOrEmpty(s)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
+            throw new Exception();
+        }
+
+        item = SearchByKey(key);
+        if (item == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen, ID Fehler");
+            throw new Exception();
+        }
+
+        // Dann die Inital-Werte reinschreiben
+
+        foreach (var thisColum in db.Column) {
+            var val = FilterCollection.InitValue(fc, thisColum, true);
+            if (!string.IsNullOrWhiteSpace(val)) {
+                item.CellSet(thisColum, val, "Initialwert neuer Zeile");
+            }
+        }
+
+        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
+
+        return item;
     }
 
     private void OnRowAdded(RowEventArgs e) {

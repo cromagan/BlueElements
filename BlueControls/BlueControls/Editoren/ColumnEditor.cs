@@ -621,7 +621,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         var spalteauDb = linkdb.Column[cbxTargetColumn.Text];
 
         foreach (var col in linkdb.Column) {
-            var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, null, "Neue Spalte");
+            var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
 
             if (r != null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
