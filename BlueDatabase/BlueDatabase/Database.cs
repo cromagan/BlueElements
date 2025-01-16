@@ -3102,7 +3102,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         // Script-Überprüfung
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
-        if (e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
+        if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
 
         if (!HasChangedChunks() || !LogUndo) {
             _checkerTickCount = 0;
