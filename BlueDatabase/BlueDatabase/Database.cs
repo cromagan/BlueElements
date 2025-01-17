@@ -1195,7 +1195,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        var chunk = DatabaseChunk.GetChunkName(this, command, chunkvalue);
+        var chunk = DatabaseChunk.GetChunkName(this, command, chunkvalue, column?.KeyName ?? string.Empty);
 
         _saveRequired = true;
 

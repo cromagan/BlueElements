@@ -920,7 +920,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // Dann die Inital-Werte reinschreiben
 
-        foreach (var thisColum in db.Column) {
+        List<ColumnItem> l = [.. db.Column];
+        if (db.Column.SplitColumn is { } spc) {
+            l.Remove(spc);
+            l.Insert(0, spc);
+        }
+
+        foreach (var thisColum in l) {
             var val = FilterCollection.InitValue(fc, thisColum, true);
             if (!string.IsNullOrWhiteSpace(val)) {
                 item.CellSet(thisColum, val, "Initialwert neuer Zeile");

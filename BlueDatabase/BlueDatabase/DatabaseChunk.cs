@@ -175,7 +175,7 @@ public class DatabaseChunk : Database {
                         if (thisWorkItem.LogsUndo(db)) {
                             n++;
 
-                            var chunkname = GetChunkName(db, thisWorkItem.Command, thisWorkItem.ChunkValue);
+                            var chunkname = GetChunkName(db, thisWorkItem.Command, thisWorkItem.ChunkValue, thisWorkItem.ColName);
                             if (!string.IsNullOrEmpty(chunkname)) {
                                 var rowchunk = GetOrMakechunk(chunks, db, chunkname);
                                 rowchunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
@@ -206,15 +206,18 @@ public class DatabaseChunk : Database {
     public static string GetChunkName(RowItem r) {
         if (r.Database?.Column.SplitColumn is not { }) { return Chunk_MainData; }
 
-        return GetChunkName(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
+        return GetChunkName(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r), string.Empty);
     }
 
-    public static string GetChunkName(Database db, DatabaseDataType type, string value) {
+    public static string GetChunkName(Database db, DatabaseDataType type, string value, string columnItem) {
         if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData; }
 
         if (type is DatabaseDataType.Command_RemoveRow or DatabaseDataType.Command_AddRow
             or DatabaseDataType.Command_RemoveColumn or DatabaseDataType.Command_AddColumnByName
             or DatabaseDataType.Command_NewStart) { return string.Empty; }
+
+        // Werteänderungen von Split-Spalten nicht loggen. Neue Zeilen werden mit dem Wert initialisert und sind somit noch nicht richtig zugeordnet
+        if (type.IsCellValue() && string.Equals(columnItem, spc.KeyName, StringComparison.OrdinalIgnoreCase)) { return string.Empty; }
 
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases; }
@@ -287,7 +290,7 @@ public class DatabaseChunk : Database {
         foreach (var file in chunkFiles) {
             var chunkName = file.FileNameWithoutSuffix();
 
-            var (_, ok) = LoadChunkWithChunkId(chunkName, true, null);
+            var (_, ok) = LoadChunkWithChunkId(chunkName, true, null, false);
             if (!ok) { return false; }
         }
 
@@ -301,11 +304,11 @@ public class DatabaseChunk : Database {
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public override (bool loaded, bool ok) LoadChunkfromValue(string value, DatabaseDataType type, bool important, NeedPassword? needPassword) {
-        var chunkname = GetChunkName(this, type, value);
+        var chunkname = GetChunkName(this, type, value, string.Empty);
 
         if (string.IsNullOrEmpty(chunkname)) { return (false, false); }
 
-        return LoadChunkWithChunkId(chunkname, important, needPassword);
+        return LoadChunkWithChunkId(chunkname, important, needPassword, false);
     }
 
     /// <summary>
@@ -315,7 +318,7 @@ public class DatabaseChunk : Database {
     /// <param name="chunkname"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public (bool loaded, bool ok) LoadChunkWithChunkId(string chunkname, bool important, NeedPassword? needPassword) {
+    public (bool loaded, bool ok) LoadChunkWithChunkId(string chunkname, bool important, NeedPassword? needPassword, bool mustExist) {
         //if (Column.SplitColumn == null) { return (false, true); }
 
         if (string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
@@ -332,10 +335,15 @@ public class DatabaseChunk : Database {
 
         if (chunk.LoadFailed) { return (false, false); }
         OnLoading();
-        var ok = (true, Parse(chunk, needPassword));
+        var ok = Parse(chunk, needPassword);
 
         OnLoaded();
-        return ok;
+
+        if (ok && mustExist && chunk.Bytes.Length == 0) {
+            chunk.SaveRequired = true;
+        }
+
+        return (!chunk.LoadFailed, ok);
     }
 
     public override void ReorganizeChunks() {
@@ -375,7 +383,7 @@ public class DatabaseChunk : Database {
     public List<RowItem> RowsOfChunk(string chunkid) => Row.Where(r => GetChunkName(r) == chunkid).ToList();
 
     internal override string IsChunkEditable(string chunkid) {
-        var (_, ok) = LoadChunkWithChunkId(chunkid, true, null);
+        var (_, ok) = LoadChunkWithChunkId(chunkid, true, null, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -391,10 +399,10 @@ public class DatabaseChunk : Database {
     protected override void CheckSysUndoNowOfMe() {
         base.CheckSysUndoNowOfMe();
 
-        LoadChunkWithChunkId(Chunk_MainData, false, null);
-        LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null);
-        LoadChunkWithChunkId(Chunk_Master, false, null);
-        LoadChunkWithChunkId(Chunk_Variables, false, null);
+        LoadChunkWithChunkId(Chunk_MainData, false, null, true);
+        LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true);
+        LoadChunkWithChunkId(Chunk_Master, false, null, true);
+        LoadChunkWithChunkId(Chunk_Variables, false, null, true);
     }
 
     protected override void DidLastChanges() {
@@ -470,6 +478,8 @@ public class DatabaseChunk : Database {
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (Develop.AllReadOnly) { return string.Empty; }
+
+        //if (column != null && column == Column.SplitColumn) { return string.Empty; }
 
         if (string.IsNullOrEmpty(f) && _chunks.TryGetValue(chunkId, out var chk)) {
             chk.SaveRequired = true;
