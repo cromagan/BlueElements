@@ -1228,7 +1228,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 if (!_ignoreAtRowFilter) { return "Diese Spalte muss bei Zeilenfiltern ignoriert werden."; }
 
                 if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Auto-Filter müssen bei dieser Spalte erlaubt sein."; }
-
+                if (_showUndo) { return "Undo bei dieser Spalte nicht erlaubt."; }
                 break;
 
             case ColumnFunction.First:

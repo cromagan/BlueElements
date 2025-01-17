@@ -650,24 +650,24 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(Database, fi), comment);
 
-    public bool RemoveOlderThan(float inHours, string comment) {
-        if (Database?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
+    //public bool RemoveOlderThan(float inHours, string comment) {
+    //    if (Database?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
 
-        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
-        //foreach (var thisrowitem in _Internal.Values)
-        //{
-        //    if (thisrowitem != null)
-        //    {
-        //        var D = thisrowitem.CellGetDateTime(database.Column.SysRowCreateDate());
-        //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
-        //    }
-        //}
-        if (x.Count == 0) { return false; }
-        foreach (var thisKey in x) {
-            _ = Remove(thisKey, comment);
-        }
-        return true;
-    }
+    //    var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
+    //    //foreach (var thisrowitem in _Internal.Values)
+    //    //{
+    //    //    if (thisrowitem != null)
+    //    //    {
+    //    //        var D = thisrowitem.CellGetDateTime(database.Column.SysRowCreateDate());
+    //    //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
+    //    //    }
+    //    //}
+    //    if (x.Count == 0) { return false; }
+    //    foreach (var thisKey in x) {
+    //        _ = Remove(thisKey, comment);
+    //    }
+    //    return true;
+    //}
 
     /// <summary>
     /// Löscht die Jüngste Zeile

@@ -225,7 +225,7 @@ public class DatabaseChunk : Database {
         if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC
                  or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Chunk_Master; }
 
-        if (type.IsCellValue() || type != DatabaseDataType.Undo) {
+        if (type.IsCellValue() || type == DatabaseDataType.Undo) {
             switch (spc.Function) {
                 case ColumnFunction.Split_Medium:
                     return value.ToLower().GetHashString().Right(2).ToLower();
@@ -400,9 +400,14 @@ public class DatabaseChunk : Database {
         base.CheckSysUndoNowOfMe();
 
         LoadChunkWithChunkId(Chunk_MainData, false, null, true);
-        LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true);
-        LoadChunkWithChunkId(Chunk_Master, false, null, true);
-        LoadChunkWithChunkId(Chunk_Variables, false, null, true);
+
+        Column.GetSystems();
+
+        if (Column.SplitColumn != null) {
+            LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true);
+            LoadChunkWithChunkId(Chunk_Master, false, null, true);
+            LoadChunkWithChunkId(Chunk_Variables, false, null, true);
+        }
     }
 
     protected override void DidLastChanges() {
