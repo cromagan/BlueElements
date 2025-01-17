@@ -601,8 +601,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void UnRegisterEvents() {
         if (_column != null) {
             _column.PropertyChanged -= _column_PropertyChanged;
-            if (_column.Database is { IsDisposed: false } db) {
-                db.Cell.CellValueChanged += Cell_CellValueChanged;
+            if (_column.Database is { } db) {
+                db.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
         }
     }

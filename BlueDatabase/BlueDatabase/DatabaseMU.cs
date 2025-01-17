@@ -38,14 +38,10 @@ public class DatabaseMu : Database {
 
     #region Fields
 
-    public static int MaxMasterCount = 3;
-
-    /// <summary>
-    /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
-    /// </summary>
     private bool _masterNeeded;
 
     private string _myFragmentsFilename = string.Empty;
+
     private StreamWriter? _writer;
 
     #endregion
@@ -65,7 +61,13 @@ public class DatabaseMu : Database {
     #region Properties
 
     public new static string DatabaseId => nameof(DatabaseMu);
+
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
+
+    /// <summary>
+    /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
+    /// </summary>
+    public override bool MasterNeeded => _masterNeeded;
 
     #endregion
 
@@ -97,20 +99,6 @@ public class DatabaseMu : Database {
         return mins > ranges && mins < rangee;
     }
 
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
-        if (string.IsNullOrEmpty(Filename)) { return null; }
-
-        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mbdb";
-
-        if (checkExists && !File.Exists(f)) { return null; }
-
-        return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
-    }
-
-    //    var db = new DatabaseMu(ci.TableName);
-    //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
-    //    return db;
-    //}
     public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (FileExists(fileNameToLoad)) {
             Filename = fileNameToLoad;
@@ -122,9 +110,6 @@ public class DatabaseMu : Database {
         base.LoadFromFile(fileNameToLoad, createWhenNotExisting, needPassword, freeze, ronly);
     }
 
-    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-    //    if (ci.AdditionalData.FileSuffix().ToUpperInvariant() is not "MBDB") { return null; }
-    //    if (!FileExists(ci.AdditionalData)) { return null; }
     public override bool Save() {
         if (_writer == null) { return true; }
 
@@ -134,28 +119,6 @@ public class DatabaseMu : Database {
             }
             return true;
         } catch { return false; }
-    }
-
-    //public new static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
-    protected override List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked) {
-        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
-
-        if (allreadychecked != null) {
-            foreach (var thisa in allreadychecked) {
-                if (thisa is { IsDisposed: false } db) {
-                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
-                }
-            }
-        }
-
-        var nn = Directory.GetFiles(Filename.FilePath(), "*.mbdb", SearchOption.AllDirectories);
-        var gb = new List<ConnectionInfo>();
-        foreach (var thisn in nn) {
-            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
-            if (t != null) { gb.Add(t); }
-        }
-        return gb;
     }
 
     protected override void DidLastChanges() {
@@ -362,6 +325,8 @@ public class DatabaseMu : Database {
         return oo;
     }
 
+    protected override bool SaveRequired() => true; // immer "speichern"
+
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunk) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, chunk);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -400,31 +365,6 @@ public class DatabaseMu : Database {
         return Filename.FilePath() + "Frgm\\";
     }
 
-    private bool NewMasterPossible() {
-        if (ReadOnly) { return false; }
-        if (!IsAdministrator()) { return false; }
-
-        if (DateTimeTryParse(TemporaryDatabaseMasterTimeUtc, out var dt)) {
-            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < 60) { return false; }
-            if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
-        }
-
-        if (RowCollection.WaitDelay > 90) { return true; }
-
-        if (_masterNeeded) { return true; }
-        if (DateTime.UtcNow.Subtract(FileStateUtcDate).TotalDays > 3) { return true; } // Letze Komplettierung, aber _masterneeded prüft das auch schon
-
-        var masters = 0;
-        foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseMu && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
-                masters++;
-                if (masters >= MaxMasterCount) { return false; }
-            }
-        }
-
-        return true;
-    }
-
     private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {
             Freeze("Fragmentpfad nicht gesetzt. Stand: " + IsInCache.ToString5());
@@ -457,21 +397,6 @@ public class DatabaseMu : Database {
             _writer.WriteLine(l.ParseableItems().FinishParseable());
             _writer.Flush();
         } catch { }
-    }
-
-    /// <summary>
-    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
-    /// </summary>
-    private void TryToSetMeTemporaryMaster() {
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
-
-        if (AmITemporaryMaster(0, 60)) { return; }
-
-        if (!NewMasterPossible()) { return; }
-
-        RowCollection.WaitDelay = 0;
-        TemporaryDatabaseMasterUser = MyMasterCode;
-        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
     }
 
     #endregion

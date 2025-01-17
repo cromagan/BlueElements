@@ -277,7 +277,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         if (FilterInput is { IsDisposed: false } fi) {
             for (var fz = 0; fz < fi.Count; fz++) {
-                if (fi[fz] is { IsDisposed: false } thisf) {
+                if (fi[fz] is { } thisf) {
                     var nam = "Filter" + fz;
                     vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
                     fis = fis + nam + ",";

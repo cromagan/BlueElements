@@ -30,7 +30,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase, IDisposableExtended, ICloneable, IEditable {
+public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase, ICloneable, IEditable {
 
     #region Fields
 
@@ -122,12 +122,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     #endregion
 
-    #region Destructors
-
-    ~FilterItem() { Dispose(disposing: false); }
-
-    #endregion
-
     #region Events
 
     public event EventHandler? PropertyChanged;
@@ -143,7 +137,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     public ColumnItem? Column {
         get => _column;
         set {
-            if (IsDisposed) { return; }
             if (value == _column) { return; }
             OnChanging();
             _column = value;
@@ -157,13 +150,14 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     public Database? Database {
         get => _database;
         private set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value?.IsDisposed ?? true) { value = null; }
             if (value == _database) { return; }
 
             if (_database != null) {
                 _database.DisposingEvent -= _database_Disposing;
             }
             _database = value;
+            OnPropertyChanged();
 
             if (_database != null) {
                 _database.DisposingEvent += _database_Disposing;
@@ -176,7 +170,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     public FilterType FilterType {
         get => _filterType;
         set {
-            if (IsDisposed) { return; }
             if (value == _filterType) { return; }
             OnChanging();
             _filterType = value;
@@ -184,14 +177,11 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         }
     }
 
-    public bool IsDisposed { get; private set; }
-
     public string KeyName { get; private set; }
 
     public string Origin {
         get => _origin;
         set {
-            if (IsDisposed) { return; }
             if (value == _origin) { return; }
             OnChanging();
             _origin = value;
@@ -213,7 +203,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     public ReadOnlyCollection<string> SearchValue {
         get => _searchValue;
         set {
-            if (IsDisposed) { return; }
             if (!value.IsDifferentTo(_searchValue)) { return; }
             OnChanging();
             _searchValue = value;
@@ -226,7 +215,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     #region Methods
 
     public void Changeto(FilterType type, IEnumerable<string> searchvalue) {
-        if (IsDisposed) { return; }
         var svl = searchvalue.ToList();
         if (type == _filterType && !svl.IsDifferentTo(_searchValue)) { return; }
         OnChanging();
@@ -246,31 +234,23 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         return fi;
     }
 
-    public void Dispose() {
-        // ƒndern Sie diesen Code nicht. F¸gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    public bool Equals(FilterItem? thisFilter) => !IsDisposed &&
-                                                  thisFilter != null &&
+    public bool Equals(FilterItem? thisFilter) => thisFilter != null &&
                                                   thisFilter.FilterType == _filterType &&
                                                   thisFilter.Column == _column &&
                                                   thisFilter._origin == _origin &&
                                                   thisFilter.SearchValue.JoinWithCr() == _searchValue.JoinWithCr();
 
     public string ErrorReason() {
-        if (IsDisposed) { return "Filter verworfen"; }
+        if (Database == null) { return "Keine Datenbank angegeben"; }
+
+        if (Database.IsDisposed) { return "Datenbank verworfen"; }
+        //if (IsDisposed) { return "Filter verworfen"; }
 
         //if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
 
         if (_filterType == FilterType.AlwaysFalse) { return string.Empty; }
 
         if (_filterType is FilterType.GroﬂKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
-
-        if (Database == null) { return "Keine Datenbank angegeben"; }
-
-        if (Database.IsDisposed) { return "Datenbank verworfen"; }
 
         if (_column != null && _column?.Database != Database) { return "Datenbanken inkonsistent"; }
 
@@ -320,18 +300,14 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     }
 
     public void OnChanging() {
-        if (IsDisposed) { return; }
         PropertyChanging?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnPropertyChanged() {
-        if (IsDisposed) { return; }
         PropertyChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-
         try {
             // F¸r FlexiForFilter werden auch "ung¸ltige" Filter benˆtigt
             // z.B. Instr ohn Text
@@ -496,20 +472,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-                Column = null;
-                Database = null;
-            }
-            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
-
-            IsDisposed = true;
-        }
-    }
+    private void _database_Disposing(object sender, System.EventArgs e) => Database = null;
 
     #endregion
 }

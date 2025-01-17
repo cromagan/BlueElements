@@ -173,7 +173,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         #region Wenn ein Filter übergeben wurde, die Einträge markieren
 
-        if (fc?[_column] is { IsDisposed: false } myFilter) {
+        if (fc?[_column] is { } myFilter) {
             if (myFilter.FilterType.HasFlag(FilterType.Istgleich)) {
                 if (myFilter.SearchValue.Count == 0 || (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]))) {
                     // Filter Leere anzeigen

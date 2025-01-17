@@ -327,8 +327,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return null;
     }
 
-    public static bool Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(fi), comment);
-
     public static bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
         var allrows = new List<RowItem>();
         if (fc?.Rows is { Count: > 0 } rows) { allrows.AddRange(rows); }
@@ -364,7 +362,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public static bool Remove(RowItem? row, string comment) {
         if (row is not { IsDisposed: false } r) { return false; }
-        return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, r.GetChunkValue()));
+        return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, DatabaseChunk.GetChunkValue(r)));
     }
 
     /// <summary>
@@ -650,6 +648,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return foundrow;
     }
 
+    public bool Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(Database, fi), comment);
+
     public bool RemoveOlderThan(float inHours, string comment) {
         if (Database?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
 
@@ -699,12 +699,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         #endregion
-    }
-
-    public List<RowItem> RowsOfChunk(string chunkid) {
-        return this.Where(r =>
-                   r.GetChunkName(true) == chunkid
-               ).ToList();
     }
 
     public RowItem? SearchByKey(string? key) {

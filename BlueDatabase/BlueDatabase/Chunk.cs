@@ -52,25 +52,20 @@ public class Chunk : IHasKeyName {
         KeyName = chunkName;
     }
 
-    public Chunk(byte[] bLoaded) {
-        _bytes = bLoaded.ToList();
-        KeyName = Database.Chunk_MainData;
-    }
-
     #endregion
 
     #region Properties
 
     public byte[] Bytes => _bytes.ToArray();
-    public bool DataChanged { get; set; } = false;
     public long DataLenght => _bytes?.Count ?? 0;
-    public bool IsMain => KeyName == Database.Chunk_MainData;
+    public bool IsMain => KeyName == DatabaseChunk.Chunk_MainData;
     public string KeyName { get; private set; }
     public string LastEditApp { get; private set; } = string.Empty;
     public string LastEditMachineName { get; private set; } = string.Empty;
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
     public string LastEditUser { get; private set; } = string.Empty;
     public bool LoadFailed { get; private set; } = false;
+    public bool SaveRequired { get; set; } = false;
 
     private string ChunkFileName {
         get {
@@ -78,15 +73,36 @@ public class Chunk : IHasKeyName {
 
             var folder = MainFileName.FilePath();
             var databasename = MainFileName.FileNameWithoutSuffix();
-            var suffix = MainFileName.FileSuffix();
 
-            return $"{folder}{databasename}\\{KeyName}.{suffix}c";
+            return $"{folder}{databasename}\\{KeyName}.bdbc";
         }
     }
 
     #endregion
 
     #region Methods
+
+    public static (List<byte> bytes, string fileinfo, bool failed) LoadBytesFromDisk(string filename) {
+        var startTime = DateTime.UtcNow;
+
+        while (true) {
+            try {
+                var fileinfo = GetFileInfo(filename, true);
+                var bLoaded = File.ReadAllBytes(filename);
+                if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
+                return (bLoaded.ToList(), fileinfo, false);
+            } catch (Exception ex) {
+                // Home Office kann lange blockieren....
+                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
+
+                    return ([], string.Empty, true);
+                }
+            }
+
+            Pause(0.5, false);
+        }
+    }
 
     public bool DataOk(int minLen) {
         if (LoadFailed) { return true; }
@@ -134,37 +150,9 @@ public class Chunk : IHasKeyName {
             return;
         }
 
-        var startTime = DateTime.UtcNow;
-
-        while (true) {
-            try {
-                //var f = EditableErrorReason(EditableErrorReasonType.Load);
-
-                _lastcheck = DateTime.UtcNow;
-                _fileinfo = GetFileInfo(ChunkFileName, true);
-                var bLoaded = File.ReadAllBytes(c);
-                if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
-                _bytes = bLoaded.ToList();
-                ParseLockData();
-                return;
-
-                //if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20) {
-                //    Develop.DebugPrint(FehlerArt.Info, f + "\r\n" + ChunkFileName);
-                //}
-
-                //Pause(0.5, false);
-            } catch (Exception ex) {
-                // Home Office kann lange blokieren....
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + c + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-                    _bytes.Clear();
-                    LoadFailed = true;
-                    return;
-                }
-            }
-
-            Pause(0.5, false);
-        }
+        _lastcheck = DateTime.UtcNow;
+        (_bytes, _fileinfo, LoadFailed) = LoadBytesFromDisk(c);
+        ParseLockData();
     }
 
     /// <summary>
@@ -176,7 +164,7 @@ public class Chunk : IHasKeyName {
     /// <returns></returns>
     public bool NeedsReload(bool important) {
         if (LoadFailed) { return true; }
-        if(string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Datenbanken
+        if (string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Datenbanken
 
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
             var nf = GetFileInfo(ChunkFileName, false);

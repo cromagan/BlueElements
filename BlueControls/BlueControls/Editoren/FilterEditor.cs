@@ -40,7 +40,7 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
 
     public Database? Database {
         get {
-            if (ToEdit is not FilterItem { IsDisposed: false } f) { return null; }
+            if (ToEdit is not FilterItem { } f) { return null; }
             return f.Database;
         }
     }
@@ -76,7 +76,7 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
     }
 
     protected override bool SetValuesToFormula(IEditable? toEdit) {
-        if (toEdit is not FilterItem { IsDisposed: false } fi) { return false; }
+        if (toEdit is not FilterItem { } fi) { return false; }
 
         cbxFilterType.Text = ((int)fi.FilterType).ToString();
 
@@ -88,19 +88,19 @@ public partial class FilterEditor : EditorEasy, IHasDatabase {
     }
 
     private void cbxColumn_TextChanged(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem { IsDisposed: false } fi) { return; }
+        if (ToEdit is not FilterItem { } fi) { return; }
 
         fi.Column = fi.Database?.Column[cbxColumn.Text];
     }
 
     private void cbxFilterType_TextChanged(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem { IsDisposed: false } fi) { return; }
+        if (ToEdit is not FilterItem { } fi) { return; }
 
         fi.FilterType = (FilterType)IntParse(cbxFilterType.Text);
     }
 
     private void txbFilterText_TextChanged(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem { IsDisposed: false } fi) { return; }
+        if (ToEdit is not FilterItem { } fi) { return; }
 
         fi.SearchValue = new List<string> { txbFilterText.Text }.AsReadOnly();
     }

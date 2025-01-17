@@ -52,7 +52,7 @@ public class ConnectionInfo : IReadableTextWithKey, IEditable {
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
 
         if (uniqueId.IsFormat(FormatHolder.FilepathAndName) &&
-            uniqueId.FileSuffix().ToUpperInvariant() is "MDB" or "BDB" or "MBDB") {
+            uniqueId.FileSuffix().ToUpperInvariant() is "MDB" or "BDB" or "MBDB" or "CBDB") {
             foreach (var thisDb in alf) {
                 var d = thisDb.ConnectionData;
 
@@ -177,6 +177,7 @@ public class ConnectionInfo : IReadableTextWithKey, IEditable {
         if (AdditionalData.ToLowerInvariant().Contains(".bdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         if (AdditionalData.ToLowerInvariant().Contains(".mdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         if (AdditionalData.ToLowerInvariant().Contains(".mbdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
+        if (AdditionalData.ToLowerInvariant().Contains(".cbdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         return QuickImage.Get(ImageCode.Datenbank, 16);
     }
 

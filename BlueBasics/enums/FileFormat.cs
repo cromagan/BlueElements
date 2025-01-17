@@ -34,6 +34,7 @@ public enum FileFormat {
     Executable,
     HelpFile,
     Database,
+    DatabaseChunk,
     XMLFile,
     Visitenkarte,
     Sound,

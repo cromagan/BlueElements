@@ -138,7 +138,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public ReadOnlyCollection<RowItem> Rows {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return new List<RowItem>().AsReadOnly(); }
-            _rows ??= CalculateFilteredRows(_internal.ToArray());
+            _rows ??= CalculateFilteredRows(_database, _internal.ToArray());
             return _rows.AsReadOnly();
         }
     }
@@ -146,7 +146,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public RowItem? RowSingleOrNull {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
-            _rows ??= CalculateFilteredRows(_internal.ToArray());
+            _rows ??= CalculateFilteredRows(_database, _internal.ToArray());
             return _rows.Count != 1 ? null : _rows[0];
         }
     }
@@ -170,22 +170,17 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Methods
 
-    public static List<RowItem> CalculateFilteredRows(params FilterItem[] filter) {
-        if (filter == null || filter.Length == 0) { return []; }
+    public static List<RowItem> CalculateFilteredRows(Database? db, params FilterItem[] filter) {
+        //if (filter == null || filter.Length == 0) { return []; }
 
-        if (filter[0].IsDisposed || filter[0].Database is not { IsDisposed: false } db) { return []; }
+        //if (!filter[0].IsOk() || filter[0].Database is not { IsDisposed: false } db) { return []; }
 
         //var fi2 = _internal.ToArray();
         if (db.Column.SplitColumn != null) {
             foreach (var fi in filter) {
                 if (fi.Column == db.Column.SplitColumn) {
-                    var (loaded, ok) = db.LoadChunkfromValue(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+                    var (_, ok) = db.LoadChunkfromValue(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData, false, null);
                     if (!ok) { return []; }
-
-                    if (loaded) {
-                        // OnLoaded kann den Filter disposen
-                        return CalculateFilteredRows(filter);
-                    }
                 }
             }
         }
@@ -204,7 +199,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             });
         } catch {
             Develop.CheckStackForOverflow();
-            return CalculateFilteredRows(filter);
+            return CalculateFilteredRows(db, filter);
         }
 
         return tmpVisibleRows;
@@ -367,10 +362,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         Invalidate_FilteredRows();
         OnPropertyChanged();
 
-        // Aufräumen
-        foreach (var thisF in t) {
-            thisF.Dispose();
-        }
+        //// Aufräumen
+        //foreach (var thisF in t) {
+        //    thisF.Dispose();
+        //}
     }
 
     /// <summary>
@@ -480,7 +475,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         List<string> result = [];
 
         foreach (var thisFilterItem in _internal) {
-            if (thisFilterItem is { IsDisposed: false } && thisFilterItem.IsOk()) {
+            if (thisFilterItem is { } && thisFilterItem.IsOk()) {
                 result.ParseableAdd("Filter", thisFilterItem as IStringable);
             }
         }
@@ -698,9 +693,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
                 Invalidate_FilteredRows();
 
-                foreach (var thisf in _internal) {
-                    thisf.Dispose();
-                }
+                //foreach (var thisf in _internal) {
+                //    thisf.Dispose();
+                //}
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             UnRegisterEvents(_internal);
@@ -775,8 +770,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void UnRegisterEvents(FilterItem fi) {
-        fi.PropertyChanging += Filter_PropertyChanging;
-        fi.PropertyChanged += Filter_PropertyChanged;
+        fi.PropertyChanging -= Filter_PropertyChanging;
+        fi.PropertyChanged -= Filter_PropertyChanged;
     }
 
     #endregion

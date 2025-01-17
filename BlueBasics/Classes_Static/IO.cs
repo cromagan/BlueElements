@@ -297,7 +297,8 @@ public static class IO {
             "VCF" => FileFormat.Visitenkarte,
             "MP3" or "WAV" or "AAC" => FileFormat.Sound,
             "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-            "DB" or "MDB" or "BDB" or "MBDB" => FileFormat.Database,
+            "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Database,
+            "BDBC" => FileFormat.DatabaseChunk,
             "LNK" or "URL" => FileFormat.Link,
             "BCR" => FileFormat.BlueCreativeFile,
             "BCS" => FileFormat.BlueCreativeSymbol,

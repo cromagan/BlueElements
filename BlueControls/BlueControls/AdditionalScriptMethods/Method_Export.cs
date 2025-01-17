@@ -76,11 +76,14 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         #endregion
 
-        #region  Datebank ermitteln (db)
+        #region  Datenbank ermitteln (db)
 
         var db = MyDatabase(scp);
 
         if (db == null || allFi.Database != db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+
+        Database.CheckSysUndoNow([db], true);
+        if (db is DatabaseChunk dbc) { dbc.LoadAllChunks(); }
 
         #endregion
 
@@ -124,7 +127,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
-                        var chunks = Database.GenerateNewChunks(db, 100, db.FileStateUtcDate, false);
+                        var chunks = DatabaseChunk.GenerateNewChunks(db, 100, db.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
                         mainchunk.Save(filn, 100);

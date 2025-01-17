@@ -80,7 +80,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "Datenbanken (*.BDB;*.MBDB)|*.BDB;*.MBDB|Alle Dateien (*.*)|*.*";
+            this.LoadTab.Filter = "Datenbanken (*.BDB;*.MBDB)|*.BDB;*.MBDB;*.CBDB|Alle Dateien (*.*)|*.*";
             this.LoadTab.Multiselect = true;
             this.LoadTab.Title = "Bitte Datenbank wählen.";
             this.LoadTab.FileOk += new CancelEventHandler(this.LoadTab_FileOk);

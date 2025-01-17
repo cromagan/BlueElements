@@ -223,7 +223,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_additionalFormatCheck == value) { return; }
 
-            _ = Database?.ChangeData(DatabaseDataType.AdditionalFormatCheck, this, null, ((int)_additionalFormatCheck).ToString(), ((int)value).ToString(), Generic.UserName, DateTime.UtcNow, string.Empty,string.Empty);
+            _ = Database?.ChangeData(DatabaseDataType.AdditionalFormatCheck, this, null, ((int)_additionalFormatCheck).ToString(), ((int)value).ToString(), Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
             OnPropertyChanged();
         }
     }
@@ -1444,7 +1444,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             #region Aus Dateinamen den Tablename extrahieren
 
             if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
-                _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB");
+                _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB").TrimEnd(".CBDB");
                 LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
             }
 

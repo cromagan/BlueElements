@@ -414,12 +414,12 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
         if (fo.Count == 0) {
             if (_prevFilter is { Count: 1 }) {
-                if (_prevFilter[0] is { IsDisposed: false } fi) {
+                if (_prevFilter[0] is { } fi) {
                     _table.Filter.Remove(fi.Column);
                 }
             }
         } else {
-            if (fo[0] is { IsDisposed: false } fi) {
+            if (fo[0] is { } fi) {
                 _table.Filter.RemoveOtherAndAdd(fi);
             }
         }

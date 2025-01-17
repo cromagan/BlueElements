@@ -517,8 +517,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool MatchesTo(FilterItem fi) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
 
-        if (fi.IsDisposed) { return true; }
-
         if (fi.Database != Database) { return false; }
 
         if (fi.FilterType == FilterType.AlwaysFalse) { return false; }
@@ -912,18 +910,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
         }
-    }
-
-    internal string GetChunkValue() {
-        if (Database?.Column.SplitColumn is not { } spc) { return string.Empty; }
-
-return CellGetString(spc);
-    }
-
-    internal string GetChunkName(bool chunksAllowed) {
-        if (!chunksAllowed || Database?.Column.SplitColumn is not { }) { return Database.Chunk_MainData; }
-
-        return Database.GetChunkName(Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue());
     }
 
     internal void Repair() {
