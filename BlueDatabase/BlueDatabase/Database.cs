@@ -96,7 +96,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     /// Flüchtiger Speicher, wird nur zum Halten von Daten verwendet.
     /// </summary>
-    private readonly ConcurrentDictionary<string, DatabaseChunk> _chunks = new();
+    private readonly ConcurrentDictionary<string, Chunk> _chunks = new();
 
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<DatabaseScriptDescription> _eventScript = [];
@@ -676,12 +676,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public static List<DatabaseChunk>? GenerateNewChunks(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
-        var chunks = new List<DatabaseChunk>();
+    public static List<Chunk>? GenerateNewChunks(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
+        var chunks = new List<Chunk>();
 
         chunksAllowed = chunksAllowed && db.Column.SplitColumn != null;
 
-        var mainChunk = new DatabaseChunk(db.Filename, Chunk_MainData);
+        var mainChunk = new Chunk(db.Filename, Chunk_MainData);
         mainChunk.InitByteList();
         chunks.Add(mainChunk);
 
@@ -690,15 +690,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var masterUserChunk = mainChunk;
 
         if (chunksAllowed) {
-            usesChunk = new DatabaseChunk(db.Filename, Chunk_AdditionalUseCases);
+            usesChunk = new Chunk(db.Filename, Chunk_AdditionalUseCases);
             usesChunk.InitByteList();
             chunks.Add(usesChunk);
 
-            varChunk = new DatabaseChunk(db.Filename, Chunk_Variables);
+            varChunk = new Chunk(db.Filename, Chunk_Variables);
             varChunk.InitByteList();
             chunks.Add(varChunk);
 
-            masterUserChunk = new DatabaseChunk(db.Filename, Chunk_Master);
+            masterUserChunk = new Chunk(db.Filename, Chunk_Master);
             masterUserChunk.InitByteList();
             chunks.Add(masterUserChunk);
         }
@@ -2333,7 +2333,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
         //}
 
-        var MainChunk = new DatabaseChunk(bLoaded);
+        var MainChunk = new Chunk(bLoaded);
         Parse(MainChunk, null);
 
         RepairAfterParse();
@@ -2584,7 +2584,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkname}' der Datenbank {Filename.FileNameWithoutSuffix()}");
 
-        var chunk = new DatabaseChunk(Filename, chunkname);
+        var chunk = new Chunk(Filename, chunkname);
         chunk.LoadBytesFromDisk();
 
         //if (chunk.LoadBytesFromDisk == null) { return false; }
@@ -2774,7 +2774,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         #region Nun gibt es noch Chunk-Leichen
 
         // Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
-        var chunks = new List<DatabaseChunk>();
+        var chunks = new List<Chunk>();
         chunks.AddRange(_chunks.Values);
         foreach (var thisChunk in chunks) {
             if (thisChunk.DataChanged) {
@@ -3064,11 +3064,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return false;
     }
 
-    private static DatabaseChunk GetOrMakechunk(List<DatabaseChunk> chunks, Database db, string chunkId) {
+    private static Chunk GetOrMakechunk(List<Chunk> chunks, Database db, string chunkId) {
         var rowchunk = chunks.Get(chunkId);
 
         if (rowchunk == null) {
-            rowchunk = new DatabaseChunk(db.Filename, chunkId);
+            rowchunk = new Chunk(db.Filename, chunkId);
             rowchunk.InitByteList();
             chunks.Add(rowchunk);
         }
@@ -3263,7 +3263,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private bool Parse(DatabaseChunk chunk, NeedPassword? needPassword) {
+    private bool Parse(Chunk chunk, NeedPassword? needPassword) {
         if (chunk.LoadFailed) { return false; }
 
         OnLoading();

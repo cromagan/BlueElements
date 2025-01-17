@@ -111,7 +111,7 @@
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
-    <Compile Include="DatabaseChunk.cs" />
+    <Compile Include="Chunk.cs" />
     <Compile Include="DatabaseMu.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="Database.cs" />

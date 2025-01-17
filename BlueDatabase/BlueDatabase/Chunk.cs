@@ -34,7 +34,7 @@ using static BlueBasics.Converter;
 namespace BlueDatabase;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class DatabaseChunk : IHasKeyName {
+public class Chunk : IHasKeyName {
 
     #region Fields
 
@@ -47,12 +47,12 @@ public class DatabaseChunk : IHasKeyName {
 
     #region Constructors
 
-    public DatabaseChunk(string mainFileName, string chunkName) {
+    public Chunk(string mainFileName, string chunkName) {
         MainFileName = mainFileName;
         KeyName = chunkName;
     }
 
-    public DatabaseChunk(byte[] bLoaded) {
+    public Chunk(byte[] bLoaded) {
         _bytes = bLoaded.ToList();
         KeyName = Database.Chunk_MainData;
     }
