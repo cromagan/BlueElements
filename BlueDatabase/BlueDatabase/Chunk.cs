@@ -47,9 +47,9 @@ public class Chunk : IHasKeyName {
 
     #region Constructors
 
-    public Chunk(string mainFileName, string chunkName) {
+    public Chunk(string mainFileName, string chunkId) {
         MainFileName = mainFileName;
-        KeyName = chunkName;
+        KeyName = chunkId.ToLower();
     }
 
     #endregion
@@ -58,7 +58,7 @@ public class Chunk : IHasKeyName {
 
     public byte[] Bytes => _bytes.ToArray();
     public long DataLenght => _bytes?.Count ?? 0;
-    public bool IsMain => KeyName == DatabaseChunk.Chunk_MainData;
+    public bool IsMain => string.Equals(KeyName, DatabaseChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
     public string KeyName { get; private set; }
     public string LastEditApp { get; private set; } = string.Empty;
     public string LastEditMachineName { get; private set; } = string.Empty;
@@ -159,7 +159,6 @@ public class Chunk : IHasKeyName {
     ///
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="chunkname"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns></returns>
     public bool NeedsReload(bool important) {

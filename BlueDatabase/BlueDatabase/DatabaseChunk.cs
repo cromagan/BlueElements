@@ -142,9 +142,9 @@ public class DatabaseChunk : Database {
 
                 var rowchunk = mainChunk;
                 if (chunksAllowed && db.Column.SplitColumn is { } spc) {
-                    var chunkname = GetChunkName(thisRow);
-                    if (string.IsNullOrEmpty(chunkname)) { return null; }
-                    rowchunk = GetOrMakechunk(chunks, db, chunkname);
+                    var chunkId = GetChunkId(thisRow);
+                    if (string.IsNullOrEmpty(chunkId)) { return null; }
+                    rowchunk = GetOrMakechunk(chunks, db, chunkId);
                 }
 
                 #endregion
@@ -175,9 +175,9 @@ public class DatabaseChunk : Database {
                         if (thisWorkItem.LogsUndo(db)) {
                             n++;
 
-                            var chunkname = GetChunkName(db, thisWorkItem.Command, thisWorkItem.ChunkValue, thisWorkItem.ColName);
-                            if (!string.IsNullOrEmpty(chunkname)) {
-                                var rowchunk = GetOrMakechunk(chunks, db, chunkname);
+                            var chunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ChunkValue, thisWorkItem.ColName);
+                            if (!string.IsNullOrEmpty(chunkId)) {
+                                var rowchunk = GetOrMakechunk(chunks, db, chunkId);
                                 rowchunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
                                 if (n > 10000) { break; }
                             }
@@ -203,13 +203,13 @@ public class DatabaseChunk : Database {
         }
     }
 
-    public static string GetChunkName(RowItem r) {
+    public static string GetChunkId(RowItem r) {
         if (r.Database?.Column.SplitColumn is not { }) { return Chunk_MainData; }
 
-        return GetChunkName(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r), string.Empty);
+        return GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r), string.Empty);
     }
 
-    public static string GetChunkName(Database db, DatabaseDataType type, string value, string columnItem) {
+    public static string GetChunkId(Database db, DatabaseDataType type, string value, string columnItem) {
         if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData; }
 
         if (type is DatabaseDataType.Command_RemoveRow or DatabaseDataType.Command_AddRow
@@ -288,9 +288,9 @@ public class DatabaseChunk : Database {
 
         var chunkFiles = Directory.GetFiles(chunkPath, "*.bdbc");
         foreach (var file in chunkFiles) {
-            var chunkName = file.FileNameWithoutSuffix();
+            var chunkId = file.FileNameWithoutSuffix();
 
-            var (_, ok) = LoadChunkWithChunkId(chunkName, true, null, false);
+            var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, false);
             if (!ok) { return false; }
         }
 
@@ -304,33 +304,33 @@ public class DatabaseChunk : Database {
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public override (bool loaded, bool ok) LoadChunkfromValue(string value, DatabaseDataType type, bool important, NeedPassword? needPassword) {
-        var chunkname = GetChunkName(this, type, value, string.Empty);
+        var chunkId = GetChunkId(this, type, value, string.Empty);
 
-        if (string.IsNullOrEmpty(chunkname)) { return (false, false); }
+        if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
 
-        return LoadChunkWithChunkId(chunkname, important, needPassword, false);
+        return LoadChunkWithChunkId(chunkId, important, needPassword, false);
     }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="chunkname"></param>
+    /// <param name="chunkId"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public (bool loaded, bool ok) LoadChunkWithChunkId(string chunkname, bool important, NeedPassword? needPassword, bool mustExist) {
+    public (bool loaded, bool ok) LoadChunkWithChunkId(string chunkId, bool important, NeedPassword? needPassword, bool mustExist) {
         //if (Column.SplitColumn == null) { return (false, true); }
 
         if (string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
 
-        if (_chunks.TryGetValue(chunkname, out var chk)) {
+        if (_chunks.TryGetValue(chunkId.ToLower(), out var chk)) {
             if (chk.LoadFailed) { return (false, false); }
             if (!chk.NeedsReload(important)) { return (false, true); }
         }
 
-        OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkname}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
+        OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkId.ToLower()}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
 
-        var chunk = new Chunk(Filename, chunkname);
+        var chunk = new Chunk(Filename, chunkId);
         chunk.LoadBytesFromDisk();
 
         if (chunk.LoadFailed) { return (false, false); }
@@ -380,14 +380,14 @@ public class DatabaseChunk : Database {
         SaveInternal(FileStateUtcDate);
     }
 
-    public List<RowItem> RowsOfChunk(string chunkid) => Row.Where(r => GetChunkName(r) == chunkid).ToList();
+    public List<RowItem> RowsOfChunk(string chunkid) => Row.Where(r => GetChunkId(r) == chunkid.ToLower()).ToList();
 
     internal override string IsChunkEditable(string chunkid) {
         var (_, ok) = LoadChunkWithChunkId(chunkid, true, null, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        if (!_chunks.TryGetValue(chunkid, out var chunk)) {
+        if (!_chunks.TryGetValue(chunkid.ToLower(), out var chunk)) {
             return "Interner Chunk-Fehler";
         }
 
@@ -486,7 +486,7 @@ public class DatabaseChunk : Database {
 
         //if (column != null && column == Column.SplitColumn) { return string.Empty; }
 
-        if (string.IsNullOrEmpty(f) && _chunks.TryGetValue(chunkId, out var chk)) {
+        if (string.IsNullOrEmpty(f) && _chunks.TryGetValue(chunkId.ToLower(), out var chk)) {
             chk.SaveRequired = true;
         }
 

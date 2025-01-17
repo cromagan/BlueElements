@@ -1195,7 +1195,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        var chunk = DatabaseChunk.GetChunkName(this, command, chunkvalue, column?.KeyName ?? string.Empty);
+        var chunk = DatabaseChunk.GetChunkId(this, command, chunkvalue, column?.KeyName ?? string.Empty);
 
         _saveRequired = true;
 
@@ -2520,8 +2520,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="starttimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     protected virtual void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc, DateTime endTimeUtc) {
     }
-
-    protected virtual string GetChunkName() => DatabaseChunk.Chunk_MainData;
 
     protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime startTimeUtc, DateTime endTimeUtc) => ([], null);
 

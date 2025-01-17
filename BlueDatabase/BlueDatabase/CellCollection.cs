@@ -187,7 +187,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { }) {
-                var cn = DatabaseChunk.GetChunkName(row);
+                var cn = DatabaseChunk.GetChunkId(row);
                 return db.IsChunkEditable(cn);
             }
         }
