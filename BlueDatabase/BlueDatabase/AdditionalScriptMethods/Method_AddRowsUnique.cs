@@ -33,7 +33,7 @@ public class Method_AddRowsUnique : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, ListStringVar];
+    public override List<List<string>> Args => [StringVal, ListStringVar, FilterVar];
     public override string Command => "addrowsunique";
     public override List<string> Constants => [];
 
@@ -41,10 +41,11 @@ public class Method_AddRowsUnique : Method_Database {
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
+                                          "Die Werte der Filter werden zusätzlich gesetzte.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
+    public override int LastArgMinCount => 0;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
 
@@ -52,7 +53,7 @@ public class Method_AddRowsUnique : Method_Database {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRowsUnique(database, ZusätzlichesSkript, keyvalues);";
+    public override string Syntax => "AddRowsUnique(database, ZusätzlichesSkript, keyvalues, filter, ...);";
 
     #endregion
 
@@ -83,9 +84,15 @@ public class Method_AddRowsUnique : Method_Database {
         if (c == null) { return new DoItFeedback(ld, "Erste Spalte nicht vorhanden"); }
 
         foreach (var thisKey in keys) {
-            var allFi = new FilterCollection(db, "Method_AddRows") {
-                new(c, FilterType.Istgleich_GroßKleinEgal, thisKey)
-            };
+
+            #region  Filter ermitteln (allfi)
+
+            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName);
+            allFi ??= new FilterCollection(db, "Method_AddRows");
+
+            #endregion
+
+            allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
             var fb = Method_RowUnique.UniqueRow(ld, allFi, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
 
