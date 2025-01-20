@@ -1931,7 +1931,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (table?.Database?.Column.First() is not { } colfirst) { return; }
 
             var fc = new List<FilterItem>() { new FilterItem(colfirst, FilterType.Istgleich, newValue) };
-            fc.AddRange(table.Filter.ToList());
+            foreach (var thisFilter in table.Filter) {
+                if (thisFilter.Column != null) {
+                    fc.Add(thisFilter);
+                }
+            }
 
             var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true, fc);
             if (!string.IsNullOrEmpty(fe)) {

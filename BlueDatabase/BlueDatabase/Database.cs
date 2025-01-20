@@ -2554,7 +2554,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.SetUserDidSomething();
 
         var chunksnew = DatabaseChunk.GenerateNewChunks(this, 1200, setfileStateUtcDateTo, false);
-        if (chunksnew == null || chunksnew.Count != 0) { return false; }
+        if (chunksnew == null || chunksnew.Count != 1) { return false; }
 
         if (!chunksnew[0].DoExtendedSave(5)) { return false; }
 
