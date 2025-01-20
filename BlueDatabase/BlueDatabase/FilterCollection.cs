@@ -216,6 +216,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (column.Database is not { IsDisposed: false } db) { return string.Empty; }
 
         if (column.Function is not ColumnFunction.Normal
+                           and not ColumnFunction.First
                            and not ColumnFunction.Schlüsselspalte
                            and not ColumnFunction.RelationText
                            and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
